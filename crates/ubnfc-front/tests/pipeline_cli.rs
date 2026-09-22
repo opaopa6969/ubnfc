@@ -253,20 +253,31 @@ fn gen_writes_ir_before_backend_exit_for_both_targets() {
     let expected = dir.run(&["ir", "--grammar", "main.ubnf"]);
     code(&expected, 0);
     for target in ["rust", "java"] {
-        let out = dir.run(&[
-            "gen",
-            "--grammar",
-            "main.ubnf",
-            "--target",
-            target,
-            "--out",
-            target,
-        ]);
+        let missing = dir.0.join("missing backend");
+        let variable = if target == "rust" {
+            "UBNFC_RUST_BIN"
+        } else {
+            "UBNFC_JAVA_JAR"
+        };
+        let out = Command::new(env!("CARGO_BIN_EXE_ubnfc"))
+            .current_dir(&dir.0)
+            .env(variable, &missing)
+            .args([
+                "gen",
+                "--grammar",
+                "main.ubnf",
+                "--target",
+                target,
+                "--out",
+                target,
+            ])
+            .output()
+            .unwrap();
         code(&out, 3);
         assert!(out.stdout.is_empty());
         assert!(String::from_utf8(out.stderr)
             .unwrap()
-            .contains("backend 未接続"));
+            .contains(missing.to_str().unwrap()));
         assert_eq!(
             std::fs::read(dir.0.join(target).join("grammar.ir.json")).unwrap(),
             expected.stdout
@@ -340,4 +351,85 @@ fn repository_markers_preserve_nested_logical_paths_after_relocation() {
     assert_eq!(a.stdout, b.stdout);
     let typed = ir::from_json(std::str::from_utf8(&a.stdout).unwrap()).unwrap();
     assert_eq!(typed.sources[0].path, "grammar/main.ubnf");
+}
+
+#[cfg(unix)]
+#[test]
+fn gen_invokes_both_backends_and_propagates_failure() {
+    use std::os::unix::fs::PermissionsExt;
+    let dir = Sandbox::new();
+    dir.write("main.ubnf", VALID);
+    dir.write(
+        "fake backend",
+        "#!/bin/sh\nprintf '%s\\n' \"$@\" > arguments\nexit \"${BACKEND_STATUS:-0}\"\n",
+    );
+    let fake = dir.0.join("fake backend");
+    std::fs::set_permissions(&fake, std::fs::Permissions::from_mode(0o755)).unwrap();
+    dir.write("generator jar.jar", "placeholder");
+    std::fs::copy(&fake, dir.0.join("java")).unwrap();
+    for target in ["rust", "java"] {
+        for status in [0, 7] {
+            let output = Command::new(env!("CARGO_BIN_EXE_ubnfc"))
+                .current_dir(&dir.0)
+                .env("UBNFC_RUST_BIN", "fake backend")
+                .env("UBNFC_JAVA_JAR", dir.0.join("generator jar.jar"))
+                .env("PATH", &dir.0)
+                .env("BACKEND_STATUS", status.to_string())
+                .args([
+                    "gen",
+                    "--grammar",
+                    "main.ubnf",
+                    "--target",
+                    target,
+                    "--out",
+                    "generated sources",
+                ])
+                .output()
+                .unwrap();
+            code(&output, status);
+            let arguments = std::fs::read_to_string(dir.0.join("arguments")).unwrap();
+            let mut expected = Vec::new();
+            let jar = dir.0.join("generator jar.jar");
+            if target == "java" {
+                expected.extend(["-cp", jar.to_str().unwrap(), "org.ubnfc.java.Main"]);
+            }
+            expected.extend(["--ir", "generated sources/grammar.ir.json", "--out"]);
+            if target == "java" {
+                expected.extend(["generated sources/src/main/java", "--package", "target"]);
+            } else {
+                expected.push("generated sources");
+            }
+            expected.push("--emit-driver");
+            assert_eq!(arguments.lines().collect::<Vec<_>>(), expected);
+            assert!(dir.0.join("generated sources/grammar.ir.json").is_file());
+        }
+    }
+}
+
+#[test]
+fn gen_rust_discovers_adjacent_generator_and_builds_driver() {
+    let dir = Sandbox::new();
+    dir.write("main.ubnf", VALID);
+    let out = Command::new(env!("CARGO_BIN_EXE_ubnfc"))
+        .current_dir(&dir.0)
+        .env_remove("UBNFC_RUST_BIN")
+        .args([
+            "gen",
+            "--grammar",
+            "main.ubnf",
+            "--target",
+            "rust",
+            "--out",
+            "generated",
+        ])
+        .output()
+        .unwrap();
+    code(&out, 0);
+    assert!(dir.0.join("generated/src/bin/driver.rs").is_file());
+    let build = Command::new(env!("CARGO"))
+        .current_dir(dir.0.join("generated"))
+        .args(["build", "--offline", "--release"])
+        .output()
+        .unwrap();
+    code(&build, 0);
 }

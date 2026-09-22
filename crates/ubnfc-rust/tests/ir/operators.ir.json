@@ -4,13 +4,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -34,13 +34,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -64,13 +64,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/repeat",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/repeat",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -94,13 +94,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -124,13 +124,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -154,13 +154,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -184,13 +184,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -214,13 +214,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -244,13 +244,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/repeat",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/repeat",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -274,13 +274,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -304,13 +304,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -334,13 +334,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -364,13 +364,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:AddOp/body/choice",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:AddOp/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -394,13 +394,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:AddOp/body/0/literal",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:AddOp/body/0/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -424,13 +424,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:AddOp/body/1/literal",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:AddOp/body/1/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -454,13 +454,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:MulOp/body/choice",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:MulOp/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -484,13 +484,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:MulOp/body/0/literal",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:MulOp/body/0/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -514,13 +514,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:MulOp/body/1/literal",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:MulOp/body/1/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -544,13 +544,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/choice",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -574,13 +574,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -604,13 +604,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -634,13 +634,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/0/literal",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/0/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -664,13 +664,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/1/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -694,13 +694,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/2/literal",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/2/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -724,13 +724,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Number/body/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Number/body/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -754,13 +754,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -784,13 +784,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/0/tokenRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/0/tokenRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -818,7 +818,7 @@
         "followSyncPatterns": null,
         "leftRecursion": "none",
         "progressProven": true,
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "sccId": "scc:0"
       },
       {
@@ -863,7 +863,7 @@
         "memoPolicy": "allEligible",
         "recursive": true,
         "ruleIds": [
-          "Operators::Expr",
+          "Operators::Expression",
           "Operators::Term",
           "Operators::Factor"
         ]
@@ -897,7 +897,7 @@
   "analysisVersion": "ubnfc-analysis.v1-draft1",
   "entry": {
     "grammarId": "grammar:Operators",
-    "ruleId": "Operators::Expr"
+    "ruleId": "Operators::Expression"
   },
   "grammarUnits": [
     {
@@ -913,7 +913,7 @@
         "whitespace": "javaStyle"
       },
       "source": {
-        "end": 843,
+        "end": 855,
         "sourceId": "fixtures/operators.ubnf",
         "start": 0
       },
@@ -925,10 +925,10 @@
     "choices": [
       {
         "candidateOrder": [
-          "expr:fixtures/operators.ubnf:0:843:AddOp/body/0/literal",
-          "expr:fixtures/operators.ubnf:0:843:AddOp/body/1/literal"
+          "expr:fixtures/operators.ubnf:0:855:AddOp/body/0/literal",
+          "expr:fixtures/operators.ubnf:0:855:AddOp/body/1/literal"
         ],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:AddOp/body/choice",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:AddOp/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -936,10 +936,10 @@
       },
       {
         "candidateOrder": [
-          "expr:fixtures/operators.ubnf:0:843:MulOp/body/0/literal",
-          "expr:fixtures/operators.ubnf:0:843:MulOp/body/1/literal"
+          "expr:fixtures/operators.ubnf:0:855:MulOp/body/0/literal",
+          "expr:fixtures/operators.ubnf:0:855:MulOp/body/1/literal"
         ],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:MulOp/body/choice",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:MulOp/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -947,10 +947,10 @@
       },
       {
         "candidateOrder": [
-          "expr:fixtures/operators.ubnf:0:843:Factor/body/0/ruleRef",
-          "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq"
+          "expr:fixtures/operators.ubnf:0:855:Factor/body/0/ruleRef",
+          "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq"
         ],
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/choice",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -969,189 +969,189 @@
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/seq",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/repeat",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/repeat",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/seq",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/seq",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/repeat",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/repeat",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/seq",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:AddOp/body/choice",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:AddOp/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:AddOp/body/0/literal",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:AddOp/body/0/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:AddOp/body/1/literal",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:AddOp/body/1/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:MulOp/body/choice",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:MulOp/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:MulOp/body/0/literal",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:MulOp/body/0/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:MulOp/body/1/literal",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:MulOp/body/1/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/choice",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/0/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/0/literal",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/0/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/1/ruleRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/2/literal",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/2/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Number/body/seq",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Number/body/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/0/tokenRef",
+          "exprId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/0/tokenRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         }
@@ -1180,20 +1180,20 @@
     "operators": [
       {
         "boundaryExprIds": [
-          "expr:fixtures/operators.ubnf:0:843:Expr/body/seq"
+          "expr:fixtures/operators.ubnf:0:855:Expression/body/seq"
         ],
         "liftRecipeIds": [
-          "recipe:Expr"
+          "recipe:Expression"
         ],
         "proof": null,
         "ruleIds": [
-          "Operators::Expr"
+          "Operators::Expression"
         ],
         "strategy": "tierFunctions"
       },
       {
         "boundaryExprIds": [
-          "expr:fixtures/operators.ubnf:0:843:Term/body/seq"
+          "expr:fixtures/operators.ubnf:0:855:Term/body/seq"
         ],
         "liftRecipeIds": [
           "recipe:Term"
@@ -1205,7 +1205,7 @@
         "strategy": "tierFunctions"
       }
     ],
-    "profile": "conservative",
+    "profile": "optimized",
     "triviaCache": {
       "enabled": false,
       "key": [
@@ -1298,11 +1298,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
-        "ruleId": "Operators::Expr",
-        "siteId": "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef/capture/0",
+        "ruleId": "Operators::Expression",
+        "siteId": "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -1313,11 +1313,11 @@
       {
         "cardinality": "list",
         "conversion": "text",
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef",
         "name": "op",
         "occurrenceOrder": "completionInnerBeforeOuter",
-        "ruleId": "Operators::Expr",
-        "siteId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef/capture/0",
+        "ruleId": "Operators::Expression",
+        "siteId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -1327,11 +1327,11 @@
       {
         "cardinality": "list",
         "conversion": "node",
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef",
         "name": "right",
         "occurrenceOrder": "completionInnerBeforeOuter",
-        "ruleId": "Operators::Expr",
-        "siteId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef/capture/0",
+        "ruleId": "Operators::Expression",
+        "siteId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -1342,11 +1342,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Operators::Term",
-        "siteId": "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef/capture/0",
+        "siteId": "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -1357,11 +1357,11 @@
       {
         "cardinality": "list",
         "conversion": "text",
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef",
         "name": "op",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Operators::Term",
-        "siteId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef/capture/0",
+        "siteId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -1371,11 +1371,11 @@
       {
         "cardinality": "list",
         "conversion": "node",
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef",
         "name": "right",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Operators::Term",
-        "siteId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef/capture/0",
+        "siteId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -1386,11 +1386,11 @@
       {
         "cardinality": "scalar",
         "conversion": "text",
-        "exprId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq",
+        "exprId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq",
         "name": "value",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Operators::Number",
-        "siteId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq/capture/0",
+        "siteId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -1475,24 +1475,24 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Expr/body/seq",
+        "id": "expr:fixtures/operators.ubnf:0:855:Expression/body/seq",
         "node": {
           "items": [
-            "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef",
-            "expr:fixtures/operators.ubnf:0:843:Expr/body/1/repeat"
+            "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef",
+            "expr:fixtures/operators.ubnf:0:855:Expression/body/1/repeat"
           ],
           "kind": "seq"
         },
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef/capture/0"
+          "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -1502,14 +1502,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Operators::Term"
         },
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1524,17 +1524,17 @@
           "primitiveProfile": null,
           "transaction": "occurs"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/repeat",
+        "id": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/repeat",
         "node": {
-          "child": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/seq",
+          "child": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/seq",
           "kind": "repeat",
           "max": null,
           "min": 0,
           "terminator": null
         },
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1549,24 +1549,24 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/seq",
+        "id": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef",
-            "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef"
+            "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef",
+            "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef"
           ],
           "kind": "seq"
         },
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef/capture/0"
+          "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -1576,21 +1576,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Operators::AddOp"
         },
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef/capture/0"
+          "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -1600,14 +1600,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Operators::Term"
         },
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1622,24 +1622,24 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Term/body/seq",
+        "id": "expr:fixtures/operators.ubnf:0:855:Term/body/seq",
         "node": {
           "items": [
-            "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef",
-            "expr:fixtures/operators.ubnf:0:843:Term/body/1/repeat"
+            "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef",
+            "expr:fixtures/operators.ubnf:0:855:Term/body/1/repeat"
           ],
           "kind": "seq"
         },
         "ruleId": "Operators::Term",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef/capture/0"
+          "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -1649,14 +1649,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Operators::Factor"
         },
         "ruleId": "Operators::Term",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1671,9 +1671,9 @@
           "primitiveProfile": null,
           "transaction": "occurs"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Term/body/1/repeat",
+        "id": "expr:fixtures/operators.ubnf:0:855:Term/body/1/repeat",
         "node": {
-          "child": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/seq",
+          "child": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/seq",
           "kind": "repeat",
           "max": null,
           "min": 0,
@@ -1681,7 +1681,7 @@
         },
         "ruleId": "Operators::Term",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1696,24 +1696,24 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/seq",
+        "id": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef",
-            "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef"
+            "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef",
+            "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Operators::Term",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef/capture/0"
+          "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -1723,21 +1723,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Operators::MulOp"
         },
         "ruleId": "Operators::Term",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef/capture/0"
+          "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -1747,14 +1747,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Operators::Factor"
         },
         "ruleId": "Operators::Term",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1769,11 +1769,11 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:AddOp/body/choice",
+        "id": "expr:fixtures/operators.ubnf:0:855:AddOp/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/operators.ubnf:0:843:AddOp/body/0/literal",
-            "expr:fixtures/operators.ubnf:0:843:AddOp/body/1/literal"
+            "expr:fixtures/operators.ubnf:0:855:AddOp/body/0/literal",
+            "expr:fixtures/operators.ubnf:0:855:AddOp/body/1/literal"
           ],
           "kind": "choice",
           "selection": "ordered",
@@ -1781,7 +1781,7 @@
         },
         "ruleId": "Operators::AddOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1796,7 +1796,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:AddOp/body/0/literal",
+        "id": "expr:fixtures/operators.ubnf:0:855:AddOp/body/0/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -1805,7 +1805,7 @@
         },
         "ruleId": "Operators::AddOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1820,7 +1820,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:AddOp/body/1/literal",
+        "id": "expr:fixtures/operators.ubnf:0:855:AddOp/body/1/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -1829,7 +1829,7 @@
         },
         "ruleId": "Operators::AddOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1844,11 +1844,11 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:MulOp/body/choice",
+        "id": "expr:fixtures/operators.ubnf:0:855:MulOp/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/operators.ubnf:0:843:MulOp/body/0/literal",
-            "expr:fixtures/operators.ubnf:0:843:MulOp/body/1/literal"
+            "expr:fixtures/operators.ubnf:0:855:MulOp/body/0/literal",
+            "expr:fixtures/operators.ubnf:0:855:MulOp/body/1/literal"
           ],
           "kind": "choice",
           "selection": "ordered",
@@ -1856,7 +1856,7 @@
         },
         "ruleId": "Operators::MulOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1871,7 +1871,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:MulOp/body/0/literal",
+        "id": "expr:fixtures/operators.ubnf:0:855:MulOp/body/0/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -1880,7 +1880,7 @@
         },
         "ruleId": "Operators::MulOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1895,7 +1895,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:MulOp/body/1/literal",
+        "id": "expr:fixtures/operators.ubnf:0:855:MulOp/body/1/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -1904,7 +1904,7 @@
         },
         "ruleId": "Operators::MulOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1919,11 +1919,11 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Factor/body/choice",
+        "id": "expr:fixtures/operators.ubnf:0:855:Factor/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/operators.ubnf:0:843:Factor/body/0/ruleRef",
-            "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq"
+            "expr:fixtures/operators.ubnf:0:855:Factor/body/0/ruleRef",
+            "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq"
           ],
           "kind": "choice",
           "selection": "ordered",
@@ -1931,7 +1931,7 @@
         },
         "ruleId": "Operators::Factor",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1946,14 +1946,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Factor/body/0/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Factor/body/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Operators::Number"
         },
         "ruleId": "Operators::Factor",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1968,18 +1968,18 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq",
+        "id": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq",
         "node": {
           "items": [
-            "expr:fixtures/operators.ubnf:0:843:Factor/body/1/0/literal",
-            "expr:fixtures/operators.ubnf:0:843:Factor/body/1/1/ruleRef",
-            "expr:fixtures/operators.ubnf:0:843:Factor/body/1/2/literal"
+            "expr:fixtures/operators.ubnf:0:855:Factor/body/1/0/literal",
+            "expr:fixtures/operators.ubnf:0:855:Factor/body/1/1/ruleRef",
+            "expr:fixtures/operators.ubnf:0:855:Factor/body/1/2/literal"
           ],
           "kind": "seq"
         },
         "ruleId": "Operators::Factor",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -1994,7 +1994,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/0/literal",
+        "id": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/0/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -2003,7 +2003,7 @@
         },
         "ruleId": "Operators::Factor",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -2018,14 +2018,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/1/ruleRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/1/ruleRef",
         "node": {
           "kind": "ruleRef",
-          "symbolId": "Operators::Expr"
+          "symbolId": "Operators::Expression"
         },
         "ruleId": "Operators::Factor",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -2040,7 +2040,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/2/literal",
+        "id": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/2/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -2049,7 +2049,7 @@
         },
         "ruleId": "Operators::Factor",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -2064,23 +2064,23 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Number/body/seq",
+        "id": "expr:fixtures/operators.ubnf:0:855:Number/body/seq",
         "node": {
           "items": [
-            "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq"
+            "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq"
           ],
           "kind": "seq"
         },
         "ruleId": "Operators::Number",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq/capture/0"
+          "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -2090,16 +2090,16 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq",
+        "id": "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/operators.ubnf:0:843:Number/body/0/0/tokenRef"
+            "expr:fixtures/operators.ubnf:0:855:Number/body/0/0/tokenRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Operators::Number",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -2114,14 +2114,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/operators.ubnf:0:843:Number/body/0/0/tokenRef",
+        "id": "expr:fixtures/operators.ubnf:0:855:Number/body/0/0/tokenRef",
         "node": {
           "kind": "tokenRef",
           "symbolId": "Operators::NUMBER"
         },
         "ruleId": "Operators::Number",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         }
@@ -2136,7 +2136,7 @@
             "conversion": "node",
             "field": "left",
             "siteIds": [
-              "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef/capture/0"
+              "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef/capture/0"
             ]
           },
           {
@@ -2144,7 +2144,7 @@
             "conversion": "text",
             "field": "op",
             "siteIds": [
-              "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef/capture/0"
+              "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef/capture/0"
             ]
           },
           {
@@ -2152,17 +2152,17 @@
             "conversion": "node",
             "field": "right",
             "siteIds": [
-              "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef/capture/0"
+              "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef/capture/0"
             ]
           }
         ],
-        "id": "recipe:Expr",
+        "id": "recipe:Expression",
         "kind": "assocLists",
         "leafFallback": null,
         "onFailure": "mappingFailure",
         "phase": "selectedMapping",
         "resultTypeId": "Binary",
-        "ruleId": "Operators::Expr",
+        "ruleId": "Operators::Expression",
         "transformId": null
       },
       {
@@ -2172,7 +2172,7 @@
             "conversion": "node",
             "field": "left",
             "siteIds": [
-              "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef/capture/0"
+              "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef/capture/0"
             ]
           },
           {
@@ -2180,7 +2180,7 @@
             "conversion": "text",
             "field": "op",
             "siteIds": [
-              "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef/capture/0"
+              "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef/capture/0"
             ]
           },
           {
@@ -2188,7 +2188,7 @@
             "conversion": "node",
             "field": "right",
             "siteIds": [
-              "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef/capture/0"
+              "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef/capture/0"
             ]
           }
         ],
@@ -2208,7 +2208,7 @@
             "conversion": "text",
             "field": "value",
             "siteIds": [
-              "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq/capture/0"
+              "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq/capture/0"
             ]
           }
         ],
@@ -2226,7 +2226,7 @@
     "rules": [
       {
         "annotations": [],
-        "body": "expr:fixtures/operators.ubnf:0:843:Expr/body/seq",
+        "body": "expr:fixtures/operators.ubnf:0:855:Expression/body/seq",
         "eval": null,
         "mappingParams": [
           "left",
@@ -2238,19 +2238,19 @@
           "associativity": "left",
           "baseRuleId": "Operators::Term",
           "canonicalForm": "leftOpRightLists",
-          "leftSiteId": "expr:fixtures/operators.ubnf:0:843:Expr/body/0/ruleRef/capture/0",
-          "opSiteId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/0/ruleRef/capture/0",
+          "leftSiteId": "expr:fixtures/operators.ubnf:0:855:Expression/body/0/ruleRef/capture/0",
+          "opSiteId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/0/ruleRef/capture/0",
           "operatorRuleId": "Operators::AddOp",
           "precedence": 10,
-          "rightSiteId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/1/ruleRef/capture/0"
+          "rightSiteId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/1/ruleRef/capture/0"
         },
         "skip": false,
-        "symbolId": "Operators::Expr",
+        "symbolId": "Operators::Expression",
         "triviaPolicyId": "trivia:javaStyle"
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/operators.ubnf:0:843:Term/body/seq",
+        "body": "expr:fixtures/operators.ubnf:0:855:Term/body/seq",
         "eval": null,
         "mappingParams": [
           "left",
@@ -2262,11 +2262,11 @@
           "associativity": "left",
           "baseRuleId": "Operators::Factor",
           "canonicalForm": "leftOpRightLists",
-          "leftSiteId": "expr:fixtures/operators.ubnf:0:843:Term/body/0/ruleRef/capture/0",
-          "opSiteId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/0/ruleRef/capture/0",
+          "leftSiteId": "expr:fixtures/operators.ubnf:0:855:Term/body/0/ruleRef/capture/0",
+          "opSiteId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/0/ruleRef/capture/0",
           "operatorRuleId": "Operators::MulOp",
           "precedence": 20,
-          "rightSiteId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/1/ruleRef/capture/0"
+          "rightSiteId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/1/ruleRef/capture/0"
         },
         "skip": false,
         "symbolId": "Operators::Term",
@@ -2274,7 +2274,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/operators.ubnf:0:843:AddOp/body/choice",
+        "body": "expr:fixtures/operators.ubnf:0:855:AddOp/body/choice",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -2285,7 +2285,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/operators.ubnf:0:843:MulOp/body/choice",
+        "body": "expr:fixtures/operators.ubnf:0:855:MulOp/body/choice",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -2296,7 +2296,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/operators.ubnf:0:843:Factor/body/choice",
+        "body": "expr:fixtures/operators.ubnf:0:855:Factor/body/choice",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -2307,7 +2307,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/operators.ubnf:0:843:Number/body/seq",
+        "body": "expr:fixtures/operators.ubnf:0:855:Number/body/seq",
         "eval": null,
         "mappingParams": [
           "value"
@@ -2339,7 +2339,7 @@
         "originalName": "NUMBER",
         "qualifiedSymbolId": "Operators::NUMBER",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         },
@@ -2347,13 +2347,13 @@
       },
       {
         "grammarId": "grammar:Operators",
-        "id": "Operators::Expr",
+        "id": "Operators::Expression",
         "kind": "rule",
-        "name": "Expr",
-        "originalName": "Expr",
-        "qualifiedSymbolId": "Operators::Expr",
+        "name": "Expression",
+        "originalName": "Expression",
+        "qualifiedSymbolId": "Operators::Expression",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         },
@@ -2367,7 +2367,7 @@
         "originalName": "Term",
         "qualifiedSymbolId": "Operators::Term",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         },
@@ -2381,7 +2381,7 @@
         "originalName": "AddOp",
         "qualifiedSymbolId": "Operators::AddOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         },
@@ -2395,7 +2395,7 @@
         "originalName": "MulOp",
         "qualifiedSymbolId": "Operators::MulOp",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         },
@@ -2409,7 +2409,7 @@
         "originalName": "Factor",
         "qualifiedSymbolId": "Operators::Factor",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         },
@@ -2423,7 +2423,7 @@
         "originalName": "Number",
         "qualifiedSymbolId": "Operators::Number",
         "source": {
-          "end": 843,
+          "end": 855,
           "sourceId": "fixtures/operators.ubnf",
           "start": 0
         },
@@ -2460,7 +2460,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2468,7 +2468,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2476,7 +2476,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/1/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/1/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2484,7 +2484,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2492,7 +2492,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2500,7 +2500,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Expr/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Expression/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2508,7 +2508,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2516,7 +2516,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2524,7 +2524,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Term/body/1/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Term/body/1/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2532,7 +2532,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Term/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Term/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2540,7 +2540,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Term/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Term/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2548,7 +2548,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Term/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Term/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2556,7 +2556,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2564,7 +2564,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2572,7 +2572,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2580,7 +2580,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 2,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Factor/body/1/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Factor/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2588,7 +2588,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2596,7 +2596,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Number/body/0/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Number/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2604,7 +2604,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Number/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Number/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -2612,7 +2612,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/operators.ubnf:0:843:Number/body/seq"
+            "ownerExprId": "expr:fixtures/operators.ubnf:0:855:Number/body/seq"
           },
           "policyId": "trivia:javaStyle"
         }
@@ -2659,10 +2659,10 @@
   "serialization": "ubnfc-json.v1",
   "sources": [
     {
-      "codePointLength": 843,
+      "codePointLength": 855,
       "id": "fixtures/operators.ubnf",
       "path": "fixtures/operators.ubnf",
-      "sha256": "ed2150086ac0bf0e4f8da2f118a9fe4572f95f5bcfd0466cb5233395ff014857"
+      "sha256": "a1339261daf9774536dfba747401042356d35a33d1ba4b319ce065809368d8db"
     }
   ],
   "version": 1

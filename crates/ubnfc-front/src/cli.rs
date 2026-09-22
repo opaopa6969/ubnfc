@@ -2,7 +2,8 @@
 
 use std::collections::BTreeMap;
 use std::io::{self, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use serde_json::json;
 
@@ -65,18 +66,107 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         std::fs::create_dir_all(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
         let path = dir.join("grammar.ir.json");
         std::fs::write(&path, output).map_err(|e| format!("{}: {e}", path.display()))?;
-        eprintln!(
-            "ubnfc: {} backend 未接続（IR: {}）",
-            options.target.as_deref().expect("gen --target"),
-            path.display()
-        );
-        return Ok(3);
+        return generate_backend(options.target.as_deref().expect("gen --target"), &path, dir);
     }
     match options.out.as_deref().unwrap_or("-") {
         "-" => stdout(&output)?,
         path => std::fs::write(path, output).map_err(|e| format!("{path}: {e}"))?,
     }
     Ok(0)
+}
+
+fn generate_backend(target: &str, ir: &Path, out: &Path) -> Result<i32, String> {
+    let variable = if target == "rust" {
+        "UBNFC_RUST_BIN"
+    } else {
+        "UBNFC_JAVA_JAR"
+    };
+    let mut searched = Vec::new();
+    let mut candidates = Vec::new();
+    if let Some(path) = std::env::var_os(variable) {
+        // 明示指定を優先し、typo を他の生成器への fallback で隠さない。
+        candidates.push(PathBuf::from(path));
+    } else {
+        let mut roots = vec![PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")];
+        if let Ok(cwd) = std::env::current_dir() {
+            roots.extend(cwd.ancestors().map(Path::to_owned));
+        }
+        if let Ok(exe) = std::env::current_exe() {
+            if let Some(dir) = exe.parent() {
+                if target == "rust" {
+                    candidates
+                        .push(dir.join(format!("ubnfc-rust{}", std::env::consts::EXE_SUFFIX)));
+                }
+                roots.extend(dir.ancestors().map(Path::to_owned));
+            }
+        }
+        if target == "rust" {
+            let mut targets = roots.iter().map(|p| p.join("target")).collect::<Vec<_>>();
+            if let Some(dir) = std::env::var_os("CARGO_TARGET_DIR") {
+                targets.insert(0, dir.into());
+            }
+            for dir in targets {
+                for profile in ["debug", "release"] {
+                    candidates.push(
+                        dir.join(profile)
+                            .join(format!("ubnfc-rust{}", std::env::consts::EXE_SUFFIX)),
+                    );
+                }
+            }
+        } else {
+            for root in roots {
+                let dir = root.join("ubnfc-java/target");
+                searched.push(dir.join("ubnfc-java-*.jar"));
+                if let Ok(entries) = std::fs::read_dir(dir) {
+                    let mut jars = entries
+                        .filter_map(Result::ok)
+                        .map(|e| e.path())
+                        .filter(|p| {
+                            p.file_name().and_then(|n| n.to_str()).is_some_and(|n| {
+                                n.starts_with("ubnfc-java-")
+                                    && n.ends_with(".jar")
+                                    && !n.ends_with("-sources.jar")
+                                    && !n.ends_with("-javadoc.jar")
+                            })
+                        })
+                        .collect::<Vec<_>>();
+                    jars.sort();
+                    candidates.extend(jars);
+                }
+            }
+        }
+    }
+    searched.extend(candidates.iter().cloned());
+    let Some(generator) = candidates.iter().find(|p| p.is_file()) else {
+        eprintln!("ubnfc: {target} backend が見つかりません（{variable} で指定可能、IR: {}）。探索パス:\n{}", ir.display(), searched.iter().map(|p| format!("  {}",p.display())).collect::<Vec<_>>().join("\n"));
+        return Ok(3);
+    };
+    let generator = generator
+        .canonicalize()
+        .map_err(|e| format!("{}: {e}", generator.display()))?;
+    let mut command = if target == "rust" {
+        Command::new(&generator)
+    } else {
+        let mut command = Command::new("java");
+        command
+            .arg("-cp")
+            .arg(&generator)
+            .arg("org.ubnfc.java.Main");
+        command
+    };
+    command.arg("--ir").arg(ir).arg("--out");
+    if target == "rust" {
+        command.arg(out);
+    } else {
+        command
+            .arg(out.join("src/main/java"))
+            .args(["--package", "target"]);
+    }
+    let status = command
+        .arg("--emit-driver")
+        .status()
+        .map_err(|e| format!("{target} backend {}: {e}", generator.display()))?;
+    Ok(status.code().unwrap_or(1))
 }
 
 struct Options {
@@ -221,5 +311,5 @@ const USAGE: &str = "usage: ubnfc <ir|validate|gen> [options]\n\n\
   ubnfc --version | --help\n\n\
 ir の既定出力は標準出力。--strict は WARNING を exit 5 にします。\n\
 validate は syntax / resolve / validate の診断を出力します。\n\
-gen は DIR/grammar.ir.json を書き、backend 未接続として exit 3 を返します。\n\
-exit: 0 成功、1 文法エラー、2 CLI/入出力エラー、3 backend 未接続、5 strict 警告。\n";
+gen は DIR/grammar.ir.json を書き、backend で driver 付きソースを生成します。\n\
+exit: 0 成功、1 文法エラー、2 CLI/入出力エラー、3 backend が見つからない、5 strict 警告。\n";

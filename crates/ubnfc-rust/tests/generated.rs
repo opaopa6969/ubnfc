@@ -68,7 +68,11 @@ fn generated_crates_build_offline_and_match_all_golden() {
     ];
     for mode in ["Text", "Mapped", "Unicode", "Grouped"] {
         let mut ir = fixture("power");
-        ir.entry.rule_id = format!("Power::{mode}Expr");
+        ir.entry.rule_id = if mode == "Text" {
+            "Power::Expr".into()
+        } else {
+            format!("Power::{mode}Expr")
+        };
         grammars.push((mode.to_lowercase(), ir));
     }
     for (name, ir) in &grammars {

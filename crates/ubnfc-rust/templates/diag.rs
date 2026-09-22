@@ -1,4 +1,4 @@
-//! 局所診断を共有する arena。memo replay の rule path は親に接続して復元する。
+// 局所診断を共有する arena。memo replay の rule path は親に接続して復元する。
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Diag(pub usize);
 #[derive(Clone, Copy)]
@@ -8,7 +8,6 @@ enum Node {
     Join(Diag, Diag),
     Rule(usize, Diag),
 }
-#[derive(Default)]
 pub struct Diagnostics {
     nodes: Vec<(usize, Node)>,
 }
@@ -86,5 +85,11 @@ impl Diagnostics {
             }
         }
         Some((self.nodes[root.0].0, expected, deepest))
+    }
+}
+
+impl Default for Diagnostics {
+    fn default() -> Self {
+        Self::new()
     }
 }

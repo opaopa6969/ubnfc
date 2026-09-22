@@ -1,4 +1,4 @@
-//! Vec open addressing。slot は payload index のみ。rehash で結果を複製しない。
+// Vec open addressing。slot は payload index のみ。rehash で結果を複製しない。
 use super::cursor::State;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Key {

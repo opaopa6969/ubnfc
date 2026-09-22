@@ -1,89 +1,65 @@
-use ubnfc_rt_template::cursor::Cursor;
+use ubnfc_rt_template::cursor::State;
 
 #[test]
-fn advancing_preserves_the_lookahead_gap() {
-    let mut cursor = Cursor::default();
-    cursor.advance(3);
-    cursor.advance_matched_only(4);
-    assert_eq!(
-        cursor,
-        Cursor {
-            consumed: 3,
-            matched: 7
-        }
-    );
-    cursor.advance(2);
-    assert_eq!(
-        cursor,
-        Cursor {
-            consumed: 5,
-            matched: 9
-        }
-    );
-    cursor.reset_matched_to_consumed();
-    assert_eq!(
-        cursor,
-        Cursor {
-            consumed: 5,
-            matched: 5
-        }
-    );
+fn consuming_resets_matched_to_consumed() {
+    let mut state = State::default();
+    state.advance::<false>(3);
+    state.advance::<true>(4);
+    assert_eq!((state.consumed, state.matched), (3, 7));
+    state.advance::<false>(2);
+    assert_eq!((state.consumed, state.matched), (5, 5));
 }
-
 #[test]
-fn checkpoints_restore_both_positions() {
-    let mut cursor = Cursor {
+fn copied_checkpoints_restore_both_positions_and_flags() {
+    let mut state = State {
         consumed: 2,
         matched: 6,
+        invert: true,
+        reset: false,
     };
-    let outer = cursor.checkpoint();
-    cursor.advance(3);
-    let inner = cursor.checkpoint();
-    cursor.reset_matched_to_consumed();
-    cursor.advance_matched_only(4);
-    cursor.restore(inner);
-    assert_eq!(
-        cursor,
-        Cursor {
-            consumed: 5,
-            matched: 9
-        }
-    );
-    cursor.restore(outer);
-    assert_eq!(
-        cursor,
-        Cursor {
-            consumed: 2,
-            matched: 6
-        }
-    );
+    let outer = state;
+    state.advance::<false>(3);
+    let inner = state;
+    state.advance::<true>(4);
+    assert_eq!(state.matched, 9);
+    state = inner;
+    assert_eq!((state.consumed, state.matched), (5, 5));
+    state = outer;
+    assert_eq!((state.consumed, state.matched), (2, 6));
+    assert!(state.invert);
+    assert!(!state.reset);
 }
-
 #[test]
-fn zero_width_operations_preserve_progress() {
-    let mut cursor = Cursor {
+fn advance_zero_sets_matched_to_consumed_only_in_consume_mode() {
+    let mut state = State {
         consumed: 1,
         matched: 3,
+        ..State::default()
     };
-    let before = cursor;
-    cursor.advance(0);
-    cursor.advance_matched_only(0);
-    assert_eq!(cursor, before);
+    state.advance::<true>(0);
+    assert_eq!((state.consumed, state.matched), (1, 3));
+    state.advance::<false>(0);
+    assert_eq!((state.consumed, state.matched), (1, 1));
 }
-
 #[test]
-fn overflow_does_not_partially_advance() {
-    let mut cursor = Cursor {
-        consumed: 1,
-        matched: usize::MAX,
+fn begin_and_commit_preserve_parent_flags() {
+    let parent = State {
+        consumed: 2,
+        matched: 7,
+        invert: true,
+        reset: false,
     };
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| cursor.advance(1)));
-    assert!(result.is_err());
-    assert_eq!(
-        cursor,
-        Cursor {
-            consumed: 1,
-            matched: usize::MAX
-        }
-    );
+    assert_eq!(parent.begin().matched, 7);
+    let child = State {
+        consumed: 3,
+        matched: 9,
+        invert: false,
+        reset: true,
+    };
+    assert_eq!(child.begin().matched, 3);
+    let result = parent.commit(child);
+    assert_eq!(result.position::<false>(), 3);
+    assert_eq!(result.position::<true>(), 9);
+    assert!(result.invert);
+    assert!(!result.reset);
 }

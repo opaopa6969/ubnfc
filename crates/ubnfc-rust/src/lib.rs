@@ -1,5 +1,6 @@
 //! Grammar IR v1 から、外部 runtime に依存しない Rust モジュールを生成する。
 mod ast;
+mod driver;
 mod emit;
 mod expressions;
 mod mapping;
@@ -9,10 +10,21 @@ mod validate;
 use std::{collections::BTreeMap, fmt, path::Path};
 use ubnfc_front::ir::GrammarIr;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct EmitOptions {
     /// rustfmt は呼ばず、決定的なソースを返す。呼び出し側が必要に応じて整形する。
     pub documentation: Option<String>,
+    /// JSON Lines driver を生成する（既定 true）。
+    pub emit_driver: bool,
+}
+
+impl Default for EmitOptions {
+    fn default() -> Self {
+        Self {
+            documentation: None,
+            emit_driver: true,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

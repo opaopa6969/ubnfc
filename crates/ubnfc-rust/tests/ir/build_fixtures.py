@@ -66,7 +66,7 @@ class Fixture:
             if operator:
                 assoc, base, op = operator
                 sites = {c['name']: c['siteId'] for c in captures}
-                rule['operator'] = dict(associativity=assoc, baseRuleId=self.rule_id(base), operatorRuleId=self.rule_id(op), canonicalForm='leftOpRightLists' if assoc == 'left' else 'baseOpSelfOrBase', leftSiteId=sites['left'], opSiteId=sites['op'], rightSiteId=sites['right'], precedence=10 if r.endswith('Expr') else 20)
+                rule['operator'] = dict(associativity=assoc, baseRuleId=self.rule_id(base), operatorRuleId=self.rule_id(op), canonicalForm='leftOpRightLists' if assoc == 'left' else 'baseOpSelfOrBase', leftSiteId=sites['left'], opSiteId=sites['op'], rightSiteId=sites['right'], precedence=10 if (r.endswith('Expr') or r == 'Expression') else 20)
                 j['plan']['operators'].append(dict(ruleIds=[self.rule_id(r)], strategy='tierFunctions', liftRecipeIds=[f'recipe:{r}'], boundaryExprIds=[body], proof=None))
             s['rules'].append(rule)
             j['analysis']['rules'].append(dict(ruleId=self.rule_id(r), sccId='scc:all', followSyncPatterns=None, leftRecursion='none', progressProven=True))
@@ -140,17 +140,18 @@ class Fixture:
 binary = [field('left'), field('op', 'list', 'text'), field('right', 'list')]
 number = [field('value', kind='text')]
 operators = [
-    ('Expr', seq(cap(ref('Term'), 'left'), repeat(seq(cap(ref('AddOp'), 'op', 'list', 'text'), cap(ref('Term'), 'right', 'list')))), 'Binary', ('left', 'Term', 'AddOp')),
+    ('Expression', seq(cap(ref('Term'), 'left'), repeat(seq(cap(ref('AddOp'), 'op', 'list', 'text'), cap(ref('Term'), 'right', 'list')))), 'Binary', ('left', 'Term', 'AddOp')),
     ('Term', seq(cap(ref('Factor'), 'left'), repeat(seq(cap(ref('MulOp'), 'op', 'list', 'text'), cap(ref('Factor'), 'right', 'list')))), 'Binary', ('left', 'Factor', 'MulOp')),
     ('AddOp', choice(lit('+'), lit('-')), None, None),
     ('MulOp', choice(lit('*'), lit('/')), None, None),
-    ('Factor', choice(ref('Number'), seq(lit('('), ref('Expr'), lit(')'))), None, None),
+    ('Factor', choice(ref('Number'), seq(lit('('), ref('Expression'), lit(')'))), None, None),
     ('Number', seq(cap(seq(token()), 'value', conv='text')), 'Number', None),
 ]
 Fixture('Operators', operators, [('Binary', binary), ('Number', number)]).write(Path(__file__).with_name('operators.ir.json'))
 power = []
 for mode in ('Text', 'Mapped', 'Unicode', 'Grouped'):
     expr, atom, base, op = [mode + s for s in ('Expr', 'Atom', 'Base', 'Op')]
+    if mode == 'Text': expr = 'Expr'
     power.append((expr, choice(seq(cap(ref(base), 'left'), cap(ref(op), 'op', 'list', 'text'), cap(ref(expr), 'right', 'list')), cap(ref(base), 'left')), 'Power', ('right', base, op)))
     power.append((atom, seq(token()) if mode == 'Text' else seq(*([optional(lit('😀'))] if mode == 'Unicode' else []), cap(seq(token()), 'value', conv='text')), None if mode == 'Text' else 'Number', None))
     power.append((base, choice(ref(atom), seq(lit('('), ref(expr), lit(')'))) if mode == 'Grouped' else ref(atom), None, None))

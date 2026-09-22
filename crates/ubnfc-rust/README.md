@@ -6,33 +6,54 @@ Grammar IR v1 から Rust の静的 parser と型付き AST を生成する。�
 ```rust,ignore
 let ir = ubnfc_front::ir::from_json(&json)?;
 let generated = ubnfc_rust::emit(&ir, &ubnfc_rust::EmitOptions::default())?;
-generated.write_to("generated/src")?;
+generated.write_to("generated")?;
 ```
 
 ```sh
-cargo run -p ubnfc-rust -- --ir ir/examples/tinycalc.ir.json --out /tmp/generated/src
+cargo build -q --offline --bin ubnfc-rust --bin ubnfc
+out=$(mktemp -d)
+target/debug/ubnfc-rust --ir ir/examples/tinycalc.ir.json --out "$out" --emit-driver
+cargo build --release --offline --manifest-path "$out/Cargo.toml"
+printf '%s\n' '{"id":0,"grammar":"TinyCalc","entry":"Expression","input":"1+2","options":{"lexical":true,"scope":true}}' | "$out/target/release/driver"
 ```
 
-出力は `mod.rs`, `parser.rs`, `ast.rs`, `api.rs`, `runtime.rs`, `rt/{mod,cursor,input,memo,diag,scope}.rs`。
-既存 crate のサブモジュールとしても、次の manifest の独立 crate としても使用できる。
+出力は `Cargo.toml`, `mod.rs`, `parser.rs`, `ast.rs`, `api.rs`, `runtime.rs`,
+`rt/{mod,cursor,input,memo,diag,scope}.rs` と `src/bin/{driver,driver_json}.rs`。
+manifest の lib は `mod.rs` を指す。既存 crate のサブモジュールとしても利用できる。
 `GeneratedCrate.files` は相対パスからソースへの BTreeMap。生成時に cargo/rustfmt/network は起動しない。
+`--emit-driver` は既定 on。`--emit-driver false` / `--no-emit-driver` または
+`EmitOptions { emit_driver: false, ..Default::default() }` で無効にできる。
+生成 crate の通常依存はゼロで、`json` feature のときだけ optional な serde / serde_json を使う。
+driver 自身の JSON reader/writer は std のみで動き、任意の JSON `id` と数値字句を保持する。
 
-```toml
-[package]
-name = "generated-parser"
-version = "0.1.0"
-edition = "2021"
-[lib]
-path = "src/mod.rs"
-[features]
-default = []
-json = ["dep:serde", "dep:serde_json"]
-[dependencies]
-serde = { version = "1", optional = true }
-serde_json = { version = "1", optional = true }
-```
+`ubnfc gen --grammar X.ubnf --target rust --out DIR` は IR を書いて `ubnfc-rust` を呼ぶ。
+隣接するバイナリや `target/{debug,release}` を探索し、`UBNFC_RUST_BIN` で明示指定できる。
+`--target java` は `UBNFC_JAVA_JAR` または `ubnfc-java/target/ubnfc-java-*.jar` を使い、
+`java -cp ... org.ubnfc.java.Main` で `DIR/src/main/java` へ出力する。
+明示指定が存在しない場合も含め、生成器が見つからなければ探索パスを表示し exit 3。
+生成器の失敗終了は終了コードをそのまま返す。
 
-`parse`, `parse_with_options`, `parse_with_scanner` が入口。結果には構文成功、code point の C/M、
+runner の `Artifact::FromIr { backend: Backend::Rust, .. }` は事前ビルド済みの
+`ubnfc-rust` を `CARGO_BIN_EXE_ubnfc-rust` または実行ファイル付近の target から解決する。
+生成した全ファイルの内容 hash をキーに `Runner.build_dir/rust-cache` を作り、
+同じ生成物なら cargo を再実行しない。`rust-target/<hash>` は build_dir 内で共有し、
+文法の異なる driver が上書きされるのを防ぐ。キャッシュ寿命は build_dir の寿命と同じ。
+ツール不足・生成失敗・offline build 失敗はエラーで、テストも skip しない。
+
+JSON Lines driver は [harness protocol](../../docs/harness-driver-protocol.md) の全標準観測を返す。
+`grammar` と `entry`（null は文法の root）を解決し、未知の指定はエラーにする。
+`lexical=false` で captures、`scope=false` で declarations/references を省略し、文法の認識は変えない。
+prefix の accepted/C/M と全入力の AST・診断を別々に観測する。
+`value` は IR の operator 指定がある結果型に限り、AST の数値葉と `left/op/right` の
+`+ - * / ^` を評価する。それ以外は null、非有限値はエラー応答。
+不正リクエストも1行のエラーを返して後続を処理する。
+
+`ubnfc-rt-template/src/{cursor,input,memo,diag,scope}.rs` は、この crate の
+`templates/*.rs` を直接 `include!` する。生成物と46件のテンプレートテストが単一ソースを検証する。
+cursor は `advance::<false>(0)` でも M=C、memo は State・mode・version を含む open addressing、
+診断は局所 DAG の参照を親 rule に接続して再生する。input/scope の契約は維持する。
+
+`parse`, `parse_with_options`, `parse_with_scanner`, `parse_entry_with_options` が入口。結果には構文成功、code point の C/M、
 AST、node span、capture、任意の lexical occurrence、診断、scope の宣言・参照・診断、統計を含む。
 `build_ast=false` で AST と capture 出力を省略し、scope 効果と構文診断は維持する。
 `require_eof=false` は prefix 受理。mapping 失敗は `ok=true, ast=None` と Mapping 診断で表す。
@@ -87,11 +108,14 @@ Choice plan の候補欠落・順序変更、空 trivia delimiter は InvalidIr�
 ## 検証
 
 ```sh
-cargo test -p ubnfc-rust --offline
+cargo build -q --bin ubnfc-rust --offline
+cargo test -p ubnfc-rust -p ubnfc-rt-template --offline
+cargo test -p ubnfc-harness --test runner_rust_e2e --offline
 cargo clippy -p ubnfc-rust --offline --all-targets -- -D warnings
 cargo fmt -p ubnfc-rust -- --check
 ```
 
+- driver E2E: associative 24/24、right-associative 28/28、tinycalc 8/8。Known/Fail/未観測は各0。
 - TinyCalc: 既存 IR を直接読み、独立して組み立てた canonical JSON golden に一致。
 - Operators: 手で記述した27 Expr の IR、24 corpus 行に一致。
 - Power: 50 Expr の IR に text/mapped/unicode/grouped の入口を収録。28行×4モードに一致。
