@@ -1,5 +1,7 @@
 //! 全 corpus の .ubnf → IR → Java/Rust → build → driver → 独立 oracle 比較。
 //! loader が既存 Conformance テストと同じ形に合成した文法を再解釈しない。
+#[cfg(test)]
+mod rejection_tests;
 mod report;
 mod rust;
 pub use crate::runner::rust::BatchStats;
@@ -306,7 +308,8 @@ fn plan(files: &[CorpusFile], filters: &[String], backend: Backend) -> Result<Pl
                 case.grammar_ref = vec![index];
             }
             if !subset.cases.is_empty() {
-                for case in runner::select(&[subset], &[], None)? {
+                for mut case in runner::select(&[subset], &[], None)? {
+                    expect_rejection(&corpus, &mut case);
                     let mut row = CaseResult::new(&corpus, &kind, &label, &case);
                     row.build_id = Some(work.build.id.clone());
                     work.cases.push(case);
@@ -317,6 +320,40 @@ fn plan(files: &[CorpusFile], filters: &[String], backend: Backend) -> Result<Pl
     }
     Ok(plan)
 }
+
+/// 元の採取値は保持し、case × variant に展開してから拒否契約を付ける。
+fn expect_rejection(corpus: &str, case: &mut RunCase) {
+    let (stage, code, evidence) = match (corpus, case.variant.as_str(), case.case.id.as_str()) {
+        ("associative/corpus.json", "reversed-metadata", _) => (
+            "validate",
+            "E-PRECEDENCE-ORDER",
+            "docs/reports/2026-09-22-triage.md 末尾の訂正; GrammarValidator.java:917–945",
+        ),
+        ("oracle/common-field-missing.json", _, "common-field-missing/1")
+        | ("oracle/common-field-type.json", _, "common-field-type/1") => (
+            "ir",
+            "E-LOWER-COMMON-FIELD",
+            "docs/reports/2026-09-22-triage.md 末尾の訂正; corpus/oracle/common-field-{missing,type}.json compilation.diagnostics",
+        ),
+        ("oracle/eval-sum.json", _, "eval-sum/1") => (
+            "ir",
+            "E-LOWER-SUM-EVAL",
+            "docs/reports/2026-09-22-triage.md 末尾の訂正（sum eval の早期拒否を維持）",
+        ),
+        // 循環 import は loader が採取済み apiError を確認して登録済み。
+        _ => return,
+    };
+    // triage 末尾の訂正: 「同じ文法を既存 GrammarValidator.validate に直接かけると
+    // E-PRECEDENCE-ORDER で拒否される」。commonField 2 件・sum eval 1 件も早期拒否を維持。
+    // D-017 の既存バグに対する既知乖離ではなく、指定の段階・コードだけを Pass にする。
+    case.case.expect = Expectation::ExpectedRejection {
+        stage: stage.into(),
+        code: code.into(),
+        evidence: evidence.into(),
+        original: Box::new(case.case.expect.clone()),
+    };
+}
+
 fn source_parts(grammar: &GrammarSource) -> Result<(String, String, BTreeMap<String, String>)> {
     let (name, source, metadata) = match grammar {
         GrammarSource::Inline {
@@ -588,26 +625,46 @@ fn stopped(
         row.outcome = outcome;
         if let Expectation::ExpectedRejection { stage, code, .. } = &row.expected {
             let (actual_stage, result) = match outcome {
+                // ubnfc ir は validate も実行する。このコードは検証器の拒否。
+                Outcome::IrFailure
+                    if build.ir.reasons.iter().any(|c| c == "E-PRECEDENCE-ORDER") =>
+                {
+                    ("validate", &build.ir)
+                }
                 Outcome::IrFailure => ("ir", &build.ir),
                 Outcome::GenerationRejected => ("generation", &build.generation),
                 Outcome::JavacFailure => ("javac", &build.javac),
                 Outcome::BuildFailure => ("build", build.cargo.as_ref().expect("cargo failure")),
                 _ => unreachable!("stopped は build 段階の失敗のみ"),
             };
-            if stage == actual_stage && result.reasons == [code.clone()] {
-                row.outcome = Outcome::Pass;
-            } else {
-                row.outcome = Outcome::Fail;
-                row.differences.push(Difference {
-                    path: "/rejection".into(),
-                    expected: Some(serde_json::json!({"stage":stage,"code":code})),
-                    actual: Some(serde_json::json!({"stage":actual_stage,"codes":result.reasons})),
-                });
+            match rejection_verdict(stage, code, actual_stage, result) {
+                Verdict::Pass => row.outcome = Outcome::Pass,
+                Verdict::Fail(differences) => {
+                    row.outcome = Outcome::Fail;
+                    row.differences = differences;
+                }
+                Verdict::KnownDivergence(_) => unreachable!("期待拒否は既知乖離で免除しない"),
             }
         }
     }
     normalize_logs(&mut build, directory);
     (build, rows)
+}
+
+fn rejection_verdict(stage: &str, code: &str, actual_stage: &str, result: &StageResult) -> Verdict {
+    if result.status == StageStatus::Failed
+        && stage == actual_stage
+        && result.reasons.len() == 1
+        && result.reasons[0] == code
+    {
+        Verdict::Pass
+    } else {
+        Verdict::Fail(vec![Difference {
+            path: "/rejection".into(),
+            expected: Some(serde_json::json!({"stage":stage,"code":code})),
+            actual: Some(serde_json::json!({"stage":actual_stage,"codes":result.reasons})),
+        }])
+    }
 }
 fn normalize_logs(build: &mut BuildResult, directory: &Path) {
     // ランダムな mktemp パスをレポートの差分に持ち込まない。診断内容は保持する。
@@ -891,6 +948,7 @@ mod tests {
                 build_failure: 1,
                 driver_error: 1,
                 pass: 1,
+                expected_rejection_pass: 0,
                 known_divergence: 1,
                 fail: 1,
                 unobserved: 2

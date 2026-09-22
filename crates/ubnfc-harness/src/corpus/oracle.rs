@@ -232,8 +232,7 @@ pub fn load(path: &Path) -> Result<CorpusFile, LoadError> {
             };
         }
         // resolve.rs:143-155 は循環 import を明示的に拒否する契約。
-        // 採取済み apiError と照合する。RustConformanceTest.java:391-455 の
-        // reversed-metadata は正のテストなのでこの扱いにしない。
+        // 採取済み apiError と照合する。他の期待拒否は run-all の variant 展開で登録する。
         if path
             .file_name()
             .is_some_and(|name| name == "import-cycle.json")
