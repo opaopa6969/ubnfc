@@ -233,6 +233,17 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | M4 | self-host 検証: 手書き / 生成 frontend を全対象文法 + 不正文法で比較、IR byte 一致、固定点 | 一致 |
 | M5 | 最適化生成（予測・memo 省略・climbing・trie・遅延診断）を保守的生成と差分比較。P4 でベンチ（長い正常入力・不完全入力・深い共通接頭辞） | 性能報告（達成/未達を明記） |
 
+## 7.1 到達状況（2026-09-22 夜）
+
+| M | 状態 | 根拠 |
+|---|---|---|
+| M0 | 完了 | corpus loader 6 系統 1,212 ケース、compat-matrix、oracle 107 ファイル、rt テンプレート |
+| M1 | 完了 | 手書き目標（Operators/Power）両言語、両バックエンド縦断緑 |
+| M2 | 完了 | `ubnfc ir` で 21 fixture + P4 の golden、self-host 経路（生成 Rust frontend → `compile_parsed`） |
+| M3 | **完了** | round7: Java Pass 1,306 / Fail 0、Rust Pass 1,292 / Fail 0（既知乖離 28 は D-017/D-018） |
+| M4 | 完了（既知差分あり） | ubnf.ubnf の IR byte 一致・再生成固定点。25 対象中 19 一致、6 は手書きの fixture 互換拡張（`05-selfhost.md`） |
+| M5 | **進行中** | P4 Java 17.3 ms / Rust 25 ms（目標 complex ≤0.2 ms、x64 ≤15 ms）。主因は診断 DAG（`docs/reports/2026-09-22-p4-rust-bench.md`） |
+
 ## 8. 争点の状態
 
 | ID | 状態 | 決定 |
