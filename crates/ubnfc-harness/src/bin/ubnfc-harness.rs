@@ -1,7 +1,7 @@
 use std::{ffi::OsStr, path::PathBuf, process::ExitCode};
 use ubnfc_harness::{
     default_root, load_all,
-    runner::{self, Backend, Report, Runner, Scratch},
+    runner::{self, Artifact, Backend, Report, Runner, Scratch},
     summary,
 };
 
@@ -14,7 +14,7 @@ fn run() -> Result<(), String> {
         [cmd] if cmd == "list" => default_root(),
         [cmd, flag, path] if cmd == "list" && flag == "--root" => PathBuf::from(path),
         [flag] if flag == OsStr::new("--help") || flag == OsStr::new("-h") => {
-            println!("使い方: ubnfc-harness list [--root DIR]\nubnfc-harness run --backend rust|java --artifact DIR --families associative,right-associative [--root DIR] [--variant NAME] [--report out.md|out.json]");
+            println!("使い方: ubnfc-harness list [--root DIR]\nubnfc-harness run --backend rust|java (--artifact DIR | --ir FILE) --families associative,right-associative [--root DIR] [--variant NAME] [--report out.md|out.json]");
             return Ok(());
         }
         _ => return Err("使い方: ubnfc-harness list [--root DIR]".into()),
@@ -52,6 +52,7 @@ fn execute(args: &[std::ffi::OsString]) -> Result<(), String> {
         if ![
             "--backend",
             "--artifact",
+            "--ir",
             "--families",
             "--root",
             "--variant",
@@ -70,7 +71,16 @@ fn execute(args: &[std::ffi::OsString]) -> Result<(), String> {
         Some("java") => Backend::Java,
         _ => return Err("--backend rust|java が必要です".into()),
     };
-    let artifact = flags.get("--artifact").ok_or("--artifact DIR が必要です")?;
+    let artifact = match (flags.get("--artifact"), flags.get("--ir")) {
+        (Some(dir), None) => Artifact::Prebuilt {
+            dir: PathBuf::from(dir),
+        },
+        (None, Some(path)) => Artifact::FromIr {
+            ir_path: PathBuf::from(path),
+            backend,
+        },
+        _ => return Err("--artifact DIR または --ir FILE のいずれか一つが必要です".into()),
+    };
     let families = flags
         .get("--families")
         .and_then(|v| v.to_str())

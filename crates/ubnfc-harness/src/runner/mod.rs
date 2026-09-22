@@ -241,16 +241,81 @@ pub struct Executable {
     pub grammars: BTreeMap<String, PathBuf>,
 }
 
+/// 既存ソース、または生成する Grammar IR。FromIr は現在 Java のみ。
+#[derive(Clone, Debug)]
+pub enum Artifact {
+    Prebuilt { dir: PathBuf },
+    FromIr { ir_path: PathBuf, backend: Backend },
+}
+// 従来の runner.build(path) 呼出しも維持する。
+impl<P: AsRef<Path>> From<P> for Artifact {
+    fn from(dir: P) -> Self {
+        Self::Prebuilt {
+            dir: dir.as_ref().to_owned(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Runner {
     pub backend: Backend,
     pub build_dir: PathBuf,
 }
 impl Runner {
-    pub fn build(&self, artifact_dir: impl AsRef<Path>) -> Result<Executable> {
-        let artifact = artifact_dir.as_ref().canonicalize()?;
+    pub fn build(&self, artifact: impl Into<Artifact>) -> Result<Executable> {
+        self.build_impl(artifact.into(), None)
+    }
+
+    /// 生成器の jar/classes を明示する。テストでは target/classes を再利用する。
+    pub fn build_with_java_generator(
+        &self,
+        artifact: impl Into<Artifact>,
+        classpath: impl AsRef<Path>,
+    ) -> Result<Executable> {
+        self.build_impl(artifact.into(), Some(classpath.as_ref()))
+    }
+
+    fn build_impl(&self, artifact: Artifact, java_generator: Option<&Path>) -> Result<Executable> {
         fs::create_dir_all(&self.build_dir)?;
         let build_dir = self.build_dir.canonicalize()?;
+        // 生成ソースは javac の終了まで保持し、失敗時も Scratch が削除する。
+        let mut generated = None;
+        let artifact = match artifact {
+            Artifact::Prebuilt { dir } => dir.canonicalize()?,
+            Artifact::FromIr { ir_path, backend } => {
+                if backend != self.backend {
+                    return Err(Error("Artifact と Runner の backend が一致しません".into()));
+                }
+                if backend != Backend::Java {
+                    return Err(Error("FromIr は Java backend のみ対応しています".into()));
+                }
+                let ir_path = ir_path.canonicalize()?;
+                let default_jar = Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../ubnfc-java/target/ubnfc-java-0.1.0-SNAPSHOT.jar");
+                let generator = java_generator.unwrap_or(&default_jar);
+                if !generator.exists() {
+                    return Err(Error(format!(
+                        "Java 生成器がありません: {} (cd ubnfc-java && mvn -o -q package を先に実行)",
+                        generator.display()
+                    )));
+                }
+                let sources = Scratch::create(Some(&build_dir))?;
+                let output = Command::new("java")
+                    .arg("-cp")
+                    .arg(generator.canonicalize()?)
+                    .args(["org.ubnfc.java.Main", "--ir"])
+                    .arg(ir_path)
+                    .arg("--out")
+                    .arg(sources.0.join("src/main/java"))
+                    .args(["--package", "target", "--emit-driver"])
+                    .output()?;
+                check_build("Java IR generation", &output)?;
+                let path = sources.0.clone();
+                generated = Some(sources);
+                path
+            }
+        };
+        let _generated = generated;
         match self.backend {
             Backend::Rust => {
                 let output = Command::new("cargo")

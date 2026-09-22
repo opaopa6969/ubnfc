@@ -19,6 +19,7 @@ import org.ubnfc.java.ir.Validation;
 /** Deterministic direct source emission. Generated code has no dependency on this generator. */
 public final class JavaEmitter {
     private final GrammarIr ir;
+    private final boolean emitDriver;
     private final String pkg, grammar, ast, parser;
     private final Map<String, Expr> expressions;
     private final Map<String, Rule> rules;
@@ -27,8 +28,9 @@ public final class JavaEmitter {
     private final Map<String, Token> tokens;
     private final Map<String, Recipe> recipes;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
-    public JavaEmitter(GrammarIr ir, String packageName) {
-        Validation.validate(ir); this.ir = ir;
+    public JavaEmitter(GrammarIr ir, String packageName) { this(ir, packageName, true); }
+    public JavaEmitter(GrammarIr ir, String packageName, boolean emitDriver) {
+        Validation.validate(ir); this.ir = ir; this.emitDriver = emitDriver;
         var unit = ir.grammarUnits().stream().filter(g -> g.id().equals(ir.entry().grammarId())).findFirst().orElseThrow();
         grammar = unit.name(); Validation.identifier(grammar); ast = grammar + "AST"; parser = grammar + "Parser";
         pkg = packageName != null ? packageName : unit.package_() != null ? unit.package_() : "generated." + grammar.toLowerCase(java.util.Locale.ROOT);
@@ -52,6 +54,7 @@ public final class JavaEmitter {
         for (String name : List.of("Recipe", "Session")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
         for (String name : List.of("Input", "Cursor", "MemoTable", "ScopeStore", "Diagnostics", "Severity"))
             result.put(prefix + "rt/" + name + ".java", resource("/runtime/ubnfc/rt/" + name + ".java").replace("package ubnfc.rt;", "package " + pkg + ".rt;"));
+        if (emitDriver) result.put(prefix + "driver/Driver.java", driverSource());
         return java.util.Collections.unmodifiableMap(result);
     }
     public void write(Path output) throws IOException {
@@ -153,11 +156,30 @@ public final class JavaEmitter {
         out.append(indent).append("}\n");
     }
     private String parserSource() {
+        String defaultEntry = ir.semantics().symbols().stream().filter(s -> s.id().equals(ir.entry().ruleId())).findFirst().orElseThrow().name();
         var out = new StringBuilder("package " + pkg + ";\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Optional;\nimport java.util.regex.Pattern;\nimport " + pkg + ".api.*;\nimport " + pkg + ".internal.Recipe;\nimport " + pkg + ".internal.Session;\nimport " + pkg + ".internal.Session.*;\n\npublic final class " + parser + " {\n    private " + parser + "() {}\n");
         out.append("    public static ParseResult<").append(ast).append("> parse(CharSequence source) { return parse(source, ParseOptions.DEFAULT); }\n")
             .append("    public static ParseResult<").append(ast).append("> parse(CharSequence source, ParseOptions options) {\n")
+            .append("        return parseEntry(").append(q(grammar)).append(", ").append(q(defaultEntry)).append(", source, options);\n    }\n")
+            .append("    public static ParseResult<").append(ast).append("> parseEntry(String grammar, String entry, CharSequence source, ParseOptions options) {\n")
+            .append("        Call entryPoint = switch (grammar) {\n");
+        for (var unit : ir.grammarUnits()) {
+            var symbols = ir.semantics().symbols().stream().filter(s -> s.grammarId().equals(unit.id()) && rules.containsKey(s.id())).toList();
+            if (symbols.isEmpty()) {
+                out.append("            case ").append(q(unit.name())).append(" -> throw new IllegalArgumentException(\"Grammar has no parser entry\");\n");
+                continue;
+            }
+            var roots = symbols.stream().filter(s -> rules.get(s.id()).annotations().stream().anyMatch(a -> a.name().equals("root"))).toList();
+            String rootId = roots.size() == 1 ? roots.getFirst().id() : roots.isEmpty() && unit.id().equals(ir.entry().grammarId()) ? ir.entry().ruleId() : null;
+            out.append("            case ").append(q(unit.name())).append(" -> switch (entry) {\n");
+            if (rootId != null) out.append("                case null -> ").append(parser).append("::").append(ruleMethod(rootId)).append(";\n");
+            else out.append("                case null -> throw new IllegalArgumentException(\"Grammar has no unique root\");\n");
+            for (var symbol : symbols) out.append("                case ").append(q(symbol.name())).append(" -> ").append(parser).append("::").append(ruleMethod(symbol.id())).append(";\n");
+            out.append("                default -> throw new IllegalArgumentException(\"Unsupported entry: \" + entry);\n            };\n");
+        }
+        out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
             .append("        var s = new Session(source, options, ").append(strings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(");\n")
-            .append("        var f = new Frame(); Match match = ").append(ruleMethod(ir.entry().ruleId())).append("(s, f);\n")
+            .append("        var f = new Frame(); Match match = entryPoint.parse(s, f);\n")
             .append("        ParseResult<").append(ast).append("> syntax = s.result(f, match, ").append(catalogs()).append(");\n")
             .append("        if (!syntax.ok() || !options.buildAst()) return syntax;\n")
             .append("        if (match.mappingFailure()) throw s.mapping(match.start(), match.end(), \"Recovered input cannot be mapped\", null);\n")
@@ -167,6 +189,13 @@ public final class JavaEmitter {
         for (Rule rule : rules.values()) emitRule(out, rule);
         for (Expr expr : expressions.values()) emitExpr(out, expr);
         return out.append("}\n").toString();
+    }
+    private String driverSource() throws IOException {
+        String operatorTypes = rules.values().stream().filter(r -> r.operator() != null && recipes.containsKey(r.symbolId()))
+            .map(r -> typeName(recipes.get(r.symbolId()).resultTypeId()) + ".class")
+            .distinct().collect(Collectors.joining(", "));
+        return resource("/templates/driver/Driver.java").replace("generated.", pkg + ".")
+            .replace("__PARSER__", parser).replace("__AST__", ast).replace("__OPERATOR_TYPES__", operatorTypes);
     }
     private String catalogs() {
         return "Map.ofEntries(" + ir.semantics().catalogs().stream().map(c -> "Map.entry(" + q(c.captureSiteId()) + "," + q(c.context()) + ")").collect(Collectors.joining(",")) + ")";
