@@ -1,5 +1,5 @@
-//! Java Pattern の保守的な正則部分集合。Thompson NFA → 部分集合 DFA。
-//! 分岐順ではなく最長の正長接頭辞を採用する（Java の a|ab とは異なる）。
+//! Java Pattern の保守的な正則部分集合。Thompson NFA → 優先順位付き部分集合 DFA。
+//! lookingAt と同じ leftmost-first（左枝優先・貪欲量指定子）の接頭辞を採用する。
 use super::charset::CharSet;
 use crate::ir::*;
 use std::collections::{BTreeMap, BTreeSet};
@@ -15,6 +15,19 @@ enum Re {
     Seq(Vec<Re>),
     Alt(Vec<Re>),
     Repeat(Box<Re>, usize, Option<usize>),
+}
+
+impl Re {
+    // ^ は開始位置で空文字を受理し得るので、ここでは保守的に nullable とする。
+    fn nullable(&self) -> bool {
+        match self {
+            Self::Set(_) => false,
+            Self::Start => true,
+            Self::Seq(items) => items.iter().all(Self::nullable),
+            Self::Alt(items) => items.iter().any(Self::nullable),
+            Self::Repeat(item, min, _) => *min == 0 || item.nullable(),
+        }
+    }
 }
 
 struct Parser {
@@ -105,6 +118,12 @@ impl Parser {
             items.push(if let Some((min, max)) = bounds {
                 // lazy/possessive は正則でも Java の採用結果を変えるので委譲。
                 if matches!(self.peek(), Some('?' | '+')) || matches!(atom, Re::Start) {
+                    return None;
+                }
+                // Java は反復本体のゼロ幅成功で進捗停止し、通常の Thompson NFA と
+                // 探索順が異なり得る（(|a)* / a は Java ではゼロ幅）。有界反復にも
+                // 差分があるので、本体が nullable で複数回試す場合は保守的に委譲。
+                if max.is_none_or(|max| max > 1) && atom.nullable() {
                     return None;
                 }
                 Re::Repeat(Box::new(atom), min, max)
@@ -258,9 +277,10 @@ impl Nfa {
                 }
                 if let Some(max) = max {
                     for _ in *min..*max {
-                        self.states[prev].epsilon.push(end);
                         let (a, b) = self.build(item)?;
+                        // 貪欲量指定子では「続ける」を「終了する」より先に試す。
                         self.states[prev].epsilon.push(a);
+                        self.states[prev].epsilon.push(end);
                         prev = b;
                     }
                 } else {
@@ -277,24 +297,41 @@ impl Nfa {
         &self,
         seeds: impl IntoIterator<Item = usize>,
         start: bool,
+        end: usize,
         work: &mut usize,
     ) -> Option<Vec<usize>> {
         let mut seen = BTreeSet::new();
+        let mut ordered = vec![];
         let mut pending: Vec<_> = seeds.into_iter().collect();
+        pending.reverse();
         while let Some(i) = pending.pop() {
             *work = work.checked_sub(1)?;
             if seen.insert(i) {
-                pending.extend(&self.states[i].epsilon);
+                ordered.push(i);
+                if i == end {
+                    break;
+                }
+                // stack は逆順に積み、左枝・貪欲の継続枝から深さ優先で列挙する。
+                // at_start と epsilon は同じ NFA 状態には共存しない。
+                pending.extend(self.states[i].epsilon.iter().rev());
                 if start {
-                    pending.extend(&self.states[i].at_start);
+                    pending.extend(self.states[i].at_start.iter().rev());
                 }
             }
         }
-        Some(seen.into_iter().collect())
+        Some(ordered)
     }
+    // 各リストは、同じ入力位置でのバックトラック探索の優先順を表す。
+    // 同一 NFA 状態への再到達は以降の照合が同じなので、最優先の経路だけ残せる
+    // （後方参照等の経路依存の構文・nullable 本体の反復は compile しない）。
+    // 受理より低優先の経路は今の候補に勝てず、closure で切り捨てる。
+    // 高優先の未完了経路は残して進め、
+    // 後で受理したときだけ候補を置き換える。この不変条件により、入力終端または
+    // 遷移なしで停止したときの最後の候補が、バックトラック探索の最初の成功になる。
+    // 同じ集合でも順序が異なれば優先順位が違うため、DFA 状態のキーは Vec のまま。
     fn determinize(&self, start: usize, end: usize, limit: usize) -> Option<Dfa> {
         let mut work = WORK_LIMIT;
-        let initial = self.closure([start], true, &mut work)?;
+        let initial = self.closure([start], true, end, &mut work)?;
         let mut ids = BTreeMap::from([(initial.clone(), 0)]);
         let mut subsets = vec![initial];
         let mut states = vec![];
@@ -318,7 +355,7 @@ impl Nfa {
                 let seeds = edges
                     .iter()
                     .filter_map(|(r, to)| (r.start <= pair[0] && pair[0] <= r.end).then_some(*to));
-                let next = self.closure(seeds, false, &mut work)?;
+                let next = self.closure(seeds, false, end, &mut work)?;
                 if next.is_empty() {
                     continue;
                 }
@@ -397,7 +434,7 @@ pub(super) fn plan(token: &Token) -> LexicalPlan {
     }
 }
 
-/// 同一計画から token の追加表現を作る。既存 lexical DFA の形・意味は保持する。
+/// 同一計画から token の追加表現を作る。lexical DFA と token 側の表は同じ意味を持つ。
 pub(crate) fn attach(semantics: &mut Semantics, plan: &Plan) {
     for (token, lexical) in semantics.tokens.iter_mut().zip(&plan.lexical) {
         if let TokenSpec::Regex {

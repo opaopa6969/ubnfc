@@ -26,6 +26,8 @@ fn dfa(ir: &GrammarIr) -> &RegexDfa {
 }
 
 // backend とは独立に追加 IR の閉区間遷移を解釈する。戻り値は code point 消費長。
+// 受理後も高優先の経路だけを走査し、最後の候補を採用する。開始状態の受理は
+// 長さ 0 の候補なので zeroWidth=fail により返さない（その枝刈り自体は DFA に残る）。
 fn run(dfa: &RegexDfa, input: &str) -> Option<usize> {
     let mut state = dfa.start;
     let mut accepted = None;
@@ -48,7 +50,7 @@ fn run(dfa: &RegexDfa, input: &str) -> Option<usize> {
 }
 
 #[test]
-fn regular_subset_longest_prefix_and_zero_width() {
+fn regular_subset_leftmost_first_and_zero_width() {
     type CaseTable<'a> = &'a [(&'a str, &'a [(&'a str, Option<usize>)])];
     let cases: CaseTable<'_> = &[
         ("[a-z]+", &[("abc!", Some(3)), ("1a", None), ("", None)]),
@@ -56,8 +58,8 @@ fn regular_subset_longest_prefix_and_zero_width() {
             r"\d+\.\d+",
             &[("12.345!", Some(6)), (".5", None), ("12.", None)],
         ),
-        // Java Pattern の ordered alternation と異なる、明示要求の最長一致。
-        ("a|ab", &[("ab!", Some(2)), ("ax", Some(1)), ("b", None)]),
+        // Java Pattern と同じ左枝優先。右枝の方が長くても左枝を採用する。
+        ("a|ab", &[("ab!", Some(1)), ("ax", Some(1)), ("b", None)]),
         ("ab|a", &[("ab!", Some(2)), ("ax", Some(1))]),
         ("[^a-c]+", &[("deあ!b", Some(4)), ("abc", None)]),
         (
@@ -78,7 +80,6 @@ fn regular_subset_longest_prefix_and_zero_width() {
         ("a{0}", &[("a", None), ("", None)]),
         ("a*", &[("aaaa!", Some(4)), ("b", None), ("", None)]),
         ("a?", &[("a", Some(1)), ("b", None)]),
-        ("(a?)*", &[("aaab", Some(3)), ("b", None)]),
         ("a|", &[("a", Some(1)), ("", None)]),
         ("", &[("", None), ("x", None)]),
         ("^a+", &[("aa", Some(2)), ("ba", None)]),
@@ -123,6 +124,98 @@ fn regular_subset_longest_prefix_and_zero_width() {
 }
 
 #[test]
+fn java_21_looking_at_oracle_matches_leftmost_first() {
+    // JDK 21.0.9+7-LTS-338 の java.util.regex.Pattern で実測した固定 oracle。
+    // var m = Pattern.compile(regex).matcher(input);
+    // m.lookingAt() ? input.codePointCount(0, m.end()) : -1
+    // Matcher.end() は UTF-16 offset。😀+ / 😀😀x は end=4、code point 長=2。
+    // Some(0) は Pattern のゼロ幅成功であり、UBNF の zeroWidth=fail で失敗にする。
+    let cases = [
+        ("a|ab", "ab", Some(1)),
+        ("ab|a", "ab", Some(2)),
+        ("(a|ab)(c|bcd)", "abcd", Some(4)),
+        ("a*ab", "aaab", Some(4)),
+        ("(a|b)*a", "abab", Some(3)),
+        (r"[0-9]+\.[0-9]+", "1.5", Some(3)),
+        (r"\d+", "12x", Some(2)),
+        ("x*", "y", Some(0)),
+        ("(?:ab)+", "ababx", Some(4)),
+        ("a{2,3}", "aaaa", Some(3)),
+        ("[^a]+", "bbba", Some(3)),
+        ("😀+", "😀😀x", Some(2)),
+        ("(a|ab)c", "abc", Some(3)),
+        ("(ab|a)b", "ab", Some(2)),
+        ("(ab|a)b", "abb", Some(3)),
+        ("a|", "a", Some(1)),
+        ("|a", "a", Some(0)),
+        ("(a|ab)*", "ab", Some(1)),
+        ("(ab|a)*", "ab", Some(2)),
+        ("a?ab", "ab", Some(2)),
+        ("a{2,3}a", "aaa", Some(3)),
+        ("ab|a", "ac", Some(1)),
+        ("a*ab", "aaaa", None),
+        ("^a+", "baa", None),
+        ("(^a)+", "aa", Some(1)),
+        ("(ab*c|a)", "abbbx", Some(1)),
+        ("(ab*c|a)", "abbbc", Some(5)),
+        ("(a|ab)(c|bcd)", "abc", Some(3)),
+        ("😀|😀😀", "😀😀x", Some(1)),
+        ("(ab|a)*b", "abab", Some(4)),
+        ("a{0}", "a", Some(0)),
+    ];
+    for (regex, input, java_length) in cases {
+        let ir = pattern(regex);
+        let json = serde_json::to_value(dfa(&ir)).unwrap();
+        assert_eq!(json["semantics"], "leftmostFirst");
+        assert!(json.get("longestMatch").is_none());
+        assert_eq!(json["anchoredAtStart"], true);
+        assert_eq!(json["zeroWidth"], "fail");
+        assert_eq!(
+            run(dfa(&ir), input),
+            java_length.filter(|&length| length > 0),
+            "Java lookingAt: {regex:?} / {input:?}"
+        );
+    }
+}
+
+#[test]
+fn java_nullable_repetition_oracle_requires_fallback() {
+    // 同じ JDK 21 実走。通常の Thompson NFA の ε-cycle 除去だけでは Java の
+    // ゼロ幅進捗停止を再現できない。差分の有無にかかわらず本体が nullable なら委譲。
+    let cases = [
+        ("(|a)*", "a", 0),
+        ("(a?|b)*", "b", 0),
+        ("(a*|b){0,2}a", "baa", 3),
+        ("(a?)*", "aaab", 3),
+        ("(a?)*", "b", 0),
+        ("(a?)+", "aaab", 3),
+        ("(a?){2,3}", "aaab", 3),
+    ];
+    for (regex, input, java_length) in cases {
+        let ir = pattern(regex);
+        assert!(
+            matches!(
+                &ir.semantics.tokens[0].spec,
+                TokenSpec::Regex {
+                    dfa: Some(None),
+                    fallback: Some(_),
+                    regular_subset: false,
+                    java_fallback: TokenSpecRegexJavaFallback::JavaUtilRegexPattern,
+                    ..
+                }
+            ),
+            "Java lookingAt: {regex:?} / {input:?} = {java_length}"
+        );
+        assert_eq!(
+            ir.plan.lexical[0].strategy,
+            LexicalPlanStrategy::JavaPattern
+        );
+        assert!(ir.plan.lexical[0].dfa.is_none());
+        assert!(validate_references(&ir).is_empty());
+    }
+}
+
+#[test]
 fn unsupported_or_unproven_patterns_explicitly_fall_back() {
     for regex in [
         r"(a+)\1",
@@ -130,6 +223,7 @@ fn unsupported_or_unproven_patterns_explicitly_fall_back() {
         "(?!b)a",
         "(?<=a)b",
         r"\bword\b",
+        "a*?",
         "a+?",
         "a??",
         "a{2,3}?",

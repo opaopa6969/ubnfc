@@ -63,22 +63,28 @@ nullable、minConsume、文字範囲/EOF/ゼロ消費条件、rule 解析、trie
 
 - `regex.rs` は Java Pattern のリテラル、`.`、文字クラス（否定・範囲）、
   `\d/\w/\s` と各補集合、制御文字/記号の escape、グループ（`(?:...)` を含む）、
-  選択、`* + ? {n} {n,} {n,m}`、`^` を Thompson NFA → 部分集合 DFA にする。
+  選択、`* + ? {n} {n,} {n,m}`、`^` を Thompson NFA → 優先順位付き部分集合 DFA にする。
   `^` は token 開始位置でのみ通る epsilon とし、`a^b` を `ab` に変えない。
   `.` は Java 既定の改行集合 LF/CR/NEL/LS/PS を除く。`\d/\w/\s` は ASCII 集合。
 - 正則と証明できない構文（後方参照、先読み/後読み、`\b`、Unicode property、flags、
-  lazy/possessive、class の交差/入れ子など）は JavaPattern に委譲し Rust は生成時エラー。
+  lazy/possessive、class の交差/入れ子、nullable 本体の複数回反復など）は
+  JavaPattern に委譲し Rust は生成時エラー。
+  nullable 本体の反復は Java のゼロ幅進捗停止により探索順が変わるため委譲する。
   DFA/NFA 各10,000状態、構成処理量2,000,000、入れ子128段、pattern 65,536 byte、
   class 1,024要素を上限とし、超過も同じ fallback にする。DFA は最小化しない。
 - `plan.lexical[].dfa` の既存状態別形式を保持し、pipeline は同じ表から token spec に
-  optional な `dfa={states,start,accepting,transitions,anchoredAtStart:true,longestMatch:true,
+  optional な `dfa={states,start,accepting,transitions,anchoredAtStart:true,semantics:"leftmostFirst",
   zeroWidth:"fail"}` を追加する。`states` は状態数、ID は0始まりの連番、遷移は
   `{from,ranges:[[lo,hi]],to}`。未構成は `dfa:null,fallback:"javaPattern"`。
   新旧の表・fallback の不整合は IR の参照検証で拒否する。
 - 入力の現在位置から code point 閉区間で遷移し、最後の正長受理位置を記録する。
-  開始状態が受理でもゼロ幅は失敗。Java Pattern の選択順とは異なり `a|ab` は
-  `ab` を2文字受理する（要求された最長一致）。`matching=lookingAt` の既存値は保持する。
-- `tests/regex_dfa.rs` の独立評価器は既存 oracle の ascii/zero の受理・消費・照合長と一致。
+  開始状態が受理でも最終候補がゼロ幅なら失敗。ε-閉包は左枝・貪欲の継続枝を優先し、
+  受理より低優先の状態を切り捨てる。同じ集合でも順序が異なれば別の DFA 状態。
+  Java Pattern の `lookingAt` と同じく `a|ab` は `ab` を1文字受理する。
+  受理時には停止せず、入力終端または遷移なしまで走査し、最後の候補を採用する。
+- `tests/regex_dfa.rs` は Java 21 の `Pattern.lookingAt` 実測値を固定し、
+  選択順・貪欲・バックトラック・ゼロ幅・非 BMP を独立評価器で検証する。
+  既存 oracle の ascii/zero の受理・消費・照合長と一致。
   prefix/emoji は C15 の非 BMP 既知差分を明示的に検査する。prefix の Java 実走は
   `😀` の後の `a` に失敗し、emoji は単独 `😀` に失敗、`😀x` 全体を消費する。
   DFA は `😀` を1 code point とし、これらを Java の挙動に合わせて歪めない。

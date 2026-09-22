@@ -3018,11 +3018,11 @@
                   "type": "null"
                 }
               ],
-              "description": "optional な解析済み計画。省略は旧 IR、null は未対応構文または資源上限超過で DFA なし。非 null の場合 plan.lexical の同 token の DFA と等価。既存 matching=lookingAt は開始位置固定の契約として保持し、この計画の longestMatch=true が最長の正長接頭辞採用を指定する。Java Pattern の ordered alternation（a|ab など）の実走とは異なり得る。"
+              "description": "optional な解析済み計画。省略は旧 IR、null は未対応構文または資源上限超過で DFA なし。非 null の場合 plan.lexical の同 token の DFA と等価。matching=lookingAt と同じ開始位置固定・左枝優先・貪欲量指定子の契約を semantics=leftmostFirst で指定する。"
             },
             "fallback": {
               "const": "javaPattern",
-              "description": "optional。dfa=null のとき Java は Pattern.lookingAt に委譲し、Rust は生成時エラー。後方参照、先読み/後読み、境界、lazy/possessive、Unicode property、未対応構文または構成上限超過を含む。"
+              "description": "optional。dfa=null のとき Java は Pattern.lookingAt に委譲し、Rust は生成時エラー。後方参照、先読み/後読み、境界、lazy/possessive、nullable 本体の複数回反復、Unicode property、未対応構文または構成上限超過を含む。"
             }
           },
           "required": [
@@ -3358,7 +3358,7 @@
     },
     "RegexDfa": {
       "additionalProperties": false,
-      "description": "正則部分集合を Thompson NFA と部分集合構成で解析した optional token 計画。states は状態数、ID は 0..states-1、start は開始 ID、accepting は昇順の受理 ID。現在の token 開始位置から code point の閉区間範囲遷移をたどり、到達した最後の正長受理位置を採用する。探索の開始位置をずらさない。開始状態が受理でもゼロ幅一致は失敗。遷移のない文字で停止し、同一 from の範囲は昇順・非重複。非 BMP は C15 の既知互換差分（Java oracle の UTF-16/code point 混在）であり scalar として実行する。既存 plan.lexical[].dfa と同じオートマトンを表し既存欄の意味を変更しない。",
+      "description": "正則部分集合を Thompson NFA の優先順位付き部分集合構成で解析した optional token 計画。順序付き状態の DFA で、選択は左枝優先、量指定子は継続枝優先。受理より低優先の NFA 状態は構成時に切り捨てる。states は状態数、ID は 0..states-1、start は開始 ID、accepting は昇順の受理 ID。実行は現在の token 開始位置から code point の閉区間範囲遷移をたどり、受理到達で候補を更新し、入力終端または遷移が無くなるまで進めて最後の候補を採用する。受理時点で即終了せず、高優先の経路による候補の更新を許す。最終候補の消費長が 0 または候補なしなら失敗。探索の開始位置をずらさない。同一 from の範囲は昇順・非重複。非 BMP は C15 の既知互換差分（Java oracle の UTF-16/code point 混在）であり scalar として実行する。既存 plan.lexical[].dfa と同じオートマトンを表す。",
       "properties": {
         "states": {
           "type": "integer",
@@ -3385,8 +3385,8 @@
         "anchoredAtStart": {
           "const": true
         },
-        "longestMatch": {
-          "const": true
+        "semantics": {
+          "const": "leftmostFirst"
         },
         "zeroWidth": {
           "const": "fail"
@@ -3398,7 +3398,7 @@
         "accepting",
         "transitions",
         "anchoredAtStart",
-        "longestMatch",
+        "semantics",
         "zeroWidth"
       ],
       "type": "object"
