@@ -155,6 +155,8 @@ pub(crate) fn scope(path: &Path) -> Result<CorpusFile, LoadError> {
                 input: fixture.source.clone(),
                 expect: Expectation::ScopeOps(run.expect),
                 known_divergences: Vec::new(),
+                follow_spec: Vec::new(),
+                rust_oracle: None,
             });
         }
     }
@@ -177,6 +179,8 @@ pub(crate) fn catalog(path: &Path) -> Result<CorpusFile, LoadError> {
             input: String::new(),
             expect: Expectation::Catalog(fixture.expect),
             known_divergences: Vec::new(),
+            follow_spec: Vec::new(),
+            rust_oracle: None,
         });
     }
     Ok(out)

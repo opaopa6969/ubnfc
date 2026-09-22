@@ -87,6 +87,7 @@ pub fn apply(path: &Path, files: &mut [CorpusFile]) -> Result<(), LoadError> {
     let entries = load(path)?;
     let mut seen = BTreeSet::new();
     let mut resolved = Vec::new();
+    let mut follow_spec = Vec::new();
     for entry in entries {
         let name = Path::new(&entry.file);
         if name.file_name().and_then(|s| s.to_str()) != Some(entry.file.as_str())
@@ -121,14 +122,22 @@ pub fn apply(path: &Path, files: &mut [CorpusFile]) -> Result<(), LoadError> {
         if entry.decision.is_resolved() {
             resolved.push((*f, *c, entry.observation));
         }
+        if entry.decision == Decision::FollowSpec {
+            follow_spec.push((*f, *c, entry.observation));
+        }
     }
     for file in files.iter_mut().filter(|f| f.family == Family::Oracle) {
         for case in &mut file.cases {
             case.known_divergences.clear();
+            case.follow_spec.clear();
         }
     }
     for (f, c, observation) in resolved {
         files[f].cases[c].known_divergences.push(observation);
+    }
+    // D-021: follow-spec は「旧 oracle の値を再現しない」決定なので、一致したら既知バグ再現。
+    for (f, c, observation) in follow_spec {
+        files[f].cases[c].follow_spec.push(observation);
     }
     Ok(())
 }
@@ -142,9 +151,10 @@ pub enum Verdict {
     Fail(Vec<Difference>),
 }
 
-fn observation(path: &str) -> Option<Observation> {
+/// 差分・欠落の JSON Pointer を観測単位へ写す。wire の prefixCaptures は oracle の captures。
+pub(crate) fn observation(path: &str) -> Option<Observation> {
     match path.split('/').nth(1)? {
-        "ast" | "captures" => Some(Observation::Ast),
+        "ast" | "captures" | "prefixCaptures" => Some(Observation::Ast),
         "consumed" => Some(Observation::Consumed),
         "matched" => Some(Observation::Matched),
         "accepted" | "allConsumed" => Some(Observation::Accepted),

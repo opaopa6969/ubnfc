@@ -420,6 +420,15 @@ fn scope_fields(
 /// 欠落した観測は比較用コピーでのみ一致させ、受信値自体には書き足さない。
 fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<String>) {
     let mut expected = serde_json::to_value(&case.case.expect).unwrap();
+    if actual.backend == Backend::Rust {
+        // D-022: 数値 capture は Java 厳密 int / Rust 字句保持の別契約。Java 採取 oracle を
+        // Rust 契約へ投影し、字句そのものは capture 原文と照合する。
+        numeric_lexeme_contract(&mut expected["Oracle"], actual.response.get("ast"));
+        // D-011: 診断の主 offset は言語別 oracle。Rust 実走の採取値で置換する（farthestOffset は D-014 の共有契約）。
+        if let Some(rust) = &case.case.rust_oracle {
+            crate::rust_oracle::project_diagnostics(&mut expected["Oracle"]["diagnostics"], rust);
+        }
+    }
     let mut observed = expected.clone();
     let mut missing = Vec::new();
     let mut response = actual.response.clone();
@@ -506,14 +515,121 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
         }
     }
     // 型違い・必須フィールド欠落も Fail。deserialize 失敗を未観測にしない。
-    match serde_json::from_value(observed.clone()) {
-        Ok(observed) => (case.case.expect.clone(), observed, missing),
-        Err(_) => (
+    // expected は backend 別投影（D-022 / D-011）後の値を返す。
+    match (
+        serde_json::from_value(expected.clone()),
+        serde_json::from_value(observed.clone()),
+    ) {
+        (Ok(expected), Ok(observed)) => (expected, observed, missing),
+        _ => (
             Expectation::Raw(expected["Oracle"].clone()),
             Expectation::Raw(observed["Oracle"].clone()),
             missing,
         ),
     }
+}
+/// `Integer.parseInt` の受理範囲（NumericCaptureRuntimeTest.java:31-49、generators.md「数値 token の型境界」）。
+fn java_int(text: &str) -> Option<i64> {
+    let digits = text.strip_prefix(['+', '-']).unwrap_or(text);
+    if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    text.parse::<i32>().ok().map(i64::from)
+}
+fn within(inner: &Value, outer: &Value) -> bool {
+    let span = |v: &Value| match v.as_array() {
+        Some(a) if a.len() == 2 => Some((a[0].as_u64()?, a[1].as_u64()?)),
+        _ => None,
+    };
+    match (span(inner), span(outer)) {
+        (Some(i), Some(o)) => i.0 >= o.0 && i.1 <= o.1,
+        _ => false,
+    }
+}
+/// Java 採取 AST の int field を、同名・同範囲・同値へ変換できる capture 原文へ置換する。
+fn lexeme_fields(node: &mut Value, captures: &[Value]) {
+    let Some(span) = node.get("span").cloned() else {
+        return;
+    };
+    let Some(fields) = node.get_mut("fields").and_then(Value::as_object_mut) else {
+        return;
+    };
+    for (name, value) in fields.iter_mut() {
+        let lexeme = |n: i64| {
+            captures
+                .iter()
+                .find(|c| {
+                    c["name"] == *name
+                        && within(&c["span"], &span)
+                        && c["text"].as_str().and_then(java_int) == Some(n)
+                })
+                .map(|c| c["text"].clone())
+        };
+        match value {
+            Value::Number(number) => {
+                if let Some(text) = number.as_i64().and_then(lexeme) {
+                    *value = text;
+                }
+            }
+            Value::Array(items) => {
+                for item in items {
+                    match item {
+                        Value::Number(number) => {
+                            if let Some(text) = number.as_i64().and_then(lexeme) {
+                                *item = text;
+                            }
+                        }
+                        Value::Object(_) => lexeme_fields(item, captures),
+                        _ => {}
+                    }
+                }
+            }
+            Value::Object(_) => lexeme_fields(value, captures),
+            _ => {}
+        }
+    }
+}
+fn has_text_field(node: &Value, name: &str, text: &str) -> bool {
+    match node {
+        Value::Object(map) => map
+            .iter()
+            .any(|(k, v)| (k == name && v.as_str() == Some(text)) || has_text_field(v, name, text)),
+        Value::Array(items) => items.iter().any(|item| has_text_field(item, name, text)),
+        _ => false,
+    }
+}
+/// D-022 (docs/design/03-design-v1.md §8): oracle 系統の数値 capture を Rust 契約で比較する。
+/// - AST の int は capture 原文（字句）へ置換して厳密比較する（RustConformanceTest.java:561-575、
+///   NumericCaptureRuntimeTest.java:55-89 の「fields.value == 入力字句」）。
+/// - Java の NumberFormatException（mappingError）は Rust では起きない。Rust の AST に
+///   同名 capture の字句がそのまま入っていることを確認し、mappingError は null を期待する。
+fn numeric_lexeme_contract(oracle: &mut Value, observed_ast: Option<&Value>) {
+    let captures = oracle["captures"].as_array().cloned().unwrap_or_default();
+    if let Some(ast) = oracle.get_mut("ast") {
+        lexeme_fields(ast, &captures);
+    }
+    let lexeme = oracle["mappingError"]
+        .as_str()
+        .and_then(|m| m.strip_prefix("java.lang.NumberFormatException: For input string: \""))
+        .and_then(|m| m.strip_suffix('"'))
+        .map(str::to_owned);
+    let Some(lexeme) = lexeme else {
+        return;
+    };
+    let Some(capture) = captures
+        .iter()
+        .find(|c| c["text"].as_str() == Some(&lexeme))
+    else {
+        return;
+    };
+    let name = capture["name"].as_str().unwrap_or_default().to_owned();
+    oracle["mappingError"] = Value::Null;
+    oracle["ast"] = match observed_ast {
+        Some(ast) if ast.is_object() && has_text_field(ast, &name, &lexeme) => ast.clone(),
+        _ => {
+            json!({"type":"<D-022 numeric lexeme>","span":capture["span"].clone(),"fields":{name:lexeme}})
+        }
+    };
 }
 fn raw_compare(p: &Projection) -> Verdict {
     clean(divergence::compare(
@@ -563,7 +679,7 @@ pub fn compare(case: &RunCase, actual: &Actual, known: &[Observation]) -> Verdic
     }
     let p = projection(case, actual);
     if matches!(case.case.expect, Expectation::Oracle { .. }) {
-        let (expected, observed, _) = oracle(case, actual);
+        let (expected, observed, unobserved) = oracle(case, actual);
         let verdict = clean(divergence::compare(&expected, &observed, known));
         // parsedStatus も明示登録された観測だけを既知扱いにする。
         // references/scopeDepth 等の未登録・未知の観測は引き続き Fail。
@@ -572,12 +688,23 @@ pub fn compare(case: &RunCase, actual: &Actual, known: &[Observation]) -> Verdic
             &Value::Object(p.actual),
             known,
         );
-        let failed = matches!(verdict, Verdict::Fail(_)) || matches!(extra, Verdict::Fail(_));
+        let mut failed = matches!(verdict, Verdict::Fail(_)) || matches!(extra, Verdict::Fail(_));
         let mut differences = Vec::new();
         for result in [extra, verdict] {
             if let Verdict::Fail(d) | Verdict::KnownDivergence(d) = result {
                 differences.extend(d);
             }
+        }
+        // D-021 (docs/design/03-design-v1.md §8): follow-spec は「旧 oracle の値を再現しない」決定。
+        // 登録済み観測群が実測と一致し、かつ観測済み（欠落・null oracle でない）なら既知バグ再現として Fail。
+        let reproduced = reproduced_follow_spec(
+            case,
+            &differences,
+            unobserved.iter().chain(&p.missing).map(String::as_str),
+        );
+        if !reproduced.is_empty() {
+            failed = true;
+            differences.extend(reproduced);
         }
         if failed {
             Verdict::Fail(differences)
@@ -590,6 +717,44 @@ pub fn compare(case: &RunCase, actual: &Actual, known: &[Observation]) -> Verdic
         raw_compare(&p)
     }
 }
+fn reproduced_follow_spec<'a>(
+    case: &RunCase,
+    differences: &[Difference],
+    missing: impl Iterator<Item = &'a str>,
+) -> Vec<Difference> {
+    use std::collections::BTreeSet;
+    let differing: BTreeSet<_> = differences
+        .iter()
+        .filter_map(|d| divergence::observation(&d.path))
+        .collect();
+    let unobserved: BTreeSet<_> = missing.filter_map(divergence::observation).collect();
+    let oracle = serde_json::to_value(&case.case.expect).unwrap();
+    let oracle = &oracle["Oracle"];
+    let null_oracle = |o: Observation| {
+        let keys: &[&str] = match o {
+            Observation::Accepted => &["accepted", "allConsumed"],
+            Observation::Consumed => &["consumed"],
+            Observation::Matched => &["matched"],
+            _ => &[],
+        };
+        keys.iter().any(|k| oracle[k].is_null())
+    };
+    case.case
+        .follow_spec
+        .iter()
+        .filter(|o| {
+            !matches!(o, Observation::Generation)
+                && !differing.contains(o)
+                && !unobserved.contains(o)
+                && !null_oracle(**o)
+        })
+        .map(|o| Difference {
+            path: format!("/{}", serde_json::to_value(o).unwrap().as_str().unwrap()),
+            expected: Some(json!("follow-spec: 旧 oracle と異なる値（D-017）")),
+            actual: Some(json!("旧 oracle と一致（既知バグ再現、D-021）")),
+        })
+        .collect()
+}
 pub fn unobserved(case: &RunCase, actual: &Actual) -> Vec<String> {
     if actual.response.get("error").is_some() {
         return vec![];
@@ -599,4 +764,272 @@ pub fn unobserved(case: &RunCase, actual: &Actual) -> Vec<String> {
         missing.extend(oracle(case, actual).2);
     }
     missing
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{corpus::Case, runner::Options, rust_oracle::RustOracle};
+    use serde_json::json;
+
+    fn run_case(oracle: Value) -> RunCase {
+        RunCase {
+            case: Case {
+                id: "numeric/1".into(),
+                grammar_ref: vec![0],
+                entry_rule: None,
+                input: oracle["input"].as_str().unwrap_or("n7;").to_owned(),
+                expect: serde_json::from_value(json!({"Oracle": {
+                    "accepted": oracle["accepted"], "allConsumed": oracle["allConsumed"],
+                    "consumed": oracle["consumed"], "matched": oracle["matched"],
+                    "ast": oracle["ast"], "captures": oracle["captures"], "declarations": [],
+                    "diagnostics": oracle["diagnostics"], "mappingError": oracle["mappingError"]
+                }}))
+                .unwrap(),
+                known_divergences: vec![],
+                follow_spec: vec![],
+                rust_oracle: None,
+            },
+            grammar: "Probe".into(),
+            variant: "numeric-capture".into(),
+            family: "oracle".into(),
+            options: Options::default(),
+            fixture: Value::Null,
+            extra_expectations: Default::default(),
+        }
+    }
+    fn actual(backend: Backend, response: Value) -> Actual {
+        Actual {
+            backend,
+            variant: "numeric-capture".into(),
+            response,
+        }
+    }
+    fn response(ast: Value, mapping_error: Value) -> Value {
+        json!({"accepted": true, "allConsumed": true, "consumed": 3, "matched": 3, "ast": ast,
+            "prefixCaptures": [{"name":"value","binding":"Root:0","span":[1,2],"text":"7"}],
+            "declarations": [], "diagnostics": [], "mappingError": mapping_error})
+    }
+    fn int_oracle() -> Value {
+        json!({"input":"n7;","accepted": true, "allConsumed": true, "consumed": 3, "matched": 3,
+            "ast": {"type":"Value","span":[0,3],"fields":{"value":7}},
+            "captures": [{"name":"value","binding":"Root:0","span":[1,2],"text":"7"}],
+            "diagnostics": [], "mappingError": null})
+    }
+
+    #[test]
+    fn d022_rust_compares_int_captures_as_lexemes_and_java_as_ints() {
+        let case = run_case(int_oracle());
+        let lexeme = response(
+            json!({"type":"Value","span":[0,3],"fields":{"value":"7"}}),
+            Value::Null,
+        );
+        assert_eq!(
+            compare(&case, &actual(Backend::Rust, lexeme.clone()), &[]),
+            Verdict::Pass
+        );
+        assert!(matches!(
+            compare(&case, &actual(Backend::Java, lexeme), &[]),
+            Verdict::Fail(_)
+        ));
+        let int = response(
+            json!({"type":"Value","span":[0,3],"fields":{"value":7}}),
+            Value::Null,
+        );
+        assert_eq!(
+            compare(&case, &actual(Backend::Java, int.clone()), &[]),
+            Verdict::Pass
+        );
+        assert!(matches!(
+            compare(&case, &actual(Backend::Rust, int), &[]),
+            Verdict::Fail(_)
+        ));
+        // 字句そのものを照合する: 同値でも綴りが違えば Fail。
+        let other = response(
+            json!({"type":"Value","span":[0,3],"fields":{"value":"07"}}),
+            Value::Null,
+        );
+        let Verdict::Fail(diffs) = compare(&case, &actual(Backend::Rust, other), &[]) else {
+            panic!()
+        };
+        assert_eq!(diffs[0].path, "/ast/fields/value");
+        assert_eq!(diffs[0].expected, Some(json!("7")));
+    }
+
+    #[test]
+    fn d022_rust_has_no_number_format_error_but_must_keep_the_lexeme() {
+        let mut oracle = int_oracle();
+        oracle["input"] = json!("n1.5;");
+        oracle["consumed"] = json!(5);
+        oracle["matched"] = json!(5);
+        oracle["ast"] = Value::Null;
+        oracle["captures"] = json!([{"name":"value","binding":"Root:0","span":[1,4],"text":"1.5"}]);
+        oracle["mappingError"] =
+            json!("java.lang.NumberFormatException: For input string: \"1.5\"");
+        let case = run_case(oracle);
+        let mut ok = response(
+            json!({"type":"Value","span":[0,5],"fields":{"value":"1.5"}}),
+            Value::Null,
+        );
+        ok["consumed"] = json!(5);
+        ok["matched"] = json!(5);
+        ok["prefixCaptures"] =
+            json!([{"name":"value","binding":"Root:0","span":[1,4],"text":"1.5"}]);
+        assert_eq!(
+            compare(&case, &actual(Backend::Rust, ok.clone()), &[]),
+            Verdict::Pass
+        );
+        // Java は旧 oracle どおり mappingError。
+        let mut java = ok.clone();
+        java["ast"] = Value::Null;
+        java["mappingError"] = json!("java.lang.NumberFormatException: For input string: \"1.5\"");
+        assert_eq!(
+            compare(&case, &actual(Backend::Java, java), &[]),
+            Verdict::Pass
+        );
+        assert!(matches!(
+            compare(&case, &actual(Backend::Java, ok.clone()), &[]),
+            Verdict::Fail(_)
+        ));
+        // Rust が字句を落とした／別の値にした／AST を作らなかった場合は Fail。
+        for ast in [
+            json!({"type":"Value","span":[0,5],"fields":{"value":"1"}}),
+            json!({"type":"Value","span":[0,5],"fields":{"other":"1.5"}}),
+            Value::Null,
+        ] {
+            let mut bad = ok.clone();
+            bad["ast"] = ast;
+            let Verdict::Fail(diffs) = compare(&case, &actual(Backend::Rust, bad), &[]) else {
+                panic!()
+            };
+            assert!(
+                diffs.iter().any(|d| d.path.starts_with("/ast")),
+                "{diffs:?}"
+            );
+        }
+        let mut bad = ok;
+        bad["mappingError"] = json!("x");
+        assert!(matches!(
+            compare(&case, &actual(Backend::Rust, bad), &[]),
+            Verdict::Fail(_)
+        ));
+    }
+
+    #[test]
+    fn d011_rust_oracle_replaces_diagnostic_offsets_for_rust_only() {
+        let mut oracle = int_oracle();
+        oracle["input"] = json!("n1e+;");
+        oracle["accepted"] = json!(false);
+        oracle["allConsumed"] = json!(false);
+        oracle["consumed"] = json!(0);
+        oracle["matched"] = json!(0);
+        oracle["ast"] = Value::Null;
+        oracle["captures"] = json!([]);
+        oracle["diagnostics"] = json!([{"kind":"syntax","offset":4,"expected":["DigitParser"],
+            "farthestOffset":4,"farthestExpected":["DigitParser"],"origin":"Mapper.diagnose"}]);
+        let mut case = run_case(oracle);
+        case.case.rust_oracle = Some(RustOracle {
+            diagnostics: vec![
+                json!({"kind":"syntax","offset":2,"expected":[";"],"farthestOffset":2,"farthestExpected":[";"]}),
+            ],
+        });
+        let at = |offset: u64| {
+            json!({"accepted": false, "allConsumed": false, "consumed": 0, "matched": 0, "ast": null,
+                "prefixCaptures": [], "declarations": [], "mappingError": null,
+                "diagnostics": [{"kind":"syntax","offset":offset,"expected":["';'"],
+                    "farthestOffset":4,"farthestExpected":["DigitParser"],"origin":"Mapper.diagnose"}]})
+        };
+        assert_eq!(
+            compare(&case, &actual(Backend::Rust, at(2)), &[]),
+            Verdict::Pass
+        );
+        assert!(matches!(
+            compare(&case, &actual(Backend::Rust, at(4)), &[]),
+            Verdict::Fail(_)
+        ));
+        assert_eq!(
+            compare(&case, &actual(Backend::Java, at(4)), &[]),
+            Verdict::Pass
+        );
+        assert!(matches!(
+            compare(&case, &actual(Backend::Java, at(2)), &[]),
+            Verdict::Fail(_)
+        ));
+    }
+
+    #[test]
+    fn d021_follow_spec_equal_to_the_old_oracle_is_a_reproduced_known_bug() {
+        let mut case = run_case(int_oracle());
+        case.case.known_divergences = vec![
+            Observation::Consumed,
+            Observation::Ast,
+            Observation::Accepted,
+        ];
+        case.case.follow_spec = vec![Observation::Consumed];
+        let same = response(
+            json!({"type":"Value","span":[0,3],"fields":{"value":7}}),
+            Value::Null,
+        );
+        let Verdict::Fail(diffs) = compare(
+            &case,
+            &actual(Backend::Java, same.clone()),
+            &case.case.known_divergences,
+        ) else {
+            panic!("follow-spec と一致した consumed は既知バグ再現")
+        };
+        assert_eq!(diffs.len(), 1);
+        assert_eq!(diffs[0].path, "/consumed");
+        // 値が変わっていれば従来どおり既知乖離。
+        let mut fixed = same.clone();
+        fixed["consumed"] = json!(2);
+        assert!(matches!(
+            compare(
+                &case,
+                &actual(Backend::Java, fixed),
+                &case.case.known_divergences
+            ),
+            Verdict::KnownDivergence(_)
+        ));
+        // new-contract だけの登録は一致しても Pass。
+        case.case.follow_spec = vec![];
+        assert_eq!(
+            compare(
+                &case,
+                &actual(Backend::Java, same.clone()),
+                &case.case.known_divergences
+            ),
+            Verdict::Pass
+        );
+        // 未観測（wire 欠落。allConsumed は consumed から再計算されるので両群とも未観測）や
+        // 旧 oracle が null の観測群は再現判定しない。
+        case.case.follow_spec = vec![Observation::Consumed, Observation::Accepted];
+        let mut missing = same.clone();
+        missing.as_object_mut().unwrap().remove("consumed");
+        assert_eq!(
+            compare(
+                &case,
+                &actual(Backend::Java, missing.clone()),
+                &case.case.known_divergences
+            ),
+            Verdict::Pass
+        );
+        assert!(
+            unobserved(&case, &actual(Backend::Java, missing)).contains(&"/consumed".to_string())
+        );
+        let mut null_oracle = run_case(int_oracle());
+        let Expectation::Oracle { accepted, .. } = &mut null_oracle.case.expect else {
+            panic!()
+        };
+        *accepted = None;
+        null_oracle.case.known_divergences = vec![Observation::Accepted];
+        null_oracle.case.follow_spec = vec![Observation::Accepted];
+        assert_eq!(
+            compare(
+                &null_oracle,
+                &actual(Backend::Java, same),
+                &null_oracle.case.known_divergences
+            ),
+            Verdict::Pass
+        );
+    }
 }
