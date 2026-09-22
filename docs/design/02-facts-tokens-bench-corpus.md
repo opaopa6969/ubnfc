@@ -55,3 +55,14 @@
 
 合計 ≈ 700 ケース。`golden/*.java.txt` は既存生成物のスナップショットなので **使わない**
 （ubnfc は生成物の形が違う）。`catalog/corpus.json` は JSON として不正な `\'` エスケープを含む（9 行目）。既存 Java 側 loader は寛容。ubnfc の loader も `\'` を許容する（upstream は触らない）。
+
+## D. 手書き目標パーサ（examples/handwritten-target）の知見
+
+- Java（`examples/handwritten-target/java`、112 テスト）: ベンチ（µs/回、200,000 回 × 5 run 中央値）
+  `1+2*3` 2.13 / 2.29（認識のみ / AST 付き）、括弧深さ 8: 14.2 / 15.8、512 atom: 409 / 573。
+- trivia 挿入: chain の先頭・各要素後・group/反復 helper の境界。choice 自体には一律挿入しない。
+- rightAssoc: `Base Op Self | Base` のレシピを保持し各段を `right=[]` or `[child]` で構築。
+- parseInt は採用確定後の `build()` で、失敗は `MappingException`。失敗枝では公開 record を作らない。
+- 反復: 成功後に count++ → 進捗・max 確認。ゼロ幅成功も 1 回と数える。
+- **訂正**: `(NUMBER) @value`（group 包み）は既存生成器では `String` 型（generators.md #132）。手書き Java 目標は指示ミスで
+  `int` にしている。lowering / backend は既存 `MapperTypeResolver` を正とする。
