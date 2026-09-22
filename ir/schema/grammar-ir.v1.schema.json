@@ -3075,6 +3075,13 @@
         {
           "additionalProperties": false,
           "properties": {
+            "firstChars": {
+              "description": "scanner 実装が宣言する、成功し得る先頭 code point の集合（昇順・互いに素な閉区間）。省略は unknown。集合外の先頭文字では scanner が消費なしで失敗することを scanner 側が保証する必要条件であり、backend は候補除外（設計 v1 §3.4）にだけ使う。front は --extern-first-chars の宣言ファイルから originalClassName で引いて埋める。",
+              "items": {
+                "$ref": "#/$defs/CharRange"
+              },
+              "type": "array"
+            },
             "inputState": {
               "description": "scanner 呼出し時に渡す解析状態の項目名。front は consumed/matched（code point 位置）、mode（consumed または matchOnly）、invertMatch、resetMatchedWithConsumed（現在の transaction frame の R）を要求する。matched は最遠診断位置ではなく現在の照合 cursor。backend は列挙された状態を scanner に渡し、省略や既定値への置換をしない。",
               "items": {

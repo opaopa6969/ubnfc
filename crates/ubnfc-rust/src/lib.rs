@@ -5,6 +5,7 @@ mod driver;
 mod emit;
 mod evaluator;
 mod expressions;
+mod factor;
 mod mapping;
 mod metadata;
 mod predict;

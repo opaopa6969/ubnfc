@@ -27,18 +27,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     // stack 検査（limit）は rule 入口で行う。局所診断 frame と mark は memo の保存に必要な
     // 箇所にだけ置き、失敗時の rollback は choice / repeat / optional / separated /
     // lookahead / rule の各構造が自前で行う。
-    let (success, failure) = cacheable(g, i);
-    let rule_body = g.expr[g.ir.semantics.rules[g.rules[expr.rule_id.as_str()]]
-        .body
-        .as_str()];
-    let (success, failure) = if g.bodies.contains(&i)
-        || g.shared.contains(&i)
-        || cacheable(g, rule_body) == (false, false)
-    {
-        (success, failure)
-    } else {
-        (false, false)
-    };
+    let (success, failure) = memo_flags(g, i);
     let memoized = success || failure;
     // 到達位置（display の reached）は葉（literal / token / any / eof / empty / error）の出口、
     // trivia、memo frame の入口、memo hit の再生で記録すれば十分で、複合式と rule の入口・出口の
@@ -164,12 +153,25 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             if guarded.iter().any(|x| !x.known.skipped.is_empty()) {
                 writeln!(s,"let ct=self.input.cp_at(self.skip_{}::<{child_mode}>(out.state.begin()).position::<{child_mode}>()).map(|(c,_)|c);",policy.expect("policy of skipped chars")).unwrap();
             }
-            for (index, alt) in order.iter().enumerate() {
+            let candidate = |index: usize| -> String {
+                let alt = &order[index];
                 if let Some(x) = guarded.iter().find(|x| x.index == index) {
-                    writeln!(s,"self.restore(mark);let mut child=if {} {{self.guard_e{}_{}(out.state.begin())}} else {{{}}};diagnostic=self.diag.join(diagnostic,child.diag);",crate::predict::skip_condition(&x.known),x.expr,suffix(child_mode),g.call(alt,child_mode,"out.state.begin()")).unwrap();
+                    format!("self.restore(mark);let mut child=if {} {{self.guard_e{}_{}(out.state.begin())}} else {{{}}};diagnostic=self.diag.join(diagnostic,child.diag);\n",crate::predict::skip_condition(&x.known),x.expr,suffix(child_mode),g.call(alt,child_mode,"out.state.begin()"))
                 } else {
-                    writeln!(s,"self.restore(mark);let mut child={};diagnostic=self.diag.join(diagnostic,child.diag);",g.call(alt,child_mode,"out.state.begin()")).unwrap();
+                    format!("self.restore(mark);let mut child={};diagnostic=self.diag.join(diagnostic,child.diag);\n",g.call(alt,child_mode,"out.state.begin()"))
                 }
+            };
+            // 共通接頭辞を持つ連続候補は共有要素を 1 回だけ評価する（factor.rs）。参照経路は
+            // `options.factor` が偽のときのために残す。
+            if !longest {
+                if let Some(plan) = crate::factor::plan(g, order, &guarded) {
+                    s.push_str(&crate::factor::emit(
+                        g, order, child_mode, &plan, &guarded, &candidate,
+                    ));
+                }
+            }
+            for index in 0..order.len() {
+                s.push_str(&candidate(index));
                 if longest {
                     s.push_str("if child.ok && best.as_ref().is_none_or(|(b,_)|child.state.consumed>b.state.consumed) {child.state=out.state.commit(child.state);let effects=self.save_effects(mark);best=Some((child,effects));}\n");
                 } else {
@@ -346,6 +348,25 @@ pub(crate) fn label_of<'a>(g: &'a Generator<'_>, expr: &'a Expr) -> &'a str {
         })
 }
 
+/// expression `i` の wrapper が置く memo（成功, 失敗）。rule 本体・共有 expression・
+/// 本体が memo されない rule の内側だけ（上記の方針）。
+pub(crate) fn memo_flags(g: &Generator<'_>, i: usize) -> (bool, bool) {
+    let expr = &g.ir.semantics.expressions[i];
+    let (success, failure) = cacheable(g, i);
+    let rule_body = g.expr[g.ir.semantics.rules[g.rules[expr.rule_id.as_str()]]
+        .body
+        .as_str()];
+    if g.bodies.contains(&i) || g.shared.contains(&i) || cacheable(g, rule_body) == (false, false) {
+        (success, failure)
+    } else {
+        (false, false)
+    }
+}
+pub(crate) fn memoized(g: &Generator<'_>, i: usize) -> bool {
+    let (success, failure) = memo_flags(g, i);
+    success || failure
+}
+
 /// plan.memo（無ければ analysis.memoSafety）が許す成功・失敗の memo。
 fn cacheable(g: &Generator<'_>, i: usize) -> (bool, bool) {
     let expr = &g.ir.semantics.expressions[i];
@@ -403,7 +424,27 @@ pub(crate) fn scope_events(
         // One traversal for all sites preserves completion order across repeats,
         // alternatives and nested captures. Action order at the same site is IR order.
         if !sites.is_empty() {
-            writeln!(s, "for (site,span) in self.scope_captures({events},&{sites:?}) {{ let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;").unwrap();
+            // name を 1 回だけ使う（Declare / Use が 1 件）なら複製せず移動する。
+            let name_uses = if effect.mode == ScopeEffectMode::SameRuleText {
+                usize::MAX
+            } else {
+                selected
+                    .iter()
+                    .filter(|e| {
+                        e.capture_site_id.is_some()
+                            && matches!(
+                                e.action,
+                                ScopeEffectEventsAction::Declare | ScopeEffectEventsAction::Use
+                            )
+                    })
+                    .count()
+            };
+            let name_expr = if name_uses == 1 {
+                "name"
+            } else {
+                "name:name.clone()"
+            };
+            writeln!(s, "let mut scope_sites=self.take_scope();self.scope_captures({events},&{sites:?},&mut scope_sites);for &(site,span) in &scope_sites {{ let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;").unwrap();
             for event in selected.iter().filter(|e| e.capture_site_id.is_some()) {
                 let site = g.sites[event.capture_site_id.as_ref().unwrap().as_str()];
                 if effect.mode != ScopeEffectMode::SameRuleText {
@@ -432,12 +473,12 @@ pub(crate) fn scope_events(
                                         .map(|id| g.sites[id.as_str()]),
                                 )
                                 .collect();
-                        writeln!(s, "if site=={site} {{if let Some((_,target))=self.scope_captures({events},&{targets:?}).first() {{let expected=self.text(*target);if expected!=name {{self.effect(ScanEffect::Diagnostic{{message:format!(\"back-reference mismatch: expected '{{expected}}' but got '{{name}}'\"),offset_cp,len_cp,severity:Severity::Error}});}}}}}}").unwrap();
+                        writeln!(s, "if site=={site} {{let mut targets=self.take_scope();self.scope_captures({events},&{targets:?},&mut targets);if let Some((_,target))=targets.first() {{let expected=self.text(*target);if expected!=name {{self.effect(ScanEffect::Diagnostic{{message:format!(\"back-reference mismatch: expected '{{expected}}' but got '{{name}}'\"),offset_cp,len_cp,severity:Severity::Error}});}}}}self.give_scope(targets);}}").unwrap();
                     }
                 } else {
                     match event.action {
-                        ScopeEffectEventsAction::Declare => writeln!(s,"self.effect_at(ScanEffect::Declare{{name:name.clone(),offset_cp}},{mode:?},offset_cp,len_cp);").unwrap(),
-                        ScopeEffectEventsAction::Use => writeln!(s,"self.effect_at(ScanEffect::Use{{name:name.clone(),offset_cp,len_cp}},{mode:?},offset_cp,len_cp);").unwrap(),
+                        ScopeEffectEventsAction::Declare => writeln!(s,"self.effect_at(ScanEffect::Declare{{{name_expr},offset_cp}},{mode:?},offset_cp,len_cp);").unwrap(),
+                        ScopeEffectEventsAction::Use => writeln!(s,"self.effect_at(ScanEffect::Use{{{name_expr},offset_cp,len_cp}},{mode:?},offset_cp,len_cp);").unwrap(),
                         _ => {}
                     }
                 }
@@ -445,7 +486,11 @@ pub(crate) fn scope_events(
                     s.push_str("}\n");
                 }
             }
-            s.push_str("let _=(&name,offset_cp,len_cp); }\n");
+            if name_uses == 1 {
+                s.push_str("let _=(offset_cp,len_cp); }\nself.give_scope(scope_sites);\n");
+            } else {
+                s.push_str("let _=(&name,offset_cp,len_cp); }\nself.give_scope(scope_sites);\n");
+            }
         }
         for event in selected.iter().filter(|e| e.capture_site_id.is_none()) {
             let action = match event.action {
@@ -522,7 +567,7 @@ fn predict_literals(g: &Generator<'_>, order: &[ExprId], mode: bool) -> String {
     s
 }
 
-fn capture_events(g: &Generator<'_>, expr: &Expr, state: &str, out: &str) -> String {
+pub(crate) fn capture_events(g: &Generator<'_>, expr: &Expr, state: &str, out: &str) -> String {
     let mut s = String::new();
     for site in &expr.capture_site_ids {
         let index = g.sites[site.as_str()];
@@ -551,6 +596,9 @@ fn capture_events(g: &Generator<'_>, expr: &Expr, state: &str, out: &str) -> Str
         .replace("[state.", &format!("[{state}."))
 }
 
+pub(crate) fn semantic_shape_of(g: &Generator<'_>, id: &ExprId) -> Option<Cardinality> {
+    semantic_shape(g, id, &mut std::collections::BTreeSet::new())
+}
 // Text-only syntax supplies one lexeme. Only references that can produce mapped
 // values participate in semantic cardinality; delimiters do not become values.
 fn semantic_shape(

@@ -189,11 +189,12 @@ self.depth-=1;out.diag=self.diag.rule(4,out.diag);out
 fn r5_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e38_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[9]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[9],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==9 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:5,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -203,11 +204,12 @@ self.depth-=1;out.diag=self.diag.rule(5,out.diag);out
 fn r6_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e56_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[13]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[13],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==13 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:6,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -217,11 +219,12 @@ self.depth-=1;out.diag=self.diag.rule(6,out.diag);out
 fn r7_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e74_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[17]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[17],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==17 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:7,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -231,11 +234,12 @@ self.depth-=1;out.diag=self.diag.rule(7,out.diag);out
 fn r8_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e92_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[21]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[21],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==21 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:8,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -346,11 +350,12 @@ self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
 let mut out=self.e183_c(state);
 if out.ok {
 self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-for (site,span) in self.scope_captures(out.events,&[25]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[25],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==25 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:20,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -362,11 +367,12 @@ self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
 let mut out=self.e193_c(state);
 if out.ok {
 self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-for (site,span) in self.scope_captures(out.events,&[28]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[28],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==28 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:21,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -378,11 +384,12 @@ self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
 let mut out=self.e203_c(state);
 if out.ok {
 self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-for (site,span) in self.scope_captures(out.events,&[31]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[31],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==31 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:22,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -394,11 +401,12 @@ self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
 let mut out=self.e213_c(state);
 if out.ok {
 self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-for (site,span) in self.scope_captures(out.events,&[34]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[34],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==34 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:23,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -417,11 +425,12 @@ self.depth-=1;out.diag=self.diag.rule(24,out.diag);out
 fn r25_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e229_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[39]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[39],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==39 {
-self.effect_at(ScanEffect::Declare{name:name.clone(),offset_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:25,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -521,11 +530,12 @@ self.depth-=1;out.diag=self.diag.rule(35,out.diag);out
 fn r36_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e345_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[57]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[57],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==57 {
-self.effect_at(ScanEffect::Use{name:name.clone(),offset_cp,len_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Use{name,offset_cp,len_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:36,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -1291,11 +1301,12 @@ self.depth-=1;out.diag=self.diag.rule(120,out.diag);out
 fn r121_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e1014_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[238]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[238],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==238 {
-self.effect_at(ScanEffect::Use{name:name.clone(),offset_cp,len_cp},"lexical",offset_cp,len_cp);
+self.effect_at(ScanEffect::Use{name,offset_cp,len_cp},"lexical",offset_cp,len_cp);
 }
-let _=(&name,offset_cp,len_cp); }
+let _=(offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:121,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -11889,21 +11900,224 @@ out
 fn b681_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
-self.restore(mark);let mut child=self.e682_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+let ct=self.input.cp_at(self.skip_0::<false>(out.state.begin()).position::<false>()).map(|(c,_)|c);
+if self.options.factor && !out.state.invert {
+let entry=out.state.begin();
+let mut child='factored: {
+self.restore(mark);
+{let mut st=entry;
+st.reset=false;
+let mut cur=Step::yes(st);
+cur.state=st.begin();
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let p0=cur.state;let child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e683_c(cur.state)} else {self.e683_c(cur.state)};let ev0=child.events;let _=(p0,ev0);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p0.consumed.max(p0.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let p4=cur.state;
+let child=self.e684_c(cur.state);let ev3=child.events;let _=(p4,ev3);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p4.consumed.max(p4.matched),&["'['"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m5=self.mark();let b6=cur;
+let p8=cur.state;
+let child=self.e685_c(cur.state);let ev7=child.events;let _=(p8,ev7);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p8.consumed.max(p8.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let p12=cur.state;
+let child=self.e686_c(cur.state);let ev11=child.events;let _=(p12,ev11);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p12.consumed.max(p12.matched),&["':'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m13=self.mark();let b14=cur;
+let p16=cur.state;
+let child=self.e687_c(cur.state);let ev15=child.events;let _=(p16,ev15);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p16.consumed.max(p16.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m17=self.mark();let b18=cur;
+'f19: {
+let child=self.e688_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e689_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e690_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m17);cur=b18;
+'f20: {
+let child=self.e697_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f20;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(133),None);
+self.retag(ev3,None,Some(693));
+self.retag(ev7,Some(134),None);
+self.retag(ev11,None,Some(695));
+self.retag(ev15,Some(135),None);
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+self.restore(m13);cur=b14;
+'f21: {
+let child=self.e703_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e704_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e705_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(136),None);
+self.retag(ev3,None,Some(700));
+self.retag(ev7,Some(137),None);
+self.retag(ev11,None,Some(702));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m13);cur=b14;
+'f22: {
+let child=self.e711_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f22;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(139),None);
+self.retag(ev3,None,Some(708));
+self.retag(ev7,Some(140),None);
+self.retag(ev11,None,Some(710));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+}
+self.restore(m5);cur=b6;
+let p24=cur.state;
+let child=self.e715_c(cur.state);let ev23=child.events;let _=(p24,ev23);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p24.consumed.max(p24.matched),&["':'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m25=self.mark();let b26=cur;
+let p28=cur.state;
+let child=self.e716_c(cur.state);let ev27=child.events;let _=(p28,ev27);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p28.consumed.max(p28.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m29=self.mark();let b30=cur;
+'f31: {
+let child=self.e717_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e718_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e719_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(141),None);
+self.retag(ev3,None,Some(714));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m29);cur=b30;
+'f32: {
+let child=self.e725_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f32;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(144),None);
+self.retag(ev3,None,Some(722));
+self.retag(ev23,None,Some(723));
+self.retag(ev27,Some(145),None);
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+self.restore(m25);cur=b26;
+'f33: {
+let child=self.e730_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e731_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e732_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(146),None);
+self.retag(ev3,None,Some(728));
+self.retag(ev23,None,Some(729));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m25);cur=b26;
+'f34: {
+let child=self.e737_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f34;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:true});
+self.retag(ev0,Some(148),None);
+self.retag(ev3,None,Some(735));
+self.retag(ev23,None,Some(736));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+}
+}
+}
+let _=entry;self.restore(mark);out.ok=false;out.diag=diagnostic;out
+};
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
-self.restore(mark);let mut child=self.e691_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+self.restore(mark);break 'choice child;
+}
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e682_c(out.state.begin())} else {self.e682_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
-self.restore(mark);let mut child=self.e698_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e691_c(out.state.begin())} else {self.e691_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
-self.restore(mark);let mut child=self.e706_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e698_c(out.state.begin())} else {self.e698_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
-self.restore(mark);let mut child=self.e712_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e706_c(out.state.begin())} else {self.e706_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
-self.restore(mark);let mut child=self.e720_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e712_c(out.state.begin())} else {self.e712_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
-self.restore(mark);let mut child=self.e726_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e720_c(out.state.begin())} else {self.e720_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
-self.restore(mark);let mut child=self.e733_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e726_c(out.state.begin())} else {self.e726_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
+if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
+self.restore(mark);let mut child=if self.options.predict && !out.state.invert && !(ct.is_some_and(|c| matches!(c as u32,34|36|39..=40|99|101|105|116))) {self.guard_e733_c(out.state.begin())} else {self.e733_c(out.state.begin())};diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);break 'choice if let Some((mut child,effects))=best {self.replay_effects(effects);child.diag=diagnostic;child} else {out.ok=false;out.diag=diagnostic;out};
 };
@@ -12741,6 +12955,208 @@ out
 fn b738_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
+if self.options.factor && !out.state.invert {
+let entry=out.state.begin();
+let mut child='factored: {
+self.restore(mark);
+{let mut st=entry;
+st.reset=false;
+let mut cur=Step::yes(st);
+cur.state=st.begin();
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let p0=cur.state;let child=self.e740_c(cur.state);let ev0=child.events;let _=(p0,ev0);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p0.consumed.max(p0.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let p4=cur.state;
+let child=self.e741_c(cur.state);let ev3=child.events;let _=(p4,ev3);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p4.consumed.max(p4.matched),&["'['"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m5=self.mark();let b6=cur;
+let p8=cur.state;
+let child=self.e742_c(cur.state);let ev7=child.events;let _=(p8,ev7);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p8.consumed.max(p8.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let p12=cur.state;
+let child=self.e743_c(cur.state);let ev11=child.events;let _=(p12,ev11);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p12.consumed.max(p12.matched),&["':'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m13=self.mark();let b14=cur;
+let p16=cur.state;
+let child=self.e744_c(cur.state);let ev15=child.events;let _=(p16,ev15);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p16.consumed.max(p16.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m17=self.mark();let b18=cur;
+'f19: {
+let child=self.e745_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e746_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e747_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m17);cur=b18;
+'f20: {
+let child=self.e754_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f20;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(153),None);
+self.retag(ev3,None,Some(750));
+self.retag(ev7,Some(154),None);
+self.retag(ev11,None,Some(752));
+self.retag(ev15,Some(155),None);
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+self.restore(m13);cur=b14;
+'f21: {
+let child=self.e760_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e761_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e762_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(156),None);
+self.retag(ev3,None,Some(757));
+self.retag(ev7,Some(157),None);
+self.retag(ev11,None,Some(759));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m13);cur=b14;
+'f22: {
+let child=self.e768_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f22;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(159),None);
+self.retag(ev3,None,Some(765));
+self.retag(ev7,Some(160),None);
+self.retag(ev11,None,Some(767));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+}
+self.restore(m5);cur=b6;
+let p24=cur.state;
+let child=self.e772_c(cur.state);let ev23=child.events;let _=(p24,ev23);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p24.consumed.max(p24.matched),&["':'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m25=self.mark();let b26=cur;
+let p28=cur.state;
+let child=self.e773_c(cur.state);let ev27=child.events;let _=(p28,ev27);cur=self.combine(cur,child);
+if !cur.ok {
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+self.display.failures(p28.consumed.max(p28.matched),&["__CaptureSite"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+} else {
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let m29=self.mark();let b30=cur;
+'f31: {
+let child=self.e774_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e775_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e776_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(161),None);
+self.retag(ev3,None,Some(771));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m29);cur=b30;
+'f32: {
+let child=self.e782_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f32;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(164),None);
+self.retag(ev3,None,Some(779));
+self.retag(ev23,None,Some(780));
+self.retag(ev27,Some(165),None);
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+self.restore(m25);cur=b26;
+'f33: {
+let child=self.e787_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e788_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+let child=self.e789_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+self.retag(ev0,Some(166),None);
+self.retag(ev3,None,Some(785));
+self.retag(ev23,None,Some(786));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+self.restore(m25);cur=b26;
+'f34: {
+let child=self.e794_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f34;}
+let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
+cur.state=st.commit(cur.state);
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:true});
+self.retag(ev0,Some(168),None);
+self.retag(ev3,None,Some(792));
+self.retag(ev23,None,Some(793));
+diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;
+}
+self.display.failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
+diagnostic=self.diag.join(diagnostic,cur.diag);
+}
+}
+}
+}
+let _=entry;self.restore(mark);out.ok=false;out.diag=diagnostic;out
+};
+if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
+self.restore(mark);break 'choice child;
+}
 self.restore(mark);let mut child=self.e739_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e748_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -18029,6 +18445,484 @@ self.display.failures(t1.consumed.max(t1.matched),&["'call'", "'call'", "'call'"
 if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'call'", "'internal'", "'internal'", "'internal'"]);}
 if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'internal'", "'('", "')'"]);}
 Step {ok:false,state,events:EventId(0),diag:d6}
+}
+fn guard_e682_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e682_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e683_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e683_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let mut d1=Diag::NONE;
+let t2=self.trivia_1::<false>(state.begin().entered(true,true)).state;
+let d3=self.diag.fail(t2.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d1=self.diag.join(d1,d4);
+let d5=self.diag.fail(t2.position::<false>(),"(");
+d1=self.diag.join(d1,d5);
+let d6=self.diag.fail(t2.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d1=self.diag.join(d1,d7);
+let d8=self.diag.fail(t2.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d1=self.diag.join(d1,d9);
+let d10=self.diag.fail(t2.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d1=self.diag.join(d1,d11);
+let d12=self.diag.fail(t2.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d1=self.diag.join(d1,d13);
+let d14=self.diag.fail(t2.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d1=self.diag.join(d1,d16);
+let d17=self.diag.fail(t2.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d1=self.diag.join(d1,d19);
+let d20=self.diag.fail(t2.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d1=self.diag.join(d1,d22);
+let d23=self.e672_c(state.begin()).diag;
+d1=self.diag.join(d1,d23);
+let d24=self.diag.fail(t2.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d1=self.diag.join(d1,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t2.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t2.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d1=self.diag.join(d1,d30);
+let d31=self.diag.rule(82,d1);
+self.display.failures(t2.consumed.max(t2.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'"]);
+if state.begin().consumed.max(state.begin().matched)==t2.consumed.max(t2.matched) {self.display.failures(t2.consumed.max(t2.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'internal'", "'('", "')'"]);}
+if t2.begin().consumed.max(t2.begin().matched)==t2.consumed.max(t2.matched) {self.display.failures(t2.consumed.max(t2.matched),&["'call'", "'internal'", "'internal'", "'internal'"]);}
+if state.consumed.max(state.matched)==t2.consumed.max(t2.matched) {self.display.failures(t2.consumed.max(t2.matched),&["'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e691_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e691_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e698_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e698_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e706_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e706_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e712_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e712_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e720_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e720_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e726_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e726_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
+}
+fn guard_e733_c(&mut self,state:State)->Step {
+if !self.can_replay(3) {return self.e733_c(state);}
+self.display.reach(state.consumed.max(state.matched));
+let t1=self.trivia_1::<false>(state.entered(true,true)).state;
+let mut d2=Diag::NONE;
+let d3=self.diag.fail(t1.position::<false>(),"external");
+let d4=self.diag.rule(33,d3);
+d2=self.diag.join(d2,d4);
+let d5=self.diag.fail(t1.position::<false>(),"(");
+d2=self.diag.join(d2,d5);
+let d6=self.diag.fail(t1.position::<false>(),"(");
+let d7=self.diag.rule(90,d6);
+d2=self.diag.join(d2,d7);
+let d8=self.diag.fail(t1.position::<false>(),"toUpperCase");
+let d9=self.diag.rule(61,d8);
+d2=self.diag.join(d2,d9);
+let d10=self.diag.fail(t1.position::<false>(),"toLowerCase");
+let d11=self.diag.rule(62,d10);
+d2=self.diag.join(d2,d11);
+let d12=self.diag.fail(t1.position::<false>(),"trim");
+let d13=self.diag.rule(63,d12);
+d2=self.diag.join(d2,d13);
+let d14=self.diag.fail(t1.position::<false>(),"$");
+let d15=self.diag.rule(121,d14);
+let d16=self.diag.rule(66,d15);
+d2=self.diag.join(d2,d16);
+let d17=self.diag.fail(t1.position::<false>(),"$");
+let d18=self.diag.rule(121,d17);
+let d19=self.diag.rule(67,d18);
+d2=self.diag.join(d2,d19);
+let d20=self.diag.fail(t1.position::<false>(),"$");
+let d21=self.diag.rule(121,d20);
+let d22=self.diag.rule(68,d21);
+d2=self.diag.join(d2,d22);
+let d23=self.e672_c(t1.begin()).diag;
+d2=self.diag.join(d2,d23);
+let d24=self.diag.fail(t1.position::<false>(),"$");
+let d25=self.diag.rule(121,d24);
+d2=self.diag.join(d2,d25);
+let mut d26=Diag::NONE;
+let d27=self.diag.fail(t1.position::<false>(),"call");
+d26=self.diag.join(d26,d27);
+let d28=self.diag.fail(t1.begin().position::<false>(),"internal");
+d26=self.diag.join(d26,d28);
+let d29=self.diag.rule(35,d26);
+let d30=self.diag.rule(36,d29);
+d2=self.diag.join(d2,d30);
+let d31=self.diag.rule(82,d2);
+self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'external'", "'('", "'('", "'('", "'('", "'toUpperCase'", "'toUpperCase'", "'toLowerCase'", "'toLowerCase'", "'trim'", "'trim'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'$'", "'call'", "'call'", "'call'", "'internal'", "'external'", "'('", "')'", "'toUpperCase'", "'toLowerCase'", "'trim'", "'.toUpperCase'", "'.toLowerCase'", "'.trim'", "'$'", "__CaptureSite"]);
+if t1.begin().consumed.max(t1.begin().matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["'external'", "'string'", "':'", "'('", "')'", "'$'", "'('", "')'", "'('", "')'", "'toUpperCase'", "'('", "')'", "'toLowerCase'", "'('", "')'", "'trim'", "'('", "')'", "'.toUpperCase'", "'('", "')'", "'.toLowerCase'", "'('", "')'", "'.trim'", "'('", "')'", "'$'", "'call'", "'internal'", "'internal'", "'internal'", "'internal'", "'('", "')'"]);}
+if state.consumed.max(state.matched)==t1.consumed.max(t1.matched) {self.display.failures(t1.consumed.max(t1.matched),&["':'", "'['", "']'"]);}
+Step {ok:false,state,events:EventId(0),diag:d31}
 }
 fn guard_e809_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e809_c(state);}

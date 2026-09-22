@@ -48,6 +48,7 @@ pub(super) fn lower(cx: &mut Context<'_>, grammar: &r::Grammar) {
                 TokenSpec::Builtin { which, code_points }
             }
             T::Extern { class_name } => TokenSpec::Extern {
+                first_chars: None,
                 logical_id: cx.sid(token.id),
                 original_class_name: class_name.clone(),
                 java_binding: Some(class_name.clone()),

@@ -84,11 +84,26 @@ mod tests {
     }
     #[test]
     fn scope_rollback_and_replay() {
+        // `Decl '!' | Decl Use` は既定で左因数分解され Decl は 1 回だけ評価される。
+        // memo hit での効果の巻戻し・再生は参照経路（factor off）で検証する。
         let r = scope::parse("aa");
         assert!(r.ok);
-        assert!(r.statistics.memo_hits > 0);
         assert_eq!(r.declarations.len(), 1);
         assert_eq!(r.references.len(), 1);
+        assert!(r.scope_diagnostics.is_empty());
+        let factored = r;
+        let r = scope::parse_with_options(
+            "aa",
+            scope::ParseOptions {
+                factor: false,
+                ..Default::default()
+            },
+        );
+        assert!(r.ok);
+        assert!(r.statistics.memo_hits > 0);
+        assert_eq!(r.declarations, factored.declarations);
+        assert_eq!(r.references, factored.references);
+        assert_eq!(r.scope, factored.scope);
         assert!(r.scope_diagnostics.is_empty());
         let r = scope::parse_with_options(
             "aa",

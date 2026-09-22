@@ -255,6 +255,38 @@ tiny-string-token の single quote 内容抽出は残る Fail として報告す
 scanner 自体の value span は両言語の契約テストで検証し、登録 E2E は corpus の
 `direct-eof` 文法の double quote 入力と拒否入力を使う。期待値・oracle・乖離登録は変更しない。
 
+### Extern scanner の先頭文字宣言（M5 round 3）
+
+front の解析は Extern token の先頭文字集合（`mayStart`）を unknown として扱い、backend は
+Extern で始まる候補を候補除外（設計 v1 §3.4）の対象にしない。scanner registry は
+`scanners/first-chars.json` で、元クラス名（`originalClassName`、または registry が認める
+alias）ごとに「成功し得る先頭 code point の集合」を宣言できる。
+
+```json
+{"scanners": {"org.unlaxer.tinyexpression.parser.StringLiteralParser": ["'", "\""],
+              "oracle.ExternalCursorParser": ["😀"],
+              "some.UnknownScanner": null}}
+```
+
+要素は 1 code point の文字列か整数、または `{"start": "0", "end": "9"}` の閉区間。`null` は
+unknown（宣言しないのと同じ）。front は `ubnfc ir|gen --extern-first-chars FILE` で読み込み、
+`TokenSpec.extern.firstChars`（省略可・昇順・互いに素な区間）へ写す。宣言の無いクラスは
+警告を出して unknown のまま残す。`ir/fixtures` の golden はこのファイルを渡して生成する
+（`crates/ubnfc-front/tests/pipeline_golden.rs`）。harness の run-all は渡さない
+（corpus の verdict は宣言に依存しない）。
+
+宣言は必要条件で、健全性は scanner 実装の責任である: 集合外の先頭文字（Extern を呼ぶ位置の
+文字。同梱集合は `match_only && reset` の STRING を含め、消費 cursor の位置）では scanner が
+消費なしで失敗しなければならない。backend（Rust）はこの宣言を候補除外の判定にだけ使い、
+除外した候補の失敗再生では Extern の葉を本物の scanner 呼出しで再生するので、失敗診断
+（scanner が返す表示文字列）は宣言の有無で変わらない。同梱集合の宣言:
+DoubleQuoted `"`、SingleQuoted `'`、StringLiteral `'` `"`、CodeStart / CodeEnd `` ` ``
+（行頭でなければ失敗するが、先頭文字は必ず backtick）、ExternalCursor `😀`。
+`examples/p4-rust/tests/fixtures.rs` の `extern_first_chars_declaration_matches_bundled_scanners`
+が、宣言外の ASCII 文字で各 scanner が消費なしに失敗することを確認する。
+front の `analysis.mayStart`（両 backend の predict 表）は変えない。変えると P4 の plan と
+Java 生成物が同時に動くため、別 issue とする。
+
 ## round5: prefix capture と内部診断情報
 
 Java/Rust とも `options.lexical=true` の応答で `prefixCaptures` を返す。

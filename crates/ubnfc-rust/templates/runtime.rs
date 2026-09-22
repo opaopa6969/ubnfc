@@ -122,6 +122,8 @@ impl std::hash::Hasher for PtrHasher {
 }
 pub(crate) type TextSpans =
     std::collections::HashMap<usize, Span, std::hash::BuildHasherDefault<PtrHasher>>;
+/// capture の出現（site, span, 子 event）。
+pub(crate) type Cap = (usize, Span, EventId);
 #[derive(Clone, Copy)]
 pub(crate) struct Mark {
     scope: Checkpoint,
@@ -135,6 +137,39 @@ struct Effect {
     mode: &'static str,
     offset_cp: usize,
     length_cp: usize,
+}
+/// parse をまたいで再利用する大きな buffer（`ParseOptions::reuse_buffers`）。
+/// 内容は parse ごとに捨て、確保だけを thread ごとに 1 組保持する。大きな入力を扱った後は
+/// `POOL_RETAIN_BYTES` を超える組を捨てて、常駐量を抑える。結果には影響しない。
+pub(crate) struct Buffers {
+    arena: Vec<Event>,
+    diag: Diagnostics,
+    display: DisplayDiagnostics,
+    memo: Memo<Saved>,
+    trivia_cache: Memo<(Step, DisplaySnapshot)>,
+    effects: Vec<Effect>,
+    saved_effects: Vec<Effect>,
+    stacks: Vec<Vec<(EventId, bool)>>,
+    captures_pool: Vec<Vec<Cap>>,
+    values_pool: Vec<Vec<Ast>>,
+    texts_pool: Vec<Vec<String>>,
+    scope_pool: Vec<Vec<(usize, Span)>>,
+    text_spans: TextSpans,
+}
+const POOL_RETAIN_BYTES: usize = 64 << 20;
+thread_local! {
+    static POOL: std::cell::RefCell<Option<Buffers>> = const { std::cell::RefCell::new(None) };
+}
+impl Buffers {
+    fn bytes(&self) -> usize {
+        self.arena.capacity() * std::mem::size_of::<Event>()
+            + self.diag.capacity_bytes()
+            + self.display.capacity_bytes()
+            + self.memo.capacity_bytes()
+            + self.trivia_cache.capacity_bytes()
+            + (self.effects.capacity() + self.saved_effects.capacity())
+                * std::mem::size_of::<Effect>()
+    }
 }
 pub(crate) struct Session<'a> {
     pub text: &'a str,
@@ -156,6 +191,11 @@ pub(crate) struct Session<'a> {
     pub text_spans: TextSpans,
     /// AST 構築の走査用 stack の再利用 pool（再帰するので複数）。
     stacks: Vec<Vec<(EventId, bool)>>,
+    /// AST 構築の作業 Vec の再利用 pool（capture 出現、field 値、field 文字列）。
+    captures_pool: Vec<Vec<Cap>>,
+    values_pool: Vec<Vec<Ast>>,
+    texts_pool: Vec<Vec<String>>,
+    scope_pool: Vec<Vec<(usize, Span)>>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -169,38 +209,73 @@ impl<'a> Session<'a> {
     pub fn new(text: &'a str, options: ParseOptions, scanner: &'a mut dyn TokenScanner) -> Self {
         let rejected = text.len() > options.limits.input_bytes.min(u32::MAX as usize);
         let text = if rejected { "" } else { text };
+        let arena_capacity = if options.build_ast || options.lexical || HAS_SCOPE || HAS_RECOVERY {
+            // P4 実測 約 4.4 event / byte。
+            text.len().saturating_mul(5).saturating_add(8).min(32768)
+        } else {
+            1
+        };
+        let diag_capacity = text.len().saturating_mul(24).saturating_add(64).min(1 << 20);
+        // memo は rule 本体単位（P4 実測 約 2.3 entry / byte。候補除外で失敗 entry が減った）。
+        let memo_capacity = text.len().saturating_mul(3).saturating_add(64).min(1 << 20);
+        let pooled = if options.reuse_buffers {
+            POOL.with(|p| p.borrow_mut().take())
+        } else {
+            None
+        };
+        let buffers = match pooled {
+            Some(mut b) => {
+                b.arena.clear();
+                b.diag.reset(options.limits.diagnostics);
+                b.display.reset(options.limits.diagnostics);
+                b.memo.reset(memo_capacity);
+                b.trivia_cache.reset(0);
+                b.effects.clear();
+                b.saved_effects.clear();
+                b.text_spans.clear();
+                b.values_pool.iter_mut().for_each(Vec::clear);
+                b.texts_pool.iter_mut().for_each(Vec::clear);
+                b
+            }
+            None => Buffers {
+                arena: Vec::with_capacity(arena_capacity),
+                diag: Diagnostics::with_limit_and_capacity(options.limits.diagnostics, diag_capacity),
+                display: DisplayDiagnostics::new(options.limits.diagnostics),
+                memo: Memo::with_capacity(memo_capacity),
+                trivia_cache: Memo::default(),
+                effects: vec![],
+                saved_effects: vec![],
+                stacks: vec![],
+                captures_pool: vec![],
+                values_pool: vec![],
+                texts_pool: vec![],
+                scope_pool: vec![],
+                text_spans: Default::default(),
+            },
+        };
+        let mut arena = buffers.arena;
+        arena.push(Event::Empty);
         Self {
             text,
             input: Input::new(text),
             options,
             scanner,
-            arena: {
-                let mut arena = Vec::with_capacity(
-                    if options.build_ast || options.lexical || HAS_SCOPE || HAS_RECOVERY {
-                        // P4 実測 約 4.4 event / byte。
-                        text.len().saturating_mul(5).saturating_add(8).min(32768)
-                    } else {
-                        1
-                    },
-                );
-                arena.push(Event::Empty);
-                arena
-            },
-            diag: Diagnostics::with_limit_and_capacity(
-                options.limits.diagnostics,
-                text.len().saturating_mul(24).saturating_add(64).min(1 << 20),
-            ),
-            display: DisplayDiagnostics::new(options.limits.diagnostics),
-            // memo は rule 本体単位（P4 実測 約 2.3 entry / byte。候補除外で失敗 entry が減った）。
-            memo: Memo::with_capacity(text.len().saturating_mul(3).saturating_add(64).min(1 << 20)),
+            arena,
+            diag: buffers.diag,
+            display: buffers.display,
+            memo: buffers.memo,
             scope: ScopeStore::new(),
-            trivia_cache: Memo::default(),
-            effects: vec![],
-            saved_effects: vec![],
+            trivia_cache: buffers.trivia_cache,
+            effects: buffers.effects,
+            saved_effects: buffers.saved_effects,
             statistics: Statistics::default(),
             node_spans: vec![],
-            text_spans: Default::default(),
-            stacks: vec![],
+            text_spans: buffers.text_spans,
+            stacks: buffers.stacks,
+            captures_pool: buffers.captures_pool,
+            values_pool: buffers.values_pool,
+            texts_pool: buffers.texts_pool,
+            scope_pool: buffers.scope_pool,
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -209,6 +284,30 @@ impl<'a> Session<'a> {
             effect_bytes: 0,
             mapping_depth: 0,
             mapping_anchor: None,
+        }
+    }
+    /// 大きな buffer を thread の pool へ返す（`finish` の最後）。
+    fn recycle(&mut self) {
+        if !self.options.reuse_buffers {
+            return;
+        }
+        let buffers = Buffers {
+            arena: std::mem::take(&mut self.arena),
+            diag: std::mem::replace(&mut self.diag, Diagnostics::with_limit_and_capacity(0, 0)),
+            display: std::mem::replace(&mut self.display, DisplayDiagnostics::new(0)),
+            memo: std::mem::take(&mut self.memo),
+            trivia_cache: std::mem::take(&mut self.trivia_cache),
+            effects: std::mem::take(&mut self.effects),
+            saved_effects: std::mem::take(&mut self.saved_effects),
+            stacks: std::mem::take(&mut self.stacks),
+            captures_pool: std::mem::take(&mut self.captures_pool),
+            values_pool: std::mem::take(&mut self.values_pool),
+            texts_pool: std::mem::take(&mut self.texts_pool),
+            scope_pool: std::mem::take(&mut self.scope_pool),
+            text_spans: std::mem::take(&mut self.text_spans),
+        };
+        if buffers.bytes() <= POOL_RETAIN_BYTES {
+            POOL.with(|p| *p.borrow_mut() = Some(buffers));
         }
     }
     // Rust cannot recover from native stack overflow. Stop before consuming the
@@ -716,6 +815,31 @@ impl<'a> Session<'a> {
         }
         step
     }
+    /// 左因数分解（factor.rs）: 共有要素を先頭候補の expression 関数で評価した後、採用された
+    /// 候補の capture site / token expr に付け替える。共有要素の wrapper は memo されないので
+    /// この event は今回の結果からしか参照されない。
+    pub fn retag(&mut self, id: EventId, site: Option<usize>, expr: Option<usize>) {
+        if id.0 == 0 {
+            return;
+        }
+        let mut target = id;
+        if let Event::Capture {
+            site: current,
+            child,
+            ..
+        } = &mut self.arena[id.0]
+        {
+            if let Some(site) = site {
+                *current = site;
+            }
+            target = *child;
+        }
+        if let (Some(expr), Event::Token { expr: current, .. }) =
+            (expr, &mut self.arena[target.0])
+        {
+            *current = expr;
+        }
+    }
     pub fn take_stack(&mut self) -> Vec<(EventId, bool)> {
         let mut stack = self.stacks.pop().unwrap_or_default();
         stack.clear();
@@ -724,8 +848,9 @@ impl<'a> Session<'a> {
     pub fn give_stack(&mut self, stack: Vec<(EventId, bool)>) {
         self.stacks.push(stack);
     }
-    pub fn owned_captures(&mut self, root: EventId, sites: &[usize]) -> Vec<(Span, EventId)> {
-        let mut out = Vec::new();
+    /// rule の局所 event（Join / Values / Capture）を 1 回だけ走査し、全 capture site の出現を
+    /// 完了順に集める。AST 構築は field ごとにここから site で選ぶ（field ごとの再走査をしない）。
+    pub fn collect_captures(&mut self, root: EventId, out: &mut Vec<Cap>) {
         let mut stack = self.take_stack();
         stack.push((root, false));
         while let Some((id, done)) = stack.pop() {
@@ -742,16 +867,15 @@ impl<'a> Session<'a> {
                     token_extent,
                 } => {
                     if done {
-                        if sites.contains(&site) {
-                            out.push((
-                                if token_extent {
-                                    self.selected_extent(child, span)
-                                } else {
-                                    span
-                                },
-                                child,
-                            ));
-                        }
+                        out.push((
+                            site,
+                            if token_extent {
+                                self.selected_extent(child, span)
+                            } else {
+                                span
+                            },
+                            child,
+                        ));
                     } else {
                         stack.push((id, true));
                         stack.push((child, false));
@@ -761,7 +885,88 @@ impl<'a> Session<'a> {
             }
         }
         self.give_stack(stack);
-        out
+    }
+    pub fn take_captures(&mut self) -> Vec<Cap> {
+        let mut v = self.captures_pool.pop().unwrap_or_default();
+        v.clear();
+        v
+    }
+    pub fn give_captures(&mut self, v: Vec<Cap>) {
+        self.captures_pool.push(v);
+    }
+    pub fn take_values(&mut self) -> Vec<Ast> {
+        let mut v = self.values_pool.pop().unwrap_or_default();
+        v.clear();
+        v
+    }
+    pub fn give_values(&mut self, v: Vec<Ast>) {
+        self.values_pool.push(v);
+    }
+    pub fn take_texts(&mut self) -> Vec<String> {
+        let mut v = self.texts_pool.pop().unwrap_or_default();
+        v.clear();
+        v
+    }
+    pub fn give_texts(&mut self, v: Vec<String>) {
+        self.texts_pool.push(v);
+    }
+    /// text 変換の field 値（recovery で直接置換された出現は除く）。
+    pub fn text_values(&mut self, caps: &[Cap], sites: &[usize], out: &mut Vec<String>) {
+        for &(site, span, child) in caps {
+            if sites.contains(&site) && !self.directly_recovered(child) {
+                let text = self.semantic_text(child, span);
+                out.push(text);
+            }
+        }
+    }
+    pub fn text_nodes(&mut self, caps: &[Cap], sites: &[usize], out: &mut Vec<Ast>) {
+        for &(site, span, child) in caps {
+            if sites.contains(&site) && !self.directly_recovered(child) {
+                let text = self.semantic_text(child, span);
+                out.push(Ast::Text(text));
+            }
+        }
+    }
+    /// node 変換の field 値。出現ごとに子の値を構築し、値が無く空でない出現は字句 Text にする。
+    /// `fallback` は leaf 型（Text を leaf node に昇格する recipe）。
+    pub fn node_values(
+        &mut self,
+        caps: &[Cap],
+        sites: &[usize],
+        fallback: Option<usize>,
+        out: &mut Vec<Ast>,
+    ) -> Result<(), String> {
+        for &(site, span, child) in caps {
+            if !sites.contains(&site) {
+                continue;
+            }
+            let start = out.len();
+            self.build_values_into(child, out)?;
+            if out.len() == start
+                && span[0] != span[1]
+                && !self.has_recovery(child)
+                && !self.has_value_group(child)
+            {
+                let text = self.semantic_text(child, span);
+                out.push(Ast::Text(text));
+            }
+            if let Some(ty) = fallback {
+                let mut i = start;
+                while i < out.len() {
+                    if let Ast::Text(text) = &out[i] {
+                        let text = text.clone();
+                        out[i] = self.leaf(ty, span, text)?;
+                    }
+                    i += 1;
+                }
+            }
+        }
+        Ok(())
+    }
+    /// field の出現のどれかが recovery を含む（値が欠けた node は作らず省略する）。
+    pub fn missing_field(&self, caps: &[Cap], sites: &[usize]) -> bool {
+        caps.iter()
+            .any(|&(site, _, child)| sites.contains(&site) && self.has_recovery(child))
     }
     pub fn selected_extent(&self, root: EventId, fallback: Span) -> Span {
         let mut stack = vec![root];
@@ -826,11 +1031,6 @@ impl<'a> Session<'a> {
                 _ => return false,
             }
         }
-    }
-    pub fn field_missing(&mut self, root: EventId, sites: &[usize]) -> bool {
-        self.owned_captures(root, sites)
-            .iter()
-            .any(|(_, child)| self.has_recovery(*child))
     }
     pub fn recover<const MATCH: bool>(
         &mut self,
@@ -956,21 +1156,18 @@ impl<'a> Session<'a> {
         let value = if self.has_token_text(root) { self.text[content[0]..content[1]].to_owned() } else { self.text(content) };
         self.remember_text(value, extent)
     }
-    pub fn field_text(&mut self, root: EventId, sites: &[usize]) -> Vec<String> {
-        self.owned_captures(root, sites)
-            .into_iter()
-            .filter_map(|(span, child)| {
-                if self.directly_recovered(child) {
-                    None
-                } else {
-                    Some(self.semantic_text(child, span))
-                }
-            })
-            .collect()
+    pub fn take_scope(&mut self) -> Vec<(usize, Span)> {
+        let mut v = self.scope_pool.pop().unwrap_or_default();
+        v.clear();
+        v
     }
-    pub fn scope_captures(&self, root: EventId, sites: &[usize]) -> Vec<(usize, Span)> {
-        let mut out = Vec::new();
-        let mut stack = vec![(root, false)];
+    pub fn give_scope(&mut self, v: Vec<(usize, Span)>) {
+        self.scope_pool.push(v);
+    }
+    /// scope イベントの capture 出現（trim 済み span）を完了順に集める。
+    pub fn scope_captures(&mut self, root: EventId, sites: &[usize], out: &mut Vec<(usize, Span)>) {
+        let mut stack = self.take_stack();
+        stack.push((root, false));
         while let Some((id, done)) = stack.pop() {
             match self.arena[id.0] {
                 Event::Join(a, b) => {
@@ -997,7 +1194,7 @@ impl<'a> Session<'a> {
                 _ => {}
             }
         }
-        out
+        self.give_stack(stack);
     }
     pub fn node(&mut self, rule: &'static str, name: &'static str, span: Span) -> usize {
         let id = self.node_spans.len();

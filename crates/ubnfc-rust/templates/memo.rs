@@ -64,6 +64,28 @@ impl<T: Copy> Memo<T> {
             max_probe: Cell::new(0),
         }
     }
+    /// 内容を捨てて再利用する（確保は保持）。前回の表が今回の見積りより大きすぎるときは
+    /// 縮める（小さい入力で大きな slot 表を毎回ゼロ埋めしない）。
+    #[allow(dead_code)]
+    pub fn reset(&mut self, capacity: usize) {
+        let capacity = capacity.min(1_000_000);
+        let wanted = ((capacity + 1) * 2).next_power_of_two().max(64);
+        self.entries.clear();
+        if self.slots.len() > wanted.saturating_mul(8) {
+            self.slots = vec![0; wanted];
+            self.entries.shrink_to(capacity);
+        } else if self.slots.len() < wanted {
+            self.slots = vec![0; wanted];
+        } else {
+            self.slots.fill(0);
+        }
+        self.max_probe.set(0);
+    }
+    #[allow(dead_code)]
+    pub fn capacity_bytes(&self) -> usize {
+        self.slots.capacity() * std::mem::size_of::<u32>()
+            + self.entries.capacity() * std::mem::size_of::<(PackedKey, T)>()
+    }
     pub fn len(&self) -> usize {
         self.entries.len()
     }
