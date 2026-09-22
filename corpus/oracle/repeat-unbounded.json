@@ -1,0 +1,261 @@
+{
+  "feature": "bounded-repeat",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Value, params=[values]) Root ::= ('a' @values){2,};\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "repeat-unbounded/1",
+      "input": "",
+      "accepted": false,
+      "allConsumed": true,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'a'",
+            "Repeat",
+            "RootBounded0Parser",
+            "RootParser"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'a'",
+            "Repeat",
+            "RootBounded0Parser",
+            "RootParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'a'",
+          "Repeat",
+          "RootBounded0Parser",
+          "RootParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "repeat-unbounded/2",
+      "input": "a",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 1,
+          "expected": [
+            "'a'",
+            "RootBounded0Parser"
+          ],
+          "farthestOffset": 1,
+          "farthestExpected": [
+            "'a'",
+            "RootBounded0Parser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "'a'",
+          "RootBounded0Parser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "repeat-unbounded/3",
+      "input": "aa",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "values": [
+            "a",
+            "a"
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "a"
+        },
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            1,
+            2
+          ],
+          "text": "a"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "'a'",
+          "RootBounded0Parser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "repeat-unbounded/4",
+      "input": "aaa!",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 3,
+      "matched": 3,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "a"
+        },
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            1,
+            2
+          ],
+          "text": "a"
+        },
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            2,
+            3
+          ],
+          "text": "a"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 3,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 3,
+          "farthestExpected": [
+            "'a'",
+            "RootBounded0Parser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "'a'",
+          "RootBounded0Parser"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "ea4e1e728d6875e5397cc804486b04401c6d133aabaa6771eaa194f3d9c1dd73",
+    "org/example/oracle/ProbeMapper.java": "10d55b34404d947c61c71bc72d0af3f938b6e6eb6e851eaa799100eec63ca55e",
+    "org/example/oracle/ProbeParsers.java": "c4ca724a5f017d0b9c27f7c88c7b2fdd968db1c0398f5aee0d73cc3579b70cda"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/repeat-unbounded/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "values",
+          "returnType": "java.util.List<java.lang.String>",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

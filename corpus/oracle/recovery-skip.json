@@ -1,0 +1,102 @@
+{
+  "feature": "@recovery",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Root, params=[items]) Root ::= Stmt @items { Stmt @items }; @recovery(skip) @mapping(Stmt, params=[value]) Stmt ::= 'ok' @value ';';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "recovery-skip/1",
+      "input": "bad;ok;",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    },
+    {
+      "id": "recovery-skip/2",
+      "input": "bad",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "5dee5783f11e71698df5a609891eb097cc87b7907399fed7673699e8c8c48ff1",
+    "org/example/oracle/ProbeMapper.java": "cca6a0728ff48b26cf0953e4046c2cf8d3f4bb1d4a76eff7bb8c516e76f9d437",
+    "org/example/oracle/ProbeParsers.java": "1b0852314e90d21720cbabd6b4e0db9d28381bc677cd18e8aebf71f924091652"
+  },
+  "compilation": {
+    "success": false,
+    "diagnostics": [
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.cant.resolve.location.args",
+        "file": "ProbeParsers.java",
+        "line": 84,
+        "message": "cannot find symbol\n  symbol:   method toParsed()\n  location: class org.unlaxer.Committed"
+      },
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.cant.resolve.location.args",
+        "file": "ProbeParsers.java",
+        "line": 88,
+        "message": "cannot find symbol\n  symbol:   method isAtEnd()\n  location: variable parseContext of type org.unlaxer.context.ParseContext"
+      },
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.cant.apply.symbol",
+        "file": "ProbeParsers.java",
+        "line": 92,
+        "message": "method getCursor in interface org.unlaxer.context.Transaction cannot be applied to given types;\n  required: org.unlaxer.TokenKind\n  found:    no arguments\n  reason: actual and formal argument lists differ in length"
+      },
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.cant.resolve.location.args",
+        "file": "ProbeParsers.java",
+        "line": 100,
+        "message": "cannot find symbol\n  symbol:   method advanceCursor(int)\n  location: variable parseContext of type org.unlaxer.context.ParseContext"
+      },
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.cant.resolve.location.args",
+        "file": "ProbeParsers.java",
+        "line": 101,
+        "message": "cannot find symbol\n  symbol:   method toParsed()\n  location: class org.unlaxer.Committed"
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/recovery-skip/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "stage": "compilation_failed"
+}

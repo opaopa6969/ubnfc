@@ -1,0 +1,328 @@
+{
+  "feature": "numeric-capture",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token NUM=NumberParser @root @mapping(Value, params=[value]) Root ::= 'n' NUM @value ';';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "numeric/1",
+      "input": "n2147483647;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 12,
+      "matched": 12,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          12
+        ],
+        "fields": {
+          "value": 2147483647
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            1,
+            11
+          ],
+          "text": "2147483647"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 11,
+        "consumed": 12,
+        "matched": 12,
+        "expected": [
+          "'.'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "numeric/2",
+      "input": "n2147483648;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 12,
+      "matched": 12,
+      "ast": null,
+      "mappingError": "java.lang.NumberFormatException: For input string: \"2147483648\"",
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            1,
+            11
+          ],
+          "text": "2147483648"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 11,
+        "consumed": 12,
+        "matched": 12,
+        "expected": [
+          "'.'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "numeric/3",
+      "input": "n-2147483649;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 13,
+      "matched": 13,
+      "ast": null,
+      "mappingError": "java.lang.NumberFormatException: For input string: \"-2147483649\"",
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            1,
+            12
+          ],
+          "text": "-2147483649"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 12,
+        "consumed": 13,
+        "matched": 13,
+        "expected": [
+          "'.'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "numeric/4",
+      "input": "n1.5;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 5,
+      "matched": 5,
+      "ast": null,
+      "mappingError": "java.lang.NumberFormatException: For input string: \"1.5\"",
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            1,
+            4
+          ],
+          "text": "1.5"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 4,
+        "consumed": 5,
+        "matched": 5,
+        "expected": [
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "numeric/5",
+      "input": "n1e2;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 5,
+      "matched": 5,
+      "ast": null,
+      "mappingError": "java.lang.NumberFormatException: For input string: \"1e2\"",
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            1,
+            4
+          ],
+          "text": "1e2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 4,
+        "consumed": 5,
+        "matched": 5,
+        "expected": [
+          "DigitParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "numeric/6",
+      "input": "n+0007;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 7,
+      "matched": 7,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          7
+        ],
+        "fields": {
+          "value": 7
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            1,
+            6
+          ],
+          "text": "+0007"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 6,
+        "consumed": 7,
+        "matched": 7,
+        "expected": [
+          "'.'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "numeric/7",
+      "input": "n1e+;",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 4,
+          "expected": [
+            "DigitParser",
+            "OneOrMore"
+          ],
+          "farthestOffset": 4,
+          "farthestExpected": [
+            "DigitParser",
+            "OneOrMore"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 4,
+        "consumed": 4,
+        "matched": 4,
+        "expected": [
+          "DigitParser",
+          "OneOrMore"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "ef97daa835b1701e8d5fdd1b75c54fc7d8b571ad3d16b8c66c1b4982e135bb73",
+    "org/example/oracle/ProbeMapper.java": "de9f45eec3ed3c1879934fe5a6b882db9f16b81bdf32e902f338b951c0fa1da7",
+    "org/example/oracle/ProbeParsers.java": "72ff9da9843e47234d04e712aa31a351cff51fd34a1f4c0ce95aef7440d86729"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/numeric/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "int",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

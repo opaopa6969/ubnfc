@@ -1,0 +1,219 @@
+{
+  "feature": "dotted-mapping",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Node) Root ::= A | B; @mapping(Node.A) A ::= 'a'; @mapping(Node.B) B ::= 'b';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "mapping-dotted/1",
+      "input": "a",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "A",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": []
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "mapping-dotted/2",
+      "input": "b",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "B",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "'a'"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "mapping-dotted/3",
+      "input": "c",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'a'",
+            "'b'"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'a'",
+            "'b'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'a'",
+          "'b'"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "174bb287f3d91b1f88ce1e6a6ce2242130d56ad6d7aa718fcf5c5dac228b85f6",
+    "org/example/oracle/ProbeMapper.java": "85abec83c66972d6b65e80e8f615aa1f846584f081f8088b74688072a95fe7f6",
+    "org/example/oracle/ProbeParsers.java": "ecf6a55d94f4ab8c71ec0d695c97c7bdd8890c286ebec5f82dba089aa0d162e1"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/mapping-dotted/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Node",
+      "kind": "interface",
+      "methods": []
+    },
+    {
+      "name": "Node$A",
+      "kind": "record",
+      "methods": []
+    },
+    {
+      "name": "Node$B",
+      "kind": "record",
+      "methods": []
+    }
+  ],
+  "evaluator": {
+    "sourceSha256": "50a1c7c8cfd085f9f9d89e3ab8a898337995334e87fc8526aecac53030e11e39",
+    "compilation": {
+      "success": true,
+      "diagnostics": []
+    },
+    "methods": [
+      {
+        "name": "evalInternal",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "evalNodeA",
+        "abstract": true,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Node$A"
+        ]
+      },
+      {
+        "name": "evalNodeB",
+        "abstract": true,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Node$B"
+        ]
+      },
+      {
+        "name": "evalNode",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Node"
+        ]
+      },
+      {
+        "name": "eval",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "setDebugStrategy",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeEvaluator$DebugStrategy"
+        ]
+      }
+    ],
+    "emptyConcreteSubclass": {
+      "success": false,
+      "diagnostics": [
+        {
+          "kind": "ERROR",
+          "code": "compiler.err.does.not.override.abstract",
+          "file": "EmptySemantics.java",
+          "line": 1,
+          "message": "org.example.oracle.EmptySemantics is not abstract and does not override abstract method evalNodeB(org.example.oracle.ProbeAST.Node.B) in org.example.oracle.ProbeEvaluator"
+        }
+      ]
+    }
+  },
+  "stage": "executed"
+}

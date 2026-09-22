@@ -1,0 +1,74 @@
+{
+  "feature": "@enum",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @enum Mode ::= 'on' | 'ON'; @root @mapping(Config, params=[mode]) Root ::= Mode @mode;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "enum-collision/1",
+      "input": "on",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "c57c600902726b16b16f305b6673749444d99bb69273c11ea6cc1936b0fa46a0",
+    "org/example/oracle/ProbeMapper.java": "5396442d625ea84a784ecec01174f9211eaca26f0272e52c3dc85cef6eb0a076",
+    "org/example/oracle/ProbeParsers.java": "b6cf466448fce1c8911ef748c68895038a7e33b253acb50409eea061054f1163"
+  },
+  "compilation": {
+    "success": false,
+    "diagnostics": [
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.already.defined",
+        "file": "ProbeAST.java",
+        "line": 15,
+        "message": "variable ON is already defined in enum org.example.oracle.ProbeAST.Mode"
+      },
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.prob.found.req",
+        "file": "ProbeMapper.java",
+        "line": 544,
+        "message": "incompatible types: org.example.oracle.ProbeAST.Mode cannot be converted to java.lang.String"
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/enum-collision/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.compressed.diags",
+        "file": null,
+        "line": -1,
+        "message": "Some messages have been simplified; recompile with -Xdiags:verbose to get full output"
+      }
+    ]
+  },
+  "stage": "compilation_failed"
+}

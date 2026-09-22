@@ -1,0 +1,191 @@
+{
+  "feature": "@catalog",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @catalog(context=' variable ') @mapping(Value, params=[name]) Root ::= 'z' @name 'Z' @name;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "catalog/1",
+      "input": "zZ",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "name": [
+            "z",
+            "Z"
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "name",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "z"
+        },
+        {
+          "name": "name",
+          "binding": "Root:1",
+          "span": [
+            1,
+            2
+          ],
+          "text": "Z"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": []
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "catalog/2",
+      "input": "z",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 1,
+          "expected": [
+            "'Z'"
+          ],
+          "farthestOffset": 1,
+          "farthestExpected": [
+            "'Z'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "'Z'"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "catalog/3",
+      "input": "x",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'Z'",
+            "'z'"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'Z'",
+            "'z'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'Z'",
+          "'z'"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "ac6dc6abb7dba29b0f0a1d9399cc409e87dcae35b0032e10cedd4786b7d4a287",
+    "org/example/oracle/ProbeMapper.java": "e1146a75fa96d6b8dea7e854b639e649339855e474adb811e3d1576d6d6e9b48",
+    "org/example/oracle/ProbeParsers.java": "71dbaf41abcb1795a585ccd8e3169731494b22d8950b94b7bd2491a0b95498da"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/catalog/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "name",
+          "returnType": "java.util.List<java.lang.String>",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "catalogs": [
+    {
+      "context": " variable ",
+      "captures": [
+        "name"
+      ],
+      "rule": "Root"
+    }
+  ],
+  "stage": "executed"
+}

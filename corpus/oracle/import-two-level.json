@@ -1,0 +1,90 @@
+{
+  "feature": "@import",
+  "grammar": "grammar Probe {\n @import b from 'B.ubnf'\n @package: org.example.oracle\n  @root @mapping(Value, params=[value]) Root ::= b.Leaf @value;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "imports": {
+    "B.ubnf": "grammar B { @import c from 'C.ubnf' @mapping(Leaf) Leaf ::= c.Atom; }",
+    "C.ubnf": "grammar C { @mapping(Atom) Atom ::= 'c'; }"
+  },
+  "cases": [
+    {
+      "id": "import-two-level/1",
+      "input": "c",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    },
+    {
+      "id": "import-two-level/2",
+      "input": "b",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    },
+    {
+      "id": "import-two-level/3",
+      "input": "",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "",
+    "api": "UBNFMapper.parseWithImports + ParserGenerator/ASTGenerator/MapperGenerator",
+    "resolvedRules": [
+      {
+        "name": "Root",
+        "body": "ChoiceBody[alternatives=[SequenceBody[elements=[AnnotatedElement[element=RuleRefElement[namespace=Optional[b], name=Leaf], captureName=Optional[value], typeofConstraint=Optional.empty]]]]]"
+      },
+      {
+        "name": "b.Leaf",
+        "body": "ChoiceBody[alternatives=[SequenceBody[elements=[AnnotatedElement[element=RuleRefElement[namespace=Optional[c], name=Atom], captureName=Optional.empty, typeofConstraint=Optional.empty]]]]]"
+      }
+    ],
+    "resolvedTokens": []
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "1c24b76f0d4c3ef51163328e379dbb1a5040cbe71beec70a61d4df86736db34e",
+    "org/example/oracle/ProbeMapper.java": "4bf2f86286288a4ac3eedc83b115ec82b2ec7590b9fa20ffc416431405274fd5",
+    "org/example/oracle/ProbeParsers.java": "474eca3f95f8a2c92ebf66336d382d231f74cdcb31e412aa839ff01d7c19fa05"
+  },
+  "compilation": {
+    "success": false,
+    "diagnostics": [
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.expected",
+        "file": "ProbeParsers.java",
+        "line": 62,
+        "message": "'{' expected"
+      }
+    ]
+  },
+  "stage": "compilation_failed"
+}

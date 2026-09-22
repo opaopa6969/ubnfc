@@ -1,0 +1,174 @@
+{
+  "feature": "@enum",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @enum Mode ::= 'on' | 'off'; @root @mapping(Config) Root ::= Mode;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "enum-plain/1",
+      "input": "on",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Config",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": []
+      },
+      "scopeDepth": 0,
+      "enumValue": "ON"
+    },
+    {
+      "id": "enum-plain/2",
+      "input": "off",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Config",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "'on'"
+        ]
+      },
+      "scopeDepth": 0,
+      "enumValue": "OFF"
+    },
+    {
+      "id": "enum-plain/3",
+      "input": "other",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'off'",
+            "'on'"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'off'",
+            "'on'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'off'",
+          "'on'"
+        ]
+      },
+      "scopeDepth": 0,
+      "enumError": "java.lang.IllegalArgumentException: Unknown Mode: other"
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "d695e5d5e077f45dc55a09b3f7f45422cf92d24e41c718e41a710136ff9d401f",
+    "org/example/oracle/ProbeMapper.java": "ee12dc543c04e54dd7988dabebb2d5dc2cb3b350035a168732a93cc1c383726d",
+    "org/example/oracle/ProbeParsers.java": "7260d9d4972edb4f6cc032aef32c2b5419a21807deeda5a510f18ba3729e7884"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/enum-plain/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Config",
+      "kind": "record",
+      "methods": []
+    },
+    {
+      "name": "Mode",
+      "kind": "enum",
+      "methods": [
+        {
+          "name": "fromText",
+          "returnType": "org.example.oracle.ProbeAST$Mode",
+          "abstract": false
+        },
+        {
+          "name": "valueOf",
+          "returnType": "org.example.oracle.ProbeAST$Mode",
+          "abstract": false
+        },
+        {
+          "name": "values",
+          "returnType": "org.example.oracle.ProbeAST$Mode[]",
+          "abstract": false
+        }
+      ],
+      "constants": [
+        "ON",
+        "OFF"
+      ]
+    }
+  ],
+  "stage": "executed"
+}

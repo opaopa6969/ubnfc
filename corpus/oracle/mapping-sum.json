@@ -1,0 +1,156 @@
+{
+  "feature": "transparent-mapping",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Node) Root ::= A | B; @mapping(ItemA) A ::= 'a'; @mapping(ItemB) B ::= 'b';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "mapping-sum/1",
+      "input": "a",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "ItemA",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": []
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "mapping-sum/2",
+      "input": "b",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "ItemB",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "'a'"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "mapping-sum/3",
+      "input": "c",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'a'",
+            "'b'"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'a'",
+            "'b'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'a'",
+          "'b'"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "beffb46cdbcf78b3b2b4439f56f3fe2f866bc35537e18777786a05cb6d7be872",
+    "org/example/oracle/ProbeMapper.java": "088afec61757299cd134e4654958af2d245f68af9e6aae4eff689bed50c5611b",
+    "org/example/oracle/ProbeParsers.java": "ecf6a55d94f4ab8c71ec0d695c97c7bdd8890c286ebec5f82dba089aa0d162e1"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/mapping-sum/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "ItemA",
+      "kind": "record",
+      "methods": []
+    },
+    {
+      "name": "ItemB",
+      "kind": "record",
+      "methods": []
+    },
+    {
+      "name": "Node",
+      "kind": "interface",
+      "methods": []
+    }
+  ],
+  "stage": "executed"
+}

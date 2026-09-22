@@ -1,0 +1,181 @@
+{
+  "feature": "EOF",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token T=EOF\n @root @mapping(Value, params=[value]) Root ::=  T @value ;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "eof/1",
+      "input": "",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 0,
+      "matched": 0,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          0
+        ],
+        "fields": {
+          "value": ""
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            0
+          ],
+          "text": ""
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "WildCardCharacterParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "eof/2",
+      "input": "a",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "EndOfSourceParser",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "EndOfSourceParser",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "EndOfSourceParser",
+          "RootParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "eof/3",
+      "input": "😀",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "EndOfSourceParser",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "EndOfSourceParser",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "EndOfSourceParser",
+          "RootParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "c5375f73bb86e35d30639fbbaa59005ee8cbf039293e54cc330019c361069253",
+    "org/example/oracle/ProbeMapper.java": "87c4d92f1b9d6b7d8bcff1d4df542f0b9d341294964d9af64a70de6b523ccb46",
+    "org/example/oracle/ProbeParsers.java": "5afb2e9581b013cb85e88ad54ef6c90d596608e24768d99a3b3d0c382909eec7"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/eof/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}
