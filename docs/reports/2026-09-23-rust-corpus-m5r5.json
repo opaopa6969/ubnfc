@@ -1,7 +1,7 @@
 {
   "backend": "rust",
-  "generator_sha256": "f8f5aa2fa3ccb14d8f09d6b2615fef778c2613c934383a70ee2fd7be5db7e914",
-  "front_sha256": "d3a455b9f8d944296b8a89ab6f80d305571c8203693f4a345f8761ed0c0b9992",
+  "generator_sha256": "ebede30e32df79fff0e855fa513520a47d2ec015c640ac69ed97cc2a85e0c4bc",
+  "front_sha256": "32d870e9b0bd3b9b09f50282a6b15c3e20c071fd3db7ae08f4b4be8055b39ecd",
   "jobs": 4,
   "rust_build": {
     "jobs": null,
@@ -9,8 +9,8 @@
     "unique_crates": 227,
     "cache_hits": 0,
     "cargo_invocations": 1,
-    "initial_build_seconds": 146.498010718,
-    "total_build_seconds": 146.498010718
+    "initial_build_seconds": 102.330028117,
+    "total_build_seconds": 102.330028117
   },
   "corpus_files": 127,
   "grammar_variants": 279,
