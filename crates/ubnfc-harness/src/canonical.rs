@@ -153,6 +153,10 @@ pub struct Difference {
 
 /// 共通の構造は再帰比較し、欠落した部分木や型違いはその位置で一件として報告する。
 pub fn diff(expected: &AstValue, actual: &AstValue) -> Vec<Difference> {
+    diff_values(&expected.into(), &actual.into())
+}
+
+pub(crate) fn diff_values(expected: &Value, actual: &Value) -> Vec<Difference> {
     fn walk(path: &str, expected: &Value, actual: &Value, out: &mut Vec<Difference>) {
         match (expected, actual) {
             (Value::Object(e), Value::Object(a)) => {
@@ -184,6 +188,6 @@ pub fn diff(expected: &AstValue, actual: &AstValue) -> Vec<Difference> {
         }
     }
     let mut out = Vec::new();
-    walk("", &expected.into(), &actual.into(), &mut out);
+    walk("", expected, actual, &mut out);
     out
 }

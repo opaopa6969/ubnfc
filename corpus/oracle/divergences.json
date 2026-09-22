@@ -1,0 +1,527 @@
+[
+  {
+    "file": "comment-block.json",
+    "caseId": "comment-block/2",
+    "observation": "accepted",
+    "reason": "README.md#疑義 9: block='(* *)' の指定を無視して a(*x*)b を拒否している。設定した block 区切りを反映する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-block.json",
+    "caseId": "comment-block/2",
+    "observation": "ast",
+    "reason": "README.md#疑義 9: block='(* *)' の指定を無視して a(*x*)b を拒否している。設定した block 区切りを反映する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-block.json",
+    "caseId": "comment-block/2",
+    "observation": "consumed",
+    "reason": "README.md#疑義 9: block='(* *)' の指定を無視して a(*x*)b を拒否している。設定した block 区切りを反映する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-block.json",
+    "caseId": "comment-block/2",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 9: block='(* *)' の指定を無視して a(*x*)b を拒否している。設定した block 区切りを反映する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-block.json",
+    "caseId": "comment-block/2",
+    "observation": "matched",
+    "reason": "README.md#疑義 9: block='(* *)' の指定を無視して a(*x*)b を拒否している。設定した block 区切りを反映する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-line.json",
+    "caseId": "comment-line/2",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 9: 設定は line='#' なのに // を走査し、syntax offset=5・expected=// を報告している。未設定の // はコメントとして消費しない。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-line.json",
+    "caseId": "comment-line/3",
+    "observation": "accepted",
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-line.json",
+    "caseId": "comment-line/3",
+    "observation": "ast",
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-line.json",
+    "caseId": "comment-line/3",
+    "observation": "consumed",
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-line.json",
+    "caseId": "comment-line/3",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 9: line='#' が未反映で expected が // のまま。設定した区切りに従う診断にする（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-line.json",
+    "caseId": "comment-line/3",
+    "observation": "matched",
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/2",
+    "observation": "accepted",
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/2",
+    "observation": "ast",
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/2",
+    "observation": "consumed",
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/2",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/2",
+    "observation": "matched",
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/3",
+    "observation": "accepted",
+    "reason": "README.md#疑義 9: javaStyle が改行を扱う入力でも、設定した # コメントを拒否する。line の値を反映し、受理・AST・cursor・診断の乖離を記録する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/3",
+    "observation": "ast",
+    "reason": "README.md#疑義 9: javaStyle が改行を扱う入力でも、設定した # コメントを拒否する。line の値を反映し、受理・AST・cursor・診断の乖離を記録する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/3",
+    "observation": "consumed",
+    "reason": "README.md#疑義 9: javaStyle が改行を扱う入力でも、設定した # コメントを拒否する。line の値を反映し、受理・AST・cursor・診断の乖離を記録する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/3",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 9: javaStyle が改行を扱う入力でも、設定した # コメントを拒否する。line の値を反映し、受理・AST・cursor・診断の乖離を記録する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/3",
+    "observation": "matched",
+    "reason": "README.md#疑義 9: javaStyle が改行を扱う入力でも、設定した # コメントを拒否する。line の値を反映し、受理・AST・cursor・診断の乖離を記録する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "common-field-missing.json",
+    "caseId": "common-field-missing/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 8: 共通 accessor の欠損/異型を持つ AST を生成して javac で落とすのではなく、全 variant に共通 field が必要という契約で frontend が拒否する。generation の失敗段階・理由の差として記録する。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "common-field-type.json",
+    "caseId": "common-field-type/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 8: 共通 accessor の欠損/異型を持つ AST を生成して javac で落とすのではなく、全 variant に共通 field が必要という契約で frontend が拒否する。generation の失敗段階・理由の差として記録する。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "enum-collision.json",
+    "caseId": "enum-collision/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 8（7 の mapper 型不一致も併発）: 重複 ON を含む Java を生成して javac で落とすのではなく、enum 名衝突を frontend の検証で拒否する。generation の失敗段階・理由の差として記録する。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "enum.json",
+    "caseId": "enum/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 7: enum Mode を String として扱う mapper の型不一致を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "enum.json",
+    "caseId": "enum/2",
+    "observation": "generation",
+    "reason": "README.md#疑義 7: enum Mode を String として扱う mapper の型不一致を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "enum.json",
+    "caseId": "enum/3",
+    "observation": "generation",
+    "reason": "README.md#疑義 7: enum Mode を String として扱う mapper の型不一致を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "import-alias.json",
+    "caseId": "import-alias/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 6: b.Leaf を Java 識別子へ不正に出力する構文エラーを再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "import-alias.json",
+    "caseId": "import-alias/2",
+    "observation": "generation",
+    "reason": "README.md#疑義 6: b.Leaf を Java 識別子へ不正に出力する構文エラーを再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "import-alias.json",
+    "caseId": "import-alias/3",
+    "observation": "generation",
+    "reason": "README.md#疑義 6: b.Leaf を Java 識別子へ不正に出力する構文エラーを再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "import-cycle.json",
+    "caseId": "import-cycle/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 6: CLI exit 0 は疑義だが、採取 stage=generation_failed は API が循環を正しく拒否した結果。CLI 経路の是正と API の失敗 oracle を同じ generation 観測で免除すべきか未確定。",
+    "decision": "undecided"
+  },
+  {
+    "file": "import-two-level.json",
+    "caseId": "import-two-level/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 6: b.Leaf の生成構文エラーと c.Atom の多段 import 統合欠落を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "import-two-level.json",
+    "caseId": "import-two-level/2",
+    "observation": "generation",
+    "reason": "README.md#疑義 6: b.Leaf の生成構文エラーと c.Atom の多段 import 統合欠落を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "import-two-level.json",
+    "caseId": "import-two-level/3",
+    "observation": "generation",
+    "reason": "README.md#疑義 6: b.Leaf の生成構文エラーと c.Atom の多段 import 統合欠落を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "predictive.json",
+    "caseId": "predictive/5",
+    "observation": "accepted",
+    "reason": "README.md#疑義 10: 空入力で parser/diagnose が NPE。accepted=null を false に書き換えて保持せず、runner の通常の syntax 不受理・診断との違いを既知とする（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "predictive.json",
+    "caseId": "predictive/5",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 10: 空入力で parser/diagnose が NPE。accepted=null を false に書き換えて保持せず、runner の通常の syntax 不受理・診断との違いを既知とする（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-auto.json",
+    "caseId": "recovery-auto/1",
+    "observation": "accepted",
+    "reason": "README.md#疑義 4: bad;ok を消費して後続 ok; を壊す AUTO を再現しない。正常な後続 statement を解析し、末尾 ; を残す allConsumed=false と trailing_input を修正する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-auto.json",
+    "caseId": "recovery-auto/1",
+    "observation": "ast",
+    "reason": "README.md#疑義 4・11: AUTO 修正で後続 Stmt と capture は変わるが、回復領域を含む typed AST の形は設計 §3.10 で独立契約。形を推測して観測群全体を免除しない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "recovery-auto.json",
+    "caseId": "recovery-auto/1",
+    "observation": "consumed",
+    "reason": "README.md#疑義 4: bad;ok を消費して後続 ok; を壊す AUTO を再現しない。正常な後続 statement を解析し、末尾 ; を残す allConsumed=false と trailing_input を修正する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-auto.json",
+    "caseId": "recovery-auto/1",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 4: bad;ok を消費して後続 ok; を壊す AUTO を再現しない。正常な後続 statement を解析し、末尾 ; を残す allConsumed=false と trailing_input を修正する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-auto.json",
+    "caseId": "recovery-auto/1",
+    "observation": "matched",
+    "reason": "README.md#疑義 4: bad;ok を消費して後続 ok; を壊す AUTO を再現しない。正常な後続 statement を解析し、末尾 ; を残す allConsumed=false と trailing_input を修正する（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-root.json",
+    "caseId": "recovery-root/1",
+    "observation": "accepted",
+    "reason": "README.md#疑義 3: @root の recovery(sync=';') を適用し、bad; を回復する。root の注釈が無効な実行経路と syntax 失敗を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-root.json",
+    "caseId": "recovery-root/1",
+    "observation": "ast",
+    "reason": "README.md#疑義 3・11: root recovery の適用自体は D-017 で決定済みだが、回復した root を typed AST/capture にどう投影するかは設計 §3.10 の独立契約で未確定。",
+    "decision": "undecided"
+  },
+  {
+    "file": "recovery-root.json",
+    "caseId": "recovery-root/1",
+    "observation": "consumed",
+    "reason": "README.md#疑義 3: @root の recovery(sync=';') を適用し、bad; を回復する。root の注釈が無効な実行経路と syntax 失敗を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-root.json",
+    "caseId": "recovery-root/1",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 3: @root の recovery(sync=';') を適用し、bad; を回復する。root の注釈が無効な実行経路と syntax 失敗を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-root.json",
+    "caseId": "recovery-root/1",
+    "observation": "matched",
+    "reason": "README.md#疑義 3: @root の recovery(sync=';') を適用し、bad; を回復する。root の注釈が無効な実行経路と syntax 失敗を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-skip.json",
+    "caseId": "recovery-skip/1",
+    "observation": "generation",
+    "reason": "README.md#疑義 5: toParsed/isAtEnd/getCursor/advanceCursor の runtime API 不整合によるコンパイル失敗を再現しない（D-017）。未実行の入力を拒否 oracle としない。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-skip.json",
+    "caseId": "recovery-skip/2",
+    "observation": "generation",
+    "reason": "README.md#疑義 5: toParsed/isAtEnd/getCursor/advanceCursor の runtime API 不整合によるコンパイル失敗を再現しない（D-017）。未実行の入力を拒否 oracle としない。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-sync.json",
+    "caseId": "recovery-sync/1",
+    "observation": "ast",
+    "reason": "README.md#疑義 11（/3 は 2 も該当）: 回復 capture があるのに items に回復領域がない。設計 §3.10 は typed AST への投影を独立契約としており、error node・省略・別表のどれを正とするか未確定。非 BMP 修正に伴う capture/AST の変化も同じ観測群なので、包括的には免除しない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "recovery-sync.json",
+    "caseId": "recovery-sync/1",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 11: 回復が成功した入力に診断がないが、公開 recovery 診断の種類・offset・必須性は仕様から確定できない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "recovery-sync.json",
+    "caseId": "recovery-sync/3",
+    "observation": "accepted",
+    "reason": "README.md#疑義 2: 😀;x の同期は ; の直後まで。x を巻き込む C=M=3 と allConsumed=true を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-sync.json",
+    "caseId": "recovery-sync/3",
+    "observation": "ast",
+    "reason": "README.md#疑義 11（/3 は 2 も該当）: 回復 capture があるのに items に回復領域がない。設計 §3.10 は typed AST への投影を独立契約としており、error node・省略・別表のどれを正とするか未確定。非 BMP 修正に伴う capture/AST の変化も同じ観測群なので、包括的には免除しない。",
+    "decision": "undecided"
+  },
+  {
+    "file": "recovery-sync.json",
+    "caseId": "recovery-sync/3",
+    "observation": "consumed",
+    "reason": "README.md#疑義 2: 😀;x の同期は ; の直後まで。x を巻き込む C=M=3 と allConsumed=true を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-sync.json",
+    "caseId": "recovery-sync/3",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 2・11: 非 BMP の過剰消費を直すと末尾 x が残るため、空の診断列は trailing_input と乖離する。回復そのものの診断形式は別途未確定。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-sync.json",
+    "caseId": "recovery-sync/3",
+    "observation": "matched",
+    "reason": "README.md#疑義 2: 😀;x の同期は ; の直後まで。x を巻き込む C=M=3 と allConsumed=true を再現しない（D-017）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/1",
+    "observation": "accepted",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/1",
+    "observation": "ast",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/1",
+    "observation": "consumed",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/1",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/1",
+    "observation": "matched",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/2",
+    "observation": "accepted",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/2",
+    "observation": "ast",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/2",
+    "observation": "consumed",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/2",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/2",
+    "observation": "matched",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/1",
+    "observation": "accepted",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/1",
+    "observation": "ast",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/1",
+    "observation": "consumed",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/1",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/1",
+    "observation": "matched",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/2",
+    "observation": "accepted",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/2",
+    "observation": "ast",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/2",
+    "observation": "consumed",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/2",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/2",
+    "observation": "matched",
+    "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
+    "decision": "follow-spec"
+  }
+]
