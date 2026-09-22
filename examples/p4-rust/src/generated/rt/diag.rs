@@ -1,15 +1,28 @@
 // 局所診断を共有する arena。memo replay の rule path は親に接続して復元する。
+// handle は位置を持ち、join の比較で arena を参照しない（大きな arena への
+// ランダム参照を避ける）。id 0 は「診断なし」。
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct Diag(pub usize);
+pub struct Diag {
+    pub id: u32,
+    pub pos: u32,
+}
+impl Diag {
+    pub const NONE: Diag = Diag { id: 0, pos: 0 };
+    #[inline]
+    pub fn is_none(self) -> bool {
+        self.id == 0
+    }
+}
+// node は 24 byte。位置は handle が持つので Failure は label だけを持つ。
 #[derive(Clone, Copy)]
 enum Node {
     Empty,
-    Failure(usize, &'static str),
+    Failure(&'static str),
     Join(Diag, Diag),
-    Rule(usize, Diag),
+    Rule(u32, Diag),
 }
 pub struct Diagnostics {
-    nodes: Vec<(usize, Node)>,
+    nodes: Vec<Node>,
     limit: usize,
     pub exhausted: bool,
 }
@@ -18,83 +31,92 @@ impl Diagnostics {
         Self::with_limit(2_000_000)
     }
     pub fn with_limit(limit: usize) -> Self {
+        Self::with_limit_and_capacity(limit, 0)
+    }
+    /// capacity は入力長から見積もる（P4 実測 約 18 node / byte）。予算より大きくは確保しない。
+    pub fn with_limit_and_capacity(limit: usize, capacity: usize) -> Self {
+        let limit = limit.min(u32::MAX as usize);
+        let mut nodes = Vec::with_capacity(capacity.min(limit).min(1 << 20).max(1));
+        nodes.push(Node::Empty);
         Self {
-            nodes: vec![(0, Node::Empty)],
-            limit: limit.min(u32::MAX as usize),
+            nodes,
+            limit,
             exhausted: false,
         }
     }
     fn push(&mut self, pos: usize, node: Node) -> Diag {
         if self.nodes.len() >= self.limit {
             self.exhausted = true;
-            return Diag(0);
+            return Diag::NONE;
         }
-        let id = Diag(self.nodes.len());
-        self.nodes.push((pos, node));
-        id
+        let Ok(pos) = u32::try_from(pos) else {
+            self.exhausted = true;
+            return Diag::NONE;
+        };
+        let id = self.nodes.len() as u32;
+        self.nodes.push(node);
+        Diag { id, pos }
     }
     pub fn fail(&mut self, pos: usize, label: &'static str) -> Diag {
-        self.push(pos, Node::Failure(pos, label))
+        self.push(pos, Node::Failure(label))
     }
+    #[inline]
     pub fn join(&mut self, a: Diag, b: Diag) -> Diag {
-        if a.0 == 0 {
+        if a.id == 0 {
             return b;
         }
-        if b.0 == 0 || a == b {
+        if b.id == 0 || a == b {
             return a;
         }
-        let pa = self.nodes[a.0].0;
-        let pb = self.nodes[b.0].0;
-        if pa > pb {
+        if a.pos > b.pos {
             a
-        } else if pb > pa {
+        } else if b.pos > a.pos {
             b
         } else {
-            self.push(pa, Node::Join(a, b))
+            self.push(a.pos as usize, Node::Join(a, b))
         }
     }
     pub fn rule(&mut self, rule: usize, child: Diag) -> Diag {
-        if child.0 == 0 {
+        if child.id == 0 {
             child
         } else {
-            self.push(self.nodes[child.0].0, Node::Rule(rule, child))
+            self.push(child.pos as usize, Node::Rule(rule as u32, child))
         }
     }
     pub fn summary(&self, root: Diag) -> Option<(usize, Vec<&'static str>, Vec<usize>)> {
-        if root.0 == 0 {
+        if root.id == 0 {
             return None;
         }
         let mut expected = Vec::new();
         let mut labels = std::collections::HashSet::new();
         // Local suffix depth is independent of the caller. Reconnect the chosen
         // suffix from the root, so a shared node reached by a longer path wins.
-        let mut depths = std::collections::HashMap::<usize, usize>::new();
+        let mut depths = std::collections::HashMap::<u32, usize>::new();
         let mut stack = vec![(root, false)];
         while let Some((id, leave)) = stack.pop() {
             if leave {
                 depths.insert(
-                    id.0,
-                    match self.nodes[id.0].1 {
-                        Node::Join(a, b) => depths[&a.0].max(depths[&b.0]),
-                        Node::Rule(_, child) => depths[&child.0] + 1,
+                    id.id,
+                    match self.nodes[id.id as usize] {
+                        Node::Join(a, b) => depths[&a.id].max(depths[&b.id]),
+                        Node::Rule(_, child) => depths[&child.id] + 1,
                         _ => 0usize,
                     },
                 );
                 continue;
             }
-            if depths.contains_key(&id.0) {
+            if depths.contains_key(&id.id) {
                 continue;
             }
-            match self.nodes[id.0].1 {
+            match self.nodes[id.id as usize] {
                 Node::Empty => {
-                    depths.insert(id.0, 0);
+                    depths.insert(id.id, 0);
                 }
-                Node::Failure(pos, label) => {
-                    debug_assert_eq!(pos, self.nodes[root.0].0);
+                Node::Failure(label) => {
                     if labels.insert(label) {
                         expected.push(label);
                     }
-                    depths.insert(id.0, 0);
+                    depths.insert(id.id, 0);
                 }
                 Node::Join(a, b) => {
                     stack.push((id, true));
@@ -110,16 +132,16 @@ impl Diagnostics {
         let mut deepest = Vec::new();
         let mut id = root;
         loop {
-            match self.nodes[id.0].1 {
-                Node::Join(a, b) => id = if depths[&a.0] >= depths[&b.0] { a } else { b },
+            match self.nodes[id.id as usize] {
+                Node::Join(a, b) => id = if depths[&a.id] >= depths[&b.id] { a } else { b },
                 Node::Rule(rule, child) => {
-                    deepest.push(rule);
+                    deepest.push(rule as usize);
                     id = child;
                 }
                 _ => break,
             }
         }
-        Some((self.nodes[root.0].0, expected, deepest))
+        Some((root.pos as usize, expected, deepest))
     }
 }
 
@@ -155,15 +177,72 @@ pub struct DisplayDiagnostics {
     log: Vec<&'static str>,
     saved: Vec<&'static str>,
     frames: Vec<Frame>,
+    seen: Seen,
     floor: usize,
     guards: usize,
     work: usize,
     limit: usize,
     pub exhausted: bool,
 }
+// 生存 label の重複除去は pointer 同一性で行う（静的 label は同じ定数を指すことが多く、
+// 内容の重複は summary が落とす）。世代印付きの小さな open addressing 表で O(n)。
+struct Seen {
+    slots: Vec<(usize, u32)>,
+    generation: u32,
+}
+impl Seen {
+    fn new() -> Self {
+        Self {
+            slots: vec![(0, 0); 256],
+            generation: 0,
+        }
+    }
+    // range の重複を落とし、生き残った要素数を返す。log[base..] を詰める。
+    fn dedupe(&mut self, log: &mut Vec<&'static str>, base: usize) {
+        self.generation = self.generation.wrapping_add(1);
+        if self.generation == 0 {
+            self.slots.iter_mut().for_each(|s| *s = (0, 0));
+            self.generation = 1;
+        }
+        let mask = self.slots.len() - 1;
+        let mut keep = base;
+        let mut linear = false;
+        for i in base..log.len() {
+            let label = log[i];
+            let key = label.as_ptr() as usize;
+            let mut index = (key >> 4).wrapping_mul(0x9E37_79B1) & mask;
+            let mut fresh = true;
+            let mut probes = 0;
+            loop {
+                let slot = self.slots[index];
+                if slot.1 != self.generation {
+                    self.slots[index] = (key, self.generation);
+                    break;
+                }
+                if slot.0 == key {
+                    fresh = false;
+                    break;
+                }
+                index = (index + 1) & mask;
+                probes += 1;
+                if probes > 64 {
+                    linear = true;
+                    break;
+                }
+            }
+            if linear {
+                fresh = !log[base..keep].iter().any(|&s| same(s, label));
+            }
+            if fresh {
+                log[keep] = label;
+                keep += 1;
+            }
+        }
+        log.truncate(keep);
+    }
+}
 #[inline]
 fn same(a: &'static str, b: &'static str) -> bool {
-    // 静的 label は同じ文字列定数を指すことが多い。内容比較は summary だけで行う。
     a.as_ptr() == b.as_ptr() && a.len() == b.len()
 }
 impl DisplayDiagnostics {
@@ -172,6 +251,7 @@ impl DisplayDiagnostics {
             log: Vec::with_capacity(64),
             saved: vec![],
             frames: vec![Frame::default()],
+            seen: Seen::new(),
             floor: 0,
             guards: 0,
             work: 0,
@@ -237,12 +317,8 @@ impl DisplayDiagnostics {
         let frame = *self.frames.last().expect("global diagnostic frame");
         let start = self.saved.len();
         if self.log.len() > frame.base && frame.far >= self.floor {
-            for i in frame.base..self.log.len() {
-                let label = self.log[i];
-                if !self.saved[start..].iter().any(|&s| same(s, label)) {
-                    self.saved.push(label);
-                }
-            }
+            self.seen.dedupe(&mut self.log, frame.base);
+            self.saved.extend_from_slice(&self.log[frame.base..]);
         }
         DisplaySnapshot {
             far: u32::try_from(frame.far).expect("input byte budget"),
@@ -297,7 +373,7 @@ impl DisplayDiagnostics {
         }
         self.log.push(label);
         if self.log.len() - base >= 64 {
-            Self::dedupe(&mut self.log, base);
+            self.seen.dedupe(&mut self.log, base);
         }
     }
     pub fn failures(&mut self, pos: usize, labels: &[&'static str]) {
@@ -309,7 +385,7 @@ impl DisplayDiagnostics {
         }
         self.log.extend_from_slice(labels);
         if self.log.len() - base >= 64 {
-            Self::dedupe(&mut self.log, base);
+            self.seen.dedupe(&mut self.log, base);
         }
     }
     // memo hit などで保存した局所 snapshot を現在 frame へ再生する。
@@ -327,20 +403,8 @@ impl DisplayDiagnostics {
         }
         self.log.extend_from_slice(&self.saved[range]);
         if self.log.len() - base >= 64 {
-            Self::dedupe(&mut self.log, base);
+            self.seen.dedupe(&mut self.log, base);
         }
-    }
-    // 同位置の label 集合は和集合。log が伸びたときだけ重複を落とす（意味は不変）。
-    fn dedupe(log: &mut Vec<&'static str>, base: usize) {
-        let mut keep = base;
-        for i in base..log.len() {
-            let label = log[i];
-            if !log[base..keep].iter().any(|&s| same(s, label)) {
-                log[keep] = label;
-                keep += 1;
-            }
-        }
-        log.truncate(keep);
     }
     // 全 frame を内側から畳み込む（parse 終了後は global frame だけ）。
     pub fn summary(&self) -> (usize, Vec<&'static str>) {

@@ -149,7 +149,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
                 .map(|p| &p.candidate_order)
                 .filter(|o| !o.is_empty())
                 .unwrap_or(alternatives);
-            s.push_str("out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;\n");
+            s.push_str("out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;\n");
             if predict && !longest {
                 s.push_str(&predict_literals(g, order, child_mode));
             }

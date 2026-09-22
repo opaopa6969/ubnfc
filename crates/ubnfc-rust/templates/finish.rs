@@ -303,7 +303,8 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     self.statistics.ast_nodes = self.node_spans.len();
     let mut value_spans = Vec::new();
     if let Some(ast) = &ast {
-        ast.collect("", &self.text_spans, &mut value_spans);
+        let mut path = String::with_capacity(128);
+        ast.collect(&mut path, &self.text_spans, &mut value_spans);
     }
     ParseResult {
         value_spans,

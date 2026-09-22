@@ -56,7 +56,7 @@ impl Step {
             ok: true,
             state,
             events: EventId(0),
-            diag: Diag(0),
+            diag: Diag::NONE,
         }
     }
 }
@@ -66,6 +66,7 @@ pub(crate) struct Saved {
     matched: u32,
     events: u32,
     diag: u32,
+    diag_pos: u32,
     flags: u32,
     effects: [u32; 2],
     display: DisplaySnapshot,
@@ -77,7 +78,8 @@ impl Saved {
             consumed: u32::try_from(step.state.consumed).expect("cursor"),
             matched: u32::try_from(step.state.matched).expect("cursor"),
             events: u32::try_from(step.events.0).expect("arena"),
-            diag: u32::try_from(step.diag.0).expect("diagnostics"),
+            diag: step.diag.id,
+            diag_pos: step.diag.pos,
             flags: step.ok as u32
                 | ((step.state.invert as u32) << 1)
                 | ((step.state.reset as u32) << 2),
@@ -94,7 +96,10 @@ impl Saved {
                 reset: self.flags & 4 != 0,
             },
             events: EventId(self.events as usize),
-            diag: Diag(self.diag as usize),
+            diag: Diag {
+                id: self.diag,
+                pos: self.diag_pos,
+            },
         }
     }
 }
@@ -157,9 +162,13 @@ impl<'a> Session<'a> {
                 arena.push(Event::Empty);
                 arena
             },
-            diag: Diagnostics::with_limit(options.limits.diagnostics),
+            diag: Diagnostics::with_limit_and_capacity(
+                options.limits.diagnostics,
+                text.len().saturating_mul(24).saturating_add(64).min(1 << 20),
+            ),
             display: DisplayDiagnostics::new(options.limits.diagnostics),
-            memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
+            // memo は rule 本体単位（P4 実測 約 5 entry / byte）。
+            memo: Memo::with_capacity(text.len().saturating_mul(6).saturating_add(64).min(1 << 20)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
             effects: vec![],
@@ -657,7 +666,7 @@ impl<'a> Session<'a> {
             });
         } else {
             self.restore(mark);
-            if step.diag.0 == 0 {
+            if step.diag.is_none() {
                 step.diag = self.diag.fail(state.position::<MATCH>(), label);
             }
         }
@@ -2633,7 +2642,8 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     self.statistics.ast_nodes = self.node_spans.len();
     let mut value_spans = Vec::new();
     if let Some(ast) = &ast {
-        ast.collect("", &self.text_spans, &mut value_spans);
+        let mut path = String::with_capacity(128);
+        ast.collect(&mut path, &self.text_spans, &mut value_spans);
     }
     ParseResult {
         value_spans,
@@ -2708,10 +2718,11 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     }
 }
 }
+// value span の path は共有バッファに push / truncate で組み立てる（field ごとの format! を避ける）。
 trait CollectValueSpans {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     );
@@ -2719,13 +2730,13 @@ trait CollectValueSpans {
 impl CollectValueSpans for String {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         if let Some(span) = texts.get(&(self.as_ptr() as usize)) {
             out.push(ValueSpan {
-                path: path.into(),
+                path: path.clone(),
                 span: *span,
                 text: None,
             });
@@ -2735,19 +2746,23 @@ impl CollectValueSpans for String {
 impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         for (i, value) in self.iter().enumerate() {
-            value.collect(&format!("{path}/{i}"), texts, out);
+            let len = path.len();
+            path.push('/');
+            path.push_str(&i.to_string());
+            value.collect(path, texts, out);
+            path.truncate(len);
         }
     }
 }
 impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
@@ -2759,351 +2774,351 @@ impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
 impl<T: CollectValueSpans> CollectValueSpans for Box<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         self.as_ref().collect(path, texts, out);
     }
 }
-impl CollectValueSpans for Ast { fn collect(&self,path:&str,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.into(),span:*span,text:Some(text.clone())});}},Self::Null=>{},
-Self::g_TinyExpressionP4AST_2e_FormulaExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_imports.collect(&format!("{path}/fields/imports"),texts,out);
-node.g_declarations.collect(&format!("{path}/fields/declarations"),texts,out);
-node.g_expression.collect(&format!("{path}/fields/expression"),texts,out);
-node.g_methods.collect(&format!("{path}/fields/methods"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_CodeBlockExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-},
-Self::g_TinyExpressionP4AST_2e_ImportDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_className.collect(&format!("{path}/fields/className"),texts,out);
-node.g_method.collect(&format!("{path}/fields/method"),texts,out);
-node.g_alias.collect(&format!("{path}/fields/alias"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_QualifiedNameExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_head.collect(&format!("{path}/fields/head"),texts,out);
-node.g_tail.collect(&format!("{path}/fields/tail"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_NumberVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_varName.collect(&format!("{path}/fields/varName"),texts,out);
-node.g_onlyIfAbsent.collect(&format!("{path}/fields/onlyIfAbsent"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_desc.collect(&format!("{path}/fields/desc"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_StringVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_varName.collect(&format!("{path}/fields/varName"),texts,out);
-node.g_onlyIfAbsent.collect(&format!("{path}/fields/onlyIfAbsent"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_desc.collect(&format!("{path}/fields/desc"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_BooleanVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_varName.collect(&format!("{path}/fields/varName"),texts,out);
-node.g_onlyIfAbsent.collect(&format!("{path}/fields/onlyIfAbsent"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_desc.collect(&format!("{path}/fields/desc"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_ObjectVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_varName.collect(&format!("{path}/fields/varName"),texts,out);
-node.g_onlyIfAbsent.collect(&format!("{path}/fields/onlyIfAbsent"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_desc.collect(&format!("{path}/fields/desc"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-},
-Self::g_TinyExpressionP4AST_2e_NumberMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_methodName.collect(&format!("{path}/fields/methodName"),texts,out);
-node.g_parameters.collect(&format!("{path}/fields/parameters"),texts,out);
-node.g_expression.collect(&format!("{path}/fields/expression"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_StringMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_methodName.collect(&format!("{path}/fields/methodName"),texts,out);
-node.g_parameters.collect(&format!("{path}/fields/parameters"),texts,out);
-node.g_expression.collect(&format!("{path}/fields/expression"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_BooleanMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_methodName.collect(&format!("{path}/fields/methodName"),texts,out);
-node.g_parameters.collect(&format!("{path}/fields/parameters"),texts,out);
-node.g_expression.collect(&format!("{path}/fields/expression"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_ObjectMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_methodName.collect(&format!("{path}/fields/methodName"),texts,out);
-node.g_parameters.collect(&format!("{path}/fields/parameters"),texts,out);
-node.g_expression.collect(&format!("{path}/fields/expression"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_MethodParametersExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_values.collect(&format!("{path}/fields/values"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_MethodParameterExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_paramName.collect(&format!("{path}/fields/paramName"),texts,out);
-node.g_type.collect(&format!("{path}/fields/type"),texts,out);
-},
-Self::g_TinyExpressionP4AST_2e_ExternalBooleanInvocationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_className.collect(&format!("{path}/fields/className"),texts,out);
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_args.collect(&format!("{path}/fields/args"),texts,out);
+impl CollectValueSpans for Ast { fn collect(&self,path:&mut String,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.clone(),span:*span,text:Some(text.clone())});}},Self::Null=>{},
+Self::g_TinyExpressionP4AST_2e_FormulaExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/imports");node.g_imports.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/declarations");node.g_declarations.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/expression");node.g_expression.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/methods");node.g_methods.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_CodeBlockExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+},
+Self::g_TinyExpressionP4AST_2e_ImportDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/className");node.g_className.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/method");node.g_method.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/alias");node.g_alias.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_QualifiedNameExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/head");node.g_head.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/tail");node.g_tail.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_NumberVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/varName");node.g_varName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/onlyIfAbsent");node.g_onlyIfAbsent.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/desc");node.g_desc.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_StringVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/varName");node.g_varName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/onlyIfAbsent");node.g_onlyIfAbsent.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/desc");node.g_desc.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_BooleanVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/varName");node.g_varName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/onlyIfAbsent");node.g_onlyIfAbsent.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/desc");node.g_desc.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_ObjectVariableDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/varName");node.g_varName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/onlyIfAbsent");node.g_onlyIfAbsent.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/desc");node.g_desc.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+},
+Self::g_TinyExpressionP4AST_2e_NumberMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/methodName");node.g_methodName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/parameters");node.g_parameters.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/expression");node.g_expression.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_StringMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/methodName");node.g_methodName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/parameters");node.g_parameters.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/expression");node.g_expression.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_BooleanMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/methodName");node.g_methodName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/parameters");node.g_parameters.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/expression");node.g_expression.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_ObjectMethodDeclarationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/methodName");node.g_methodName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/parameters");node.g_parameters.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/expression");node.g_expression.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_MethodParametersExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/values");node.g_values.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_MethodParameterExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/paramName");node.g_paramName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/type");node.g_type.collect(path,texts,out);path.truncate(len);}
+},
+Self::g_TinyExpressionP4AST_2e_ExternalBooleanInvocationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/className");node.g_className.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/args");node.g_args.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ExternalNumberInvocationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_className.collect(&format!("{path}/fields/className"),texts,out);
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_args.collect(&format!("{path}/fields/args"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ExternalNumberInvocationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/className");node.g_className.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/args");node.g_args.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_className.collect(&format!("{path}/fields/className"),texts,out);
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_args.collect(&format!("{path}/fields/args"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/className");node.g_className.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/args");node.g_args.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_className.collect(&format!("{path}/fields/className"),texts,out);
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_args.collect(&format!("{path}/fields/args"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/className");node.g_className.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/args");node.g_args.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_MethodInvocationExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_args.collect(&format!("{path}/fields/args"),texts,out);
+Self::g_TinyExpressionP4AST_2e_MethodInvocationExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/args");node.g_args.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_TernaryExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_condition.collect(&format!("{path}/fields/condition"),texts,out);
-node.g_thenExpr.collect(&format!("{path}/fields/thenExpr"),texts,out);
-node.g_elseExpr.collect(&format!("{path}/fields/elseExpr"),texts,out);
+Self::g_TinyExpressionP4AST_2e_TernaryExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/condition");node.g_condition.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/thenExpr");node.g_thenExpr.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/elseExpr");node.g_elseExpr.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ArgumentsExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_values.collect(&format!("{path}/fields/values"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ArgumentsExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/values");node.g_values.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BinaryExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BinaryExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_SinExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_SinExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_CosExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_CosExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_TanExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_TanExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_SqrtExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_SqrtExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_MinExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_first.collect(&format!("{path}/fields/first"),texts,out);
-node.g_rest.collect(&format!("{path}/fields/rest"),texts,out);
+Self::g_TinyExpressionP4AST_2e_MinExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/first");node.g_first.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/rest");node.g_rest.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_MaxExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_first.collect(&format!("{path}/fields/first"),texts,out);
-node.g_rest.collect(&format!("{path}/fields/rest"),texts,out);
+Self::g_TinyExpressionP4AST_2e_MaxExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/first");node.g_first.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/rest");node.g_rest.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_RandomExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_TinyExpressionP4AST_2e_RandomExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_TinyExpressionP4AST_2e_AbsExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_AbsExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_RoundExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_RoundExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_CeilExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_CeilExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_FloorExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_FloorExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_PowExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_base.collect(&format!("{path}/fields/base"),texts,out);
-node.g_exponent.collect(&format!("{path}/fields/exponent"),texts,out);
+Self::g_TinyExpressionP4AST_2e_PowExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/base");node.g_base.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/exponent");node.g_exponent.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_LogExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_LogExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ExpExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_arg.collect(&format!("{path}/fields/arg"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ExpExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/arg");node.g_arg.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ToNumExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_defaultValue.collect(&format!("{path}/fields/defaultValue"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ToNumExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/defaultValue");node.g_defaultValue.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_TrimExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_TrimExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_LengthExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_LengthExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_TrimDotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_TrimDotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_LengthDotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_LengthDotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StartsWithExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_patterns.collect(&format!("{path}/fields/patterns"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StartsWithExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/patterns");node.g_patterns.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_EndsWithExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_patterns.collect(&format!("{path}/fields/patterns"),texts,out);
+Self::g_TinyExpressionP4AST_2e_EndsWithExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/patterns");node.g_patterns.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ContainsExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_patterns.collect(&format!("{path}/fields/patterns"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ContainsExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/patterns");node.g_patterns.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_InExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_candidates.collect(&format!("{path}/fields/candidates"),texts,out);
+Self::g_TinyExpressionP4AST_2e_InExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/candidates");node.g_candidates.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StartsWithDotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_patterns.collect(&format!("{path}/fields/patterns"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StartsWithDotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/patterns");node.g_patterns.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_EndsWithDotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_patterns.collect(&format!("{path}/fields/patterns"),texts,out);
+Self::g_TinyExpressionP4AST_2e_EndsWithDotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/patterns");node.g_patterns.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ContainsDotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_patterns.collect(&format!("{path}/fields/patterns"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ContainsDotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/patterns");node.g_patterns.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_IsPresentExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_IsPresentExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_InTimeRangeExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_startHour.collect(&format!("{path}/fields/startHour"),texts,out);
-node.g_endHour.collect(&format!("{path}/fields/endHour"),texts,out);
+Self::g_TinyExpressionP4AST_2e_InTimeRangeExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/startHour");node.g_startHour.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/endHour");node.g_endHour.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_InDayTimeRangeExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_startDay.collect(&format!("{path}/fields/startDay"),texts,out);
-node.g_startHour.collect(&format!("{path}/fields/startHour"),texts,out);
-node.g_endDay.collect(&format!("{path}/fields/endDay"),texts,out);
-node.g_endHour.collect(&format!("{path}/fields/endHour"),texts,out);
+Self::g_TinyExpressionP4AST_2e_InDayTimeRangeExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/startDay");node.g_startDay.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/startHour");node.g_startHour.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/endDay");node.g_endDay.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/endHour");node.g_endHour.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_SliceExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
-node.g_start.collect(&format!("{path}/fields/start"),texts,out);
-node.g_end.collect(&format!("{path}/fields/end"),texts,out);
-node.g_step.collect(&format!("{path}/fields/step"),texts,out);
+Self::g_TinyExpressionP4AST_2e_SliceExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/start");node.g_start.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/end");node.g_end.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/step");node.g_step.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringConcatExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringConcatExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringCastVariableRefExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringCastVariableRefExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanOrExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanOrExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanAndExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanAndExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanXorExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanXorExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_NotExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_NotExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanEqualityExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanEqualityExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanFactorExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanFactorExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringComparisonExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringComparisonExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ComparisonExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_left.collect(&format!("{path}/fields/left"),texts,out);
-node.g_op.collect(&format!("{path}/fields/op"),texts,out);
-node.g_right.collect(&format!("{path}/fields/right"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ComparisonExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/left");node.g_left.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/op");node.g_op.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/right");node.g_right.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ObjectExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ObjectExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_IfExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_condition.collect(&format!("{path}/fields/condition"),texts,out);
-node.g_thenExpr.collect(&format!("{path}/fields/thenExpr"),texts,out);
-node.g_elseExpr.collect(&format!("{path}/fields/elseExpr"),texts,out);
+Self::g_TinyExpressionP4AST_2e_IfExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/condition");node.g_condition.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/thenExpr");node.g_thenExpr.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/elseExpr");node.g_elseExpr.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BranchExpressionExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BranchExpressionExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_NumberMatchExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_firstCase.collect(&format!("{path}/fields/firstCase"),texts,out);
-node.g_moreCases.collect(&format!("{path}/fields/moreCases"),texts,out);
-node.g_defaultCase.collect(&format!("{path}/fields/defaultCase"),texts,out);
+Self::g_TinyExpressionP4AST_2e_NumberMatchExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/firstCase");node.g_firstCase.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/moreCases");node.g_moreCases.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/defaultCase");node.g_defaultCase.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_NumberCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_condition.collect(&format!("{path}/fields/condition"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_NumberCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/condition");node.g_condition.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_NumberDefaultCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_NumberDefaultCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_NumberCaseValueExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_NumberCaseValueExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringMatchExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_firstCase.collect(&format!("{path}/fields/firstCase"),texts,out);
-node.g_moreCases.collect(&format!("{path}/fields/moreCases"),texts,out);
-node.g_defaultCase.collect(&format!("{path}/fields/defaultCase"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringMatchExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/firstCase");node.g_firstCase.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/moreCases");node.g_moreCases.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/defaultCase");node.g_defaultCase.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_condition.collect(&format!("{path}/fields/condition"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/condition");node.g_condition.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringDefaultCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringDefaultCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_StringCaseValueExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_StringCaseValueExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanMatchExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_firstCase.collect(&format!("{path}/fields/firstCase"),texts,out);
-node.g_moreCases.collect(&format!("{path}/fields/moreCases"),texts,out);
-node.g_defaultCase.collect(&format!("{path}/fields/defaultCase"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanMatchExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/firstCase");node.g_firstCase.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/moreCases");node.g_moreCases.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/defaultCase");node.g_defaultCase.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_condition.collect(&format!("{path}/fields/condition"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/condition");node.g_condition.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanDefaultCaseExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanDefaultCaseExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_BooleanCaseValueExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_BooleanCaseValueExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_VariableRefExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_type.collect(&format!("{path}/fields/type"),texts,out);
+Self::g_TinyExpressionP4AST_2e_VariableRefExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/type");node.g_type.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_TinyExpressionP4AST_2e_ExpressionExpr(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_TinyExpressionP4AST_2e_ExpressionExpr(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
 }}}

@@ -1859,7 +1859,7 @@ out
 }
 fn b33_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e34_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e35_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -1967,7 +1967,7 @@ out
 }
 fn b40_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e41_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e42_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -2255,7 +2255,7 @@ out
 }
 fn b58_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e59_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e60_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -2543,7 +2543,7 @@ out
 }
 fn b76_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e77_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e78_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -2831,7 +2831,7 @@ out
 }
 fn b94_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e95_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e96_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -3141,7 +3141,7 @@ out
 }
 fn b114_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e115_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e116_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -3339,7 +3339,7 @@ out
 }
 fn b127_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e128_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e129_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -3477,7 +3477,7 @@ out
 }
 fn b136_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e137_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e138_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -3585,7 +3585,7 @@ out
 }
 fn b143_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e144_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e145_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -3693,7 +3693,7 @@ out
 }
 fn b150_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e151_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e152_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -4129,7 +4129,7 @@ out
 }
 fn b178_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e179_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e180_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -5027,7 +5027,7 @@ out
 }
 fn b236_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e237_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e238_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -5169,7 +5169,7 @@ out
 }
 fn b245_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e246_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e247_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -5421,7 +5421,7 @@ out
 }
 fn b261_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e262_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e266_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -5623,7 +5623,7 @@ out
 }
 fn b274_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e275_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e284_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -5833,7 +5833,7 @@ out
 }
 fn b287_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e288_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e292_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -6168,7 +6168,7 @@ out
 }
 fn b308_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e309_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e313_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -6503,7 +6503,7 @@ out
 }
 fn b329_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e330_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e334_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -6654,7 +6654,7 @@ out
 }
 fn b339_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e340_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e344_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -6952,7 +6952,7 @@ out
 }
 fn b358_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e359_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e360_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -7316,7 +7316,7 @@ out
 }
 fn b381_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 if !out.state.invert {let predicted=match self.input.cp_at(out.state.begin().position::<false>()).map(|(c,_)|c) {
 Some('+')=>0usize,
 Some('-')=>1usize,
@@ -7372,7 +7372,7 @@ out
 }
 fn b384_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 if !out.state.invert {let predicted=match self.input.cp_at(out.state.begin().position::<false>()).map(|(c,_)|c) {
 Some('*')=>0usize,
 Some('/')=>1usize,
@@ -7428,7 +7428,7 @@ out
 }
 fn b387_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e388_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e389_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -8956,7 +8956,7 @@ out
 }
 fn b488_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e489_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e490_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -11026,7 +11026,7 @@ out
 }
 fn b623_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e624_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e625_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -11441,7 +11441,7 @@ out
 }
 fn b651_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e652_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e653_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -11562,7 +11562,7 @@ out
 }
 fn b659_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e660_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e661_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -11875,7 +11875,7 @@ out
 }
 fn b681_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e682_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e691_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -12727,7 +12727,7 @@ out
 }
 fn b738_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e739_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e748_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -13579,7 +13579,7 @@ out
 }
 fn b795_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e796_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e797_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -13781,7 +13781,7 @@ out
 }
 fn b808_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e809_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e810_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -14054,7 +14054,7 @@ out
 }
 fn b828_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e829_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e830_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -14211,7 +14211,7 @@ out
 }
 fn b839_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e840_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e841_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -14631,7 +14631,7 @@ out
 }
 fn b865_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e866_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e867_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -15005,7 +15005,7 @@ out
 }
 fn b892_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e893_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e894_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -15137,7 +15137,7 @@ out
 }
 fn b901_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e902_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e903_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -15243,7 +15243,7 @@ out
 }
 fn b908_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e909_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e910_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -15349,7 +15349,7 @@ out
 }
 fn b915_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e916_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e917_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -15629,7 +15629,7 @@ out
 }
 fn b934_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e935_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e936_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -16990,7 +16990,7 @@ out
 }
 fn b1022_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e1023_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e1024_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
@@ -17156,7 +17156,7 @@ out
 }
 fn b1033_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;
+out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;
 self.restore(mark);let mut child=self.e1034_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
 if child.ok {child.state=out.state.commit(child.state);child.diag=diagnostic;break 'choice child;}
 self.restore(mark);let mut child=self.e1035_c(out.state.begin());diagnostic=self.diag.join(diagnostic,child.diag);
