@@ -247,6 +247,8 @@ fn every_definition_and_inline_enum_round_trips_and_rejects_invalid_structure() 
         Proof,
         Recipe,
         Recovery,
+        RegexDfa,
+        RegexDfaTransition,
         Rewrite,
         Rule,
         RuleAnalysis,

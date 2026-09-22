@@ -13,6 +13,8 @@ mod follow;
 mod graph;
 mod operators;
 mod planning;
+mod regex;
+pub(crate) use regex::attach as attach_regex_plans;
 
 use crate::ir::*;
 use facts::Facts;
@@ -259,22 +261,7 @@ pub fn analyze(semantics: &Semantics) -> Result<(Analysis, Plan), Vec<AnalysisEr
         choices,
         operators,
         memo,
-        lexical: semantics
-            .tokens
-            .iter()
-            .map(|t| LexicalPlan {
-                token_id: t.symbol_id.clone(),
-                dfa: None,
-                strategy: match t.spec {
-                    TokenSpec::Extern { .. } => LexicalPlanStrategy::Extern,
-                    TokenSpec::Regex {
-                        regular_subset: false,
-                        ..
-                    } => LexicalPlanStrategy::JavaPattern,
-                    _ => LexicalPlanStrategy::Scalar,
-                },
-            })
-            .collect(),
+        lexical: semantics.tokens.iter().map(regex::plan).collect(),
         trivia_cache: TriviaCache {
             enabled: false,
             key: PlanTriviaCacheKey,

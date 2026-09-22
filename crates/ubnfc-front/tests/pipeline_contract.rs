@@ -291,3 +291,51 @@ fn automatic_sum_eval_fails_validation_and_manual_or_unknown_kind_uses_callback(
         serde_json::json!({"arg":"value"})
     );
 }
+
+#[test]
+fn rewritten_left_recursion_is_metadata_not_a_backend_requirement() {
+    let ir = fixture(
+        "UNLAXER_PARSER_DIR",
+        "../../../unlaxer-parser",
+        "story/code/calc-leftrec.ubnf",
+    );
+    assert!(!ir.semantics.normalizations.is_empty());
+    assert!(!ir
+        .required_features
+        .contains(&RequiredFeature::LeftRecursionRewrite));
+    for rewrite in &ir.semantics.normalizations {
+        let rule = ir
+            .semantics
+            .rules
+            .iter()
+            .find(|r| r.symbol_id == rewrite.rule_id)
+            .unwrap();
+        assert_eq!(rule.body, rewrite.rewritten_body);
+        assert_ne!(rule.body, rewrite.original_body);
+        let body = ir
+            .semantics
+            .expressions
+            .iter()
+            .find(|e| e.id == rule.body)
+            .unwrap();
+        let ExprNode::Seq { items } = &body.node else {
+            panic!("Base Repeat");
+        };
+        assert!(items.iter().any(|id| ir
+            .semantics
+            .expressions
+            .iter()
+            .any(|e| e.id == *id && matches!(e.node, ExprNode::Repeat { .. }))));
+        assert_eq!(
+            ir.analysis
+                .rules
+                .iter()
+                .find(|r| r.rule_id == rule.symbol_id)
+                .unwrap()
+                .left_recursion,
+            RuleAnalysisLeftRecursion::DirectRewritten
+        );
+    }
+    assert!(validate_references(&ir).is_empty());
+    ubnfc_front::analysis::analyze(&ir.semantics).unwrap();
+}

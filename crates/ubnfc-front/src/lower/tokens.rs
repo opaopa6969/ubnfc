@@ -86,6 +86,8 @@ pub(super) fn lower(cx: &mut Context<'_>, grammar: &r::Grammar) {
             },
             // 正規部分集合の証明は字句 analysis の責務。未証明を DFA 対応と偽らない。
             T::Regex { pattern } => TokenSpec::Regex {
+                dfa: None,
+                fallback: None,
                 pattern: pattern.clone(),
                 regular_subset: false,
                 java_fallback: TokenSpecRegexJavaFallback::JavaUtilRegexPattern,
