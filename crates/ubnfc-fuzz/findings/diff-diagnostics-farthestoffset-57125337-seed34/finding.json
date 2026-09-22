@@ -1,0 +1,232 @@
+{
+  "slug": "diff-diagnostics-farthestoffset-57125337-seed34",
+  "signature": "diff:/diagnostics/*/farthestOffset",
+  "seed": 34,
+  "grammar": "grammar Fuzz {\n  token T0 = LOOKAHEAD('a')\n  token T1 = UNTIL('#')\n  token T2 = LOOKAHEAD('a')\n  L0 ::= ;\n  @interleave(profile=javaStyle) @recovery(AUTO) @longestChoice M0 ::= 'b'+ | ERROR('fuzz error') @v1 ( [ ',' 'あ' ] | { 'ab' @v2 } L0 ) T2 | T2 @v3 ( '😀' | T1+ @v4 ) '(';\n  @doc('fuzz 😀') M1 ::= ( L0 ( T2 ';' T2 ) | '-' @v5 ':' 'あ'{2,} @v6 ) @v7;\n  @mapping(C2, params=[v8]) @interleave(profile=javaStyle) M2 ::= M1 @v8 M0?;\n  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= M0 @left { '*' @op M0 @right };\n  @root @mapping(Top, params=[head]) Root ::= Op0 @head ERROR('fuzz error') @head;\n}\n",
+  "imported": null,
+  "input": "*",
+  "input_code_points": 1,
+  "differences": [
+    {
+      "path": "/catalogs",
+      "expected": {
+        "<unobserved>": "catalogs"
+      },
+      "actual": []
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/0",
+      "expected": "'*'",
+      "actual": "' '"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/1",
+      "expected": "fuzz error",
+      "actual": "'('"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/2",
+      "expected": null,
+      "actual": "'*/'"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/3",
+      "expected": null,
+      "actual": "'/*'"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/4",
+      "expected": null,
+      "actual": "'//'"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/5",
+      "expected": null,
+      "actual": "'a'"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/6",
+      "expected": null,
+      "actual": "'b'"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/7",
+      "expected": null,
+      "actual": "'😀'"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/8",
+      "expected": null,
+      "actual": "Op0Parser"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/9",
+      "expected": null,
+      "actual": "__CaptureSite"
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/10",
+      "expected": null,
+      "actual": "fuzz error"
+    },
+    {
+      "path": "/diagnostics/0/farthestOffset",
+      "expected": 1,
+      "actual": 0
+    },
+    {
+      "path": "/recoveries",
+      "expected": [],
+      "actual": {
+        "<unobserved>": "recoveries"
+      }
+    },
+    {
+      "path": "/scope/declarations",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/depth",
+      "expected": 0,
+      "actual": null
+    },
+    {
+      "path": "/scope/diagnostics",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/references",
+      "expected": [],
+      "actual": null
+    }
+  ],
+  "java_violations": [],
+  "rust_violations": [],
+  "java": {
+    "accepted": false,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "expected": [
+          "'*'",
+          "fuzz error"
+        ],
+        "farthestExpected": [
+          "'*'",
+          "fuzz error"
+        ],
+        "farthestOffset": 1,
+        "kind": "syntax",
+        "offset": 1,
+        "origin": "Mapper.diagnose"
+      }
+    ],
+    "id": 0,
+    "lexical": [],
+    "mappingError": null,
+    "matched": 0,
+    "nativeFailure": {
+      "consumed": 1,
+      "expected": [
+        "'*'",
+        "fuzz error"
+      ],
+      "matched": 1,
+      "offset": 1
+    },
+    "parsedStatus": "failed",
+    "prefixCaptures": [],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "rust": {
+    "accepted": false,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [],
+    "catalogs": [],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "deepestRule": "Fuzz::M0",
+        "expected": [
+          "b",
+          "expression",
+          "fuzz error",
+          "T2"
+        ],
+        "farthestExpected": [
+          "' '",
+          "'('",
+          "'*/'",
+          "'/*'",
+          "'//'",
+          "'a'",
+          "'b'",
+          "'😀'",
+          "Op0Parser",
+          "__CaptureSite",
+          "fuzz error"
+        ],
+        "farthestOffset": 0,
+        "kind": "syntax",
+        "offset": 0,
+        "origin": "Mapper.diagnose",
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::Op0",
+          "Fuzz::M0"
+        ]
+      }
+    ],
+    "hints": [
+      {
+        "deepestRule": "Fuzz::M0",
+        "expected": [
+          "b",
+          "expression",
+          "fuzz error",
+          "T2"
+        ],
+        "offset": 0,
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::Op0",
+          "Fuzz::M0"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [],
+    "mappingError": null,
+    "matched": 0,
+    "parsedStatus": "failed",
+    "prefixCaptures": [],
+    "recoveredRegions": [],
+    "references": [],
+    "scope": {
+      "events": [],
+      "mode": []
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "shrink_rounds": 11
+}

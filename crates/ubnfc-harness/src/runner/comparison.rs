@@ -589,6 +589,11 @@ fn lexeme_fields(node: &mut Value, captures: &[Value]) {
         }
     }
 }
+/// D-022 の投影（Java 採取の int field → 同名・同範囲・同値の capture 原文）を
+/// 差分 fuzzing からも同じ規則で使えるようにする。corpus と fuzzer の判定を揃えるための追加公開。
+pub fn project_numeric_lexemes(ast: &mut Value, captures: &[Value]) {
+    lexeme_fields(ast, captures);
+}
 fn has_text_field(node: &Value, name: &str, text: &str) -> bool {
     match node {
         Value::Object(map) => map

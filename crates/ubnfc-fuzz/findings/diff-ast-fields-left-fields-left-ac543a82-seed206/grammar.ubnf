@@ -1,0 +1,11 @@
+grammar Fuzz {
+  token T0 = EMPTY
+  token T1 = org.unlaxer.parser.clang.IdentifierParser
+  token T2 = UNTIL('#')
+  @enum L1 ::= 'beta';
+  @whitespace(none) @interleave(profile=commentsAndSpaces) M0 ::= [ '('* @v2 'c' @v3 ( '-' ',' @v4 )+ @v5 ]? ERROR('fuzz error'){0,} @v6 | '-' L1{0,} 'あ' @v7 | [ { ';'* 'ab' } ];
+  @mapping(C1) @recovery(sync=';') M1 ::= '😀'?;
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= M0 @left { '+' @op M0 @right };
+  @mapping(Bin1, params=[left, op, right]) @leftAssoc @precedence(level=80) Op1 ::= Op0 @left { '+' @op Op0 @right };
+  @root Root ::= Op1 @head;
+}

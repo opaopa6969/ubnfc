@@ -1,0 +1,11 @@
+grammar Fuzz {
+  token T0 = CHAR_RANGE('a','f')
+  @enum L0 ::= 'alpha';
+  @mapping(Node.A, params=[w]) VA ::= 'p' @w ')';
+  @mapping(Node.B, params=[w]) VB ::= 'q' @w T0;
+  @mapping(Node) Node ::= VA | VB;
+  @mapping(C0, params=[v2, v1]) @predictiveChoice @scopeTree(mode=lexical) @declares(symbol=v1) M0 ::= ')'* @typeof(v1) '-' @v2 | Node+ % ')' '-' @v1 | ',';
+  @interleave(profile=javaStyle) @predictiveChoice @scopeTree(mode=lexical) @declares(symbol=v4) @backref(name=v3) @catalog(context='fuzz') @doc('fuzz 😀') M1 ::= { ( '\n' @v3 'ab' ) @v4 Node? % '\n' } | { L0 }{0,};
+  @mapping(Bin0, params=[left, op, right]) @rightAssoc @precedence(level=90) Op0 ::= L0 @left { '*' @op Op0 @right };
+  @root Root ::= Op0 @head ';' @head;
+}

@@ -1,0 +1,3 @@
+grammar G {
+  @root R ::= 'a'{1} @v;
+}

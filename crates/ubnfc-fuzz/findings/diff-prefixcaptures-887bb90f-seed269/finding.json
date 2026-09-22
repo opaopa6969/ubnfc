@@ -1,0 +1,383 @@
+{
+  "slug": "diff-prefixcaptures-887bb90f-seed269",
+  "signature": "diff:/prefixCaptures/*",
+  "seed": 269,
+  "grammar": "grammar Fuzz {\n  token T0 = EOF\n  @recovery(AUTO) M0 ::= T0 T0? 'c';\n  @root @mapping(Top, params=[head]) Root ::= M0 @head ';' @head;\n}\n",
+  "imported": null,
+  "input": "c;",
+  "input_code_points": 2,
+  "differences": [
+    {
+      "path": "/accepted",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "path": "/allConsumed",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "path": "/ast",
+      "expected": null,
+      "actual": {
+        "fields": {
+          "head": [
+            ";"
+          ]
+        },
+        "span": [
+          0,
+          2
+        ],
+        "type": "Top"
+      }
+    },
+    {
+      "path": "/captures/0",
+      "expected": null,
+      "actual": {
+        "binding": null,
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "c"
+      }
+    },
+    {
+      "path": "/captures/1",
+      "expected": null,
+      "actual": {
+        "binding": null,
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": ";"
+      }
+    },
+    {
+      "path": "/catalogs",
+      "expected": {
+        "<unobserved>": "catalogs"
+      },
+      "actual": []
+    },
+    {
+      "path": "/consumed",
+      "expected": 0,
+      "actual": 2
+    },
+    {
+      "path": "/diagnostics/0/expected",
+      "expected": null,
+      "actual": [
+        "T0"
+      ]
+    },
+    {
+      "path": "/diagnostics/0/expectedNonEmpty",
+      "expected": true,
+      "actual": null
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/0",
+      "expected": "';'",
+      "actual": "T0"
+    },
+    {
+      "path": "/diagnostics/0/farthestOffset",
+      "expected": 2,
+      "actual": 0
+    },
+    {
+      "path": "/diagnostics/0/kind",
+      "expected": "syntax",
+      "actual": "recovery"
+    },
+    {
+      "path": "/diagnostics/0/length",
+      "expected": null,
+      "actual": 1
+    },
+    {
+      "path": "/diagnostics/0/offset",
+      "expected": null,
+      "actual": 0
+    },
+    {
+      "path": "/diagnostics/0/severity",
+      "expected": null,
+      "actual": "ERROR"
+    },
+    {
+      "path": "/matched",
+      "expected": 0,
+      "actual": 2
+    },
+    {
+      "path": "/parsedStatus",
+      "expected": "failed",
+      "actual": "succeeded"
+    },
+    {
+      "path": "/prefixCaptures/0",
+      "expected": null,
+      "actual": {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "c"
+      }
+    },
+    {
+      "path": "/prefixCaptures/1",
+      "expected": null,
+      "actual": {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": ";"
+      }
+    },
+    {
+      "path": "/recoveries",
+      "expected": [],
+      "actual": {
+        "<unobserved>": "recoveries"
+      }
+    },
+    {
+      "path": "/scope/declarations",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/depth",
+      "expected": 0,
+      "actual": null
+    },
+    {
+      "path": "/scope/diagnostics",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/references",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/value",
+      "expected": null,
+      "actual": {
+        "<unobserved>": "value"
+      }
+    }
+  ],
+  "java_violations": [],
+  "rust_violations": [],
+  "java": {
+    "accepted": false,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "expected": [
+          "';'"
+        ],
+        "farthestExpected": [
+          "';'"
+        ],
+        "farthestOffset": 2,
+        "kind": "syntax",
+        "offset": 2,
+        "origin": "Mapper.diagnose"
+      }
+    ],
+    "id": 0,
+    "lexical": [],
+    "mappingError": null,
+    "matched": 0,
+    "nativeFailure": {
+      "consumed": 2,
+      "expected": [
+        "';'"
+      ],
+      "matched": 2,
+      "offset": 2
+    },
+    "parsedStatus": "failed",
+    "prefixCaptures": [],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "rust": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": {
+      "fields": {
+        "head": [
+          ";"
+        ]
+      },
+      "span": [
+        0,
+        2
+      ],
+      "type": "Top"
+    },
+    "captures": [
+      {
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "c"
+      },
+      {
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": ";"
+      }
+    ],
+    "catalogs": [],
+    "consumed": 2,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "deepestRule": "Fuzz::M0",
+        "expected": [
+          "T0"
+        ],
+        "farthestExpected": [
+          "T0"
+        ],
+        "farthestOffset": 0,
+        "kind": "recovery",
+        "length": 1,
+        "offset": 0,
+        "origin": "recovery",
+        "recoveryId": 0,
+        "ruleId": "Fuzz::M0",
+        "rulePath": [
+          "Fuzz::M0"
+        ],
+        "severity": "ERROR"
+      }
+    ],
+    "hints": [
+      {
+        "deepestRule": "Fuzz::M0",
+        "expected": [
+          "T0"
+        ],
+        "offset": 0,
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::M0"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 1,
+        "exprId": "expr:grammar.ubnf:115:127:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": null,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          2
+        ]
+      },
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:124:127:body/1/literal",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          1,
+          2
+        ]
+      }
+    ],
+    "mappingError": null,
+    "matched": 2,
+    "nodes": [],
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "c"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": ";"
+      }
+    ],
+    "recoveredRegions": [
+      {
+        "captureOccurrenceIds": [
+          0
+        ],
+        "mode": "AUTO",
+        "ruleId": "Fuzz::M0",
+        "span": [
+          0,
+          1
+        ],
+        "syncSpan": [
+          1,
+          2
+        ]
+      }
+    ],
+    "references": [],
+    "scope": {
+      "events": [],
+      "mode": []
+    },
+    "scopeDepth": 0,
+    "texts": []
+  },
+  "shrink_rounds": 5
+}
