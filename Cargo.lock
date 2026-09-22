@@ -95,6 +95,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ubnfc-fuzz"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "ubnfc-front",
+ "ubnfc-harness",
+]
+
+[[package]]
 name = "ubnfc-harness"
 version = "0.1.0"
 dependencies = [

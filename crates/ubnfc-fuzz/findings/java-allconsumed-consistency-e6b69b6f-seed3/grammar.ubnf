@@ -1,0 +1,9 @@
+grammar Fuzz {
+  token T0 = NEGATIVE_LOOKAHEAD('#')
+  token T1 = org.unlaxer.parser.elementary.SingleQuotedParser
+  L1 ::= ERROR('fuzz error');
+  @mapping(C0, params=[v3, v5, v4]) @scopeTree(mode=dynamic) @declares(symbol=v3) @backref(name=v4) M0 ::= ( 'b' L1+ ) T0 T0 | T0 @v3 ( '😀'? 'ab'{0,} % ',' { '*' @v4 }+ @v5 | 'c'{1,2} )? % ')' ERROR('fuzz error');
+  @whitespace(none) @scopeTree(mode=dynamic) @declares(symbol=v6) @catalog(context='fuzz') M1 ::= ERROR('fuzz error') @v6 ';'? % ';';
+  @mapping(Bin0, params=[left, op, right]) @rightAssoc @precedence(level=90) Op0 ::= M1 @left { '-' @op Op0 @right };
+  @root @mapping(Top, params=[head, v7, v8, tail]) @eval(kind='binary', strategy='manual') Root ::= Op0 @head ( ':'+ T1 @v7 | 'ab'? M1 @v8 ){1,3} @head ( ',' @tail 'b' )* @tail;
+}

@@ -1,0 +1,7 @@
+grammar Fuzz {
+  token T0 = NumberParser
+  token T1 = NEGATION('ab\n')
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= T0 @left { '+' @op T0 @right };
+  @mapping(Bin1, params=[left, op, right]) @rightAssoc @precedence(level=80) Op1 ::= Op0 @left { '+' @op Op1 @right };
+  @root Root ::= Op1 @head '\n'{2,} @head;
+}

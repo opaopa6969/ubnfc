@@ -1,0 +1,795 @@
+{
+  "slug": "diff-prefixcaptures-binding-80d2f5e1-seed272",
+  "signature": "diff:/prefixCaptures/*/binding",
+  "seed": 272,
+  "grammar": "grammar Fuzz {\n  token T0 = ANY\n  token T1 = LOOKAHEAD('a')\n  L0 ::= '\\n' ',' 'あ';\n  @mapping(C0) @whitespace @recovery(AUTO) M0 ::= ERROR('fuzz error') T1{0,};\n  @root Root ::= L0 @head [ 'あ' '='{2,4} @v5 M0 ]+ @head;\n}\n",
+  "imported": null,
+  "input": "\n,ああ==あ",
+  "input_code_points": 7,
+  "differences": [
+    {
+      "path": "/allConsumed",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "path": "/captures/1/name",
+      "expected": "v5",
+      "actual": "head"
+    },
+    {
+      "path": "/captures/1/span/0",
+      "expected": 4,
+      "actual": 3
+    },
+    {
+      "path": "/captures/1/span/1",
+      "expected": 5,
+      "actual": 3
+    },
+    {
+      "path": "/captures/1/text",
+      "expected": "=",
+      "actual": ""
+    },
+    {
+      "path": "/captures/2",
+      "expected": {
+        "binding": null,
+        "name": "v5",
+        "span": [
+          5,
+          6
+        ],
+        "text": "="
+      },
+      "actual": null
+    },
+    {
+      "path": "/captures/3",
+      "expected": {
+        "binding": null,
+        "name": "head",
+        "span": [
+          3,
+          7
+        ],
+        "text": "あ==あ"
+      },
+      "actual": null
+    },
+    {
+      "path": "/captures/4",
+      "expected": {
+        "binding": null,
+        "name": "head",
+        "span": [
+          7,
+          7
+        ],
+        "text": ""
+      },
+      "actual": null
+    },
+    {
+      "path": "/catalogs",
+      "expected": {
+        "<unobserved>": "catalogs"
+      },
+      "actual": []
+    },
+    {
+      "path": "/consumed",
+      "expected": 7,
+      "actual": 3
+    },
+    {
+      "path": "/diagnostics/0/expected/0",
+      "expected": "' '",
+      "actual": "end of input"
+    },
+    {
+      "path": "/diagnostics/0/expected/1",
+      "expected": "'*/'",
+      "actual": null
+    },
+    {
+      "path": "/diagnostics/0/expected/2",
+      "expected": "'/*'",
+      "actual": null
+    },
+    {
+      "path": "/diagnostics/0/expected/3",
+      "expected": "'//'",
+      "actual": null
+    },
+    {
+      "path": "/diagnostics/0/expected/4",
+      "expected": "'あ'",
+      "actual": null
+    },
+    {
+      "path": "/diagnostics/0/expected/5",
+      "expected": "fuzz error",
+      "actual": null
+    },
+    {
+      "path": "/diagnostics/0/farthestExpected/4",
+      "expected": "'あ'",
+      "actual": "'='"
+    },
+    {
+      "path": "/diagnostics/0/kind",
+      "expected": "recovery",
+      "actual": "trailing_input"
+    },
+    {
+      "path": "/diagnostics/0/length",
+      "expected": 1,
+      "actual": null
+    },
+    {
+      "path": "/diagnostics/0/offset",
+      "expected": 6,
+      "actual": 3
+    },
+    {
+      "path": "/diagnostics/0/severity",
+      "expected": "ERROR",
+      "actual": null
+    },
+    {
+      "path": "/matched",
+      "expected": 7,
+      "actual": 3
+    },
+    {
+      "path": "/prefixCaptures/1/binding",
+      "expected": "Root:2",
+      "actual": "Root:1"
+    },
+    {
+      "path": "/prefixCaptures/1/name",
+      "expected": "v5",
+      "actual": "head"
+    },
+    {
+      "path": "/prefixCaptures/1/span/0",
+      "expected": 4,
+      "actual": 3
+    },
+    {
+      "path": "/prefixCaptures/1/span/1",
+      "expected": 5,
+      "actual": 3
+    },
+    {
+      "path": "/prefixCaptures/1/text",
+      "expected": "=",
+      "actual": ""
+    },
+    {
+      "path": "/prefixCaptures/2",
+      "expected": {
+        "binding": "Root:2",
+        "name": "v5",
+        "span": [
+          5,
+          6
+        ],
+        "text": "="
+      },
+      "actual": null
+    },
+    {
+      "path": "/prefixCaptures/3",
+      "expected": {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          3,
+          7
+        ],
+        "text": "あ==あ"
+      },
+      "actual": null
+    },
+    {
+      "path": "/prefixCaptures/4",
+      "expected": {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          7,
+          7
+        ],
+        "text": ""
+      },
+      "actual": null
+    },
+    {
+      "path": "/recoveries",
+      "expected": [
+        {
+          "captureOccurrences": [
+            3
+          ],
+          "mode": "AUTO",
+          "ruleId": "Fuzz::M0",
+          "skippedSpan": [
+            6,
+            6
+          ],
+          "span": [
+            6,
+            7
+          ],
+          "syncPattern": "あ",
+          "syncSpan": [
+            6,
+            7
+          ]
+        }
+      ],
+      "actual": {
+        "<unobserved>": "recoveries"
+      }
+    },
+    {
+      "path": "/scope/declarations",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/depth",
+      "expected": 0,
+      "actual": null
+    },
+    {
+      "path": "/scope/diagnostics",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/references",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/value",
+      "expected": {
+        "<unobserved>": "value"
+      },
+      "actual": null
+    }
+  ],
+  "java_violations": [],
+  "rust_violations": [],
+  "java": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": null,
+    "captures": [
+      {
+        "name": "head",
+        "span": [
+          0,
+          3
+        ],
+        "text": "\n,あ"
+      },
+      {
+        "name": "v5",
+        "span": [
+          4,
+          5
+        ],
+        "text": "="
+      },
+      {
+        "name": "v5",
+        "span": [
+          5,
+          6
+        ],
+        "text": "="
+      },
+      {
+        "name": "head",
+        "span": [
+          3,
+          7
+        ],
+        "text": "あ==あ"
+      },
+      {
+        "name": "head",
+        "span": [
+          7,
+          7
+        ],
+        "text": ""
+      }
+    ],
+    "consumed": 7,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "expected": [
+          "' '",
+          "'*/'",
+          "'/*'",
+          "'//'",
+          "'あ'",
+          "fuzz error"
+        ],
+        "farthestExpected": [
+          "' '",
+          "'*/'",
+          "'/*'",
+          "'//'",
+          "'あ'",
+          "fuzz error"
+        ],
+        "farthestOffset": 6,
+        "kind": "recovery",
+        "length": 1,
+        "offset": 6,
+        "origin": "recovery",
+        "ruleId": "Fuzz::M0",
+        "severity": "ERROR"
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:69:73:body/0/literal",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          0,
+          1
+        ],
+        "token": "\n"
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:grammar.ubnf:74:77:body/1/literal",
+        "occurrenceId": 4,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          1,
+          2
+        ],
+        "token": ","
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:78:81:body/2/literal",
+        "occurrenceId": 5,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          2,
+          3
+        ],
+        "token": "あ"
+      },
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:69:81:body/seq",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          0,
+          3
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 4,
+        "exprId": "expr:grammar.ubnf:178:180:body/0/ruleRef",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          3
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 5,
+        "exprId": "expr:grammar.ubnf:189:192:body/1/0/0/0/literal",
+        "occurrenceId": 9,
+        "parentOccurrenceId": 8,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          4
+        ],
+        "token": "あ"
+      },
+      {
+        "completionOrder": 6,
+        "exprId": "expr:grammar.ubnf:193:196:body/1/0/0/1/0/literal",
+        "occurrenceId": 11,
+        "parentOccurrenceId": 10,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          4,
+          5
+        ],
+        "token": "="
+      },
+      {
+        "completionOrder": 7,
+        "exprId": "expr:grammar.ubnf:193:196:body/1/0/0/1/repeat/lower/helper/0",
+        "occurrenceId": 10,
+        "parentOccurrenceId": 8,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          4,
+          5
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 8,
+        "exprId": "expr:grammar.ubnf:193:196:body/1/0/0/1/0/literal",
+        "occurrenceId": 13,
+        "parentOccurrenceId": 12,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          5,
+          6
+        ],
+        "token": "="
+      },
+      {
+        "completionOrder": 9,
+        "exprId": "expr:grammar.ubnf:193:196:body/1/0/0/1/repeat/lower/helper/0",
+        "occurrenceId": 12,
+        "parentOccurrenceId": 8,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          5,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 10,
+        "exprId": "expr:grammar.ubnf:206:208:body/1/0/0/2/ruleRef",
+        "occurrenceId": 14,
+        "parentOccurrenceId": 8,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          6,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 11,
+        "exprId": "expr:grammar.ubnf:189:208:body/1/0/0/seq",
+        "occurrenceId": 8,
+        "parentOccurrenceId": 7,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 12,
+        "exprId": "expr:grammar.ubnf:187:210:body/1/0/optional",
+        "occurrenceId": 7,
+        "parentOccurrenceId": 6,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 13,
+        "exprId": "expr:grammar.ubnf:187:210:body/1/repeat/lower/helper/0",
+        "occurrenceId": 6,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 14,
+        "exprId": "expr:grammar.ubnf:187:210:body/1/0/optional",
+        "occurrenceId": 16,
+        "parentOccurrenceId": 15,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          7,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 15,
+        "exprId": "expr:grammar.ubnf:187:210:body/1/repeat/lower/helper/0",
+        "occurrenceId": 15,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          7,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 16,
+        "exprId": "expr:grammar.ubnf:178:211:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": -1,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          7
+        ],
+        "token": null
+      }
+    ],
+    "mappingError": null,
+    "matched": 7,
+    "nativeFailure": {
+      "consumed": 7,
+      "expected": [
+        "'あ'"
+      ],
+      "matched": 7,
+      "offset": 7
+    },
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          3
+        ],
+        "text": "\n,あ"
+      },
+      {
+        "binding": "Root:2",
+        "name": "v5",
+        "span": [
+          4,
+          5
+        ],
+        "text": "="
+      },
+      {
+        "binding": "Root:2",
+        "name": "v5",
+        "span": [
+          5,
+          6
+        ],
+        "text": "="
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          3,
+          7
+        ],
+        "text": "あ==あ"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          7,
+          7
+        ],
+        "text": ""
+      }
+    ],
+    "recoveries": [
+      {
+        "captureOccurrences": [
+          3
+        ],
+        "mode": "AUTO",
+        "ruleId": "Fuzz::M0",
+        "skippedSpan": [
+          6,
+          6
+        ],
+        "span": [
+          6,
+          7
+        ],
+        "syncPattern": "あ",
+        "syncSpan": [
+          6,
+          7
+        ]
+      }
+    ],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [],
+      "references": []
+    },
+    "scopeDepth": 0
+  },
+  "rust": {
+    "accepted": true,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [
+      {
+        "name": "head",
+        "span": [
+          0,
+          3
+        ],
+        "text": "\n,あ"
+      },
+      {
+        "name": "head",
+        "span": [
+          3,
+          3
+        ],
+        "text": ""
+      }
+    ],
+    "catalogs": [],
+    "consumed": 3,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "deepestRule": "Fuzz::M0",
+        "expected": [
+          "end of input"
+        ],
+        "farthestExpected": [
+          "' '",
+          "'*/'",
+          "'/*'",
+          "'//'",
+          "'='",
+          "fuzz error"
+        ],
+        "farthestOffset": 6,
+        "kind": "trailing_input",
+        "offset": 3,
+        "origin": "Mapper.diagnose",
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::M0"
+        ]
+      }
+    ],
+    "hints": [
+      {
+        "deepestRule": "Fuzz::M0",
+        "expected": [
+          "=",
+          "fuzz error"
+        ],
+        "offset": 6,
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::M0"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 4,
+        "exprId": "expr:grammar.ubnf:178:211:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": null,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          3
+        ]
+      },
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:69:81:body/seq",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          0,
+          3
+        ]
+      },
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:69:73:body/0/literal",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          0,
+          1
+        ]
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:grammar.ubnf:74:77:body/1/literal",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          1,
+          2
+        ]
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:78:81:body/2/literal",
+        "occurrenceId": 4,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::L0",
+        "span": [
+          2,
+          3
+        ]
+      }
+    ],
+    "mappingError": null,
+    "matched": 3,
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          3
+        ],
+        "text": "\n,あ"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          3,
+          3
+        ],
+        "text": ""
+      }
+    ],
+    "recoveredRegions": [],
+    "references": [],
+    "scope": {
+      "events": [],
+      "mode": []
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "shrink_rounds": 7
+}

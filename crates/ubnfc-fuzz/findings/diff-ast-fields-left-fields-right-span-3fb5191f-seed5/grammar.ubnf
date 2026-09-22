@@ -1,0 +1,11 @@
+grammar Fuzz {
+  @whitespace: javaStyle
+  token T0 = EMPTY
+  token T1 = ANY
+  token T2 = NEGATION('ab\n')
+  L0 ::= '😀';
+  @whitespace M0 ::= [ { 'x'* % ')' T2? % 'x' }? @v2 ] T2 @v3 [ ( '😀' | '*'{2,4} % ':' ';' 'c'{1,} @v4 ) T0{0,} ( T1 @v5 L0{0,} % ':' ')' ) ] | ( 'あ' @v6 '-' @v7 )? T2 { ( T1 @v8 L0? ';' ) ERROR('fuzz error')+ % 'ab' [ 'ab'+ '(' ',' ]? }{1,2};
+  @mapping(Bin0, params=[left, op, right]) @rightAssoc @precedence(level=90) Op0 ::= T2 @left { '+' @op Op0 @right };
+  @mapping(Bin1, params=[left, op, right]) @leftAssoc @precedence(level=80) Op1 ::= Op0 @left { '-' @op Op0 @right };
+  @root Root ::= Op1 @head ( ',' @tail '\n' )* @tail;
+}
