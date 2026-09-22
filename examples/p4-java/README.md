@@ -71,7 +71,11 @@ x4/x16 は処理入力総量を概ね揃える設定。結果を volatile に保
 BENCH_JVM_OPTS='-Dbench.fixtures=complex,complex-x64 -Dbench.modes=ast -Dbench.warmup=500 -Dbench.runs=7' bash scripts/benchmark.sh
 # comparison-heavy 系は Formula 入口が拒否するので BooleanExpression 入口で測る
 BENCH_JVM_OPTS='-Dbench.fixtures=comparison-heavy,comparison-heavy-x64 -Dbench.entry=BooleanExpression' bash scripts/benchmark.sh
+# 候補除外（emit/Prediction）を切って参照経路と比べる
+BENCH_JVM_OPTS='-Dubnfc.predict=false' bash scripts/benchmark.sh
 # 旧生成物（tinyexpression の target/classes）を同じ計測法にかける任意ツール
+# root は JMH P4ParserBenchmark.parseFreshToken(true) と同じ経路（認識に対応）
+bash scripts/legacy-bench.sh /path/to/tinyexpression root complex
 bash scripts/legacy-bench.sh /path/to/tinyexpression mapper complex,complex-x4
 ```
 

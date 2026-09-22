@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# 旧生成物を同じ計測法にかける。使用法: legacy-bench.sh TINYEXPRESSION_REPO mapper|facade [fixture,...]
+# 旧生成物を同じ計測法にかける。使用法: legacy-bench.sh TINYEXPRESSION_REPO root|root-deferred|mapper|facade [fixture,...]
 set -euo pipefail
 module=$(cd "$(dirname "$0")/.." && pwd)
-if [[ $# -lt 2 ]]; then echo '使用法: legacy-bench.sh TINYEXPRESSION_REPO mapper|facade [fixture,...]' >&2; exit 2; fi
+if [[ $# -lt 2 ]]; then echo '使用法: legacy-bench.sh TINYEXPRESSION_REPO root|root-deferred|mapper|facade [fixture,...]' >&2; exit 2; fi
 tiny=$(cd "$1" && pwd); kind=$2; fixtures=${3:-complex,complex-x4,complex-x16,complex-x64}
 repo=${MAVEN_REPO:-$HOME/.m2/repository}; version=${UNLAXER_VERSION:-3.0.15}
 common="$repo/org/unlaxer/unlaxer-common/$version/unlaxer-common-$version.jar"
