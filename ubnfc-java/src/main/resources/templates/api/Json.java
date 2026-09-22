@@ -123,11 +123,14 @@ public final class Json {
         if (span == null) throw new IllegalArgumentException("Missing node span");
         var fields = new LinkedHashMap<String, Object>();
         try {
-            for (var component : object.getClass().getRecordComponents())
-                fields.put(component.getName(), value(component.getAccessor().invoke(object), spans));
+            for (var component : object.getClass().getRecordComponents()) {
+                var original = component.getAnnotation(SourceName.class);
+                fields.put(original == null ? component.getName() : original.value(), value(component.getAccessor().invoke(object), spans));
+            }
         } catch (IllegalAccessException | InvocationTargetException error) { throw new IllegalStateException(error); }
         var node = new LinkedHashMap<String, Object>();
-        node.put("type", object.getClass().getSimpleName()); node.put("span", List.of(span.start(), span.end())); node.put("fields", fields);
+        var original = object.getClass().getAnnotation(SourceName.class);
+        node.put("type", original == null ? object.getClass().getSimpleName() : original.value()); node.put("span", List.of(span.start(), span.end())); node.put("fields", fields);
         return node;
     }
     public static String write(Object value) {

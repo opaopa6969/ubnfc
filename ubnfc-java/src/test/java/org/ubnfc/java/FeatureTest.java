@@ -32,12 +32,16 @@ class FeatureTest {
             assertTrue(ok(result)); assertEquals(0, get(result, "consumedCp")); assertEquals(2, get(result, "matchedCp"));
         }
     }
-    @Test void matchOnlyProgressNegativeSuppressionAndEmptyConsumeReset() throws Exception {
+    @Test void matchOnlyProgressAndNegativeSuppressionReset() throws Exception {
         var f = new IrFixture();
         String repeated = f.expression("Root", "repeat", "child", f.expression("Root", "any"), "min", 2, "max", 2, "terminator", null);
         String look = f.expression("Root", "lookahead", "child", repeated);
         String negative = f.expression("Root", "negativeLookahead", "child", f.literal("Root", "xx"));
-        f.rule("Root", f.seq("Root", look, negative, f.literal("Root", "")));
+        // Empty Word fails; use an empty sequence for epsilon and preserve R=true here.
+        String body = f.seq("Root", look, negative, f.seq("Root"));
+        var execution = Json.object(f.expressions.getLast().get("execution"));
+        execution.put("entryFlag", "preserve"); f.expressions.getLast().put("execution", execution);
+        f.rule("Root", body);
         try (var h = f.compile()) {
             Object result = h.parse("ab", h.options(false, false, false, true, Map.of()));
             assertTrue(ok(result)); assertEquals(0, get(result, "consumedCp")); assertEquals(0, get(result, "matchedCp"));
@@ -118,7 +122,7 @@ class FeatureTest {
                 var count = new AtomicInteger(); Class<?> scannerType = h.loader.loadClass(h.pkg + ".api.TokenScanner");
                 var effect = h.loader.loadClass(h.pkg + ".api.TokenScanner$Effect").getConstructor(String.class, String.class, int.class, int.class).newInstance("declare", "a", 0, 1);
                 var ctor = h.loader.loadClass(h.pkg + ".api.TokenScanner$ScanResult").getConstructor(boolean.class, int.class, int.class, int.class, int.class, List.class, List.class);
-                Object scanner = Proxy.newProxyInstance(h.loader, new Class<?>[]{scannerType}, (proxy, method, args) -> { count.incrementAndGet(); int c = (Integer) args[1]; return ctor.newInstance(true, c + 1, c + 1, c, c + 1, List.of(), List.of(effect)); });
+                Object scanner = Proxy.newProxyInstance(h.loader, new Class<?>[]{scannerType}, (proxy, method, args) -> { count.incrementAndGet(); int c = (Integer) get(args[1], "consumed"); return ctor.newInstance(true, c + 1, c + 1, c, c + 1, List.of(), List.of(effect)); });
                 Object result = h.parse("ay", h.options(false, true, false, true, Map.of("scan", scanner)));
                 assertTrue(ok(result)); assertEquals(safe ? 1 : 2, count.get()); assertEquals(1, ((List<?>) get(get(result, "scope"), "declarations")).size());
             }
@@ -159,7 +163,7 @@ class FeatureTest {
     }
     @Test void optionalAndListCardinalityPreserveEmptyCaptures() throws Exception {
         var f = new IrFixture();
-        String repeated = f.literal("Root", "a"), optional = f.literal("Root", "b"), empty = f.literal("Root", "");
+        String repeated = f.literal("Root", "a"), optional = f.literal("Root", "b"), empty = f.seq("Root");
         String a = f.capture(repeated, "items", "text", "list", obj("kind", "text"));
         String b = f.capture(optional, "maybe", "text", "optional", obj("kind", "text"));
         String e = f.capture(empty, "empty", "text", "scalar", obj("kind", "text"));

@@ -165,7 +165,6 @@ public final class Validation {
             int previous = -1;
             for (int point : spec.codePoints()) { require(point > previous && point <= 0x10ffff, "Invalid codePoints: " + token.symbolId()); previous = point; }
             if (!token.memoSafety().success() || !token.memoSafety().failure()) unsafe.add(token.symbolId());
-            if (token.spec().kind().equals("extern") && !token.spec().inputState().isEmpty()) unsupported("externTokens.inputState:" + token.spec().logicalId());
             if (token.spec().kind().equals("regex") && token.spec().javaFallback().equals("none")) unsupported("regex.dfaRequired");
         }
         boolean changed;

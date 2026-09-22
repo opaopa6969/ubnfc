@@ -67,7 +67,7 @@ class BackendTest {
                     }
                     var diagnostic = Json.object(expected.get("diagnostics"));
                     assertEquals(((Number) diagnostic.get("farthestCp")).intValue(), get(get(result, "diagnostics"), "farthestCp"));
-                    assertEquals(Json.array(diagnostic.get("expected")).stream().map(Object::toString).sorted().toList(), get(get(result, "diagnostics"), "expected"));
+                    assertLegacyExpected(Json.array(diagnostic.get("expected")), result);
                     List<?> expectedCaptures = Json.array(expected.get("captures")), actualCaptures = (List<?>) get(result, "captures");
                     assertEquals(expectedCaptures.size(), actualCaptures.size());
                     for (int c = 0; c < actualCaptures.size(); c++) {
@@ -79,6 +79,15 @@ class BackendTest {
             }
         }
         return tests.stream();
+    }
+    private static void assertLegacyExpected(List<?> expected, Object result) throws Exception {
+        Object diagnostic = get(result, "diagnostics");
+        // The handwritten golden's expected is the old farthest accumulator, with an
+        // injected EOF hint. Keep that file intact and check the two new API fields separately.
+        assertEquals(expected.stream().map(Object::toString).filter(s -> !s.equals("EOF")).sorted().toList(),
+            get(diagnostic, "farthestExpected"));
+        if (get(diagnostic, "kind").equals("trailing_input")) assertEquals(List.of("end of input"), get(diagnostic, "expected"));
+        else assertEquals(get(diagnostic, "farthestExpected"), get(diagnostic, "expected"));
     }
     private static Object correctedNumbers(Object value, List<?> captures, String input) {
         if (value instanceof List<?> list) return list.stream().map(v -> correctedNumbers(v, captures, input)).toList();
@@ -120,7 +129,7 @@ class BackendTest {
             Object result = h.parse((String) row.get("input")); assertEquals(row.get("ok"), ok(result));
             assertEquals(row.get("ast"), h.canonical(result));
             assertEquals(((Number) row.get("offset")).intValue(), get(get(result, "diagnostics"), "offset"));
-            assertEquals(row.get("expected"), get(get(result, "diagnostics"), "expected"));
+            assertLegacyExpected(Json.array(row.get("expected")), result);
         }));
     }
     @Test void deterministicSourcesAndUnknownKeys() throws Exception {

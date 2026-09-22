@@ -49,7 +49,7 @@ public final class JavaEmitter {
         result.put(prefix + ast + ".java", astSource());
         result.put(prefix + parser + ".java", parserSource());
         result.put(prefix + grammar + "Result.java", "package " + pkg + ";\nimport " + pkg + ".api.ParseResult;\npublic record " + grammar + "Result(ParseResult<" + ast + "> result) {}\n");
-        for (String name : List.of("Span", "Capture", "Diagnostic", "MappingException", "ParseOptions", "ParseResult", "TokenScanner", "Json"))
+        for (String name : List.of("Span", "Capture", "Diagnostic", "MappingException", "ParseOptions", "ParseResult", "TokenScanner", "Json", "SourceName"))
             result.put(prefix + "api/" + name + ".java", resource("/templates/api/" + name + ".java").replace("generated.", pkg + "."));
         for (String name : List.of("Recipe", "Session")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
         for (String name : List.of("Input", "Cursor", "MemoTable", "ScopeStore", "Diagnostics", "Severity"))
@@ -92,10 +92,13 @@ public final class JavaEmitter {
         return "parse" + name.replaceAll("[^A-Za-z0-9_]", "_") + "_" + ruleIds.get(id);
     }
     private boolean root(AstType type) { return type.kind().equals("transparentUnion") && type.name().equals(ast); }
+    /** Injective escaping: java -> java_, java_ -> java__, etc. */
+    private static String name(String value) { return value.matches("(?:java|javax|org|util)_*") ? value + "_" : value; }
+    private String named(String value) { return name(value).equals(value) ? "" : "@" + pkg + ".api.SourceName(" + q(value) + ") "; }
     private String typeName(String id) {
         AstType type = types.get(id);
         if (root(type)) return ast;
-        return (type.enclosingTypeId() == null ? ast : typeName(type.enclosingTypeId())) + "." + type.name();
+        return (type.enclosingTypeId() == null ? ast : typeName(type.enclosingTypeId())) + "." + name(type.name());
     }
     private Set<String> parents(AstType type) {
         var parents = new LinkedHashSet<>(type.implements_());
@@ -117,38 +120,38 @@ public final class JavaEmitter {
         return switch (field.cardinality()) { case "optional" -> "java.util.Optional<" + type + ">"; case "list" -> "java.util.List<" + type + ">"; default -> type; };
     }
     private String astSource() {
-        var out = new StringBuilder("package " + pkg + ";\nimport java.util.List;\nimport java.util.Optional;\n\npublic sealed interface " + ast);
+        var out = new StringBuilder("package " + pkg + ";\n\npublic sealed interface " + ast);
         var direct = types.values().stream().filter(t -> !root(t) && (parents(t).isEmpty() || parents(t).stream().anyMatch(p -> root(types.get(p))))).map(t -> typeName(t.id())).toList();
         if (direct.isEmpty()) direct = List.of(ast + ".Text");
         out.append(" permits ").append(String.join(", ", direct)).append(" {\n");
-        if (types.isEmpty()) out.append("    record Text(String value) implements ").append(ast).append(" {}\n");
+        if (types.isEmpty()) out.append("    record Text(java.lang.String value) implements ").append(ast).append(" {}\n");
         for (AstType type : types.values()) if (!root(type) && (type.enclosingTypeId() == null || root(types.get(type.enclosingTypeId())))) astType(out, type, "    ");
-        for (var common : ir.semantics().commonFields()) if (root(types.get(common.interfaceTypeId()))) out.append("    ").append(fieldType(common.field())).append(' ').append(common.field().name()).append("();\n");
+        for (var common : ir.semantics().commonFields()) if (root(types.get(common.interfaceTypeId()))) out.append("    ").append(fieldType(common.field())).append(' ').append(name(common.field().name())).append("();\n");
         return out.append("}\n").toString();
     }
     private void astType(StringBuilder out, AstType type, String indent) {
         Set<String> parents = parents(type);
         String supers = parents.isEmpty() ? ast : parents.stream().map(this::typeName).collect(Collectors.joining(", "));
-        out.append(indent);
+        out.append(indent).append(named(type.name()));
         switch (type.kind()) {
             case "record" -> {
-                out.append("record ").append(type.name()).append('(').append(type.fields().stream().map(f -> fieldType(f) + " " + f.name()).collect(Collectors.joining(", ")))
+                out.append("record ").append(name(type.name())).append('(').append(type.fields().stream().map(f -> named(f.name()) + fieldType(f) + " " + name(f.name())).collect(Collectors.joining(", ")))
                     .append(") implements ").append(supers).append(" {\n");
                 if (type.fields().stream().anyMatch(f -> f.cardinality().equals("list") || f.cardinality().equals("optional"))) {
-                    out.append(indent).append("    public ").append(type.name()).append(" {\n");
+                    out.append(indent).append("    public ").append(name(type.name())).append(" {\n");
                     for (var f : type.fields()) {
-                        if (f.cardinality().equals("list")) out.append(indent).append("        ").append(f.name()).append(" = java.util.List.copyOf(").append(f.name()).append(");\n");
-                        if (f.cardinality().equals("optional")) out.append(indent).append("        java.util.Objects.requireNonNull(").append(f.name()).append(");\n");
+                        if (f.cardinality().equals("list")) out.append(indent).append("        ").append(name(f.name())).append(" = java.util.List.copyOf(").append(name(f.name())).append(");\n");
+                        if (f.cardinality().equals("optional")) out.append(indent).append("        java.util.Objects.requireNonNull(").append(name(f.name())).append(");\n");
                     }
                     out.append(indent).append("    }\n");
                 }
             }
             case "transparentUnion" -> {
-                out.append("sealed interface ").append(type.name()).append(" extends ").append(supers).append(" permits ")
+                out.append("sealed interface ").append(name(type.name())).append(" extends ").append(supers).append(" permits ")
                     .append(type.variants().stream().map(v -> typeName(v.variant())).collect(Collectors.joining(", "))).append(" {\n");
-                for (var common : ir.semantics().commonFields()) if (common.interfaceTypeId().equals(type.id())) out.append(indent).append("    ").append(fieldType(common.field())).append(' ').append(common.field().name()).append("();\n");
+                for (var common : ir.semantics().commonFields()) if (common.interfaceTypeId().equals(type.id())) out.append(indent).append("    ").append(fieldType(common.field())).append(' ').append(name(common.field().name())).append("();\n");
             }
-            case "enum" -> out.append("enum ").append(type.name()).append(" implements ").append(supers).append(" { ")
+            case "enum" -> out.append("enum ").append(name(type.name())).append(" implements ").append(supers).append(" { ")
                 .append(type.variants().stream().map(AstTypeVariantsItem::javaName).collect(Collectors.joining(", "))).append(";\n");
             default -> throw new IllegalArgumentException(type.kind());
         }
@@ -179,7 +182,7 @@ public final class JavaEmitter {
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
             .append("        var s = new Session(source, options, ").append(strings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(");\n")
-            .append("        var f = new Frame(); Match match = entryPoint.parse(s, f);\n")
+            .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
             .append("        ParseResult<").append(ast).append("> syntax = s.result(f, match, ").append(catalogs()).append(");\n")
             .append("        if (!syntax.ok() || !options.buildAst()) return syntax;\n")
             .append("        if (match.mappingFailure()) throw s.mapping(match.start(), match.end(), \"Recovered input cannot be mapped\", null);\n")
@@ -208,7 +211,7 @@ public final class JavaEmitter {
         var scope = ir.semantics().scope().effects().stream().filter(e -> e.ruleId().equals(rule.symbolId())).toList();
         String effects = scope.stream().flatMap(e -> e.events().stream().map(v -> "new Effect(" + q(v.when()) + "," + q(v.action()) + "," + q(v.captureSiteId()) + "," + q(v.name()) + "," + q(e.mode()) + ")")).collect(Collectors.joining(","));
         String fields = recipe == null ? "" : recipe.fields().stream().map(f -> "new Field(" + q(f.field()) + "," + strings(f.siteIds()) + "," + q(f.conversion()) + "," + q(f.cardinality()) + ")").collect(Collectors.joining(","));
-        out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
+        out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(exprIds.size() + ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
             .append(", new Field[]{").append(fields).append("}, new Effect[]{").append(effects).append("}, ").append(rule.skip()).append(");\n    }\n");
     }
@@ -223,6 +226,12 @@ public final class JavaEmitter {
         String method = method(expr.id());
         var sites = expr.captureSiteIds().stream().map(captures::get).toList();
         out.append("    private static Match ").append(method).append("(Session s, Frame f) {\n");
+        var memo = ir.plan().memo().entries().stream().filter(e -> e.exprId().equals(expr.id())).findFirst().orElse(null);
+        if (memo != null && (memo.cacheSuccess() || memo.cacheFailure())) {
+            out.append("        return s.expression(f, ").append(exprIds.get(expr.id())).append(", ").append(memo.cacheSuccess()).append(", ").append(memo.cacheFailure())
+                .append(", ").append(parser).append("::").append(method).append("Body);\n    }\n")
+                .append("    private static Match ").append(method).append("Body(Session s, Frame f) {\n");
+        }
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(strings(expr.captureSiteIds())).append(", ").append(strings(sites.stream().map(Capture::name).toList())).append(", ").append(strings(sites.stream().map(Capture::spanRule).toList()))
@@ -249,7 +258,7 @@ public final class JavaEmitter {
                 var recovery = ir.semantics().recovery().stream().filter(r -> r.applicationSites().contains(expr.id())).findFirst().orElse(null);
                 yield recovery == null ? "return " + ruleMethod(n.symbolId()) + "(s, f);" : "return s.recover(f, " + call + ", " + strings(recovery.resolvedSyncPatterns()) + ", " + recovery.consumeSync() + ", " + q(recovery.noSyncAction()) + ", " + q(recovery.astProjection()) + ", " + q(recovery.recipeId()) + ");";
             }
-            case "tokenRef" -> "return " + token(tokens.get(n.symbolId()).spec()) + ";";
+            case "tokenRef" -> "return " + token(tokens.get(n.symbolId()).spec(), label) + ";";
             case "lookahead", "negativeLookahead" -> "return s.look(f, " + call(n.child()) + ", " + n.kind().equals("negativeLookahead") + ", " + q(label) + ");";
             case "any" -> "return s.any(f, " + q(label) + ");";
             case "eof" -> "return s.eof(f);"; case "empty" -> "return s.empty(f);";
@@ -257,15 +266,15 @@ public final class JavaEmitter {
             default -> throw new IllegalArgumentException(n.kind());
         };
     }
-    private String token(TokenSpec spec) {
+    private String token(TokenSpec spec, String label) {
         return switch (spec.kind()) {
             case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + ints(spec.codePoints()) + ")";
             case "until" -> "s.until(f," + q(spec.terminator()) + ")";
-            case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + q(spec.pattern()) + ")," + spec.kind().equals("negativeLookahead") + "," + q(spec.pattern()) + ")";
+            case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + q(label) + ")," + spec.kind().equals("negativeLookahead") + "," + q(label) + ")";
             case "negation" -> "s.range(f,0,1114111," + q(spec.excluded()) + ",\"NEGATION\")";
             case "charRange" -> "s.range(f," + spec.min() + "," + spec.max() + ",null,\"CHAR_RANGE\")";
-            case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + q(spec.word()) + ")";
-            case "regex" -> "s.regex(f,Pattern.compile(" + q(spec.pattern()) + "))";
+            case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + q(label) + ")";
+            case "regex" -> "s.regex(f,Pattern.compile(" + q(spec.pattern()) + ")," + q(label) + ")";
             case "extern" -> "s.external(f," + q(spec.logicalId()) + ")";
             case "any" -> "s.any(f,\"ANY\")"; case "eof" -> "s.eof(f)"; case "empty" -> "s.empty(f)";
             default -> throw new IllegalArgumentException(spec.kind());

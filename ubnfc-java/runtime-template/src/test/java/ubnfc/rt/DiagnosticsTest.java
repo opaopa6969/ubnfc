@@ -8,6 +8,39 @@ import org.junit.jupiter.api.Test;
 
 class DiagnosticsTest {
     @Test
+    void speculationRestoresGlobalAndEveryEnclosingLocal() {
+        Diagnostics diagnostics = new Diagnostics();
+        diagnostics.failAt(10, 1);
+        diagnostics.enterRule(7);
+        diagnostics.failAt(2, 2);
+        var mark = diagnostics.checkpoint();
+        diagnostics.enterRule(8);
+        diagnostics.failAt(20, 3);
+        diagnostics.leaveRule();
+        diagnostics.restore(mark);
+        assertEquals(10, diagnostics.farthest());
+        assertArrayEquals(new int[]{1}, diagnostics.expected());
+        assertEquals(2, diagnostics.snapshot().farthest());
+        assertArrayEquals(new int[]{2}, diagnostics.leaveRule().expected());
+    }
+
+    @Test
+    void expressionMemoDoesNotDuplicateTheCallingRuleInItsStack() {
+        Diagnostics diagnostics = new Diagnostics();
+        diagnostics.enterRule(7);
+        diagnostics.enterExpression();
+        diagnostics.enterRule(8);
+        diagnostics.failAt(2, 1);
+        diagnostics.leaveRule();
+        var expression = diagnostics.leaveRule();
+        diagnostics.leaveRule();
+        assertArrayEquals(new int[]{8}, expression.ruleStack());
+        diagnostics.enterRule(9);
+        diagnostics.merge(expression);
+        assertArrayEquals(new int[]{9, 8}, diagnostics.snapshot().ruleStack());
+    }
+
+    @Test
     void emptyDiagnosticsHaveNoFailureOrDeepestRule() {
         Diagnostics diagnostics = new Diagnostics();
         assertEquals(-1, diagnostics.farthest());

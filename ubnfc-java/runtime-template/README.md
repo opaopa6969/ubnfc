@@ -5,7 +5,7 @@ JDK 21 でコンパイル・テストする。生成物にこの jar の依存�
 本体の依存は JDK のみ。JUnit Jupiter 5.10.2 は test scope のみで使用する。
 
 ```sh
-cd /home/opa/work/unlaxer-workspace/ubnfc-wt-rt-java/ubnfc-java/runtime-template
+cd ubnfc-java/runtime-template
 mvn -q -o test
 ```
 
@@ -49,8 +49,10 @@ mvn -q -o test
   `leaveRule` は局所 Snapshot を返す。成功 rule の内部失敗も消さない。
   Snapshot の stack は保存した rule 自身からの suffix。memo hit では対象 rule を enter する前に
   `merge` し、現在の呼出元へ付け替える。suppression は入れ子可能で fail/merge の双方に効く。
+  `checkpoint/restore` は global と実行中の全局所診断を復元し、Not の成否確定後の破棄に使う。
+  `enterExpression` は rule stack に新しい rule を足さず匿名式の memo 用 accumulator を作る。
   `failAt(pos, expectedId)` の位置単位・consumed/matched の選択は生成側で統一する。
-  設計 D-011 は未確定なので、このモジュールでは一方を暗黙に選択しない。
+  D-011 / D-014 の主位置と最遠位置の分離は生成側が行い、このモジュールは最遠 accumulator を提供する。
 
 ## テストの範囲
 

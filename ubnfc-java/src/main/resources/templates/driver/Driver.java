@@ -77,7 +77,7 @@ public final class Driver {
         if (!diagnostic.kind().equals("none") || !diagnostic.expected().isEmpty())
             diagnostics.add(object("kind", diagnostic.kind().equals("none") ? "syntax" : diagnostic.kind(),
                 "offset", diagnostic.offset() < 0 ? diagnostic.farthestCp() : diagnostic.offset(),
-                "expected", diagnostic.expected()));
+                "expected", diagnostic.expected(), "farthestOffset", diagnostic.farthestCp(), "farthestExpected", diagnostic.farthestExpected()));
         for (var diagnosticEvent : result.scope().diagnostics())
             diagnostics.add(object("kind", "scope", "offset", diagnosticEvent.offset(), "expected", List.of(),
                 "message", diagnosticEvent.msg(), "length", diagnosticEvent.len(), "severity", diagnosticEvent.severity().name()));
