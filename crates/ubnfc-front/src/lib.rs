@@ -10,6 +10,7 @@
 
 pub mod cli;
 pub mod ir;
+pub mod lower;
 pub mod resolve;
 pub mod syntax;
 pub mod validate;
