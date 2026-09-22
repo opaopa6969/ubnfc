@@ -7,11 +7,13 @@
 //! - `ir`       : Grammar IR（serde）
 //! - `analysis` : nullable / FIRST / 左再帰 / 優先順位 / choice 戦略 / capture cardinality
 //! - `cli`      : `ubnfc` コマンド
+//! - `pipeline` : ソース読込から参照検証済み Grammar IR までの結線
 
 pub mod analysis;
 pub mod cli;
 pub mod ir;
 pub mod lower;
+pub mod pipeline;
 pub mod resolve;
 pub mod syntax;
 pub mod validate;

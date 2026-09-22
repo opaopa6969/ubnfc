@@ -1,0 +1,1865 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:150:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:140:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 3,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:143:150:body/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 3,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:225:246:body/1/group",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 42
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 42
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": "trie:expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice"
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 42,
+              "start": 42
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/0/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [
+      {
+        "id": "trie:expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice",
+        "maxDepth": 1,
+        "nodes": [
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal"
+            ],
+            "completedCandidateExprIds": [],
+            "edges": [
+              {
+                "codePoint": 42,
+                "target": 2
+              },
+              {
+                "codePoint": 43,
+                "target": 1
+              }
+            ],
+            "index": 0,
+            "unknownCandidateExprIds": []
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal"
+            ],
+            "edges": [],
+            "index": 1,
+            "unknownCandidateExprIds": []
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal"
+            ],
+            "edges": [],
+            "index": 2,
+            "unknownCandidateExprIds": []
+          }
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Evolution::Expression",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Evolution::Binary",
+        "sccId": "scc:1"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Evolution::Literal",
+        "sccId": "scc:2"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Evolution::Digits",
+        "sccId": "scc:3"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Evolution::Expression"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Evolution::Binary"
+        ]
+      },
+      {
+        "id": "scc:2",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Evolution::Literal"
+        ]
+      },
+      {
+        "id": "scc:3",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Evolution::Digits"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Evolution",
+    "ruleId": "Evolution::Expression"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Evolution",
+      "name": "Evolution",
+      "package": "org.example.evolution",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": "javaStyle"
+      },
+      "source": {
+        "end": 352,
+        "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+        "start": 0
+      },
+      "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [
+      {
+        "candidateOrder": [
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:140:body/0/ruleRef",
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:143:150:body/1/ruleRef"
+        ],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:150:body/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": null
+      },
+      {
+        "candidateOrder": [
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal"
+        ],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": "trie:expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice"
+      }
+    ],
+    "lexical": [
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Evolution::NUMBER"
+      }
+    ],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:150:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:140:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:143:150:body/1/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:225:246:body/1/group",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/0/tokenRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "conservative",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "memoReplay",
+    "orderedChoice",
+    "structuredOccurrences",
+    "triviaInsertion"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "EvolutionAST",
+        "kind": "transparentUnion",
+        "name": "EvolutionAST",
+        "variants": [
+          "EvolutionAST.Binary",
+          "EvolutionAST.Number"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "left",
+            "valueType": {
+              "kind": "node",
+              "typeId": "EvolutionAST.Number"
+            }
+          },
+          {
+            "cardinality": "scalar",
+            "name": "op",
+            "valueType": {
+              "kind": "text"
+            }
+          },
+          {
+            "cardinality": "scalar",
+            "name": "right",
+            "valueType": {
+              "kind": "node",
+              "typeId": "EvolutionAST.Number"
+            }
+          }
+        ],
+        "id": "EvolutionAST.Binary",
+        "implements": [
+          "EvolutionAST"
+        ],
+        "kind": "record",
+        "name": "Binary"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "EvolutionAST.Number",
+        "implements": [
+          "EvolutionAST"
+        ],
+        "kind": "record",
+        "name": "Number"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef",
+        "name": "left",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Evolution::Binary",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "EvolutionAST.Number"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+        "name": "op",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Evolution::Binary",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal",
+        "name": "op",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Evolution::Binary",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef",
+        "name": "right",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Evolution::Binary",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "EvolutionAST.Number"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Evolution::Literal",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+          "java": "'+'",
+          "rust": "+"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal",
+          "java": "'*'",
+          "rust": "*"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:150:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:140:body/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:143:150:body/1/ruleRef"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Evolution::Expression",
+        "source": {
+          "end": 150,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 134
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:140:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Evolution::Binary"
+        },
+        "ruleId": "Evolution::Expression",
+        "source": {
+          "end": 140,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 134
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:143:150:body/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Evolution::Literal"
+        },
+        "ruleId": "Evolution::Expression",
+        "source": {
+          "end": 150,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 143
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:225:246:body/1/group",
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Evolution::Binary",
+        "source": {
+          "end": 254,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 211
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Evolution::Literal"
+        },
+        "ruleId": "Evolution::Binary",
+        "source": {
+          "end": 218,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 211
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:225:246:body/1/group",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice",
+          "kind": "group"
+        },
+        "ruleId": "Evolution::Binary",
+        "source": {
+          "end": 246,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 225
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:240:body/1/0/choice",
+        "node": {
+          "alternatives": [
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Evolution::Binary",
+        "source": {
+          "end": 240,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 227
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal/capture/0"
+        ],
+        "diagnosticLabel": "'+'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "ruleId": "Evolution::Binary",
+        "source": {
+          "end": 230,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 227
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal/capture/0"
+        ],
+        "diagnosticLabel": "'*'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "ruleId": "Evolution::Binary",
+        "source": {
+          "end": 240,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 237
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Evolution::Literal"
+        },
+        "ruleId": "Evolution::Binary",
+        "source": {
+          "end": 254,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 247
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Evolution::Literal",
+        "source": {
+          "end": 319,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 313
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Evolution::Digits"
+        },
+        "ruleId": "Evolution::Literal",
+        "source": {
+          "end": 319,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 313
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/0/tokenRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Evolution::Digits",
+        "source": {
+          "end": 348,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 342
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/0/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Evolution::NUMBER"
+        },
+        "ruleId": "Evolution::Digits",
+        "source": {
+          "end": 348,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 342
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "left",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:218:body/0/ruleRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "op",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:227:230:body/1/0/0/literal/capture/0",
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:237:240:body/1/0/1/literal/capture/0"
+            ]
+          },
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "right",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:247:254:body/2/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Binary",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "EvolutionAST.Binary",
+        "ruleId": "Evolution::Binary",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "value",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/0/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Literal",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "EvolutionAST.Number",
+        "ruleId": "Evolution::Literal",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 116,
+              "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+              "start": 111
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:134:150:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Evolution::Expression",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Binary",
+              "params": [
+                "left",
+                "op",
+                "right"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 197,
+              "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+              "start": 155
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "left",
+          "op",
+          "right"
+        ],
+        "mappingTypeId": "EvolutionAST.Binary",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Evolution::Binary",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Number",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 298,
+              "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+              "start": 266
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "EvolutionAST.Number",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Evolution::Literal",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [],
+        "body": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/seq",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Evolution::Digits",
+        "triviaPolicyId": "trivia:javaStyle"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Evolution",
+        "id": "Evolution::NUMBER",
+        "kind": "token",
+        "name": "NUMBER",
+        "originalName": "NUMBER",
+        "qualifiedSymbolId": "Evolution::NUMBER",
+        "source": {
+          "end": 108,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 81
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf"
+      },
+      {
+        "grammarId": "grammar:Evolution",
+        "id": "Evolution::Expression",
+        "kind": "rule",
+        "name": "Expression",
+        "originalName": "Expression",
+        "qualifiedSymbolId": "Evolution::Expression",
+        "source": {
+          "end": 152,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 119
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf"
+      },
+      {
+        "grammarId": "grammar:Evolution",
+        "id": "Evolution::Binary",
+        "kind": "rule",
+        "name": "Binary",
+        "originalName": "Binary",
+        "qualifiedSymbolId": "Evolution::Binary",
+        "source": {
+          "end": 263,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 200
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf"
+      },
+      {
+        "grammarId": "grammar:Evolution",
+        "id": "Evolution::Literal",
+        "kind": "rule",
+        "name": "Literal",
+        "originalName": "Literal",
+        "qualifiedSymbolId": "Evolution::Literal",
+        "source": {
+          "end": 328,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 301
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf"
+      },
+      {
+        "grammarId": "grammar:Evolution",
+        "id": "Evolution::Digits",
+        "kind": "rule",
+        "name": "Digits",
+        "originalName": "Digits",
+        "qualifiedSymbolId": "Evolution::Digits",
+        "source": {
+          "end": 350,
+          "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+          "start": 331
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf"
+      }
+    ],
+    "tokens": [
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaNumber",
+          "rust": "legacyRustNumber"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token NUMBER = NumberParser",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "既知の NumberParser の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Number"
+        },
+        "symbolId": "Evolution::NUMBER"
+      }
+    ],
+    "trivia": {
+      "insertionPlan": [
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 2,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:211:254:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:313:319:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf:342:348:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        }
+      ],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [
+            {
+              "codePoints": [
+                9,
+                10,
+                11,
+                12,
+                13,
+                32
+              ],
+              "kind": "characters"
+            },
+            {
+              "kind": "lineComment",
+              "lineEndProfile": "legacyLineTerminator",
+              "open": "//"
+            },
+            {
+              "close": "*/",
+              "kind": "blockComment",
+              "open": "/*"
+            }
+          ],
+          "id": "trivia:javaStyle",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": "javaStyle"
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 353,
+      "id": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+      "path": "unlaxer-dsl/src/test/resources/evolution/1/Evolution.ubnf",
+      "sha256": "c7c1a399fc4c093e610c8b0a911c530bb5f7024092c625166f6e983cdfd304ef"
+    }
+  ],
+  "version": 1
+}

@@ -1,0 +1,2130 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 102,
+              "start": 102
+            },
+            {
+              "end": 115,
+              "start": 115
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 102,
+              "start": 102
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 115,
+              "start": 115
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 102,
+              "start": 102
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 102,
+              "start": 102
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            },
+            {
+              "end": 121,
+              "start": 120
+            },
+            {
+              "end": 128512,
+              "start": 128512
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 115,
+              "start": 115
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 115,
+              "start": 115
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            },
+            {
+              "end": 121,
+              "start": 120
+            },
+            {
+              "end": 128512,
+              "start": 128512
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": "trie:expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice"
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 128512,
+              "start": 128512
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 121,
+              "start": 121
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 121,
+              "start": 121
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 121,
+              "start": 121
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [
+      {
+        "id": "trie:expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+        "maxDepth": 1,
+        "nodes": [
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+            ],
+            "completedCandidateExprIds": [],
+            "edges": [
+              {
+                "codePoint": 97,
+                "target": 1
+              },
+              {
+                "codePoint": 128512,
+                "target": 2
+              }
+            ],
+            "index": 0,
+            "unknownCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+            ]
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal"
+            ],
+            "edges": [],
+            "index": 1,
+            "unknownCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+            ]
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal"
+            ],
+            "edges": [],
+            "index": 2,
+            "unknownCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+            ]
+          }
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Shared::Entry",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Shared::First",
+        "sccId": "scc:1"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Shared::Second",
+        "sccId": "scc:2"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Shared::Factor",
+        "sccId": "scc:3"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Shared::LeafRule",
+        "sccId": "scc:4"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Shared::OtherRule",
+        "sccId": "scc:5"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Shared::Entry"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Shared::First"
+        ]
+      },
+      {
+        "id": "scc:2",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Shared::Second"
+        ]
+      },
+      {
+        "id": "scc:3",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Shared::Factor"
+        ]
+      },
+      {
+        "id": "scc:4",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Shared::LeafRule"
+        ]
+      },
+      {
+        "id": "scc:5",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Shared::OtherRule"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Shared",
+    "ruleId": "Shared::Entry"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Shared",
+      "name": "Shared",
+      "package": "org.example.mixed",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": null
+      },
+      "source": {
+        "end": 380,
+        "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+        "start": 0
+      },
+      "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [
+      {
+        "candidateOrder": [
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef",
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef"
+        ],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": null
+      },
+      {
+        "candidateOrder": [
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+        ],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": "trie:expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice"
+      }
+    ],
+    "lexical": [],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "memoReplay",
+    "orderedChoice",
+    "structuredOccurrences"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "SharedAST",
+        "kind": "transparentUnion",
+        "name": "SharedAST",
+        "variants": [
+          "SharedAST.Value",
+          "SharedAST.Leaf",
+          "SharedAST.OtherLeaf"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "kind": "mixed",
+              "members": [
+                {
+                  "kind": "text"
+                },
+                {
+                  "kind": "node",
+                  "typeId": "SharedAST.Leaf"
+                },
+                {
+                  "kind": "node",
+                  "typeId": "SharedAST.OtherLeaf"
+                }
+              ]
+            }
+          }
+        ],
+        "id": "SharedAST.Value",
+        "implements": [
+          "SharedAST"
+        ],
+        "kind": "record",
+        "name": "Value"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "SharedAST.Leaf",
+        "implements": [
+          "SharedAST"
+        ],
+        "kind": "record",
+        "name": "Leaf"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "SharedAST.OtherLeaf",
+        "implements": [
+          "SharedAST"
+        ],
+        "kind": "record",
+        "name": "OtherLeaf"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "scalar",
+        "conversion": "mixed",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Shared::First",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "mixed",
+          "members": [
+            {
+              "kind": "text"
+            },
+            {
+              "kind": "node",
+              "typeId": "SharedAST.Leaf"
+            },
+            {
+              "kind": "node",
+              "typeId": "SharedAST.OtherLeaf"
+            }
+          ]
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Shared::Second",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "SharedAST.Leaf"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Shared::LeafRule",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Shared::OtherRule",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal",
+          "java": "'f'",
+          "rust": "f"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal",
+          "java": "'s'",
+          "rust": "s"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+          "java": "'a'",
+          "rust": "a"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+          "java": "'😀'",
+          "rust": "😀"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal",
+          "java": "'x'",
+          "rust": "x"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal",
+          "java": "'y'",
+          "rust": "y"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Shared::Entry",
+        "source": {
+          "end": 79,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 65
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Shared::First"
+        },
+        "ruleId": "Shared::Entry",
+        "source": {
+          "end": 70,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 65
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Shared::Second"
+        },
+        "ruleId": "Shared::Entry",
+        "source": {
+          "end": 79,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 73
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Shared::First",
+        "source": {
+          "end": 135,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 125
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'f'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "f",
+          "wordBoundary": false
+        },
+        "ruleId": "Shared::First",
+        "source": {
+          "end": 128,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 125
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Shared::Factor"
+        },
+        "ruleId": "Shared::First",
+        "source": {
+          "end": 135,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 129
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Shared::Second",
+        "source": {
+          "end": 201,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 189
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'s'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "s",
+          "wordBoundary": false
+        },
+        "ruleId": "Shared::Second",
+        "source": {
+          "end": 192,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 189
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Shared::LeafRule"
+        },
+        "ruleId": "Shared::Second",
+        "source": {
+          "end": 201,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 193
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Shared::Factor",
+        "source": {
+          "end": 255,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 223
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'a'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "ruleId": "Shared::Factor",
+        "source": {
+          "end": 226,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 223
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'😀'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "😀",
+          "wordBoundary": false
+        },
+        "ruleId": "Shared::Factor",
+        "source": {
+          "end": 232,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 229
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Shared::LeafRule"
+        },
+        "ruleId": "Shared::Factor",
+        "source": {
+          "end": 243,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 235
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Shared::OtherRule"
+        },
+        "ruleId": "Shared::Factor",
+        "source": {
+          "end": 255,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 246
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Shared::LeafRule",
+        "source": {
+          "end": 306,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 303
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal/capture/0"
+        ],
+        "diagnosticLabel": "'x'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "ruleId": "Shared::LeafRule",
+        "source": {
+          "end": 306,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 303
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Shared::OtherRule",
+        "source": {
+          "end": 370,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 367
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal/capture/0"
+        ],
+        "diagnosticLabel": "'y'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "y",
+          "wordBoundary": false
+        },
+        "ruleId": "Shared::OtherRule",
+        "source": {
+          "end": 370,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 367
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "mixed",
+            "field": "value",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:First",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "SharedAST.Value",
+        "ruleId": "Shared::First",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "value",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Second",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "SharedAST.Value",
+        "ruleId": "Shared::Second",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "value",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:LeafRule",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "SharedAST.Leaf",
+        "ruleId": "Shared::LeafRule",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "value",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:OtherRule",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "SharedAST.OtherLeaf",
+        "ruleId": "Shared::OtherRule",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 54,
+              "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+              "start": 49
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Shared::Entry",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Value",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 114,
+              "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+              "start": 83
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "SharedAST.Value",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Shared::First",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Value",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 177,
+              "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+              "start": 146
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "SharedAST.Value",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Shared::Second",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [],
+        "body": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Shared::Factor",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Leaf",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 289,
+              "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+              "start": 259
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "SharedAST.Leaf",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Shared::LeafRule",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "OtherLeaf",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 352,
+              "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+              "start": 317
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "SharedAST.OtherLeaf",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Shared::OtherRule",
+        "triviaPolicyId": "trivia:none"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Shared",
+        "id": "Shared::Entry",
+        "kind": "rule",
+        "name": "Entry",
+        "originalName": "Entry",
+        "qualifiedSymbolId": "Shared::Entry",
+        "source": {
+          "end": 80,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 55
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf"
+      },
+      {
+        "grammarId": "grammar:Shared",
+        "id": "Shared::First",
+        "kind": "rule",
+        "name": "First",
+        "originalName": "First",
+        "qualifiedSymbolId": "Shared::First",
+        "source": {
+          "end": 143,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 115
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf"
+      },
+      {
+        "grammarId": "grammar:Shared",
+        "id": "Shared::Second",
+        "kind": "rule",
+        "name": "Second",
+        "originalName": "Second",
+        "qualifiedSymbolId": "Shared::Second",
+        "source": {
+          "end": 209,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 178
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf"
+      },
+      {
+        "grammarId": "grammar:Shared",
+        "id": "Shared::Factor",
+        "kind": "rule",
+        "name": "Factor",
+        "originalName": "Factor",
+        "qualifiedSymbolId": "Shared::Factor",
+        "source": {
+          "end": 256,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 212
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf"
+      },
+      {
+        "grammarId": "grammar:Shared",
+        "id": "Shared::LeafRule",
+        "kind": "rule",
+        "name": "LeafRule",
+        "originalName": "LeafRule",
+        "qualifiedSymbolId": "Shared::LeafRule",
+        "source": {
+          "end": 314,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 290
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf"
+      },
+      {
+        "grammarId": "grammar:Shared",
+        "id": "Shared::OtherRule",
+        "kind": "rule",
+        "name": "OtherRule",
+        "originalName": "OtherRule",
+        "qualifiedSymbolId": "Shared::OtherRule",
+        "source": {
+          "end": 378,
+          "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+          "start": 353
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf"
+      }
+    ],
+    "tokens": [],
+    "trivia": {
+      "insertionPlan": [],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [],
+          "id": "trivia:none",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": null
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 381,
+      "id": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+      "path": "unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf",
+      "sha256": "7ec69e17406a7c9cd34772de0213a64ef96981994c60317158b6066a452695c3"
+    }
+  ],
+  "version": 1
+}
