@@ -172,3 +172,11 @@ parser 本体・golden を補正せず、バックエンドの正しい mapping 
 - `ubnfc gen --grammar X.ubnf --target rust|java --out DIR` は front から各生成器を subprocess で呼ぶ
   （`UBNFC_RUST_BIN` / `UBNFC_JAVA_JAR` で上書き、見つからなければ探索パスを表示して exit 3）。
 - 生成 Rust での実測: associative 24/24、right-associative 28/28、tinycalc 8/8。
+
+## 追記（2026-09-22、レビュー修正後の応答拡張）
+
+- `options.scope=true` のとき `scope` は `{ mode: [...], events: [ {order, action: "enter"|"leave"|"declare"|"reference", mode, name, offset, length} ], declarations, references, diagnostics }`。
+  位置・長さは code point。
+- 診断は主診断の `offset`/`expected` に加えて `farthestOffset` / `farthestExpected` を持つ（primary と farthest の分離。
+  全入力要求で末尾入力が残る場合、主診断は `trailing_input`）。
+- `ParseOptions.maxDepth`（既定 10,000）超過は `syntax` 失敗として返す（両バックエンド）。
