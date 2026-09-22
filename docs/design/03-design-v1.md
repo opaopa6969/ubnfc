@@ -134,6 +134,14 @@ skip cache は policy とカーソルをキーにした局所最適化であり�
   expected hints（リテラル/token の表示文字列、`ERROR('msg')`）、deepest rule。
 - 成功した rule 内の失敗も寄与、負の先読み内は抑止、memo hit 時は局所診断を再生し呼出し stack を付け替え。
 - 生成コードは成功経路の診断コストを抑える（局所 accumulator を rule 開始時にだけ作る）。
+- **二段構えの解析（2026-09-23）**: `ParseOptions.diagnostics` の既定は `false`（fast mode）で、
+  主診断 DAG も公開 farthest（D-014）も記録しない。入口（`parse` / `parse_with_options` /
+  `parse_entry_*`）は結果が診断を要するとき—失敗・入力の残り・recovery・scope / mapping /
+  resource 診断—だけ、同じ入力を `diagnostics: true` で解析し直して診断付きの結果を返す。
+  解析は決定的で観測可能な副作用を持たないので両者の結果は等しい。fast mode が落とす観測は
+  **成功した解析の `hints`（投機的失敗）だけ**で、これが要る利用者は `diagnostics: true` を渡す
+  （生成 driver は hints を常に出すので渡している）。`limits.diagnostics` は記録の予算なので、
+  fast mode では消費されず、成功した解析を予算超過で失敗にすることはない。
 
 ### 3.10 @recovery
 

@@ -59,6 +59,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             require_eof: false,
             lexical,
             max_depth,
+            // driver は成功時も hints（投機的失敗）を出すので、診断を明示的に要求する。
+            diagnostics: true,
             ..Default::default()
         },
     )?;
@@ -71,6 +73,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             require_eof: true,
             lexical,
             max_depth,
+            diagnostics: true,
             ..Default::default()
         },
     )?;
