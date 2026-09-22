@@ -6,6 +6,7 @@ mod emit;
 mod evaluator;
 mod expressions;
 mod factor;
+mod lexical;
 mod mapping;
 mod metadata;
 mod predict;

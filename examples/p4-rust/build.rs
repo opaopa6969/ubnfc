@@ -30,7 +30,7 @@ fn main() {
     fs::write(out.join("rt/diag.rs"), diag).unwrap();
     // rt::diag だけ複製し、cursor/input/memo/scope（公開 API の型）は commit 済み生成物を共有する。
     let rt_mod = format!(
-        "pub use crate::generated::rt::{{cursor, input, memo, scope}};\n\
+        "pub use crate::generated::rt::{{cursor, input, lexcache, memo, scope}};\n\
          #[path = {diag:?}] pub mod diag;\n",
         diag = out.join("rt/diag.rs").display().to_string(),
     );

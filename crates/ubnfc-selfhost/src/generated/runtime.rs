@@ -2,6 +2,7 @@ use super::api::*;
 use super::rt::{
     diag::{Diag, Diagnostics, DisplayDiagnostics, DisplaySnapshot},
     input::Input,
+    lexcache::{LexCache, SkipCache},
     memo::{Key, Memo},
     scope::{Checkpoint, ScopeStore},
 };
@@ -147,6 +148,8 @@ pub(crate) struct Buffers {
     display: DisplayDiagnostics,
     memo: Memo<Saved>,
     trivia_cache: Memo<(Step, DisplaySnapshot)>,
+    lex: LexCache,
+    trivia_skip: SkipCache,
     effects: Vec<Effect>,
     saved_effects: Vec<Effect>,
     stacks: Vec<Vec<(EventId, bool)>>,
@@ -157,6 +160,8 @@ pub(crate) struct Buffers {
     text_spans: TextSpans,
 }
 const POOL_RETAIN_BYTES: usize = 64 << 20;
+/// 位置ごとの字句 cache の上限（入力長に比例するため）。超える入力では cache を使わない。
+const LEX_CACHE_MAX_BYTES: usize = 256 << 20;
 thread_local! {
     static POOL: std::cell::RefCell<Option<Buffers>> = const { std::cell::RefCell::new(None) };
 }
@@ -167,6 +172,8 @@ impl Buffers {
             + self.display.capacity_bytes()
             + self.memo.capacity_bytes()
             + self.trivia_cache.capacity_bytes()
+            + self.lex.capacity_bytes()
+            + self.trivia_skip.capacity_bytes()
             + (self.effects.capacity() + self.saved_effects.capacity())
                 * std::mem::size_of::<Effect>()
     }
@@ -182,6 +189,12 @@ pub(crate) struct Session<'a> {
     pub memo: Memo<Saved>,
     pub scope: ScopeStore,
     pub trivia_cache: Memo<(Step, DisplaySnapshot)>,
+    /// 位置ごとの字句 cache（統合 DFA の結果）。key は位置だけ（rt/lexcache.rs の健全性議論）。
+    pub lex: LexCache,
+    /// trivia policy ごとの「次の非 trivia 位置」（診断を記録しない読み飛ばし）。
+    pub trivia_skip: SkipCache,
+    /// cache を引くか（`ParseOptions::lexical_cache` と、文法に cache 対象があるか）。
+    pub lex_enabled: bool,
     effects: Vec<Effect>,
     saved_effects: Vec<Effect>,
     pub statistics: Statistics,
@@ -218,6 +231,18 @@ impl<'a> Session<'a> {
         let diag_capacity = text.len().saturating_mul(24).saturating_add(64).min(1 << 20);
         // memo は rule 本体単位（P4 実測 約 2.3 entry / byte。候補除外で失敗 entry が減った）。
         let memo_capacity = text.len().saturating_mul(3).saturating_add(64).min(1 << 20);
+        // 字句 cache は位置で直接引く（位置は 0..=text.len()、EOF 位置を含む）。
+        // 文法に cache 対象の literal / trivia policy が無ければ 0 を渡して確保しない。
+        // 表は入力長に比例するので、割に合わない大きさになるときは cache を使わない。
+        let lex_bytes = (text.len() + 1)
+            .saturating_mul(LEX_WORDS * std::mem::size_of::<u64>() + std::mem::size_of::<u32>());
+        let lex_enabled = options.lexical_cache
+            && !rejected
+            && lex_bytes <= LEX_CACHE_MAX_BYTES
+            && (LEX_WORDS != 0 || TRIVIA_POLICIES != 0);
+        let lex_words = if lex_enabled { LEX_WORDS } else { 0 };
+        let skip_policies = if lex_enabled { TRIVIA_POLICIES } else { 0 };
+        let lex_positions = if lex_enabled { text.len() + 1 } else { 0 };
         let pooled = if options.reuse_buffers {
             POOL.with(|p| p.borrow_mut().take())
         } else {
@@ -232,6 +257,8 @@ impl<'a> Session<'a> {
                 // trivia cache は前回の entry 数を見積りにする（0 だと毎 parse 縮小と再拡張を繰り返す）。
                 let trivia_capacity = b.trivia_cache.len();
                 b.trivia_cache.reset(trivia_capacity);
+                b.lex.reset(lex_words, lex_positions);
+                b.trivia_skip.reset(skip_policies, lex_positions);
                 b.effects.clear();
                 b.saved_effects.clear();
                 b.text_spans.clear();
@@ -245,6 +272,16 @@ impl<'a> Session<'a> {
                 display: DisplayDiagnostics::new(options.limits.diagnostics),
                 memo: Memo::with_capacity(memo_capacity),
                 trivia_cache: Memo::default(),
+                lex: {
+                    let mut lex = LexCache::default();
+                    lex.reset(lex_words, lex_positions);
+                    lex
+                },
+                trivia_skip: {
+                    let mut cache = SkipCache::default();
+                    cache.reset(skip_policies, lex_positions);
+                    cache
+                },
                 effects: vec![],
                 saved_effects: vec![],
                 stacks: vec![],
@@ -275,6 +312,9 @@ impl<'a> Session<'a> {
             memo: buffers.memo,
             scope: ScopeStore::new(),
             trivia_cache: buffers.trivia_cache,
+            lex: buffers.lex,
+            trivia_skip: buffers.trivia_skip,
+            lex_enabled,
             effects: buffers.effects,
             saved_effects: buffers.saved_effects,
             statistics: Statistics::default(),
@@ -306,6 +346,8 @@ impl<'a> Session<'a> {
             display: std::mem::replace(&mut self.display, DisplayDiagnostics::new(0)),
             memo: std::mem::take(&mut self.memo),
             trivia_cache: std::mem::take(&mut self.trivia_cache),
+            lex: std::mem::take(&mut self.lex),
+            trivia_skip: std::mem::take(&mut self.trivia_skip),
             effects: std::mem::take(&mut self.effects),
             saved_effects: std::mem::take(&mut self.saved_effects),
             stacks: std::mem::take(&mut self.stacks),
@@ -602,14 +644,38 @@ impl<'a> Session<'a> {
             }
         }
     }
+    /// 統合 DFA の結果を位置ごとに引く。範囲外（起こらないはず）は None を返し、
+    /// 呼出し側は走査へ戻る。`lex_fill` は (入力, 位置) だけの関数なので、どの parser 状態
+    /// から引いても同じ答えになる。
+    #[inline]
+    pub fn lex_matches(&mut self, pos: usize, id: u32) -> Option<bool> {
+        if self.lex.need_fill(pos)? {
+            self.lex_run(pos);
+        }
+        Some(self.lex.test(pos, id))
+    }
+    /// この位置の統合 DFA を 1 回走らせて bitset を埋める（cache miss のときだけ）。
+    #[inline]
+    pub fn lex_run(&mut self, pos: usize) {
+        let bytes = self.text.as_bytes();
+        let out = self.lex.slot(pos);
+        lex_fill(bytes, pos, out);
+    }
     pub fn literal<const MATCH: bool>(
         &mut self,
         state: State,
         word: &'static str,
         sensitive: bool,
+        lit: u32,
         label: &'static str,
     ) -> Step {
         let start = state.position::<MATCH>();
+        if self.lex_enabled && lit != u32::MAX {
+            if let Some(hit) = self.lex_matches(start, lit) {
+                let length = hit.then_some(word.len());
+                return self.primitive::<MATCH>(state, length, label);
+            }
+        }
         let length = if sensitive {
             self.input.starts_with(start, word).then_some(word.len())
         } else {
@@ -1260,6 +1326,1065 @@ impl<'a> Session<'a> {
         });
         id
     }
+}
+/// 統合 DFA の bitset 語数（literal 62 個）。0 なら cache を作らない。
+const LEX_WORDS:usize=1;
+/// 診断を記録しない読み飛ばし cache を持つ trivia policy 数（区切り集合で正規化済み）。
+const TRIVIA_POLICIES:usize=1;
+/// 全 literal 終端を 1 本にまとめた DFA（trie）。位置 `pos` から 1 回走らせ、
+/// 一致した literal の id を `out` の bitset に立てる。長さは id ごとに静的。
+fn lex_fill(bytes:&[u8],pos:usize,out:&mut [u64]) {
+let mut p=pos;let mut state=0usize;
+loop {
+let Some(&c)=bytes.get(p) else {return;};
+state=match state {
+0=>match c {
+37=>{out[0]|=1;1},
+40=>{out[0]|=2;2},
+41=>{out[0]|=4;3},
+42=>{out[0]|=8;4},
+43=>{out[0]|=16;5},
+44=>{out[0]|=32;6},
+46=>{out[0]|=64;7},
+58=>{out[0]|=128;8},
+59=>{out[0]|=512;11},
+61=>{out[0]|=1024;12},
+63=>{out[0]|=2048;13},
+64=>{out[0]|=4096;14},
+65=>170,
+67=>173,
+69=>184,
+76=>195,
+78=>204,
+82=>224,
+85=>229,
+91=>{out[0]|=35184372088832;234},
+93=>{out[0]|=70368744177664;235},
+99=>236,
+100=>243,
+102=>254,
+103=>258,
+108=>265,
+109=>270,
+110=>274,
+112=>278,
+115=>290,
+116=>298,
+123=>{out[0]|=576460752303423488;303},
+124=>{out[0]|=1152921504606846976;304},
+125=>{out[0]|=2305843009213693952;305},
+_=>return,
+},
+8=>match c {
+58=>9,
+_=>return,
+},
+9=>match c {
+61=>{out[0]|=256;10},
+_=>return,
+},
+14=>match c {
+98=>15,
+99=>22,
+100=>39,
+101=>49,
+105=>56,
+108=>71,
+109=>92,
+112=>99,
+114=>122,
+115=>142,
+116=>154,
+119=>160,
+_=>return,
+},
+15=>match c {
+97=>16,
+_=>return,
+},
+16=>match c {
+99=>17,
+_=>return,
+},
+17=>match c {
+107=>18,
+_=>return,
+},
+18=>match c {
+114=>19,
+_=>return,
+},
+19=>match c {
+101=>20,
+_=>return,
+},
+20=>match c {
+102=>{out[0]|=8192;21},
+_=>return,
+},
+22=>match c {
+97=>23,
+111=>29,
+_=>return,
+},
+23=>match c {
+116=>24,
+_=>return,
+},
+24=>match c {
+97=>25,
+_=>return,
+},
+25=>match c {
+108=>26,
+_=>return,
+},
+26=>match c {
+111=>27,
+_=>return,
+},
+27=>match c {
+103=>{out[0]|=16384;28},
+_=>return,
+},
+29=>match c {
+109=>30,
+_=>return,
+},
+30=>match c {
+109=>31,
+_=>return,
+},
+31=>match c {
+111=>32,
+_=>return,
+},
+32=>match c {
+110=>33,
+_=>return,
+},
+33=>match c {
+70=>34,
+_=>return,
+},
+34=>match c {
+105=>35,
+_=>return,
+},
+35=>match c {
+101=>36,
+_=>return,
+},
+36=>match c {
+108=>37,
+_=>return,
+},
+37=>match c {
+100=>{out[0]|=32768;38},
+_=>return,
+},
+39=>match c {
+101=>40,
+111=>47,
+_=>return,
+},
+40=>match c {
+99=>41,
+_=>return,
+},
+41=>match c {
+108=>42,
+_=>return,
+},
+42=>match c {
+97=>43,
+_=>return,
+},
+43=>match c {
+114=>44,
+_=>return,
+},
+44=>match c {
+101=>45,
+_=>return,
+},
+45=>match c {
+115=>{out[0]|=65536;46},
+_=>return,
+},
+47=>match c {
+99=>{out[0]|=131072;48},
+_=>return,
+},
+49=>match c {
+110=>50,
+118=>53,
+_=>return,
+},
+50=>match c {
+117=>51,
+_=>return,
+},
+51=>match c {
+109=>{out[0]|=262144;52},
+_=>return,
+},
+53=>match c {
+97=>54,
+_=>return,
+},
+54=>match c {
+108=>{out[0]|=524288;55},
+_=>return,
+},
+56=>match c {
+109=>57,
+110=>62,
+_=>return,
+},
+57=>match c {
+112=>58,
+_=>return,
+},
+58=>match c {
+111=>59,
+_=>return,
+},
+59=>match c {
+114=>60,
+_=>return,
+},
+60=>match c {
+116=>{out[0]|=1048576;61},
+_=>return,
+},
+62=>match c {
+116=>63,
+_=>return,
+},
+63=>match c {
+101=>64,
+_=>return,
+},
+64=>match c {
+114=>65,
+_=>return,
+},
+65=>match c {
+108=>66,
+_=>return,
+},
+66=>match c {
+101=>67,
+_=>return,
+},
+67=>match c {
+97=>68,
+_=>return,
+},
+68=>match c {
+118=>69,
+_=>return,
+},
+69=>match c {
+101=>{out[0]|=2097152;70},
+_=>return,
+},
+71=>match c {
+101=>72,
+111=>80,
+_=>return,
+},
+72=>match c {
+102=>73,
+_=>return,
+},
+73=>match c {
+116=>74,
+_=>return,
+},
+74=>match c {
+65=>75,
+_=>return,
+},
+75=>match c {
+115=>76,
+_=>return,
+},
+76=>match c {
+115=>77,
+_=>return,
+},
+77=>match c {
+111=>78,
+_=>return,
+},
+78=>match c {
+99=>{out[0]|=4194304;79},
+_=>return,
+},
+80=>match c {
+110=>81,
+_=>return,
+},
+81=>match c {
+103=>82,
+_=>return,
+},
+82=>match c {
+101=>83,
+_=>return,
+},
+83=>match c {
+115=>84,
+_=>return,
+},
+84=>match c {
+116=>85,
+_=>return,
+},
+85=>match c {
+67=>86,
+_=>return,
+},
+86=>match c {
+104=>87,
+_=>return,
+},
+87=>match c {
+111=>88,
+_=>return,
+},
+88=>match c {
+105=>89,
+_=>return,
+},
+89=>match c {
+99=>90,
+_=>return,
+},
+90=>match c {
+101=>{out[0]|=8388608;91},
+_=>return,
+},
+92=>match c {
+97=>93,
+_=>return,
+},
+93=>match c {
+112=>94,
+_=>return,
+},
+94=>match c {
+112=>95,
+_=>return,
+},
+95=>match c {
+105=>96,
+_=>return,
+},
+96=>match c {
+110=>97,
+_=>return,
+},
+97=>match c {
+103=>{out[0]|=16777216;98},
+_=>return,
+},
+99=>match c {
+114=>100,
+_=>return,
+},
+100=>match c {
+101=>101,
+_=>return,
+},
+101=>match c {
+99=>102,
+100=>109,
+_=>return,
+},
+102=>match c {
+101=>103,
+_=>return,
+},
+103=>match c {
+100=>104,
+_=>return,
+},
+104=>match c {
+101=>105,
+_=>return,
+},
+105=>match c {
+110=>106,
+_=>return,
+},
+106=>match c {
+99=>107,
+_=>return,
+},
+107=>match c {
+101=>{out[0]|=33554432;108},
+_=>return,
+},
+109=>match c {
+105=>110,
+_=>return,
+},
+110=>match c {
+99=>111,
+_=>return,
+},
+111=>match c {
+116=>112,
+_=>return,
+},
+112=>match c {
+105=>113,
+_=>return,
+},
+113=>match c {
+118=>114,
+_=>return,
+},
+114=>match c {
+101=>115,
+_=>return,
+},
+115=>match c {
+67=>116,
+_=>return,
+},
+116=>match c {
+104=>117,
+_=>return,
+},
+117=>match c {
+111=>118,
+_=>return,
+},
+118=>match c {
+105=>119,
+_=>return,
+},
+119=>match c {
+99=>120,
+_=>return,
+},
+120=>match c {
+101=>{out[0]|=67108864;121},
+_=>return,
+},
+122=>match c {
+101=>123,
+105=>130,
+111=>139,
+_=>return,
+},
+123=>match c {
+99=>124,
+_=>return,
+},
+124=>match c {
+111=>125,
+_=>return,
+},
+125=>match c {
+118=>126,
+_=>return,
+},
+126=>match c {
+101=>127,
+_=>return,
+},
+127=>match c {
+114=>128,
+_=>return,
+},
+128=>match c {
+121=>{out[0]|=134217728;129},
+_=>return,
+},
+130=>match c {
+103=>131,
+_=>return,
+},
+131=>match c {
+104=>132,
+_=>return,
+},
+132=>match c {
+116=>133,
+_=>return,
+},
+133=>match c {
+65=>134,
+_=>return,
+},
+134=>match c {
+115=>135,
+_=>return,
+},
+135=>match c {
+115=>136,
+_=>return,
+},
+136=>match c {
+111=>137,
+_=>return,
+},
+137=>match c {
+99=>{out[0]|=268435456;138},
+_=>return,
+},
+139=>match c {
+111=>140,
+_=>return,
+},
+140=>match c {
+116=>{out[0]|=536870912;141},
+_=>return,
+},
+142=>match c {
+99=>143,
+107=>151,
+_=>return,
+},
+143=>match c {
+111=>144,
+_=>return,
+},
+144=>match c {
+112=>145,
+_=>return,
+},
+145=>match c {
+101=>146,
+_=>return,
+},
+146=>match c {
+84=>147,
+_=>return,
+},
+147=>match c {
+114=>148,
+_=>return,
+},
+148=>match c {
+101=>149,
+_=>return,
+},
+149=>match c {
+101=>{out[0]|=1073741824;150},
+_=>return,
+},
+151=>match c {
+105=>152,
+_=>return,
+},
+152=>match c {
+112=>{out[0]|=2147483648;153},
+_=>return,
+},
+154=>match c {
+121=>155,
+_=>return,
+},
+155=>match c {
+112=>156,
+_=>return,
+},
+156=>match c {
+101=>157,
+_=>return,
+},
+157=>match c {
+111=>158,
+_=>return,
+},
+158=>match c {
+102=>{out[0]|=4294967296;159},
+_=>return,
+},
+160=>match c {
+104=>161,
+_=>return,
+},
+161=>match c {
+105=>162,
+_=>return,
+},
+162=>match c {
+116=>163,
+_=>return,
+},
+163=>match c {
+101=>164,
+_=>return,
+},
+164=>match c {
+115=>165,
+_=>return,
+},
+165=>match c {
+112=>166,
+_=>return,
+},
+166=>match c {
+97=>167,
+_=>return,
+},
+167=>match c {
+99=>168,
+_=>return,
+},
+168=>match c {
+101=>{out[0]|=8589934592;169},
+_=>return,
+},
+170=>match c {
+78=>171,
+_=>return,
+},
+171=>match c {
+89=>{out[0]|=17179869184;172},
+_=>return,
+},
+173=>match c {
+72=>174,
+73=>{out[0]|=68719476736;183},
+_=>return,
+},
+174=>match c {
+65=>175,
+_=>return,
+},
+175=>match c {
+82=>176,
+_=>return,
+},
+176=>match c {
+95=>177,
+_=>return,
+},
+177=>match c {
+82=>178,
+_=>return,
+},
+178=>match c {
+65=>179,
+_=>return,
+},
+179=>match c {
+78=>180,
+_=>return,
+},
+180=>match c {
+71=>181,
+_=>return,
+},
+181=>match c {
+69=>{out[0]|=34359738368;182},
+_=>return,
+},
+184=>match c {
+77=>185,
+79=>189,
+82=>191,
+_=>return,
+},
+185=>match c {
+80=>186,
+_=>return,
+},
+186=>match c {
+84=>187,
+_=>return,
+},
+187=>match c {
+89=>{out[0]|=137438953472;188},
+_=>return,
+},
+189=>match c {
+70=>{out[0]|=274877906944;190},
+_=>return,
+},
+191=>match c {
+82=>192,
+_=>return,
+},
+192=>match c {
+79=>193,
+_=>return,
+},
+193=>match c {
+82=>{out[0]|=549755813888;194},
+_=>return,
+},
+195=>match c {
+79=>196,
+_=>return,
+},
+196=>match c {
+79=>197,
+_=>return,
+},
+197=>match c {
+75=>198,
+_=>return,
+},
+198=>match c {
+65=>199,
+_=>return,
+},
+199=>match c {
+72=>200,
+_=>return,
+},
+200=>match c {
+69=>201,
+_=>return,
+},
+201=>match c {
+65=>202,
+_=>return,
+},
+202=>match c {
+68=>{out[0]|=1099511627776;203},
+_=>return,
+},
+204=>match c {
+69=>205,
+_=>return,
+},
+205=>match c {
+71=>206,
+_=>return,
+},
+206=>match c {
+65=>207,
+_=>return,
+},
+207=>match c {
+84=>208,
+_=>return,
+},
+208=>match c {
+73=>209,
+_=>return,
+},
+209=>match c {
+79=>210,
+86=>212,
+_=>return,
+},
+210=>match c {
+78=>{out[0]|=2199023255552;211},
+_=>return,
+},
+212=>match c {
+69=>213,
+_=>return,
+},
+213=>match c {
+95=>214,
+_=>return,
+},
+214=>match c {
+76=>215,
+_=>return,
+},
+215=>match c {
+79=>216,
+_=>return,
+},
+216=>match c {
+79=>217,
+_=>return,
+},
+217=>match c {
+75=>218,
+_=>return,
+},
+218=>match c {
+65=>219,
+_=>return,
+},
+219=>match c {
+72=>220,
+_=>return,
+},
+220=>match c {
+69=>221,
+_=>return,
+},
+221=>match c {
+65=>222,
+_=>return,
+},
+222=>match c {
+68=>{out[0]|=4398046511104;223},
+_=>return,
+},
+224=>match c {
+69=>225,
+_=>return,
+},
+225=>match c {
+71=>226,
+_=>return,
+},
+226=>match c {
+69=>227,
+_=>return,
+},
+227=>match c {
+88=>{out[0]|=8796093022208;228},
+_=>return,
+},
+229=>match c {
+78=>230,
+_=>return,
+},
+230=>match c {
+84=>231,
+_=>return,
+},
+231=>match c {
+73=>232,
+_=>return,
+},
+232=>match c {
+76=>{out[0]|=17592186044416;233},
+_=>return,
+},
+236=>match c {
+111=>237,
+_=>return,
+},
+237=>match c {
+110=>238,
+_=>return,
+},
+238=>match c {
+116=>239,
+_=>return,
+},
+239=>match c {
+101=>240,
+_=>return,
+},
+240=>match c {
+120=>241,
+_=>return,
+},
+241=>match c {
+116=>{out[0]|=140737488355328;242},
+_=>return,
+},
+243=>match c {
+101=>244,
+_=>return,
+},
+244=>match c {
+115=>245,
+_=>return,
+},
+245=>match c {
+99=>246,
+_=>return,
+},
+246=>match c {
+114=>247,
+_=>return,
+},
+247=>match c {
+105=>248,
+_=>return,
+},
+248=>match c {
+112=>249,
+_=>return,
+},
+249=>match c {
+116=>250,
+_=>return,
+},
+250=>match c {
+105=>251,
+_=>return,
+},
+251=>match c {
+111=>252,
+_=>return,
+},
+252=>match c {
+110=>{out[0]|=281474976710656;253},
+_=>return,
+},
+254=>match c {
+114=>255,
+_=>return,
+},
+255=>match c {
+111=>256,
+_=>return,
+},
+256=>match c {
+109=>{out[0]|=562949953421312;257},
+_=>return,
+},
+258=>match c {
+114=>259,
+_=>return,
+},
+259=>match c {
+97=>260,
+_=>return,
+},
+260=>match c {
+109=>261,
+_=>return,
+},
+261=>match c {
+109=>262,
+_=>return,
+},
+262=>match c {
+97=>263,
+_=>return,
+},
+263=>match c {
+114=>{out[0]|=1125899906842624;264},
+_=>return,
+},
+265=>match c {
+101=>266,
+_=>return,
+},
+266=>match c {
+118=>267,
+_=>return,
+},
+267=>match c {
+101=>268,
+_=>return,
+},
+268=>match c {
+108=>{out[0]|=2251799813685248;269},
+_=>return,
+},
+270=>match c {
+111=>271,
+_=>return,
+},
+271=>match c {
+100=>272,
+_=>return,
+},
+272=>match c {
+101=>{out[0]|=4503599627370496;273},
+_=>return,
+},
+274=>match c {
+97=>275,
+_=>return,
+},
+275=>match c {
+109=>276,
+_=>return,
+},
+276=>match c {
+101=>{out[0]|=9007199254740992;277},
+_=>return,
+},
+278=>match c {
+97=>279,
+114=>284,
+_=>return,
+},
+279=>match c {
+114=>280,
+_=>return,
+},
+280=>match c {
+97=>281,
+_=>return,
+},
+281=>match c {
+109=>282,
+_=>return,
+},
+282=>match c {
+115=>{out[0]|=18014398509481984;283},
+_=>return,
+},
+284=>match c {
+111=>285,
+_=>return,
+},
+285=>match c {
+102=>286,
+_=>return,
+},
+286=>match c {
+105=>287,
+_=>return,
+},
+287=>match c {
+108=>288,
+_=>return,
+},
+288=>match c {
+101=>{out[0]|=36028797018963968;289},
+_=>return,
+},
+290=>match c {
+121=>291,
+_=>return,
+},
+291=>match c {
+109=>292,
+110=>296,
+_=>return,
+},
+292=>match c {
+98=>293,
+_=>return,
+},
+293=>match c {
+111=>294,
+_=>return,
+},
+294=>match c {
+108=>{out[0]|=72057594037927936;295},
+_=>return,
+},
+296=>match c {
+99=>{out[0]|=144115188075855872;297},
+_=>return,
+},
+298=>match c {
+111=>299,
+_=>return,
+},
+299=>match c {
+107=>300,
+_=>return,
+},
+300=>match c {
+101=>301,
+_=>return,
+},
+301=>match c {
+110=>{out[0]|=288230376151711744;302},
+_=>return,
+},
+_=>return,
+};
+p+=1;
+}
 }
 
 use super::ast::*;
@@ -2038,6 +3163,10 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         .max(self.trivia_cache.max_probe_len());
     self.statistics.recipes = self.arena.len() - 1;
     self.statistics.ast_nodes = self.node_spans.len();
+    self.statistics.lexical_runs = self.lex.runs;
+    self.statistics.lexical_probes = self.lex.probes;
+    self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
+    self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
     let mut value_spans = Vec::with_capacity(if ast.is_some() {
         self.node_spans.len() + self.text_spans.len()
     } else {

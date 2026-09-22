@@ -92,7 +92,7 @@ fn fixture(name: &str) -> String {
 }
 /// 既定の診断予算 200 万 node は comparison-heavy-x4 以上で不足する（report 参照）。
 /// ベンチは受理を前提にするため予算だけ広げる。予算は事前確保ではないので計時に影響しない。
-/// `UBNFC_BENCH_OPTS="predict=0,factor=0,reuse=0,memo=0"` で個別の最適化を切って A/B する。
+/// `UBNFC_BENCH_OPTS="predict=0,factor=0,reuse=0,memo=0,lexcache=1"` で個別の最適化を切り替えて A/B する。
 fn options(build_ast: bool) -> ParseOptions {
     let mut options = ParseOptions {
         build_ast,
@@ -107,6 +107,7 @@ fn options(build_ast: bool) -> ParseOptions {
                 "factor" => options.factor = on,
                 "reuse" => options.reuse_buffers = on,
                 "memo" => options.memo = on,
+                "lexcache" => options.lexical_cache = on,
                 other => panic!("unknown UBNFC_BENCH_OPTS key: {other}"),
             }
         }
@@ -132,8 +133,8 @@ fn timing(cases: &[&Case]) {
         .ok()
         .and_then(|s| s.parse().ok())
         .unwrap_or(0.3);
-    println!("| 入力 | bytes | mode | iterations/run | 中央値 ms/parse | min | max | µs/byte | allocs/parse | alloc bytes/parse | rule_evaluations | memo_hits | memo_entries | memo_max_probe | recipes | ast_nodes |");
-    println!("|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|");
+    println!("| 入力 | bytes | mode | iterations/run | 中央値 ms/parse | min | max | µs/byte | allocs/parse | alloc bytes/parse | rule_evaluations | memo_hits | memo_entries | memo_max_probe | recipes | ast_nodes | lex_runs | lex_probes | skip_hits | skip_misses |");
+    println!("|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|");
     for case in cases {
         let text = fixture(case.name);
         for build_ast in [false, true] {
@@ -162,7 +163,7 @@ fn timing(cases: &[&Case]) {
             let (allocs, bytes) = (COUNT.load(Relaxed), BYTES.load(Relaxed));
             let s = result.statistics;
             println!(
-                "| {} | {} | {} | {} | {:.3} | {:.3} | {:.3} | {:.2} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                "| {} | {} | {} | {} | {:.3} | {:.3} | {:.3} | {:.2} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                 case.name,
                 text.len(),
                 if build_ast { "AST" } else { "認識" },
@@ -178,7 +179,11 @@ fn timing(cases: &[&Case]) {
                 s.memo_entries,
                 s.memo_max_probe,
                 s.recipes,
-                s.ast_nodes
+                s.ast_nodes,
+                s.lexical_runs,
+                s.lexical_probes,
+                s.trivia_skip_hits,
+                s.trivia_skip_misses
             );
         }
     }

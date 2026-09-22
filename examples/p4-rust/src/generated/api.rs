@@ -24,6 +24,13 @@ pub struct ParseOptions {
     /// retained set is bounded (`POOL_RETAIN_BYTES`) and only affects allocation
     /// behaviour, never results.
     pub reuse_buffers: bool,
+    /// Per-position lexical cache: a combined DFA over the grammar's literal terminals is
+    /// run once per input position and its result (the set of literals that match there)
+    /// is kept for that position, together with the trivia policies' `next_non_trivia`
+    /// table. Every terminal is a pure predicate on (input, position), so the cache cannot
+    /// change any parse or diagnostic; false is the reference path that scans characters at
+    /// every attempt. Both produce the same result and diagnostics.
+    pub lexical_cache: bool,
     pub limits: ResourceLimits,
 }
 /// Per-session hard limits, checked before indexing input or retaining data.
@@ -61,6 +68,7 @@ impl Default for ParseOptions {
             predict: true,
             factor: true,
             reuse_buffers: true,
+            lexical_cache: false,
             limits: ResourceLimits::default(),
         }
     }
@@ -126,6 +134,13 @@ pub struct Statistics {
     pub recipes: usize,
     pub ast_nodes: usize,
     pub memo_max_probe: usize,
+    /// Number of combined-DFA runs (lexical cache misses; one per newly touched position).
+    pub lexical_runs: u64,
+    /// Number of terminal matches answered from the lexical cache (hits + misses).
+    pub lexical_probes: u64,
+    /// `next_non_trivia` table hits / misses (diagnostic-free trivia skipping).
+    pub trivia_skip_hits: u64,
+    pub trivia_skip_misses: u64,
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ParseResult {

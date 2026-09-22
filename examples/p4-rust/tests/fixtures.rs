@@ -460,7 +460,8 @@ fn fixtures_are_unmodified_copies() {
     assert!(Path::new(&dir).join("complex.tiny").is_file());
 }
 
-/// §3.4 の候補除外（`ParseOptions::predict`）は参照経路（全候補を試行）と結果・診断が同じ。
+/// §3.4 の候補除外（`ParseOptions::predict`）と位置ごとの字句 cache（`ParseOptions::lexical_cache`）は
+/// 参照経路（全候補を試行・cache なし）と結果・診断が同じ。
 /// 全 fixture の完全入力に加え、切り詰め（各 byte 境界）と 1 文字破壊（`#`）で失敗経路を通す。
 /// 大きい fixture は間引く。memo の有無とも掛け合わせる。
 #[test]
@@ -504,22 +505,32 @@ fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
                 if !memo && (input.len() > 400 || index % 13 != 0) {
                     continue;
                 }
-                let run = |predict: bool, factor: bool| {
+                let run = |predict: bool, factor: bool, lexical_cache: bool| {
                     let mut options = options(true, memo);
                     options.predict = predict;
                     options.factor = factor;
+                    options.lexical_cache = lexical_cache;
                     strip_statistics(match entry {
                         None => parse_formula(input, options),
                         Some(entry) => parse_entry(Some(entry), input, options).unwrap(),
                     })
                 };
-                // 参照経路（候補除外なし・因数分解なし）と、各最適化の組合せを比較する。
-                let reference = run(false, false);
-                for (predict, factor) in [(true, true), (true, false), (false, true)] {
-                    let optimized = run(predict, factor);
+                // 参照経路（候補除外なし・因数分解なし・字句 cache なし）と、各最適化の組合せを比較する。
+                let reference = run(false, false, false);
+                for (predict, factor, lexical_cache) in [
+                    (true, true, false),
+                    (true, false, false),
+                    (false, true, false),
+                    // 字句 cache（位置ごとの統合 DFA）の on/off 軸。
+                    (false, false, true),
+                    (true, true, true),
+                    (true, false, true),
+                    (false, true, true),
+                ] {
+                    let optimized = run(predict, factor, lexical_cache);
                     assert!(
                         optimized == reference,
-                        "{name}: predict {predict} / factor {factor} differ from reference (memo {memo}) for input {:?}\nopt: {:?}\nref: {:?}",
+                        "{name}: predict {predict} / factor {factor} / lexical_cache {lexical_cache} differ from reference (memo {memo}) for input {:?}\nopt: {:?}\nref: {:?}",
                         input,
                         optimized.diagnostics,
                         reference.diagnostics
