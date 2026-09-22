@@ -57,7 +57,10 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>) {
     }
     (captures, lexical)
 }
-pub(crate) fn finish(mut self, step: Step) -> ParseResult {
+pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
+    if let Some(offset) = self.depth_failure {
+        step = self.fail(State::default(), offset, "maximum parse depth exceeded");
+    }
     let trailing = step.ok && self.options.require_eof && step.state.consumed != self.text.len();
     let ok = step.ok && !trailing;
     let consumed_cp = if step.ok {
@@ -77,6 +80,7 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
             kind: DiagnosticKind::Syntax,
             offset_cp: self.cp(pos),
             farthest_cp: self.cp(pos),
+            farthest_expected: expected.clone(),
             expected,
             deepest_rule: rule_path.last().copied(),
             rule_path,
@@ -84,14 +88,25 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
         });
     }
     if trailing {
-        let farthest_cp = diagnostics.last().map_or(consumed_cp, |d| d.farthest_cp);
+        let (farthest_cp, farthest_expected, deepest_rule, rule_path) =
+            diagnostics
+                .pop()
+                .map_or((consumed_cp, vec![], None, vec![]), |d| {
+                    (
+                        d.farthest_cp,
+                        d.farthest_expected,
+                        d.deepest_rule,
+                        d.rule_path,
+                    )
+                });
         diagnostics.push(Diagnostic {
             kind: DiagnosticKind::TrailingInput,
             offset_cp: consumed_cp,
             farthest_cp,
+            farthest_expected,
             expected: vec!["end of input"],
-            deepest_rule: None,
-            rule_path: vec![],
+            deepest_rule,
+            rule_path,
             message: None,
         });
     }
@@ -116,6 +131,7 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
                     offset_cp: consumed_cp,
                     farthest_cp: consumed_cp,
                     expected: vec![],
+                    farthest_expected: vec![],
                     deepest_rule: None,
                     rule_path: vec![],
                     message: Some(message),
@@ -154,5 +170,45 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
             vec![]
         },
         statistics: self.statistics,
+        scope: ScopeResult {
+            mode: SCOPE_MODES.to_vec(),
+            events: if ok {
+                self.effects
+                    .iter()
+                    .enumerate()
+                    .map(|(order, effect)| {
+                        let (action, name, offset_cp, length_cp) = match &effect.value {
+                            ScanEffect::Enter => ("enter", None, effect.offset_cp, 0),
+                            ScanEffect::Leave => ("leave", None, effect.offset_cp, 0),
+                            ScanEffect::Clear => ("clear", None, effect.offset_cp, 0),
+                            ScanEffect::Declare { name, offset_cp } => {
+                                ("declare", Some(name.clone()), *offset_cp, effect.length_cp)
+                            }
+                            ScanEffect::Use {
+                                name,
+                                offset_cp,
+                                len_cp,
+                            } => ("use", Some(name.clone()), *offset_cp, *len_cp),
+                            ScanEffect::Diagnostic {
+                                message,
+                                offset_cp,
+                                len_cp,
+                                ..
+                            } => ("error", Some(message.clone()), *offset_cp, *len_cp),
+                        };
+                        ScopeEvent {
+                            order,
+                            action,
+                            mode: effect.mode,
+                            name,
+                            offset_cp,
+                            length_cp,
+                        }
+                    })
+                    .collect()
+            } else {
+                vec![]
+            },
+        },
     }
 }

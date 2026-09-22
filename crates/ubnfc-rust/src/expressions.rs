@@ -24,7 +24,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         (analysis.memo_safety.success, analysis.memo_safety.failure),
         |p| (p.cache_success, p.cache_failure),
     );
-    let mut s = format!("fn e{i}_{suf}(&mut self,state:State)->Step {{\nlet mark=self.mark();\n");
+    let mut s = format!("fn e{i}_{suf}(&mut self,state:State)->Step {{\nif let Some(limit)=self.limit(state) {{return limit;}}\nlet mark=self.mark();\n");
     if success || failure {
         writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:self.scope.state_version()}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
     }
@@ -75,6 +75,13 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             .unwrap_or_else(|| match &expr.node {
                 ExprNode::Literal { value, .. } => value,
                 ExprNode::Error { message } => message,
+                ExprNode::TokenRef { symbol_id } => {
+                    g.ir.semantics
+                        .symbols
+                        .iter()
+                        .find(|symbol| symbol.id == *symbol_id)
+                        .map_or(symbol_id.as_str(), |symbol| symbol.name.as_str())
+                }
                 _ => "expression",
             });
     let transaction = matches!(
@@ -193,7 +200,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         ExprNode::TokenRef { symbol_id } => {
             writeln!(
                 s,
-                "out=self.token_{}::<{child_mode}>(out.state);",
+                "out=self.token_{}::<{child_mode}>(out.state,{label:?});",
                 g.tokens[symbol_id.as_str()]
             )
             .unwrap();
@@ -232,7 +239,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             )
             .unwrap();
             if matches!(expr.node, ExprNode::NegativeLookahead { .. }) {
-                writeln!(s,"out=if child.ok {{self.fail(state,state.position::<{mode}>(),{label:?})}} else {{Step::yes(state.commit(out.state))}};").unwrap();
+                writeln!(s,"out=if child.ok {{let mut failed=self.fail(state,state.position::<{mode}>(),{label:?});failed.diag=self.diag.join(child.diag,failed.diag);failed}} else {{Step::yes(state.commit(out.state))}};").unwrap();
             } else {
                 s.push_str("out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
             }
@@ -264,6 +271,11 @@ pub(crate) fn scope_events(
             .iter()
             .filter(|e| e.rule_id == g.ir.semantics.rules[rule].symbol_id)
     {
+        let mode = match effect.mode {
+            ScopeEffectMode::Lexical => "lexical",
+            ScopeEffectMode::Dynamic => "dynamic",
+            ScopeEffectMode::SameRuleText => "sameRuleText",
+        };
         for event in effect.events.iter().filter(|e| e.when == when) {
             if effect.mode == ScopeEffectMode::SameRuleText
                 && matches!(
@@ -288,9 +300,21 @@ pub(crate) fn scope_events(
                 continue;
             }
             match event.action {
-                ScopeEffectEventsAction::Enter => s.push_str("self.effect(ScanEffect::Enter);\n"),
-                ScopeEffectEventsAction::Leave => s.push_str("self.effect(ScanEffect::Leave);\n"),
-                ScopeEffectEventsAction::Clear => s.push_str("self.effect(ScanEffect::Clear);\n"),
+                ScopeEffectEventsAction::Enter => writeln!(
+                    s,
+                    "self.effect_at(ScanEffect::Enter,{mode:?},self.cp({state}.consumed),0);"
+                )
+                .unwrap(),
+                ScopeEffectEventsAction::Leave => writeln!(
+                    s,
+                    "self.effect_at(ScanEffect::Leave,{mode:?},self.cp({state}.consumed),0);"
+                )
+                .unwrap(),
+                ScopeEffectEventsAction::Clear => writeln!(
+                    s,
+                    "self.effect_at(ScanEffect::Clear,{mode:?},self.cp({state}.consumed),0);"
+                )
+                .unwrap(),
                 ScopeEffectEventsAction::Declare | ScopeEffectEventsAction::Use => {
                     if let Some(site) = &event.capture_site_id {
                         writeln!(s,"if let Some(span)=self.scope_capture({events},{}) {{let name=self.text(span);let offset_cp=self.cp(span[0]);",g.sites[site.as_str()]).unwrap();
@@ -298,9 +322,9 @@ pub(crate) fn scope_events(
                         writeln!(s,"{{let name={:?}.to_owned();let span=[{state}.consumed,{state}.consumed];let offset_cp=self.cp(span[0]);",event.name.as_deref().unwrap_or("")).unwrap();
                     }
                     if event.action == ScopeEffectEventsAction::Declare {
-                        s.push_str("self.effect(ScanEffect::Declare {name,offset_cp});}\n");
+                        writeln!(s,"let len_cp=self.cp(span[1])-offset_cp;self.effect_at(ScanEffect::Declare {{name,offset_cp}},{mode:?},offset_cp,len_cp);}}").unwrap();
                     } else {
-                        s.push_str("let len_cp=self.cp(span[1])-offset_cp;self.effect(ScanEffect::Use {name,offset_cp,len_cp});}\n");
+                        writeln!(s,"let len_cp=self.cp(span[1])-offset_cp;self.effect_at(ScanEffect::Use {{name,offset_cp,len_cp}},{mode:?},offset_cp,len_cp);}}").unwrap();
                     }
                 }
             }

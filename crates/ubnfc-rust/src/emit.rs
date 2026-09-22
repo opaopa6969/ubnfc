@@ -101,7 +101,11 @@ impl<'a> Generator<'a> {
                     .iter()
                     .position(|p| p.id == insertion.policy_id)
                     .unwrap();
-                writeln!(s, "out.state=self.trivia_{p}::<{mode}>(out.state);").unwrap();
+                writeln!(
+                    s,
+                    "let trivia=self.trivia_{p}::<{mode}>(out.state);out=self.combine(out,trivia);"
+                )
+                .unwrap();
             }
         }
         s
@@ -213,7 +217,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {
                 continue;
             }
-            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ self.statistics.rule_evaluations+=1;let mark=self.mark();",suffix(mode)).unwrap();
+            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;let mark=self.mark();",suffix(mode)).unwrap();
             p.push_str(&crate::expressions::scope_events(
                 &g,
                 i,
@@ -240,7 +244,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
                     "out.state",
                 ));
             }
-            writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,out.state.consumed],child:out.events}});\n}} else {{ self.restore(mark); }}\nout.diag=self.diag.rule({i},out.diag);out\n}}").unwrap();
+            writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,out.state.consumed],child:out.events}});\n}} else {{ self.restore(mark); }}\nself.depth-=1;out.diag=self.diag.rule({i},out.diag);out\n}}").unwrap();
         }
     }
     for &(i, mode) in &g.modes {

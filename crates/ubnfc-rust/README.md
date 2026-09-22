@@ -42,7 +42,10 @@ runner の `Artifact::FromIr { backend: Backend::Rust, .. }` は事前ビルド�
 
 JSON Lines driver は [harness protocol](../../docs/harness-driver-protocol.md) の全標準観測を返す。
 `grammar` と `entry`（null は文法の root）を解決し、未知の指定はエラーにする。
-`lexical=false` で captures、`scope=false` で declarations/references を省略し、文法の認識は変えない。
+`lexical=false` で captures、`scope=false` で declarations/references/scope を省略し、文法の認識は変えない。
+`scope` は `mode`（文法に現れるモードの順序付き配列）と `events` を持つ。イベントは
+`{order, action, mode, name, offset, length}`。offset/length は code point、enter/leave の name は null。
+診断は主位置の `expected` と `farthestOffset` / `farthestExpected` を独立して返す。
 prefix の accepted/C/M と全入力の AST・診断を別々に観測する。
 `value` は IR の operator 指定がある結果型に限り、AST の数値葉と `left/op/right` の
 `+ - * / ^` を評価する。それ以外は null、非有限値はエラー応答。
@@ -247,6 +250,33 @@ allocator の状態、測定順序、共有環境の負荷の差があり、今�
 
 memo の byte offset / arena index / state version は u32 で圧縮し、超過時は切り捨てず明示的に停止する。
 入力そのものは &str、公開 span は code point。深い括弧・右再帰・mapping の完全な明示 stack 化は未実装。
+
+### Java レビューから移植した契約（2026-09-22）
+
+- `ParseOptions.max_depth` は同時に実行中の rule 呼出し上限（既定 10,000、0 は entry から失敗）。
+  上限超過は解析全体を `syntax` / `maximum parse depth exceeded` で失敗させる。
+  optional / choice / Not はこの失敗を成功へ変換できず、結果のカーソルと意味イベントは空に戻す。
+- Rust の stack overflow は回復不能なので、追加で parse 開始からの native stack 使用量を
+  256 KiB に制限する。rule / expression の入口で検査し、同じ構文失敗へ変換する。
+  この保護により `max_depth` に達する前に失敗する場合がある（Java の JVM stack 上限と同様）。
+  呼出し元は少なくとも 1 MiB の未使用 stack を確保する。小さな独自 thread stack、非常に大きい
+  単一生成関数、scanner 自身の再帰まで安全を保証する仕組みではない。
+- `ParseOptions.memo=false` で式 memo を無効化できる。既定は true。
+- 空 Word の LOOKAHEAD は失敗、NEGATIVE_LOOKAHEAD は成功。空の IR literal の意味は既存のまま。
+- Not 成功時だけ子診断を破棄する。memo payload 内の診断は残り、後の通常評価に再生する。
+- tokenRef の表示は各参照の `expectedDisplay.rust` を使う。同じ token の別参照も独立する。
+- 末尾入力診断の主 expected は `end of input`。投機的失敗は `farthest_expected` に保存する。
+- `ParseResult.scope.events` は採用した enter / leave / declare / use / clear / error を実行順に保持し、
+  各イベントに mode と code point 位置を含む。rollback・先読み・memo replay に追従する。
+  `scope.mode` は IR の効果定義に現れるモードを重複なしで保持する（lexical と dynamic の混在に対応）。
+- 行コメントの終端先読みは consumed を改行前に残し matched を LF/CRLF の後へ進める。
+  `a//x\nb` の診断位置は 5、CRLF は 6。`neg(1e+)` は **Rust oracle の 5** を維持する。
+
+`tests/review.rs` は Java `ReviewRegressionTest` 由来の生成物テストを debug / release / clippy で実行する。
+反復・optional の境界、mixed list の空列と全 occurrence、Rust 識別子のエスケープ、scanner の
+5 状態（State の C/M/invert/reset と独立の match_only）、式単位 memo の成功・失敗・副作用も固定する。
+`tests/driver.rs` で JSON 応答も検証する。Java oracle の expected 集合を Rust 全体へ強制せず、
+Rust の診断位置と Rust 用ラベルを独立に検証する。
 memo / arena は入力長から上限付きの容量を予約し、拡張時のコピーと再確保を減らす。
 
 変更範囲の指定に従い workspace の Cargo.lock は commit に含めない。

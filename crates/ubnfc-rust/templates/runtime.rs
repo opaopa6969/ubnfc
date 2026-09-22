@@ -84,6 +84,13 @@ pub(crate) struct Mark {
     scope: Checkpoint,
     effects: usize,
 }
+#[derive(Clone)]
+struct Effect {
+    value: ScanEffect,
+    mode: &'static str,
+    offset_cp: usize,
+    length_cp: usize,
+}
 pub(crate) struct Session<'a> {
     pub text: &'a str,
     pub input: Input<'a>,
@@ -93,11 +100,14 @@ pub(crate) struct Session<'a> {
     pub diag: Diagnostics,
     pub memo: Memo<Saved>,
     pub scope: ScopeStore,
-    pub trivia_cache: Memo<State>,
-    effects: Vec<ScanEffect>,
-    saved_effects: Vec<ScanEffect>,
+    pub trivia_cache: Memo<Step>,
+    effects: Vec<Effect>,
+    saved_effects: Vec<Effect>,
     pub statistics: Statistics,
     pub node_spans: Vec<NodeSpan>,
+    pub depth: usize,
+    stack_anchor: Option<usize>,
+    depth_failure: Option<usize>,
 }
 impl<'a> Session<'a> {
     pub fn new(text: &'a str, options: ParseOptions, scanner: &'a mut dyn TokenScanner) -> Self {
@@ -106,7 +116,16 @@ impl<'a> Session<'a> {
             input: Input::new(text),
             options,
             scanner,
-            arena: {let mut arena=Vec::with_capacity(if options.build_ast || options.lexical || HAS_SCOPE {text.len().saturating_mul(8).saturating_add(8).min(32768)} else {1});arena.push(Event::Empty);arena},
+            arena: {
+                let mut arena =
+                    Vec::with_capacity(if options.build_ast || options.lexical || HAS_SCOPE {
+                        text.len().saturating_mul(8).saturating_add(8).min(32768)
+                    } else {
+                        1
+                    });
+                arena.push(Event::Empty);
+                arena
+            },
             diag: Diagnostics::new(),
             memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
             scope: ScopeStore::new(),
@@ -115,7 +134,35 @@ impl<'a> Session<'a> {
             saved_effects: vec![],
             statistics: Statistics::default(),
             node_spans: vec![],
+            depth: 0,
+            stack_anchor: None,
+            depth_failure: None,
         }
+    }
+    // Rust cannot recover from native stack overflow. Stop before consuming the
+    // per-parse 256 KiB native stack budget, in addition to the logical rule limit.
+    // Check expressions too: one rule may contain a deeply nested expression tree.
+    #[inline(never)]
+    pub fn limit(&mut self, state: State) -> Option<Step> {
+        let frame = 0u8;
+        let address = std::ptr::addr_of!(frame) as usize;
+        let anchor = *self.stack_anchor.get_or_insert(address);
+        if self.depth_failure.is_none() && anchor.abs_diff(address) > 256 * 1024 {
+            self.depth_failure = Some(state.consumed.max(state.matched));
+        }
+        self.depth_failure
+            .map(|offset| self.fail(state, offset, "maximum parse depth exceeded"))
+    }
+    pub fn enter_rule(&mut self, state: State) -> Option<Step> {
+        if self.depth >= self.options.max_depth {
+            self.depth_failure
+                .get_or_insert(state.consumed.max(state.matched));
+        }
+        if let Some(limit) = self.limit(state) {
+            return Some(limit);
+        }
+        self.depth += 1;
+        None
     }
     pub fn cp(&self, byte: usize) -> usize {
         self.input.byte_to_cp(byte).expect("parser UTF-8 boundary")
@@ -146,10 +193,25 @@ impl<'a> Session<'a> {
     }
     pub fn replay_effects(&mut self, span: Span) {
         for i in span[0]..span[1] {
-            self.effect(self.saved_effects[i].clone());
+            let effect = self.saved_effects[i].clone();
+            self.effect_at(
+                effect.value,
+                effect.mode,
+                effect.offset_cp,
+                effect.length_cp,
+            );
         }
     }
     pub fn effect(&mut self, effect: ScanEffect) {
+        self.effect_at(effect, "lexical", 0, 0);
+    }
+    pub fn effect_at(
+        &mut self,
+        effect: ScanEffect,
+        mode: &'static str,
+        offset_cp: usize,
+        length_cp: usize,
+    ) {
         match &effect {
             ScanEffect::Diagnostic {
                 message,
@@ -179,15 +241,26 @@ impl<'a> Session<'a> {
                 }
             }
         }
-        self.effects.push(effect);
+        self.effects.push(Effect {
+            value: effect,
+            mode,
+            offset_cp,
+            length_cp,
+        });
     }
     pub fn lookup(&mut self, key: Key) -> Option<Step> {
+        if !self.options.memo {
+            return None;
+        }
         let saved = self.memo.get(key)?;
         self.statistics.memo_hits += 1;
         self.replay_effects(saved.effects.map(|p| p as usize));
         Some(saved.step())
     }
     pub fn store(&mut self, key: Key, step: Step, mark: Mark) {
+        if !self.options.memo || self.depth_failure.is_some() {
+            return;
+        }
         let effects = if step.ok {
             self.save_effects(mark)
         } else {

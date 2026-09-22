@@ -8,6 +8,18 @@ use std::fmt::Write;
 use ubnfc_front::ir::*;
 pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
     let mut s = String::from("\nuse super::ast::*;\n");
+    let mut modes = Vec::new();
+    for effect in &g.ir.semantics.scope.effects {
+        let mode = match effect.mode {
+            ScopeEffectMode::Lexical => "lexical",
+            ScopeEffectMode::Dynamic => "dynamic",
+            ScopeEffectMode::SameRuleText => "sameRuleText",
+        };
+        if !modes.contains(&mode) {
+            modes.push(mode);
+        }
+    }
+    writeln!(s, "const SCOPE_MODES:&[&str]=&{modes:?};").unwrap();
     writeln!(
         s,
         "const HAS_SCOPE:bool={};",

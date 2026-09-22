@@ -7,6 +7,9 @@ pub struct ParseOptions {
     pub build_ast: bool,
     pub require_eof: bool,
     pub lexical: bool,
+    /// Maximum active rule calls; native stack budget may stop earlier.
+    pub max_depth: usize,
+    pub memo: bool,
 }
 impl Default for ParseOptions {
     fn default() -> Self {
@@ -14,6 +17,8 @@ impl Default for ParseOptions {
             build_ast: true,
             require_eof: true,
             lexical: false,
+            max_depth: 10_000,
+            memo: true,
         }
     }
 }
@@ -53,6 +58,7 @@ pub struct Diagnostic {
     pub offset_cp: usize,
     pub farthest_cp: usize,
     pub expected: Vec<&'static str>,
+    pub farthest_expected: Vec<&'static str>,
     pub deepest_rule: Option<&'static str>,
     pub rule_path: Vec<&'static str>,
     pub message: Option<String>,
@@ -79,6 +85,7 @@ pub struct ParseResult {
     pub references: Vec<Reference>,
     pub scope_diagnostics: Vec<ScopeDiagnostic>,
     pub statistics: Statistics,
+    pub scope: ScopeResult,
 }
 #[derive(Clone, Debug)]
 pub enum ScanEffect {
@@ -145,4 +152,21 @@ impl TokenScanner for RejectExtern {
             effects: vec![],
         }
     }
+}
+
+/// Events retained by the selected parse, in execution order. Offsets are code points.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScopeEvent {
+    pub order: usize,
+    pub action: &'static str,
+    pub mode: &'static str,
+    pub name: Option<String>,
+    pub offset_cp: usize,
+    pub length_cp: usize,
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScopeResult {
+    /// Grammar modes in declaration order (a grammar may mix lexical and dynamic effects).
+    pub mode: Vec<&'static str>,
+    pub events: Vec<ScopeEvent>,
 }

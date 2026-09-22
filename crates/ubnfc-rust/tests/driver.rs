@@ -201,3 +201,72 @@ fn dispatches_each_grammar_root_and_reports_mapping_without_losing_acceptance() 
         assert!(row["error"].is_string());
     }
 }
+
+#[path = "support/fixture.rs"]
+#[allow(dead_code)]
+mod fixture;
+
+#[test]
+fn scope_events_and_farthest_diagnostics_are_public_protocol_fields() {
+    use ubnfc_front::ir::*;
+    let temp = Temp::new();
+    let mut ir = fixture::grammar(
+        vec![(
+            "Root",
+            fixture::choice(
+                vec![
+                    fixture::seq(vec![
+                        fixture::literal("a"),
+                        fixture::literal("b"),
+                        fixture::literal("x"),
+                    ]),
+                    fixture::literal("a"),
+                ],
+                "ordered",
+            ),
+        )],
+        None,
+    );
+    ir.semantics.scope.effects = vec![ScopeEffect {
+        rule_id: "Operators::Root".into(),
+        mode: ScopeEffectMode::Dynamic,
+        events: vec![
+            ScopeEvent {
+                action: ScopeEffectEventsAction::Enter,
+                when: ScopeEffectEventsWhen::Entry,
+                capture_site_id: None,
+                name: None,
+            },
+            ScopeEvent {
+                action: ScopeEffectEventsAction::Leave,
+                when: ScopeEffectEventsWhen::SuccessBeforeLeave,
+                capture_site_id: None,
+                name: None,
+            },
+        ],
+    }];
+    ubnfc_rust::emit(&ir, &Default::default())
+        .unwrap()
+        .write_to(&temp.0)
+        .unwrap();
+    cargo(&temp.0, &["build", "--offline"]);
+    let request = |input, scope| {
+        json!({"id":0,"grammar":"Operators","entry":"Root","input":input,"options":{"lexical":false,"scope":scope}}).to_string()+"\n"
+    };
+    let rows = exchange(
+        &temp.0.join("target/debug/driver"),
+        &(request("a", true) + &request("a", false) + &request("abq", true)),
+    );
+    assert_eq!(
+        rows[0]["scope"],
+        json!({"mode":["dynamic"],"events":[
+            {"order":0,"action":"enter","mode":"dynamic","name":null,"offset":0,"length":0},
+            {"order":1,"action":"leave","mode":"dynamic","name":null,"offset":1,"length":0}
+        ]})
+    );
+    assert!(rows[1].get("scope").is_none());
+    assert_eq!(
+        rows[2]["diagnostics"][0],
+        json!({"kind":"trailing_input","offset":1,"expected":["end of input"],"farthestOffset":2,"farthestExpected":["x"]})
+    );
+}

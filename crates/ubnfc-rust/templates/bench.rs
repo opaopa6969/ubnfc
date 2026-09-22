@@ -33,6 +33,7 @@ fn main() {
                                 build_ast: ast,
                                 require_eof: true,
                                 lexical: false,
+                                ..Default::default()
                             }),
                         );
                         assert!(r.ok);
