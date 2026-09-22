@@ -156,10 +156,10 @@ let step=entry_step(&mut parser,grammar,entry)?;
 Ok(parser.finish(step))}
 impl Session<'_> {
 fn r0_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
-self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
+self.effect_scope_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0,"Formula");
 let mut out=self.e0_c(state);
 if out.ok {
-self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
+self.effect_scope_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0,"Formula");
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:0,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
@@ -205,7 +205,7 @@ self.depth-=1;out.diag=self.diag.rule(4,out.diag);out
 fn r5_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e38_c(state);
 if out.ok {
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[9],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[9],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==9 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -220,7 +220,7 @@ self.depth-=1;out.diag=self.diag.rule(5,out.diag);out
 fn r6_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e56_c(state);
 if out.ok {
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[13],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[13],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==13 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -235,7 +235,7 @@ self.depth-=1;out.diag=self.diag.rule(6,out.diag);out
 fn r7_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e74_c(state);
 if out.ok {
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[17],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[17],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==17 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -250,7 +250,7 @@ self.depth-=1;out.diag=self.diag.rule(7,out.diag);out
 fn r8_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e92_c(state);
 if out.ok {
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[21],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[21],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==21 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -362,11 +362,11 @@ if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'('", "')
 self.depth-=1;out.diag=self.diag.rule(19,out.diag);out
 }
 fn r20_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
-self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
+self.effect_scope_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0,"NumberMethodDeclaration");
 let mut out=self.e183_c(state);
 if out.ok {
-self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[25],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+self.effect_scope_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0,"NumberMethodDeclaration");
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[25],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==25 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -379,11 +379,11 @@ if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'number'"
 self.depth-=1;out.diag=self.diag.rule(20,out.diag);out
 }
 fn r21_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
-self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
+self.effect_scope_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0,"StringMethodDeclaration");
 let mut out=self.e193_c(state);
 if out.ok {
-self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[28],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+self.effect_scope_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0,"StringMethodDeclaration");
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[28],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==28 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -396,11 +396,11 @@ if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'string'"
 self.depth-=1;out.diag=self.diag.rule(21,out.diag);out
 }
 fn r22_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
-self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
+self.effect_scope_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0,"BooleanMethodDeclaration");
 let mut out=self.e203_c(state);
 if out.ok {
-self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[31],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+self.effect_scope_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0,"BooleanMethodDeclaration");
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[31],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==31 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -413,11 +413,11 @@ if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'boolean'
 self.depth-=1;out.diag=self.diag.rule(22,out.diag);out
 }
 fn r23_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
-self.effect_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0);
+self.effect_scope_at(ScanEffect::Enter,"lexical",self.cp(state.consumed),0,"ObjectMethodDeclaration");
 let mut out=self.e213_c(state);
 if out.ok {
-self.effect_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0);
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[34],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+self.effect_scope_at(ScanEffect::Leave,"lexical",self.cp(out.state.consumed),0,"ObjectMethodDeclaration");
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[34],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==34 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -441,7 +441,7 @@ self.depth-=1;out.diag=self.diag.rule(24,out.diag);out
 fn r25_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e229_c(state);
 if out.ok {
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[39],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[39],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==39 {
 self.effect_at(ScanEffect::Declare{name,offset_cp},"lexical",offset_cp,len_cp);
 }
@@ -546,7 +546,7 @@ self.depth-=1;out.diag=self.diag.rule(35,out.diag);out
 fn r36_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e345_c(state);
 if out.ok {
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[57],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[57],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==57 {
 self.effect_at(ScanEffect::Use{name,offset_cp,len_cp},"lexical",offset_cp,len_cp);
 }
@@ -1317,7 +1317,7 @@ self.depth-=1;out.diag=self.diag.rule(120,out.diag);out
 fn r121_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e1014_c(state);
 if out.ok {
-let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[238],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[238],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);if name.is_empty() {continue;}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
 if site==238 {
 self.effect_at(ScanEffect::Use{name,offset_cp,len_cp},"lexical",offset_cp,len_cp);
 }
