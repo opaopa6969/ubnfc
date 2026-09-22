@@ -115,10 +115,11 @@ fn public_failure_frames_keep_successes_discard_not_and_replay_only_local_candid
     assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));
     let replay = d.snapshot();
     assert_eq!(replay.far, 3);
+    // saved は記録（label 列）単位。同じ列の再記録は除去され、1 記録に収まる。
     assert_eq!(
         replay.labels[1] - replay.labels[0],
-        2,
-        "saved labels are deduplicated"
+        1,
+        "saved records are deduplicated"
     );
     d.leave();
     d.leave();

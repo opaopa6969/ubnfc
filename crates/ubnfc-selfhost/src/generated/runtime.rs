@@ -229,7 +229,9 @@ impl<'a> Session<'a> {
                 b.diag.reset(options.limits.diagnostics);
                 b.display.reset(options.limits.diagnostics);
                 b.memo.reset(memo_capacity);
-                b.trivia_cache.reset(0);
+                // trivia cache は前回の entry 数を見積りにする（0 だと毎 parse 縮小と再拡張を繰り返す）。
+                let trivia_capacity = b.trivia_cache.len();
+                b.trivia_cache.reset(trivia_capacity);
                 b.effects.clear();
                 b.saved_effects.clear();
                 b.text_spans.clear();
@@ -255,6 +257,13 @@ impl<'a> Session<'a> {
         };
         let mut arena = buffers.arena;
         arena.push(Event::Empty);
+        // AST node は入力 byte の約 1/2.5（P4 実測 332 byte / 131 node、20,923 byte / 8,195 node）。
+        // 結果へ移すので pool 化しない。
+        let node_capacity = if options.build_ast {
+            text.len() / 2
+        } else {
+            0
+        };
         Self {
             text,
             input: Input::new(text),
@@ -269,7 +278,7 @@ impl<'a> Session<'a> {
             effects: buffers.effects,
             saved_effects: buffers.saved_effects,
             statistics: Statistics::default(),
-            node_spans: vec![],
+            node_spans: Vec::with_capacity(node_capacity),
             text_spans: buffers.text_spans,
             stacks: buffers.stacks,
             captures_pool: buffers.captures_pool,
@@ -953,8 +962,8 @@ impl<'a> Session<'a> {
             if let Some(ty) = fallback {
                 let mut i = start;
                 while i < out.len() {
-                    if let Ast::Text(text) = &out[i] {
-                        let text = text.clone();
+                    if let Ast::Text(text) = &mut out[i] {
+                        let text = std::mem::take(text);
                         out[i] = self.leaf(ty, span, text)?;
                     }
                     i += 1;
@@ -964,20 +973,30 @@ impl<'a> Session<'a> {
         Ok(())
     }
     /// field の出現のどれかが recovery を含む（値が欠けた node は作らず省略する）。
-    pub fn missing_field(&self, caps: &[Cap], sites: &[usize]) -> bool {
-        caps.iter()
-            .any(|&(site, _, child)| sites.contains(&site) && self.has_recovery(child))
+    pub fn missing_field(&mut self, caps: &[Cap], sites: &[usize]) -> bool {
+        if !HAS_RECOVERY {
+            return false;
+        }
+        for &(site, _, child) in caps {
+            if sites.contains(&site) && self.has_recovery(child) {
+                return true;
+            }
+        }
+        false
     }
-    pub fn selected_extent(&self, root: EventId, fallback: Span) -> Span {
-        let mut stack = vec![root];
+    pub fn selected_extent(&mut self, root: EventId, fallback: Span) -> Span {
+        let mut stack = self.take_stack();
+        stack.push((root, false));
         let mut span = None;
-        while let Some(id) = stack.pop() {
+        while let Some((id, _)) = stack.pop() {
             match self.arena[id.0] {
                 Event::Join(a, b) => {
-                    stack.push(b);
-                    stack.push(a);
+                    stack.push((b, false));
+                    stack.push((a, false));
                 }
-                Event::Capture { child, .. } | Event::Values { child, .. } => stack.push(child),
+                Event::Capture { child, .. } | Event::Values { child, .. } => {
+                    stack.push((child, false))
+                }
                 Event::Rule { span: child, .. } | Event::Token { span: child, .. } => {
                     span = Some(span.map_or(child, |s: Span| [s[0], child[1]]));
                 }
@@ -987,6 +1006,7 @@ impl<'a> Session<'a> {
                 }
             }
         }
+        self.give_stack(stack);
         span.unwrap_or(fallback)
     }
     pub fn significant_end(&self, root: EventId) -> Option<usize> {
@@ -1006,24 +1026,37 @@ impl<'a> Session<'a> {
         }
         None
     }
-    pub fn has_recovery(&self, root: EventId) -> bool {
-        let mut stack = vec![root];
-        while let Some(id) = stack.pop() {
+    pub fn has_recovery(&mut self, root: EventId) -> bool {
+        // recovery を持たない文法では Recovery event が無い（走査を省く）。
+        if !HAS_RECOVERY {
+            return false;
+        }
+        let mut stack = self.take_stack();
+        stack.push((root, false));
+        let mut found = false;
+        while let Some((id, _)) = stack.pop() {
             match self.arena[id.0] {
-                Event::Recovery { .. } => return true,
+                Event::Recovery { .. } => {
+                    found = true;
+                    break;
+                }
                 Event::Join(a, b) => {
-                    stack.push(b);
-                    stack.push(a);
+                    stack.push((b, false));
+                    stack.push((a, false));
                 }
                 Event::Capture { child, .. }
                 | Event::Rule { child, .. }
-                | Event::Values { child, .. } => stack.push(child),
+                | Event::Values { child, .. } => stack.push((child, false)),
                 _ => {}
             }
         }
-        false
+        self.give_stack(stack);
+        found
     }
     pub fn directly_recovered(&self, mut root: EventId) -> bool {
+        if !HAS_RECOVERY {
+            return false;
+        }
         loop {
             match self.arena[root.0] {
                 Event::Recovery { .. } => return true,
@@ -1091,20 +1124,28 @@ impl<'a> Session<'a> {
             diag: failed.diag,
         }
     }
-    pub fn has_value_group(&self, root: EventId) -> bool {
-        let mut stack = vec![root];
-        while let Some(id) = stack.pop() {
+    pub fn has_value_group(&mut self, root: EventId) -> bool {
+        let mut stack = self.take_stack();
+        stack.push((root, false));
+        let mut found = false;
+        while let Some((id, _)) = stack.pop() {
             match self.arena[id.0] {
-                Event::Values { .. } => return true,
-                Event::Join(a, b) => {
-                    stack.push(b);
-                    stack.push(a);
+                Event::Values { .. } => {
+                    found = true;
+                    break;
                 }
-                Event::Rule { child, .. } | Event::Capture { child, .. } => stack.push(child),
+                Event::Join(a, b) => {
+                    stack.push((b, false));
+                    stack.push((a, false));
+                }
+                Event::Rule { child, .. } | Event::Capture { child, .. } => {
+                    stack.push((child, false))
+                }
                 _ => {}
             }
         }
-        false
+        self.give_stack(stack);
+        found
     }
     pub fn mapped_text(&mut self, span: Span) -> String {
         self.remember_text(self.text(span), span)
@@ -1151,9 +1192,22 @@ impl<'a> Session<'a> {
         }
     }
     pub fn semantic_text(&mut self, root: EventId, span: Span) -> String {
-        let extent = self.text_extent(root, span);
-        let content = self.text_content_extent(root, extent);
-        let value = if self.has_token_text(root) { self.text[content[0]..content[1]].to_owned() } else { self.text(content) };
+        // Token まで下って text_span / content_span を 1 回の走査で読む
+        // （text_extent / text_content_extent / has_token_text と同じ規則）。
+        let mut node = root;
+        let token = loop {
+            match self.arena[node.0] {
+                Event::Capture { child, .. } | Event::Rule { child, .. } | Event::Values { child, .. } => node = child,
+                Event::Token { text_span, content_span, .. } => break Some((text_span, content_span)),
+                _ => break None,
+            }
+        };
+        let (extent, content, token_text) = match token {
+            Some((Some(text), content)) => (text, content.unwrap_or(text), true),
+            Some((None, content)) => (span, content.unwrap_or(span), false),
+            None => (span, span, false),
+        };
+        let value = if token_text { self.text[content[0]..content[1]].to_owned() } else { self.text(content) };
         self.remember_text(value, extent)
     }
     pub fn take_scope(&mut self) -> Vec<(usize, Span)> {
@@ -1672,27 +1726,33 @@ fn occurrences(
     &self,
     root: EventId,
 ) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
-    let mut captures = Vec::new();
-    let mut capture_owners = Vec::new();
-    let mut rule_orders = Vec::new();
+    // 出現数は event 数で上から見積もる（capture / rule は event の一部）。伸長の複製を避ける。
+    let estimate = self.arena.len() / 4;
+    let mut captures = Vec::with_capacity(estimate);
+    let mut capture_owners = Vec::with_capacity(estimate);
+    let mut rule_orders = Vec::with_capacity(estimate);
     let mut rule_order = 0;
     let mut lexical = Vec::new();
     let mut tokens = Vec::new();
-    let mut stack = vec![(root, None, false, None)];
+    // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは usize::MAX。
+    const NONE: usize = usize::MAX;
+    let mut stack: Vec<(EventId, usize, bool, usize)> = Vec::with_capacity(64);
+    stack.push((root, NONE, false, NONE));
     let mut lexical_order = 0;
     while let Some((id, parent, done, current)) = stack.pop() {
+        let parent_index = (parent != NONE).then_some(parent);
         match self.arena[id.0] {
             Event::Join(a, b) => {
-                stack.push((b, parent, false, None));
-                stack.push((a, parent, false, None));
+                stack.push((b, parent, false, NONE));
+                stack.push((a, parent, false, NONE));
             }
-            Event::Values { child, .. } => stack.push((child, parent, false, None)),
+            Event::Values { child, .. } => stack.push((child, parent, false, NONE)),
             Event::Capture {
                 site, span, child, ..
             } => {
                 if done {
                     if self.options.build_ast || self.options.lexical {
-                        capture_owners.push(parent);
+                        capture_owners.push(parent_index);
                         let order = captures.len();
                         captures.push(Capture {
                             rule_completion_order: 0,
@@ -1704,8 +1764,8 @@ fn occurrences(
                         });
                     }
                 } else {
-                    stack.push((id, parent, true, None));
-                    stack.push((child, parent, false, None));
+                    stack.push((id, parent, true, NONE));
+                    stack.push((child, parent, false, NONE));
                 }
             }
             Event::Token {
@@ -1714,7 +1774,7 @@ fn occurrences(
 if self.options.lexical && expr != usize::MAX => {
                 tokens.push(LexicalOccurrence {
                     occurrence_id: tokens.len(),
-                    parent_occurrence_id: parent,
+                    parent_occurrence_id: parent_index,
                     rule_id: RULES[rule],
                     expr_id: EXPRESSIONS[expr],
                     span: self.span(span),
@@ -1724,7 +1784,8 @@ if self.options.lexical && expr != usize::MAX => {
             }
             Event::Rule { rule, span, child } => {
                 if done {
-                    if let Some(index) = current {
+                    if current != NONE {
+                        let index = current;
                         rule_orders[index] = rule_order;
                         rule_order += 1;
                         // rule 出現は lexical のときだけ保持する（AST だけなら完了順だけ要る）。
@@ -1741,19 +1802,19 @@ if self.options.lexical && expr != usize::MAX => {
                         if self.options.lexical {
                             lexical.push(LexicalOccurrence {
                                 occurrence_id: index,
-                                parent_occurrence_id: parent,
+                                parent_occurrence_id: parent_index,
                                 rule_id: RULES[rule],
                                 expr_id: BODIES[rule],
                                 span: self.span(span),
                                 completion_order: 0,
                             });
                         }
-                        Some(index)
+                        index
                     } else {
                         parent
                     };
                     stack.push((id, parent, true, index));
-                    stack.push((child, index, false, None));
+                    stack.push((child, index, false, NONE));
                 }
             }
             _ => {}
@@ -1925,17 +1986,20 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     if ok {
         diagnostics.clear();
     }
-    let (recoveries, recovery_diagnostics) = if step.ok {
+    // recovery を持たない文法では Recovery event が無く、走査しても空になる（走査を省く）。
+    let (recoveries, recovery_diagnostics) = if step.ok && HAS_RECOVERY {
         self.recovery_occurrences(step.events)
     } else {
         (vec![], vec![])
     };
     diagnostics.splice(0..0, recovery_diagnostics);
-    let (captures, lexical, tokens) = if step.ok {
-        self.occurrences(step.events)
-    } else {
-        (vec![], vec![], vec![])
-    };
+    // capture / rule / token の出現は AST か lexical のときだけ保持する（認識だけなら走査を省く）。
+    let (captures, lexical, tokens) =
+        if step.ok && (self.options.build_ast || self.options.lexical) {
+            self.occurrences(step.events)
+        } else {
+            (vec![], vec![], vec![])
+        };
     let ast = if ok && self.options.build_ast {
         match self.build_values(step.events).and_then(|mut nodes| {
             if nodes.len() == 1 {
