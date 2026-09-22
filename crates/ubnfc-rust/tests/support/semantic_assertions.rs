@@ -9,6 +9,7 @@ mod tests {
                     build_ast: true,
                     require_eof: false,
                     lexical: true,
+                    ..Default::default()
                 },
             )
         };

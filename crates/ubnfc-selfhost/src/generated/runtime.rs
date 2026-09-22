@@ -84,6 +84,13 @@ pub(crate) struct Mark {
     scope: Checkpoint,
     effects: usize,
 }
+#[derive(Clone)]
+struct Effect {
+    value: ScanEffect,
+    mode: &'static str,
+    offset_cp: usize,
+    length_cp: usize,
+}
 pub(crate) struct Session<'a> {
     pub text: &'a str,
     pub input: Input<'a>,
@@ -93,11 +100,14 @@ pub(crate) struct Session<'a> {
     pub diag: Diagnostics,
     pub memo: Memo<Saved>,
     pub scope: ScopeStore,
-    pub trivia_cache: Memo<State>,
-    effects: Vec<ScanEffect>,
-    saved_effects: Vec<ScanEffect>,
+    pub trivia_cache: Memo<Step>,
+    effects: Vec<Effect>,
+    saved_effects: Vec<Effect>,
     pub statistics: Statistics,
     pub node_spans: Vec<NodeSpan>,
+    pub depth: usize,
+    stack_anchor: Option<usize>,
+    depth_failure: Option<usize>,
 }
 impl<'a> Session<'a> {
     pub fn new(text: &'a str, options: ParseOptions, scanner: &'a mut dyn TokenScanner) -> Self {
@@ -106,7 +116,16 @@ impl<'a> Session<'a> {
             input: Input::new(text),
             options,
             scanner,
-            arena: {let mut arena=Vec::with_capacity(if options.build_ast || options.lexical || HAS_SCOPE {text.len().saturating_mul(8).saturating_add(8).min(32768)} else {1});arena.push(Event::Empty);arena},
+            arena: {
+                let mut arena =
+                    Vec::with_capacity(if options.build_ast || options.lexical || HAS_SCOPE {
+                        text.len().saturating_mul(8).saturating_add(8).min(32768)
+                    } else {
+                        1
+                    });
+                arena.push(Event::Empty);
+                arena
+            },
             diag: Diagnostics::new(),
             memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
             scope: ScopeStore::new(),
@@ -115,7 +134,35 @@ impl<'a> Session<'a> {
             saved_effects: vec![],
             statistics: Statistics::default(),
             node_spans: vec![],
+            depth: 0,
+            stack_anchor: None,
+            depth_failure: None,
         }
+    }
+    // Rust cannot recover from native stack overflow. Stop before consuming the
+    // per-parse 256 KiB native stack budget, in addition to the logical rule limit.
+    // Check expressions too: one rule may contain a deeply nested expression tree.
+    #[inline(never)]
+    pub fn limit(&mut self, state: State) -> Option<Step> {
+        let frame = 0u8;
+        let address = std::ptr::addr_of!(frame) as usize;
+        let anchor = *self.stack_anchor.get_or_insert(address);
+        if self.depth_failure.is_none() && anchor.abs_diff(address) > 256 * 1024 {
+            self.depth_failure = Some(state.consumed.max(state.matched));
+        }
+        self.depth_failure
+            .map(|offset| self.fail(state, offset, "maximum parse depth exceeded"))
+    }
+    pub fn enter_rule(&mut self, state: State) -> Option<Step> {
+        if self.depth >= self.options.max_depth {
+            self.depth_failure
+                .get_or_insert(state.consumed.max(state.matched));
+        }
+        if let Some(limit) = self.limit(state) {
+            return Some(limit);
+        }
+        self.depth += 1;
+        None
     }
     pub fn cp(&self, byte: usize) -> usize {
         self.input.byte_to_cp(byte).expect("parser UTF-8 boundary")
@@ -146,10 +193,25 @@ impl<'a> Session<'a> {
     }
     pub fn replay_effects(&mut self, span: Span) {
         for i in span[0]..span[1] {
-            self.effect(self.saved_effects[i].clone());
+            let effect = self.saved_effects[i].clone();
+            self.effect_at(
+                effect.value,
+                effect.mode,
+                effect.offset_cp,
+                effect.length_cp,
+            );
         }
     }
     pub fn effect(&mut self, effect: ScanEffect) {
+        self.effect_at(effect, "lexical", 0, 0);
+    }
+    pub fn effect_at(
+        &mut self,
+        effect: ScanEffect,
+        mode: &'static str,
+        offset_cp: usize,
+        length_cp: usize,
+    ) {
         match &effect {
             ScanEffect::Diagnostic {
                 message,
@@ -179,15 +241,26 @@ impl<'a> Session<'a> {
                 }
             }
         }
-        self.effects.push(effect);
+        self.effects.push(Effect {
+            value: effect,
+            mode,
+            offset_cp,
+            length_cp,
+        });
     }
     pub fn lookup(&mut self, key: Key) -> Option<Step> {
+        if !self.options.memo {
+            return None;
+        }
         let saved = self.memo.get(key)?;
         self.statistics.memo_hits += 1;
         self.replay_effects(saved.effects.map(|p| p as usize));
         Some(saved.step())
     }
     pub fn store(&mut self, key: Key, step: Step, mark: Mark) {
+        if !self.options.memo || self.depth_failure.is_some() {
+            return;
+        }
         let effects = if step.ok {
             self.save_effects(mark)
         } else {
@@ -537,6 +610,7 @@ impl<'a> Session<'a> {
 }
 
 use super::ast::*;
+const SCOPE_MODES:&[&str]=&["sameRuleText"];
 const HAS_SCOPE:bool=true;
 const RULES:&[&str]=&["UBNF::UBNFFile", "UBNF::ImportDecl", "UBNF::GrammarDecl", "UBNF::GlobalSetting", "UBNF::SettingValue", "UBNF::StringSettingValue", "UBNF::BlockSettingValue", "UBNF::KeyValuePair", "UBNF::TokenDecl", "UBNF::TokenValue", "UBNF::UntilExpression", "UBNF::NegationExpression", "UBNF::LookaheadExpression", "UBNF::NegativeLookaheadExpression", "UBNF::CharRangeExpression", "UBNF::CIExpression", "UBNF::RegexExpression", "UBNF::AnyExpression", "UBNF::EofExpression", "UBNF::EmptyExpression", "UBNF::RuleDecl", "UBNF::Annotation", "UBNF::RootAnnotation", "UBNF::MappingAnnotation", "UBNF::EvalAnnotation", "UBNF::WhitespaceAnnotation", "UBNF::InterleaveAnnotation", "UBNF::BackrefAnnotation", "UBNF::ScopeTreeAnnotation", "UBNF::DeclaresAnnotation", "UBNF::CatalogAnnotation", "UBNF::LeftAssocAnnotation", "UBNF::RightAssocAnnotation", "UBNF::LongestChoiceAnnotation", "UBNF::PredictiveChoiceAnnotation", "UBNF::PrecedenceAnnotation", "UBNF::DocAnnotation", "UBNF::RecoveryAnnotation", "UBNF::SkipAnnotation", "UBNF::CommonFieldAnnotation", "UBNF::EnumAnnotation", "UBNF::SimpleAnnotation", "UBNF::ChoiceBody", "UBNF::SequenceBody", "UBNF::AnnotatedElement", "UBNF::PostfixQuantifier", "UBNF::SeparatedBy", "UBNF::BoundedQuantifier", "UBNF::Digits", "UBNF::AtomicElement", "UBNF::GroupElement", "UBNF::OptionalElement", "UBNF::RepeatElement", "UBNF::ErrorElement", "UBNF::TerminalElement", "UBNF::QuantifiedRef", "UBNF::TypeofElement", "UBNF::DottedIdentifier", "UBNF::RuleBody"];
 const BODIES:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1507:1685:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2215:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4764:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4819:4826:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4924:5066:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5139:5206:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5289:5332:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5417:5472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5548:5594:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5674:5722:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5815:5912:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5991:6039:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6104:6116:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6182:6195:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6265:6281:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6357:6376:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6458:6515:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6583:6610:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6700:6772:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6827:6834:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6997:7073:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7181:7188:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7262:7276:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7457:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7727:7912:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7961:7976:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8025:8042:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8100:8133:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8152:8167:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8314:8434:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8524:8546:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8636:8658:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8749:8771:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8871:8902:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9214:9254:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9422:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9569:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9627:9637:body/seq"];
@@ -989,7 +1063,10 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>) {
     }
     (captures, lexical)
 }
-pub(crate) fn finish(mut self, step: Step) -> ParseResult {
+pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
+    if let Some(offset) = self.depth_failure {
+        step = self.fail(State::default(), offset, "maximum parse depth exceeded");
+    }
     let trailing = step.ok && self.options.require_eof && step.state.consumed != self.text.len();
     let ok = step.ok && !trailing;
     let consumed_cp = if step.ok {
@@ -1009,6 +1086,7 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
             kind: DiagnosticKind::Syntax,
             offset_cp: self.cp(pos),
             farthest_cp: self.cp(pos),
+            farthest_expected: expected.clone(),
             expected,
             deepest_rule: rule_path.last().copied(),
             rule_path,
@@ -1016,14 +1094,25 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
         });
     }
     if trailing {
-        let farthest_cp = diagnostics.last().map_or(consumed_cp, |d| d.farthest_cp);
+        let (farthest_cp, farthest_expected, deepest_rule, rule_path) =
+            diagnostics
+                .pop()
+                .map_or((consumed_cp, vec![], None, vec![]), |d| {
+                    (
+                        d.farthest_cp,
+                        d.farthest_expected,
+                        d.deepest_rule,
+                        d.rule_path,
+                    )
+                });
         diagnostics.push(Diagnostic {
             kind: DiagnosticKind::TrailingInput,
             offset_cp: consumed_cp,
             farthest_cp,
+            farthest_expected,
             expected: vec!["end of input"],
-            deepest_rule: None,
-            rule_path: vec![],
+            deepest_rule,
+            rule_path,
             message: None,
         });
     }
@@ -1048,6 +1137,7 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
                     offset_cp: consumed_cp,
                     farthest_cp: consumed_cp,
                     expected: vec![],
+                    farthest_expected: vec![],
                     deepest_rule: None,
                     rule_path: vec![],
                     message: Some(message),
@@ -1086,6 +1176,46 @@ pub(crate) fn finish(mut self, step: Step) -> ParseResult {
             vec![]
         },
         statistics: self.statistics,
+        scope: ScopeResult {
+            mode: SCOPE_MODES.to_vec(),
+            events: if ok {
+                self.effects
+                    .iter()
+                    .enumerate()
+                    .map(|(order, effect)| {
+                        let (action, name, offset_cp, length_cp) = match &effect.value {
+                            ScanEffect::Enter => ("enter", None, effect.offset_cp, 0),
+                            ScanEffect::Leave => ("leave", None, effect.offset_cp, 0),
+                            ScanEffect::Clear => ("clear", None, effect.offset_cp, 0),
+                            ScanEffect::Declare { name, offset_cp } => {
+                                ("declare", Some(name.clone()), *offset_cp, effect.length_cp)
+                            }
+                            ScanEffect::Use {
+                                name,
+                                offset_cp,
+                                len_cp,
+                            } => ("use", Some(name.clone()), *offset_cp, *len_cp),
+                            ScanEffect::Diagnostic {
+                                message,
+                                offset_cp,
+                                len_cp,
+                                ..
+                            } => ("error", Some(message.clone()), *offset_cp, *len_cp),
+                        };
+                        ScopeEvent {
+                            order,
+                            action,
+                            mode: effect.mode,
+                            name,
+                            offset_cp,
+                            length_cp,
+                        }
+                    })
+                    .collect()
+            } else {
+                vec![]
+            },
+        },
     }
 }
 }

@@ -55,6 +55,7 @@ fn main() {
                             build_ast: ast,
                             require_eof: true,
                             lexical: false,
+                            ..Default::default()
                         },
                     );
                     (r.statistics.memo_entries, r.statistics.recipes)

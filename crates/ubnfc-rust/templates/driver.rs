@@ -26,6 +26,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             build_ast: false,
             require_eof: false,
             lexical: false,
+            ..Default::default()
         },
     )?;
     let result = parse_entry_with_options(
@@ -36,6 +37,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             build_ast: true,
             require_eof: true,
             lexical,
+            ..Default::default()
         },
     )?;
     let ast = result.ast.as_ref().map_or(Json::Null, ToJson::to_json);
@@ -59,6 +61,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             ("kind", kind.to_json()),
             ("offset", d.offset_cp.to_json()),
             ("expected", d.expected.to_json()),
+            ("farthestOffset", d.farthest_cp.to_json()),
+            ("farthestExpected", d.farthest_expected.to_json()),
         ]));
     }
     for d in &result.scope_diagnostics {
@@ -115,6 +119,32 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         );
     }
     if scope {
+        fields.insert(
+            "scope".into(),
+            Json::object([
+                ("mode", result.scope.mode.to_json()),
+                (
+                    "events",
+                    Json::Array(
+                        result
+                            .scope
+                            .events
+                            .iter()
+                            .map(|event| {
+                                Json::object([
+                                    ("order", event.order.to_json()),
+                                    ("action", event.action.to_json()),
+                                    ("mode", event.mode.to_json()),
+                                    ("name", event.name.to_json()),
+                                    ("offset", event.offset_cp.to_json()),
+                                    ("length", event.length_cp.to_json()),
+                                ])
+                            })
+                            .collect(),
+                    ),
+                ),
+            ]),
+        );
         fields.insert(
             "declarations".into(),
             Json::Array(

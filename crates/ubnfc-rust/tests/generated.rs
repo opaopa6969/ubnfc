@@ -87,7 +87,7 @@ fn generated_crates_build_offline_and_match_all_golden() {
     }
     main.push_str("#[cfg(not(feature=\"json\"))] fn main(){assert!(tiny::parse(\"1+2\").ok);}\n#[cfg(feature=\"json\")] fn main(){use std::io::{self,BufRead};for line in io::stdin().lock().lines(){let value:serde_json::Value=serde_json::from_str(&line.unwrap()).unwrap();let input=value[\"input\"].as_str().unwrap();let recognize=value[\"recognize\"].as_bool().unwrap_or(false);let result=match value[\"grammar\"].as_str().unwrap(){\n");
     for (name, _) in &grammars {
-        main.push_str(&format!("{name:?}=>{{let r={name}::parse_with_options(input,{name}::ParseOptions{{build_ast:!recognize,require_eof:true,lexical:false}});serde_json::json!({{\"ok\":r.ok,\"consumed_cp\":r.consumed_cp,\"matched_cp\":r.matched_cp,\"ast\":r.ast.as_ref().map(|a|a.canonical_value())}})}},\n"));
+        main.push_str(&format!("{name:?}=>{{let r={name}::parse_with_options(input,{name}::ParseOptions{{build_ast:!recognize,require_eof:true,lexical:false,..Default::default()}});serde_json::json!({{\"ok\":r.ok,\"consumed_cp\":r.consumed_cp,\"matched_cp\":r.matched_cp,\"ast\":r.ast.as_ref().map(|a|a.canonical_value())}})}},\n"));
     }
     main.push_str("_=>panic!(\"grammar\")};println!(\"{}\",result);}}\n");
     fs::write(dir.join("src/main.rs"), main).unwrap();
