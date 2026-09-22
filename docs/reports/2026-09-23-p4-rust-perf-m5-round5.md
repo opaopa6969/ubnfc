@@ -16,6 +16,15 @@ round 4 末の fb0ed05 を baseline に始めたが、作業中に master へ
 そこで本 round の A/B は **master 1788228（二段構え込み）を baseline** に取り直した（`git merge master` 済み）。
 fb0ed05 との比較は「round 4 → 現在」の累積として最後に併記する。
 
+さらに計測の後、master に Java M5 の merge（dede59f）が入り、Rust 側にも字句 cache
+（`templates/lexcache.rs`）が加わった。これも merge して**生成物を再生成し、
+test / clippy / fmt / corpus を取り直した**（corpus は master 側の
+`2026-09-23-rust-corpus-lexcache.md` と一致）。dede59f を baseline にした確認計測では
+complex AST 0.140 → 0.136、complex-x4 0.546 → 0.518、complex-x16 2.032 → 2.010 で下の表と同じ向きだが、
+この窓は load average が 6 → 10 へ上がってしまい complex-x64 が使える値にならなかった
+（AST 12.43 → 12.59、対照の認識も 6.82 → 6.82 で雑音に埋もれている）。
+**確保の値は dede59f 上でも下の表と完全に同じ**なので、下の A/B（1788228 基準、load 4〜5 の窓）を本 round の結果とする。
+
 ## 結論
 
 - **finish（AST 付きの後処理）が 8〜11% 速くなった**。同一 run 内の `AST − 認識` で見ると
