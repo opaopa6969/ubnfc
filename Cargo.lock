@@ -103,6 +103,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "ubnfc-rt-template"
+version = "0.1.0"
+
+[[package]]
 name = "ubnfc-rust"
 version = "0.1.0"
 dependencies = [
