@@ -161,3 +161,14 @@ parser 本体・golden を補正せず、バックエンドの正しい mapping 
 - 生成 driver の簡易評価（`value`）は、IR に operator 指定がある `left/op/right` 形 AST に対する数値演算 `+ - * / ^` のみ。
   それ以外は `null`（未観測ではなく「評価なし」）。
 - 生成 Java での実測: associative 24/24、right-associative 28/28、tinycalc 8/8（Known 0 / Fail 0 / 未観測 0）。
+
+## 追記（2026-09-22、Rust backend 接続後）
+
+- Rust の `--ir` 経路（`Artifact::FromIr{backend: Rust}`）: runner が `ubnfc-rust` バイナリ（隣接 `target/` または `UBNFC_RUST_BIN`）で
+  生成 → 一時 crate を `cargo build --release --offline` → `driver` 実行。生成物 hash ごとにビルド結果をキャッシュし、
+  別文法のビルドで実行ファイルが上書きされない。
+- 生成 Rust driver は既定で生成され依存ゼロ（`json` feature 時のみ serde optional）。`value` は Java driver と同じ範囲
+  （operator 指定のある `left/op/right` AST の数値 fold `+ - * / ^`、他は null）。JSON の数値は字句のまま保持（`id` の丸め回避）。
+- `ubnfc gen --grammar X.ubnf --target rust|java --out DIR` は front から各生成器を subprocess で呼ぶ
+  （`UBNFC_RUST_BIN` / `UBNFC_JAVA_JAR` で上書き、見つからなければ探索パスを表示して exit 3）。
+- 生成 Rust での実測: associative 24/24、right-associative 28/28、tinycalc 8/8。
