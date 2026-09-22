@@ -7,7 +7,7 @@
 
 | # | v0 の主張 | v1（astra 指摘を採用） |
 |---|---|---|
-| 1 | 解析状態は `int pos` と AST だけ | **consumed / matched の二重カーソル**。`LOOKAHEAD` 等は consumed を進めず matched を進める（corpus `primitives` が `[成功, consumed=0, matched=1]` を要求） |
+| 1 | 解析状態は `int pos` と AST だけ | **consumed / matched の二重カーソル + mode / invert / R フラグ**（`04-cursor-and-diagnostics-contract.md`）。`LOOKAHEAD` 等は consumed を進めず matched を進める（corpus `primitives` が `[成功, consumed=0, matched=1]` を要求） |
 | 2 | `'let'` は `letter` を横取りしない | **リテラルは接頭辞一致、単語境界なし**（`WordParser` は code point 長だけ比較。`ParserRuleEmitter.java:1067,1182`）。境界を足すのは非互換 |
 | 3 | 予測分岐で backtrack を減らし memo は限定的 | **予測分岐と memo は併用**。memo は「省略が安全と証明できた箇所だけ省略」（`S ::= 'a' S 'b' \| 'a' S 'c' \| EMPTY` で予測だけだと 31/511/8191 回、memo で 5/9/13 回） |
 | 4 | CST を作らず typed AST を直接構築 | CST オブジェクト木は作らないが、**capture 出現・字句出現（未 capture のキーワード/演算子）・scope イベント・診断**を結果に含める。P4 LSP の semantic tokens と self-host（`AnnotatedElement` の量指定子は capture されていない）が要る |
@@ -235,6 +235,10 @@ Rust `trait TokenScanner`。`ScanResult { consumedEnd, matchedEnd, valueSpan, di
 | D-007 span | 決定 | 内部 UTF-16/byte、公開 code point、入力ごとの変換表 |
 | D-008 Extern | 決定 | interface/trait + ScanResult、純粋性宣言 |
 | D-009 IR の太さ | 決定 | 意味論は front、最適化計画は分離、バックエンドは再解釈しない |
-| D-010 左再帰 | 決定 | 直接左再帰は書き換え（拡張）、間接はエラー |
-| D-011 診断契約の範囲 | **要確認** | corpus `diagnostics.json` の offset 基準を harness で確認してから固定 |
-| D-012 self-host の量指定子復元 | **要確認** | lexical 出現表で復元 vs フロント専用変換。M2 で決める |
+| D-010 左再帰 | 決定 | 直接左再帰は書き換え（**明示的拡張**。既存は StackOverflow）、間接はエラー。対象形は D-016 |
+| D-011 診断契約の範囲 | 決定 | offset は診断の主位置（syntax: Java は frame 内 max(C,M) の最遠、Rust は fail_at 最遠 / trailing_input: 採用 prefix 末尾）。言語別 oracle。詳細 `04-cursor-and-diagnostics-contract.md` §2 |
+| D-012 self-host の量指定子復元 | 決定 | フロント専用変換（構造付き occurrence → GrammarAst）。`04` §3 |
+| D-013 カーソル状態の契約 | 決定 | `(C, M, mode, invert, R)`、遷移表は `04` §1。生成時特殊化 or 状態引数。memo キーに含める |
+| D-014 診断の互換範囲 | 決定 | 主 offset / farthest / 言語別 hints / deepest を分離。未検証部分は独立 oracle を追加 |
+| D-015 suffix 併存の意味 | 決定 | 互換段階は既存の優先採用（postfix → bounded → separated の 1 つ） |
+| D-016 左再帰書換えの対象形 | 未着手 | M2 で定義（nullable suffix、代替順、capture/trivia/scope/recovery の投影）。未対応形は明示拒否 |
