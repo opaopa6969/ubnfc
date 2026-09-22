@@ -67,7 +67,9 @@ class BackendTest {
                     }
                     var diagnostic = Json.object(expected.get("diagnostics"));
                     assertEquals(((Number) diagnostic.get("farthestCp")).intValue(), get(get(result, "diagnostics"), "farthestCp"));
-                    assertLegacyExpected(Json.array(diagnostic.get("expected")), result);
+                    // 旧 Java 実測値: LegacyDiagnosticsDump で Operators / Power の root parser に
+                    // handwritten-target の corpus 各行の input を渡して採取した全候補を照合する。
+                    assertMeasuredDiagnostics(grammar, input, result);
                     List<?> expectedCaptures = Json.array(expected.get("captures")), actualCaptures = (List<?>) get(result, "captures");
                     assertEquals(expectedCaptures.size(), actualCaptures.size());
                     for (int c = 0; c < actualCaptures.size(); c++) {
@@ -80,12 +82,11 @@ class BackendTest {
         }
         return tests.stream();
     }
-    private static void assertLegacyExpected(List<?> expected, Object result) throws Exception {
+    private static void assertMeasuredDiagnostics(String grammar, String input, Object result) throws Exception {
         Object diagnostic = get(result, "diagnostics");
-        // The handwritten golden's expected is the old farthest accumulator, with an
-        // injected EOF hint. Keep that file intact and check the two new API fields separately.
-        assertEquals(expected.stream().map(Object::toString).filter(s -> !s.equals("EOF")).sorted().toList(),
-            get(diagnostic, "farthestExpected"));
+        var expected = LegacyDiagnostics.forInput(grammar, input);
+        assertEquals(((Number) expected.get("farthestCp")).intValue(), get(diagnostic, "farthestCp"));
+        assertEquals(expected.get("farthestExpected"), get(diagnostic, "farthestExpected"));
         if (get(diagnostic, "kind").equals("trailing_input")) assertEquals(List.of("end of input"), get(diagnostic, "expected"));
         else assertEquals(get(diagnostic, "farthestExpected"), get(diagnostic, "expected"));
     }
@@ -129,7 +130,9 @@ class BackendTest {
             Object result = h.parse((String) row.get("input")); assertEquals(row.get("ok"), ok(result));
             assertEquals(row.get("ast"), h.canonical(result));
             assertEquals(((Number) row.get("offset")).intValue(), get(get(result, "diagnostics"), "offset"));
-            assertLegacyExpected(Json.array(row.get("expected")), result);
+            // 旧 Java 実測値: LegacyDiagnosticsDump で TinyCalc の root parser に
+            // golden/tinycalc.json 各行の input を渡して採取（文法の正規化手順は test/legacy/README.md）。
+            assertMeasuredDiagnostics("tinycalc", (String) row.get("input"), result);
         }));
     }
     @Test void deterministicSourcesAndUnknownKeys() throws Exception {

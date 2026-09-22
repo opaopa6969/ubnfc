@@ -1,0 +1,497 @@
+[
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2",
+    "farthestCp": 1,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^3",
+    "farthestCp": 3,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^3^2",
+    "farthestCp": 5,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "3^2^2",
+    "farthestCp": 5,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^1^3^2",
+    "farthestCp": 7,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^0",
+    "farthestCp": 3,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "0^2",
+    "farthestCp": 3,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "4^0.5",
+    "farthestCp": 5,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": " 2 ^ 3 ^ 2 ",
+    "farthestCp": 11,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'/*'",
+      "'//'",
+      "'^'"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2/*😀*/^3\n^2",
+    "farthestCp": 11,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^3//😀\n^2",
+    "farthestCp": 9,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "(2^3)^2",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^(3^2)",
+    "farthestCp": 2,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "((2))^3",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "😀2^😀3^😀2",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": " 😀 2 ^ 3 ^ 😀2 ",
+    "farthestCp": 1,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "^2",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^",
+    "farthestCp": 2,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^3^",
+    "farthestCp": 4,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^^3",
+    "farthestCp": 2,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^3x",
+    "farthestCp": 3,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2 3",
+    "farthestCp": 2,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'/*'",
+      "'//'",
+      "'^'"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "(2^3",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^3)",
+    "farthestCp": 3,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^😀",
+    "farthestCp": 2,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "😀",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "'^'",
+      "AtomParser",
+      "Chain",
+      "DigitParser",
+      "ExprParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で Power の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "2^1e+",
+    "farthestCp": 5,
+    "farthestExpected": [
+      "DigitParser",
+      "OneOrMore"
+    ]
+  }
+]

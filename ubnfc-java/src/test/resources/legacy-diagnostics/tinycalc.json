@@ -1,0 +1,180 @@
+[
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "var x set 1; x + 2 * 3",
+    "farthestCp": 22,
+    "farthestExpected": [
+      "' '",
+      "'*'",
+      "'*/'",
+      "'+'",
+      "'-'",
+      "'.'",
+      "'/'",
+      "'/*'",
+      "'//'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser",
+      "ExpressionRepeat0Parser",
+      "TermRepeat0Parser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "1",
+    "farthestCp": 1,
+    "farthestExpected": [
+      "' '",
+      "'*'",
+      "'*/'",
+      "'+'",
+      "'-'",
+      "'.'",
+      "'/'",
+      "'/*'",
+      "'//'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser",
+      "ExpressionRepeat0Parser",
+      "TermRepeat0Parser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "var x; 2",
+    "farthestCp": 8,
+    "farthestExpected": [
+      "' '",
+      "'*'",
+      "'*/'",
+      "'+'",
+      "'-'",
+      "'.'",
+      "'/'",
+      "'/*'",
+      "'//'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser",
+      "ExpressionRepeat0Parser",
+      "TermRepeat0Parser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "var x set (2+3); variable y; x*y",
+    "farthestCp": 26,
+    "farthestExpected": [
+      "' '",
+      "'*'",
+      "'*/'",
+      "'+'",
+      "'-'",
+      "'/'",
+      "'/*'",
+      "'//'",
+      "';'",
+      "'set'",
+      "ExpressionRepeat0Parser",
+      "TermRepeat0Parser"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "1+",
+    "farthestCp": 2,
+    "farthestExpected": [
+      "' '",
+      "'('",
+      "')'",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "AlphabetUnderScoreParser",
+      "Chain",
+      "DigitParser",
+      "IdentifierParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "TermParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "",
+    "farthestCp": 0,
+    "farthestExpected": [
+      "' '",
+      "'('",
+      "')'",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "';'",
+      "'var'",
+      "'variable'",
+      "AlphabetUnderScoreParser",
+      "Chain",
+      "DigitParser",
+      "ExpressionParser",
+      "IdentifierParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "TermParser",
+      "TinyCalcParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "var x set ; 1",
+    "farthestCp": 10,
+    "farthestExpected": [
+      "' '",
+      "'('",
+      "')'",
+      "'*/'",
+      "'.'",
+      "'/*'",
+      "'//'",
+      "AlphabetUnderScoreParser",
+      "Chain",
+      "DigitParser",
+      "ExpressionParser",
+      "IdentifierParser",
+      "NumberParser",
+      "OneOrMore",
+      "SignParser",
+      "TermParser",
+      "__CaptureSite"
+    ]
+  },
+  {
+    "_comment": "旧 Java 実測値。LegacyDiagnosticsDump で TinyCalc の root parser にこの行の input を渡し、ParseFailureDiagnostics を採取。expectedTokens はソートのみ（削除・追加なし）。",
+    "input": "1 /*😀*/ + 2",
+    "farthestCp": 11,
+    "farthestExpected": [
+      "' '",
+      "'*'",
+      "'*/'",
+      "'+'",
+      "'-'",
+      "'.'",
+      "'/'",
+      "'/*'",
+      "'//'",
+      "DigitParser",
+      "EParser",
+      "ExponentParser",
+      "ExpressionRepeat0Parser",
+      "TermRepeat0Parser"
+    ]
+  }
+]

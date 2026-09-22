@@ -88,7 +88,10 @@ class DriverTest {
         assertEquals(false, exchange(operators, limited).get("accepted"));
         var diagnostic = Json.object(Json.array(partial.get("diagnostics")).getFirst());
         assertEquals("trailing_input", diagnostic.get("kind")); assertEquals(1, integer(diagnostic.get("offset")));
-        assertEquals(List.of("'('", "NUMBER"), diagnostic.get("farthestExpected"));
+        // 旧 Java 実測値: LegacyDiagnosticsDump で Operators の root parser に input="1+" を渡して採取。
+        var measured = LegacyDiagnostics.forInput("operators", "1+");
+        assertEquals(((Number) measured.get("farthestCp")).intValue(), integer(diagnostic.get("farthestOffset")));
+        assertEquals(measured.get("farthestExpected"), diagnostic.get("farthestExpected"));
         assertEquals(List.of("end of input"), diagnostic.get("expected"));
     }
     @Test void numericFoldAndNonFiniteValues() throws Exception {
