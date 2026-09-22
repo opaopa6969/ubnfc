@@ -73,8 +73,14 @@ public final class Driver {
         if (result.ast().isPresent() && OPERATOR_TYPES.contains(result.ast().get().getClass()))
             value = numeric(ast);
         var diagnostics = new ArrayList<Object>();
+        for (var recovery : result.recoveries()) {
+            Diagnostic d = recovery.diagnostic();
+            diagnostics.add(object("kind", d.kind(), "offset", d.offset(), "length", d.length(), "severity", d.severity(),
+                "origin", d.origin(), "ruleId", recovery.ruleId(), "expected", d.expected(),
+                "farthestOffset", d.farthestCp(), "farthestExpected", d.farthestExpected()));
+        }
         Diagnostic diagnostic = result.diagnostics();
-        if (!diagnostic.kind().equals("none") || !diagnostic.expected().isEmpty())
+        if (!diagnostic.kind().equals("none") || result.recoveries().isEmpty() && !diagnostic.expected().isEmpty())
             diagnostics.add(object("kind", diagnostic.kind().equals("none") ? "syntax" : diagnostic.kind(),
                 "offset", diagnostic.offset() < 0 ? diagnostic.farthestCp() : diagnostic.offset(),
                 "expected", diagnostic.expected(), "farthestOffset", diagnostic.farthestCp(), "farthestExpected", diagnostic.farthestExpected()));
@@ -84,6 +90,11 @@ public final class Driver {
         var response = object("id", request.get("id"), "accepted", prefix.ok(), "allConsumed", result.ok(),
             "consumed", prefix.consumedCp(), "matched", prefix.matchedCp(), "ast", ast,
             "diagnostics", diagnostics, "mappingError", mapping, "value", value);
+        response.put("recoveries", result.recoveries().stream().map(r -> object("ruleId", r.ruleId(), "mode", r.mode(),
+            "span", List.of(r.span().start(), r.span().end()), "syncPattern", r.syncPattern(),
+            "skippedSpan", List.of(r.skippedSpan().start(), r.skippedSpan().end()),
+            "syncSpan", r.syncSpan() == null ? null : List.of(r.syncSpan().start(), r.syncSpan().end()),
+            "captureOccurrences", r.captureOccurrences())).toList());
         if (lexical) {
             var captures = new ArrayList<Object>();
             for (Capture capture : result.captures()) {

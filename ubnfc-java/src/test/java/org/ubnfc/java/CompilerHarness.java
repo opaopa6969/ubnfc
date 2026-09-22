@@ -20,12 +20,19 @@ final class CompilerHarness implements AutoCloseable {
     final Class<?> parser, options, json;
     final String pkg;
     CompilerHarness(GrammarIr ir, String pkg) throws Exception {
+        this(ir, pkg, Map.of());
+    }
+    CompilerHarness(GrammarIr ir, String pkg, Map<String, String> additionalSources) throws Exception {
         this.pkg = pkg;
         var process = new ProcessBuilder("mktemp", "-d").start();
         directory = Path.of(new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).strip());
         assertEquals(0, process.waitFor());
         var emitter = new JavaEmitter(ir, pkg);
         emitter.write(directory.resolve("src"));
+        for (var source : additionalSources.entrySet()) {
+            Path file = directory.resolve("src").resolve(source.getKey()); Files.createDirectories(file.getParent());
+            Files.writeString(file, source.getValue(), StandardCharsets.UTF_8);
+        }
         var compiler = ToolProvider.getSystemJavaCompiler(); assertNotNull(compiler);
         var messages = new javax.tools.DiagnosticCollector<javax.tools.JavaFileObject>();
         Path classes = Files.createDirectory(directory.resolve("classes"));

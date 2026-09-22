@@ -142,8 +142,8 @@ class BackendTest {
     @Test void rejectUnsupportedBeforeWriting() throws Exception {
         var raw = Json.object(Json.read(Files.readString(TINY))); raw.put("requiredFeatures", List.of("unknownFutureFeature"));
         assertTrue(assertThrows(IllegalArgumentException.class, () -> IrReader.read(Json.write(raw))).getMessage().contains("unknownFutureFeature"));
-        raw.put("requiredFeatures", List.of("eval"));
-        assertTrue(assertThrows(IllegalArgumentException.class, () -> IrReader.read(Json.write(raw))).getMessage().contains("eval"));
+        raw.put("requiredFeatures", List.of("eval", "typeof"));
+        assertDoesNotThrow(() -> IrReader.read(Json.write(raw)));
         raw.put("requiredFeatures", List.of()); raw.put("analysisVersion", "future");
         assertTrue(assertThrows(IllegalArgumentException.class, () -> IrReader.read(Json.write(raw))).getMessage().contains("analysisVersion"));
     }

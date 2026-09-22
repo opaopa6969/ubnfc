@@ -41,11 +41,17 @@ public final class Session {
     }
     public record Occurrence(String site, String name, Value value) {}
     public record Trace(String rule, String expr, int start, int end, List<Trace> children) {}
+    public record RecoveryEvent(String rule, String mode, int start, int end, String pattern, int syncStart,
+                                int syncEnd, Diagnostic diagnostic, Recipe marker) {}
     public record Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
-                        List<Trace> traces, int start, int end, boolean mappingFailure) {
+                        List<Trace> traces, int start, int end, boolean mappingFailure, List<RecoveryEvent> recoveries) {
+        public Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
+                     List<Trace> traces, int start, int end, boolean mappingFailure) {
+            this(nodes, local, captures, traces, start, end, mappingFailure, List.of());
+        }
         public Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
                      List<Trace> traces, int start, int end) { this(nodes, local, captures, traces, start, end, false); }
-        public Match { nodes = List.copyOf(nodes); local = List.copyOf(local); captures = List.copyOf(captures); traces = List.copyOf(traces); }
+        public Match { nodes = List.copyOf(nodes); local = List.copyOf(local); captures = List.copyOf(captures); traces = List.copyOf(traces); recoveries = List.copyOf(recoveries); }
         public static Match empty(int start, int end) { return new Match(List.of(), List.of(), List.of(), List.of(), start, end); }
     }
     public record Delimiter(String kind, String open, String close, int[] characters) {}
@@ -112,7 +118,7 @@ public final class Session {
         }
     }
     public Match rule(Frame f, int id, int memoId, boolean successMemo, boolean failureMemo, Call body,
-                      String recipe, String fallback, String recipeKind, Field[] fields, Effect[] scopeEffects, boolean skip) {
+                      String recipe, String fallback, String recipeKind, Field[] fields, Effect[] scopeEffects, boolean skip, String[] recoveryHints) {
         int c = f.c, m = f.m, state = scope.stateVersion();
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
         boolean cache = options.memo() && (successMemo || failureMemo);
@@ -150,9 +156,10 @@ public final class Session {
                 }
                 nodes = List.of(new Recipe(recipe, c, f.c, values, fallback));
             }
-            result = new Match(nodes, List.of(), result.captures(), result.traces(), c, f.c, result.mappingFailure());
+            result = new Match(nodes, List.of(), result.captures(), result.traces(), c, f.c, result.mappingFailure(), result.recoveries());
         } else {
             var local = diagnostics.snapshot();
+            if (local.farthest() == Math.max(c, m)) for (String hint : recoveryHints) fail(local.farthest(), "'" + hint + "'");
             if (local.farthest() == Math.max(c, m) && structural(local.expected())) fail(local.farthest(), ruleNames[id] + "Parser");
             restore(mark); f.c = c; f.m = m;
         }
@@ -166,7 +173,7 @@ public final class Session {
         return result;
     }
     private boolean structural(int[] ids) {
-        return Arrays.stream(ids).mapToObj(expected::get).anyMatch(label -> label.equals("Repeat") || label.equals("EndOfSourceParser"));
+        return Arrays.stream(ids).mapToObj(expected::get).anyMatch(label -> label.equals("Repeat") || label.equals("EndOfSourceParser") || label.equals("__CaptureSite"));
     }
     public Match expression(Frame f, int id, boolean successMemo, boolean failureMemo, Call body) {
         if (!options.memo() || !successMemo && !failureMemo) return body.parse(this, f);
@@ -216,11 +223,11 @@ public final class Session {
         }
     }
     public Match capture(Frame f, Call call, String[] sites, String[] names, String[] spanRules, boolean[] skips,
-                         String rule, String expr) {
+                         String rule, String expr, boolean ruleReference) {
         int c = f.c, m = f.m; Match result = call.parse(this, f);
         reached = Math.max(reached, Math.max(f.c, f.m));
         if (result == null) {
-            if (sites.length > 0 && diagnostics.farthest() == Math.max(c, m) && structural(diagnostics.expected())) fail(diagnostics.farthest(), "__CaptureSite");
+            if (sites.length > 0 && diagnostics.farthest() == Math.max(c, m) && (ruleReference || structural(diagnostics.expected()))) fail(diagnostics.farthest(), "__CaptureSite");
             return null;
         }
         var locals = new ArrayList<>(result.local()); var captures = new ArrayList<>(result.captures());
@@ -231,13 +238,14 @@ public final class Session {
             locals.add(occurrence); captures.add(occurrence);
         }
         List<Trace> traces = options.lexical() ? List.of(new Trace(rule, expr, c, f.c, result.traces())) : List.of();
-        return new Match(result.nodes(), locals, captures, traces, result.start(), result.end(), result.mappingFailure());
+        return new Match(result.nodes(), locals, captures, traces, result.start(), result.end(), result.mappingFailure(), result.recoveries());
     }
     private static Match combine(List<Match> items, int start, int end) {
         var nodes = new ArrayList<Recipe>(); var local = new ArrayList<Occurrence>();
         var captures = new ArrayList<Occurrence>(); var traces = new ArrayList<Trace>();
         for (Match item : items) { nodes.addAll(item.nodes()); local.addAll(item.local()); captures.addAll(item.captures()); traces.addAll(item.traces()); }
-        return new Match(nodes, local, captures, traces, start, end, items.stream().anyMatch(Match::mappingFailure));
+        return new Match(nodes, local, captures, traces, start, end, items.stream().anyMatch(Match::mappingFailure),
+            items.stream().flatMap(m -> m.recoveries().stream()).toList());
     }
     public Match sequence(Frame parent, Call[] children, Boundary[] boundaries) {
         var mark = mark(); Frame f = parent.copy(true); int start = f.c;
@@ -460,22 +468,39 @@ public final class Session {
             }
         }
     }
-    public Match recover(Frame f, Call child, String[] patterns, boolean consumeSync, String noSync, String projection, String recipe) {
-        var mark = mark(); Frame trial = f.copy(false); Match result = child.parse(this, trial);
+    public Match recover(Frame f, Call child, String rule, String mode, String[] patterns, boolean consumeSync,
+                         String noSync, String projection, String recipe) {
+        var mark = mark(); Frame trial = f.copy(false);
+        diagnostics.enterExpression();
+        Match result = child.parse(this, trial);
+        var failure = diagnostics.leaveRule();
         if (result != null) { f.commit(trial); return result; }
-        restore(mark); int start = f.c, end = -1, length = 0;
+        restore(mark); int start = f.position(), syncStart = -1, syncLength = 0;
+        String selected = null;
         for (String pattern : patterns) {
             int found = source.indexOf(pattern, start);
-            if (found >= 0 && (end < 0 || found < end)) { end = found; length = pattern.length(); }
+            if (found >= 0 && (syncStart < 0 || found < syncStart)) { syncStart = found; syncLength = pattern.length(); selected = pattern; }
         }
-        if (end < 0) {
+        int end;
+        if (mode.equals("SKIP")) {
+            if (start >= input.length()) return null;
+            end = patterns.length == 0 || syncStart == start ? start + Character.charCount(cp(start))
+                : syncStart < 0 ? input.length() : syncStart;
+        } else if (syncStart < 0) {
             if (noSync.equals("fail")) return null;
             end = noSync.equals("consumeToEof") ? input.length() : start;
-        } else if (consumeSync) end += length;
+        } else end = syncStart + (consumeSync ? syncLength : 0);
+        if (end <= start) return null;
         f.advance(end - start);
-        effect(new TokenScanner.Effect("error", "Recovered input", input.cpIndex(start), input.cpLength(start, end)));
+        var hints = Arrays.stream(failure.expected()).mapToObj(expected::get).sorted().toList();
+        var diagnostic = new Diagnostic("recovery", input.cpIndex(start), failure.farthest() < 0 ? input.cpIndex(start) : input.cpIndex(failure.farthest()),
+            hints, failure.deepestRule() < 0 ? null : ruleNames[failure.deepestRule()],
+            Arrays.stream(failure.ruleStack()).mapToObj(i -> ruleNames[i]).toList(), hints, "ERROR", input.cpLength(start, end), "recovery");
         String id = projection.equals("explicitRecipe") ? recipe : "#recovery";
-        return new Match(List.of(new Recipe(id, start, end, Map.of(), null)), List.of(), List.of(), List.of(), start, end, projection.equals("mappingFailure"));
+        Recipe marker = new Recipe(id, start, end, Map.of(), null);
+        var recovery = new RecoveryEvent(rule, mode, start, end, selected, syncStart, syncStart < 0 ? -1 : syncStart + syncLength, diagnostic, marker);
+        return new Match(List.of(marker), List.of(), List.of(), List.of(), start, end,
+            projection.equals("mappingFailure"), List.of(recovery));
     }
     public <N> ParseResult<N> result(Frame f, Match match, Map<String, String> catalogs) {
         boolean ok = match != null; String kind = ok ? "none" : "syntax"; int offset = -1;
@@ -483,7 +508,7 @@ public final class Session {
         if (!ok && offset < 0) offset = diagnostics.farthest() < 0 ? reached : diagnostics.farthest();
         var captures = new ArrayList<Capture>(); var lexical = new ArrayList<ParseResult.Lexical>();
         var catalog = new LinkedHashMap<String, List<Capture>>();
-        if (ok) {
+        if (ok || match != null && !match.recoveries().isEmpty()) {
             long occurrence = 0;
             for (var capture : match.captures()) {
                 var value = new Capture(occurrence, capture.site(), capture.name(), span(capture.value().start(), capture.value().end()), occurrence++);
@@ -500,8 +525,17 @@ public final class Session {
             kind.equals("trailing_input") ? List.of("end of input") : farthestExpected,
             diagnostics.deepestRule() < 0 ? null : ruleNames[diagnostics.deepestRule()],
             Arrays.stream(diagnostics.ruleStack()).mapToObj(i -> ruleNames[i]).toList(), farthestExpected);
+        var recoveries = new ArrayList<ParseResult.Recovery>();
+        if (match != null) for (RecoveryEvent recovery : match.recoveries()) {
+            var occurrences = new ArrayList<Long>();
+            for (int i = 0; i < match.captures().size(); i++)
+                if (match.captures().get(i).value().nodes().stream().anyMatch(n -> n == recovery.marker())) occurrences.add((long) i);
+            recoveries.add(new ParseResult.Recovery(recovery.rule(), recovery.mode(), span(recovery.start(), recovery.end()), recovery.pattern(),
+                span(recovery.start(), recovery.mode().equals("SKIP") || recovery.syncStart() < 0 ? recovery.end() : Math.min(recovery.end(), recovery.syncStart())),
+                recovery.syncStart() < 0 ? null : span(recovery.syncStart(), recovery.syncEnd()), occurrences, recovery.diagnostic()));
+        }
         var result = new ParseResult<N>(ok, input.cpIndex(f.c), input.cpIndex(f.m), Optional.empty(), Map.of(), captures, lexical,
-            new ParseResult.Scope(scope.allDeclarations(), scope.references(), scope.diagnostics(), scopeEvents), diagnostic, catalog);
+            new ParseResult.Scope(scope.allDeclarations(), scope.references(), scope.diagnostics(), scopeEvents), diagnostic, catalog, recoveries);
         syntax = result; return result;
     }
     private void trace(Trace trace, long parent, long[] counter, List<ParseResult.Lexical> out) {
@@ -523,16 +557,30 @@ public final class Session {
     public <T> T scalar(Recipe recipe, String field, Function<Value, T> conversion) {
         List<Value> values = recipe.fields().getOrDefault(field, List.of());
         if (values.isEmpty()) throw mapping(recipe.start(), recipe.end(), "Missing scalar capture: " + field, null);
-        return conversion.apply(values.getFirst());
+        T value = conversion.apply(values.getFirst());
+        if (value == null && !values.getFirst().nodes().isEmpty()) throw new RecoveredNodeMissing();
+        return value;
     }
     public <T> Optional<T> optional(Recipe recipe, String field, Function<Value, T> conversion) {
         List<Value> values = recipe.fields().getOrDefault(field, List.of());
         return values.isEmpty() ? Optional.empty() : Optional.ofNullable(conversion.apply(values.getFirst()));
     }
     public <T> List<T> list(Recipe recipe, String field, Function<Value, T> conversion) {
-        return recipe.fields().getOrDefault(field, List.of()).stream().map(conversion).toList();
+        return recipe.fields().getOrDefault(field, List.of()).stream().map(conversion).filter(java.util.Objects::nonNull).toList();
     }
     public MappingException mapping(int start, int end, String message, Throwable cause) { return new MappingException(syntax, span(start, end), message, cause); }
+    /** A missing recovered scalar omits its parent; optional/list callers absorb that absence. */
+    public static final class RecoveredNodeMissing extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        private RecoveredNodeMissing() { super(null, null, false, false); }
+    }
+    public void typeof(Recipe recipe, String ownName, Object own, String refName, Object referenced) {
+        if (own != null && referenced != null && !own.getClass().equals(referenced.getClass()))
+            throw mapping(recipe.start(), recipe.end(), "@typeof constraint violated: " + ownName
+                + " must be same type as " + refName + ", expected " + referenced.getClass().getSimpleName()
+                + " but got " + own.getClass().getSimpleName(), null);
+    }
+    public boolean hasBuilt(Recipe recipe) { return built.containsKey(recipe); }
     public Object built(Recipe recipe) { return built.get(recipe); }
-    public Object remember(Recipe recipe, Object object) { built.put(recipe, object); spans.put(object, span(recipe.start(), recipe.end())); return object; }
+    public Object remember(Recipe recipe, Object object) { built.put(recipe, object); if (object != null) spans.put(object, span(recipe.start(), recipe.end())); return object; }
 }

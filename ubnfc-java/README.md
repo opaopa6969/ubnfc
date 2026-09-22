@@ -31,7 +31,7 @@ java -cp target/ubnfc-java-0.1.0-SNAPSHOT.jar org.ubnfc.java.Main \
   生成された全ソースを `--release 21 -Xlint:all -Werror` でコンパイルする。
   一時領域は `mktemp -d` で確保し、テスト後に削除する。
 
-生成先には `{Grammar}Parser.java`, `{Grammar}AST.java`, `{Grammar}Result.java`,
+生成先には `{Grammar}Parser.java`, `{Grammar}AST.java`, `{Grammar}Evaluator.java`, `{Grammar}Result.java`,
 `api/*`, `internal/*`, `rt/*`, `driver/Driver.java` を配置する。通常の入口は
 `{Grammar}Parser.parse(CharSequence[, ParseOptions]) -> ParseResult<{Grammar}AST>`。
 `ParseOptions` で AST 構築、全消費、lexical 出力、memo、Extern scanner、`maxDepth` を指定できる。
@@ -134,7 +134,11 @@ JSON Lines の異常後の継続、任意の id、複数 grammar、scope イベ�
 | 診断 | 主 offset/expected と最遠位置/expected の分離、expected のソート、rule stack の再生、Not 成功時だけ子診断を破棄、不完全指数の失敗位置保持 |
 | Extern | logicalId → TokenScanner。5状態の ScanState、UTF-16 位置、任意の valueSpan/診断、順序付き効果を返す。保証のない scanner とその到達可能祖先は memo しない |
 | その他 | 統合済み import シンボル、catalog、構造付き lexical 出現、検証済みの直接左再帰 lowering 記録。実行するのは rewrittenBody |
-| recovery | SYNC/AUTO の解決済み同期文字列、consumeSync/noSyncAction、明示された ruleRef site。mappingFailure または capture 不要の explicitRecipe 投影 |
+| eval | 抽象 visitor、具象 variant dispatch、5種類の auto 既定実装。manual/abstractCallback/未知 kind は抽象 callback。DebugStrategy/StepCounterStrategy |
+| typeof | ownCapture/referencedCapture の site ID を同じ rule の mapping field へ解決し、mapping 時に runtime class 一致を検査。不一致は構文結果と位置を保持した MappingException |
+| recovery | SYNC/AUTO/SKIP、明示された ruleRef site、code point の進捗保証。D-018 の別表投影と回復1件につき recovery 診断1件。既存 mappingFailure/捕捉不要の explicitRecipe も維持 |
+| enum | IR の literal/宣言順/javaName を保持。重複名の後続を _2, _3, … で区別し、既存名を予約して衝突回避。fromText と mapping は同じ対応表 |
+| ERROR | transaction=once/none、到達位置で失敗し message を expected に一度だけ追加。memo 再生でも重複しない |
 
 認識のみでも capture と scope は取得できる。lexical は既定で無効。
 構造付き出現 ID は採用結果の materialize 時に振り直すため、memo 再生でも重複しない。
@@ -144,10 +148,10 @@ AST の位置表は IdentityHashMap により同値な record の別出現を保
 
 次の機能は推測で補わず `IllegalArgumentException` に機能名を含める。
 
-- `eval`, `typeof`, 版管理された `frontendTransform`。
+- 版管理された `frontendTransform`、具象型を必要とする auto eval の和型指定や不正な field 型/cardinality。
 - 未 lowering の直接左再帰、間接左再帰、lowering proof / rewrittenBody の不整合。
 - `precedenceClimbing`, `lexical.dfa`、Java fallback を許さない regex。
-- recovery の `legacySkip` / `legacyMarker`、capture を要求する recovery explicitRecipe。
+- capture を要求する recovery explicitRecipe、空同期文字列、参照先の不一致・重複した applicationSites。
 - ValueType 自体の `optional` / `list` 入れ子。通常の AstField/Capture.cardinality による Optional/List は対応する。
 - 対応しない execution transaction / childMode、delegate group や choice 等への trivia 挿入、repeat/separated の afterChild 挿入。
 - AST/recipe の型・cardinality 不整合、不正 Java 識別子、未解決・重複 ID、unsafe Extern を含む memo 指定、証明のない memo 省略。
@@ -178,12 +182,57 @@ prefix trie、trivia cache は読み込み可能だが、現在は先頭 code po
 | ubnf.ubnf fixture | 生成・警告なしコンパイル・認識・AST、annotations=[] / [RootAnnotation, MappingAnnotation] の golden | occurrence → GrammarAst の frontendTransform、IR byte 固定点 |
 | P4 fixture | 元 IR の拒否が Recipe conversion mismatch だけであること。報告された mismatch だけをメモリ上で補正後、inputState を保ったまま生成・コンパイル | front の fixture 修正、実 scanner を使う P4 全体の実行 |
 
+
+## M3 の契約と oracle 固定値
+
+`{Grammar}Evaluator<T>` は `eval(AST)`、型別の protected `eval*`、DebugStrategy を持つ。
+`binary_arithmetic` は左から fold（evalLeaf/applyBinary）、`variable_ref` は strip_prefix 除去後に
+resolveVariable、`conditional` は Boolean.TRUE または文字列 true を条件として片側だけ評価する。
+`passthrough` は AST 値を再帰評価し、それ以外はその値を返す。`literal` は値をそのまま返す。
+manual/未知種別/注釈なしの具象型は抽象 callback。和型の adapter は具象 variant に dispatch し、
+自動評価を和型に指定する IR は生成前に拒否する。driver の value は従来の数値 fold のままで、
+利用者の抽象 callback を勝手に実装しない。
+
+`ParseResult.recoveries()` は採用順に `ruleId, mode, span, syncPattern, skippedSpan, syncSpan,
+captureOccurrences, diagnostic` を返す。位置は code point、syncSpan は未検出時 null。
+span は回復開始から再開まで、skippedSpan は同期文字列より前の飛ばした範囲。
+`diagnostic` は `kind=recovery, severity=ERROR, origin=recovery, offset=span.start, length=span.length`。
+失敗試行の局所 expected/farthest を保持し、後続の失敗や不採用枝の診断で置き換えない。
+driver は同じ回復表を公開し、回復診断を trailing_input 等の終端診断より先に出力する。
+
+SYNC は同期文字列を消費し、未検出は失敗。AUTO は FOLLOW の直前、空なら `;` を消費して再開する。
+SKIP は FOLLOW 直前まで（未検出は EOF まで）、FOLLOW が空または開始位置なら1 code point を飛ばす。
+ゼロ前進・EOF での回復成功は禁止。root には一律適用せず applicationSites の rule 参照だけを包む。
+この点は D-018 文書の root 適用案より、本タスクの明示指示と IR schema 契約を優先している。
+
+legacyMarker は D-018 の recovery-projection/recovery-diagnostics として扱う。
+回復した typed node は作らず、list は省略、optional は空、必須 scalar が欠ける親は上へ欠損を伝播する。
+構築不能な root は ast=null、欠損自体では MappingException を出さない。正常 node の値・位置と
+回復を直接捕捉する capture は保持する。回復済み prefix の全消費失敗でも capture・回復表を公開し、
+oracle 規則どおり ast は null。失敗枝/先読みでは回復表を破棄し、memo hit では1回だけ再生する。
+
+| 対象 | 固定した値 |
+|---|---|
+| eval 7 corpus | oracle の AST/capture、eval* の abstract 属性。追加実行: `1+2=3`, `1+2+3=6`, `1?2:3=3`, literal/passthrough/manual/unknown の `7=7`, 変数 `x`。非 BMP prefix、和型 dispatch、条件の短絡も検証 |
+| typeof | `a:a`, `b:b`: C=M=3 と Pair(A,A)/Pair(B,B)。`a:b`, `b:a`: 構文成功 C=M=3、MappingException、expected A/B と got B/A。`a:`: 構文失敗 offset=2 |
+| recovery SYNC/AUTO | `bad;ok;`: C=M=7、Stmt[4,7]{value:ok} のみ、回復[0,4]と診断1件。AUTO の旧 C=M=6 を D-017/D-018 により修正 |
+| recovery 非 BMP | `😀;x`: prefix 成功 C=M=2、ast=null、capture[0,2]、recovery@0 と trailing_input@2。旧過剰消費を再現しない |
+| recovery root/SKIP | root `bad;` は失敗 C=M=0、`ok;` は成功。SKIP は生成可能にし `bad;ok;` を全消費、`bad` は C=M=3 と空 items。旧生成 API 不整合を再現しない |
+| ERROR | `a`: C=M=1 成功。`x`/空入力: C=M=0 失敗、offset=0、expected=["'a'","need a"]、hint は1件 |
+| enum | `on/off` は ON/OFF、未知値は fromText で例外。衝突 `on/ON` は ON/ON_2 として生成・mapping 成功。D-017 により旧コンパイル失敗を再現しない |
+
+`M3FeatureTest` / `M3RecoveryTest` は front 由来の16 IR、既存 eval-default/elements fixture、
+手製の境界 IR を生成→`--release 21 -Xlint:all -Werror` コンパイル→実行する。
+既存 oracle・divergences は読み取り専用。追加実行値は oracle の採取値と区別している。
+回復の nested scalar/optional/list、memo ON/OFF、Longest/先読み/失敗枝の復元、scope undo、
+破棄された数値 mapping、同じ ERROR の再訪も固定する。
+
 ## IR 契約で補足が必要な点
 
 1. `Execution` の各値と ExprNode の全組合せは schema では制限されない。tinycalc の group=delegate / optional=occurs を尊重し、実装した組合せだけ受け付ける。
 2. `MemoPlan.entries` を ExprId 単位で実行する。rule wrapper は scope/mapping も含め別名前空間のキーを使う。匿名式の局所診断には呼出元 rule を重複保存しない。
-3. recovery の `legacySkip` と `legacyMarker` は名前だけでは前進・型投影を一意に実装できないため拒否する。AUTO の FOLLOW 推測はせず resolvedSyncPatterns を使う。
-4. `ValueType.optional/list` と別欄の cardinality の二重指定、`typeof` の capture 名と site/occurrence の参照解決、frontendTransform の transformId 別仕様は未確定。該当部分は拒否する。
+3. recovery は通常 resolvedSyncPatterns を使う。現行 front の裸の auto/skip 注釈が SYNC に落ちる旧 IR は、legacyMarker に限り注釈から mode を復元し、式の継続位置から literal FOLLOW を固定点計算する。未知 token の同期文字列は推測しない。正常な明示 IR の mode は変更しない。
+4. `ValueType.optional/list` と別欄の cardinality の二重指定、frontendTransform の transformId 別仕様は未対応。typeof の ownCapture/referencedCapture は正規化 IR の capture site ID とし、rule-local の mapping field に解決する。
 5. Extern の5状態を ScanState で注入し、ValueSpan と Effect record を定義した。設計03 §6 の旧3引数 scanner 署名はこの API に合わせた更新が必要。
 6. 共有 runtime の Cursor.advance は C/M の両方に加算する。D-013 の consume は M=C なので、生成側の Session.Frame で5状態を実装する。Cursor クラス自体の API は維持する。
 7. Power の inline `'^'` も Operator.operatorRuleId は rule ID を必須とするため、fixture では trivia のない合成 PowOp rule を置く。
