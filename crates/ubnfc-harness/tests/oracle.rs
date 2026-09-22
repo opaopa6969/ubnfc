@@ -202,12 +202,20 @@ fn every_divergence_resolves_and_only_follow_spec_is_attached() {
             .count(),
         60
     );
+    // D-018 で undecided 15 件は名前付き契約（new-contract:*）に決定した。
+    assert_eq!(
+        entries
+            .iter()
+            .filter(|e| matches!(e.decision, Decision::NewContract(_)))
+            .count(),
+        15
+    );
     assert_eq!(
         entries
             .iter()
             .filter(|e| e.decision == Decision::Undecided)
             .count(),
-        15
+        0
     );
     let mut seen = BTreeSet::new();
     let mut case_ids = BTreeSet::new();
@@ -222,7 +230,7 @@ fn every_divergence_resolves_and_only_follow_spec_is_attached() {
         let case = file.cases.iter().find(|c| c.id == entry.case_id).unwrap();
         assert_eq!(
             case.known_divergences.contains(&entry.observation),
-            entry.decision == Decision::FollowSpec
+            entry.decision.is_resolved()
         );
     }
     assert_eq!(case_ids.len(), 29);
@@ -231,19 +239,20 @@ fn every_divergence_resolves_and_only_follow_spec_is_attached() {
         .flat_map(|f| &f.cases)
         .map(|c| c.known_divergences.len())
         .sum();
-    assert_eq!(attached, 60);
+    assert_eq!(attached, 75);
 
-    // 未決定の AST だけを変えても、他に既知登録があるという理由で免除しない。
+    // 登録されていない観測（recovery-sync/1 の consumed）を変えると、他に既知登録があっても免除しない。
     let case = corpus()
         .iter()
         .flat_map(|f| &f.cases)
         .find(|c| c.id == "recovery-sync/1")
         .unwrap();
+    assert!(!case.known_divergences.contains(&Observation::Consumed));
     let mut actual = case.expect.clone();
-    let Expectation::Oracle { ast, .. } = &mut actual else {
+    let Expectation::Oracle { consumed, .. } = &mut actual else {
         panic!()
     };
-    *ast = None;
+    *consumed = consumed.map(|c| c + 1).or(Some(1));
     assert!(matches!(
         compare(&case.expect, &actual, &case.known_divergences),
         Verdict::Fail(_)

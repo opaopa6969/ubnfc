@@ -45,22 +45,22 @@
     "file": "comment-line.json",
     "caseId": "comment-line/3",
     "observation": "accepted",
-    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-line.json",
     "caseId": "comment-line/3",
     "observation": "ast",
-    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-line.json",
     "caseId": "comment-line/3",
     "observation": "consumed",
-    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-line.json",
@@ -73,43 +73,43 @@
     "file": "comment-line.json",
     "caseId": "comment-line/3",
     "observation": "matched",
-    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: # 設定の反映は D-017 で決定済みだが、@whitespace が無いとき line comment が改行も消費する契約は不明。a#x\nb の受理・最終 cursor・AST を確定しない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-whitespace.json",
     "caseId": "comment-whitespace/2",
     "observation": "accepted",
-    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-whitespace.json",
     "caseId": "comment-whitespace/2",
     "observation": "ast",
-    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-whitespace.json",
     "caseId": "comment-whitespace/2",
     "observation": "consumed",
-    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-whitespace.json",
     "caseId": "comment-whitespace/2",
     "observation": "diagnostics",
-    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-whitespace.json",
     "caseId": "comment-whitespace/2",
     "observation": "matched",
-    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 9: line='#' でも // を受理する。javaStyle 自体が既定コメントを有効にするのか、明示 @comment がその集合を置換するのか、guide と実装依存の記述だけでは確定できない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:comment-trivia"
   },
   {
     "file": "comment-whitespace.json",
@@ -213,8 +213,8 @@
     "file": "import-cycle.json",
     "caseId": "import-cycle/1",
     "observation": "generation",
-    "reason": "README.md#疑義 6: CLI exit 0 は疑義だが、採取 stage=generation_failed は API が循環を正しく拒否した結果。CLI 経路の是正と API の失敗 oracle を同じ generation 観測で免除すべきか未確定。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 6: CLI exit 0 は疑義だが、採取 stage=generation_failed は API が循環を正しく拒否した結果。CLI 経路の是正と API の失敗 oracle を同じ generation 観測で免除すべきか未確定。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:import-resolution"
   },
   {
     "file": "import-two-level.json",
@@ -262,8 +262,8 @@
     "file": "recovery-auto.json",
     "caseId": "recovery-auto/1",
     "observation": "ast",
-    "reason": "README.md#疑義 4・11: AUTO 修正で後続 Stmt と capture は変わるが、回復領域を含む typed AST の形は設計 §3.10 で独立契約。形を推測して観測群全体を免除しない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 4・11: AUTO 修正で後続 Stmt と capture は変わるが、回復領域を含む typed AST の形は設計 §3.10 で独立契約。形を推測して観測群全体を免除しない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:recovery-projection"
   },
   {
     "file": "recovery-auto.json",
@@ -297,8 +297,8 @@
     "file": "recovery-root.json",
     "caseId": "recovery-root/1",
     "observation": "ast",
-    "reason": "README.md#疑義 3・11: root recovery の適用自体は D-017 で決定済みだが、回復した root を typed AST/capture にどう投影するかは設計 §3.10 の独立契約で未確定。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 3・11: root recovery の適用自体は D-017 で決定済みだが、回復した root を typed AST/capture にどう投影するかは設計 §3.10 の独立契約で未確定。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:recovery-projection"
   },
   {
     "file": "recovery-root.json",
@@ -339,15 +339,15 @@
     "file": "recovery-sync.json",
     "caseId": "recovery-sync/1",
     "observation": "ast",
-    "reason": "README.md#疑義 11（/3 は 2 も該当）: 回復 capture があるのに items に回復領域がない。設計 §3.10 は typed AST への投影を独立契約としており、error node・省略・別表のどれを正とするか未確定。非 BMP 修正に伴う capture/AST の変化も同じ観測群なので、包括的には免除しない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 11（/3 は 2 も該当）: 回復 capture があるのに items に回復領域がない。設計 §3.10 は typed AST への投影を独立契約としており、error node・省略・別表のどれを正とするか未確定。非 BMP 修正に伴う capture/AST の変化も同じ観測群なので、包括的には免除しない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:recovery-projection"
   },
   {
     "file": "recovery-sync.json",
     "caseId": "recovery-sync/1",
     "observation": "diagnostics",
-    "reason": "README.md#疑義 11: 回復が成功した入力に診断がないが、公開 recovery 診断の種類・offset・必須性は仕様から確定できない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 11: 回復が成功した入力に診断がないが、公開 recovery 診断の種類・offset・必須性は仕様から確定できない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:recovery-diagnostics"
   },
   {
     "file": "recovery-sync.json",
@@ -360,8 +360,8 @@
     "file": "recovery-sync.json",
     "caseId": "recovery-sync/3",
     "observation": "ast",
-    "reason": "README.md#疑義 11（/3 は 2 も該当）: 回復 capture があるのに items に回復領域がない。設計 §3.10 は typed AST への投影を独立契約としており、error node・省略・別表のどれを正とするか未確定。非 BMP 修正に伴う capture/AST の変化も同じ観測群なので、包括的には免除しない。",
-    "decision": "undecided"
+    "reason": "README.md#疑義 11（/3 は 2 も該当）: 回復 capture があるのに items に回復領域がない。設計 §3.10 は typed AST への投影を独立契約としており、error node・省略・別表のどれを正とするか未確定。非 BMP 修正に伴う capture/AST の変化も同じ観測群なので、包括的には免除しない。 決定: docs/decisions/D-018-undecided-divergences.md",
+    "decision": "new-contract:recovery-projection"
   },
   {
     "file": "recovery-sync.json",

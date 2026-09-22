@@ -23,11 +23,45 @@ pub enum Observation {
     Generation,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+/// `follow-spec` / `undecided` / `new-contract:<名>`（D-018 で定義した名前付き契約）。
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Decision {
     FollowSpec,
     Undecided,
+    NewContract(String),
+}
+
+impl Decision {
+    /// 既知の乖離として比較を免除するか（undecided だけが免除されない）。
+    pub fn is_resolved(&self) -> bool {
+        !matches!(self, Decision::Undecided)
+    }
+}
+
+impl Serialize for Decision {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Decision::FollowSpec => s.serialize_str("follow-spec"),
+            Decision::Undecided => s.serialize_str("undecided"),
+            Decision::NewContract(name) => s.serialize_str(&format!("new-contract:{name}")),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for Decision {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let text = String::deserialize(d)?;
+        match text.as_str() {
+            "follow-spec" => Ok(Decision::FollowSpec),
+            "undecided" => Ok(Decision::Undecided),
+            other => match other.strip_prefix("new-contract:") {
+                Some(name) if !name.is_empty() => Ok(Decision::NewContract(name.to_string())),
+                _ => Err(serde::de::Error::custom(format!(
+                    "unknown decision: {other} (expected follow-spec | undecided | new-contract:<name>)"
+                ))),
+            },
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -82,7 +116,7 @@ pub fn apply(path: &Path, files: &mut [CorpusFile]) -> Result<(), LoadError> {
                 format!("乖離の file/caseId が一意に存在しません: {entry:?}"),
             ));
         };
-        if entry.decision == Decision::FollowSpec {
+        if entry.decision.is_resolved() {
             resolved.push((*f, *c, entry.observation));
         }
     }

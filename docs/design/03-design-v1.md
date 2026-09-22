@@ -242,4 +242,5 @@ Rust `trait TokenScanner`。`ScanResult { consumedEnd, matchedEnd, valueSpan, di
 | D-014 診断の互換範囲 | 決定 | 主 offset / farthest / 言語別 hints / deepest を分離。未検証部分は独立 oracle を追加 |
 | D-015 suffix 併存の意味 | 決定 | 互換段階は既存の優先採用（postfix → bounded → separated の 1 つ） |
 | D-017 既存バグとの互換方針 | 決定 | `corpus/oracle/README.md` の疑義（import alias の生成不正、recovery SKIP の API 不整合、enum mapper 型不一致、root の recovery 無効、AUTO の過剰消費、REGEX/recovery の非 BMP 過剰消費、comment 設定未反映、predictive 空入力 NPE 等）は**再現しない**。仕様（specs/*.md、guide）に従い、oracle JSON のその値は `expectedDivergence` として harness で「既知の乖離」扱いにする。乖離は `docs/compat-matrix.md` に追記 |
-| D-016 左再帰書換えの対象形 | 未着手 | M2 で定義（nullable suffix、代替順、capture/trivia/scope/recovery の投影）。未対応形は明示拒否 |
+| D-018 未決乖離 15 件 | 決定 | 名前付き新契約 `recovery-projection` / `recovery-diagnostics` / `comment-trivia` / `import-resolution`（`docs/decisions/D-018-undecided-divergences.md`）。harness は `new-contract:<名>` を既知乖離として扱う |
+| D-016 左再帰書換えの対象形 | 決定（lowering 実装） | 対象は `E ::= E Op Base \| Base` で参照先にも capture/mapping/scope/recovery が無く演算子側から自身へ戻らない形。他は明示拒否 | M2 で定義（nullable suffix、代替順、capture/trivia/scope/recovery の投影）。未対応形は明示拒否 |
