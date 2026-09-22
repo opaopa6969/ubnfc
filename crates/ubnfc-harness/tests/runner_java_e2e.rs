@@ -242,11 +242,19 @@ fn ir_build_errors_are_explicit() {
         backend: Backend::Rust,
         build_dir: scratch.0.clone(),
     };
+    // Rust 経路は実装済み。backend が食い違う Artifact は Rust runner でも拒否する。
+    let java_artifact = match &mismatch {
+        Artifact::FromIr { ir_path, .. } => Artifact::FromIr {
+            ir_path: ir_path.clone(),
+            backend: Backend::Java,
+        },
+        other => other.clone(),
+    };
     assert!(rust
-        .build(mismatch)
+        .build(java_artifact)
         .unwrap_err()
         .to_string()
-        .contains("Java backend のみ"));
+        .contains("一致しません"));
     let bad = scratch.0.join("bad.ir.json");
     std::fs::write(&bad, "{}").unwrap();
     let error = runner

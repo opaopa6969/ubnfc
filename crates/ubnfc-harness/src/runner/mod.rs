@@ -1,6 +1,7 @@
 //! オフライン build と JSON Lines driver。実行値を oracle から補完しない。
 mod comparison;
 mod report;
+mod rust;
 pub use comparison::{compare, unobserved};
 pub use report::Report;
 
@@ -241,7 +242,7 @@ pub struct Executable {
     pub grammars: BTreeMap<String, PathBuf>,
 }
 
-/// 既存ソース、または生成する Grammar IR。FromIr は現在 Java のみ。
+/// 既存ソース、または生成する Grammar IR。FromIr は Java / Rust の生成器を呼ぶ。
 #[derive(Clone, Debug)]
 pub enum Artifact {
     Prebuilt { dir: PathBuf },
@@ -286,8 +287,8 @@ impl Runner {
                 if backend != self.backend {
                     return Err(Error("Artifact と Runner の backend が一致しません".into()));
                 }
-                if backend != Backend::Java {
-                    return Err(Error("FromIr は Java backend のみ対応しています".into()));
+                if backend == Backend::Rust {
+                    return rust::build(&ir_path, &build_dir);
                 }
                 let ir_path = ir_path.canonicalize()?;
                 let default_jar = Path::new(env!("CARGO_MANIFEST_DIR"))

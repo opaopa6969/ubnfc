@@ -1,6 +1,6 @@
 // transactional-scopes.md / generated-scope-effects.md の store 層の契約。
 // capture 選択・trim・注釈 lowering は生成側の責務で、末尾のケースはその呼出し列を再現する。
-use ubnfc_rt_template::cursor::Cursor;
+use ubnfc_rt_template::cursor::State;
 use ubnfc_rt_template::diag::Diagnostics;
 use ubnfc_rt_template::scope::{Decl, ScopeStore, Severity};
 
@@ -229,18 +229,19 @@ fn first_mutation_inside_transaction_can_restore_empty_baseline() {
 fn lookahead_restores_semantics_and_keeps_independent_matched_cursor() {
     let mut store = ScopeStore::new();
     let checkpoint = store.checkpoint();
-    let mut cursor = Cursor::default();
+    let mut cursor = State::default();
     store.enter();
     store.declare("temporary", 0);
     assert!(store.is_declared("temporary")); // 先読み内部の後続の子には見える。
-    cursor.advance_matched_only(4);
+    cursor.advance::<true>(4);
     store.restore(checkpoint);
     assert!(!store.is_declared("temporary"));
     assert_eq!(
         cursor,
-        Cursor {
+        State {
             consumed: 0,
-            matched: 4
+            matched: 4,
+            ..State::default()
         }
     );
 }
@@ -251,10 +252,10 @@ fn syntax_failure_survives_semantic_rollback() {
     let mut syntax = Diagnostics::new();
     let checkpoint = store.checkpoint();
     store.add_diagnostic("speculative", 3, 1, Severity::Warning);
-    syntax.fail_at(3, 1);
+    let failure = syntax.fail(3, "number");
     store.restore(checkpoint);
     assert!(store.diagnostics().is_empty());
-    assert_eq!(syntax.expected, [1]);
+    assert_eq!(syntax.summary(failure).unwrap().1, ["number"]);
 }
 
 #[test]

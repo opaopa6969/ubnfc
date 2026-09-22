@@ -4,13 +4,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -34,13 +34,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -64,13 +64,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -94,13 +94,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -124,13 +124,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -154,13 +154,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -184,13 +184,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -214,13 +214,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/0/tokenRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/0/tokenRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -244,13 +244,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextBase/body/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:TextBase/body/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -274,13 +274,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextOp/body/literal",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:TextOp/body/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -304,13 +304,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -334,13 +334,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -364,13 +364,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -394,13 +394,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -424,13 +424,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -454,13 +454,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -484,13 +484,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -514,13 +514,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -544,13 +544,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/0/tokenRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/0/tokenRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -574,13 +574,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedBase/body/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedBase/body/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -604,13 +604,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedOp/body/literal",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedOp/body/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -634,13 +634,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -664,13 +664,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -694,13 +694,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -724,13 +724,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -754,13 +754,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -784,13 +784,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -814,13 +814,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -844,13 +844,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/optional",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/optional",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -874,13 +874,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/0/literal",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/0/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -904,13 +904,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -934,13 +934,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/0/tokenRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/0/tokenRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -964,13 +964,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeBase/body/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeBase/body/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -994,13 +994,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeOp/body/literal",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeOp/body/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1024,13 +1024,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1054,13 +1054,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1084,13 +1084,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1114,13 +1114,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1144,13 +1144,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1174,13 +1174,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1204,13 +1204,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1234,13 +1234,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1264,13 +1264,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/0/tokenRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/0/tokenRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1294,13 +1294,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/choice",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1324,13 +1324,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/0/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1354,13 +1354,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1384,13 +1384,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/0/literal",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/0/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1414,13 +1414,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/1/ruleRef",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1444,13 +1444,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/2/literal",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/2/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1474,13 +1474,13 @@
       {
         "cursorTransition": {
           "consumedMode": "advance",
-          "failure": "contextual",
+          "failure": "restore",
           "flagEffect": "setFalse",
           "matchedMode": "advance",
           "matchedOnConsume": "resetToConsumed"
         },
         "effects": [],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedOp/body/literal",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedOp/body/literal",
         "mayStart": {
           "certainty": "unknown",
           "eof": true,
@@ -1508,7 +1508,7 @@
         "followSyncPatterns": null,
         "leftRecursion": "none",
         "progressProven": true,
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "sccId": "scc:0"
       },
       {
@@ -1623,7 +1623,7 @@
         "memoPolicy": "allEligible",
         "recursive": true,
         "ruleIds": [
-          "Power::TextExpr"
+          "Power::Expr"
         ]
       },
       {
@@ -1744,7 +1744,7 @@
   "analysisVersion": "ubnfc-analysis.v1-draft1",
   "entry": {
     "grammarId": "grammar:Power",
-    "ruleId": "Power::TextExpr"
+    "ruleId": "Power::Expr"
   },
   "grammarUnits": [
     {
@@ -1760,7 +1760,7 @@
         "whitespace": "javaStyle"
       },
       "source": {
-        "end": 2072,
+        "end": 2064,
         "sourceId": "fixtures/power.ubnf",
         "start": 0
       },
@@ -1772,10 +1772,10 @@
     "choices": [
       {
         "candidateOrder": [
-          "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq",
-          "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef"
+          "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq",
+          "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef"
         ],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -1783,10 +1783,10 @@
       },
       {
         "candidateOrder": [
-          "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq",
-          "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef"
+          "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq",
+          "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef"
         ],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -1794,10 +1794,10 @@
       },
       {
         "candidateOrder": [
-          "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq",
-          "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef"
+          "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq",
+          "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef"
         ],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -1805,10 +1805,10 @@
       },
       {
         "candidateOrder": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq",
-          "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef"
+          "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq",
+          "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef"
         ],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -1816,10 +1816,10 @@
       },
       {
         "candidateOrder": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/0/ruleRef",
-          "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq"
+          "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/0/ruleRef",
+          "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq"
         ],
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/choice",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/choice",
         "fallback": "none",
         "proof": null,
         "strategy": "ordered",
@@ -1838,350 +1838,350 @@
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/choice",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/0/tokenRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/0/tokenRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextBase/body/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:TextBase/body/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:TextOp/body/literal",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:TextOp/body/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/choice",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/0/tokenRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/0/tokenRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedBase/body/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedBase/body/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:MappedOp/body/literal",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:MappedOp/body/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/choice",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/optional",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/optional",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/0/literal",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/0/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/0/tokenRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/0/tokenRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeBase/body/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeBase/body/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeOp/body/literal",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeOp/body/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/choice",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/0/tokenRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/0/tokenRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/choice",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/choice",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/0/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/0/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/0/literal",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/0/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/1/ruleRef",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/1/ruleRef",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/2/literal",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/2/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         },
         {
           "cacheFailure": true,
           "cacheSuccess": true,
-          "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedOp/body/literal",
+          "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedOp/body/literal",
           "omissionProof": null,
           "reason": "defaultSafe"
         }
@@ -2210,20 +2210,20 @@
     "operators": [
       {
         "boundaryExprIds": [
-          "expr:fixtures/power.ubnf:0:2072:TextExpr/body/choice"
+          "expr:fixtures/power.ubnf:0:2064:Expr/body/choice"
         ],
         "liftRecipeIds": [
-          "recipe:TextExpr"
+          "recipe:Expr"
         ],
         "proof": null,
         "ruleIds": [
-          "Power::TextExpr"
+          "Power::Expr"
         ],
         "strategy": "tierFunctions"
       },
       {
         "boundaryExprIds": [
-          "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/choice"
+          "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/choice"
         ],
         "liftRecipeIds": [
           "recipe:MappedExpr"
@@ -2236,7 +2236,7 @@
       },
       {
         "boundaryExprIds": [
-          "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/choice"
+          "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/choice"
         ],
         "liftRecipeIds": [
           "recipe:UnicodeExpr"
@@ -2249,7 +2249,7 @@
       },
       {
         "boundaryExprIds": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/choice"
+          "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/choice"
         ],
         "liftRecipeIds": [
           "recipe:GroupedExpr"
@@ -2261,7 +2261,7 @@
         "strategy": "tierFunctions"
       }
     ],
-    "profile": "conservative",
+    "profile": "optimized",
     "triviaCache": {
       "enabled": false,
       "key": [
@@ -2362,11 +2362,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
-        "ruleId": "Power::TextExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef/capture/0",
+        "ruleId": "Power::Expr",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2377,11 +2377,11 @@
       {
         "cardinality": "list",
         "conversion": "text",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef",
         "name": "op",
         "occurrenceOrder": "completionInnerBeforeOuter",
-        "ruleId": "Power::TextExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef/capture/0",
+        "ruleId": "Power::Expr",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2391,11 +2391,11 @@
       {
         "cardinality": "list",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef",
         "name": "right",
         "occurrenceOrder": "completionInnerBeforeOuter",
-        "ruleId": "Power::TextExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef/capture/0",
+        "ruleId": "Power::Expr",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2406,11 +2406,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
-        "ruleId": "Power::TextExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef/capture/0",
+        "ruleId": "Power::Expr",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2421,11 +2421,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::MappedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2436,11 +2436,11 @@
       {
         "cardinality": "list",
         "conversion": "text",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef",
         "name": "op",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::MappedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2450,11 +2450,11 @@
       {
         "cardinality": "list",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef",
         "name": "right",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::MappedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2465,11 +2465,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::MappedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2480,11 +2480,11 @@
       {
         "cardinality": "scalar",
         "conversion": "text",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq",
         "name": "value",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::MappedAtom",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2494,11 +2494,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::UnicodeExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2509,11 +2509,11 @@
       {
         "cardinality": "list",
         "conversion": "text",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef",
         "name": "op",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::UnicodeExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2523,11 +2523,11 @@
       {
         "cardinality": "list",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef",
         "name": "right",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::UnicodeExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2538,11 +2538,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::UnicodeExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2553,11 +2553,11 @@
       {
         "cardinality": "scalar",
         "conversion": "text",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq",
         "name": "value",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::UnicodeAtom",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2567,11 +2567,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::GroupedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2582,11 +2582,11 @@
       {
         "cardinality": "list",
         "conversion": "text",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef",
         "name": "op",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::GroupedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2596,11 +2596,11 @@
       {
         "cardinality": "list",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef",
         "name": "right",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::GroupedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2611,11 +2611,11 @@
       {
         "cardinality": "scalar",
         "conversion": "node",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef",
         "name": "left",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::GroupedExpr",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2626,11 +2626,11 @@
       {
         "cardinality": "scalar",
         "conversion": "text",
-        "exprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq",
+        "exprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq",
         "name": "value",
         "occurrenceOrder": "completionInnerBeforeOuter",
         "ruleId": "Power::GroupedAtom",
-        "siteId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq/capture/0",
+        "siteId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq/capture/0",
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
@@ -2715,19 +2715,19 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/choice",
+        "id": "expr:fixtures/power.ubnf:0:2064:Expr/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq",
-            "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq",
+            "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef"
           ],
           "kind": "choice",
           "selection": "ordered",
           "tieBreak": "declarationOrder"
         },
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -2742,25 +2742,25 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef"
           ],
           "kind": "seq"
         },
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -2770,21 +2770,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::TextBase"
         },
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -2794,21 +2794,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::TextOp"
         },
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -2818,21 +2818,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef",
         "node": {
           "kind": "ruleRef",
-          "symbolId": "Power::TextExpr"
+          "symbolId": "Power::Expr"
         },
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -2842,14 +2842,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::TextBase"
         },
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -2864,16 +2864,16 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:TextAtom/body/0/tokenRef"
+            "expr:fixtures/power.ubnf:0:2064:TextAtom/body/0/tokenRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::TextAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -2888,14 +2888,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/0/tokenRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/0/tokenRef",
         "node": {
           "kind": "tokenRef",
           "symbolId": "Power::NUMBER"
         },
         "ruleId": "Power::TextAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -2910,14 +2910,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextBase/body/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:TextBase/body/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::TextAtom"
         },
         "ruleId": "Power::TextBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -2932,7 +2932,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:TextOp/body/literal",
+        "id": "expr:fixtures/power.ubnf:0:2064:TextOp/body/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -2941,7 +2941,7 @@
         },
         "ruleId": "Power::TextOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -2956,11 +2956,11 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/choice",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq",
-            "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq",
+            "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef"
           ],
           "kind": "choice",
           "selection": "ordered",
@@ -2968,7 +2968,7 @@
         },
         "ruleId": "Power::MappedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -2983,25 +2983,25 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::MappedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3011,21 +3011,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::MappedBase"
         },
         "ruleId": "Power::MappedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3035,21 +3035,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::MappedOp"
         },
         "ruleId": "Power::MappedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3059,21 +3059,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::MappedExpr"
         },
         "ruleId": "Power::MappedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3083,14 +3083,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::MappedBase"
         },
         "ruleId": "Power::MappedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3105,23 +3105,23 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq"
+            "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::MappedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3131,16 +3131,16 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/0/tokenRef"
+            "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/0/tokenRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::MappedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3155,14 +3155,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/0/tokenRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/0/tokenRef",
         "node": {
           "kind": "tokenRef",
           "symbolId": "Power::NUMBER"
         },
         "ruleId": "Power::MappedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3177,14 +3177,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedBase/body/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedBase/body/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::MappedAtom"
         },
         "ruleId": "Power::MappedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3199,7 +3199,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:MappedOp/body/literal",
+        "id": "expr:fixtures/power.ubnf:0:2064:MappedOp/body/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -3208,7 +3208,7 @@
         },
         "ruleId": "Power::MappedOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3223,11 +3223,11 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/choice",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq",
-            "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq",
+            "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef"
           ],
           "kind": "choice",
           "selection": "ordered",
@@ -3235,7 +3235,7 @@
         },
         "ruleId": "Power::UnicodeExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3250,25 +3250,25 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::UnicodeExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3278,21 +3278,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::UnicodeBase"
         },
         "ruleId": "Power::UnicodeExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3302,21 +3302,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::UnicodeOp"
         },
         "ruleId": "Power::UnicodeExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3326,21 +3326,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::UnicodeExpr"
         },
         "ruleId": "Power::UnicodeExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3350,14 +3350,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::UnicodeBase"
         },
         "ruleId": "Power::UnicodeExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3372,17 +3372,17 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/optional",
-            "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq"
+            "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/optional",
+            "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::UnicodeAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3397,14 +3397,14 @@
           "primitiveProfile": null,
           "transaction": "occurs"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/optional",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/optional",
         "node": {
-          "child": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/0/literal",
+          "child": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/0/literal",
           "kind": "optional"
         },
         "ruleId": "Power::UnicodeAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3419,7 +3419,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/0/0/literal",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/0/0/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -3428,14 +3428,14 @@
         },
         "ruleId": "Power::UnicodeAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3445,16 +3445,16 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/0/tokenRef"
+            "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/0/tokenRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::UnicodeAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3469,14 +3469,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/0/tokenRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/0/tokenRef",
         "node": {
           "kind": "tokenRef",
           "symbolId": "Power::NUMBER"
         },
         "ruleId": "Power::UnicodeAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3491,14 +3491,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeBase/body/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeBase/body/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::UnicodeAtom"
         },
         "ruleId": "Power::UnicodeBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3513,7 +3513,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:UnicodeOp/body/literal",
+        "id": "expr:fixtures/power.ubnf:0:2064:UnicodeOp/body/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -3522,7 +3522,7 @@
         },
         "ruleId": "Power::UnicodeOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3537,11 +3537,11 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/choice",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq",
-            "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq",
+            "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef"
           ],
           "kind": "choice",
           "selection": "ordered",
@@ -3549,7 +3549,7 @@
         },
         "ruleId": "Power::GroupedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3564,25 +3564,25 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef"
+            "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::GroupedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3592,21 +3592,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::GroupedBase"
         },
         "ruleId": "Power::GroupedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3616,21 +3616,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::GroupedOp"
         },
         "ruleId": "Power::GroupedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3640,21 +3640,21 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::GroupedExpr"
         },
         "ruleId": "Power::GroupedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3664,14 +3664,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::GroupedBase"
         },
         "ruleId": "Power::GroupedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3686,23 +3686,23 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq"
+            "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::GroupedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
       },
       {
         "captureSiteIds": [
-          "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq/capture/0"
+          "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq/capture/0"
         ],
         "diagnosticLabel": null,
         "execution": {
@@ -3712,16 +3712,16 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/0/tokenRef"
+            "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/0/tokenRef"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::GroupedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3736,14 +3736,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/0/tokenRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/0/tokenRef",
         "node": {
           "kind": "tokenRef",
           "symbolId": "Power::NUMBER"
         },
         "ruleId": "Power::GroupedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3758,11 +3758,11 @@
           "primitiveProfile": null,
           "transaction": "perAlternative"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/choice",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/choice",
         "node": {
           "alternatives": [
-            "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/0/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq"
+            "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/0/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq"
           ],
           "kind": "choice",
           "selection": "ordered",
@@ -3770,7 +3770,7 @@
         },
         "ruleId": "Power::GroupedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3785,14 +3785,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/0/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/0/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::GroupedAtom"
         },
         "ruleId": "Power::GroupedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3807,18 +3807,18 @@
           "primitiveProfile": null,
           "transaction": "once"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq",
         "node": {
           "items": [
-            "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/0/literal",
-            "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/1/ruleRef",
-            "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/2/literal"
+            "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/0/literal",
+            "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/1/ruleRef",
+            "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/2/literal"
           ],
           "kind": "seq"
         },
         "ruleId": "Power::GroupedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3833,7 +3833,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/0/literal",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/0/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -3842,7 +3842,7 @@
         },
         "ruleId": "Power::GroupedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3857,14 +3857,14 @@
           "primitiveProfile": null,
           "transaction": "delegate"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/1/ruleRef",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/1/ruleRef",
         "node": {
           "kind": "ruleRef",
           "symbolId": "Power::GroupedExpr"
         },
         "ruleId": "Power::GroupedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3879,7 +3879,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/2/literal",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/2/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -3888,7 +3888,7 @@
         },
         "ruleId": "Power::GroupedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3903,7 +3903,7 @@
           "primitiveProfile": "legacyWord",
           "transaction": "none"
         },
-        "id": "expr:fixtures/power.ubnf:0:2072:GroupedOp/body/literal",
+        "id": "expr:fixtures/power.ubnf:0:2064:GroupedOp/body/literal",
         "node": {
           "caseSensitive": true,
           "kind": "literal",
@@ -3912,7 +3912,7 @@
         },
         "ruleId": "Power::GroupedOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         }
@@ -3927,8 +3927,8 @@
             "conversion": "node",
             "field": "left",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/0/ruleRef/capture/0",
-              "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:Expr/body/0/0/ruleRef/capture/0",
+              "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef/capture/0"
             ]
           },
           {
@@ -3936,7 +3936,7 @@
             "conversion": "text",
             "field": "op",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef/capture/0"
             ]
           },
           {
@@ -3944,17 +3944,17 @@
             "conversion": "node",
             "field": "right",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef/capture/0"
             ]
           }
         ],
-        "id": "recipe:TextExpr",
+        "id": "recipe:Expr",
         "kind": "assocLists",
         "leafFallback": null,
         "onFailure": "mappingFailure",
         "phase": "selectedMapping",
         "resultTypeId": "Power",
-        "ruleId": "Power::TextExpr",
+        "ruleId": "Power::Expr",
         "transformId": null
       },
       {
@@ -3964,8 +3964,8 @@
             "conversion": "node",
             "field": "left",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/0/ruleRef/capture/0",
-              "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/0/ruleRef/capture/0",
+              "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef/capture/0"
             ]
           },
           {
@@ -3973,7 +3973,7 @@
             "conversion": "text",
             "field": "op",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef/capture/0"
             ]
           },
           {
@@ -3981,7 +3981,7 @@
             "conversion": "node",
             "field": "right",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef/capture/0"
             ]
           }
         ],
@@ -4001,7 +4001,7 @@
             "conversion": "text",
             "field": "value",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq/capture/0"
             ]
           }
         ],
@@ -4021,8 +4021,8 @@
             "conversion": "node",
             "field": "left",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/0/ruleRef/capture/0",
-              "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/0/ruleRef/capture/0",
+              "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef/capture/0"
             ]
           },
           {
@@ -4030,7 +4030,7 @@
             "conversion": "text",
             "field": "op",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef/capture/0"
             ]
           },
           {
@@ -4038,7 +4038,7 @@
             "conversion": "node",
             "field": "right",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef/capture/0"
             ]
           }
         ],
@@ -4058,7 +4058,7 @@
             "conversion": "text",
             "field": "value",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq/capture/0"
             ]
           }
         ],
@@ -4078,8 +4078,8 @@
             "conversion": "node",
             "field": "left",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/0/ruleRef/capture/0",
-              "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/0/ruleRef/capture/0",
+              "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef/capture/0"
             ]
           },
           {
@@ -4087,7 +4087,7 @@
             "conversion": "text",
             "field": "op",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef/capture/0"
             ]
           },
           {
@@ -4095,7 +4095,7 @@
             "conversion": "node",
             "field": "right",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef/capture/0"
             ]
           }
         ],
@@ -4115,7 +4115,7 @@
             "conversion": "text",
             "field": "value",
             "siteIds": [
-              "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq/capture/0"
+              "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq/capture/0"
             ]
           }
         ],
@@ -4133,7 +4133,7 @@
     "rules": [
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/choice",
+        "body": "expr:fixtures/power.ubnf:0:2064:Expr/body/choice",
         "eval": null,
         "mappingParams": [
           "left",
@@ -4145,19 +4145,19 @@
           "associativity": "right",
           "baseRuleId": "Power::TextBase",
           "canonicalForm": "baseOpSelfOrBase",
-          "leftSiteId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/1/ruleRef/capture/0",
-          "opSiteId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/1/ruleRef/capture/0",
+          "leftSiteId": "expr:fixtures/power.ubnf:0:2064:Expr/body/1/ruleRef/capture/0",
+          "opSiteId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/1/ruleRef/capture/0",
           "operatorRuleId": "Power::TextOp",
           "precedence": 10,
-          "rightSiteId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/2/ruleRef/capture/0"
+          "rightSiteId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/2/ruleRef/capture/0"
         },
         "skip": false,
-        "symbolId": "Power::TextExpr",
+        "symbolId": "Power::Expr",
         "triviaPolicyId": "trivia:javaStyle"
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/seq",
+        "body": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/seq",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4168,7 +4168,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:TextBase/body/ruleRef",
+        "body": "expr:fixtures/power.ubnf:0:2064:TextBase/body/ruleRef",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4179,7 +4179,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:TextOp/body/literal",
+        "body": "expr:fixtures/power.ubnf:0:2064:TextOp/body/literal",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4190,7 +4190,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/choice",
+        "body": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/choice",
         "eval": null,
         "mappingParams": [
           "left",
@@ -4202,11 +4202,11 @@
           "associativity": "right",
           "baseRuleId": "Power::MappedBase",
           "canonicalForm": "baseOpSelfOrBase",
-          "leftSiteId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/1/ruleRef/capture/0",
-          "opSiteId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/1/ruleRef/capture/0",
+          "leftSiteId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/1/ruleRef/capture/0",
+          "opSiteId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/1/ruleRef/capture/0",
           "operatorRuleId": "Power::MappedOp",
           "precedence": 10,
-          "rightSiteId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/2/ruleRef/capture/0"
+          "rightSiteId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/2/ruleRef/capture/0"
         },
         "skip": false,
         "symbolId": "Power::MappedExpr",
@@ -4214,7 +4214,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/seq",
+        "body": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/seq",
         "eval": null,
         "mappingParams": [
           "value"
@@ -4227,7 +4227,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:MappedBase/body/ruleRef",
+        "body": "expr:fixtures/power.ubnf:0:2064:MappedBase/body/ruleRef",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4238,7 +4238,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:MappedOp/body/literal",
+        "body": "expr:fixtures/power.ubnf:0:2064:MappedOp/body/literal",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4249,7 +4249,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/choice",
+        "body": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/choice",
         "eval": null,
         "mappingParams": [
           "left",
@@ -4261,11 +4261,11 @@
           "associativity": "right",
           "baseRuleId": "Power::UnicodeBase",
           "canonicalForm": "baseOpSelfOrBase",
-          "leftSiteId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/1/ruleRef/capture/0",
-          "opSiteId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/1/ruleRef/capture/0",
+          "leftSiteId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/1/ruleRef/capture/0",
+          "opSiteId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/1/ruleRef/capture/0",
           "operatorRuleId": "Power::UnicodeOp",
           "precedence": 10,
-          "rightSiteId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/2/ruleRef/capture/0"
+          "rightSiteId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/2/ruleRef/capture/0"
         },
         "skip": false,
         "symbolId": "Power::UnicodeExpr",
@@ -4273,7 +4273,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/seq",
+        "body": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/seq",
         "eval": null,
         "mappingParams": [
           "value"
@@ -4286,7 +4286,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:UnicodeBase/body/ruleRef",
+        "body": "expr:fixtures/power.ubnf:0:2064:UnicodeBase/body/ruleRef",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4297,7 +4297,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:UnicodeOp/body/literal",
+        "body": "expr:fixtures/power.ubnf:0:2064:UnicodeOp/body/literal",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4308,7 +4308,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/choice",
+        "body": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/choice",
         "eval": null,
         "mappingParams": [
           "left",
@@ -4320,11 +4320,11 @@
           "associativity": "right",
           "baseRuleId": "Power::GroupedBase",
           "canonicalForm": "baseOpSelfOrBase",
-          "leftSiteId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/1/ruleRef/capture/0",
-          "opSiteId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/1/ruleRef/capture/0",
+          "leftSiteId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/1/ruleRef/capture/0",
+          "opSiteId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/1/ruleRef/capture/0",
           "operatorRuleId": "Power::GroupedOp",
           "precedence": 10,
-          "rightSiteId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/2/ruleRef/capture/0"
+          "rightSiteId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/2/ruleRef/capture/0"
         },
         "skip": false,
         "symbolId": "Power::GroupedExpr",
@@ -4332,7 +4332,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/seq",
+        "body": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/seq",
         "eval": null,
         "mappingParams": [
           "value"
@@ -4345,7 +4345,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/choice",
+        "body": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/choice",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4356,7 +4356,7 @@
       },
       {
         "annotations": [],
-        "body": "expr:fixtures/power.ubnf:0:2072:GroupedOp/body/literal",
+        "body": "expr:fixtures/power.ubnf:0:2064:GroupedOp/body/literal",
         "eval": null,
         "mappingParams": [],
         "mappingTypeId": null,
@@ -4386,7 +4386,7 @@
         "originalName": "NUMBER",
         "qualifiedSymbolId": "Power::NUMBER",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4394,13 +4394,13 @@
       },
       {
         "grammarId": "grammar:Power",
-        "id": "Power::TextExpr",
+        "id": "Power::Expr",
         "kind": "rule",
-        "name": "TextExpr",
-        "originalName": "TextExpr",
-        "qualifiedSymbolId": "Power::TextExpr",
+        "name": "Expr",
+        "originalName": "Expr",
+        "qualifiedSymbolId": "Power::Expr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4414,7 +4414,7 @@
         "originalName": "TextAtom",
         "qualifiedSymbolId": "Power::TextAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4428,7 +4428,7 @@
         "originalName": "TextBase",
         "qualifiedSymbolId": "Power::TextBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4442,7 +4442,7 @@
         "originalName": "TextOp",
         "qualifiedSymbolId": "Power::TextOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4456,7 +4456,7 @@
         "originalName": "MappedExpr",
         "qualifiedSymbolId": "Power::MappedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4470,7 +4470,7 @@
         "originalName": "MappedAtom",
         "qualifiedSymbolId": "Power::MappedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4484,7 +4484,7 @@
         "originalName": "MappedBase",
         "qualifiedSymbolId": "Power::MappedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4498,7 +4498,7 @@
         "originalName": "MappedOp",
         "qualifiedSymbolId": "Power::MappedOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4512,7 +4512,7 @@
         "originalName": "UnicodeExpr",
         "qualifiedSymbolId": "Power::UnicodeExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4526,7 +4526,7 @@
         "originalName": "UnicodeAtom",
         "qualifiedSymbolId": "Power::UnicodeAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4540,7 +4540,7 @@
         "originalName": "UnicodeBase",
         "qualifiedSymbolId": "Power::UnicodeBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4554,7 +4554,7 @@
         "originalName": "UnicodeOp",
         "qualifiedSymbolId": "Power::UnicodeOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4568,7 +4568,7 @@
         "originalName": "GroupedExpr",
         "qualifiedSymbolId": "Power::GroupedExpr",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4582,7 +4582,7 @@
         "originalName": "GroupedAtom",
         "qualifiedSymbolId": "Power::GroupedAtom",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4596,7 +4596,7 @@
         "originalName": "GroupedBase",
         "qualifiedSymbolId": "Power::GroupedBase",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4610,7 +4610,7 @@
         "originalName": "GroupedOp",
         "qualifiedSymbolId": "Power::GroupedOp",
         "source": {
-          "end": 2072,
+          "end": 2064,
           "sourceId": "fixtures/power.ubnf",
           "start": 0
         },
@@ -4647,7 +4647,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4655,7 +4655,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4663,7 +4663,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4671,7 +4671,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 2,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:TextExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:Expr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4679,7 +4679,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4687,7 +4687,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:TextAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:TextAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4695,7 +4695,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4703,7 +4703,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4711,7 +4711,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4719,7 +4719,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 2,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4727,7 +4727,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4735,7 +4735,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4743,7 +4743,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4751,7 +4751,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:MappedAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:MappedAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4759,7 +4759,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4767,7 +4767,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4775,7 +4775,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4783,7 +4783,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 2,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4791,7 +4791,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4799,7 +4799,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/1/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4807,7 +4807,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4815,7 +4815,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4823,7 +4823,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:UnicodeAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:UnicodeAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4831,7 +4831,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4839,7 +4839,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4847,7 +4847,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4855,7 +4855,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 2,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedExpr/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedExpr/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4863,7 +4863,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4871,7 +4871,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/0/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/0/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4879,7 +4879,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4887,7 +4887,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedAtom/body/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedAtom/body/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4895,7 +4895,7 @@
           "boundary": {
             "at": "entry",
             "childIndex": null,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4903,7 +4903,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 0,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4911,7 +4911,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 1,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         },
@@ -4919,7 +4919,7 @@
           "boundary": {
             "at": "afterChild",
             "childIndex": 2,
-            "ownerExprId": "expr:fixtures/power.ubnf:0:2072:GroupedBase/body/1/seq"
+            "ownerExprId": "expr:fixtures/power.ubnf:0:2064:GroupedBase/body/1/seq"
           },
           "policyId": "trivia:javaStyle"
         }
@@ -4966,10 +4966,10 @@
   "serialization": "ubnfc-json.v1",
   "sources": [
     {
-      "codePointLength": 2072,
+      "codePointLength": 2064,
       "id": "fixtures/power.ubnf",
       "path": "fixtures/power.ubnf",
-      "sha256": "11131cafaa5931a19176a94d0daa2e8e34975a80e8922b2a72748a7a878fdc87"
+      "sha256": "e050819c9098acf187df1159c14c074580d66caf425731a95f1ede90ddf2bcf5"
     }
   ],
   "version": 1

@@ -1,181 +1,113 @@
-use ubnfc_rt_template::diag::{Diagnostics, Snapshot, NO_RULE};
-
+use ubnfc_rt_template::diag::{Diag, Diagnostics};
 #[test]
 fn zero_offset_failure_is_distinct_from_no_failure() {
-    let mut diag = Diagnostics::new();
-    assert_eq!(diag.snapshot(), Snapshot::default());
-    diag.fail_at(0, 7);
-    assert_eq!(diag.farthest, 0);
-    assert_eq!(diag.expected, [7]);
-    assert_eq!(diag.deepest_rule, NO_RULE);
+    let mut d = Diagnostics::default();
+    assert_eq!(d.summary(Diag(0)), None);
+    let leaf = d.fail(0, "number");
+    assert_eq!(d.summary(leaf), Some((0, vec!["number"], vec![])));
 }
-
 #[test]
 fn farthest_replaces_ties_union_and_nearer_failures_are_ignored() {
-    let mut diag = Diagnostics::new();
-    diag.fail_at(4, 1);
-    diag.fail_at(4, 2);
-    diag.fail_at(4, 1);
-    diag.fail_at(3, 9);
-    assert_eq!(diag.expected, [1, 2]);
-    diag.fail_at(5, 3);
-    assert_eq!(diag.farthest, 5);
-    assert_eq!(diag.expected, [3]);
+    let mut d = Diagnostics::new();
+    let a = d.fail(4, "a");
+    let b = d.fail(4, "b");
+    let c = d.fail(3, "c");
+    let joined = d.join(a, b);
+    let joined = d.join(joined, c);
+    let joined = d.join(joined, a);
+    assert_eq!(d.summary(joined), Some((4, vec!["a", "b"], vec![])));
+    let far = d.fail(5, "far");
+    let joined = d.join(joined, far);
+    assert_eq!(d.summary(joined), Some((5, vec!["far"], vec![])));
 }
-
 #[test]
-fn deepest_rule_is_selected_at_the_farthest_position() {
-    let mut diag = Diagnostics::new();
-    diag.enter_rule(10);
-    diag.fail_at(4, 1);
-    diag.enter_rule(20);
-    diag.fail_at(4, 2);
-    diag.leave_rule();
-    diag.enter_rule(30);
-    diag.fail_at(4, 3);
-    assert_eq!(diag.deepest_rule, 20); // 同深度は初回を保持する。
-    diag.leave_rule();
-    diag.fail_at(5, 4);
-    assert_eq!(diag.deepest_rule, 10); // より遠い位置なら浅い stack に置き換わる。
-    diag.leave_rule();
-    assert_eq!(diag.snapshot().rule_path, [10]);
-    assert!(diag.leave_rule().is_none());
+fn deepest_rule_ties_preserve_first_path() {
+    let mut d = Diagnostics::new();
+    let leaf = d.fail(4, "x");
+    let a = d.rule(20, leaf);
+    let b = d.rule(30, leaf);
+    let both = d.join(a, b);
+    let root = d.rule(10, both);
+    assert_eq!(d.summary(root).unwrap().2, vec![10, 20]);
+    let far = d.fail(5, "far");
+    let far = d.rule(10, far);
+    let root = d.join(root, far);
+    assert_eq!(d.summary(root).unwrap().2, vec![10]);
 }
-
 #[test]
-fn successful_rule_failures_survive_leave() {
-    let mut diag = Diagnostics::new();
-    diag.enter_rule(1);
-    diag.enter_rule(2);
-    diag.fail_at(8, 9);
-    let child = diag.leave_rule().unwrap();
-    assert_eq!(child.rule_path, [2]);
-    assert_eq!(diag.snapshot().rule_path, [1, 2]);
-    diag.leave_rule();
-    assert_eq!(diag.farthest, 8);
-    assert_eq!(diag.expected, [9]);
+fn successful_rule_failures_remain_in_parent_dag() {
+    let mut d = Diagnostics::new();
+    let leaf = d.fail(8, "x");
+    let child = d.rule(2, leaf);
+    let parent = d.rule(1, child);
+    assert_eq!(d.summary(child).unwrap().2, vec![2]);
+    assert_eq!(d.summary(parent), Some((8, vec!["x"], vec![1, 2])));
 }
-
 #[test]
-fn negative_lookahead_suppresses_nested_failures_and_memo_replay() {
-    let mut saved = Diagnostics::new();
-    saved.enter_rule(99);
-    saved.fail_at(100, 99);
-    let saved = saved.snapshot();
-
-    let mut diag = Diagnostics::new();
-    diag.enter_rule(1);
-    diag.fail_at(2, 3);
-    let before = diag.snapshot();
-    diag.suppress_begin();
-    diag.enter_rule(2);
-    diag.fail_at(50, 4);
-    diag.suppress_begin();
-    diag.merge(&saved);
-    diag.suppress_end();
-    diag.fail_at(60, 5);
-    assert!(diag.leave_rule().unwrap().expected.is_empty());
-    assert_eq!(diag.snapshot(), before);
-    diag.suppress_end();
-    diag.fail_at(3, 6);
-    assert_eq!(diag.expected, [6]);
-    assert_eq!(diag.farthest, 3);
+fn negative_lookahead_suppresses_by_not_joining_child_diagnostics() {
+    let mut d = Diagnostics::new();
+    let kept = d.fail(2, "kept");
+    let ignored = d.fail(100, "ignored");
+    let ignored = d.rule(99, ignored);
+    assert_eq!(d.summary(ignored).unwrap().0, 100);
+    let parent = d.rule(1, kept);
+    assert_eq!(d.summary(parent), Some((2, vec!["kept"], vec![1])));
 }
-
 #[test]
-fn local_snapshot_excludes_farther_sibling_and_caller_failures() {
-    let mut diag = Diagnostics::new();
-    diag.enter_rule(1);
-    diag.fail_at(100, 1);
-    diag.enter_rule(2);
-    diag.fail_at(200, 2);
-    diag.leave_rule();
-    diag.enter_rule(3);
-    assert!(diag.snapshot().expected.is_empty());
-    diag.enter_rule(4);
-    diag.fail_at(5, 7);
-    diag.leave_rule();
-    let local = diag.snapshot();
-    assert_eq!(local.farthest, 5);
-    assert_eq!(local.expected, [7]);
-    assert_eq!(local.rule_path, [3, 4]);
-    assert_eq!(diag.farthest, 200);
-    assert_eq!(diag.deepest_rule, 2);
+fn local_dag_excludes_farther_sibling_and_caller_failures() {
+    let mut d = Diagnostics::new();
+    let far = d.fail(200, "far");
+    let far = d.rule(2, far);
+    let local = d.fail(5, "local");
+    let local = d.rule(4, local);
+    let local = d.rule(3, local);
+    let root = d.join(far, local);
+    assert_eq!(d.summary(root).unwrap().0, 200);
+    assert_eq!(d.summary(local), Some((5, vec!["local"], vec![3, 4])));
 }
-
 #[test]
-fn memo_replay_rebases_stack_and_reaches_all_active_accumulators() {
-    let mut first = Diagnostics::new();
-    first.enter_rule(1);
-    first.enter_rule(2);
-    first.enter_rule(3);
-    first.fail_at(8, 10);
-    first.leave_rule();
-    let memo = first.snapshot();
-
-    let mut replay = Diagnostics::new();
-    replay.enter_rule(40);
-    replay.enter_rule(50);
-    replay.merge(&memo);
-    assert_eq!(replay.deepest_rule, 3);
-    assert_eq!(replay.snapshot().rule_path, [50, 2, 3]);
-    replay.leave_rule();
-    assert_eq!(replay.snapshot().rule_path, [40, 50, 2, 3]);
-    replay.leave_rule();
-
-    let mut direct = Diagnostics::new();
-    for rule in [40, 50, 2, 3] {
-        direct.enter_rule(rule);
-    }
-    direct.fail_at(8, 10);
-    for _ in 0..4 {
-        direct.leave_rule();
-    }
-    assert_eq!(replay.snapshot(), direct.snapshot());
+fn memo_replay_rebases_without_copying_local_dag() {
+    let mut d = Diagnostics::new();
+    let leaf = d.fail(8, "x");
+    let leaf = d.rule(3, leaf);
+    let memo = d.rule(2, leaf);
+    let first = d.rule(1, memo);
+    let replay = d.rule(50, memo);
+    let replay = d.rule(40, replay);
+    assert_eq!(d.summary(first).unwrap().2, vec![1, 2, 3]);
+    assert_eq!(d.summary(replay), Some((8, vec!["x"], vec![40, 50, 2, 3])));
 }
-
 #[test]
-fn nearer_memo_failure_still_reaches_local_frame() {
-    let mut source = Diagnostics::new();
-    source.enter_rule(7);
-    source.fail_at(5, 8);
-    let saved = source.snapshot();
-    let mut target = Diagnostics::new();
-    target.fail_at(100, 1);
-    target.enter_rule(6);
-    target.merge(&saved);
-    assert_eq!(target.farthest, 100);
-    assert_eq!(target.expected, [1]);
-    assert_eq!(target.snapshot().farthest, 5);
-    assert_eq!(target.snapshot().rule_path, [6, 7]);
+fn nearer_memo_failure_remains_available_to_local_frame() {
+    let mut d = Diagnostics::new();
+    let local = d.fail(5, "local");
+    let local = d.rule(7, local);
+    let local = d.rule(6, local);
+    let far = d.fail(100, "far");
+    let root = d.join(far, local);
+    assert_eq!(d.summary(root).unwrap().0, 100);
+    assert_eq!(d.summary(local), Some((5, vec!["local"], vec![6, 7])));
 }
-
 #[test]
-fn empty_and_repeated_merges_are_harmless() {
-    let mut source = Diagnostics::new();
-    source.fail_at(8, 4);
-    source.fail_at(8, 5);
-    let saved = source.snapshot();
-    let mut target = Diagnostics::new();
-    target.merge(&Snapshot::default());
-    assert_eq!(target.snapshot(), Snapshot::default());
-    target.fail_at(8, 3);
-    target.merge(&saved);
-    target.merge(&saved);
-    assert_eq!(target.expected, [3, 4, 5]);
-    target.merge(&Snapshot::default());
-    assert_eq!(target.expected, [3, 4, 5]);
+fn empty_and_repeated_joins_are_harmless() {
+    let mut d = Diagnostics::new();
+    let a = d.fail(8, "a");
+    let b = d.fail(8, "b");
+    assert_eq!(d.join(Diag(0), a), a);
+    assert_eq!(d.join(a, Diag(0)), a);
+    assert_eq!(d.join(a, a), a);
+    let both = d.join(a, b);
+    let repeated = d.join(both, a);
+    assert_eq!(d.summary(repeated).unwrap().1, vec!["a", "b"]);
 }
-
 #[test]
-fn snapshots_are_owned_and_independent_of_later_failures() {
-    let mut diag = Diagnostics::new();
-    diag.enter_rule(1);
-    diag.fail_at(2, 3);
-    let saved = diag.snapshot();
-    diag.fail_at(9, 4);
-    drop(diag);
-    assert_eq!(saved.farthest, 2);
-    assert_eq!(saved.expected, [3]);
-    assert_eq!(saved.rule_path, [1]);
+fn saved_handles_are_immutable_and_summaries_are_owned() {
+    let mut d = Diagnostics::new();
+    let saved = d.fail(2, "saved");
+    let saved = d.rule(1, saved);
+    let later = d.fail(9, "later");
+    let _ = d.join(saved, later);
+    let summary = d.summary(saved);
+    drop(d);
+    assert_eq!(summary, Some((2, vec!["saved"], vec![1])));
 }
