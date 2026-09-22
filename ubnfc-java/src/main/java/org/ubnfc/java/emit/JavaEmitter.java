@@ -27,6 +27,8 @@ public final class JavaEmitter {
     private final Map<String, Capture> captures;
     private final Map<String, Token> tokens;
     private final Map<String, Recipe> recipes;
+    private final SemanticShape semanticShapes;
+    private final DiagnosticPlan diagnosticPlan;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
     public JavaEmitter(GrammarIr ir, String packageName) { this(ir, packageName, true); }
     public JavaEmitter(GrammarIr ir, String packageName, boolean emitDriver) {
@@ -41,6 +43,8 @@ public final class JavaEmitter {
         captures = Validation.index(ir.semantics().captures(), Capture::siteId);
         tokens = Validation.index(ir.semantics().tokens(), Token::symbolId);
         recipes = Validation.index(ir.semantics().recipes(), Recipe::ruleId);
+        semanticShapes = new SemanticShape(expressions, rules);
+        diagnosticPlan = new DiagnosticPlan(ir);
         for (String id : expressions.keySet()) exprIds.put(id, exprIds.size());
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
     }
@@ -312,7 +316,7 @@ public final class JavaEmitter {
         out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(exprIds.size() + ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
             .append(", new Field[]{").append(fields).append("}, new Effect[]{").append(effects).append("}, ").append(rule.skip()).append(", ")
-            .append(strings(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(");\n    }\n");
+            .append(strings(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(", ").append(strings(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
     }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;
@@ -334,17 +338,9 @@ public final class JavaEmitter {
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(strings(expr.captureSiteIds())).append(", ").append(strings(sites.stream().map(Capture::name).toList())).append(", ").append(strings(sites.stream().map(Capture::spanRule).toList()))
-            .append(", new boolean[]{").append(sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(","))).append("}, ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(captureFailureHint(expr)).append(", ").append(Set.of("repeat", "optional").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(");\n    }\n");
+            .append(", new boolean[]{").append(sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(","))).append("}, ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(strings(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
         String body = expression(expr);
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
-    }
-    private boolean captureFailureHint(Expr expr) {
-        if (!expr.node().kind().equals("ruleRef")) return false;
-        AstType target = types.get(rules.get(expr.node().symbolId()).mappingTypeId());
-        // Mapped sum and recovery wrappers contribute __CaptureSite on entry failure.
-        // Primitive/operator references retain their existing diagnostic display profile.
-        return target != null && target.kind().equals("transparentUnion")
-            || ir.semantics().recovery().stream().anyMatch(r -> r.applicationSites().contains(expr.id()));
     }
     private String expression(Expr expr) {
         ExprNode n = expr.node(); String boundary = boundaries(expr.id());
@@ -365,7 +361,7 @@ public final class JavaEmitter {
                 var recovery = ir.semantics().recovery().stream().filter(r -> r.applicationSites().contains(expr.id())).findFirst().orElse(null);
                 yield recovery == null ? "return " + ruleMethod(n.symbolId()) + "(s, f);" : recoveryCall(recovery, call);
             }
-            case "tokenRef" -> "return " + token(tokens.get(n.symbolId()).spec(), label) + ";";
+            case "tokenRef" -> "return " + token(tokens.get(n.symbolId()).spec(), diagnosticPlan.tokenLabel(expr.id())) + ";";
             case "lookahead", "negativeLookahead" -> "return s.look(f, " + call(n.child()) + ", " + n.kind().equals("negativeLookahead") + ", " + q(label) + ");";
             case "any" -> "return s.any(f, " + q(label) + ");";
             case "eof" -> "return s.eof(f);"; case "empty" -> "return s.empty(f);";
@@ -434,11 +430,11 @@ public final class JavaEmitter {
     }
     private String token(TokenSpec spec, String label) {
         return switch (spec.kind()) {
-            case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + ints(spec.codePoints()) + ")";
+            case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + ints(spec.codePoints()) + "," + q(label) + ")";
             case "until" -> "s.until(f," + q(spec.terminator()) + ")";
             case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + q(label) + ")," + spec.kind().equals("negativeLookahead") + "," + q(label) + ")";
-            case "negation" -> "s.range(f,0,1114111," + q(spec.excluded()) + ",\"NEGATION\")";
-            case "charRange" -> "s.range(f," + spec.min() + "," + spec.max() + ",null,\"CHAR_RANGE\")";
+            case "negation" -> "s.range(f,0,1114111," + q(spec.excluded()) + "," + q(label) + ")";
+            case "charRange" -> "s.range(f," + spec.min() + "," + spec.max() + ",null," + q(label) + ")";
             case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + q(label) + ")";
             case "regex" -> regex(spec, label);
             case "extern" -> "s.external(f," + q(spec.logicalId()) + ")";
