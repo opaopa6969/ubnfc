@@ -34,6 +34,10 @@ pub(crate) enum Event {
         rule: usize,
         span: Span,
         child: EventId,
+        /// この rule の直下 capture が `caps_flat` のどこにあるか（開始, 個数）。
+        /// 出現収集が書き、AST 構築が読む。event を読むときに同じ cache line に載るので、
+        /// event id で索く別表（x64 で 640 KB の疎な書き込み）を持たない。
+        caps: (u32, u32),
     },
     Token {
         text_span: Option<Span>,
@@ -157,7 +161,6 @@ pub(crate) struct Buffers {
     text_spans: TextSpans,
     caps_flat: Vec<Cap>,
     caps_pending: Vec<Cap>,
-    rule_caps: Vec<(u32, u32)>,
 }
 const POOL_RETAIN_BYTES: usize = 64 << 20;
 thread_local! {
@@ -174,7 +177,6 @@ impl Buffers {
                 * std::mem::size_of::<Effect>()
             + (self.caps_flat.capacity() + self.caps_pending.capacity())
                 * std::mem::size_of::<Cap>()
-            + self.rule_caps.capacity() * std::mem::size_of::<(u32, u32)>()
     }
 }
 pub(crate) struct Session<'a> {
@@ -202,14 +204,10 @@ pub(crate) struct Session<'a> {
     values_pool: Vec<Vec<Ast>>,
     texts_pool: Vec<Vec<String>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
-    /// 出現収集で組み立てる「rule ごとの直下 capture」表。AST 構築はここを読むだけで
-    /// 木を再走査しない（`rule_caps[rule event id] = (caps_flat の開始, 個数)`）。
-    /// `rule_caps` は event id で索く疎な表で、読む前に必ず同じ parse の走査が書く
-    /// （AST を作る parse では出現収集が build_values より前に全 Rule event を訪れる）ため
-    /// parse ごとの初期化は要らない。伸長だけする。
+    /// 出現収集で組み立てる「rule ごとの直下 capture」の並び。どの区間がどの rule のものかは
+    /// `Event::Rule::caps`（開始, 個数）が持つ。AST 構築はその区間を写すだけで木を再走査しない。
     caps_flat: Vec<Cap>,
     caps_pending: Vec<Cap>,
-    rule_caps: Vec<(u32, u32)>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -277,7 +275,6 @@ impl<'a> Session<'a> {
                 text_spans: Default::default(),
                 caps_flat: vec![],
                 caps_pending: vec![],
-                rule_caps: vec![],
             },
         };
         buffers.diag.enable(diag_on);
@@ -314,7 +311,6 @@ impl<'a> Session<'a> {
             scope_pool: buffers.scope_pool,
             caps_flat: buffers.caps_flat,
             caps_pending: buffers.caps_pending,
-            rule_caps: buffers.rule_caps,
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -346,7 +342,6 @@ impl<'a> Session<'a> {
             text_spans: std::mem::take(&mut self.text_spans),
             caps_flat: std::mem::take(&mut self.caps_flat),
             caps_pending: std::mem::take(&mut self.caps_pending),
-            rule_caps: std::mem::take(&mut self.rule_caps),
         };
         if buffers.bytes() <= POOL_RETAIN_BYTES {
             POOL.with(|p| *p.borrow_mut() = Some(buffers));
@@ -397,20 +392,26 @@ impl<'a> Session<'a> {
     pub fn cp(&self, byte: usize) -> usize {
         self.input.byte_to_cp(byte).expect("parser UTF-8 boundary")
     }
-    /// 空文字列にも固有の識別子が要るので、常に 1 byte 余分に確保して複製する。
+    /// `remember_text` へ渡す複製は識別用の 1 byte を最初から確保する
+    /// （`to_owned` は丁度 len で確保するので、直後の `reserve(1)` が必ず再確保になる）。
     fn owned_text(text: &str) -> String {
         let mut owned = String::with_capacity(text.len() + 1);
         owned.push_str(text);
         owned
     }
+    fn text_for_identity(&self, span: Span) -> String {
+        Self::owned_text(self.trimmed(span))
+    }
     pub fn span(&self, span: Span) -> Span {
         [self.cp(span[0]), self.cp(span[1])]
     }
-    pub fn text(&self, span: Span) -> String {
-        // remember_text の識別用 1 byte を最初から確保する（to_owned + reserve(1) は再確保になる）。
-        Self::owned_text(self.text[span[0]..span[1]].trim_matches(|c: char| {
+    fn trimmed(&self, span: Span) -> &str {
+        self.text[span[0]..span[1]].trim_matches(|c: char| {
             c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
-        }))
+        })
+    }
+    pub fn text(&self, span: Span) -> String {
+        self.trimmed(span).to_owned()
     }
     pub fn mark(&self) -> Mark {
         Mark {
@@ -895,12 +896,11 @@ impl<'a> Session<'a> {
     pub fn give_stack(&mut self, stack: Vec<(EventId, bool)>) {
         self.stacks.push(stack);
     }
-    /// rule の直下 capture 出現（完了順）を出現収集が作った表から写す。
+    /// rule の直下 capture 出現（完了順）を出現収集が並べた区間から写す。
     /// 以前は rule ごとに局所 event を再走査していた（`collect_captures`）。同じ木を 2 度
     /// 下るのをやめ、出現収集の 1 回の走査で rule ごとに切り出しておく。
-    pub fn rule_captures(&mut self, id: EventId, out: &mut Vec<Cap>) {
-        let (offset, len) = self.rule_caps[id.0];
-        let (offset, len) = (offset as usize, len as usize);
+    pub fn rule_captures(&mut self, caps: (u32, u32), out: &mut Vec<Cap>) {
+        let (offset, len) = (caps.0 as usize, caps.1 as usize);
         out.extend_from_slice(&self.caps_flat[offset..offset + len]);
     }
     pub fn take_captures(&mut self) -> Vec<Cap> {
@@ -1156,7 +1156,7 @@ impl<'a> Session<'a> {
         found
     }
     pub fn mapped_text(&mut self, span: Span) -> String {
-        self.remember_text(self.text(span), span)
+        self.remember_text(self.text_for_identity(span), span)
     }
     fn remember_text(&mut self, mut text: String, span: Span) -> String {
         // Empty strings also need distinct identities until paths are resolved.
@@ -1215,7 +1215,7 @@ impl<'a> Session<'a> {
             Some((None, content)) => (span, content.unwrap_or(span), false),
             None => (span, span, false),
         };
-        let value = if token_text { Self::owned_text(&self.text[content[0]..content[1]]) } else { self.text(content) };
+        let value = if token_text { Self::owned_text(&self.text[content[0]..content[1]]) } else { self.text_for_identity(content) };
         self.remember_text(value, extent)
     }
     pub fn take_scope(&mut self) -> Vec<(usize, Span)> {

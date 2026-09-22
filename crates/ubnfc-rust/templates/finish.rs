@@ -40,9 +40,6 @@ fn occurrences(
         caps_flat.clear();
         caps_flat.reserve(estimate);
         pending.clear();
-        if self.rule_caps.len() < self.arena.len() {
-            self.rule_caps.resize(self.arena.len(), (0, 0));
-        }
     }
     // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは u32::MAX。
     // event id も出現番号も入力 byte 数（u32 上限）で抑えられるので u32 に詰める（1 要素 16 byte）。
@@ -104,7 +101,9 @@ fn occurrences(
                 });
                 lexical_order += 1;
             }
-            Event::Rule { rule, span, child } => {
+            Event::Rule {
+                rule, span, child, ..
+            } => {
                 if done {
                     if want_occurrences {
                         let start = rule_starts.pop().unwrap_or(0) as usize;
@@ -112,8 +111,9 @@ fn occurrences(
                             let offset = caps_flat.len();
                             caps_flat.extend_from_slice(&pending[start..]);
                             pending.truncate(start);
-                            self.rule_caps[id.0] =
-                                (offset as u32, (caps_flat.len() - offset) as u32);
+                            if let Event::Rule { caps, .. } = &mut self.arena[id.0] {
+                                *caps = (offset as u32, (caps_flat.len() - offset) as u32);
+                            }
                         }
                         // この rule の直下 capture に rule 完了順を書く（後段の走査の代わり）。
                         for &order in &pending_ids[start..] {

@@ -34,6 +34,10 @@ pub(crate) enum Event {
         rule: usize,
         span: Span,
         child: EventId,
+        /// この rule の直下 capture が `caps_flat` のどこにあるか（開始, 個数）。
+        /// 出現収集が書き、AST 構築が読む。event を読むときに同じ cache line に載るので、
+        /// event id で索く別表（x64 で 640 KB の疎な書き込み）を持たない。
+        caps: (u32, u32),
     },
     Token {
         text_span: Option<Span>,
@@ -157,7 +161,6 @@ pub(crate) struct Buffers {
     text_spans: TextSpans,
     caps_flat: Vec<Cap>,
     caps_pending: Vec<Cap>,
-    rule_caps: Vec<(u32, u32)>,
 }
 const POOL_RETAIN_BYTES: usize = 64 << 20;
 thread_local! {
@@ -174,7 +177,6 @@ impl Buffers {
                 * std::mem::size_of::<Effect>()
             + (self.caps_flat.capacity() + self.caps_pending.capacity())
                 * std::mem::size_of::<Cap>()
-            + self.rule_caps.capacity() * std::mem::size_of::<(u32, u32)>()
     }
 }
 pub(crate) struct Session<'a> {
@@ -202,14 +204,10 @@ pub(crate) struct Session<'a> {
     values_pool: Vec<Vec<Ast>>,
     texts_pool: Vec<Vec<String>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
-    /// 出現収集で組み立てる「rule ごとの直下 capture」表。AST 構築はここを読むだけで
-    /// 木を再走査しない（`rule_caps[rule event id] = (caps_flat の開始, 個数)`）。
-    /// `rule_caps` は event id で索く疎な表で、読む前に必ず同じ parse の走査が書く
-    /// （AST を作る parse では出現収集が build_values より前に全 Rule event を訪れる）ため
-    /// parse ごとの初期化は要らない。伸長だけする。
+    /// 出現収集で組み立てる「rule ごとの直下 capture」の並び。どの区間がどの rule のものかは
+    /// `Event::Rule::caps`（開始, 個数）が持つ。AST 構築はその区間を写すだけで木を再走査しない。
     caps_flat: Vec<Cap>,
     caps_pending: Vec<Cap>,
-    rule_caps: Vec<(u32, u32)>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -277,7 +275,6 @@ impl<'a> Session<'a> {
                 text_spans: Default::default(),
                 caps_flat: vec![],
                 caps_pending: vec![],
-                rule_caps: vec![],
             },
         };
         buffers.diag.enable(diag_on);
@@ -314,7 +311,6 @@ impl<'a> Session<'a> {
             scope_pool: buffers.scope_pool,
             caps_flat: buffers.caps_flat,
             caps_pending: buffers.caps_pending,
-            rule_caps: buffers.rule_caps,
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -346,7 +342,6 @@ impl<'a> Session<'a> {
             text_spans: std::mem::take(&mut self.text_spans),
             caps_flat: std::mem::take(&mut self.caps_flat),
             caps_pending: std::mem::take(&mut self.caps_pending),
-            rule_caps: std::mem::take(&mut self.rule_caps),
         };
         if buffers.bytes() <= POOL_RETAIN_BYTES {
             POOL.with(|p| *p.borrow_mut() = Some(buffers));
@@ -397,20 +392,26 @@ impl<'a> Session<'a> {
     pub fn cp(&self, byte: usize) -> usize {
         self.input.byte_to_cp(byte).expect("parser UTF-8 boundary")
     }
-    /// 空文字列にも固有の識別子が要るので、常に 1 byte 余分に確保して複製する。
+    /// `remember_text` へ渡す複製は識別用の 1 byte を最初から確保する
+    /// （`to_owned` は丁度 len で確保するので、直後の `reserve(1)` が必ず再確保になる）。
     fn owned_text(text: &str) -> String {
         let mut owned = String::with_capacity(text.len() + 1);
         owned.push_str(text);
         owned
     }
+    fn text_for_identity(&self, span: Span) -> String {
+        Self::owned_text(self.trimmed(span))
+    }
     pub fn span(&self, span: Span) -> Span {
         [self.cp(span[0]), self.cp(span[1])]
     }
-    pub fn text(&self, span: Span) -> String {
-        // remember_text の識別用 1 byte を最初から確保する（to_owned + reserve(1) は再確保になる）。
-        Self::owned_text(self.text[span[0]..span[1]].trim_matches(|c: char| {
+    fn trimmed(&self, span: Span) -> &str {
+        self.text[span[0]..span[1]].trim_matches(|c: char| {
             c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
-        }))
+        })
+    }
+    pub fn text(&self, span: Span) -> String {
+        self.trimmed(span).to_owned()
     }
     pub fn mark(&self) -> Mark {
         Mark {
@@ -895,12 +896,11 @@ impl<'a> Session<'a> {
     pub fn give_stack(&mut self, stack: Vec<(EventId, bool)>) {
         self.stacks.push(stack);
     }
-    /// rule の直下 capture 出現（完了順）を出現収集が作った表から写す。
+    /// rule の直下 capture 出現（完了順）を出現収集が並べた区間から写す。
     /// 以前は rule ごとに局所 event を再走査していた（`collect_captures`）。同じ木を 2 度
     /// 下るのをやめ、出現収集の 1 回の走査で rule ごとに切り出しておく。
-    pub fn rule_captures(&mut self, id: EventId, out: &mut Vec<Cap>) {
-        let (offset, len) = self.rule_caps[id.0];
-        let (offset, len) = (offset as usize, len as usize);
+    pub fn rule_captures(&mut self, caps: (u32, u32), out: &mut Vec<Cap>) {
+        let (offset, len) = (caps.0 as usize, caps.1 as usize);
         out.extend_from_slice(&self.caps_flat[offset..offset + len]);
     }
     pub fn take_captures(&mut self) -> Vec<Cap> {
@@ -1156,7 +1156,7 @@ impl<'a> Session<'a> {
         found
     }
     pub fn mapped_text(&mut self, span: Span) -> String {
-        self.remember_text(self.text(span), span)
+        self.remember_text(self.text_for_identity(span), span)
     }
     fn remember_text(&mut self, mut text: String, span: Span) -> String {
         // Empty strings also need distinct identities until paths are resolved.
@@ -1215,7 +1215,7 @@ impl<'a> Session<'a> {
             Some((None, content)) => (span, content.unwrap_or(span), false),
             None => (span, span, false),
         };
-        let value = if token_text { Self::owned_text(&self.text[content[0]..content[1]]) } else { self.text(content) };
+        let value = if token_text { Self::owned_text(&self.text[content[0]..content[1]]) } else { self.text_for_identity(content) };
         self.remember_text(value, extent)
     }
     pub fn take_scope(&mut self) -> Vec<(usize, Span)> {
@@ -1287,80 +1287,80 @@ fn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<Ast>)->Result<(),S
 loop {match self.arena[root.0] {
 Event::Capture{child,..}=>root=child,
 Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}return Ok(());},
-Event::Rule{rule,span,child}=>return self.build_rule(rule,root,span,child,out),
+Event::Rule{rule,span,child,caps}=>return self.build_rule(rule,caps,span,child,out),
 Event::Join(..)=>break,
 _=>return Ok(()),}}
-let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child}=>self.build_rule(rule,id,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
 fn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);let _=(span,text);Err(format!("unknown leaf type {ty}"))}
-fn build_rule(&mut self,rule:usize,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);match rule {
-0=>self.map_rule_0(event,span,child,out),
-1=>self.map_rule_1(event,span,child,out),
-2=>self.map_rule_2(event,span,child,out),
-3=>self.map_rule_3(event,span,child,out),
-4=>self.map_rule_4(event,span,child,out),
-5=>self.map_rule_5(event,span,child,out),
-6=>self.map_rule_6(event,span,child,out),
-7=>self.map_rule_7(event,span,child,out),
-8=>self.map_rule_8(event,span,child,out),
-9=>self.map_rule_9(event,span,child,out),
-10=>self.map_rule_10(event,span,child,out),
-11=>self.map_rule_11(event,span,child,out),
-12=>self.map_rule_12(event,span,child,out),
-13=>self.map_rule_13(event,span,child,out),
-14=>self.map_rule_14(event,span,child,out),
-15=>self.map_rule_15(event,span,child,out),
-16=>self.map_rule_16(event,span,child,out),
-17=>self.map_rule_17(event,span,child,out),
-18=>self.map_rule_18(event,span,child,out),
-19=>self.map_rule_19(event,span,child,out),
-20=>self.map_rule_20(event,span,child,out),
-21=>self.map_rule_21(event,span,child,out),
-22=>self.map_rule_22(event,span,child,out),
-23=>self.map_rule_23(event,span,child,out),
-24=>self.map_rule_24(event,span,child,out),
-25=>self.map_rule_25(event,span,child,out),
-26=>self.map_rule_26(event,span,child,out),
-27=>self.map_rule_27(event,span,child,out),
-28=>self.map_rule_28(event,span,child,out),
-29=>self.map_rule_29(event,span,child,out),
-30=>self.map_rule_30(event,span,child,out),
-31=>self.map_rule_31(event,span,child,out),
-32=>self.map_rule_32(event,span,child,out),
-33=>self.map_rule_33(event,span,child,out),
-34=>self.map_rule_34(event,span,child,out),
-35=>self.map_rule_35(event,span,child,out),
-36=>self.map_rule_36(event,span,child,out),
-37=>self.map_rule_37(event,span,child,out),
-38=>self.map_rule_38(event,span,child,out),
-39=>self.map_rule_39(event,span,child,out),
-40=>self.map_rule_40(event,span,child,out),
-41=>self.map_rule_41(event,span,child,out),
-42=>self.map_rule_42(event,span,child,out),
-43=>self.map_rule_43(event,span,child,out),
-44=>self.map_rule_44(event,span,child,out),
-45=>self.map_rule_45(event,span,child,out),
-46=>self.map_rule_46(event,span,child,out),
-47=>self.map_rule_47(event,span,child,out),
-48=>self.map_rule_48(event,span,child,out),
-49=>self.map_rule_49(event,span,child,out),
-50=>self.map_rule_50(event,span,child,out),
-51=>self.map_rule_51(event,span,child,out),
-52=>self.map_rule_52(event,span,child,out),
-53=>self.map_rule_53(event,span,child,out),
-54=>self.map_rule_54(event,span,child,out),
-55=>self.map_rule_55(event,span,child,out),
-56=>self.map_rule_56(event,span,child,out),
-57=>self.map_rule_57(event,span,child,out),
-58=>self.map_rule_58(event,span,child,out),
+fn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);match rule {
+0=>self.map_rule_0(caps,span,child,out),
+1=>self.map_rule_1(caps,span,child,out),
+2=>self.map_rule_2(caps,span,child,out),
+3=>self.map_rule_3(caps,span,child,out),
+4=>self.map_rule_4(caps,span,child,out),
+5=>self.map_rule_5(caps,span,child,out),
+6=>self.map_rule_6(caps,span,child,out),
+7=>self.map_rule_7(caps,span,child,out),
+8=>self.map_rule_8(caps,span,child,out),
+9=>self.map_rule_9(caps,span,child,out),
+10=>self.map_rule_10(caps,span,child,out),
+11=>self.map_rule_11(caps,span,child,out),
+12=>self.map_rule_12(caps,span,child,out),
+13=>self.map_rule_13(caps,span,child,out),
+14=>self.map_rule_14(caps,span,child,out),
+15=>self.map_rule_15(caps,span,child,out),
+16=>self.map_rule_16(caps,span,child,out),
+17=>self.map_rule_17(caps,span,child,out),
+18=>self.map_rule_18(caps,span,child,out),
+19=>self.map_rule_19(caps,span,child,out),
+20=>self.map_rule_20(caps,span,child,out),
+21=>self.map_rule_21(caps,span,child,out),
+22=>self.map_rule_22(caps,span,child,out),
+23=>self.map_rule_23(caps,span,child,out),
+24=>self.map_rule_24(caps,span,child,out),
+25=>self.map_rule_25(caps,span,child,out),
+26=>self.map_rule_26(caps,span,child,out),
+27=>self.map_rule_27(caps,span,child,out),
+28=>self.map_rule_28(caps,span,child,out),
+29=>self.map_rule_29(caps,span,child,out),
+30=>self.map_rule_30(caps,span,child,out),
+31=>self.map_rule_31(caps,span,child,out),
+32=>self.map_rule_32(caps,span,child,out),
+33=>self.map_rule_33(caps,span,child,out),
+34=>self.map_rule_34(caps,span,child,out),
+35=>self.map_rule_35(caps,span,child,out),
+36=>self.map_rule_36(caps,span,child,out),
+37=>self.map_rule_37(caps,span,child,out),
+38=>self.map_rule_38(caps,span,child,out),
+39=>self.map_rule_39(caps,span,child,out),
+40=>self.map_rule_40(caps,span,child,out),
+41=>self.map_rule_41(caps,span,child,out),
+42=>self.map_rule_42(caps,span,child,out),
+43=>self.map_rule_43(caps,span,child,out),
+44=>self.map_rule_44(caps,span,child,out),
+45=>self.map_rule_45(caps,span,child,out),
+46=>self.map_rule_46(caps,span,child,out),
+47=>self.map_rule_47(caps,span,child,out),
+48=>self.map_rule_48(caps,span,child,out),
+49=>self.map_rule_49(caps,span,child,out),
+50=>self.map_rule_50(caps,span,child,out),
+51=>self.map_rule_51(caps,span,child,out),
+52=>self.map_rule_52(caps,span,child,out),
+53=>self.map_rule_53(caps,span,child,out),
+54=>self.map_rule_54(caps,span,child,out),
+55=>self.map_rule_55(caps,span,child,out),
+56=>self.map_rule_56(caps,span,child,out),
+57=>self.map_rule_57(caps,span,child,out),
+58=>self.map_rule_58(caps,span,child,out),
 _=>Err(format!("unknown rule {rule}"))}}
-fn map_rule_0(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_0(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.node_values(&caps,&[0],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_GrammarDecl(_))) {return Err("grammars: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[0],"UBNFFile",span);out.push(Ast::g_UBNFAST_2e_UBNFFile(g_UBNFAST_2e_UBNFFile{span,node_id,
 g_grammars:f0,
 }));Ok(())}}
-fn map_rule_1(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_1(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[1],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[1]) {return Ok(());}
 if t0.len()!=1 {return Err("alias requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1371,7 +1371,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[1]
 g_alias:f0,
 g_path:f1,
 }));Ok(())}}
-fn map_rule_2(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_2(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[3],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[3]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1394,7 +1394,7 @@ g_settings:f2,
 g_tokens:f3,
 g_rules:f4,
 }));Ok(())}}
-fn map_rule_3(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_3(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[8],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[8]) {return Ok(());}
 if t0.len()!=1 {return Err("key requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1407,8 +1407,8 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[3]
 g_key:f0,
 g_value:f1,
 }));Ok(())}}
-fn map_rule_4(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_5(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_4(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_5(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[10],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_DottedIdentifier(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[10]) {return Ok(());}
@@ -1417,14 +1417,14 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[5],"StringSettingValue",span);out.push(Ast::g_UBNFAST_2e_StringSettingValue(g_UBNFAST_2e_StringSettingValue{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_6(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_6(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.node_values(&caps,&[11],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_KeyValuePair(_))) {return Err("entries: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[6],"BlockSettingValue",span);out.push(Ast::g_UBNFAST_2e_BlockSettingValue(g_UBNFAST_2e_BlockSettingValue{span,node_id,
 g_entries:f0,
 }));Ok(())}}
-fn map_rule_7(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_7(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[12],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[12]) {return Ok(());}
 if t0.len()!=1 {return Err("key requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1435,7 +1435,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[7]
 g_key:f0,
 g_value:f1,
 }));Ok(())}}
-fn map_rule_8(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_8(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[14],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[14]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1448,36 +1448,36 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[8]
 g_name:f0,
 g_value:f1,
 }));Ok(())}}
-fn map_rule_9(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_10(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_9(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_10(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[16],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[16]) {return Ok(());}
 if t0.len()!=1 {return Err("terminator requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[10],"UntilExpression",span);out.push(Ast::g_UBNFAST_2e_UntilExpression(g_UBNFAST_2e_UntilExpression{span,node_id,
 g_terminator:f0,
 }));Ok(())}}
-fn map_rule_11(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_11(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[17],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[17]) {return Ok(());}
 if t0.len()!=1 {return Err("chars requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[11],"NegationExpression",span);out.push(Ast::g_UBNFAST_2e_NegationExpression(g_UBNFAST_2e_NegationExpression{span,node_id,
 g_chars:f0,
 }));Ok(())}}
-fn map_rule_12(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_12(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[18],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[18]) {return Ok(());}
 if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[12],"LookaheadExpression",span);out.push(Ast::g_UBNFAST_2e_LookaheadExpression(g_UBNFAST_2e_LookaheadExpression{span,node_id,
 g_pattern:f0,
 }));Ok(())}}
-fn map_rule_13(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_13(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[19],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[19]) {return Ok(());}
 if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[13],"NegativeLookaheadExpression",span);out.push(Ast::g_UBNFAST_2e_NegativeLookaheadExpression(g_UBNFAST_2e_NegativeLookaheadExpression{span,node_id,
 g_pattern:f0,
 }));Ok(())}}
-fn map_rule_14(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_14(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[20],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[20]) {return Ok(());}
 if t0.len()!=1 {return Err("min requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1488,30 +1488,30 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[14
 g_min:f0,
 g_max:f1,
 }));Ok(())}}
-fn map_rule_15(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_15(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[22],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[22]) {return Ok(());}
 if t0.len()!=1 {return Err("word requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[15],"CIExpression",span);out.push(Ast::g_UBNFAST_2e_CIExpression(g_UBNFAST_2e_CIExpression{span,node_id,
 g_word:f0,
 }));Ok(())}}
-fn map_rule_16(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_16(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[23],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[23]) {return Ok(());}
 if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[16],"RegexExpression",span);out.push(Ast::g_UBNFAST_2e_RegexExpression(g_UBNFAST_2e_RegexExpression{span,node_id,
 g_pattern:f0,
 }));Ok(())}}
-fn map_rule_17(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_17(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[17],"AnyExpression",span);out.push(Ast::g_UBNFAST_2e_AnyExpression(g_UBNFAST_2e_AnyExpression{span,node_id,
 }));Ok(())}}
-fn map_rule_18(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_18(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[18],"EofExpression",span);out.push(Ast::g_UBNFAST_2e_EofExpression(g_UBNFAST_2e_EofExpression{span,node_id,
 }));Ok(())}}
-fn map_rule_19(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_19(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[19],"EmptyExpression",span);out.push(Ast::g_UBNFAST_2e_EmptyExpression(g_UBNFAST_2e_EmptyExpression{span,node_id,
 }));Ok(())}}
-fn map_rule_20(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_20(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.node_values(&caps,&[24],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_BackrefAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_CatalogAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_CommonFieldAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_DeclaresAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_DocAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_EnumAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_EvalAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_InterleaveAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_LeftAssocAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_LongestChoiceAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_MappingAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_PrecedenceAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_PredictiveChoiceAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_RecoveryAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_RightAssocAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_RootAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_ScopeTreeAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_SimpleAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_SkipAnnotation(_)) || matches!(value,Ast::g_UBNFAST_2e_WhitespaceAnnotation(_))) {return Err("annotations: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
@@ -1528,11 +1528,11 @@ g_annotations:f0,
 g_name:f1,
 g_body:f2,
 }));Ok(())}}
-fn map_rule_21(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_22(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_21(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_22(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[22],"RootAnnotation",span);out.push(Ast::g_UBNFAST_2e_RootAnnotation(g_UBNFAST_2e_RootAnnotation{span,node_id,
 }));Ok(())}}
-fn map_rule_23(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_23(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[27],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[27]) {return Ok(());}
 if t0.len()!=1 {return Err("className requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1542,41 +1542,41 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[23
 g_className:f0,
 g_paramNames:f1,
 }));Ok(())}}
-fn map_rule_24(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_24(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.node_values(&caps,&[30, 31],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_KeyValuePair(_))) {return Err("entries: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[24],"EvalAnnotation",span);out.push(Ast::g_UBNFAST_2e_EvalAnnotation(g_UBNFAST_2e_EvalAnnotation{span,node_id,
 g_entries:f0,
 }));Ok(())}}
-fn map_rule_25(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_25(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[32],&mut t0);if t0.len()>1 {return Err("style requires at most one value".into());}let f0=t0.pop();self.give_texts(t0);
 let f0:Option<String>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[25],"WhitespaceAnnotation",span);out.push(Ast::g_UBNFAST_2e_WhitespaceAnnotation(g_UBNFAST_2e_WhitespaceAnnotation{span,node_id,
 g_style:f0,
 }));Ok(())}}
-fn map_rule_26(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_26(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[33],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[33]) {return Ok(());}
 if t0.len()!=1 {return Err("profile requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[26],"InterleaveAnnotation",span);out.push(Ast::g_UBNFAST_2e_InterleaveAnnotation(g_UBNFAST_2e_InterleaveAnnotation{span,node_id,
 g_profile:f0,
 }));Ok(())}}
-fn map_rule_27(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_27(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[34],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[34]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[27],"BackrefAnnotation",span);out.push(Ast::g_UBNFAST_2e_BackrefAnnotation(g_UBNFAST_2e_BackrefAnnotation{span,node_id,
 g_name:f0,
 }));Ok(())}}
-fn map_rule_28(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_28(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[35],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[35]) {return Ok(());}
 if t0.len()!=1 {return Err("mode requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[28],"ScopeTreeAnnotation",span);out.push(Ast::g_UBNFAST_2e_ScopeTreeAnnotation(g_UBNFAST_2e_ScopeTreeAnnotation{span,node_id,
 g_mode:f0,
 }));Ok(())}}
-fn map_rule_29(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_29(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[36],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[36]) {return Ok(());}
 if t0.len()!=1 {return Err("symbol requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1586,40 +1586,40 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[29
 g_symbol:f0,
 g_description:f1,
 }));Ok(())}}
-fn map_rule_30(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_30(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[38],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[38]) {return Ok(());}
 if t0.len()!=1 {return Err("context requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[30],"CatalogAnnotation",span);out.push(Ast::g_UBNFAST_2e_CatalogAnnotation(g_UBNFAST_2e_CatalogAnnotation{span,node_id,
 g_context:f0,
 }));Ok(())}}
-fn map_rule_31(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_31(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[31],"LeftAssocAnnotation",span);out.push(Ast::g_UBNFAST_2e_LeftAssocAnnotation(g_UBNFAST_2e_LeftAssocAnnotation{span,node_id,
 }));Ok(())}}
-fn map_rule_32(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_32(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[32],"RightAssocAnnotation",span);out.push(Ast::g_UBNFAST_2e_RightAssocAnnotation(g_UBNFAST_2e_RightAssocAnnotation{span,node_id,
 }));Ok(())}}
-fn map_rule_33(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_33(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[33],"LongestChoiceAnnotation",span);out.push(Ast::g_UBNFAST_2e_LongestChoiceAnnotation(g_UBNFAST_2e_LongestChoiceAnnotation{span,node_id,
 }));Ok(())}}
-fn map_rule_34(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_34(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[34],"PredictiveChoiceAnnotation",span);out.push(Ast::g_UBNFAST_2e_PredictiveChoiceAnnotation(g_UBNFAST_2e_PredictiveChoiceAnnotation{span,node_id,
 }));Ok(())}}
-fn map_rule_35(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_35(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[39],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[39]) {return Ok(());}
 if t0.len()!=1 {return Err("level requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[35],"PrecedenceAnnotation",span);out.push(Ast::g_UBNFAST_2e_PrecedenceAnnotation(g_UBNFAST_2e_PrecedenceAnnotation{span,node_id,
 g_level:f0,
 }));Ok(())}}
-fn map_rule_36(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_36(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[40],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[40]) {return Ok(());}
 if t0.len()!=1 {return Err("text requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[36],"DocAnnotation",span);out.push(Ast::g_UBNFAST_2e_DocAnnotation(g_UBNFAST_2e_DocAnnotation{span,node_id,
 g_text:f0,
 }));Ok(())}}
-fn map_rule_37(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_37(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[42],&mut t0);if t0.len()>1 {return Err("mode requires at most one value".into());}let f0=t0.pop();self.give_texts(t0);
 let f0:Option<String>=f0;
 let mut t1=self.take_texts();self.text_values(&caps,&[41],&mut t1);if t1.len()>1 {return Err("syncTokens requires at most one value".into());}let f1=t1.pop();self.give_texts(t1);
@@ -1628,40 +1628,40 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[37
 g_mode:f0,
 g_syncTokens:f1,
 }));Ok(())}}
-fn map_rule_38(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_38(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[38],"SkipAnnotation",span);out.push(Ast::g_UBNFAST_2e_SkipAnnotation(g_UBNFAST_2e_SkipAnnotation{span,node_id,
 }));Ok(())}}
-fn map_rule_39(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_39(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.text_values(&caps,&[43, 44],&mut f0);
 let f0:Vec<String>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[39],"CommonFieldAnnotation",span);out.push(Ast::g_UBNFAST_2e_CommonFieldAnnotation(g_UBNFAST_2e_CommonFieldAnnotation{span,node_id,
 g_fieldNames:f0,
 }));Ok(())}}
-fn map_rule_40(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_40(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[40],"EnumAnnotation",span);out.push(Ast::g_UBNFAST_2e_EnumAnnotation(g_UBNFAST_2e_EnumAnnotation{span,node_id,
 }));Ok(())}}
-fn map_rule_41(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_41(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[45],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[45]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[41],"SimpleAnnotation",span);out.push(Ast::g_UBNFAST_2e_SimpleAnnotation(g_UBNFAST_2e_SimpleAnnotation{span,node_id,
 g_name:f0,
 }));Ok(())}}
-fn map_rule_42(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_42(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.node_values(&caps,&[46, 47],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_SequenceBody(_))) {return Err("alternatives: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[42],"ChoiceBody",span);out.push(Ast::g_UBNFAST_2e_ChoiceBody(g_UBNFAST_2e_ChoiceBody{span,node_id,
 g_alternatives:f0,
 }));Ok(())}}
-fn map_rule_43(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_43(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.node_values(&caps,&[48],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_AnnotatedElement(_))) {return Err("elements: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[43],"SequenceBody",span);out.push(Ast::g_UBNFAST_2e_SequenceBody(g_UBNFAST_2e_SequenceBody{span,node_id,
 g_elements:f0,
 }));Ok(())}}
-fn map_rule_44(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_44(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[50],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Text(_)) || matches!(value,Ast::g_UBNFAST_2e_ErrorElement(_)) || matches!(value,Ast::g_UBNFAST_2e_GroupElement(_)) || matches!(value,Ast::g_UBNFAST_2e_OptionalElement(_)) || matches!(value,Ast::g_UBNFAST_2e_RepeatElement(_)) || matches!(value,Ast::g_UBNFAST_2e_TerminalElement(_))) {return Err("element: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[50]) {return Ok(());}
@@ -1678,12 +1678,12 @@ g_element:f0,
 g_captureName:f1,
 g_typeofConstraint:f2,
 }));Ok(())}}
-fn map_rule_45(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_46(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_47(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_48(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_49(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_50(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_45(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_46(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_47(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_48(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_49(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_50(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[52],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_ChoiceBody(_))) {return Err("body: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[52]) {return Ok(());}
@@ -1692,7 +1692,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[50],"GroupElement",span);out.push(Ast::g_UBNFAST_2e_GroupElement(g_UBNFAST_2e_GroupElement{span,node_id,
 g_body:f0,
 }));Ok(())}}
-fn map_rule_51(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_51(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[53],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_ChoiceBody(_))) {return Err("body: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[53]) {return Ok(());}
@@ -1701,7 +1701,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[51],"OptionalElement",span);out.push(Ast::g_UBNFAST_2e_OptionalElement(g_UBNFAST_2e_OptionalElement{span,node_id,
 g_body:f0,
 }));Ok(())}}
-fn map_rule_52(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_52(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[54],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_ChoiceBody(_))) {return Err("body: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[54]) {return Ok(());}
@@ -1710,35 +1710,35 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[52],"RepeatElement",span);out.push(Ast::g_UBNFAST_2e_RepeatElement(g_UBNFAST_2e_RepeatElement{span,node_id,
 g_body:f0,
 }));Ok(())}}
-fn map_rule_53(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_53(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[55],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[55]) {return Ok(());}
 if t0.len()!=1 {return Err("message requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[53],"ErrorElement",span);out.push(Ast::g_UBNFAST_2e_ErrorElement(g_UBNFAST_2e_ErrorElement{span,node_id,
 g_message:f0,
 }));Ok(())}}
-fn map_rule_54(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_54(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[56],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[56]) {return Ok(());}
 if t0.len()!=1 {return Err("value requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[54],"TerminalElement",span);out.push(Ast::g_UBNFAST_2e_TerminalElement(g_UBNFAST_2e_TerminalElement{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_55(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_56(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_55(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_56(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_texts();self.text_values(&caps,&[59],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[59]) {return Ok(());}
 if t0.len()!=1 {return Err("captureName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[56],"TypeofElement",span);out.push(Ast::g_UBNFAST_2e_TypeofElement(g_UBNFAST_2e_TypeofElement{span,node_id,
 g_captureName:f0,
 }));Ok(())}}
-fn map_rule_57(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
+fn map_rule_57(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=Vec::new();self.text_values(&caps,&[60, 61],&mut f0);
 let f0:Vec<String>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[57],"DottedIdentifier",span);out.push(Ast::g_UBNFAST_2e_DottedIdentifier(g_UBNFAST_2e_DottedIdentifier{span,node_id,
 g_parts:f0,
 }));Ok(())}}
-fn map_rule_58(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_58(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
 /// 出現（capture / rule / token）の収集と、AST 構築が rule ごとに読む直下 capture 表を
 /// 1 回の走査で作る。以前は出現収集の後に AST 構築が rule ごとに `collect_captures` で
 /// 同じ木をもう一度下っていた。
@@ -1781,9 +1781,6 @@ fn occurrences(
         caps_flat.clear();
         caps_flat.reserve(estimate);
         pending.clear();
-        if self.rule_caps.len() < self.arena.len() {
-            self.rule_caps.resize(self.arena.len(), (0, 0));
-        }
     }
     // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは u32::MAX。
     // event id も出現番号も入力 byte 数（u32 上限）で抑えられるので u32 に詰める（1 要素 16 byte）。
@@ -1846,7 +1843,9 @@ if want_lexical && expr != usize::MAX => {
                 });
                 lexical_order += 1;
             }
-            Event::Rule { rule, span, child } => {
+            Event::Rule {
+                rule, span, child, ..
+            } => {
                 if done {
                     if want_occurrences {
                         let start = rule_starts.pop().unwrap_or(0) as usize;
@@ -1854,8 +1853,9 @@ if want_lexical && expr != usize::MAX => {
                             let offset = caps_flat.len();
                             caps_flat.extend_from_slice(&pending[start..]);
                             pending.truncate(start);
-                            self.rule_caps[id.0] =
-                                (offset as u32, (caps_flat.len() - offset) as u32);
+                            if let Event::Rule { caps, .. } = &mut self.arena[id.0] {
+                                *caps = (offset as u32, (caps_flat.len() - offset) as u32);
+                            }
                         }
                         // この rule の直下 capture に rule 完了順を書く（後段の走査の代わり）。
                         for &order in &pending_ids[start..] {

@@ -355,7 +355,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             } else {
                 p.push_str("let end=out.state.consumed;\n");
             }
-            writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,end],child:out.events}});\n}} else {{ self.restore(mark); }}").unwrap();
+            writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,end],child:out.events,caps:(0,0)}});\n}} else {{ self.restore(mark); }}").unwrap();
             writeln!(
                 p,
                 "if !out.ok {{self.display.failures(state.consumed.max(state.matched),&{:?});}}",
