@@ -30,6 +30,8 @@ public final class JavaEmitter {
     private final SemanticShape semanticShapes;
     private final DiagnosticPlan diagnosticPlan;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
+    /** Generated constants (arrays of boundaries, fields, hints, ...) hoisted to static finals: expression text -> field name. */
+    private final Map<String, String> constants = new LinkedHashMap<>();
     public JavaEmitter(GrammarIr ir, String packageName) { this(ir, packageName, true); }
     public JavaEmitter(GrammarIr ir, String packageName, boolean emitDriver) {
         Validation.validate(ir); this.ir = ir; this.emitDriver = emitDriver;
@@ -89,9 +91,14 @@ public final class JavaEmitter {
     }
     private static String strings(List<String> list) { return "new String[]{" + list.stream().map(JavaEmitter::q).collect(Collectors.joining(",")) + "}"; }
     private static String ints(List<Integer> list) { return "new int[]{" + list.stream().map(Object::toString).collect(Collectors.joining(",")) + "}"; }
+    /** Hoist a side-effect-free constructor expression into a shared static final field (allocated once per class, not per call). */
+    private String constant(String type, String expression) {
+        return constants.computeIfAbsent(type + " " + expression, key -> "K" + constants.size());
+    }
+    private String kStrings(List<String> list) { return constant("String[]", strings(list)); }
     private String method(String id) { return "e" + exprIds.get(id); }
     private String call(String id) { return parser + "::" + method(id); }
-    private String calls(List<String> ids) { return "new Call[]{" + ids.stream().map(this::call).collect(Collectors.joining(",")) + "}"; }
+    private String calls(List<String> ids) { return constant("Call[]", "new Call[]{" + ids.stream().map(this::call).collect(Collectors.joining(",")) + "}"); }
     private String ruleMethod(String id) {
         String name = ir.semantics().symbols().stream().filter(s -> s.id().equals(id)).map(Symbol::name).findFirst().orElse("Rule" + ruleIds.get(id));
         return "parse" + name.replaceAll("[^A-Za-z0-9_]", "_") + "_" + ruleIds.get(id);
@@ -279,6 +286,10 @@ public final class JavaEmitter {
         emitBuild(out);
         for (Rule rule : rules.values()) emitRule(out, rule);
         for (Expr expr : expressions.values()) emitExpr(out, expr);
+        for (var constant : constants.entrySet()) {
+            int split = constant.getKey().indexOf(' ');
+            out.append("    private static final ").append(constant.getKey(), 0, split).append(' ').append(constant.getValue()).append(" = ").append(constant.getKey().substring(split + 1)).append(";\n");
+        }
         return out.append("}\n").toString();
     }
     private String driverSource() throws IOException {
@@ -315,8 +326,8 @@ public final class JavaEmitter {
         String fields = recipe == null ? "" : recipe.fields().stream().map(f -> "new Field(" + q(f.field()) + "," + strings(f.siteIds()) + "," + q(f.conversion()) + "," + q(f.cardinality()) + ")").collect(Collectors.joining(","));
         out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(exprIds.size() + ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
-            .append(", new Field[]{").append(fields).append("}, new Effect[]{").append(effects).append("}, ").append(rule.skip()).append(", ")
-            .append(strings(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(", ").append(strings(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
+            .append(", ").append(constant("Field[]", "new Field[]{" + fields + "}")).append(", ").append(constant("Effect[]", "new Effect[]{" + effects + "}")).append(", ").append(rule.skip()).append(", ")
+            .append(kStrings(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().map(hint -> "'" + hint + "'").toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(", ").append(kStrings(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
     }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;
@@ -330,15 +341,17 @@ public final class JavaEmitter {
         var sites = expr.captureSiteIds().stream().map(captures::get).toList();
         out.append("    private static Match ").append(method).append("(Session s, Frame f) {\n");
         var memo = ir.plan().memo().entries().stream().filter(e -> e.exprId().equals(expr.id())).findFirst().orElse(null);
-        if (memo != null && (memo.cacheSuccess() || memo.cacheFailure())) {
+        // A rule body is memoized by Session.rule with the same key and flags; wrapping it again only doubles the table.
+        boolean ruleBody = rules.values().stream().anyMatch(r -> r.body().equals(expr.id()));
+        if (memo != null && (memo.cacheSuccess() || memo.cacheFailure()) && !ruleBody) {
             out.append("        return s.expression(f, ").append(exprIds.get(expr.id())).append(", ").append(memo.cacheSuccess()).append(", ").append(memo.cacheFailure())
                 .append(", ").append(parser).append("::").append(method).append("Body);\n    }\n")
                 .append("    private static Match ").append(method).append("Body(Session s, Frame f) {\n");
         }
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
-            .append(strings(expr.captureSiteIds())).append(", ").append(strings(sites.stream().map(Capture::name).toList())).append(", ").append(strings(sites.stream().map(Capture::spanRule).toList()))
-            .append(", new boolean[]{").append(sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(","))).append("}, ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(strings(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
+            .append(kStrings(expr.captureSiteIds())).append(", ").append(kStrings(sites.stream().map(Capture::name).toList())).append(", ").append(kStrings(sites.stream().map(Capture::spanRule).toList()))
+            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}")).append(", ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(kStrings(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
         String body = expression(expr);
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
     }
@@ -382,7 +395,7 @@ public final class JavaEmitter {
         }
         if (!mode.equals("SKIP") && patterns.isEmpty()) { patterns = List.of(";"); consume = true; }
         if (mode.equals("SYNC")) { consume = true; noSync = "fail"; }
-        return "return s.recover(f, " + call + ", " + q(recovery.ruleId()) + ", " + q(mode) + ", " + strings(patterns) + ", " + consume + ", " + q(noSync) + ", " + q(recovery.astProjection()) + ", " + q(recovery.recipeId()) + ");";
+        return "return s.recover(f, " + call + ", " + q(recovery.ruleId()) + ", " + q(mode) + ", " + kStrings(patterns) + ", " + consume + ", " + q(noSync) + ", " + q(recovery.astProjection()) + ", " + q(recovery.recipeId()) + ");";
     }
     private List<String> followPatterns(String rule) {
         var follows = new LinkedHashMap<String, Set<String>>();
@@ -430,7 +443,7 @@ public final class JavaEmitter {
     }
     private String token(TokenSpec spec, String label) {
         return switch (spec.kind()) {
-            case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + ints(spec.codePoints()) + "," + q(label) + ")";
+            case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + constant("int[]", ints(spec.codePoints())) + "," + q(label) + ")";
             case "until" -> "s.until(f," + q(spec.terminator()) + ")";
             case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + q(label) + ")," + spec.kind().equals("negativeLookahead") + "," + q(label) + ")";
             case "negation" -> "s.range(f,0,1114111," + q(spec.excluded()) + "," + q(label) + ")";
@@ -455,7 +468,7 @@ public final class JavaEmitter {
             String transitions = dfa.transitions().stream().flatMap(t -> t.ranges().stream()
                 .map(r -> "new int[]{" + t.from() + "," + r.get(0) + "," + r.get(1) + "," + t.to() + "}"))
                 .collect(Collectors.joining(","));
-            return "s.dfa(f," + dfa.start() + "," + ints(dfa.accepting()) + ",new int[][]{" + transitions + "}," + q(label) + ")";
+            return "s.dfa(f," + dfa.start() + "," + constant("int[]", ints(dfa.accepting())) + "," + constant("int[][]", "new int[][]{" + transitions + "}") + "," + q(label) + ")";
         }
         var token = tokens.values().stream().filter(t -> t.spec() == spec).findFirst().orElseThrow();
         var plan = ir.plan().lexical().stream().filter(p -> p.tokenId().equals(token.symbolId()) && p.dfa() != null).findFirst().orElse(null);
@@ -463,18 +476,18 @@ public final class JavaEmitter {
             String transitions = plan.dfa().states().stream().flatMap(state -> state.transitions().stream()
                 .map(t -> "new int[]{" + state.id() + "," + t.range().start() + "," + t.range().end() + "," + t.target() + "}"))
                 .collect(Collectors.joining(","));
-            return "s.dfa(f," + plan.dfa().startState() + "," + ints(plan.dfa().states().stream().filter(s -> s.accepting()).map(s -> s.id()).toList())
-                + ",new int[][]{" + transitions + "}," + q(label) + ")";
+            return "s.dfa(f," + plan.dfa().startState() + "," + constant("int[]", ints(plan.dfa().states().stream().filter(s -> s.accepting()).map(s -> s.id()).toList()))
+                + "," + constant("int[][]", "new int[][]{" + transitions + "}") + "," + q(label) + ")";
         }
-        return "s.regex(f,Pattern.compile(" + q(spec.pattern()) + ")," + q(label) + ")";
+        return "s.regex(f," + constant("Pattern", "Pattern.compile(" + q(spec.pattern()) + ")") + "," + q(label) + ")";
     }
     private String boundaries(String id) {
         var policies = Validation.index(ir.semantics().trivia().policies(), TriviaPolicy::id);
-        return "new Boundary[]{" + ir.semantics().trivia().insertionPlan().stream().filter(p -> p.boundary().ownerExprId().equals(id)).map(p -> {
+        return constant("Boundary[]", "new Boundary[]{" + ir.semantics().trivia().insertionPlan().stream().filter(p -> p.boundary().ownerExprId().equals(id)).map(p -> {
             Boundary b = p.boundary();
             String delimiters = policies.get(p.policyId()).effectiveDelimiterSet().stream().map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + ")").collect(Collectors.joining(","));
-            return "new Boundary(" + q(b.at()) + "," + (b.childIndex() == null ? -1 : b.childIndex()) + ",new Delimiter[]{" + delimiters + "})";
-        }).collect(Collectors.joining(",")) + "}";
+            return "new Boundary(" + q(b.at()) + "," + (b.childIndex() == null ? -1 : b.childIndex()) + "," + constant("Delimiter[]", "new Delimiter[]{" + delimiters + "}") + ")";
+        }).collect(Collectors.joining(",")) + "}");
     }
     private String choice(Expr expr) {
         var plan = ir.plan().choices().stream().filter(p -> p.exprId().equals(expr.id())).findFirst().orElse(null);

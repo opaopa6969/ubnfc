@@ -1399,7 +1399,7 @@
     "sccs": [
       {
         "id": "scc:0",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": true,
         "ruleIds": [
           "Operators::Expression",
@@ -1425,7 +1425,7 @@
       },
       {
         "id": "scc:3",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Operators::NumericLiteral"
@@ -1525,39 +1525,79 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1567,39 +1607,79 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1613,7 +1693,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal"
@@ -1627,7 +1707,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
@@ -1648,7 +1728,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal"
@@ -1662,7 +1742,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
               "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
@@ -1679,39 +1759,77 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:455:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:455:body/0/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:462:472:body/1/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:462:472:body/1/1/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1721,25 +1839,49 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/0/tokenRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/0/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         }
       ],
       "referenceMode": "allEligible",

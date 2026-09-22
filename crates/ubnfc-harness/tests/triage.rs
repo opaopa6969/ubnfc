@@ -232,7 +232,8 @@ fn oracle_captures_require_prefix_observation_even_after_full_parse_failure() {
         a.response.as_object_mut().unwrap().remove("prefixCaptures");
         assert_eq!(compare(&c, &a, &[]), Verdict::Pass);
         assert_eq!(unobserved(&c, &a), ["/prefixCaptures"]);
-        let report = ubnfc_harness::runner::Report::from_actual(&[c.clone()], &[a]).unwrap();
+        let report =
+            ubnfc_harness::runner::Report::from_actual(std::slice::from_ref(&c), &[a]).unwrap();
         assert_eq!((report.unobserved, report.unobserved_cases), (1, 1));
     }
 }

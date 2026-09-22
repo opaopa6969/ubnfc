@@ -1649,7 +1649,7 @@
     "sccs": [
       {
         "id": "scc:0",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "TinyCalcLR::Formula"
@@ -1657,7 +1657,7 @@
       },
       {
         "id": "scc:1",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": true,
         "ruleIds": [
           "TinyCalcLR::Expression",
@@ -1802,18 +1802,32 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:218:228:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:218:232:body/seq",
+              "expr:story/code/calc-leftrec.ubnf:218:228:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:229:232:body/1/tokenRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:218:232:body/seq",
+              "expr:story/code/calc-leftrec.ubnf:229:232:body/1/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1837,25 +1851,50 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:263:268:body/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/1",
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/2",
+              "expr:story/code/calc-leftrec.ubnf:263:268:body/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:269:273:body/0/2/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/1",
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/2",
+              "expr:story/code/calc-leftrec.ubnf:269:273:body/0/2/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:276:280:body/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:276:280:body/1/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1865,18 +1904,33 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/1",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/1"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/2",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/1",
+              "expr:story/code/calc-leftrec.ubnf:252:280:body/choice/lower/leftRecursion/2"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1900,25 +1954,50 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:299:304:body/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/1",
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/2",
+              "expr:story/code/calc-leftrec.ubnf:299:304:body/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:305:311:body/0/2/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/1",
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/2",
+              "expr:story/code/calc-leftrec.ubnf:305:311:body/0/2/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:314:320:body/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:314:320:body/1/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1928,18 +2007,33 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/1",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/1"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/2",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/0",
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/1",
+              "expr:story/code/calc-leftrec.ubnf:294:320:body/choice/lower/leftRecursion/2"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1949,39 +2043,77 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:336:342:body/0/tokenRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:336:363:body/choice",
+              "expr:story/code/calc-leftrec.ubnf:336:342:body/0/tokenRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:345:363:body/1/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:336:363:body/choice",
+              "expr:story/code/calc-leftrec.ubnf:345:363:body/1/seq"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:345:348:body/1/0/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:336:363:body/choice",
+              "expr:story/code/calc-leftrec.ubnf:345:363:body/1/seq",
+              "expr:story/code/calc-leftrec.ubnf:345:348:body/1/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:349:359:body/1/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:336:363:body/choice",
+              "expr:story/code/calc-leftrec.ubnf:345:363:body/1/seq",
+              "expr:story/code/calc-leftrec.ubnf:349:359:body/1/1/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:360:363:body/1/2/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:story/code/calc-leftrec.ubnf:336:363:body/choice",
+              "expr:story/code/calc-leftrec.ubnf:345:363:body/1/seq",
+              "expr:story/code/calc-leftrec.ubnf:360:363:body/1/2/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1995,7 +2127,7 @@
           "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:378:381:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:story/code/calc-leftrec.ubnf:378:387:body/choice",
               "expr:story/code/calc-leftrec.ubnf:378:381:body/0/literal"
@@ -2009,7 +2141,7 @@
           "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:384:387:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:story/code/calc-leftrec.ubnf:378:387:body/choice",
               "expr:story/code/calc-leftrec.ubnf:384:387:body/1/literal"
@@ -2030,7 +2162,7 @@
           "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:402:405:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:story/code/calc-leftrec.ubnf:402:411:body/choice",
               "expr:story/code/calc-leftrec.ubnf:402:405:body/0/literal"
@@ -2044,7 +2176,7 @@
           "cacheSuccess": false,
           "exprId": "expr:story/code/calc-leftrec.ubnf:408:411:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:story/code/calc-leftrec.ubnf:402:411:body/choice",
               "expr:story/code/calc-leftrec.ubnf:408:411:body/1/literal"

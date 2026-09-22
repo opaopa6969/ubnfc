@@ -537,7 +537,7 @@
     "sccs": [
       {
         "id": "scc:0",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Evolution::Expression"
@@ -545,7 +545,7 @@
       },
       {
         "id": "scc:1",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Evolution::Binary"
@@ -553,7 +553,7 @@
       },
       {
         "id": "scc:2",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Evolution::Literal"
@@ -561,7 +561,7 @@
       },
       {
         "id": "scc:3",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Evolution::Digits"
@@ -625,18 +625,32 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:134:140:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:134:150:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:134:140:body/0/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:143:150:body/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:134:150:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:143:150:body/1/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -646,25 +660,46 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:211:218:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:211:240:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:211:218:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:225:228:body/1/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:211:240:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:225:228:body/1/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:233:240:body/2/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:211:240:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:233:240:body/2/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -674,11 +709,18 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:299:305:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:299:305:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:299:305:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -688,11 +730,18 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:328:334:body/0/tokenRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:328:334:body/seq",
+              "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:328:334:body/0/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         }
       ],
       "referenceMode": "allEligible",
@@ -717,7 +766,7 @@
       ]
     },
     "operators": [],
-    "profile": "conservative",
+    "profile": "optimized",
     "triviaCache": {
       "enabled": false,
       "key": [

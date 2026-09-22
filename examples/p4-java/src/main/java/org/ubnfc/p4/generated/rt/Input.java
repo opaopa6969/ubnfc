@@ -32,8 +32,12 @@ public final class Input {
     }
 
     public int codePointAt(int idx) {
-        Objects.checkIndex(idx, chars.length);
-        return Character.codePointAt(chars, idx);
+        char c = chars[idx];
+        if (Character.isHighSurrogate(c) && idx + 1 < chars.length) {
+            char d = chars[idx + 1];
+            if (Character.isLowSurrogate(d)) return Character.toCodePoint(c, d);
+        }
+        return c;
     }
 
     /** 単語境界を要求しない接頭辞一致。入力末尾では空リテラルだけが一致する。 */

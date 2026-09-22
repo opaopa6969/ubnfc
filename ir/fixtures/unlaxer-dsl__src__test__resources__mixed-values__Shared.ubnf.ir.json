@@ -766,7 +766,7 @@
     "sccs": [
       {
         "id": "scc:0",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Shared::Entry"
@@ -790,7 +790,7 @@
       },
       {
         "id": "scc:3",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Shared::Factor"
@@ -877,18 +877,32 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -902,7 +916,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal"
@@ -916,7 +930,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef"
@@ -937,7 +951,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal"
@@ -951,7 +965,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef"
@@ -968,32 +982,60 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1007,7 +1049,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/seq",
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal"
@@ -1028,7 +1070,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/seq",
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal"

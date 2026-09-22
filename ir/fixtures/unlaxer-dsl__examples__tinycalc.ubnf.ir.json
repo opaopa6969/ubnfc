@@ -2192,7 +2192,7 @@
     "sccs": [
       {
         "id": "scc:0",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "TinyCalc::TinyCalc"
@@ -2200,7 +2200,7 @@
       },
       {
         "id": "scc:1",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "TinyCalc::VariableDeclaration"
@@ -2208,7 +2208,7 @@
       },
       {
         "id": "scc:2",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": true,
         "ruleIds": [
           "TinyCalc::Expression",
@@ -2345,25 +2345,47 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:483:body/0/repeat",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:483:body/0/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:462:481:body/0/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:483:body/0/repeat",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:462:481:body/0/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:503:513:body/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:503:513:body/1/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -2373,74 +2395,154 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:645:body/0/0/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:645:body/0/0/choice"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:632:body/0/0/0/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:645:body/0/0/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:632:body/0/0/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:635:645:body/0/0/1/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:645:body/0/0/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:635:645:body/0/0/1/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:662:672:body/1/tokenRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:662:672:body/1/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:702:body/2/0/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:702:body/2/0/seq"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:691:body/2/0/0/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:702:body/2/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:691:body/2/0/0/literal"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:692:702:body/2/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:702:body/2/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:692:702:body/2/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:716:719:body/3/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:716:719:body/3/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -2450,39 +2552,79 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:831:835:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:831:867:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:831:835:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:842:867:body/1/repeat",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:831:867:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:842:867:body/1/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:844:858:body/1/0/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:831:867:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:842:867:body/1/repeat",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:844:858:body/1/0/seq"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:844:849:body/1/0/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:831:867:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:842:867:body/1/repeat",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:844:858:body/1/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:844:849:body/1/0/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:854:858:body/1/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:831:867:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:842:867:body/1/repeat",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:844:858:body/1/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:854:858:body/1/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -2492,39 +2634,79 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:973:979:body/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:973:1013:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:973:979:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:986:1013:body/1/repeat",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:973:1013:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:986:1013:body/1/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:988:1004:body/1/0/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:973:1013:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:986:1013:body/1/repeat",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:988:1004:body/1/0/seq"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:988:993:body/1/0/0/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:973:1013:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:986:1013:body/1/repeat",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:988:1004:body/1/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:988:993:body/1/0/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:998:1004:body/1/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:973:1013:body/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:986:1013:body/1/repeat",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:988:1004:body/1/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:998:1004:body/1/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -2538,7 +2720,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1031:1034:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1031:1040:body/choice",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1031:1034:body/0/literal"
@@ -2552,7 +2734,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1037:1040:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1031:1040:body/choice",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1037:1040:body/1/literal"
@@ -2573,7 +2755,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1056:1059:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1056:1065:body/choice",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1056:1059:body/0/literal"
@@ -2587,7 +2769,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1062:1065:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1056:1065:body/choice",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:1062:1065:body/1/literal"
@@ -2604,46 +2786,91 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1109:body/0/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1141:body/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1109:body/0/seq"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1094:body/0/0/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1141:body/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1109:body/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1094:body/0/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1095:1105:body/0/1/ruleRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1141:body/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1109:body/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1095:1105:body/0/1/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1106:1109:body/0/2/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1141:body/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1109:body/0/seq",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1106:1109:body/0/2/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1117:1123:body/1/tokenRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1141:body/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1117:1123:body/1/tokenRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:1131:1141:body/2/tokenRef",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1091:1141:body/choice",
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:1131:1141:body/2/tokenRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         }
       ],
       "referenceMode": "allEligible",
