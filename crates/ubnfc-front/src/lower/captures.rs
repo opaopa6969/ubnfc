@@ -65,9 +65,14 @@ pub(super) fn conversion(value: &ValueType) -> Conversion {
     }
 }
 pub(super) fn fields(cx: &Context<'_>, rule: &r::ResolvedRule) -> BTreeMap<String, Shape> {
-    body_captures(cx, &rule.body)
+    body_captures(cx, &rule.body, true)
 }
-fn body_captures(cx: &Context<'_>, body: &ResolvedBody) -> BTreeMap<String, Shape> {
+/// capture の出現回数は、参照先 helper が返す意味値の個数とは別。
+/// AST field/recipe は fields の意味的 cardinality を保持する。
+pub(super) fn occurrences(cx: &Context<'_>, rule: &r::ResolvedRule) -> BTreeMap<String, Shape> {
+    body_captures(cx, &rule.body, false)
+}
+fn body_captures(cx: &Context<'_>, body: &ResolvedBody, semantic: bool) -> BTreeMap<String, Shape> {
     let alternatives: Vec<_> = body
         .alternatives
         .iter()
@@ -75,9 +80,21 @@ fn body_captures(cx: &Context<'_>, body: &ResolvedBody) -> BTreeMap<String, Shap
             let mut out = BTreeMap::new();
             for e in seq {
                 if let Some(name) = &e.capture {
-                    add(&mut out, name.clone(), captured(cx, &e.atom), true);
+                    let shape = if semantic {
+                        captured(cx, &e.atom)
+                    } else {
+                        Shape::text().wrap(match &e.atom {
+                            A::Optional { .. } => Cardinality::Optional,
+                            A::Repeat { .. }
+                            | A::OneOrMore { .. }
+                            | A::Bounded { .. }
+                            | A::Separated { .. } => Cardinality::List,
+                            _ => Cardinality::Scalar,
+                        })
+                    };
+                    add(&mut out, name.clone(), shape, true);
                 }
-                for (name, shape) in atom_captures(cx, &e.atom) {
+                for (name, shape) in atom_captures(cx, &e.atom, semantic) {
                     add(&mut out, name, shape, true);
                 }
             }
@@ -104,19 +121,19 @@ fn add(out: &mut BTreeMap<String, Shape>, name: String, shape: Shape, sequence: 
         out.insert(name, shape);
     }
 }
-fn atom_captures(cx: &Context<'_>, atom: &A) -> BTreeMap<String, Shape> {
+fn atom_captures(cx: &Context<'_>, atom: &A, semantic: bool) -> BTreeMap<String, Shape> {
     let (mut out, count) = match atom {
-        A::Group { body, .. } => (body_captures(cx, body), Cardinality::Scalar),
-        A::Optional { body, .. } => (body_captures(cx, body), Cardinality::Optional),
-        A::Repeat { body, .. } => (body_captures(cx, body), Cardinality::List),
+        A::Group { body, .. } => (body_captures(cx, body, semantic), Cardinality::Scalar),
+        A::Optional { body, .. } => (body_captures(cx, body, semantic), Cardinality::Optional),
+        A::Repeat { body, .. } => (body_captures(cx, body, semantic), Cardinality::List),
         A::OneOrMore { body, .. } | A::Bounded { body, .. } => {
-            (atom_captures(cx, body), Cardinality::List)
+            (atom_captures(cx, body, semantic), Cardinality::List)
         }
         A::Separated {
             element, separator, ..
         } => {
-            let mut out = atom_captures(cx, element);
-            for (name, shape) in atom_captures(cx, separator) {
+            let mut out = atom_captures(cx, element, semantic);
+            for (name, shape) in atom_captures(cx, separator, semantic) {
                 add(&mut out, name, shape, true);
             }
             (out, Cardinality::List)

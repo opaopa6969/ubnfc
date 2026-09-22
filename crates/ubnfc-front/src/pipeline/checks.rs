@@ -2,6 +2,9 @@
 use super::*;
 use std::collections::BTreeSet;
 
+#[path = "cardinality.rs"]
+mod cardinality;
+
 pub(super) fn check(ir: &GrammarIr) -> Result<(), PipelineError> {
     let mut errors = ir::validate_references(ir);
     check_semantics(&ir.semantics, &mut errors);
@@ -98,6 +101,7 @@ fn assignable(source: &ValueType, target: &ValueType, semantics: &Semantics) -> 
 }
 
 fn check_semantics(s: &Semantics, errors: &mut Vec<IrError>) {
+    let values = cardinality::Values::new(s);
     for (i, t) in s.ast_types.iter().enumerate() {
         if let AstType::Record { fields, .. } = t {
             for (j, field) in fields.iter().enumerate() {
@@ -207,14 +211,20 @@ fn check_semantics(s: &Semantics, errors: &mut Vec<IrError>) {
                     "recipe と capture site の対応が不一致",
                 );
             }
+            // Capture.cardinality は構文上の出現回数、recipe は意味値の個数。
+            // Helper @value の一回の capture が Optional/List を返す場合もある。
+            let cardinality = captures
+                .iter()
+                .map(|c| values.captured(c))
+                .reduce(cardinality::join);
+            if cardinality.is_some_and(|c| c != field.cardinality) {
+                error(
+                    errors,
+                    &format!("{path}/cardinality"),
+                    "recipe と capture の意味値 cardinality が不一致",
+                );
+            }
             for capture in captures {
-                if capture.cardinality != field.cardinality {
-                    error(
-                        errors,
-                        &format!("{path}/cardinality"),
-                        "recipe と capture の cardinality が不一致",
-                    );
-                }
                 if schema.is_some_and(|f| {
                     !assignable(
                         element_type(&capture.value_type),
@@ -367,6 +377,30 @@ mod tests {
                     ir.semantics.captures[0].value_type = value;
                 },
                 "/valueType",
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_lost_semantic_cardinality_even_when_recipe_and_schema_agree() {
+        for helper in ["[ Leaf ]", "Leaf Leaf"] {
+            let ir = compile("contract.ubnf", &|_| Ok(format!(
+                "grammar G {{ @root @mapping(Box,params=[value]) Root ::= Helper @value; Helper ::= {helper}; @mapping(Leaf) Leaf ::= 'x'; }}"
+            ))).unwrap().ir;
+            assert_eq!(ir.semantics.captures[0].cardinality, Cardinality::Scalar);
+            rejected(
+                ir,
+                |ir| {
+                    ir.semantics.recipes[0].fields[0].cardinality = Cardinality::Scalar;
+                    for ty in &mut ir.semantics.ast_types {
+                        if let AstType::Record { name, fields, .. } = ty {
+                            if name == "Box" {
+                                fields[0].cardinality = Cardinality::Scalar;
+                            }
+                        }
+                    }
+                },
+                "/cardinality",
             );
         }
     }
