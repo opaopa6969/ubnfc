@@ -1,0 +1,5 @@
+grammar Fuzz {
+  token T0 = EOF
+  @recovery(AUTO) M0 ::= T0? 'c';
+  @root @mapping(Top, params=[head]) Root ::= M0 @head ';' @head;
+}

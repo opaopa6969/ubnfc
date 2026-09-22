@@ -2,27 +2,33 @@ fn occurrences(
     &self,
     root: EventId,
 ) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
-    let mut captures = Vec::new();
-    let mut capture_owners = Vec::new();
-    let mut rule_orders = Vec::new();
+    // 出現数は event 数で上から見積もる（capture / rule は event の一部）。伸長の複製を避ける。
+    let estimate = self.arena.len() / 4;
+    let mut captures = Vec::with_capacity(estimate);
+    let mut capture_owners = Vec::with_capacity(estimate);
+    let mut rule_orders = Vec::with_capacity(estimate);
     let mut rule_order = 0;
     let mut lexical = Vec::new();
     let mut tokens = Vec::new();
-    let mut stack = vec![(root, None, false, None)];
+    // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは usize::MAX。
+    const NONE: usize = usize::MAX;
+    let mut stack: Vec<(EventId, usize, bool, usize)> = Vec::with_capacity(64);
+    stack.push((root, NONE, false, NONE));
     let mut lexical_order = 0;
     while let Some((id, parent, done, current)) = stack.pop() {
+        let parent_index = (parent != NONE).then_some(parent);
         match self.arena[id.0] {
             Event::Join(a, b) => {
-                stack.push((b, parent, false, None));
-                stack.push((a, parent, false, None));
+                stack.push((b, parent, false, NONE));
+                stack.push((a, parent, false, NONE));
             }
-            Event::Values { child, .. } => stack.push((child, parent, false, None)),
+            Event::Values { child, .. } => stack.push((child, parent, false, NONE)),
             Event::Capture {
                 site, span, child, ..
             } => {
                 if done {
                     if self.options.build_ast || self.options.lexical {
-                        capture_owners.push(parent);
+                        capture_owners.push(parent_index);
                         let order = captures.len();
                         captures.push(Capture {
                             rule_completion_order: 0,
@@ -34,8 +40,8 @@ fn occurrences(
                         });
                     }
                 } else {
-                    stack.push((id, parent, true, None));
-                    stack.push((child, parent, false, None));
+                    stack.push((id, parent, true, NONE));
+                    stack.push((child, parent, false, NONE));
                 }
             }
             Event::Token {
@@ -43,7 +49,7 @@ fn occurrences(
             } if self.options.lexical && expr != usize::MAX => {
                 tokens.push(LexicalOccurrence {
                     occurrence_id: tokens.len(),
-                    parent_occurrence_id: parent,
+                    parent_occurrence_id: parent_index,
                     rule_id: RULES[rule],
                     expr_id: EXPRESSIONS[expr],
                     span: self.span(span),
@@ -53,7 +59,8 @@ fn occurrences(
             }
             Event::Rule { rule, span, child } => {
                 if done {
-                    if let Some(index) = current {
+                    if current != NONE {
+                        let index = current;
                         rule_orders[index] = rule_order;
                         rule_order += 1;
                         // rule 出現は lexical のときだけ保持する（AST だけなら完了順だけ要る）。
@@ -70,19 +77,19 @@ fn occurrences(
                         if self.options.lexical {
                             lexical.push(LexicalOccurrence {
                                 occurrence_id: index,
-                                parent_occurrence_id: parent,
+                                parent_occurrence_id: parent_index,
                                 rule_id: RULES[rule],
                                 expr_id: BODIES[rule],
                                 span: self.span(span),
                                 completion_order: 0,
                             });
                         }
-                        Some(index)
+                        index
                     } else {
                         parent
                     };
                     stack.push((id, parent, true, index));
-                    stack.push((child, index, false, None));
+                    stack.push((child, index, false, NONE));
                 }
             }
             _ => {}
@@ -157,7 +164,12 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
     }
     (recoveries, diagnostics)
 }
-pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
+pub(crate) fn finish(self, step: Step) -> ParseResult {
+    self.finish_checked(step).0
+}
+/// 結果と「診断付きで解析し直す必要があるか」を返す（`ParseOptions::diagnostics` 参照）。
+/// fast mode で診断が要る結果になった入口は、同じ入力を診断モードで解析し直す。
+pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     if let Some(offset) = self.depth_failure {
         step = self.fail(State::default(), offset, "maximum parse depth exceeded");
     }
@@ -171,7 +183,9 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             ..Step::yes(State::default())
         };
     }
-    let trailing = step.ok && self.options.require_eof && step.state.consumed != self.text.len();
+    // require_eof を問わず「入力が残った」ことを再解析の条件にする（保守的）。
+    let incomplete = step.state.consumed != self.text.len();
+    let trailing = step.ok && self.options.require_eof && incomplete;
     let ok = step.ok && !trailing;
     let consumed_cp = if step.ok {
         self.cp(step.state.consumed)
@@ -254,17 +268,20 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     if ok {
         diagnostics.clear();
     }
-    let (recoveries, recovery_diagnostics) = if step.ok {
+    // recovery を持たない文法では Recovery event が無く、走査しても空になる（走査を省く）。
+    let (recoveries, recovery_diagnostics) = if step.ok && HAS_RECOVERY {
         self.recovery_occurrences(step.events)
     } else {
         (vec![], vec![])
     };
     diagnostics.splice(0..0, recovery_diagnostics);
-    let (captures, lexical, tokens) = if step.ok {
-        self.occurrences(step.events)
-    } else {
-        (vec![], vec![], vec![])
-    };
+    // capture / rule / token の出現は AST か lexical のときだけ保持する（認識だけなら走査を省く）。
+    let (captures, lexical, tokens) =
+        if step.ok && (self.options.build_ast || self.options.lexical) {
+            self.occurrences(step.events)
+        } else {
+            (vec![], vec![], vec![])
+        };
     let ast = if ok && self.options.build_ast {
         match self.build_values(step.events).and_then(|mut nodes| {
             if nodes.len() == 1 {
@@ -383,6 +400,14 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             },
         },
     };
+    // 診断を要する結果（失敗・入力の残り・recovery / mapping / resource 診断）は fast mode では
+    // 観測を持たないので、入口が診断モードで解析し直す。scope の意味診断（`scope_diagnostics`）は
+    // 診断機構ではなく scope store の効果なので、fast mode でも同じものが得られる（再解析しない）。
+    let escalate = !self.options.diagnostics
+        && (!result.ok
+            || incomplete
+            || !result.diagnostics.is_empty()
+            || !result.recoveries.is_empty());
     self.recycle();
-    result
+    (result, escalate)
 }

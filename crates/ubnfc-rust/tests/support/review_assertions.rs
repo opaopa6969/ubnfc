@@ -257,6 +257,9 @@ mod review {
                     build_ast: false,
                     require_eof: false,
                     memo,
+                    // scanner の呼出し回数を数えるので 1 回の解析に固定する（既定の fast mode は
+                    // 入力が残った結果を診断モードで解析し直すため、scanner が 2 回呼ばれる）。
+                    diagnostics: true,
                     ..Default::default()
                 },
                 &mut scanner,
@@ -327,6 +330,8 @@ mod review {
                     memo::ParseOptions {
                         build_ast: false,
                         memo: enabled,
+                        // 同上。診断の比較もこのテストの主題なので診断モードで回す。
+                        diagnostics: true,
                         ..Default::default()
                     },
                     &mut scanner,

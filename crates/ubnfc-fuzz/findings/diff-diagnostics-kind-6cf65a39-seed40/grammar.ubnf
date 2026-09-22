@@ -1,0 +1,12 @@
+grammar Fuzz {
+  token T0 = org.unlaxer.parser.elementary.SingleQuotedParser
+  token T1 = NumberParser
+  L0 ::= ;
+  @mapping(Node.A, params=[w]) VA ::= 'p' @w T1;
+  @mapping(Node.B, params=[w]) VB ::= 'q' @w T0{0,2};
+  @mapping(Node) Node ::= VA | VB;
+  M0 ::= '+' ')' @v1 Node | ')'+ ';' @v2 '(';
+  @mapping(C1, params=[v3, v4, v5]) @recovery(sync=';') @predictiveChoice @scopeTree(mode=dynamic) @backref(name=v5) M1 ::= 'あ' @v3 { '\n' } | { T1 @v4 '('* @v5 'ab' } L0*;
+  @recovery(AUTO) M2 ::= 'c' { '😀'+ '😀'* @v6 };
+  @root @mapping(Top, params=[head, tail]) Root ::= M1 @head '😀' @head ( ',' @tail [ '😀' T1* ] )* @tail;
+}

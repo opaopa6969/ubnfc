@@ -156,7 +156,8 @@ pub fn diff(expected: &AstValue, actual: &AstValue) -> Vec<Difference> {
     diff_values(&expected.into(), &actual.into())
 }
 
-pub(crate) fn diff_values(expected: &Value, actual: &Value) -> Vec<Difference> {
+/// 差分 fuzzing も同じ JSON Pointer 規則で比較できるように公開する（追加のみ）。
+pub fn diff_values(expected: &Value, actual: &Value) -> Vec<Difference> {
     fn walk(path: &str, expected: &Value, actual: &Value, out: &mut Vec<Difference>) {
         match (expected, actual) {
             (Value::Object(e), Value::Object(a)) => {

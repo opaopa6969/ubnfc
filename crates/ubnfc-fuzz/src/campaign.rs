@@ -1,0 +1,601 @@
+//! campaign の進行。seed ごとに 文法 → 入力 → 両バックエンド実行 → 比較 を行い、
+//! 差分を見つけたら入力・文法の順に縮小して再現最小例を書き出す。
+
+use crate::engine::{Built, Discard, Engine};
+use crate::model::Grammar;
+use crate::observe::{differences, invariants, Violation};
+use crate::{gen, input, model};
+use serde::Serialize;
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
+use std::fmt::Write as _;
+use std::path::PathBuf;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
+use ubnfc_harness::canonical::Difference;
+use ubnfc_harness::runner::Backend;
+
+#[derive(Clone, Debug)]
+pub struct Config {
+    pub start_seed: u64,
+    pub seeds: usize,
+    pub inputs: usize,
+    pub jobs: usize,
+    pub budget: Option<Duration>,
+    /// 最小再現例の出力先。None なら書き出さない。
+    pub findings: Option<PathBuf>,
+    /// 1 件の縮小で許す build 回数の上限（javac / cargo が支配的なので必ず要る）。
+    pub shrink_builds: usize,
+    pub driver_timeout: Duration,
+    pub workdir: PathBuf,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            start_seed: 1,
+            seeds: 8,
+            inputs: 24,
+            jobs: 2,
+            budget: None,
+            findings: None,
+            shrink_builds: 30,
+            driver_timeout: Duration::from_secs(90),
+            workdir: PathBuf::from("."),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct Finding {
+    pub slug: String,
+    pub signature: String,
+    pub seed: u64,
+    pub grammar: String,
+    pub imported: Option<String>,
+    pub input: String,
+    pub input_code_points: usize,
+    pub differences: Vec<Difference>,
+    pub java_violations: Vec<Violation>,
+    pub rust_violations: Vec<Violation>,
+    pub java: Value,
+    pub rust: Value,
+    pub shrink_rounds: usize,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct Summary {
+    pub seeds: usize,
+    pub generated: usize,
+    pub compiled: usize,
+    pub discarded: usize,
+    /// discard 理由コード → 件数。
+    pub discards: BTreeMap<String, usize>,
+    /// 機能 → その機能を含む生成文法の数 / うち discard された数。
+    pub feature_grammars: BTreeMap<String, usize>,
+    pub feature_discarded: BTreeMap<String, usize>,
+    pub inputs: usize,
+    pub comparisons: usize,
+    pub accepted_all: usize,
+    pub rejected: usize,
+    pub partial: usize,
+    pub driver_errors: usize,
+    pub builds: usize,
+    pub driver_timeouts: usize,
+    pub violation_counts: BTreeMap<String, usize>,
+    pub findings: Vec<Finding>,
+    pub elapsed_seconds: f64,
+}
+
+/// 1 回の比較で観測した「差の種類」。所見はこの単位で 1 件にし、同じ入力に
+/// 複数の種類が出たらそれぞれ別の最小再現例へ縮小する。
+fn classes(differences: &[Difference], java: &[Violation], rust: &[Violation]) -> BTreeSet<String> {
+    let mut parts = BTreeSet::new();
+    for difference in differences {
+        parts.insert(format!("diff:{}", normalize_path(&difference.path)));
+    }
+    for violation in java {
+        parts.insert(format!("java:{}", violation.id));
+    }
+    for violation in rust {
+        parts.insert(format!("rust:{}", violation.id));
+    }
+    parts
+}
+
+/// 配列添字を伏せ、同じ種類の差分を 1 つの signature にまとめる。
+fn normalize_path(path: &str) -> String {
+    path.split('/')
+        .map(|part| {
+            if !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit()) {
+                "*"
+            } else {
+                part
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("/")
+}
+
+/// 差分クラスごとに一意なディレクトリ名。長い pointer は切り詰めるので、
+/// 切り詰めで衝突しないように signature の hash を必ず付ける。
+fn slug_of(signature: &str, seed: u64) -> String {
+    let mut slug: String = signature
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+        .collect();
+    while slug.contains("--") {
+        slug = slug.replace("--", "-");
+    }
+    let slug = slug.trim_matches('-').to_lowercase();
+    let short: String = slug.chars().take(52).collect();
+    let hash = signature
+        .bytes()
+        .fold(0xcbf2_9ce4_8422_2325u64, |hash, byte| {
+            (hash ^ u64::from(byte)).wrapping_mul(0x0000_0100_0000_01b3)
+        });
+    format!("{}-{:08x}-seed{seed}", short.trim_matches('-'), hash as u32)
+}
+
+struct Observed {
+    differences: Vec<Difference>,
+    java_violations: Vec<Violation>,
+    rust_violations: Vec<Violation>,
+}
+
+fn observe(text: &str, java: &Value, rust: &Value) -> Observed {
+    Observed {
+        differences: differences(java, rust),
+        java_violations: invariants(text, java),
+        rust_violations: invariants(text, rust),
+    }
+}
+
+fn run_pair(engine: &mut Engine, built: &Built, inputs: &[String]) -> Vec<(Value, Value)> {
+    let java = engine.run(built, Backend::Java, inputs);
+    let rust = engine.run(built, Backend::Rust, inputs);
+    java.into_iter().zip(rust).collect()
+}
+
+/// 1 つの (文法, 入力) の差分が保たれる範囲で、入力 → 文法 → 入力 の順に縮小する。
+fn shrink(
+    engine: &mut Engine,
+    grammar: &Grammar,
+    text: &str,
+    target: &str,
+    budget: usize,
+) -> (Grammar, String, usize) {
+    let mut grammar = grammar.clone();
+    let mut text = text.to_owned();
+    let mut rounds = 0;
+    let mut builds = 0;
+    // 予算 0 は「縮小しない」。CI 用の短い campaign で driver 実行が膨らむのを防ぐ。
+    if budget == 0 {
+        return (grammar, text, 0);
+    }
+    // 再現確認 1 回につき driver を 2 回起動する（JVM 起動が支配的）。
+    // build 予算に比例した上限を置き、1 件の縮小が campaign を食い潰さないようにする。
+    let mut checks = 0usize;
+    let max_checks = budget * 8;
+    let mut reproduces = |engine: &mut Engine, grammar: &Grammar, text: &str| -> bool {
+        if checks >= max_checks {
+            return false;
+        }
+        checks += 1;
+        let Ok(built) = engine.prepare(grammar) else {
+            return false;
+        };
+        let pair = run_pair(engine, &built, std::slice::from_ref(&text.to_owned()));
+        let Some((java, rust)) = pair.into_iter().next() else {
+            return false;
+        };
+        let observed = observe(text, &java, &rust);
+        classes(
+            &observed.differences,
+            &observed.java_violations,
+            &observed.rust_violations,
+        )
+        .contains(target)
+    };
+    for _ in 0..2 {
+        // 入力の縮小は build を伴わないので先に回す。
+        while let Some(smaller) = input::shrink_candidates(&text)
+            .into_iter()
+            .find(|candidate| reproduces(engine, &grammar, candidate))
+        {
+            text = smaller;
+            rounds += 1;
+        }
+        // 文法の縮小は 1 候補ごとに build が要る。上限で必ず止める。
+        loop {
+            let mut improved = false;
+            for candidate in model::shrink_candidates(&grammar) {
+                if builds >= budget {
+                    return (grammar, text, rounds);
+                }
+                builds += 1;
+                if reproduces(engine, &candidate, &text) {
+                    grammar = candidate;
+                    rounds += 1;
+                    improved = true;
+                    break;
+                }
+            }
+            if !improved {
+                break;
+            }
+        }
+    }
+    (grammar, text, rounds)
+}
+
+/// front が拒否した文法を、同じ理由コードのまま最小化する。build を伴わないので安い。
+/// 所見の最小再現例が「runtime の差」ではなく「front が受け付けない形」のときに使う。
+pub fn minimize_front(engine: &mut Engine, grammar: &Grammar, code: &str) -> Grammar {
+    let mut current = grammar.clone();
+    loop {
+        let Some(smaller) = model::shrink_candidates(&current)
+            .into_iter()
+            .find(|candidate| {
+                engine
+                    .compile_front(candidate)
+                    .err()
+                    .is_some_and(|discard| discard.code == code)
+            })
+        else {
+            return current;
+        };
+        current = smaller;
+    }
+}
+
+struct Shared {
+    next: AtomicUsize,
+    seen: Mutex<BTreeSet<String>>,
+    summary: Mutex<Summary>,
+    start: Instant,
+}
+
+/// campaign 本体。`config.jobs` 個の worker が seed を取り合う。
+pub fn run(config: &Config) -> Summary {
+    let shared = Arc::new(Shared {
+        next: AtomicUsize::new(0),
+        seen: Mutex::new(BTreeSet::new()),
+        summary: Mutex::new(Summary {
+            seeds: config.seeds,
+            ..Summary::default()
+        }),
+        start: Instant::now(),
+    });
+    std::thread::scope(|scope| {
+        for worker in 0..config.jobs.max(1) {
+            let shared = shared.clone();
+            let config = config.clone();
+            scope.spawn(move || {
+                let mut engine = Engine::new(config.workdir.join(format!("w{worker}")));
+                engine.timeout = config.driver_timeout;
+                loop {
+                    let index = shared.next.fetch_add(1, Ordering::Relaxed);
+                    if index >= config.seeds {
+                        break;
+                    }
+                    if config
+                        .budget
+                        .is_some_and(|budget| shared.start.elapsed() >= budget)
+                    {
+                        break;
+                    }
+                    let seed = config.start_seed.wrapping_add(index as u64);
+                    run_seed(&mut engine, &config, &shared, seed);
+                }
+                let mut summary = shared.summary.lock().expect("summary");
+                summary.builds += engine.builds;
+                summary.driver_timeouts += engine.timeouts;
+            });
+        }
+    });
+    let mut summary = shared.summary.lock().expect("summary").clone();
+    summary.elapsed_seconds = shared.start.elapsed().as_secs_f64();
+    summary.findings.sort_by(|a, b| a.slug.cmp(&b.slug));
+    summary
+}
+
+fn record_discard(shared: &Shared, grammar: &Grammar, discard: &Discard) {
+    let mut summary = shared.summary.lock().expect("summary");
+    summary.discarded += 1;
+    *summary.discards.entry(discard.code.clone()).or_default() += 1;
+    for feature in &grammar.features {
+        *summary
+            .feature_discarded
+            .entry((*feature).to_owned())
+            .or_default() += 1;
+    }
+}
+
+fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
+    let grammar = gen::generate(seed);
+    {
+        let mut summary = shared.summary.lock().expect("summary");
+        summary.generated += 1;
+        for feature in &grammar.features {
+            *summary
+                .feature_grammars
+                .entry((*feature).to_owned())
+                .or_default() += 1;
+        }
+    }
+    let built = match engine.prepare(&grammar) {
+        Ok(built) => built,
+        Err(discard) => return record_discard(shared, &grammar, &discard),
+    };
+    shared.summary.lock().expect("summary").compiled += 1;
+    let mut rng = crate::rng::Rng::new(seed ^ 0xF00D_BEEF);
+    let inputs = input::generate(&grammar, &mut rng, config.inputs);
+    let texts: Vec<String> = inputs.iter().map(|i| i.text.clone()).collect();
+    let pairs = run_pair(engine, &built, &texts);
+    let mut new_findings = Vec::new();
+    for (text, (java, rust)) in texts.iter().zip(pairs) {
+        let observed = observe(text, &java, &rust);
+        {
+            let mut summary = shared.summary.lock().expect("summary");
+            summary.inputs += 1;
+            summary.comparisons += 1;
+            if java.get("error").is_some() || rust.get("error").is_some() {
+                summary.driver_errors += 1;
+            } else if java["allConsumed"] == json!(true) {
+                summary.accepted_all += 1;
+            } else if java["accepted"] == json!(true) {
+                summary.partial += 1;
+            } else {
+                summary.rejected += 1;
+            }
+            for violation in observed
+                .java_violations
+                .iter()
+                .map(|v| format!("java:{}", v.id))
+                .chain(
+                    observed
+                        .rust_violations
+                        .iter()
+                        .map(|v| format!("rust:{}", v.id)),
+                )
+            {
+                *summary.violation_counts.entry(violation).or_default() += 1;
+            }
+        }
+        for class in classes(
+            &observed.differences,
+            &observed.java_violations,
+            &observed.rust_violations,
+        ) {
+            if shared.seen.lock().expect("seen").insert(class.clone()) {
+                new_findings.push((class, text.clone()));
+            }
+        }
+    }
+    for (signature, text) in new_findings {
+        let (small_grammar, small_input, rounds) =
+            shrink(engine, &grammar, &text, &signature, config.shrink_builds);
+        let Ok(built) = engine.prepare(&small_grammar) else {
+            continue;
+        };
+        let pair = run_pair(engine, &built, std::slice::from_ref(&small_input));
+        let Some((java, rust)) = pair.into_iter().next() else {
+            continue;
+        };
+        let observed = observe(&small_input, &java, &rust);
+        let finding = Finding {
+            slug: slug_of(&signature, seed),
+            signature,
+            seed,
+            grammar: small_grammar.render(),
+            imported: small_grammar.imported_source().map(|(_, source)| source),
+            input: small_input.clone(),
+            input_code_points: small_input.chars().count(),
+            differences: observed.differences,
+            java_violations: observed.java_violations,
+            rust_violations: observed.rust_violations,
+            java,
+            rust,
+            shrink_rounds: rounds,
+        };
+        if let Some(directory) = &config.findings {
+            let _ = write_finding(directory, &finding);
+        }
+        shared
+            .summary
+            .lock()
+            .expect("summary")
+            .findings
+            .push(finding);
+    }
+}
+
+/// 最小再現例を 1 ディレクトリに固める。入力は生ファイルと JSON の両方で残す
+/// （NUL や非 BMP をエディタ経由で壊さないため）。
+pub fn write_finding(directory: &std::path::Path, finding: &Finding) -> std::io::Result<()> {
+    let target = directory.join(&finding.slug);
+    std::fs::create_dir_all(&target)?;
+    std::fs::write(target.join("grammar.ubnf"), &finding.grammar)?;
+    if let Some(imported) = &finding.imported {
+        std::fs::write(target.join("imported.ubnf"), imported)?;
+    }
+    std::fs::write(target.join("input.txt"), &finding.input)?;
+    std::fs::write(
+        target.join("finding.json"),
+        serde_json::to_string_pretty(finding).expect("finding json") + "\n",
+    )?;
+    let mut readme = format!(
+        "# {}\n\nseed: {} / 入力 {} code point / 縮小 {} 回\n\n## signature\n\n`{}`\n\n## 入力（JSON escape）\n\n```json\n{}\n```\n\n",
+        finding.slug,
+        finding.seed,
+        finding.input_code_points,
+        finding.shrink_rounds,
+        finding.signature,
+        json!(finding.input)
+    );
+    let _ = writeln!(readme, "## 文法\n\n```ubnf\n{}```\n", finding.grammar);
+    if !finding.differences.is_empty() {
+        let _ = writeln!(readme, "## 観測差（左 Java / 右 Rust）\n");
+        for difference in &finding.differences {
+            let _ = writeln!(
+                readme,
+                "- `{}`: java=`{}` rust=`{}`",
+                difference.path,
+                difference
+                    .expected
+                    .as_ref()
+                    .map_or("<欠落>".into(), Value::to_string),
+                difference
+                    .actual
+                    .as_ref()
+                    .map_or("<欠落>".into(), Value::to_string)
+            );
+        }
+        readme.push('\n');
+    }
+    for (label, violations) in [
+        ("Java", &finding.java_violations),
+        ("Rust", &finding.rust_violations),
+    ] {
+        if violations.is_empty() {
+            continue;
+        }
+        let _ = writeln!(readme, "## {label} の不変条件違反\n");
+        for violation in violations {
+            let _ = writeln!(readme, "- `{}`: {}", violation.id, violation.detail);
+        }
+        readme.push('\n');
+    }
+    let _ = writeln!(
+        readme,
+        "## 応答\n\n```json\njava = {}\nrust = {}\n```",
+        finding.java, finding.rust
+    );
+    std::fs::write(target.join("README.md"), readme)?;
+    Ok(())
+}
+
+/// campaign の Markdown 要約。
+pub fn markdown(summary: &Summary) -> String {
+    let mut out = String::new();
+    let _ = writeln!(out, "## campaign の規模\n");
+    let _ = writeln!(out, "| 項目 | 値 |\n|---|---:|");
+    for (label, value) in [
+        ("seed 数", summary.seeds),
+        ("生成した文法", summary.generated),
+        ("IR/生成/build を通った文法", summary.compiled),
+        ("discard された文法", summary.discarded),
+        ("build 回数（縮小を含む）", summary.builds),
+        ("入力（= 比較）件数", summary.comparisons),
+        ("全入力受理", summary.accepted_all),
+        ("prefix のみ受理（部分消費）", summary.partial),
+        ("不受理", summary.rejected),
+        ("driver error / timeout 応答", summary.driver_errors),
+        ("driver の制限時間超過", summary.driver_timeouts),
+        ("最小化済みの所見", summary.findings.len()),
+    ] {
+        let _ = writeln!(out, "| {label} | {value} |");
+    }
+    let _ = writeln!(out, "| 所要 | {:.1} 秒 |", summary.elapsed_seconds);
+    let _ = writeln!(out, "\n## 機能別の被覆と discard 率\n");
+    let _ = writeln!(
+        out,
+        "| 機能 | 生成文法数 | うち discard | discard 率 |\n|---|---:|---:|---:|"
+    );
+    for feature in gen::FEATURES {
+        let total = summary.feature_grammars.get(*feature).copied().unwrap_or(0);
+        let discarded = summary
+            .feature_discarded
+            .get(*feature)
+            .copied()
+            .unwrap_or(0);
+        let rate = if total == 0 {
+            "-".to_string()
+        } else {
+            format!("{:.0}%", 100.0 * discarded as f64 / total as f64)
+        };
+        let _ = writeln!(out, "| `{feature}` | {total} | {discarded} | {rate} |");
+    }
+    if !summary.discards.is_empty() {
+        let _ = writeln!(out, "\n## discard の理由\n");
+        let _ = writeln!(out, "| コード | 件数 |\n|---|---:|");
+        let mut rows: Vec<_> = summary.discards.iter().collect();
+        rows.sort_by(|a, b| b.1.cmp(a.1).then(a.0.cmp(b.0)));
+        for (code, count) in rows {
+            let _ = writeln!(out, "| `{code}` | {count} |");
+        }
+    }
+    if !summary.violation_counts.is_empty() {
+        let _ = writeln!(out, "\n## 不変条件違反（観測件数）\n");
+        let _ = writeln!(out, "| 条件 | 件数 |\n|---|---:|");
+        let mut rows: Vec<_> = summary.violation_counts.iter().collect();
+        rows.sort_by(|a, b| b.1.cmp(a.1).then(a.0.cmp(b.0)));
+        for (id, count) in rows {
+            let _ = writeln!(out, "| `{id}` | {count} |");
+        }
+    }
+    let _ = writeln!(out, "\n## 所見\n");
+    if summary.findings.is_empty() {
+        let _ = writeln!(out, "差分・不変条件違反はいずれも観測されなかった。");
+    }
+    for finding in &summary.findings {
+        let _ = writeln!(
+            out,
+            "### `{}`\n\n- signature: `{}`\n- seed: {} / 入力 {} code point\n- 最小再現: `crates/ubnfc-fuzz/findings/{}/`\n",
+            finding.slug, finding.signature, finding.seed, finding.input_code_points, finding.slug
+        );
+    }
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn difference_classes_ignore_array_indexes_and_slugs_stay_filesystem_safe() {
+        let difference = |path: &str| Difference {
+            path: path.into(),
+            expected: None,
+            actual: None,
+        };
+        let a = classes(&[difference("/captures/0/span/1")], &[], &[]);
+        assert_eq!(a, classes(&[difference("/captures/3/span/1")], &[], &[]));
+        assert_eq!(a.len(), 1);
+        let slug = slug_of(a.iter().next().unwrap(), 12);
+        assert!(
+            slug.chars().all(|c| c.is_ascii_alphanumeric() || c == '-'),
+            "{slug}"
+        );
+        assert!(slug.ends_with("-seed12"));
+        // 切り詰めても別クラスは別ディレクトリになる。
+        let long = |tail: &str| format!("diff:/ast/fields/right/0/fields/right/0/fields/{tail}");
+        assert_ne!(slug_of(&long("left"), 1), slug_of(&long("right"), 1));
+        assert!(classes(&[], &[], &[]).is_empty());
+        let violation = Violation {
+            id: "cursor-order",
+            detail: "x".into(),
+        };
+        // 1 回の比較に複数種類が出たら、種類ごとに別の所見へ分ける。
+        let mixed = classes(
+            &[difference("/consumed")],
+            std::slice::from_ref(&violation),
+            &[],
+        );
+        assert_eq!(
+            mixed.into_iter().collect::<Vec<_>>(),
+            ["diff:/consumed", "java:cursor-order"]
+        );
+    }
+
+    #[test]
+    fn markdown_lists_every_feature_even_when_a_campaign_never_reached_it() {
+        let text = markdown(&Summary::default());
+        for feature in gen::FEATURES {
+            assert!(text.contains(&format!("`{feature}`")), "{feature}");
+        }
+        assert!(text.contains("差分・不変条件違反はいずれも観測されなかった。"));
+    }
+}

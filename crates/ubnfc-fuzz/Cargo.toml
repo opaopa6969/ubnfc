@@ -1,0 +1,16 @@
+[package]
+name = "ubnfc-fuzz"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+ubnfc-front = { path = "../ubnfc-front" }
+ubnfc-harness = { path = "../ubnfc-harness" }
+
+[[bin]]
+name = "ubnfc-fuzz"
+path = "src/main.rs"
