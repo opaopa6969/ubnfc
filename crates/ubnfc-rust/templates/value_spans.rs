@@ -1,7 +1,8 @@
+// value span の path は共有バッファに push / truncate で組み立てる（field ごとの format! を避ける）。
 trait CollectValueSpans {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     );
@@ -9,13 +10,13 @@ trait CollectValueSpans {
 impl CollectValueSpans for String {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         if let Some(span) = texts.get(&(self.as_ptr() as usize)) {
             out.push(ValueSpan {
-                path: path.into(),
+                path: path.clone(),
                 span: *span,
                 text: None,
             });
@@ -25,19 +26,23 @@ impl CollectValueSpans for String {
 impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         for (i, value) in self.iter().enumerate() {
-            value.collect(&format!("{path}/{i}"), texts, out);
+            let len = path.len();
+            path.push('/');
+            path.push_str(&i.to_string());
+            value.collect(path, texts, out);
+            path.truncate(len);
         }
     }
 }
 impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
@@ -49,7 +54,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
 impl<T: CollectValueSpans> CollectValueSpans for Box<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {

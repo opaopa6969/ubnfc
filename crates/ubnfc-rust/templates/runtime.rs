@@ -56,7 +56,7 @@ impl Step {
             ok: true,
             state,
             events: EventId(0),
-            diag: Diag(0),
+            diag: Diag::NONE,
         }
     }
 }
@@ -66,6 +66,7 @@ pub(crate) struct Saved {
     matched: u32,
     events: u32,
     diag: u32,
+    diag_pos: u32,
     flags: u32,
     effects: [u32; 2],
     display: DisplaySnapshot,
@@ -77,7 +78,8 @@ impl Saved {
             consumed: u32::try_from(step.state.consumed).expect("cursor"),
             matched: u32::try_from(step.state.matched).expect("cursor"),
             events: u32::try_from(step.events.0).expect("arena"),
-            diag: u32::try_from(step.diag.0).expect("diagnostics"),
+            diag: step.diag.id,
+            diag_pos: step.diag.pos,
             flags: step.ok as u32
                 | ((step.state.invert as u32) << 1)
                 | ((step.state.reset as u32) << 2),
@@ -94,7 +96,10 @@ impl Saved {
                 reset: self.flags & 4 != 0,
             },
             events: EventId(self.events as usize),
-            diag: Diag(self.diag as usize),
+            diag: Diag {
+                id: self.diag,
+                pos: self.diag_pos,
+            },
         }
     }
 }
@@ -157,9 +162,13 @@ impl<'a> Session<'a> {
                 arena.push(Event::Empty);
                 arena
             },
-            diag: Diagnostics::with_limit(options.limits.diagnostics),
+            diag: Diagnostics::with_limit_and_capacity(
+                options.limits.diagnostics,
+                text.len().saturating_mul(24).saturating_add(64).min(1 << 20),
+            ),
             display: DisplayDiagnostics::new(options.limits.diagnostics),
-            memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
+            // memo は rule 本体単位（P4 実測 約 5 entry / byte）。
+            memo: Memo::with_capacity(text.len().saturating_mul(6).saturating_add(64).min(1 << 20)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
             effects: vec![],
@@ -182,7 +191,7 @@ impl<'a> Session<'a> {
     // Check expressions too: one rule may contain a deeply nested expression tree.
     #[inline(never)]
     pub fn limit(&mut self, state: State) -> Option<Step> {
-        if self.diag.exhausted || self.display.arena.exhausted {
+        if self.diag.exhausted || self.display.exhausted {
             self.resource_failure
                 .get_or_insert((state.consumed, "diagnostic budget exceeded"));
         }
@@ -657,7 +666,7 @@ impl<'a> Session<'a> {
             });
         } else {
             self.restore(mark);
-            if step.diag.0 == 0 {
+            if step.diag.id == 0 {
                 step.diag = self.diag.fail(state.position::<MATCH>(), label);
             }
         }

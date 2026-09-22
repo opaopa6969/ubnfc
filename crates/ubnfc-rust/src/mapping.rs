@@ -364,7 +364,7 @@ fn accepts(g: &Generator<'_>, ty: &ValueType, value: &str) -> String {
 
 fn value_spans(g: &Generator<'_>) -> String {
     let mut s = include_str!("../templates/value_spans.rs").to_owned();
-    s.push_str("impl CollectValueSpans for Ast { fn collect(&self,path:&str,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.into(),span:*span,text:Some(text.clone())});}},Self::Null=>{},\n");
+    s.push_str("impl CollectValueSpans for Ast { fn collect(&self,path:&mut String,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.clone(),span:*span,text:Some(text.clone())});}},Self::Null=>{},\n");
     for ty in &g.ir.semantics.ast_types {
         if matches!(ty, AstType::TransparentUnion { .. }) {
             continue;
@@ -372,7 +372,7 @@ fn value_spans(g: &Generator<'_>) -> String {
         let id = ident(ty.id());
         writeln!(
             s,
-            "Self::{id}(node)=>{{out.push(ValueSpan{{path:path.into(),span:node.span,text:None}});"
+            "Self::{id}(node)=>{{out.push(ValueSpan{{path:path.clone(),span:node.span,text:None}});"
         )
         .unwrap();
         if let AstType::Record { fields, .. } = ty {
@@ -380,7 +380,7 @@ fn value_spans(g: &Generator<'_>) -> String {
                 let field = f.name.replace('~', "~0").replace('/', "~1");
                 writeln!(
                     s,
-                    "node.{}.collect(&format!(\"{{path}}/fields/{field}\"),texts,out);",
+                    "{{let len=path.len();path.push_str(\"/fields/{field}\");node.{}.collect(path,texts,out);path.truncate(len);}}",
                     ident(&f.name)
                 )
                 .unwrap();

@@ -83,9 +83,11 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         if g.ir.plan.trivia_cache.enabled {
             writeln!(s,"let key=Key{{expression:{i},state,matched_mode:MATCH,version:0}};if let Some((hit,display))=self.trivia_cache.get(key) {{self.display.merge(display);return hit;}}").unwrap();
         }
-        s.push_str(
-            "self.display.enter(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n",
-        );
+        s.push_str(if g.ir.plan.trivia_cache.enabled {
+            "self.display.enter(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n"
+        } else {
+            "self.display.reach(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n"
+        });
         for d in &p.effective_delimiter_set {
             s.push_str("{let start=out.state.position::<MATCH>();let mut p=start;\n");
             match d {
@@ -110,7 +112,11 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         if g.ir.plan.trivia_cache.enabled {
             s.push_str("if self.trivia_cache.len()<self.options.limits.memo_entries {self.trivia_cache.insert(key,(out,self.display.snapshot()));}else {self.resource_failure.get_or_insert((state.consumed,\"trivia memo budget exceeded\"));}\n");
         }
-        s.push_str("self.display.reach(out.state.consumed.max(out.state.matched));self.display.leave();out}\n");
+        s.push_str(if g.ir.plan.trivia_cache.enabled {
+            "self.display.reach(out.state.consumed.max(out.state.matched));self.display.leave();out}\n"
+        } else {
+            "self.display.reach(out.state.consumed.max(out.state.matched));out}\n"
+        });
     }
     Ok(s)
 }

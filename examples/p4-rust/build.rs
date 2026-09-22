@@ -200,11 +200,11 @@ fn instrument_diag(diag: &mut String) {
         ),
         (
             "    pub fn reach(&mut self, reached: usize) {\n",
-            "        crate::counters::add(crate::counters::FRAME_ITER, self.frames.len() as u64);\n",
+            "        crate::counters::add(crate::counters::FRAME_ITER, 1);\n",
         ),
         (
             "    pub fn merge(&mut self, snapshot: DisplaySnapshot) {\n",
-            "        crate::counters::add(crate::counters::FRAME_ITER, self.frames.len() as u64);\n",
+            "        crate::counters::add(crate::counters::FRAME_ITER, 1);\n",
         ),
         (
             "    pub fn enter(&mut self, reached: usize) {\n",

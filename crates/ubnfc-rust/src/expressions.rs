@@ -19,16 +19,41 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             .iter()
             .find(|a| a.expr_id == expr.id)
             .unwrap();
-    let memo = g.ir.plan.memo.entries.iter().find(|p| p.expr_id == expr.id);
-    let (success, failure) = memo.map_or(
-        (analysis.memo_safety.success, analysis.memo_safety.failure),
-        |p| (p.cache_success, p.cache_failure),
-    );
-    let mut s = format!("fn e{i}_{suf}(&mut self,state:State)->Step {{\nif let Some(limit)=self.limit(state) {{return limit;}}\nlet mark=self.mark();\n");
-    if success || failure {
-        writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:self.scope.state_version()}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
+    // memo は plan が許す expression のうち、rule 本体と共有 expression（複数の親を持つ）にだけ置く
+    // （packrat の rule 単位 memo）。単一の親しか持たない expression は、その親の 1 回の評価で
+    // 高々 1 回、しかも互いに異なる位置でしか実行されず、同じ状態での再訪は最寄りの memo
+    // （rule 本体か共有 expression）が吸収する。本体が memo されない rule（Extern 閉包）では
+    // plan どおり内側の expression を memo する。
+    // stack 検査（limit）は rule 入口で行う。局所診断 frame と mark は memo の保存に必要な
+    // 箇所にだけ置き、失敗時の rollback は choice / repeat / optional / separated /
+    // lookahead / rule の各構造が自前で行う。
+    let (success, failure) = cacheable(g, i);
+    let rule_body = g.expr[g.ir.semantics.rules[g.rules[expr.rule_id.as_str()]]
+        .body
+        .as_str()];
+    let (success, failure) = if g.bodies.contains(&i)
+        || g.shared.contains(&i)
+        || cacheable(g, rule_body) == (false, false)
+    {
+        (success, failure)
+    } else {
+        (false, false)
+    };
+    let memoized = success || failure;
+    let mut s = format!("fn e{i}_{suf}(&mut self,state:State)->Step {{\n");
+    if memoized {
+        s.push_str("let mark=self.mark();\n");
+        // scope を読み書きしない（effects が空の）expression は stateVersion に依存しない。
+        let version = if analysis.effects.is_empty() {
+            "0".to_owned()
+        } else {
+            "self.scope.state_version()".to_owned()
+        };
+        writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:{version}}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
+        writeln!(s, "self.display.enter(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
+    } else {
+        writeln!(s, "self.display.reach(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
     }
-    writeln!(s, "self.display.enter(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
     if matches!(
         expr.node,
         ExprNode::Literal { .. } | ExprNode::TokenRef { .. } | ExprNode::Any {}
@@ -57,17 +82,23 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     ) {
         s.push_str(&capture_events(g, expr, "state", "out"));
     }
-    writeln!(s,"}} else {{self.restore(mark);self.display.failures(state.consumed.max(state.matched),&{:?});}}",g.display.expression(expr.id.as_str())).unwrap();
-    if success || failure {
+    writeln!(
+        s,
+        "}} else {{{}self.display.failures(state.consumed.max(state.matched),&{:?});}}",
+        if memoized { "self.restore(mark);" } else { "" },
+        g.display.expression(expr.id.as_str())
+    )
+    .unwrap();
+    if memoized {
         writeln!(
             s,
-            "if (out.ok && {success}) || (!out.ok && {failure}) {{self.store(key,out,mark);}}"
+            "if (out.ok && {success}) || (!out.ok && {failure}) {{self.store(key,out,mark);}}self.display.leave();"
         )
         .unwrap();
     }
     writeln!(
         s,
-        "self.display.leave();out\n}}\nfn b{i}_{suf}(&mut self,mut state:State)->Step {{"
+        "out\n}}\nfn b{i}_{suf}(&mut self,mut state:State)->Step {{"
     )
     .unwrap();
     if expr.execution.entry_flag == ExecutionEntryFlag::SetFalse {
@@ -126,7 +157,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
                 .map(|p| &p.candidate_order)
                 .filter(|o| !o.is_empty())
                 .unwrap_or(alternatives);
-            s.push_str("out='choice: {let mark=self.mark();let mut diagnostic=Diag(0);let mut best:Option<(Step,[usize;2])>=None;\n");
+            s.push_str("out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;\n");
             if predict && !longest {
                 s.push_str(&predict_literals(g, order, child_mode));
             }
@@ -243,7 +274,13 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             .unwrap();
         }
         ExprNode::Lookahead { child } | ExprNode::NegativeLookahead { child } => {
-            s.push_str("let mark=self.mark();let display_checkpoint=self.display.checkpoint();\n");
+            let not = matches!(expr.node, ExprNode::NegativeLookahead { .. });
+            writeln!(
+                s,
+                "let mark=self.mark();self.display.{}(state.consumed.max(state.matched));",
+                if not { "enter_guard" } else { "enter" }
+            )
+            .unwrap();
             writeln!(
                 s,
                 "let child={};self.restore(mark);",
@@ -251,9 +288,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             )
             .unwrap();
             if matches!(expr.node, ExprNode::NegativeLookahead { .. }) {
-                writeln!(s,"out=if child.ok {{let mut failed=self.fail(state,state.position::<{mode}>(),{label:?});failed.diag=self.diag.join(child.diag,failed.diag);failed}} else {{self.display.restore(display_checkpoint);Step::yes(state.commit(out.state))}};").unwrap();
+                writeln!(s,"out=if child.ok {{self.display.leave_guard();let mut failed=self.fail(state,state.position::<{mode}>(),{label:?});failed.diag=self.diag.join(child.diag,failed.diag);failed}} else {{self.display.discard();Step::yes(state.commit(out.state))}};").unwrap();
             } else {
-                s.push_str("let _=display_checkpoint;out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
+                s.push_str("self.display.leave();out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
             }
         }
     }
@@ -277,6 +314,26 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     }
     s.push_str("out\n}\n");
     Ok(s)
+}
+
+/// plan.memo（無ければ analysis.memoSafety）が許す成功・失敗の memo。
+fn cacheable(g: &Generator<'_>, i: usize) -> (bool, bool) {
+    let expr = &g.ir.semantics.expressions[i];
+    let analysis =
+        g.ir.analysis
+            .expressions
+            .iter()
+            .find(|a| a.expr_id == expr.id)
+            .unwrap();
+    g.ir.plan
+        .memo
+        .entries
+        .iter()
+        .find(|p| p.expr_id == expr.id)
+        .map_or(
+            (analysis.memo_safety.success, analysis.memo_safety.failure),
+            |p| (p.cache_success, p.cache_failure),
+        )
 }
 
 pub(crate) fn scope_events(

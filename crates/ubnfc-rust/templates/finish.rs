@@ -159,7 +159,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     if let Some(offset) = self.depth_failure {
         step = self.fail(State::default(), offset, "maximum parse depth exceeded");
     }
-    if self.diag.exhausted || self.display.arena.exhausted {
+    if self.diag.exhausted || self.display.exhausted {
         self.resource_failure
             .get_or_insert((0, "diagnostic budget exceeded"));
     }
@@ -303,7 +303,8 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     self.statistics.ast_nodes = self.node_spans.len();
     let mut value_spans = Vec::new();
     if let Some(ast) = &ast {
-        ast.collect("", &self.text_spans, &mut value_spans);
+        let mut path = String::with_capacity(128);
+        ast.collect(&mut path, &self.text_spans, &mut value_spans);
     }
     ParseResult {
         value_spans,

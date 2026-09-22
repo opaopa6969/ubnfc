@@ -13,6 +13,11 @@ pub(crate) struct Generator<'a> {
     pub tokens: BTreeMap<&'a str, usize>,
     pub sites: BTreeMap<&'a str, usize>,
     pub modes: BTreeSet<(usize, bool)>,
+    /// rule 本体の expression index。memo・診断 frame は本体と共有 expression にだけ置く（expressions.rs 参照）。
+    pub bodies: BTreeSet<usize>,
+    /// 複数の親（expression の子、または rule 本体）から参照される expression。同一 rule の評価中に
+    /// 同じ状態で再訪され得るので、plan が許せば memo を置く。
+    pub shared: BTreeSet<usize>,
 }
 impl<'a> Generator<'a> {
     pub fn new(ir: &'a GrammarIr) -> Self {
@@ -48,7 +53,30 @@ impl<'a> Generator<'a> {
                 .map(|(i, c)| (c.site_id.as_str(), i))
                 .collect(),
             modes: BTreeSet::new(),
+            bodies: BTreeSet::new(),
+            shared: BTreeSet::new(),
         };
+        g.bodies = ir
+            .semantics
+            .rules
+            .iter()
+            .map(|r| g.expr[r.body.as_str()])
+            .collect();
+        let mut incoming = vec![0usize; ir.semantics.expressions.len()];
+        for rule in &ir.semantics.rules {
+            incoming[g.expr[rule.body.as_str()]] += 1;
+        }
+        for expr in &ir.semantics.expressions {
+            for child in expr.node.children() {
+                incoming[g.expr[child.as_str()]] += 1;
+            }
+        }
+        g.shared = incoming
+            .iter()
+            .enumerate()
+            .filter(|(_, n)| **n > 1)
+            .map(|(i, _)| i)
+            .collect();
         for rule in &ir.semantics.rules {
             g.visit(g.expr[rule.body.as_str()], false);
         }
@@ -223,7 +251,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {
                 continue;
             }
-            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;self.display.enter(state.consumed.max(state.matched));let mark=self.mark();",suffix(mode)).unwrap();
+            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;self.display.reach(state.consumed.max(state.matched));let mark=self.mark();",suffix(mode)).unwrap();
             p.push_str(&crate::expressions::scope_events(
                 &g,
                 i,
@@ -282,7 +310,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             }
             writeln!(
                 p,
-                "self.depth-=1;self.display.leave();out.diag=self.diag.rule({i},out.diag);out\n}}"
+                "self.depth-=1;out.diag=self.diag.rule({i},out.diag);out\n}}"
             )
             .unwrap();
         }
