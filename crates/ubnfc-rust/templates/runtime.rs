@@ -1075,6 +1075,10 @@ impl<'a> Session<'a> {
             }
         }
     }
+    /// design v1 §3.10。mode / 同期集合 / `consume_sync` / `no_sync` は IR が正本で、
+    /// ここでは推測しない。SYNC だけが同期文字列を消費し、AUTO の同期文字列（FOLLOW）は
+    /// 外側が待っている字句なので残す。SKIP は同期文字列の手前まで進む別規則。
+    #[allow(clippy::too_many_arguments)]
     pub fn recover<const MATCH: bool>(
         &mut self,
         state: State,
@@ -1082,38 +1086,58 @@ impl<'a> Session<'a> {
         rule: usize,
         mode: &'static str,
         patterns: &[&str],
+        consume_sync: bool,
+        no_sync: &'static str,
     ) -> Step {
         if self.depth_failure.is_some() || self.resource_failure.is_some() || self.diag.exhausted {
             return failed;
         }
         let start = state.position::<MATCH>();
-        let mut end = start;
+        let one = |s: &Self, at: usize| s.input.cp_at(at).map_or(0, |(_, n)| n);
+        let eof = self.input.bytes().len();
+        // §3.10: AUTO の FOLLOW が空なら既定の `;`。既定文字列は FOLLOW ではないので消費する。
+        let fallback = mode == "AUTO" && patterns.is_empty();
+        let patterns = if fallback { &[";"][..] } else { patterns };
+        let consume_sync = consume_sync || fallback;
         let mut sync_span = None;
-        if mode == "SKIP" && patterns.is_empty() {
-            end += self.input.cp_at(start).map_or(0, |(_, n)| n);
-        } else {
-            let fallback = mode == "AUTO" && patterns.is_empty();
-            let patterns = if fallback { &[";"][..] } else { patterns };
-            while let Some((_, n)) = self.input.cp_at(end) {
-                if let Some(sync) = patterns
-                    .iter()
-                    .find(|s| !s.is_empty() && self.input.starts_with(end, s))
-                {
-                    sync_span = Some([end, end + sync.len()]);
-                    if mode == "SYNC" || fallback {
-                        end += sync.len();
-                    }
-                    break;
-                }
-                end += n;
+        let mut at = start;
+        while !patterns.is_empty() {
+            let Some((_, n)) = self.input.cp_at(at) else {
+                break;
+            };
+            if let Some(sync) = patterns
+                .iter()
+                .find(|s| !s.is_empty() && self.input.starts_with(at, s))
+            {
+                sync_span = Some([at, at + sync.len()]);
+                break;
             }
-            if sync_span.is_none() && mode != "SKIP" {
-                return failed;
-            }
-            if mode == "SKIP" && end == start {
-                end += self.input.cp_at(start).map_or(0, |(_, n)| n);
-            }
+            at += n;
         }
+        let end = if mode == "SKIP" {
+            match sync_span {
+                _ if self.input.cp_at(start).is_none() => return failed,
+                None if patterns.is_empty() => start + one(self, start),
+                None => eof,
+                Some([found, _]) if found == start => start + one(self, start),
+                Some([found, _]) => found,
+            }
+        } else {
+            match sync_span {
+                Some([found, stop]) => {
+                    if consume_sync {
+                        stop
+                    } else {
+                        found
+                    }
+                }
+                None => match no_sync {
+                    "consumeToEof" => eof,
+                    "succeed" => start,
+                    _ => return failed,
+                },
+            }
+        };
         if end <= start {
             return failed;
         }

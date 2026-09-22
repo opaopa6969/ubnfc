@@ -549,7 +549,7 @@ fn auto_recovery(rule: &str, sites: Vec<ExprId>) -> Recovery {
     }
 }
 #[test]
-fn follow_uses_terminal_strings_and_only_auto_gets_semicolon_fallback() {
+fn follow_uses_terminal_strings_and_stays_empty_for_a_rule_nothing_follows() {
     let mut s = empty_semantics();
     let atom = lit(&mut s, "A", "x");
     rule(&mut s, "A", atom);
@@ -566,7 +566,9 @@ fn follow_uses_terminal_strings_and_only_auto_gets_semicolon_fallback() {
         a.rules[0].follow_sync_patterns,
         Some(vec![",".into(), "end".into()])
     );
-    assert_eq!(a.rules[1].follow_sync_patterns, Some(vec![";".into()]));
+    // FOLLOW そのものを返す。空 AUTO への既定 `;` は pipeline の回復方針
+    // （`pipeline_api::auto_recovery_follow_is_integrated_without_changing_sync_or_skip`）。
+    assert_eq!(a.rules[1].follow_sync_patterns, Some(vec![]));
     s.recovery[1].mode = RecoveryMode::Sync;
     assert_eq!(analyze(&s).unwrap().0.rules[1].follow_sync_patterns, None);
 }

@@ -265,7 +265,9 @@
         "sccId": "scc:0"
       },
       {
-        "followSyncPatterns": null,
+        "followSyncPatterns": [
+          "ok"
+        ],
         "leftRecursion": "none",
         "progressProven": true,
         "ruleId": "Probe::Stmt",
@@ -828,13 +830,13 @@
           "expr:recovery-skip.ubnf:109:113:body/1/0/ruleRef"
         ],
         "astProjection": "legacyMarker",
-        "consumeSync": true,
-        "mode": "SYNC",
-        "noSyncAction": "fail",
-        "progressRule": "legacySync",
+        "consumeSync": false,
+        "mode": "SKIP",
+        "noSyncAction": "consumeToEof",
+        "progressRule": "legacySkip",
         "recipeId": null,
         "resolvedSyncPatterns": [
-          ";"
+          "ok"
         ],
         "ruleId": "Probe::Stmt"
       }

@@ -145,11 +145,45 @@ skip cache は policy とカーソルをキーにした局所最適化であり�
 
 ### 3.10 @recovery
 
-`SYNC` / `AUTO` / `SKIP`（`ParserRuleEmitter.java:500`、`SyncPointRecoveryParser.java:102`）:
-AUTO は FOLLOW（空なら `;`）、SYNC は同期文字列自体も消費・未検出なら失敗、SKIP は別の前進規則。
-IR: `mode, resolvedSyncPatterns, consumeSync, noSyncAction, progressRule, applicationSites`。
-wrapper は rule 参照解決で選ばれる（`@root` へ一律適用しない）。回復領域の typed AST への投影は
-独立契約（既存はエラーマーカー Token）。第一段は corpus に有る範囲。
+適用単位は rule。wrapper は rule 参照の解決で選ばれ、`@root` と直接 entry にも適用する（D-021）。
+IR: `mode, resolvedSyncPatterns, consumeSync, noSyncAction, progressRule, applicationSites,
+astProjection, recipeId`。**mode・同期集合・消費規則は front が決めて IR に載せ、backend は
+IR の値をそのまま使う**。注釈から mode を推定し直さない（推定すると backend ごとに受理が変わる。
+2026-09-23 の差分 fuzzing A-1）。`@recovery(auto)` と `@recovery(AUTO)` は同じ注釈（大小無視）。
+
+同期集合は front が解決する（`crates/ubnfc-front/src/analysis/follow.rs` と `pipeline.rs`）:
+
+| mode | `resolvedSyncPatterns` | `consumeSync` | `noSyncAction` |
+|---|---|---|---|
+| `SYNC` | `sync=` の文字列（無指定は `;`） | `true` | `fail` |
+| `AUTO` | FOLLOW。**空なら既定の `;`** | FOLLOW 由来なら `false` / 既定 `;` なら `true` | `fail` |
+| `SKIP` | FOLLOW（空でもよい） | `false` | `consumeToEof` |
+
+FOLLOW は文法に書かれた終端文字列の有限集合で、文字クラスや opaque token の綴りは捏造しない。
+先読みの中は消費列ではないので混ぜない。IR に FOLLOW が無い AUTO を backend が受け取った場合は
+`;` を同期集合とし消費する（既定 `;` と同じ扱い）。
+
+子 parser が位置 `start` で失敗したとき、`start` 以降で同期集合のどれかが最初に現れる位置を `sync`
+とする（複数一致するなら最も手前、同位置なら配列順）。回復領域 `[start, end)` は:
+
+1. `sync` が見つかったとき
+   - `SKIP`: `end = sync`。ただし `sync == start` なら 1 code point だけ進む（無限ループを避ける）。
+   - `SYNC` / `AUTO`: `consumeSync` なら `end = sync + 同期文字列長`、そうでなければ `end = sync`。
+2. 見つからないとき
+   - `SKIP`: 同期集合が空なら 1 code point、そうでなければ入力末尾まで（`consumeToEof`）。
+   - `SYNC` / `AUTO`: `noSyncAction` に従う。`fail` は回復せず rule の失敗をそのまま返す。
+3. `end <= start` になる場合と、`start` に code point が無い（入力末尾）場合は回復しない。
+
+**AUTO は同期文字列を消費しない**。AUTO の同期文字列は FOLLOW、つまり外側の rule が次に読む字句で、
+消費すると外側の解析を壊す（`corpus/oracle/README.md` 疑義 4「AUTO の過剰消費」。D-017 で
+「再現しない」と決めた既存バグ）。FOLLOW が空のときの既定 `;` は外側が待つ字句ではないので、
+SYNC と同じく消費する。
+
+回復は `recovery` 診断（`severity=ERROR`、`offset=start`、`length=end-start` の code point 長）と
+回復領域 1 件（`ruleId` / `mode` / `span=[start,end]` / `syncSpan`）を残す。回復領域の typed AST への
+投影は独立契約（既存はエラーマーカー Token、D-018 `recovery-projection`）。
+参照実装: Java `templates/internal/Session.java#recover`、Rust `templates/runtime.rs#Session::recover`。
+旧実装は `ParserRuleEmitter.java:500` と `SyncPointRecoveryParser.java:102`。
 
 ### 3.11 演算子（@leftAssoc / @rightAssoc / @precedence）と左再帰
 
@@ -280,3 +314,5 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | D-022 oracle 系統の数値 capture の比較契約 | 決定 | 旧 Java 採取 oracle の `int` 値と `NumberFormatException` は Java 契約（`Integer.parseInt`、`NumericCaptureRuntimeTest.java:31-49`、`generators.md`「数値 token の型境界」）。Rust は字句保持（`NumericCaptureRuntimeTest.java:55-89`: `fields.value == 入力字句`、`RustConformanceTest.java:561-575`、§1 表 11・§2）。harness は Rust backend でだけ Java oracle を投影する: (a) AST の int field は同名・同範囲・`parseInt` で同値の capture 原文（字句）へ置換して**厳密比較**（`+0007` は `"+0007"`）、(b) `NumberFormatException: For input string: "X"` は Rust では起きないので `mappingError=null` を期待し、Rust の AST に同名 capture の字句 `X` が入っていることを照合（欠落・別値・AST null は Fail）。Java backend は無投影。実装 `comparison.rs numeric_lexeme_contract`。numeric-capture 系統の `javaInt`/`rustLexeme` 二重 oracle と同じ規則 |
 | D-023 診断は opt-in、失敗時に決定的再解析 | 決定 | `ParseOptions.diagnostics`（既定 false）。既定の fast path は主診断 DAG も公開 farthest も記録しない。結果が診断を要する場合（失敗 / 全入力未消費 / recovery / mapping・resource 診断）だけ、同じ入力を診断モードで**もう一度**解析して返す（解析は決定的なので観測は同一）。副作用: (a) 成功解析の `hints` は既定で空（要求時に出る。driver は常に要求するので corpus 観測は不変）、(b) 再解析で `TokenScanner` が 2 回呼ばれる — **効果のある Extern scanner は `diagnostics: true` を要求する**（純粋宣言した scanner は影響なし）、(c) 拒否入力は約 1.8 倍のコスト。`limits.diagnostics` は fast mode では消費しない |
 | D-016 左再帰書換えの対象形 | 決定（lowering 実装） | 対象は `E ::= E Op Base \| Base` で参照先にも capture/mapping/scope/recovery が無く演算子側から自身へ戻らない形。他は明示拒否 | M2 で定義（nullable suffix、代替順、capture/trivia/scope/recovery の投影）。未対応形は明示拒否 |
+| D-024 `@recovery` の適用規則 | 決定 | §3.10 に確定。mode / 同期集合 / `consumeSync` / `noSyncAction` は front が IR に載せ、backend は再推定しない（`JavaEmitter.recoveryCall` の legacy mode 補正を撤去、Rust `Session::recover` は mode 文字列で分岐しない）。**AUTO は同期文字列（FOLLOW）を消費しない**（D-017「AUTO の過剰消費」は再現しない）。FOLLOW が空のときの既定 `;` だけは SYNC と同じく消費する。SKIP も FOLLOW を同期集合に使い、同期文字列の手前で止まる。`@recovery(auto)` と `@recovery(AUTO)` は同じ注釈。根拠: 2026-09-23 差分 fuzzing A-1（`@recovery(AUTO)` の受理が backend で食い違った）。corpus の recovery 系観測は不変 |
+| D-025 量指定子つき capture の cardinality | 決定 | cardinality は**一度の成功解析で共存し得る値の個数**（`docs/nested-capture-migration.md` の表）。量指定子は上限が 2 以上のときだけ List で、`{1}` は Scalar・`{0}` / `{0,1}` / `X?` は Optional。capture site の量指定子は出現回数としてそのまま数え、site より内側の量指定子は**意味値**だけを増やす（text だけの領域は一致範囲全体で 1 つの値）。これで `validate` が通り `ir` が落ちる文法（2026-09-23 差分 fuzzing D、320 文法中 28 件）が無くなる。旧 Java 生成器は bounded を常に List と型付けしていた（`SemanticCardinality.java`）が、corpus に capture つき `{n<=1}` の fixture は無く観測は不変 |
