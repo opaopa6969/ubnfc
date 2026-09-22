@@ -1,0 +1,13 @@
+implementation,input,ast,alloc_calls,allocated_bytes,memo_entries,recipes
+generated,short,false,17,9856,49,0
+handwritten,short,false,47,10208,25,0
+generated,short,true,96,22741,49,30
+handwritten,short,true,85,16069,25,8
+generated,depth8,false,20,36480,249,0
+handwritten,depth8,false,350,68444,113,0
+generated,depth8,true,320,85013,249,102
+handwritten,depth8,true,444,89665,113,24
+generated,atoms512,false,24,888128,9219,0
+handwritten,atoms512,false,5163,2266576,4609,0
+generated,atoms512,true,11376,3088239,9219,6140
+handwritten,atoms512,true,9310,3548775,4609,1536

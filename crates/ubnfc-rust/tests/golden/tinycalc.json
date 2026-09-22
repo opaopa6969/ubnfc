@@ -1,0 +1,96 @@
+{
+  "ast": {
+    "fields": {
+      "declarations": [],
+      "expression": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "left": null,
+                  "op": [
+                    "1"
+                  ],
+                  "right": []
+                },
+                "span": [
+                  0,
+                  1
+                ],
+                "type": "BinaryExpr"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              1
+            ],
+            "type": "BinaryExpr"
+          },
+          "op": [
+            "+"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "left": null,
+                    "op": [
+                      "2"
+                    ],
+                    "right": []
+                  },
+                  "span": [
+                    2,
+                    3
+                  ],
+                  "type": "BinaryExpr"
+                },
+                "op": [
+                  "*"
+                ],
+                "right": [
+                  {
+                    "fields": {
+                      "left": null,
+                      "op": [
+                        "3"
+                      ],
+                      "right": []
+                    },
+                    "span": [
+                      4,
+                      5
+                    ],
+                    "type": "BinaryExpr"
+                  }
+                ]
+              },
+              "span": [
+                2,
+                5
+              ],
+              "type": "BinaryExpr"
+            }
+          ]
+        },
+        "span": [
+          0,
+          5
+        ],
+        "type": "BinaryExpr"
+      }
+    },
+    "span": [
+      0,
+      5
+    ],
+    "type": "TinyCalcProgram"
+  },
+  "consumed_cp": 5,
+  "matched_cp": 5,
+  "ok": true
+}
