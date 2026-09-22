@@ -115,3 +115,15 @@ guide `:454–467` は alias 名前空間、設計 §4 は import graph と統�
 適用には名前付き契約の読込・独立期待値による検証を先に実装する。`new-contract` を観測群の一括免除にせず、契約適合を必須にする。旧値と同じ場合も契約の検証を省かない。
 `ast` 観測は captures も含む。`corpus/oracle.rs:136–158` は generation 全体を失敗メッセージへ保存し、`divergence.rs:137–158` は生成成功への変化まで同じ観測にまとめるため、import の経路別検証が必要である。
 受入条件は上記の期待値を Java/Rust 両 backend で照合し、回復の root/list/optional/scalar・rollback/memo、LF/CRLF/CR/EOF、コメント合成、循環・非循環の共有 import・相対パス別名を追加検証すること。本提案では実装・台帳・oracle を変更していない。
+
+## 適用状況（2026-09-22 round7）
+
+`comment-trivia` を実装した。front（`crates/ubnfc-front/src/lower/trivia.rs`）は `@comment` の `line` 値と
+`blockOpen`+`blockClose`（`block: 'OPEN CLOSE'` も同じ表現へ写す）を有効集合へ加算し、javaStyle 相当がなければ
+明示コメントだけを有効にする。両 backend は既に `effectiveDelimiterSet` を走査していたため、Java は未終端 block の
+候補文字列（固定 `'*/'`）を宣言した close に直した以外に変更はない。実測（Java/Rust 同値）: `comment-block/2` 受理・
+`C=M=7`・`Value[0,7]`、`comment-whitespace/3` 受理・`C=M=5`・`Value[0,5]`、`comment-line/3` は不受理・`C=M=0` で
+Java の `syntax.offset=4`（§(b) の予測どおり）、`comment-line/2` は `syntax@1`、expected `'#'`・`'b'`。
+台帳は `comment-block/1#diagnostics`（候補に `'(*'`・`'*)'` が加わる）と `comment-block/2`・`comment-whitespace/3` の
+`parsedStatus` を follow-spec で追加し、`reobserved-*.json` は harness が `origin` の同じ caseId へ台帳を継承する。
+

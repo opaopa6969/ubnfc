@@ -228,13 +228,15 @@ fn observations_imports_errors_and_source_revision_survive_normalization() {
 fn every_divergence_resolves_and_only_follow_spec_is_attached() {
     let entries = divergence::load(&oracle::default_root().join("divergences.json")).unwrap();
     // round5: recovery-root/1 の parsedStatus（D-017 follow-spec）を追加して 79 件。
-    assert_eq!(entries.len(), 79);
+    // round7: comment-trivia 適用で comment-block/1 diagnostics、comment-block/2 と
+    // comment-whitespace/3 の parsedStatus（follow-spec）を追加して 82 件。
+    assert_eq!(entries.len(), 82);
     assert_eq!(
         entries
             .iter()
             .filter(|e| e.decision == Decision::FollowSpec)
             .count(),
-        64
+        67
     );
     // D-018 で undecided 15 件は名前付き契約（new-contract:*）に決定した。
     assert_eq!(
@@ -267,13 +269,27 @@ fn every_divergence_resolves_and_only_follow_spec_is_attached() {
             entry.decision.is_resolved()
         );
     }
-    assert_eq!(case_ids.len(), 29);
+    // round7: comment-block/1 が加わり 30 ケース。
+    assert_eq!(case_ids.len(), 30);
+    // reobserved-*.json は origin の同じ caseId へ台帳を継承する（comment-block/1 の 1 観測、
+    // comment-block/2 の 6 観測、comment-whitespace/2 の 5 観測）。
     let attached: usize = corpus()
         .iter()
         .flat_map(|f| &f.cases)
         .map(|c| c.known_divergences.len())
         .sum();
-    assert_eq!(attached, 79);
+    assert_eq!(attached, 82 + 12);
+    let reobserved = corpus()
+        .iter()
+        .find(|f| f.path.file_name().unwrap() == "reobserved-comment-block.json")
+        .unwrap();
+    let case = reobserved
+        .cases
+        .iter()
+        .find(|c| c.id == "comment-block/2")
+        .unwrap();
+    assert_eq!(case.known_divergences.len(), 6);
+    assert_eq!(case.follow_spec.len(), 6);
 
     // 登録されていない観測（recovery-sync/1 の consumed）を変えると、他に既知登録があっても免除しない。
     let case = corpus()

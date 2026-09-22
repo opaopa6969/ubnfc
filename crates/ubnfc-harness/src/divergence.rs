@@ -119,11 +119,30 @@ pub fn apply(path: &Path, files: &mut [CorpusFile]) -> Result<(), LoadError> {
                 format!("乖離の file/caseId が一意に存在しません: {entry:?}"),
             ));
         };
-        if entry.decision.is_resolved() {
-            resolved.push((*f, *c, entry.observation));
-        }
-        if entry.decision == Decision::FollowSpec {
-            follow_spec.push((*f, *c, entry.observation));
+        // reobserved-*.json は元 JSON と全フィールドが一致する再採取（corpus/oracle/README.md）。
+        // 台帳は元ファイル名で引くので、`origin` が元ファイルの同じ caseId へ同じ決定を継承する。
+        let origin = format!("oracle/{}", entry.file);
+        let reobserved = files
+            .iter()
+            .enumerate()
+            .filter(|(_, file)| {
+                file.family == Family::Oracle
+                    && file.raw.get("origin").and_then(Value::as_str) == Some(origin.as_str())
+            })
+            .flat_map(|(f, file)| {
+                file.cases
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, case)| case.id == entry.case_id)
+                    .map(move |(c, _)| (f, c))
+            });
+        for (f, c) in std::iter::once((*f, *c)).chain(reobserved) {
+            if entry.decision.is_resolved() {
+                resolved.push((f, c, entry.observation));
+            }
+            if entry.decision == Decision::FollowSpec {
+                follow_spec.push((f, c, entry.observation));
+            }
         }
     }
     for file in files.iter_mut().filter(|f| f.family == Family::Oracle) {

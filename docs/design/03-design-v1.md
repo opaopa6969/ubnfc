@@ -89,7 +89,11 @@ IR に `analysisVersion` と対象機能集合を持たせ、未対応版は明�
 rule-trivia 契約（`docs/rule-trivia.md`）。有効設定は rule `@whitespace` > rule `@interleave` > grammar。
 挿入位置は既存生成 chain と同じ（先頭・各要素後・helper 境界。`ParserGenerator.java:495`）。
 IR に **挿入計画**（どの ExprId 境界で、どの policy で）を持たせる。global `@comment` は
-`line` キーの存在で `CPPComment` を有効化（値は使われない）+ block open/close。`rawSettings + effectiveDelimiterSet + insertionPlan` を IR に載せる。
+D-018 `comment-trivia` に従い、`line` / `blockOpen`+`blockClose`（または `block: 'OPEN CLOSE'`）の
+**値どおり**の区切りを有効集合へ追加する（javaStyle 相当があれば既定の空白・`//`・`/* */` に加算、
+なければ明示コメントだけ。同一区切りは重複除去）。旧 Java の「`line` キーの存在で `CPPComment`
+を有効化し値を読まない」挙動（D-017 疑義 9）は再現しない。`rawSettings + effectiveDelimiterSet + insertionPlan` を IR に載せ、
+両 backend は `effectiveDelimiterSet` だけを走査する（行コメントは改行を残し matched のみ改行末へ、block は open..close、未終端 block は無進行で候補に宣言した close を報告）。
 skip cache は policy とカーソルをキーにした局所最適化であり保証ではない。
 
 ### 3.6 capture と AST 構築
@@ -253,5 +257,6 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | D-019 `nativeFailure` の扱い | 決定 | 既存 Java の内部診断（パーサクラス名・内部位置）は unlaxer-common の実装詳細で契約対象外。harness は `nativeFailure` を情報として保持するが Verdict に使わない。契約対象は D-014 の主 offset / farthest / hints / deepest / kind |
 | D-020 `rulePath` / `deepestRule` の扱い | 決定 | 既存 conformance テストは検証しておらず（`RustConformanceTest.java:758` は kind/offset/expected 非空のみ）、oracle の値は旧 Java の内部 rule 経路。D-019 と同様に **情報として保持し Verdict に使わない**。主 offset / farthest / farthestExpected / kind は契約（D-014）のまま |
 | D-021 root の `@recovery` と既知バグ一致の検出 | 決定 | Java も `@root`（および直接 entry）の rule に recovery wrapper を適用する（`JavaEmitter.entryCall`、D-018 recovery-projection 2）。harness は `follow-spec` 登録済み観測群が実測と一致し、かつ観測済み（wire 欠落・旧 oracle null でない）なら **Fail「既知バグ再現」**（`comparison.rs reproduced_follow_spec`、`Case.follow_spec`）。`new-contract:*` の一致は従来どおり Pass。適用結果: `recovery-root/1` は両 backend で Known。同時に `comment-block/2`・`comment-line/2`・`comment-line/3`(diagnostics)・`comment-whitespace/3` が両 backend で「既知バグ再現」として露出（`@comment` の block/line 設定を旧実装どおり無視。次の修正対象、D-017 の決定は維持） |
+| D-018 `comment-trivia` の適用（round7） | 決定 | front の lowering が `@comment` の `line` 値と `block`/`blockOpen`+`blockClose` を `effectiveDelimiterSet` に反映（`crates/ubnfc-front/src/lower/trivia.rs`）。Java `Session.trivia` の未終端 block 候補を宣言した close に変更。harness は `reobserved-*.json` の同じ caseId へ `origin` の台帳を継承（README「全フィールドが一致」）。台帳に `comment-block/1#diagnostics`・`comment-block/2#parsedStatus`・`comment-whitespace/3#parsedStatus` の follow-spec を追加（既登録 accepted/consumed と同じ疑義 9 由来）。結果: 4 件は両 backend で Known、Java 1306/0、Rust 1292/0（`docs/reports/2026-09-22-{java,rust}-corpus-round7.md`） |
 | D-022 oracle 系統の数値 capture の比較契約 | 決定 | 旧 Java 採取 oracle の `int` 値と `NumberFormatException` は Java 契約（`Integer.parseInt`、`NumericCaptureRuntimeTest.java:31-49`、`generators.md`「数値 token の型境界」）。Rust は字句保持（`NumericCaptureRuntimeTest.java:55-89`: `fields.value == 入力字句`、`RustConformanceTest.java:561-575`、§1 表 11・§2）。harness は Rust backend でだけ Java oracle を投影する: (a) AST の int field は同名・同範囲・`parseInt` で同値の capture 原文（字句）へ置換して**厳密比較**（`+0007` は `"+0007"`）、(b) `NumberFormatException: For input string: "X"` は Rust では起きないので `mappingError=null` を期待し、Rust の AST に同名 capture の字句 `X` が入っていることを照合（欠落・別値・AST null は Fail）。Java backend は無投影。実装 `comparison.rs numeric_lexeme_contract`。numeric-capture 系統の `javaInt`/`rustLexeme` 二重 oracle と同じ規則 |
 | D-016 左再帰書換えの対象形 | 決定（lowering 実装） | 対象は `E ::= E Op Base \| Base` で参照先にも capture/mapping/scope/recovery が無く演算子側から自身へ戻らない形。他は明示拒否 | M2 で定義（nullable suffix、代替順、capture/trivia/scope/recovery の投影）。未対応形は明示拒否 |

@@ -20,10 +20,22 @@ pub(super) fn settings(settings: &[a::GlobalSetting]) -> Settings {
                         .find(|e| e.key == key)
                         .map(|e| e.value.clone())
                 };
+                // `block: '(* *)'`（open と close を空白で区切った 1 値）は
+                // blockOpen/blockClose と同じ IR 表現へ写す（D-018 comment-trivia、
+                // corpus/oracle/comment-block.json）。明示の blockOpen/blockClose が優先。
+                let block = get("block").and_then(|v| {
+                    let mut parts = v.split_whitespace();
+                    match (parts.next(), parts.next(), parts.next()) {
+                        (Some(open), Some(close), None) => {
+                            Some((open.to_string(), close.to_string()))
+                        }
+                        _ => None,
+                    }
+                });
                 out.comment = Some(CommentSettings {
                     line: get("line"),
-                    block_open: get("blockOpen"),
-                    block_close: get("blockClose"),
+                    block_open: get("blockOpen").or_else(|| block.as_ref().map(|b| b.0.clone())),
+                    block_close: get("blockClose").or_else(|| block.as_ref().map(|b| b.1.clone())),
                 });
             }
             _ => {}
@@ -75,30 +87,39 @@ pub(super) fn policy(cx: &mut Context<'_>, grammar: &r::Grammar, rule: &r::Resol
                 code_points: vec![9, 10, 11, 12, 13, 32],
             });
         }
-        if full || raw.comment.as_ref().is_some_and(|c| c.line.is_some()) {
+        if full {
             delimiters.push(Delimiter::LineComment {
                 open: "//".into(),
                 line_end_profile: DelimiterLineCommentLineEndProfile,
             });
-        }
-        if full {
             delimiters.push(Delimiter::BlockComment {
                 open: "/*".into(),
                 close: "*/".into(),
             });
         }
-        if let Some(CommentSettings {
-            block_open: Some(open),
-            block_close: Some(close),
-            ..
-        }) = &raw.comment
-        {
-            let d = Delimiter::BlockComment {
-                open: open.clone(),
-                close: close.clone(),
-            };
+        // D-018 comment-trivia (2)(3): 明示 @comment の line / block は値どおりの区切りを
+        // javaStyle の既定集合へ追加する（置換しない。同一の区切りは重複除去）。
+        // javaStyle 相当がなければ明示コメントだけを有効にする。旧 Java が line の値を
+        // 読まずに `//` を登録していた挙動（D-017 疑義 9）は再現しない。
+        let mut push = |d: Delimiter| {
             if !delimiters.contains(&d) {
                 delimiters.push(d);
+            }
+        };
+        if let Some(c) = &raw.comment {
+            if let Some(line) = c.line.as_deref().filter(|s| !s.is_empty()) {
+                push(Delimiter::LineComment {
+                    open: line.into(),
+                    line_end_profile: DelimiterLineCommentLineEndProfile,
+                });
+            }
+            if let (Some(open), Some(close)) = (&c.block_open, &c.block_close) {
+                if !open.is_empty() && !close.is_empty() {
+                    push(Delimiter::BlockComment {
+                        open: open.clone(),
+                        close: close.clone(),
+                    });
+                }
             }
         }
     }

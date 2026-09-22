@@ -318,7 +318,13 @@ fn trivia_has_chain_and_helper_boundaries_with_precedence() {
     )
     .unwrap();
     let p = &comments.semantics.trivia.policies[0];
+    // D-018 comment-trivia: javaStyle なしの明示 @comment は宣言した区切りだけを有効にする
+    // （旧 Java の「line の値を無視して // を登録」は再現しない）。
     assert!(p
+        .effective_delimiter_set
+        .iter()
+        .any(|d| matches!(d,Delimiter::LineComment {open,..} if open=="#")));
+    assert!(!p
         .effective_delimiter_set
         .iter()
         .any(|d| matches!(d,Delimiter::LineComment {open,..} if open=="//")));
@@ -326,6 +332,63 @@ fn trivia_has_chain_and_helper_boundaries_with_precedence() {
         .effective_delimiter_set
         .iter()
         .any(|d| matches!(d,Delimiter::BlockComment {open,close} if open=="<!--"&&close=="-->")));
+    assert!(!p
+        .effective_delimiter_set
+        .iter()
+        .any(|d| matches!(d, Delimiter::Characters { .. })));
+    // javaStyle と併用すると既定集合へ追加し、同一の区切りは重複除去する。`block: '(* *)'`
+    // は blockOpen/blockClose と同じ表現へ写す（corpus/oracle/comment-block.json）。
+    let merged = compile(
+        "grammar G { @whitespace: javaStyle @comment: {line: '//' block: '(* *)'} @root R ::= 'x'; }",
+    )
+    .unwrap();
+    let p = &merged.semantics.trivia.policies[0];
+    assert_eq!(
+        p.raw_settings
+            .comment
+            .as_ref()
+            .and_then(|c| c.block_open.as_deref()),
+        Some("(*")
+    );
+    assert_eq!(
+        p.raw_settings
+            .comment
+            .as_ref()
+            .and_then(|c| c.block_close.as_deref()),
+        Some("*)")
+    );
+    assert_eq!(p.effective_delimiter_set.len(), 4);
+    assert!(matches!(
+        &p.effective_delimiter_set[0],
+        Delimiter::Characters { .. }
+    ));
+    assert!(
+        matches!(&p.effective_delimiter_set[1], Delimiter::LineComment { open, .. } if open == "//")
+    );
+    assert!(
+        matches!(&p.effective_delimiter_set[2], Delimiter::BlockComment { open, close } if open == "/*" && close == "*/")
+    );
+    assert!(
+        matches!(&p.effective_delimiter_set[3], Delimiter::BlockComment { open, close } if open == "(*" && close == "*)")
+    );
+    // rule @whitespace(none) はその rule の自動 trivia 全体を無効にする。
+    let none =
+        compile("grammar G { @comment: {line: '#'} @root R ::= S; @whitespace(none) S ::= 'x'; }")
+            .unwrap();
+    let s_rule = none
+        .semantics
+        .rules
+        .iter()
+        .find(|r| r.symbol_id == "G::S")
+        .unwrap();
+    let s_policy = none
+        .semantics
+        .trivia
+        .policies
+        .iter()
+        .find(|p| p.id == s_rule.trivia_policy_id)
+        .unwrap();
+    assert!(s_policy.effective_delimiter_set.is_empty());
 }
 #[test]
 fn structured_annotations_and_recovery_application_sites() {
