@@ -103,14 +103,35 @@ impl Saved {
         }
     }
 }
+/// mapped text の識別子（String の先頭 pointer）から span を引く。乗算 hash で十分に散る。
+#[derive(Default)]
+pub(crate) struct PtrHasher(u64);
+impl std::hash::Hasher for PtrHasher {
+    fn finish(&self) -> u64 {
+        let h = self.0.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        h ^ (h >> 29)
+    }
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.0 = (self.0 << 8) | u64::from(b);
+        }
+    }
+    fn write_usize(&mut self, n: usize) {
+        self.0 = n as u64 >> 3;
+    }
+}
+pub(crate) type TextSpans =
+    std::collections::HashMap<usize, Span, std::hash::BuildHasherDefault<PtrHasher>>;
 #[derive(Clone, Copy)]
 pub(crate) struct Mark {
     scope: Checkpoint,
     effects: usize,
 }
+// 効果は Rc で共有する。memo の save / replay は参照を複製するだけで文字列を複製しない
+// （scope 側の Decl / Reference は結果 API なので所有する）。
 #[derive(Clone)]
 struct Effect {
-    value: ScanEffect,
+    value: std::rc::Rc<ScanEffect>,
     mode: &'static str,
     offset_cp: usize,
     length_cp: usize,
@@ -132,7 +153,9 @@ pub(crate) struct Session<'a> {
     pub node_spans: Vec<NodeSpan>,
     // Allocation identity is used only while mapping. finish resolves it into
     // owned AST paths, so ParseResult remains valid after moves and clones.
-    pub text_spans: std::collections::HashMap<usize, Span>,
+    pub text_spans: TextSpans,
+    /// AST 構築の走査用 stack の再利用 pool（再帰するので複数）。
+    stacks: Vec<Vec<(EventId, bool)>>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -154,7 +177,8 @@ impl<'a> Session<'a> {
             arena: {
                 let mut arena = Vec::with_capacity(
                     if options.build_ast || options.lexical || HAS_SCOPE || HAS_RECOVERY {
-                        text.len().saturating_mul(8).saturating_add(8).min(32768)
+                        // P4 実測 約 4.4 event / byte。
+                        text.len().saturating_mul(5).saturating_add(8).min(32768)
                     } else {
                         1
                     },
@@ -167,8 +191,8 @@ impl<'a> Session<'a> {
                 text.len().saturating_mul(24).saturating_add(64).min(1 << 20),
             ),
             display: DisplayDiagnostics::new(options.limits.diagnostics),
-            // memo は rule 本体単位（P4 実測 約 5 entry / byte）。
-            memo: Memo::with_capacity(text.len().saturating_mul(6).saturating_add(64).min(1 << 20)),
+            // memo は rule 本体単位（P4 実測 約 2.3 entry / byte。候補除外で失敗 entry が減った）。
+            memo: Memo::with_capacity(text.len().saturating_mul(3).saturating_add(64).min(1 << 20)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
             effects: vec![],
@@ -176,6 +200,7 @@ impl<'a> Session<'a> {
             statistics: Statistics::default(),
             node_spans: vec![],
             text_spans: Default::default(),
+            stacks: vec![],
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -206,6 +231,16 @@ impl<'a> Session<'a> {
         }
         self.depth_failure
             .map(|offset| self.fail(state, offset, "maximum parse depth exceeded"))
+    }
+    // 候補除外の失敗再生（§3.4、predict.rs）は rule 入口の検査を行わないので、
+    // 再生中に limit / 深さ上限が発火し得る状態では本物の候補関数へ戻す。
+    #[inline]
+    pub fn can_replay(&self, nesting: usize) -> bool {
+        self.depth + nesting <= self.options.max_depth
+            && !self.diag.exhausted
+            && !self.display.exhausted
+            && self.resource_failure.is_none()
+            && self.depth_failure.is_none()
     }
     pub fn enter_rule(&mut self, state: State) -> Option<Step> {
         if self.depth >= self.options.max_depth {
@@ -263,7 +298,7 @@ impl<'a> Session<'a> {
     pub fn replay_effects(&mut self, span: Span) {
         for i in span[0]..span[1] {
             let effect = self.saved_effects[i].clone();
-            self.effect_at(
+            self.effect_shared(
                 effect.value,
                 effect.mode,
                 effect.offset_cp,
@@ -272,7 +307,7 @@ impl<'a> Session<'a> {
         }
     }
     fn effect_size(effect: &Effect) -> usize {
-        match &effect.value {
+        match &*effect.value {
             ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. } => name.len(),
             ScanEffect::Diagnostic { message, .. } => message.len(),
             _ => 0,
@@ -288,6 +323,15 @@ impl<'a> Session<'a> {
         offset_cp: usize,
         length_cp: usize,
     ) {
+        self.effect_shared(std::rc::Rc::new(effect), mode, offset_cp, length_cp);
+    }
+    fn effect_shared(
+        &mut self,
+        effect: std::rc::Rc<ScanEffect>,
+        mode: &'static str,
+        offset_cp: usize,
+        length_cp: usize,
+    ) {
         if self.effect_work
             >= self
                 .options
@@ -299,7 +343,7 @@ impl<'a> Session<'a> {
                 .get_or_insert((0, "effect budget exceeded"));
             return;
         }
-        let size = match &effect {
+        let size = match &*effect {
             ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. } => name.len(),
             ScanEffect::Diagnostic { message, .. } => message.len(),
             _ => 0,
@@ -311,7 +355,7 @@ impl<'a> Session<'a> {
         }
         self.effect_work += 1;
         self.effect_bytes += size;
-        match &effect {
+        match &*effect {
             ScanEffect::Diagnostic {
                 message,
                 offset_cp,
@@ -672,9 +716,18 @@ impl<'a> Session<'a> {
         }
         step
     }
-    pub fn owned_captures(&self, root: EventId, sites: &[usize]) -> Vec<(Span, EventId)> {
+    pub fn take_stack(&mut self) -> Vec<(EventId, bool)> {
+        let mut stack = self.stacks.pop().unwrap_or_default();
+        stack.clear();
+        stack
+    }
+    pub fn give_stack(&mut self, stack: Vec<(EventId, bool)>) {
+        self.stacks.push(stack);
+    }
+    pub fn owned_captures(&mut self, root: EventId, sites: &[usize]) -> Vec<(Span, EventId)> {
         let mut out = Vec::new();
-        let mut stack = vec![(root, false)];
+        let mut stack = self.take_stack();
+        stack.push((root, false));
         while let Some((id, done)) = stack.pop() {
             match self.arena[id.0] {
                 Event::Join(a, b) => {
@@ -707,6 +760,7 @@ impl<'a> Session<'a> {
                 _ => {}
             }
         }
+        self.give_stack(stack);
         out
     }
     pub fn selected_extent(&self, root: EventId, fallback: Span) -> Span {
@@ -773,7 +827,7 @@ impl<'a> Session<'a> {
             }
         }
     }
-    pub fn field_missing(&self, root: EventId, sites: &[usize]) -> bool {
+    pub fn field_missing(&mut self, root: EventId, sites: &[usize]) -> bool {
         self.owned_captures(root, sites)
             .iter()
             .any(|(_, child)| self.has_recovery(*child))

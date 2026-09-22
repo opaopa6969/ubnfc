@@ -103,14 +103,35 @@ impl Saved {
         }
     }
 }
+/// mapped text の識別子（String の先頭 pointer）から span を引く。乗算 hash で十分に散る。
+#[derive(Default)]
+pub(crate) struct PtrHasher(u64);
+impl std::hash::Hasher for PtrHasher {
+    fn finish(&self) -> u64 {
+        let h = self.0.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        h ^ (h >> 29)
+    }
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.0 = (self.0 << 8) | u64::from(b);
+        }
+    }
+    fn write_usize(&mut self, n: usize) {
+        self.0 = n as u64 >> 3;
+    }
+}
+pub(crate) type TextSpans =
+    std::collections::HashMap<usize, Span, std::hash::BuildHasherDefault<PtrHasher>>;
 #[derive(Clone, Copy)]
 pub(crate) struct Mark {
     scope: Checkpoint,
     effects: usize,
 }
+// 効果は Rc で共有する。memo の save / replay は参照を複製するだけで文字列を複製しない
+// （scope 側の Decl / Reference は結果 API なので所有する）。
 #[derive(Clone)]
 struct Effect {
-    value: ScanEffect,
+    value: std::rc::Rc<ScanEffect>,
     mode: &'static str,
     offset_cp: usize,
     length_cp: usize,
@@ -132,7 +153,9 @@ pub(crate) struct Session<'a> {
     pub node_spans: Vec<NodeSpan>,
     // Allocation identity is used only while mapping. finish resolves it into
     // owned AST paths, so ParseResult remains valid after moves and clones.
-    pub text_spans: std::collections::HashMap<usize, Span>,
+    pub text_spans: TextSpans,
+    /// AST 構築の走査用 stack の再利用 pool（再帰するので複数）。
+    stacks: Vec<Vec<(EventId, bool)>>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -154,7 +177,8 @@ impl<'a> Session<'a> {
             arena: {
                 let mut arena = Vec::with_capacity(
                     if options.build_ast || options.lexical || HAS_SCOPE || HAS_RECOVERY {
-                        text.len().saturating_mul(8).saturating_add(8).min(32768)
+                        // P4 実測 約 4.4 event / byte。
+                        text.len().saturating_mul(5).saturating_add(8).min(32768)
                     } else {
                         1
                     },
@@ -167,8 +191,8 @@ impl<'a> Session<'a> {
                 text.len().saturating_mul(24).saturating_add(64).min(1 << 20),
             ),
             display: DisplayDiagnostics::new(options.limits.diagnostics),
-            // memo は rule 本体単位（P4 実測 約 5 entry / byte）。
-            memo: Memo::with_capacity(text.len().saturating_mul(6).saturating_add(64).min(1 << 20)),
+            // memo は rule 本体単位（P4 実測 約 2.3 entry / byte。候補除外で失敗 entry が減った）。
+            memo: Memo::with_capacity(text.len().saturating_mul(3).saturating_add(64).min(1 << 20)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
             effects: vec![],
@@ -176,6 +200,7 @@ impl<'a> Session<'a> {
             statistics: Statistics::default(),
             node_spans: vec![],
             text_spans: Default::default(),
+            stacks: vec![],
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -206,6 +231,16 @@ impl<'a> Session<'a> {
         }
         self.depth_failure
             .map(|offset| self.fail(state, offset, "maximum parse depth exceeded"))
+    }
+    // 候補除外の失敗再生（§3.4、predict.rs）は rule 入口の検査を行わないので、
+    // 再生中に limit / 深さ上限が発火し得る状態では本物の候補関数へ戻す。
+    #[inline]
+    pub fn can_replay(&self, nesting: usize) -> bool {
+        self.depth + nesting <= self.options.max_depth
+            && !self.diag.exhausted
+            && !self.display.exhausted
+            && self.resource_failure.is_none()
+            && self.depth_failure.is_none()
     }
     pub fn enter_rule(&mut self, state: State) -> Option<Step> {
         if self.depth >= self.options.max_depth {
@@ -263,7 +298,7 @@ impl<'a> Session<'a> {
     pub fn replay_effects(&mut self, span: Span) {
         for i in span[0]..span[1] {
             let effect = self.saved_effects[i].clone();
-            self.effect_at(
+            self.effect_shared(
                 effect.value,
                 effect.mode,
                 effect.offset_cp,
@@ -272,7 +307,7 @@ impl<'a> Session<'a> {
         }
     }
     fn effect_size(effect: &Effect) -> usize {
-        match &effect.value {
+        match &*effect.value {
             ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. } => name.len(),
             ScanEffect::Diagnostic { message, .. } => message.len(),
             _ => 0,
@@ -288,6 +323,15 @@ impl<'a> Session<'a> {
         offset_cp: usize,
         length_cp: usize,
     ) {
+        self.effect_shared(std::rc::Rc::new(effect), mode, offset_cp, length_cp);
+    }
+    fn effect_shared(
+        &mut self,
+        effect: std::rc::Rc<ScanEffect>,
+        mode: &'static str,
+        offset_cp: usize,
+        length_cp: usize,
+    ) {
         if self.effect_work
             >= self
                 .options
@@ -299,7 +343,7 @@ impl<'a> Session<'a> {
                 .get_or_insert((0, "effect budget exceeded"));
             return;
         }
-        let size = match &effect {
+        let size = match &*effect {
             ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. } => name.len(),
             ScanEffect::Diagnostic { message, .. } => message.len(),
             _ => 0,
@@ -311,7 +355,7 @@ impl<'a> Session<'a> {
         }
         self.effect_work += 1;
         self.effect_bytes += size;
-        match &effect {
+        match &*effect {
             ScanEffect::Diagnostic {
                 message,
                 offset_cp,
@@ -672,9 +716,18 @@ impl<'a> Session<'a> {
         }
         step
     }
-    pub fn owned_captures(&self, root: EventId, sites: &[usize]) -> Vec<(Span, EventId)> {
+    pub fn take_stack(&mut self) -> Vec<(EventId, bool)> {
+        let mut stack = self.stacks.pop().unwrap_or_default();
+        stack.clear();
+        stack
+    }
+    pub fn give_stack(&mut self, stack: Vec<(EventId, bool)>) {
+        self.stacks.push(stack);
+    }
+    pub fn owned_captures(&mut self, root: EventId, sites: &[usize]) -> Vec<(Span, EventId)> {
         let mut out = Vec::new();
-        let mut stack = vec![(root, false)];
+        let mut stack = self.take_stack();
+        stack.push((root, false));
         while let Some((id, done)) = stack.pop() {
             match self.arena[id.0] {
                 Event::Join(a, b) => {
@@ -707,6 +760,7 @@ impl<'a> Session<'a> {
                 _ => {}
             }
         }
+        self.give_stack(stack);
         out
     }
     pub fn selected_extent(&self, root: EventId, fallback: Span) -> Span {
@@ -773,7 +827,7 @@ impl<'a> Session<'a> {
             }
         }
     }
-    pub fn field_missing(&self, root: EventId, sites: &[usize]) -> bool {
+    pub fn field_missing(&mut self, root: EventId, sites: &[usize]) -> bool {
         self.owned_captures(root, sites)
             .iter()
             .any(|(_, child)| self.has_recovery(*child))
@@ -967,7 +1021,7 @@ const BODIES:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", 
 const SITES:&[(&str,&str)]=&[("expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/0/repeat/capture/0", "grammars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef/capture/0", "alias"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef/capture/0", "path"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1517:1527:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1550:1564:body/3/repeat/capture/0", "imports"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1584:1601:body/4/repeat/capture/0", "settings"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1619:1632:body/5/repeat/capture/0", "tokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1652:1664:body/6/repeat/capture/0", "rules"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2199:body/0/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2209:2215:body/2/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef/capture/0", "terminator"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef/capture/0", "chars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef/capture/0", "min"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef/capture/0", "max"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef/capture/0", "word"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4129:body/0/repeat/capture/0", "annotations"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4176:4184:body/3/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4946:4956:body/2/tokenRef/capture/0", "className"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4998:5008:body/3/0/4/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5027:5037:body/3/0/5/0/1/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5151:5163:body/2/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5179:5191:body/3/0/1/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5309:5319:body/1/0/1/tokenRef/capture/0", "style"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5449:5459:body/4/tokenRef/capture/0", "profile"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5574:5584:body/4/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5702:5712:body/4/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5844:5854:body/4/tokenRef/capture/0", "symbol"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5887:5893:body/5/0/3/tokenRef/capture/0", "description"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6020:6026:body/4/tokenRef/capture/0", "context"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6488:6504:body/4/tokenRef/capture/0", "level"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/2/tokenRef/capture/0", "text"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/2/tokenRef/capture/0", "syncTokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6750:6760:body/2/0/1/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7016:7026:body/2/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7045:7055:body/3/0/1/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7266:7276:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7408:body/0/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7429:7441:body/1/0/1/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/0/repeat/capture/0", "elements"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7729:7742:body/0/0/ruleRef/capture/0", "typeofConstraint"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7770:7783:body/1/ruleRef/capture/0", "element"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7887:7897:body/5/0/1/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8528:8536:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8640:8648:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8753:8761:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8883:8889:body/2/tokenRef/capture/0", "message"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/0/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9216:9226:body/0/0/0/tokenRef/capture/0", "namespace"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9244:9254:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9395:9405:body/2/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9536:body/0/tokenRef/capture/0", "parts"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9550:9560:body/1/0/1/tokenRef/capture/0", "parts")];
 impl Session<'_> {
 #[inline(never)] fn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err("maximum mapping depth exceeded".into());}self.mapping_depth+=1;let result=self.build_values_inner(root);self.mapping_depth-=1;result}
-fn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=vec![root];while let Some(id)=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push(b);stack.push(a);},Event::Capture{child,..}=>stack.push(child),Event::Values{child,span,wrap}=>{let mut found=self.build_values(child)?;if wrap && (matches!(found.as_slice(),[Ast::Text(_)]) || (found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {found=vec![Ast::Text(self.semantic_text(child,span))];}values.extend(found);},Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}Ok(values)}
+fn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let mut found=self.build_values(child)?;if wrap && (matches!(found.as_slice(),[Ast::Text(_)]) || (found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {found=vec![Ast::Text(self.semantic_text(child,span))];}values.extend(found);},Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}self.give_stack(stack);Ok(values)}
 fn field_nodes(&mut self,root:EventId,sites:&[usize],fallback:Option<usize>)->Result<Vec<Ast>,String> {let mut values=Vec::new();for (span,child) in self.owned_captures(root,sites) {let mut found=self.build_values(child)?;if found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child) {found.push(Ast::Text(self.semantic_text(child,span)));}for value in found {values.push(if let (Some(ty),Ast::Text(text))=(fallback,&value) {self.leaf(ty,span,text.clone())?} else {value});}}Ok(values)}
 fn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);let _=(span,text);Err(format!("unknown leaf type {ty}"))}
 fn build_rule(&mut self,rule:usize,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);match rule {
@@ -1796,7 +1850,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
                     .iter()
                     .enumerate()
                     .map(|(order, effect)| {
-                        let (action, name, offset_cp, length_cp) = match &effect.value {
+                        let (action, name, offset_cp, length_cp) = match &*effect.value {
                             ScanEffect::Enter => ("enter", None, effect.offset_cp, 0),
                             ScanEffect::Leave => ("leave", None, effect.offset_cp, 0),
                             ScanEffect::Clear => ("clear", None, effect.offset_cp, 0),
@@ -1837,7 +1891,7 @@ trait CollectValueSpans {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     );
 }
@@ -1845,7 +1899,7 @@ impl CollectValueSpans for String {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         if let Some(span) = texts.get(&(self.as_ptr() as usize)) {
@@ -1861,7 +1915,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         for (i, value) in self.iter().enumerate() {
@@ -1877,7 +1931,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         if let Some(value) = self {
@@ -1889,13 +1943,13 @@ impl<T: CollectValueSpans> CollectValueSpans for Box<T> {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         self.as_ref().collect(path, texts, out);
     }
 }
-impl CollectValueSpans for Ast { fn collect(&self,path:&mut String,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.clone(),span:*span,text:Some(text.clone())});}},Self::Null=>{},
+impl CollectValueSpans for Ast { fn collect(&self,path:&mut String,texts:&TextSpans,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.clone(),span:*span,text:Some(text.clone())});}},Self::Null=>{},
 Self::g_UBNFAST_2e_UBNFFile(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 {let len=path.len();path.push_str("/fields/grammars");node.g_grammars.collect(path,texts,out);path.truncate(len);}
 },
