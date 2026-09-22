@@ -1,0 +1,12 @@
+grammar Fuzz {
+  token T0 = LOOKAHEAD('a')
+  token T1 = EMPTY
+  L1 ::= ;
+  @mapping(Node.A, params=[w]) VA ::= 'p' @w '('{2,3};
+  @mapping(Node.B, params=[w]) VB ::= 'q' @w 'あ';
+  @mapping(Node) @commonField(w) Node ::= VA | VB;
+  @interleave(profile=javaStyle) @recovery(AUTO) @scopeTree(mode=dynamic) @declares(symbol=v7) M0 ::= ')'{0,} @v7 | Node '😀'{2,} '😀'{2};
+  @mapping(C1, params=[v8, v9, v10, v11, v12]) @doc('fuzz 😀') M1 ::= ')'? @v8 ( 'c' @v9 { M0 M0? } @v10 ) | 'x'* ( L1 )+ ( ERROR('fuzz error') [ 'x'{1} 'c'* ]{1,} @v11 '+' @v12 );
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= M0 @left { '+' @op M0 @right };
+  @root @mapping(Top, params=[head]) Root ::= Op0 @head;
+}

@@ -1,0 +1,212 @@
+{
+  "slug": "diff-captures-ccc0d8bb-seed1",
+  "signature": "diff:/captures/*",
+  "seed": 1,
+  "grammar": "grammar Fuzz {\n  token T0 = UNTIL('#')\n  token T1 = NEGATIVE_LOOKAHEAD('#')\n  token T2 = LOOKAHEAD('a')\n  L0 ::= ;\n  @enum L1 ::= 'alpha' | 'beta';\n  L2 ::= '(';\n  M0 ::= { '+' } '('* @v2 '\\n' @v3 | [ '('+ @v4 ] | L0{2,3} @v5 { ( L1 '😀'* % ':' @v6 '😀'? @v7 ) ( '(' @v8 L1 | L1 ){2} @v9 L1 };\n  @root Root ::= T0 @head L2? @head ( ',' @tail M0* )* @tail;\n}\n",
+  "imported": null,
+  "input": "#",
+  "input_code_points": 1,
+  "differences": [
+    {
+      "path": "/captures/0",
+      "expected": null,
+      "actual": {
+        "binding": null,
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    },
+    {
+      "path": "/catalogs",
+      "expected": {
+        "<unobserved>": "catalogs"
+      },
+      "actual": []
+    },
+    {
+      "path": "/recoveries",
+      "expected": [],
+      "actual": {
+        "<unobserved>": "recoveries"
+      }
+    },
+    {
+      "path": "/scope/declarations",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/depth",
+      "expected": 0,
+      "actual": null
+    },
+    {
+      "path": "/scope/diagnostics",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/references",
+      "expected": [],
+      "actual": null
+    }
+  ],
+  "java_violations": [],
+  "rust_violations": [],
+  "java": {
+    "accepted": true,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "expected": [
+          "end of input"
+        ],
+        "farthestExpected": [
+          "'('",
+          "','",
+          "RootRepeat0Parser"
+        ],
+        "farthestOffset": 1,
+        "kind": "trailing_input",
+        "offset": 0,
+        "origin": "Mapper.diagnose"
+      }
+    ],
+    "id": 0,
+    "lexical": [],
+    "mappingError": null,
+    "matched": 1,
+    "nativeFailure": {
+      "consumed": 0,
+      "expected": [
+        "'('",
+        "','",
+        "RootRepeat0Parser"
+      ],
+      "matched": 1,
+      "offset": 1
+    },
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    ],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "rust": {
+    "accepted": true,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [
+      {
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    ],
+    "catalogs": [],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "deepestRule": "Fuzz::L2",
+        "expected": [
+          "end of input"
+        ],
+        "farthestExpected": [
+          "'('",
+          "','",
+          "RootRepeat0Parser"
+        ],
+        "farthestOffset": 1,
+        "kind": "trailing_input",
+        "offset": 0,
+        "origin": "Mapper.diagnose",
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::L2"
+        ]
+      }
+    ],
+    "hints": [
+      {
+        "deepestRule": "Fuzz::L2",
+        "expected": [
+          "(",
+          ","
+        ],
+        "offset": 0,
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::L2"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:309:346:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": null,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          0
+        ]
+      }
+    ],
+    "mappingError": null,
+    "matched": 1,
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    ],
+    "recoveredRegions": [],
+    "references": [],
+    "scope": {
+      "events": [],
+      "mode": []
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "shrink_rounds": 9
+}

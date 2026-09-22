@@ -1,0 +1,583 @@
+{
+  "slug": "diff-ast-fields-head-fields-left-fields-left-10db0a79-seed38",
+  "signature": "diff:/ast/fields/head/fields/left/fields/left/*",
+  "seed": 38,
+  "grammar": "grammar Fuzz {\n  token T0 = EMPTY\n  token T1 = UNTIL('#')\n  token T2 = org.unlaxer.parser.clang.IdentifierParser\n  L0 ::= ;\n  @enum L1 ::= 'beta' | 'gamma';\n  @recovery(SKIP) M0 ::= ',' L1*;\n  @mapping(C1, params=[v2]) @whitespace M1 ::= ERROR('fuzz error'){1,3} @v2 L0{0,1};\n  @interleave(profile=commentsAndSpaces) @scopeTree(mode=dynamic) @declares(symbol=v3) @backref(name=v7) M2 ::= ',' @v3 | [ T2 '+'+ % ':' ] | { M0? { M0{1,2} @v4 T1 @v5 }? 'x'{0,} @v6 } M1 @v7 'あ';\n  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= M2 @left { '*' @op M2 @right };\n  @mapping(Bin1, params=[left, op, right]) @leftAssoc @precedence(level=80) Op1 ::= Op0 @left { '*' @op Op0 @right };\n  @root @mapping(Top, params=[head, tail]) Root ::= Op1 @head ( ',' @tail T2{2} )* @tail;\n}\n",
+  "imported": null,
+  "input": "",
+  "input_code_points": 0,
+  "differences": [
+    {
+      "path": "/ast/fields/head/fields/left/fields/left/0",
+      "expected": null,
+      "actual": ""
+    },
+    {
+      "path": "/catalogs",
+      "expected": {
+        "<unobserved>": "catalogs"
+      },
+      "actual": []
+    },
+    {
+      "path": "/diagnostics/0",
+      "expected": {
+        "expectedNonEmpty": true,
+        "farthestExpected": [
+          "' '",
+          "'*'",
+          "'*/'",
+          "','",
+          "'/*'",
+          "'//'",
+          "AlphabetUnderScoreParser",
+          "IdentifierParser",
+          "RootRepeat0Parser"
+        ],
+        "farthestOffset": 0,
+        "kind": "syntax",
+        "length": null,
+        "message": null,
+        "severity": null
+      },
+      "actual": null
+    },
+    {
+      "path": "/recoveries",
+      "expected": [],
+      "actual": {
+        "<unobserved>": "recoveries"
+      }
+    },
+    {
+      "path": "/scope/declarations",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/depth",
+      "expected": 0,
+      "actual": null
+    },
+    {
+      "path": "/scope/diagnostics",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/events/0/name",
+      "expected": "M2",
+      "actual": null
+    },
+    {
+      "path": "/scope/events/1/name",
+      "expected": "M2",
+      "actual": null
+    },
+    {
+      "path": "/scope/references",
+      "expected": [],
+      "actual": null
+    }
+  ],
+  "java_violations": [],
+  "rust_violations": [],
+  "java": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": {
+      "fields": {
+        "head": {
+          "fields": {
+            "left": {
+              "fields": {
+                "left": [],
+                "op": [],
+                "right": []
+              },
+              "span": [
+                0,
+                0
+              ],
+              "type": "Bin0"
+            },
+            "op": [],
+            "right": []
+          },
+          "span": [
+            0,
+            0
+          ],
+          "type": "Bin1"
+        },
+        "tail": []
+      },
+      "span": [
+        0,
+        0
+      ],
+      "type": "Top"
+    },
+    "captures": [
+      {
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    ],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "expected": [
+          "' '",
+          "'*'",
+          "'*/'",
+          "','",
+          "'/*'",
+          "'//'",
+          "AlphabetUnderScoreParser",
+          "IdentifierParser",
+          "RootRepeat0Parser"
+        ],
+        "farthestExpected": [
+          "' '",
+          "'*'",
+          "'*/'",
+          "','",
+          "'/*'",
+          "'//'",
+          "AlphabetUnderScoreParser",
+          "IdentifierParser",
+          "RootRepeat0Parser"
+        ],
+        "farthestOffset": 0,
+        "kind": "syntax",
+        "offset": 0,
+        "origin": "Mapper.diagnose"
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:398:415:body/1/optional",
+        "occurrenceId": 7,
+        "parentOccurrenceId": 6,
+        "ruleId": "Fuzz::M2",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:grammar.ubnf:388:472:body/choice",
+        "occurrenceId": 6,
+        "parentOccurrenceId": 5,
+        "ruleId": "Fuzz::M2",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:558:560:body/0/ruleRef",
+        "occurrenceId": 5,
+        "parentOccurrenceId": 4,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:567:588:body/1/repeat",
+        "occurrenceId": 8,
+        "parentOccurrenceId": 4,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 4,
+        "exprId": "expr:grammar.ubnf:558:588:body/seq",
+        "occurrenceId": 4,
+        "parentOccurrenceId": 3,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 5,
+        "exprId": "expr:grammar.ubnf:674:677:body/0/ruleRef",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 6,
+        "exprId": "expr:grammar.ubnf:684:706:body/1/repeat",
+        "occurrenceId": 9,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 7,
+        "exprId": "expr:grammar.ubnf:674:706:body/seq",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 8,
+        "exprId": "expr:grammar.ubnf:760:763:body/0/ruleRef",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 9,
+        "exprId": "expr:grammar.ubnf:760:790:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": -1,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          0
+        ],
+        "token": null
+      }
+    ],
+    "mappingError": null,
+    "matched": 0,
+    "nativeFailure": {
+      "consumed": 0,
+      "expected": [
+        "' '",
+        "'*'",
+        "'*/'",
+        "','",
+        "'/*'",
+        "'//'",
+        "AlphabetUnderScoreParser",
+        "IdentifierParser",
+        "RootRepeat0Parser"
+      ],
+      "matched": 0,
+      "offset": 0
+    },
+    "nodes": [],
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Op0:0",
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "binding": "Op1:0",
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    ],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [
+        {
+          "action": "enter",
+          "length": 0,
+          "mode": "dynamic",
+          "name": "M2",
+          "offset": 0,
+          "order": 0
+        },
+        {
+          "action": "leave",
+          "length": 0,
+          "mode": "dynamic",
+          "name": "M2",
+          "offset": 0,
+          "order": 1
+        }
+      ],
+      "mode": [
+        "dynamic"
+      ],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "texts": []
+  },
+  "rust": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": {
+      "fields": {
+        "head": {
+          "fields": {
+            "left": {
+              "fields": {
+                "left": [
+                  ""
+                ],
+                "op": [],
+                "right": []
+              },
+              "span": [
+                0,
+                0
+              ],
+              "type": "Bin0"
+            },
+            "op": [],
+            "right": []
+          },
+          "span": [
+            0,
+            0
+          ],
+          "type": "Bin1"
+        },
+        "tail": []
+      },
+      "span": [
+        0,
+        0
+      ],
+      "type": "Top"
+    },
+    "captures": [
+      {
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    ],
+    "catalogs": [],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [],
+    "hints": [
+      {
+        "deepestRule": "Fuzz::M2",
+        "expected": [
+          ",",
+          "T2",
+          "*"
+        ],
+        "offset": 0,
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::Op1",
+          "Fuzz::Op0",
+          "Fuzz::M2"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:760:790:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": null,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          0
+        ]
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:674:706:body/seq",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          0,
+          0
+        ]
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:grammar.ubnf:558:588:body/seq",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          0
+        ]
+      },
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:388:472:body/choice",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::M2",
+        "span": [
+          0,
+          0
+        ]
+      }
+    ],
+    "mappingError": null,
+    "matched": 0,
+    "nodes": [],
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Op0:0",
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "binding": "Op1:0",
+        "name": "left",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      },
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          0
+        ],
+        "text": ""
+      }
+    ],
+    "recoveredRegions": [],
+    "references": [],
+    "scope": {
+      "events": [
+        {
+          "action": "enter",
+          "length": 0,
+          "mode": "dynamic",
+          "name": null,
+          "offset": 0,
+          "order": 0
+        },
+        {
+          "action": "leave",
+          "length": 0,
+          "mode": "dynamic",
+          "name": null,
+          "offset": 0,
+          "order": 1
+        }
+      ],
+      "mode": [
+        "dynamic"
+      ]
+    },
+    "scopeDepth": 0,
+    "texts": [
+      [
+        0,
+        0,
+        ""
+      ]
+    ]
+  },
+  "shrink_rounds": 5
+}

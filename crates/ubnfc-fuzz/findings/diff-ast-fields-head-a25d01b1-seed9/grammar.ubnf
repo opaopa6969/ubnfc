@@ -1,0 +1,14 @@
+grammar Fuzz {
+  @whitespace: javaStyle
+  token T0 = LOOKAHEAD('a')
+  token T1 = CI('select')
+  token T2 = org.unlaxer.parser.clang.IdentifierParser
+  L0 ::= T1 @v1 | T1 @v2 T2;
+  @enum L1 ::= 'alpha' | 'beta' | 'gamma';
+  @mapping(Node.A, params=[w]) VA ::= 'p' @w 'b';
+  @mapping(Node.B, params=[w]) VB ::= 'q' @w L0{0,1};
+  @mapping(Node) Node ::= VA | VB;
+  @whitespace @recovery(SKIP) @scopeTree(mode=dynamic) @declares(symbol=v3) M0 ::= ( 'ab'* % '*' @v3 ){2,} 'x'? 'a' @v4 | T2* @v5 L1 @v6 [ [ ';'* ';' ]? % 'b' @v7 '*' @v8 [ T2{2,} @v9 ] ]+;
+  @predictiveChoice @scopeTree(mode=lexical) @declares(symbol=v10) @backref(name=v12) M1 ::= [ '-' ] [ 'b'+ ')' @v10 ] T1* @v11 | '😀' @v12 { { 'ab'+ 'a'{2,} L1 } } '+';
+  @root @mapping(Top, params=[head, tail]) Root ::= L1 @head M1 @head ( ',' @tail L1 )* @tail;
+}

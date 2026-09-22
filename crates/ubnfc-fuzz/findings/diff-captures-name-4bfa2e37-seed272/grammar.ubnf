@@ -1,0 +1,7 @@
+grammar Fuzz {
+  token T0 = ANY
+  token T1 = LOOKAHEAD('a')
+  L0 ::= '\n' ',' 'あ';
+  @mapping(C0) @whitespace @recovery(AUTO) M0 ::= ERROR('fuzz error') T1{0,};
+  @root Root ::= L0 @head [ 'あ' '='{2,4} @v5 M0 ]+ @head;
+}

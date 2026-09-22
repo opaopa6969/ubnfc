@@ -63,8 +63,8 @@ fn entry_with_scanner(parser: &str) -> String {
             "options:ParseOptions,scanner:&mut dyn TokenScanner)",
             1,
         )
-        .replacen("let mut scanner=RejectExtern;", "", 1)
-        .replacen("&mut scanner", "scanner", 1)
+        .replacen("let mut scanner=RejectExtern;\n", "", 1)
+        .replace("&mut scanner", "&mut *scanner")
 }
 
 /// 行頭 `fn rN_c(` / `fn rN_m(` / `fn eN_c(` / `fn eN_m(` の本体先頭にフックを挿入し、

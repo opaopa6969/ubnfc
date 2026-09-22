@@ -62,6 +62,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             lexical,
             lexical_cache,
             max_depth,
+            // driver は成功時も hints（投機的失敗）を出すので、診断を明示的に要求する。
+            diagnostics: true,
             ..Default::default()
         },
     )?;
@@ -75,6 +77,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             lexical,
             lexical_cache,
             max_depth,
+            diagnostics: true,
             ..Default::default()
         },
     )?;

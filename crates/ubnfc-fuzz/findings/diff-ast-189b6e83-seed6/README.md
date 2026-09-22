@@ -1,0 +1,50 @@
+# diff-ast-189b6e83-seed6
+
+seed: 6 / 入力 6 code point / 縮小 3 回
+
+## signature
+
+`diff:/ast`
+
+## 入力（JSON escape）
+
+```json
+"alpha;"
+```
+
+## 文法
+
+```ubnf
+grammar Fuzz {
+  token T0 = CHAR_RANGE('a','f')
+  @enum L0 ::= 'alpha';
+  @mapping(Node.A, params=[w]) VA ::= 'p' @w ')';
+  @mapping(Node.B, params=[w]) VB ::= 'q' @w T0;
+  @mapping(Node) Node ::= VA | VB;
+  @mapping(C0, params=[v2, v1]) @predictiveChoice @scopeTree(mode=lexical) @declares(symbol=v1) M0 ::= ')'* @typeof(v1) '-' @v2 | Node+ % ')' '-' @v1 | ',';
+  @interleave(profile=javaStyle) @predictiveChoice @scopeTree(mode=lexical) @declares(symbol=v4) @backref(name=v3) @catalog(context='fuzz') @doc('fuzz 😀') M1 ::= { ( '\n' @v3 'ab' ) @v4 Node? % '\n' } | { L0 }{0,};
+  @mapping(Bin0, params=[left, op, right]) @rightAssoc @precedence(level=90) Op0 ::= L0 @left { '*' @op Op0 @right };
+  @root Root ::= Op0 @head ';' @head;
+}
+```
+
+## 観測差（左 Java / 右 Rust）
+
+- `/ast`: java=`{"fields":{"left":"ALPHA","op":[],"right":[]},"span":[0,5],"type":"Bin0"}` rust=`null`
+- `/catalogs`: java=`{"<unobserved>":"catalogs"}` rust=`[{"captures":["v3","v4"],"context":"fuzz","rule":"M1"}]`
+- `/diagnostics/0`: java=`{"expectedNonEmpty":true,"farthestExpected":["'*'"],"farthestOffset":5,"kind":"syntax","length":null,"message":null,"severity":null}` rust=`<欠落>`
+- `/mappingError/present`: java=`false` rust=`true`
+- `/recoveries`: java=`[]` rust=`{"<unobserved>":"recoveries"}`
+- `/scope/declarations`: java=`[]` rust=`<欠落>`
+- `/scope/depth`: java=`0` rust=`<欠落>`
+- `/scope/diagnostics`: java=`[]` rust=`<欠落>`
+- `/scope/mode/0`: java=`<欠落>` rust=`"lexical"`
+- `/scope/references`: java=`[]` rust=`<欠落>`
+- `/value`: java=`{"<unobserved>":"value"}` rust=`null`
+
+## 応答
+
+```json
+java = {"accepted":true,"allConsumed":true,"ast":{"fields":{"left":"ALPHA","op":[],"right":[]},"span":[0,5],"type":"Bin0"},"captures":[{"name":"left","span":[0,5],"text":"alpha"},{"name":"head","span":[0,5],"text":"alpha"},{"name":"head","span":[5,6],"text":";"}],"consumed":6,"declarations":[],"diagnostics":[{"expected":["'*'"],"farthestExpected":["'*'"],"farthestOffset":5,"kind":"syntax","offset":5,"origin":"Mapper.diagnose"}],"id":0,"lexical":[{"completionOrder":0,"exprId":"expr:grammar.ubnf:63:70:body/0/literal","occurrenceId":5,"parentOccurrenceId":4,"ruleId":"Fuzz::L0","span":[0,5],"token":"alpha"},{"completionOrder":1,"exprId":"expr:grammar.ubnf:63:70:body/seq","occurrenceId":4,"parentOccurrenceId":3,"ruleId":"Fuzz::L0","span":[0,5],"token":null},{"completionOrder":2,"exprId":"expr:grammar.ubnf:663:665:body/0/ruleRef","occurrenceId":3,"parentOccurrenceId":2,"ruleId":"Fuzz::Op0","span":[0,5],"token":null},{"completionOrder":3,"exprId":"expr:grammar.ubnf:672:694:body/1/repeat","occurrenceId":6,"parentOccurrenceId":2,"ruleId":"Fuzz::Op0","span":[5,5],"token":null},{"completionOrder":4,"exprId":"expr:grammar.ubnf:663:694:body/seq","occurrenceId":2,"parentOccurrenceId":1,"ruleId":"Fuzz::Op0","span":[0,5],"token":null},{"completionOrder":5,"exprId":"expr:grammar.ubnf:713:716:body/0/ruleRef","occurrenceId":1,"parentOccurrenceId":0,"ruleId":"Fuzz::Root","span":[0,5],"token":null},{"completionOrder":6,"exprId":"expr:grammar.ubnf:723:726:body/1/literal","occurrenceId":7,"parentOccurrenceId":0,"ruleId":"Fuzz::Root","span":[5,6],"token":";"},{"completionOrder":7,"exprId":"expr:grammar.ubnf:713:726:body/seq","occurrenceId":0,"parentOccurrenceId":-1,"ruleId":"Fuzz::Root","span":[0,6],"token":null}],"mappingError":null,"matched":6,"nativeFailure":{"consumed":5,"expected":["'*'"],"matched":5,"offset":5},"nodes":[],"parsedStatus":"succeeded","prefixCaptures":[{"binding":"Op0:0","name":"left","span":[0,5],"text":"alpha"},{"binding":"Root:0","name":"head","span":[0,5],"text":"alpha"},{"binding":"Root:1","name":"head","span":[5,6],"text":";"}],"recoveries":[],"references":[],"scope":{"declarations":[],"depth":0,"diagnostics":[],"events":[],"mode":[],"references":[]},"scopeDepth":0,"texts":[]}
+rust = {"accepted":true,"allConsumed":true,"ast":null,"captures":[{"name":"left","span":[0,5],"text":"alpha"},{"name":"head","span":[0,5],"text":"alpha"},{"name":"head","span":[5,6],"text":";"}],"catalogs":[{"captures":["v3","v4"],"context":"fuzz","rule":"M1"}],"consumed":6,"declarations":[],"diagnostics":[],"hints":[{"deepestRule":"Fuzz::Op0","expected":["*"],"offset":5,"rulePath":["Fuzz::Root","Fuzz::Op0"]}],"id":0,"lexical":[{"completionOrder":4,"exprId":"expr:grammar.ubnf:713:726:body/seq","occurrenceId":0,"parentOccurrenceId":null,"ruleId":"Fuzz::Root","span":[0,6]},{"completionOrder":2,"exprId":"expr:grammar.ubnf:663:694:body/seq","occurrenceId":1,"parentOccurrenceId":0,"ruleId":"Fuzz::Op0","span":[0,5]},{"completionOrder":1,"exprId":"expr:grammar.ubnf:63:70:body/seq","occurrenceId":2,"parentOccurrenceId":1,"ruleId":"Fuzz::L0","span":[0,5]},{"completionOrder":0,"exprId":"expr:grammar.ubnf:63:70:body/0/literal","occurrenceId":3,"parentOccurrenceId":2,"ruleId":"Fuzz::L0","span":[0,5]},{"completionOrder":3,"exprId":"expr:grammar.ubnf:723:726:body/1/literal","occurrenceId":4,"parentOccurrenceId":0,"ruleId":"Fuzz::Root","span":[5,6]}],"mappingError":"java.lang.IllegalArgumentException: left: mapped value type mismatch","matched":6,"parsedStatus":"succeeded","prefixCaptures":[{"binding":"Op0:0","name":"left","span":[0,5],"text":"alpha"},{"binding":"Root:0","name":"head","span":[0,5],"text":"alpha"},{"binding":"Root:1","name":"head","span":[5,6],"text":";"}],"recoveredRegions":[],"references":[],"scope":{"events":[],"mode":["lexical"]},"scopeDepth":0,"value":null}
+```

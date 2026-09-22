@@ -1,0 +1,13 @@
+grammar Fuzz {
+  token T0 = ANY
+  L0 ::= '('{2};
+  L1 ::= '=' @v6 L0* % '\n' @v7 | ')'+ % ')';
+  @mapping(Node.A, params=[w]) VA ::= 'p' @w 'x';
+  @mapping(Node.B, params=[w]) VB ::= 'q' @w T0;
+  @mapping(Node) @commonField(w) Node ::= VA | VB;
+  @whitespace M0 ::= ( '*'{1,} @v8 { L1 @v9 } @v10 ) | { '+' ',' @v11 } @v12 [ [ L0 @v13 ] ERROR('fuzz error') ];
+  @mapping(C1) M1 ::= M0+ | L0 [ 'あ' '\n' ] '😀'+;
+  @mapping(C2, params=[v14, v15, v16, v17, v18, v19, v20]) @interleave(profile=javaStyle) M2 ::= 'あ' @v14 'あ'* % '\n' @v15 'ab'? | ( T0 )? % 'b' @v16 | L1 T0 @v17 [ ERROR('fuzz error')+ @v18 T0 @v19 [ 'b'{2} @v20 ] ];
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= L0 @left { '-' @op L0 @right };
+  @root Root ::= Op0 @head;
+}

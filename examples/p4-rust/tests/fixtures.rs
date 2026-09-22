@@ -127,7 +127,11 @@ fn default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_res
     // M5: `limits.diagnostics` は「記録した診断の件数」の上限。主診断 DAG の node 数と、
     // 公開 farthest 候補（label）の記録数をそれぞれ数え、どちらかが超えると Resource 診断で
     // 全体失敗になる。失敗 1 件が O(1) 件になったので、既定 2,000,000 で全 fixture が通る。
-    let default = ParseOptions::default();
+    // fast mode（既定）は診断を記録しないので予算を消費しない。予算の契約は診断モードで検証する。
+    let default = ParseOptions {
+        diagnostics: true,
+        ..Default::default()
+    };
     let run = |name: &str, entry: Option<&str>, options: ParseOptions| match entry {
         None => parse_formula(&fixture(name), options),
         Some(entry) => parse_entry(Some(entry), &fixture(name), options).unwrap(),
@@ -160,12 +164,16 @@ fn default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_res
         None,
         ParseOptions {
             memo: false,
+            diagnostics: true,
             ..Default::default()
         },
     );
     assert!(no_memo.ok, "{:?}", no_memo.diagnostics);
     // 予算を小さくすると、認識は正しく進んでも Resource 診断 1 件で全体失敗になる。
-    let mut small = ParseOptions::default();
+    let mut small = ParseOptions {
+        diagnostics: true,
+        ..Default::default()
+    };
     small.limits.diagnostics = 200;
     for (name, entry) in [
         ("complex", None),
@@ -515,6 +523,41 @@ fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
                         Some(entry) => parse_entry(Some(entry), input, options).unwrap(),
                     })
                 };
+                // fast mode（既定、診断を記録しない）と診断モードの同値。診断が要る結果
+                // （失敗・入力の残り・recovery / mapping / resource 診断）は入口が解析し直すので
+                // hints まで完全一致し、完全成功では hints（投機的失敗）だけが fast mode で空になる。
+                let fast = run(true, true, false);
+                let diagnostic = {
+                    let mut options = options(true, memo);
+                    options.diagnostics = true;
+                    strip_statistics(match entry {
+                        None => parse_formula(input, options),
+                        Some(entry) => parse_entry(Some(entry), input, options).unwrap(),
+                    })
+                };
+                let escalated =
+                    !fast.ok || !fast.diagnostics.is_empty() || !fast.recoveries.is_empty();
+                if escalated {
+                    assert!(
+                        fast == diagnostic,
+                        "{name}: fast mode の再解析が診断モードと異なる (memo {memo}) for input {:?}",
+                        input
+                    );
+                } else {
+                    assert!(
+                        fast.hints.is_empty(),
+                        "{name}: fast mode が hints を返した for input {:?}",
+                        input
+                    );
+                    let mut expected = diagnostic.clone();
+                    expected.hints.clear();
+                    assert!(
+                        fast == expected,
+                        "{name}: fast mode と診断モードが hints 以外で異なる (memo {memo}) for input {:?}",
+                        input
+                    );
+                }
+                compared += 1;
                 // 参照経路（候補除外なし・因数分解なし・字句 cache なし）と、各最適化の組合せを比較する。
                 let reference = run(false, false, false);
                 for (predict, factor, lexical_cache) in [

@@ -261,14 +261,15 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         );
     }
     files.insert("Cargo.toml".into(), manifest);
-    let mut p=String::from("//! IR の expression/rule ごとの静的関数。c=consumed, m=matchOnly。\n#![allow(dead_code, unused_mut)]\nuse super::api::*;\nuse super::runtime::*;\n#[allow(unused_imports)]\nuse super::rt::{diag::Diag,memo::Key};\npub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::default())}\npub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {parse_with_scanner(text,options,&mut RejectExtern)}\npub fn parse_with_scanner(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner)->ParseResult {\nlet mut parser=Session::new(text,options,scanner);\n");
+    let mut p=String::from("//! IR の expression/rule ごとの静的関数。c=consumed, m=matchOnly。\n#![allow(dead_code, unused_mut)]\nuse super::api::*;\nuse super::runtime::*;\n#[allow(unused_imports)]\nuse super::rt::{diag::Diag,memo::Key};\npub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::default())}\npub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {parse_with_scanner(text,options,&mut RejectExtern)}\npub fn parse_with_scanner(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner)->ParseResult {\n");
+    // fast mode（診断を記録しない）で解析し、診断が要る結果なら同じ入力を診断モードで解析し直す。
     writeln!(
         p,
-        "let step=parser.r{}_c(State::default());parser.finish(step)\n}}",
-        g.rules[ir.entry.rule_id.as_str()]
+        "let mut parser=Session::new(text,options,&mut *scanner);\nlet step=parser.r{entry}_c(State::default());\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {{return result;}}\nlet options=ParseOptions{{diagnostics:true,..options}};\nlet mut parser=Session::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nparser.finish(step)\n}}",
+        entry = g.rules[ir.entry.rule_id.as_str()]
     )
     .unwrap();
-    p.push_str("pub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\nlet mut scanner=RejectExtern;let mut parser=Session::new(text,options,&mut scanner);let step=match (grammar,entry) {\n");
+    p.push_str("fn entry_step(parser:&mut Session<'_>,grammar:&str,entry:Option<&str>)->Result<Step,&'static str> {\nOk(match (grammar,entry) {\n");
     for unit in &ir.grammar_units {
         let roots = ir
             .semantics
@@ -316,7 +317,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         )
         .unwrap();
     }
-    p.push_str("_=>return Err(\"unsupported grammar or entry\"),};Ok(parser.finish(step))}\nimpl Session<'_> {\n");
+    p.push_str("_=>return Err(\"unsupported grammar or entry\"),})}\npub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\nlet mut scanner=RejectExtern;\nlet mut parser=Session::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {return Ok(result);}\nlet options=ParseOptions{diagnostics:true,..options};\nlet mut parser=Session::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nOk(parser.finish(step))}\nimpl Session<'_> {\n");
     for (i, rule) in ir.semantics.rules.iter().enumerate() {
         for mode in [false, true] {
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {

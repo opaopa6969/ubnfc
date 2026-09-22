@@ -164,7 +164,12 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
     }
     (recoveries, diagnostics)
 }
-pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
+pub(crate) fn finish(self, step: Step) -> ParseResult {
+    self.finish_checked(step).0
+}
+/// 結果と「診断付きで解析し直す必要があるか」を返す（`ParseOptions::diagnostics` 参照）。
+/// fast mode で診断が要る結果になった入口は、同じ入力を診断モードで解析し直す。
+pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     if let Some(offset) = self.depth_failure {
         step = self.fail(State::default(), offset, "maximum parse depth exceeded");
     }
@@ -178,7 +183,9 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             ..Step::yes(State::default())
         };
     }
-    let trailing = step.ok && self.options.require_eof && step.state.consumed != self.text.len();
+    // require_eof を問わず「入力が残った」ことを再解析の条件にする（保守的）。
+    let incomplete = step.state.consumed != self.text.len();
+    let trailing = step.ok && self.options.require_eof && incomplete;
     let ok = step.ok && !trailing;
     let consumed_cp = if step.ok {
         self.cp(step.state.consumed)
@@ -397,6 +404,14 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             },
         },
     };
+    // 診断を要する結果（失敗・入力の残り・recovery / mapping / resource 診断）は fast mode では
+    // 観測を持たないので、入口が診断モードで解析し直す。scope の意味診断（`scope_diagnostics`）は
+    // 診断機構ではなく scope store の効果なので、fast mode でも同じものが得られる（再解析しない）。
+    let escalate = !self.options.diagnostics
+        && (!result.ok
+            || incomplete
+            || !result.diagnostics.is_empty()
+            || !result.recoveries.is_empty());
     self.recycle();
-    result
+    (result, escalate)
 }

@@ -37,6 +37,9 @@ impl std::hash::Hasher for IdHasher {
 pub struct Diagnostics {
     nodes: Vec<Node>,
     limit: usize,
+    // 記録しない parse（fast mode）では limit を 0 にして push を最初の検査で返す。
+    // `enabled` はそのときに予算超過（`exhausted`）と誤判定しないためだけに要る。
+    enabled: bool,
     pub exhausted: bool,
 }
 impl Diagnostics {
@@ -54,8 +57,14 @@ impl Diagnostics {
         Self {
             nodes,
             limit,
+            enabled: true,
             exhausted: false,
         }
+    }
+    /// 記録の有無を切り替える（`false` は limit 0 と同じ扱いで、予算超過にはしない）。
+    #[allow(dead_code)]
+    pub fn enable(&mut self, enabled: bool) {
+        self.enabled = enabled;
     }
     /// 内容を捨てて再利用する（確保は保持）。
     #[allow(dead_code)]
@@ -63,6 +72,7 @@ impl Diagnostics {
         self.nodes.clear();
         self.nodes.push(Node::Empty);
         self.limit = limit.min(u32::MAX as usize);
+        self.enabled = true;
         self.exhausted = false;
     }
     #[allow(dead_code)]
@@ -71,7 +81,8 @@ impl Diagnostics {
     }
     fn push(&mut self, pos: usize, node: Node) -> Diag {
         if self.nodes.len() >= self.limit {
-            self.exhausted = true;
+            // fast mode（limit 0）は予算超過ではない。
+            self.exhausted |= self.enabled;
             return Diag::NONE;
         }
         let Ok(pos) = u32::try_from(pos) else {
@@ -82,7 +93,11 @@ impl Diagnostics {
         self.nodes.push(node);
         Diag { id, pos }
     }
+    #[inline]
     pub fn fail(&mut self, pos: usize, label: &'static str) -> Diag {
+        if !self.enabled {
+            return Diag::NONE;
+        }
         self.push(pos, Node::Failure(label))
     }
     #[inline]
@@ -101,6 +116,7 @@ impl Diagnostics {
             self.push(a.pos as usize, Node::Join(a, b))
         }
     }
+    #[inline]
     pub fn rule(&mut self, rule: usize, child: Diag) -> Diag {
         if child.id == 0 {
             child
@@ -295,6 +311,8 @@ pub struct DisplayDiagnostics {
     guards: usize,
     work: usize,
     limit: usize,
+    // 記録しない parse（fast mode）。frame の出入りも含めて何もしない。
+    enabled: bool,
     pub exhausted: bool,
 }
 // 生存記録の重複除去は記録時に番号で行う（静的 label は同じ定数を指すことが多く、内容の重複は
@@ -357,8 +375,14 @@ impl DisplayDiagnostics {
             guards: 0,
             work: 0,
             limit,
+            enabled: true,
             exhausted: false,
         }
+    }
+    /// 記録の有無を切り替える。`false` では frame・log・予算のいずれも触らない。
+    #[allow(dead_code)]
+    pub fn enable(&mut self, enabled: bool) {
+        self.enabled = enabled;
     }
     /// 内容を捨てて再利用する（確保は保持）。世代印を進めるので dedupe 表は空と同じ。
     /// registry（静的 pointer → 番号）は有効なまま残す。
@@ -375,6 +399,7 @@ impl DisplayDiagnostics {
         self.guards = 0;
         self.work = 0;
         self.limit = limit;
+        self.enabled = true;
         self.exhausted = false;
     }
     #[allow(dead_code)]
@@ -383,8 +408,15 @@ impl DisplayDiagnostics {
             + self.frames.capacity() * std::mem::size_of::<Frame>()
             + self.registry.entries.capacity() * std::mem::size_of::<Entry>()
     }
-    #[inline]
+    #[inline(always)]
     pub fn enter(&mut self, reached: usize) {
+        if !self.enabled {
+            return;
+        }
+        self.enter_on(reached);
+    }
+    #[inline(never)]
+    fn enter_on(&mut self, reached: usize) {
         self.frames.push(self.current);
         self.current = Frame {
             far: 0,
@@ -396,6 +428,9 @@ impl DisplayDiagnostics {
     // Not の子 frame。成功時（子失敗）は discard、失敗時（子成功）は leave_guard。
     #[inline]
     pub fn enter_guard(&mut self, reached: usize) {
+        if !self.enabled {
+            return;
+        }
         self.guards += 1;
         self.enter(reached);
     }
@@ -413,8 +448,15 @@ impl DisplayDiagnostics {
         self.log.truncate(keep);
     }
     // 子 frame の観測を親へ伝える。
-    #[inline]
+    #[inline(always)]
     pub fn leave(&mut self) {
+        if !self.enabled {
+            return;
+        }
+        self.leave_on();
+    }
+    #[inline(never)]
+    fn leave_on(&mut self) {
         let inner = self.current;
         self.current = self.frames.pop().expect("balanced diagnostic frame");
         let parent = &mut self.current;
@@ -442,6 +484,9 @@ impl DisplayDiagnostics {
     }
     #[inline]
     pub fn leave_guard(&mut self) {
+        if !self.enabled {
+            return;
+        }
         self.guards -= 1;
         self.leave();
         if self.guards == 0 {
@@ -455,6 +500,9 @@ impl DisplayDiagnostics {
     // Not 成功: 子 frame の観測（reached を含む）を捨てる。
     #[inline]
     pub fn discard(&mut self) {
+        if !self.enabled {
+            return;
+        }
         self.guards -= 1;
         let inner = self.current;
         self.current = self.frames.pop().expect("balanced diagnostic frame");
@@ -465,6 +513,9 @@ impl DisplayDiagnostics {
     }
     // 現在 frame の局所 snapshot。memo と trivia cache が保存する。
     pub fn snapshot(&mut self) -> DisplaySnapshot {
+        if !self.enabled {
+            return DisplaySnapshot::default();
+        }
         let frame = self.current;
         let labels = if self.log.len() > frame.base && frame.far >= self.floor {
             if self.last_saved.0 == self.version && self.last_saved.1 == frame.base {
@@ -488,8 +539,11 @@ impl DisplayDiagnostics {
             labels,
         }
     }
-    #[inline]
+    #[inline(always)]
     pub fn reach(&mut self, reached: usize) {
+        if !self.enabled {
+            return;
+        }
         self.current.reached = self.current.reached.max(reached);
     }
     // 予算は「候補が残った記録の回数」（fail / failures / merge 呼出し単位）。
@@ -544,8 +598,15 @@ impl DisplayDiagnostics {
             self.compact_if_long(base);
         }
     }
-    #[inline]
+    #[inline(always)]
     pub fn fail(&mut self, pos: usize, label: &'static str) {
+        if !self.enabled {
+            return;
+        }
+        self.fail_on(pos, label);
+    }
+    #[inline(never)]
+    fn fail_on(&mut self, pos: usize, label: &'static str) {
         let Some((base, generation)) = self.open(pos) else {
             return;
         };
@@ -555,8 +616,11 @@ impl DisplayDiagnostics {
         self.push(base, generation, Entry::One(label));
     }
     // 候補の失敗 label 列を 1 回の記録として置く（label が空なら位置の更新だけ）。
-    #[inline]
+    #[inline(always)]
     pub fn failures(&mut self, pos: usize, labels: &'static [&'static str]) {
+        if !self.enabled {
+            return;
+        }
         // 手前の位置の記録（大半）は frame を開かずに捨てる。
         self.current.reached = self.current.reached.max(pos);
         if pos < self.floor {
@@ -575,6 +639,9 @@ impl DisplayDiagnostics {
     }
     // memo hit などで保存した局所 snapshot を現在 frame へ再生する。
     pub fn merge(&mut self, snapshot: DisplaySnapshot) {
+        if !self.enabled {
+            return;
+        }
         self.reach(snapshot.reached as usize);
         let range = snapshot.labels[0] as usize..snapshot.labels[1] as usize;
         if range.is_empty() {
@@ -597,6 +664,9 @@ impl DisplayDiagnostics {
     }
     // 全 frame を内側から畳み込む（parse 終了後は global frame だけ）。
     pub fn summary(&self) -> (usize, Vec<&'static str>) {
+        if !self.enabled {
+            return (0, vec![]);
+        }
         let mut reached = 0;
         let mut far = 0;
         let mut segments: Vec<(usize, usize)> = vec![];

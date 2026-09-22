@@ -31,6 +31,23 @@ pub struct ParseOptions {
     /// change any parse or diagnostic; false is the reference path that scans characters at
     /// every attempt. Both produce the same result and diagnostics.
     pub lexical_cache: bool,
+    /// Record diagnostics during this parse (design v1 §3.9, D-014: the main
+    /// diagnostic DAG and the public farthest observation).
+    ///
+    /// `false` (the default) is *fast mode*: nothing is recorded, so a fully
+    /// successful parse pays nothing for observations it does not return. The
+    /// entry points re-run the same input with `diagnostics: true` whenever the
+    /// result needs them (failure, trailing / partial input, a recovery, a scope
+    /// diagnostic, a mapping or resource diagnostic). Parsing is deterministic and
+    /// free of observable side effects, so the re-run yields the same result.
+    ///
+    /// Set it to `true` when the speculative failures of a *successful* parse are
+    /// wanted (`ParseResult::hints`); they are the only observation fast mode
+    /// drops. The generated driver sets it for that reason.
+    ///
+    /// `limits.diagnostics` bounds the recording, so in fast mode it is never
+    /// consumed and never fails the parse.
+    pub diagnostics: bool,
     pub limits: ResourceLimits,
 }
 /// Per-session hard limits, checked before indexing input or retaining data.
@@ -69,6 +86,7 @@ impl Default for ParseOptions {
             factor: true,
             reuse_buffers: true,
             lexical_cache: false,
+            diagnostics: false,
             limits: ResourceLimits::default(),
         }
     }

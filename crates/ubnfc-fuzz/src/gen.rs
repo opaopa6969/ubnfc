@@ -1,0 +1,713 @@
+//! ランダムな UBNF 文法の生成。検証を通る形を構成的に作り、通らなかったものは
+//! campaign 側が discard として機能別に数える（被覆が見えるようにするため）。
+
+use crate::model::*;
+use crate::rng::Rng;
+use std::collections::BTreeSet;
+
+/// 文法に投入し得る機能。discard 率の集計単位でもある。
+pub const FEATURES: &[&str] = &[
+    "literal",
+    "token:number",
+    "token:identifier",
+    "token:singleQuoted",
+    "token:charRange",
+    "token:negation",
+    "token:ci",
+    "token:any",
+    "token:eof",
+    "token:empty",
+    "token:until",
+    "token:lookahead",
+    "token:negativeLookahead",
+    "sequence",
+    "choice",
+    "optional",
+    "repeat",
+    "group",
+    "quant:plus",
+    "quant:star",
+    "quant:question",
+    "quant:bounded",
+    "separated",
+    "capture",
+    "capture:nested",
+    "capture:parallel",
+    "mapping",
+    "mapping:nested",
+    "mapping:shared",
+    "enum",
+    "commonField",
+    "skip",
+    "whitespace",
+    "interleave",
+    "comment",
+    "leftAssoc",
+    "rightAssoc",
+    "precedence",
+    "longestChoice",
+    "predictiveChoice",
+    "scopeTree",
+    "declares",
+    "backref",
+    "typeof",
+    "recovery",
+    "error",
+    "import",
+    "eval",
+    "catalog",
+    "doc",
+];
+
+/// `@enum` の選択肢。variant 名が Java / Rust の識別子になるため、
+/// 記号や非 ASCII は使えない（Java 生成器の `Validation.identifier`）。
+const ENUM_LITERALS: &[&str] = &["alpha", "beta", "gamma", "delta"];
+
+const LITERALS: &[&str] = &[
+    "a", "b", "c", "ab", "x", "(", ")", ",", ";", "+", "-", "*", ":", "=", "😀", "あ", "\n",
+];
+
+struct TokenSpec {
+    declaration: &'static str,
+    samples: &'static [&'static str],
+    feature: &'static str,
+}
+
+const TOKEN_PALETTE: &[TokenSpec] = &[
+    TokenSpec {
+        declaration: "NumberParser",
+        samples: &["0", "1", "2", "7", "42"],
+        feature: "token:number",
+    },
+    TokenSpec {
+        declaration: "org.unlaxer.parser.clang.IdentifierParser",
+        samples: &["ab", "x1", "zz"],
+        feature: "token:identifier",
+    },
+    TokenSpec {
+        declaration: "org.unlaxer.parser.elementary.SingleQuotedParser",
+        samples: &["'q'", "'😀'", "''"],
+        feature: "token:singleQuoted",
+    },
+    TokenSpec {
+        declaration: "CHAR_RANGE('a','f')",
+        samples: &["a", "c", "f"],
+        feature: "token:charRange",
+    },
+    TokenSpec {
+        declaration: "NEGATION('ab\\n')",
+        samples: &["z", "q", "😀"],
+        feature: "token:negation",
+    },
+    TokenSpec {
+        declaration: "CI('select')",
+        samples: &["select", "SELECT", "SeLeCt"],
+        feature: "token:ci",
+    },
+    TokenSpec {
+        declaration: "ANY",
+        samples: &["k", "😀", " "],
+        feature: "token:any",
+    },
+    TokenSpec {
+        declaration: "EOF",
+        samples: &[],
+        feature: "token:eof",
+    },
+    TokenSpec {
+        declaration: "EMPTY",
+        samples: &[],
+        feature: "token:empty",
+    },
+    TokenSpec {
+        declaration: "UNTIL('#')",
+        samples: &["zz#", "#"],
+        feature: "token:until",
+    },
+    TokenSpec {
+        declaration: "LOOKAHEAD('a')",
+        samples: &[],
+        feature: "token:lookahead",
+    },
+    TokenSpec {
+        declaration: "NEGATIVE_LOOKAHEAD('#')",
+        samples: &[],
+        feature: "token:negativeLookahead",
+    },
+];
+
+struct Builder<'a> {
+    rng: &'a mut Rng,
+    features: BTreeSet<&'static str>,
+    /// 参照できる、より深い層の名前（ルール名または token 名）。
+    deeper: Vec<String>,
+    tokens: Vec<Token>,
+    captures: usize,
+}
+
+impl Builder<'_> {
+    fn mark(&mut self, feature: &'static str) {
+        self.features.insert(feature);
+    }
+
+    fn literal(&mut self) -> Atom {
+        self.mark("literal");
+        Atom::Literal((*self.rng.pick(LITERALS)).to_owned())
+    }
+
+    fn reference(&mut self) -> Atom {
+        if self.deeper.is_empty() {
+            return self.literal();
+        }
+        let index = self.rng.below(self.deeper.len());
+        Atom::Ref(self.deeper[index].clone())
+    }
+
+    fn capture_name(&mut self) -> String {
+        self.captures += 1;
+        format!("v{}", self.captures)
+    }
+
+    /// 深さ制限つきの atom。深い側ほど終端に寄せる。
+    fn atom(&mut self, depth: usize) -> Atom {
+        if depth == 0 {
+            return if self.rng.chance(55) {
+                self.literal()
+            } else {
+                self.reference()
+            };
+        }
+        match self.rng.weighted(&[40, 25, 10, 10, 10, 5]) {
+            0 => self.literal(),
+            1 => self.reference(),
+            2 => {
+                self.mark("group");
+                Atom::Group(self.body(depth - 1, 2))
+            }
+            3 => {
+                self.mark("optional");
+                Atom::Optional(self.body(depth - 1, 1))
+            }
+            4 => {
+                self.mark("repeat");
+                Atom::Repeat(self.body(depth - 1, 1))
+            }
+            _ => {
+                self.mark("error");
+                Atom::Error("fuzz error".into())
+            }
+        }
+    }
+
+    fn quantifier(&mut self) -> Option<Quant> {
+        match self.rng.weighted(&[60, 8, 8, 8, 16]) {
+            0 => None,
+            1 => {
+                self.mark("quant:plus");
+                Some(Quant::Plus)
+            }
+            2 => {
+                self.mark("quant:question");
+                Some(Quant::Question)
+            }
+            3 => {
+                self.mark("quant:star");
+                Some(Quant::Star)
+            }
+            _ => {
+                self.mark("quant:bounded");
+                let min = self.rng.below(3) as u32;
+                Some(match self.rng.weighted(&[2, 1, 1]) {
+                    0 => Quant::Bounded(min, Some(min + self.rng.below(3) as u32)),
+                    1 => Quant::Bounded(min, Some(min)),
+                    _ => Quant::Bounded(min, None),
+                })
+            }
+        }
+    }
+
+    fn element(&mut self, depth: usize, allow_capture: bool) -> Element {
+        let atom = self.atom(depth);
+        let quant = self.quantifier();
+        let separator = if quant.is_some() && self.rng.chance(20) {
+            self.mark("separated");
+            Some(self.literal())
+        } else {
+            None
+        };
+        let capture = if allow_capture && self.rng.chance(35) {
+            self.mark("capture");
+            Some(self.capture_name())
+        } else {
+            None
+        };
+        normalize(Element {
+            typeof_capture: None,
+            atom,
+            quant,
+            separator,
+            capture,
+        })
+    }
+
+    fn body(&mut self, depth: usize, max_alternatives: usize) -> Body {
+        let alternatives = self.rng.between(1, max_alternatives.max(1));
+        if alternatives > 1 {
+            self.mark("choice");
+        }
+        Body {
+            alternatives: (0..alternatives)
+                .map(|_| {
+                    let count = self.rng.between(1, 3);
+                    if count > 1 {
+                        self.mark("sequence");
+                    }
+                    (0..count).map(|_| self.element(depth, true)).collect()
+                })
+                .collect(),
+        }
+    }
+}
+
+/// 同じ seed からは必ず同じ文法を作る。
+pub fn generate(seed: u64) -> Grammar {
+    let mut rng = Rng::new(seed);
+    let mut builder = Builder {
+        rng: &mut rng,
+        features: BTreeSet::new(),
+        deeper: Vec::new(),
+        tokens: Vec::new(),
+        captures: 0,
+    };
+
+    let mut settings = Vec::new();
+    let whitespace = builder.rng.weighted(&[35, 45, 20]);
+    match whitespace {
+        0 => {}
+        1 => {
+            builder.mark("whitespace");
+            settings.push("@whitespace: javaStyle".to_owned());
+        }
+        _ => {
+            builder.mark("whitespace");
+            settings.push("@whitespace: none".to_owned());
+        }
+    }
+    let comments = builder.rng.chance(30);
+    if comments {
+        builder.mark("comment");
+        settings.push("@comment: { line: \"//\" blockOpen: \"/*\" blockClose: \"*/\" }".to_owned());
+    }
+    if builder.rng.chance(40) {
+        settings.push("@package: fuzz.generated".to_owned());
+    }
+
+    for index in 0..builder.rng.between(1, 3) {
+        let spec = builder.rng.pick(TOKEN_PALETTE);
+        let (declaration, samples, feature) = (spec.declaration, spec.samples, spec.feature);
+        builder.mark(feature);
+        builder.tokens.push(Token {
+            name: format!("T{index}"),
+            declaration: declaration.to_owned(),
+            samples: samples.iter().map(|s| (*s).to_owned()).collect(),
+            feature,
+        });
+    }
+    let token_names: Vec<String> = builder.tokens.iter().map(|t| t.name.clone()).collect();
+
+    let import = if builder.rng.chance(15) {
+        builder.mark("import");
+        Some(Import {
+            alias: "imp".into(),
+            file: "imported.ubnf".into(),
+            grammar: "Imported".into(),
+            tokens: Vec::new(),
+            rules: vec![Rule {
+                annotations: Vec::new(),
+                name: "Piece".into(),
+                body: Body {
+                    alternatives: vec![
+                        vec![Element::new(Atom::Literal("i".into()))],
+                        vec![Element::new(Atom::Literal("j".into()))],
+                    ],
+                },
+            }],
+        })
+    } else {
+        None
+    };
+
+    let mut rules: Vec<Rule> = Vec::new();
+
+    // 最深層: 終端だけの小さな規則。@enum / @skip の対象にもする。
+    builder.deeper = token_names.clone();
+    if import.is_some() {
+        builder.deeper.push("imp.Piece".into());
+    }
+    for index in 0..builder.rng.between(1, 3) {
+        let name = format!("L{index}");
+        let enumerated = builder.rng.chance(25);
+        let body = if enumerated {
+            let count = builder.rng.between(2, 3);
+            Body {
+                alternatives: (0..count)
+                    .map(|index| {
+                        vec![Element::new(Atom::Literal(
+                            ENUM_LITERALS[index % ENUM_LITERALS.len()].to_owned(),
+                        ))]
+                    })
+                    .collect(),
+            }
+        } else {
+            builder.body(1, 2)
+        };
+        let mut annotations = Vec::new();
+        if enumerated {
+            builder.mark("enum");
+            annotations.push("@enum".to_owned());
+        } else if builder.rng.chance(15) {
+            builder.mark("skip");
+            annotations.push("@skip".to_owned());
+        }
+        rules.push(Rule {
+            annotations,
+            name: name.clone(),
+            body,
+        });
+        builder.deeper.push(name);
+    }
+
+    // 共有クラス族: Node.A / Node.B と、その dispatcher。@commonField もここで付ける。
+    if builder.rng.chance(35) {
+        builder.mark("mapping:shared");
+        builder.mark("mapping:nested");
+        let common = builder.rng.chance(50);
+        for (index, variant) in ["A", "B"].iter().enumerate() {
+            // 変異部は capture を持たない atom に限る。@mapping の params は
+            // 本体の capture 全体と一致していなければならない。
+            let tail = Element {
+                quant: builder.quantifier(),
+                ..Element::new(if builder.rng.chance(50) {
+                    builder.literal()
+                } else {
+                    builder.reference()
+                })
+            };
+            let mut elements = vec![Element::captured(
+                Atom::Literal(if index == 0 { "p" } else { "q" }.into()),
+                "w",
+            )];
+            elements.push(normalize(tail));
+            rules.push(Rule {
+                annotations: vec![format!("@mapping(Node.{variant}, params=[w])")],
+                name: format!("V{variant}"),
+                body: Body::single(elements),
+            });
+        }
+        let mut annotations = vec!["@mapping(Node)".to_owned()];
+        if common {
+            builder.mark("commonField");
+            annotations.push("@commonField(w)".to_owned());
+        }
+        rules.push(Rule {
+            annotations,
+            name: "Node".into(),
+            body: Body {
+                alternatives: vec![
+                    vec![Element::new(Atom::Ref("VA".into()))],
+                    vec![Element::new(Atom::Ref("VB".into()))],
+                ],
+            },
+        });
+        builder.deeper.push("Node".into());
+    }
+
+    // 中間層: capture / mapping / scope / typeof / recovery などを載せる。
+    let middle = builder.rng.between(1, 3);
+    for index in 0..middle {
+        let name = format!("M{index}");
+        let mut body = builder.body(2, 3);
+        let mut annotations = Vec::new();
+        let names = capture_names(&body);
+        if builder.rng.chance(45) {
+            builder.mark("mapping");
+            if names.is_empty() {
+                annotations.push(format!("@mapping(C{index})"));
+            } else {
+                annotations.push(format!("@mapping(C{index}, params=[{}])", names.join(", ")));
+            }
+        }
+        let mapped = annotations.iter().any(|a| a.starts_with("@mapping("));
+        if mapped && !names.is_empty() && builder.rng.chance(35) {
+            builder.mark("typeof");
+            let target = names[0].clone();
+            let extra = builder.capture_name();
+            let atom = builder.literal();
+            body.alternatives[0].push(Element {
+                typeof_capture: Some(target),
+                atom,
+                quant: None,
+                separator: None,
+                capture: Some(extra.clone()),
+            });
+            // @mapping の params は本体の capture と完全一致でなければならない。
+            if let Some(mapping) = annotations.iter_mut().find(|a| a.starts_with("@mapping(")) {
+                let all = capture_names(&body);
+                *mapping = format!("@mapping(C{index}, params=[{}])", all.join(", "));
+            }
+        }
+        if builder.rng.chance(20) {
+            builder.mark("whitespace");
+            annotations.push(if builder.rng.chance(50) {
+                "@whitespace".to_owned()
+            } else {
+                "@whitespace(none)".to_owned()
+            });
+        }
+        if builder.rng.chance(20) {
+            builder.mark("interleave");
+            annotations.push(if builder.rng.chance(50) {
+                "@interleave(profile=javaStyle)".to_owned()
+            } else {
+                "@interleave(profile=commentsAndSpaces)".to_owned()
+            });
+        }
+        if builder.rng.chance(20) {
+            builder.mark("recovery");
+            annotations.push(
+                (*builder
+                    .rng
+                    .pick(&["@recovery(AUTO)", "@recovery(SKIP)", "@recovery(sync=';')"]))
+                .to_owned(),
+            );
+        }
+        if body.alternatives.len() > 1 && builder.rng.chance(25) {
+            if builder.rng.chance(50) {
+                builder.mark("longestChoice");
+                annotations.push("@longestChoice".to_owned());
+            } else {
+                builder.mark("predictiveChoice");
+                annotations.push("@predictiveChoice".to_owned());
+            }
+        }
+        if !names.is_empty() && builder.rng.chance(25) {
+            builder.mark("scopeTree");
+            annotations.push(
+                (*builder
+                    .rng
+                    .pick(&["@scopeTree(mode=lexical)", "@scopeTree(mode=dynamic)"]))
+                .to_owned(),
+            );
+            if builder.rng.chance(70) {
+                builder.mark("declares");
+                annotations.push(format!("@declares(symbol={})", names[0]));
+            }
+            if builder.rng.chance(50) {
+                builder.mark("backref");
+                annotations.push(format!("@backref(name={})", names[names.len() - 1]));
+            }
+        }
+        if !names.is_empty() && builder.rng.chance(12) {
+            builder.mark("catalog");
+            annotations.push("@catalog(context='fuzz')".to_owned());
+        }
+        if builder.rng.chance(10) {
+            builder.mark("doc");
+            annotations.push("@doc('fuzz 😀')".to_owned());
+        }
+        rules.push(Rule {
+            annotations,
+            name: name.clone(),
+            body,
+        });
+        builder.deeper.push(name);
+    }
+
+    // 演算子塔: 内側ほど強く束縛する（precedence は外側が小さい）。
+    let tower = builder.rng.between(0, 2);
+    let mut operand = {
+        let index = builder.rng.below(builder.deeper.len());
+        builder.deeper[index].clone()
+    };
+    for step in 0..tower {
+        let name = format!("Op{step}");
+        let level = 90 - 10 * step as u64;
+        let right = builder.rng.chance(40);
+        let operator = Atom::Literal((*builder.rng.pick(&["+", "-", "*"])).to_owned());
+        let body = if right {
+            builder.mark("rightAssoc");
+            Body::single(vec![
+                Element::captured(Atom::Ref(operand.clone()), "left"),
+                Element::new(Atom::Repeat(Body::single(vec![
+                    Element::captured(operator, "op"),
+                    Element::captured(Atom::Ref(name.clone()), "right"),
+                ]))),
+            ])
+        } else {
+            builder.mark("leftAssoc");
+            Body::single(vec![
+                Element::captured(Atom::Ref(operand.clone()), "left"),
+                Element::new(Atom::Repeat(Body::single(vec![
+                    Element::captured(operator, "op"),
+                    Element::captured(Atom::Ref(operand.clone()), "right"),
+                ]))),
+            ])
+        };
+        builder.mark("precedence");
+        rules.push(Rule {
+            annotations: vec![
+                format!("@mapping(Bin{step}, params=[left, op, right])"),
+                if right { "@rightAssoc" } else { "@leftAssoc" }.to_owned(),
+                format!("@precedence(level={level})"),
+            ],
+            name: name.clone(),
+            body,
+        });
+        operand = name.clone();
+        builder.deeper.push(name);
+    }
+
+    // 根: 直下に量指定子・区切り・並行 capture を置いて、prefix と全入力の差を出す。
+    let mut root_elements = vec![Element::captured(Atom::Ref(operand.clone()), "head")];
+    if builder.rng.chance(60) {
+        builder.mark("capture:parallel");
+        let atom = builder.atom(1);
+        let quant = builder.quantifier();
+        root_elements.push(normalize(Element {
+            typeof_capture: None,
+            atom,
+            quant,
+            separator: None,
+            capture: Some("head".into()),
+        }));
+    }
+    if builder.rng.chance(45) {
+        builder.mark("capture:nested");
+        let inner = builder.element(1, false);
+        root_elements.push(Element {
+            typeof_capture: None,
+            atom: Atom::Group(Body::single(vec![
+                Element::captured(Atom::Literal(",".into()), "tail"),
+                inner,
+            ])),
+            quant: Some(Quant::Star),
+            separator: None,
+            capture: Some("tail".into()),
+        });
+    }
+    let root_captures = capture_names(&Body::single(root_elements.clone()));
+    let mut root_annotations = vec!["@root".to_owned()];
+    if builder.rng.chance(60) {
+        builder.mark("mapping");
+        root_annotations.push(format!(
+            "@mapping(Top, params=[{}])",
+            root_captures.join(", ")
+        ));
+    }
+    if builder.rng.chance(12) {
+        builder.mark("eval");
+        root_annotations.push("@eval(kind='binary', strategy='manual')".to_owned());
+    }
+    rules.push(Rule {
+        annotations: root_annotations,
+        name: "Root".into(),
+        body: Body::single(root_elements),
+    });
+
+    let features = builder.features.clone();
+    let tokens = builder.tokens.clone();
+    Grammar {
+        name: "Fuzz".into(),
+        settings,
+        tokens,
+        rules,
+        import,
+        features,
+    }
+}
+
+/// 生成器が避ける量指定子の形を潰す。
+///
+/// - `{n,0}`（決して一致しない反復）は front/backend の契約が定まっていないので使わない。
+/// - capture 付きの `{0}` / `{1}` / `{0,1}` は front 自身が拒否する: lowering は Bounded を
+///   List と宣言し、analysis は Scalar/Optional と推論して `CaptureCardinality` で落ちる
+///   （`docs/reports/2026-09-23-differential-fuzzing.md` の F1）。上限を外して避ける。
+fn normalize(mut element: Element) -> Element {
+    element.quant = match (element.capture.is_some(), element.quant) {
+        (_, Some(Quant::Bounded(min, Some(0)))) => Some(Quant::Bounded(min, None)),
+        (true, Some(Quant::Bounded(min, Some(max)))) if max <= 1 => Some(Quant::Bounded(min, None)),
+        (_, quant) => quant,
+    };
+    element
+}
+
+/// 本体に現れる capture 名を、重複を除いた出現順で返す。
+pub fn capture_names(body: &Body) -> Vec<String> {
+    let mut names = Vec::new();
+    collect(body, &mut names);
+    names
+}
+
+fn collect(body: &Body, out: &mut Vec<String>) {
+    for element in body.alternatives.iter().flatten() {
+        if let Some(name) = &element.capture {
+            if !out.contains(name) {
+                out.push(name.clone());
+            }
+        }
+        match &element.atom {
+            Atom::Group(inner) | Atom::Optional(inner) | Atom::Repeat(inner) => collect(inner, out),
+            _ => {}
+        }
+    }
+}
+
+/// 導出時に挿入してよい trivia。文法の設定に合わせて決める。
+pub fn trivia_for(grammar: &Grammar) -> Vec<&'static str> {
+    let text = grammar.render();
+    if text.contains("@whitespace: none") && !text.contains("@interleave") {
+        return Vec::new();
+    }
+    if !text.contains("@whitespace") && !text.contains("@interleave") {
+        return Vec::new();
+    }
+    let mut trivia = vec![" ", "\t", "\n", "  "];
+    if text.contains("@comment") || text.contains("commentsAndSpaces") {
+        trivia.push("// c\n");
+        trivia.push("/* c */");
+    }
+    trivia
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn generation_is_deterministic_and_always_parses_as_ubnf() {
+        for seed in 0..200u64 {
+            let grammar = generate(seed);
+            assert_eq!(grammar, generate(seed));
+            let source = grammar.render();
+            ubnfc_front::syntax::parse_file(&source)
+                .unwrap_or_else(|e| panic!("seed {seed}: {e}\n{source}"));
+            if let Some((_, imported)) = grammar.imported_source() {
+                ubnfc_front::syntax::parse_file(&imported).unwrap();
+            }
+        }
+    }
+
+    #[test]
+    fn every_declared_feature_name_is_reachable_from_some_seed() {
+        let mut seen = BTreeSet::new();
+        for seed in 0..800u64 {
+            seen.extend(generate(seed).features);
+        }
+        let missing: Vec<_> = FEATURES
+            .iter()
+            .filter(|f| !seen.contains(*f) && **f != "token:eof")
+            .copied()
+            .collect();
+        assert!(missing.is_empty(), "未到達の機能: {missing:?}");
+    }
+}

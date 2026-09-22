@@ -1,0 +1,859 @@
+{
+  "slug": "diff-ast-fields-left-fields-right-c388d321-seed295",
+  "signature": "diff:/ast/fields/left/fields/right/*",
+  "seed": 295,
+  "grammar": "grammar Fuzz {\n  token T0 = NumberParser\n  token T1 = NEGATION('ab\\n')\n  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= T0 @left { '+' @op T0 @right };\n  @mapping(Bin1, params=[left, op, right]) @rightAssoc @precedence(level=80) Op1 ::= Op0 @left { '+' @op Op1 @right };\n  @root Root ::= Op1 @head '\\n'{2,} @head;\n}\n",
+  "imported": null,
+  "input": "7+7++7\n\n",
+  "input_code_points": 8,
+  "differences": [
+    {
+      "path": "/ast/fields/left/fields/right/1",
+      "expected": "7",
+      "actual": "+7"
+    },
+    {
+      "path": "/catalogs",
+      "expected": {
+        "<unobserved>": "catalogs"
+      },
+      "actual": []
+    },
+    {
+      "path": "/diagnostics/0",
+      "expected": {
+        "expectedNonEmpty": true,
+        "farthestExpected": [
+          "'\n'"
+        ],
+        "farthestOffset": 8,
+        "kind": "syntax",
+        "length": null,
+        "message": null,
+        "severity": null
+      },
+      "actual": null
+    },
+    {
+      "path": "/recoveries",
+      "expected": [],
+      "actual": {
+        "<unobserved>": "recoveries"
+      }
+    },
+    {
+      "path": "/scope/declarations",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/depth",
+      "expected": 0,
+      "actual": null
+    },
+    {
+      "path": "/scope/diagnostics",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/references",
+      "expected": [],
+      "actual": null
+    }
+  ],
+  "java_violations": [],
+  "rust_violations": [],
+  "java": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": {
+      "fields": {
+        "left": {
+          "fields": {
+            "left": 7,
+            "op": [
+              "+",
+              "+"
+            ],
+            "right": [
+              7,
+              7
+            ]
+          },
+          "span": [
+            0,
+            6
+          ],
+          "type": "Bin0"
+        },
+        "op": [],
+        "right": []
+      },
+      "span": [
+        0,
+        6
+      ],
+      "type": "Bin1"
+    },
+    "captures": [
+      {
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "7"
+      },
+      {
+        "name": "op",
+        "span": [
+          1,
+          2
+        ],
+        "text": "+"
+      },
+      {
+        "name": "right",
+        "span": [
+          2,
+          3
+        ],
+        "text": "7"
+      },
+      {
+        "name": "op",
+        "span": [
+          3,
+          4
+        ],
+        "text": "+"
+      },
+      {
+        "name": "right",
+        "span": [
+          4,
+          6
+        ],
+        "text": "+7"
+      },
+      {
+        "name": "left",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "name": "head",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "name": "head",
+        "span": [
+          6,
+          7
+        ],
+        "text": "\n"
+      },
+      {
+        "name": "head",
+        "span": [
+          7,
+          8
+        ],
+        "text": "\n"
+      }
+    ],
+    "consumed": 8,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "expected": [
+          "'\n'"
+        ],
+        "farthestExpected": [
+          "'\n'"
+        ],
+        "farthestOffset": 8,
+        "kind": "syntax",
+        "offset": 8,
+        "origin": "Mapper.diagnose"
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:155:157:body/0/tokenRef",
+        "occurrenceId": 5,
+        "parentOccurrenceId": 4,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          1
+        ],
+        "token": "7"
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:grammar.ubnf:166:169:body/1/0/0/literal",
+        "occurrenceId": 8,
+        "parentOccurrenceId": 7,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          1,
+          2
+        ],
+        "token": "+"
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:174:176:body/1/0/1/tokenRef",
+        "occurrenceId": 9,
+        "parentOccurrenceId": 7,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          2,
+          3
+        ],
+        "token": "7"
+      },
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:166:176:body/1/0/seq",
+        "occurrenceId": 7,
+        "parentOccurrenceId": 6,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          1,
+          3
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 4,
+        "exprId": "expr:grammar.ubnf:166:169:body/1/0/0/literal",
+        "occurrenceId": 11,
+        "parentOccurrenceId": 10,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          3,
+          4
+        ],
+        "token": "+"
+      },
+      {
+        "completionOrder": 5,
+        "exprId": "expr:grammar.ubnf:174:176:body/1/0/1/tokenRef",
+        "occurrenceId": 12,
+        "parentOccurrenceId": 10,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          4,
+          6
+        ],
+        "token": "+7"
+      },
+      {
+        "completionOrder": 6,
+        "exprId": "expr:grammar.ubnf:166:176:body/1/0/seq",
+        "occurrenceId": 10,
+        "parentOccurrenceId": 6,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          3,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 7,
+        "exprId": "expr:grammar.ubnf:164:185:body/1/repeat",
+        "occurrenceId": 6,
+        "parentOccurrenceId": 4,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          1,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 8,
+        "exprId": "expr:grammar.ubnf:155:185:body/seq",
+        "occurrenceId": 4,
+        "parentOccurrenceId": 3,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 9,
+        "exprId": "expr:grammar.ubnf:272:275:body/0/ruleRef",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          0,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 10,
+        "exprId": "expr:grammar.ubnf:282:304:body/1/repeat",
+        "occurrenceId": 13,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          6,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 11,
+        "exprId": "expr:grammar.ubnf:272:304:body/seq",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          0,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 12,
+        "exprId": "expr:grammar.ubnf:323:326:body/0/ruleRef",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          6
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 13,
+        "exprId": "expr:grammar.ubnf:333:337:body/1/0/literal",
+        "occurrenceId": 15,
+        "parentOccurrenceId": 14,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          6,
+          7
+        ],
+        "token": "\n"
+      },
+      {
+        "completionOrder": 14,
+        "exprId": "expr:grammar.ubnf:333:337:body/1/repeat/lower/helper/0",
+        "occurrenceId": 14,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          6,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 15,
+        "exprId": "expr:grammar.ubnf:333:337:body/1/0/literal",
+        "occurrenceId": 17,
+        "parentOccurrenceId": 16,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          7,
+          8
+        ],
+        "token": "\n"
+      },
+      {
+        "completionOrder": 16,
+        "exprId": "expr:grammar.ubnf:333:337:body/1/repeat/lower/helper/0",
+        "occurrenceId": 16,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          7,
+          8
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 17,
+        "exprId": "expr:grammar.ubnf:323:341:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": -1,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          8
+        ],
+        "token": null
+      }
+    ],
+    "mappingError": null,
+    "matched": 8,
+    "nativeFailure": {
+      "consumed": 8,
+      "expected": [
+        "'\n'"
+      ],
+      "matched": 8,
+      "offset": 8
+    },
+    "nodes": [],
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Op0:0",
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "7"
+      },
+      {
+        "binding": "Op0:1",
+        "name": "op",
+        "span": [
+          1,
+          2
+        ],
+        "text": "+"
+      },
+      {
+        "binding": "Op0:2",
+        "name": "right",
+        "span": [
+          2,
+          3
+        ],
+        "text": "7"
+      },
+      {
+        "binding": "Op0:1",
+        "name": "op",
+        "span": [
+          3,
+          4
+        ],
+        "text": "+"
+      },
+      {
+        "binding": "Op0:2",
+        "name": "right",
+        "span": [
+          4,
+          6
+        ],
+        "text": "+7"
+      },
+      {
+        "binding": "Op1:0",
+        "name": "left",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          6,
+          7
+        ],
+        "text": "\n"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          7,
+          8
+        ],
+        "text": "\n"
+      }
+    ],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "texts": [
+      [
+        1,
+        2,
+        "+"
+      ],
+      [
+        3,
+        4,
+        "+"
+      ]
+    ]
+  },
+  "rust": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": {
+      "fields": {
+        "left": {
+          "fields": {
+            "left": "7",
+            "op": [
+              "+",
+              "+"
+            ],
+            "right": [
+              "7",
+              "+7"
+            ]
+          },
+          "span": [
+            0,
+            6
+          ],
+          "type": "Bin0"
+        },
+        "op": [],
+        "right": []
+      },
+      "span": [
+        0,
+        6
+      ],
+      "type": "Bin1"
+    },
+    "captures": [
+      {
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "7"
+      },
+      {
+        "name": "op",
+        "span": [
+          1,
+          2
+        ],
+        "text": "+"
+      },
+      {
+        "name": "right",
+        "span": [
+          2,
+          3
+        ],
+        "text": "7"
+      },
+      {
+        "name": "op",
+        "span": [
+          3,
+          4
+        ],
+        "text": "+"
+      },
+      {
+        "name": "right",
+        "span": [
+          4,
+          6
+        ],
+        "text": "+7"
+      },
+      {
+        "name": "left",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "name": "head",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "name": "head",
+        "span": [
+          6,
+          7
+        ],
+        "text": "\n"
+      },
+      {
+        "name": "head",
+        "span": [
+          7,
+          8
+        ],
+        "text": "\n"
+      }
+    ],
+    "catalogs": [],
+    "consumed": 8,
+    "declarations": [],
+    "diagnostics": [],
+    "hints": [
+      {
+        "deepestRule": "Fuzz::Root",
+        "expected": [
+          "\n"
+        ],
+        "offset": 8,
+        "rulePath": [
+          "Fuzz::Root"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 9,
+        "exprId": "expr:grammar.ubnf:323:341:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": null,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          8
+        ]
+      },
+      {
+        "completionOrder": 6,
+        "exprId": "expr:grammar.ubnf:272:304:body/seq",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Op1",
+        "span": [
+          0,
+          6
+        ]
+      },
+      {
+        "completionOrder": 5,
+        "exprId": "expr:grammar.ubnf:155:185:body/seq",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          6
+        ]
+      },
+      {
+        "completionOrder": 0,
+        "exprId": "expr:grammar.ubnf:155:157:body/0/tokenRef",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          1
+        ]
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:grammar.ubnf:166:169:body/1/0/0/literal",
+        "occurrenceId": 4,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          1,
+          2
+        ]
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:174:176:body/1/0/1/tokenRef",
+        "occurrenceId": 5,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          2,
+          3
+        ]
+      },
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:166:169:body/1/0/0/literal",
+        "occurrenceId": 6,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          3,
+          4
+        ]
+      },
+      {
+        "completionOrder": 4,
+        "exprId": "expr:grammar.ubnf:174:176:body/1/0/1/tokenRef",
+        "occurrenceId": 7,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          4,
+          6
+        ]
+      },
+      {
+        "completionOrder": 7,
+        "exprId": "expr:grammar.ubnf:333:337:body/1/0/literal",
+        "occurrenceId": 8,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          6,
+          7
+        ]
+      },
+      {
+        "completionOrder": 8,
+        "exprId": "expr:grammar.ubnf:333:337:body/1/0/literal",
+        "occurrenceId": 9,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          7,
+          8
+        ]
+      }
+    ],
+    "mappingError": null,
+    "matched": 8,
+    "nodes": [],
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Op0:0",
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "7"
+      },
+      {
+        "binding": "Op0:1",
+        "name": "op",
+        "span": [
+          1,
+          2
+        ],
+        "text": "+"
+      },
+      {
+        "binding": "Op0:2",
+        "name": "right",
+        "span": [
+          2,
+          3
+        ],
+        "text": "7"
+      },
+      {
+        "binding": "Op0:1",
+        "name": "op",
+        "span": [
+          3,
+          4
+        ],
+        "text": "+"
+      },
+      {
+        "binding": "Op0:2",
+        "name": "right",
+        "span": [
+          4,
+          6
+        ],
+        "text": "+7"
+      },
+      {
+        "binding": "Op1:0",
+        "name": "left",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          6
+        ],
+        "text": "7+7++7"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          6,
+          7
+        ],
+        "text": "\n"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          7,
+          8
+        ],
+        "text": "\n"
+      }
+    ],
+    "recoveredRegions": [],
+    "references": [],
+    "scope": {
+      "events": [],
+      "mode": []
+    },
+    "scopeDepth": 0,
+    "texts": []
+  },
+  "shrink_rounds": 13
+}

@@ -60,7 +60,17 @@ mod tests {
         assert_eq!(r.captures[0].name, "first");
         assert!(predict::parse("😀").ok);
         assert!(!predict::parse("z").ok);
-        assert_eq!(predict::parse("😀").hints[0].expected, vec!["literal a"]);
+        // 成功した parse の投機的失敗（hints）は診断モードでだけ残る（fast mode は記録しない）。
+        let predicted = predict::parse_with_options(
+            "😀",
+            predict::ParseOptions {
+                diagnostics: true,
+                ..Default::default()
+            },
+        );
+        assert!(predicted.ok);
+        assert_eq!(predicted.hints[0].expected, vec!["literal a"]);
+        assert!(predict::parse("😀").hints.is_empty());
         assert!(!prefix::parse("variable").ok);
         assert_eq!(prefix::parse("variable").consumed_cp, 3);
         let r = prefix!(separated, "a,");
@@ -70,6 +80,7 @@ mod tests {
             "a",
             memo::ParseOptions {
                 lexical: true,
+                diagnostics: true,
                 ..Default::default()
             },
         );

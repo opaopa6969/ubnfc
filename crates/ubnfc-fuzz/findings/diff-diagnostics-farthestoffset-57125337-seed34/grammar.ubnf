@@ -1,0 +1,11 @@
+grammar Fuzz {
+  token T0 = LOOKAHEAD('a')
+  token T1 = UNTIL('#')
+  token T2 = LOOKAHEAD('a')
+  L0 ::= ;
+  @interleave(profile=javaStyle) @recovery(AUTO) @longestChoice M0 ::= 'b'+ | ERROR('fuzz error') @v1 ( [ ',' 'あ' ] | { 'ab' @v2 } L0 ) T2 | T2 @v3 ( '😀' | T1+ @v4 ) '(';
+  @doc('fuzz 😀') M1 ::= ( L0 ( T2 ';' T2 ) | '-' @v5 ':' 'あ'{2,} @v6 ) @v7;
+  @mapping(C2, params=[v8]) @interleave(profile=javaStyle) M2 ::= M1 @v8 M0?;
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= M0 @left { '*' @op M0 @right };
+  @root @mapping(Top, params=[head]) Root ::= Op0 @head ERROR('fuzz error') @head;
+}
