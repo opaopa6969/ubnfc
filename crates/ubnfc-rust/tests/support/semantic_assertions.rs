@@ -60,7 +60,7 @@ mod tests {
         assert_eq!(r.captures[0].name, "first");
         assert!(predict::parse("😀").ok);
         assert!(!predict::parse("z").ok);
-        assert_eq!(predict::parse("😀").diagnostics[0].expected, vec!["literal a"]);
+        assert_eq!(predict::parse("😀").hints[0].expected, vec!["literal a"]);
         assert!(!prefix::parse("variable").ok);
         assert_eq!(prefix::parse("variable").consumed_cp, 3);
         let r = prefix!(separated, "a,");
@@ -77,8 +77,9 @@ mod tests {
         assert!(r.statistics.memo_hits > 0);
         assert_eq!(r.captures.len(), 1);
         assert_eq!(r.captures[0].span, [0, 1]);
-        assert_eq!(r.diagnostics[0].offset_cp, 1);
+        assert_eq!(r.hints[0].offset_cp, 1);
         assert_eq!(r.lexical.len(), 2);
+        assert_eq!(r.tokens.len(), 1);
         assert_eq!(r.lexical[1].parent_occurrence_id, Some(0));
     }
     #[test]

@@ -125,7 +125,7 @@ impl<'a> Input<'a> {
 // Rust/JDK の Unicode 版の差は残るため、Java との完全一致は保証しない。
 // https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html#equalsIgnoreCase(java.lang.String)
 // https://doc.rust-lang.org/std/primitive.char.html#method.to_uppercase
-fn equal_ignore_case(left: char, right: char) -> bool {
+pub fn equal_ignore_case(left: char, right: char) -> bool {
     if left == right {
         return true;
     }

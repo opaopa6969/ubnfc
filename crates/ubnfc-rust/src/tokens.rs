@@ -99,7 +99,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         }
         s.push_str("if out.state.position::<MATCH>()==before {break;}}\n");
         if g.ir.plan.trivia_cache.enabled {
-            s.push_str("self.trivia_cache.insert(key,out);\n");
+            s.push_str("if self.trivia_cache.len()<self.options.limits.memo_entries {self.trivia_cache.insert(key,out);}else {self.resource_failure.get_or_insert((state.consumed,\"trivia memo budget exceeded\"));}\n");
         }
         s.push_str("out}\n");
     }

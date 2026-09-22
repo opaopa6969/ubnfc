@@ -111,3 +111,24 @@ fn saved_handles_are_immutable_and_summaries_are_owned() {
     drop(d);
     assert_eq!(summary, Some((2, vec!["saved"], vec![1])));
 }
+
+#[test]
+fn shared_dag_depth_28_is_linear_and_reconnects_the_longest_caller() {
+    let mut d = Diagnostics::new();
+    let mut root = d.fail(0, "x");
+    for i in 0..28 {
+        let left = d.rule(i, root);
+        let right = d.rule(i + 100, root);
+        root = d.join(left, right);
+    }
+    let short = d.rule(999, root);
+    let long = d.rule(998, short);
+    let both = d.join(short, long);
+    let start = std::time::Instant::now();
+    let (_, expected, path) = d.summary(both).unwrap();
+    assert!(start.elapsed() < std::time::Duration::from_millis(50));
+    assert_eq!(expected, ["x"]);
+    assert_eq!(path.len(), 30);
+    assert_eq!(&path[..2], &[998, 999]);
+    assert_eq!(path[2..], (0..28).rev().collect::<Vec<_>>());
+}

@@ -17,7 +17,7 @@ cargo build --release --offline --manifest-path "$out/Cargo.toml"
 printf '%s\n' '{"id":0,"grammar":"TinyCalc","entry":"Expression","input":"1+2","options":{"lexical":true,"scope":true}}' | "$out/target/release/driver"
 ```
 
-出力は `Cargo.toml`, `mod.rs`, `parser.rs`, `ast.rs`, `api.rs`, `runtime.rs`,
+出力は `Cargo.toml`, `mod.rs`, `parser.rs`, `ast.rs`, `api.rs`, `runtime.rs`, `evaluator.rs`, `metadata.rs`,
 `rt/{mod,cursor,input,memo,diag,scope}.rs` と `src/bin/{driver,driver_json}.rs`。
 manifest の lib は `mod.rs` を指す。既存 crate のサブモジュールとしても利用できる。
 `GeneratedCrate.files` は相対パスからソースへの BTreeMap。生成時に cargo/rustfmt/network は起動しない。
@@ -40,7 +40,8 @@ runner の `Artifact::FromIr { backend: Backend::Rust, .. }` は事前ビルド�
 文法の異なる driver が上書きされるのを防ぐ。キャッシュ寿命は build_dir の寿命と同じ。
 ツール不足・生成失敗・offline build 失敗はエラーで、テストも skip しない。
 
-JSON Lines driver は [harness protocol](../../docs/harness-driver-protocol.md) の全標準観測を返す。
+JSON Lines driver は [harness protocol](../../docs/harness-driver-protocol.md) の認識・mapping・scope・診断を返す。
+corpus の操作列・型情報 reflection など、driver に対応する観測項目がないものは未観測としてレポートする。
 `grammar` と `entry`（null は文法の root）を解決し、未知の指定はエラーにする。
 `lexical=false` で captures、`scope=false` で declarations/references/scope を省略し、文法の認識は変えない。
 `scope` は `mode`（文法に現れるモードの順序付き配列）と `events` を持つ。イベントは
@@ -52,7 +53,7 @@ prefix の accepted/C/M と全入力の AST・診断を別々に観測する。
 不正リクエストも1行のエラーを返して後続を処理する。
 
 `ubnfc-rt-template/src/{cursor,input,memo,diag,scope}.rs` は、この crate の
-`templates/*.rs` を直接 `include!` する。生成物と46件のテンプレートテストが単一ソースを検証する。
+`templates/*.rs` を直接 `include!` する。生成物とテンプレートテストが単一ソースを検証する。
 cursor は `advance::<false>(0)` でも M=C、memo は State・mode・version を含む open addressing、
 診断は局所 DAG の参照を親 rule に接続して再生する。input/scope の契約は維持する。
 
@@ -64,6 +65,59 @@ AST、node span、capture、任意の lexical occurrence、診断、scope の宣
 型付きフィールドは String、Box<Ast>、Option<Box<Ast>>、Vec<Ast>/Vec<String> 等。
 Rust の型名・field 名は IR ID から決定的にエンコードする。`Node.Item` は独立 struct と
 `g_Node_nested::g_Item` の再 export で表現し、commonField は Ast の `common_<index>_<field>` メソッドにする。
+
+## 達成状態（round2）
+
+| 段階 | 達成状態・範囲 |
+|---|---|
+| 生成 | catalog / eval / typeof / recovery / ERROR / Unicode CI / enum 重複を受理。regex は供給された DFA だけを実行 |
+| build | std のみの生成 crate、optional json feature、driver を offline build / clippy。crate root は forbid(unsafe_code) |
+| 認識 | 二重 cursor、scope 全出現、DAG 診断、資源上限。全 corpus の完全一致は未達 |
+| mapping | rule 別関数による遅延 AST、typeof 型一致、recovery 欠損の伝播、深さ予算。数値は Rust oracle の字句 |
+| 公開 metadata | catalogs、scope mode/events、rule 出現 lexical と token 別表 tokens、recoveries、主診断と hints/deepest |
+| 固定点 | selfhost の生成 byte 一致と、生成 frontend → IR → Rust の固定点を tests/regenerate.rs で検証 |
+
+`lexical=true` は API の `lexical`（rule 表）と `tokens`（token 表）を生成する。
+既存 selfhost 変換器は rule 表だけを使うため両表を分けた。token は ExprId/RuleId を持ち、
+親 ID は rule 表を参照し、token ID は rule ID 列の後に続く。完了順は両表で共通。
+driver の `lexical` は両表を結合して公開する。未 capture の `a b x` も3 tokenになる。
+成功した投機的失敗は `ParseResult.hints` / driver `hints` に保持し、主診断へ混ぜない。
+trailing の主位置・expected と farthest、`deepestRule` / `rulePath` は別フィールド。
+
+`metadata::CATALOGS` は rule/context/site IDs と重複除去・ソート済み capture 名を公開する。
+context の空白は保存する。enum は IR の名前変換を維持し、同じ名前は一つの variant、
+同じ literal は最初の対応を使う（`on` と `ON` はともに `ON`）。
+`@typeof` は mapping 後の具象型を比較する。list は list、optional 不在は比較を省略する。
+不一致は認識成功を保ち `ast=None` / Mapping 診断にする。
+
+`evaluator::Evaluator` は具象 AST ごとの trait callback と `eval` dispatch を持つ。
+auto の literal / passthrough / variable_ref / conditional / binary_arithmetic は既定メソッド。
+manual・未知 kind と意味依存の apply_binary / eval_leaf / resolve_variable は実装側の callback。
+`DefaultEvaluator` は未実装 callback を EvalError にする。literal は Rust の字句を Text として返し、
+conditional の真偽は Java と同じ bool true または大文字小文字を無視した文字列 true。
+driver の既存 `value` は operator 用の数値評価であり、この任意 callback API とは別。
+
+recovery は D-018 に従い root にも適用し、typed AST の型を変えない。
+SYNC は同期記号を消費、AUTO は FOLLOW の前（空 FOLLOW の fallback `;` は消費）、
+SKIP は IR の FOLLOW の前まで、空集合なら1 code pointを進める。ゼロ前進は失敗。
+回復 node は list から省略、optional は None、必須 scalar の欠損は親へ伝播する。
+`ParseResult.recoveries` / driver `recoveredRegions` は span・syncSpan・capture 出現 ID を持ち、
+1領域に1つの recovery/ERROR 診断を返す。rollback・先読み・memo は採用領域だけを公開する。
+prefix の回復表・capture は保持し、全入力を満たさない場合の AST は None。
+
+右結合の rule 局所 trivia は、内側ノードの末尾から除き、entry の消費範囲は保持する。
+`RightScoped` の ` x /*r*/ ^ x ` は root `[0,13]`、右子 `[11,12]`。
+IR のこの形は operator が null でも rightAssoc/interleave 注釈が残るため、emitter が注釈を使う。
+消費範囲そのものは右子も `[11,13]` のため、generators.md #138 の一般規則に対する
+局所例外として corpus を優先する。global javaStyle で末尾 trivia を含む既存 span は維持する。
+
+`ParseOptions.limits` は入力16 MiB、arena/diagnostic各200万、memo/効果各100万、
+効果文字列64 MiB、mapping 深さ512が既定。効果は破棄枝も含む累計作業量で制限する。
+超過は resource 診断で全体失敗（mapping 深さのみ認識成功 + Mapping 診断）。
+parse と mapping はそれぞれ native stack 256 KiB も監視する。mapping は rule 別関数に分割する。
+任意サイズの scanner 内部確保や OS のメモリ枯渇を回復する仕組みではない。
+生成時も式10万・rule1万・AST型256・式の子/record field各256・ValueType深さ64を先に検査する。
+式到達性と型受理判定は明示 stack で走査し、生成予算超過は EmitError::ResourceLimit。
 
 ## 対応範囲
 
@@ -95,14 +149,14 @@ requiredFeatures は生成前に検査する。以下は対応するが、括弧
 - `externTokens`: TokenScanner trait に logicalId、入力、全カーソル状態、mode、scope を渡す。
   ScanResult の UTF-8 境界・単調性を検査し、valueSpan、診断、順序付き効果を扱う。
   analysis が unsafe とする領域は memo しない。memo-safe の保証は front / alias 宣言の責務。
-- 全 BuiltinToken、UNTIL、NEGATION、CHAR_RANGE、token 先読み、ASCII パターンの CI。
-  CI の ASCII 等価クラスには İ/ı/ſ/K を含む。Space token は **1 文字**、trivia は反復。
+- 全 BuiltinToken、UNTIL、NEGATION、CHAR_RANGE、token 先読み、Unicode CI。
+  CI は input.rs の Java simple-case 近似（é/É、İ/ı、ſ、K、sigma、非 BMP）。複数文字展開はしない。
+  Rust/JDK の Unicode バージョン差は残る。Space token は **1 文字**、trivia は反復。
 - `regex` は plan.lexical の DFA がある場合に対応。最長 prefix、ゼロ幅受理は失敗。
 - `imports` は解決済み symbols を利用。`enum`, `commonField`、enclosingTypeId に対応。
 
 次は **機能名を含む EmitError::Unsupported** で拒否する。
-`recovery`, `eval`, `catalog`, `typeof`, `leftRecursionRewrite`、frontendTransform、
-precedenceClimbing、DFA のない regex / Java Pattern fallback、非 ASCII パターンの CI、
+`leftRecursionRewrite`、frontendTransform、precedenceClimbing、DFA のない regex / Java Pattern fallback、
 ValueType 自体にさらに入れ子にした Optional/List（field cardinality の Optional/List は対応）。
 不正な参照、重複、memo の安全性違反・省略証明不足、重複 DFA 遷移、commonField の型不一致、
 Choice plan の候補欠落・順序変更、空 trivia delimiter は InvalidIr。
@@ -188,7 +242,8 @@ allocator の状態、測定順序、共有環境の負荷の差があり、今�
 - **memo の量と格納方法**: 手書き版は全 rule/helper、生成版は plan に従って全 Expr を memo する。
   512 atom のエントリは手書き4,609、生成9,219で、生成版の仕事量の方が多い。
   手書きの整数キー hasher は byte ごとに rotate/xor/multiply を実行する。
-  生成版は固定整数をまとめて混合し、Vec の slot に index のみを置く。
+  当時の生成版は固定整数をまとめて混合し、Vec の slot に index のみを置いた。
+  round2 では RandomState によるセッションごとの hash と負荷率50%へ変更し、最大 probe 長を公開する。
   payload を表の拡張ごとに複製せず、key/payload の位置は u32 に圧縮した。
 - **診断の確保**: 手書き版は失敗のたびに rule stack を Vec にし、全 active frame の
   局所 Snapshot を更新・複製する。生成版は共有できる診断 DAG を保存し、最終結果の
@@ -197,7 +252,7 @@ allocator の状態、測定順序、共有環境の負荷の差があり、今�
 - **arena / 容量**: 生成版は per-rule の event Vec を単一 arena の Join/Capture/Rule/Token に統合する。
   失敗枝から参照を外し、memo が参照する ID は再利用しない。
   memo は `min(input_bytes*10+64, 32768)`、AST arena は `min(input_bytes*8+8, 32768)` の
-  初期容量を予約する。この値は初期予約量のみで、必要なら拡張するため受理上限ではない。
+  初期容量を予約する。round2 ではこれとは別に ResourceLimits の総量上限を設けた。
 - **trivia**: 手書き版は隣接する chain/helper 境界で同じ位置を再走査する。
   生成版も意味論上必要な境界を維持し、plan が有効にした場合のみ policy/C/M/mode/R ごとの cache を使う。
   今回のベンチは trivia cache 無効なので、その効果を速度改善の理由には数えていない。
@@ -232,7 +287,7 @@ allocator の状態、測定順序、共有環境の負荷の差があり、今�
 6. Number の `rust=lexeme` と grouped NUMBER の text は、ともに String として扱う。
    [事実集 §D](../../docs/design/02-facts-tokens-bench-corpus.md) の訂正に従い、
    手書き Java の int と同一視しない。case folding の Unicode/JDK 版は IR に無いため、
-   非 ASCII パターンの CI は完全互換を装わず拒否する。
+   Unicode CI は input.rs の近似を採用し、oracle の é/É を回帰で固定する。
 
 ## 共通テンプレートとの差分
 
@@ -248,7 +303,7 @@ allocator の状態、測定順序、共有環境の負荷の差があり、今�
 | `runtime.rs`, `finish.rs`, `api.rs` | 生成物専用の共有コードを追加。採用 event arena、遅延 mapping、scope effect replay、TokenScanner、公開結果 API |
 | `bench.rs`, `allocations.rs` | 外部一時 crate での測定専用。生成物には含めない |
 
-memo の byte offset / arena index / state version は u32 で圧縮し、超過時は切り捨てず明示的に停止する。
+memo の byte offset / arena index / state version は u32 で圧縮する。セッション予算を先に検査し、超過時は resource 診断で失敗する。
 入力そのものは &str、公開 span は code point。深い括弧・右再帰・mapping の完全な明示 stack 化は未実装。
 
 ### Java レビューから移植した契約（2026-09-22）
@@ -278,7 +333,3 @@ memo の byte offset / arena index / state version は u32 で圧縮し、超過
 `tests/driver.rs` で JSON 応答も検証する。Java oracle の expected 集合を Rust 全体へ強制せず、
 Rust の診断位置と Rust 用ラベルを独立に検証する。
 memo / arena は入力長から上限付きの容量を予約し、拡張時のコピーと再確保を減らす。
-
-変更範囲の指定に従い workspace の Cargo.lock は commit に含めない。
-呼び出し側で統合する際は `ubnfc-rust` の依存リストに `ubnfc-front` を加える lock 更新が必要
-（通常の cargo コマンドが自動更新する。`--locked` では事前更新が必要）。

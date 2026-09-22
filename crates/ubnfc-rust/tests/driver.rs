@@ -267,6 +267,6 @@ fn scope_events_and_farthest_diagnostics_are_public_protocol_fields() {
     assert!(rows[1].get("scope").is_none());
     assert_eq!(
         rows[2]["diagnostics"][0],
-        json!({"kind":"trailing_input","offset":1,"expected":["end of input"],"farthestOffset":2,"farthestExpected":["x"]})
+        json!({"kind":"trailing_input","offset":1,"expected":["end of input"],"farthestOffset":2,"farthestExpected":["x"],"deepestRule":"Operators::Root","rulePath":["Operators::Root"]})
     );
 }

@@ -41,7 +41,8 @@ pub(crate) fn generate(ir: &GrammarIr) -> String {
             }
             AstType::Enum { variants, .. } => {
                 writeln!(s, "Self::{n}(node)=>match node.value {{").unwrap();
-                for v in variants {
+                let mut seen = std::collections::BTreeSet::new();
+                for v in variants.iter().filter(|v| seen.insert(&v.rust_name)) {
                     writeln!(
                         s,
                         "{n}Value::{}=>{:?}.to_json(),",

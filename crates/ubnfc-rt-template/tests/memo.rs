@@ -79,3 +79,49 @@ fn rollback_restores_memo_visibility_without_reusing_branch_versions() {
     assert!(scopes.state_version() > branch);
     assert_eq!(table.get(key(scopes.state_version())), None);
 }
+
+#[test]
+fn hostile_old_hash_buckets_are_mixed_and_probes_are_observable() {
+    use ubnfc_rt_template::{
+        cursor::State,
+        memo::{Key, Memo},
+    };
+    let mut memo = Memo::with_capacity(2048);
+    let mut keys = Vec::new();
+    for position in 0.. {
+        let mut h = (position as usize).wrapping_mul(0x9e3779b1);
+        for x in [position, 0, 0, 0] {
+            h = (h ^ x as usize).wrapping_mul(0x85ebca6b);
+            h ^= h >> 16;
+        }
+        if h & 4095 == 0 {
+            keys.push(Key {
+                expression: 0,
+                state: State {
+                    consumed: position as usize,
+                    matched: position as usize,
+                    invert: false,
+                    reset: false,
+                },
+                matched_mode: false,
+                version: 0,
+            });
+            if keys.len() == 512 {
+                break;
+            }
+        }
+    }
+    for (i, &key) in keys.iter().enumerate() {
+        memo.insert(key, i);
+    }
+    for (i, &key) in keys.iter().enumerate() {
+        assert_eq!(memo.get(key), Some(i));
+    }
+    assert!((1..128).contains(&memo.max_probe_len()));
+    let invalid = Key {
+        expression: usize::MAX,
+        ..keys[0]
+    };
+    memo.insert(invalid, 999);
+    assert_eq!(memo.get(invalid), None);
+}
