@@ -270,3 +270,211 @@ fn scope_events_and_farthest_diagnostics_are_public_protocol_fields() {
         json!({"kind":"trailing_input","offset":1,"expected":["end of input"],"farthestOffset":2,"farthestExpected":["x"],"deepestRule":"Operators::Root","rulePath":["Operators::Root"]})
     );
 }
+
+#[test]
+fn round3_evaluation_and_retained_observations_follow_mapped_values() {
+    let temp = Temp::new();
+    let grammar = temp.0.join("round3.ubnf");
+    fs::write(&grammar, r#"
+        grammar Power {
+            token NUMBER=NumberParser
+            @root @mapping(Power, params=[left,op,right]) Root ::= NumericLiteral @left ['^' @op Root @right];
+            @mapping(Number, params=[value]) NumericLiteral ::= NUMBER @value;
+        }
+        grammar Mixed {
+            @root @mapping(Root, params=[head,maybe,items]) Document ::= Factor @head ':' [Factor @maybe] ':' {Factor @items};
+            Factor ::= 'a' | LeafRule;
+            @mapping(Leaf, params=[text]) LeafRule ::= 'x' @text;
+        }
+        grammar Semantic {
+            @root @mapping(Box, params=[values]) Root ::= {Factor @values};
+            Factor ::= 'a' | LeafRule;
+            @mapping(Leaf, params=[text]) LeafRule ::= 'x' @text;
+        }
+        grammar Cardinality {
+            token NUMBER=NumberParser
+            @root @mapping(Container, params=[head,values,tail,flags]) Root ::= [Item] @head ':' {Item} @values ':' ['!'] @tail ':' {'x'} @flags;
+            @mapping(Item, params=[value]) Item ::= NUMBER @value ';';
+        }
+        grammar Quoted {
+            token TEXT=org.unlaxer.tinyexpression.parser.StringLiteralParser
+            @root @mapping(Value, params=[value]) Root ::= TEXT @value;
+        }
+        grammar Alias {
+            @root @mapping(Box, params=[values]) Root ::= Helper @values;
+            Helper ::= '(' [Factor] ')';
+            Factor ::= 'a' | Leaf;
+            @mapping(Leaf, params=[text]) Leaf ::= 'x' @text;
+        }
+        grammar RepeatAlias {
+            @root @mapping(Box, params=[values]) Root ::= Helper @values;
+            Helper ::= { '(' Factor ')' };
+            Factor ::= 'a' | Leaf;
+            @mapping(Leaf, params=[text]) Leaf ::= 'x' @text;
+        }
+        grammar Look {
+            token T=SingleQuotedParser token L=LOOKAHEAD('a') token N=LOOKAHEAD('b')
+            @root @mapping(Value, params=[value]) Root ::= L [T] N 'ab' @value;
+        }
+        grammar Backref {
+            token ID=IdentifierParser
+            @root @backref(name=name) @mapping(Pair, params=[name]) Root ::= ID @name ':' ID @name;
+        }
+        grammar Separated {
+            @root @mapping(Box, params=[values]) Root ::= '[' Items @values ']';
+            Items ::= Factor % ',';
+            Factor ::= 'a' | '😀' | Leaf;
+            @mapping(Leaf, params=[text]) Leaf ::= 'x' @text;
+        }
+        grammar GroupValue {
+            @root @mapping(Root, params=[value]) Root ::= ('a' | Leaf) @value;
+            @mapping(Leaf, params=[text]) Leaf ::= 'x' @text;
+        }
+        grammar TokenList {
+            @whitespace: javaStyle
+            token T=ANY
+            @root @mapping(Value, params=[value]) Root ::= (T | 'z')+ @value;
+        }
+        grammar GroupList {
+            @whitespace: javaStyle
+            token T=ANY
+            @root @mapping(Value, params=[value]) Root ::= ((T | 'z'))+ @value;
+        }
+        grammar Nested {
+            @root @mapping(Root, params=[first,second]) Root ::= Leaf @first Leaf @second;
+            @mapping(Leaf, params=[text]) Leaf ::= 'x' @text;
+        }
+    "#).unwrap();
+    let ir = ubnfc_front::pipeline::compile(&grammar, &|p| fs::read_to_string(p))
+        .unwrap()
+        .ir;
+    let generated = temp.0.join("generated");
+    ubnfc_rust::emit(&ir, &Default::default())
+        .unwrap()
+        .write_to(&generated)
+        .unwrap();
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    for file in ["scanners.rs", "scanners_tests.rs"] {
+        fs::copy(
+            root.join("scanners/rust").join(file),
+            generated.join("src/bin").join(file),
+        )
+        .unwrap();
+    }
+    cargo(
+        &generated,
+        &["build", "--offline", "--features", "scanners"],
+    );
+    let requests = [
+        ("Power", "2^3^2", json!({"family":"right-associative"})),
+        (
+            "Mixed",
+            "a::aa",
+            json!({"family":"mixed-values", "valueSpanField":"head", "valueSpanListField":"items"}),
+        ),
+        ("Mixed", "x:a:ax", json!({"family":"mixed-values"})),
+        ("Semantic", "axa", json!({"family":"semantic-cardinality"})),
+        ("Cardinality", ":::", json!({"family":"cardinality"})),
+        (
+            "Cardinality",
+            "1;:2;3;:!:xxx",
+            json!({"family":"cardinality"}),
+        ),
+        ("Quoted", "'😀'", json!({"family":"oracle"})),
+        ("Quoted", "'😀'!", json!({"family":"oracle"})),
+        (
+            "Nested",
+            "xx",
+            json!({"captureNames":["text","first","second"]}),
+        ),
+        ("Alias", "(a)", json!({"family":"semantic-cardinality"})),
+        ("Alias", "()", json!({"family":"semantic-cardinality"})),
+        (
+            "RepeatAlias",
+            "(a)(x)(a)",
+            json!({"family":"semantic-cardinality"}),
+        ),
+        ("RepeatAlias", "", json!({"family":"semantic-cardinality"})),
+        ("Look", "ab", json!({})),
+        ("Quoted", "' \0 '", json!({})),
+        ("Backref", "x:x", json!({})),
+        ("Backref", "x:y", json!({})),
+        (
+            "Separated",
+            "[a,x,😀]",
+            json!({"family":"semantic-cardinality"}),
+        ),
+        ("GroupValue", "a", json!({"family":"mixed-values"})),
+        ("TokenList", "a /*c*/b", json!({})),
+        ("GroupList", "a /*c*/b", json!({})),
+    ];
+    let lines: String = requests.iter().enumerate().map(|(id, (grammar, input, observations))|
+        format!("{}\n", json!({"id":id,"grammar":grammar,"entry":null,"input":input,"options":{"lexical":true,"scope":false},"observations":observations}))
+    ).collect();
+    let rows = exchange(&generated.join("target/debug/driver"), &lines);
+    assert_eq!(rows[0]["value"], 512.0, "{rows:?}");
+    assert_eq!(rows[1]["value"], "T:a|-|T:a,T:a");
+    assert_eq!(
+        rows[1]["texts"],
+        json!([[0, 1, "a"], [3, 4, "a"], [4, 5, "a"]])
+    );
+    assert_eq!(rows[1]["valueSpans"], json!([[0, 1], [3, 4], [4, 5]]));
+    assert_eq!(rows[1]["retainedValueSpans"], rows[1]["valueSpans"]);
+    assert_eq!(rows[2]["value"], "L:x|T:a|T:a,L:x");
+    assert_eq!(rows[2]["nodes"], json!([[0, 1, "x"], [5, 6, "x"]]));
+    assert_eq!(rows[3]["value"], "T:a,L:x,T:a");
+    assert_eq!(rows[4]["value"], 0.0);
+    assert_eq!(rows[4]["ast"]["fields"]["tail"], Value::Null);
+    assert_eq!(rows[4]["ast"]["fields"]["flags"], json!([]));
+    assert_eq!(rows[5]["value"], 10.0);
+    assert_eq!(rows[5]["ast"]["fields"]["flags"], json!(["x", "x", "x"]));
+    assert_eq!(rows[6]["ast"]["fields"]["value"], "😀");
+    assert_eq!(rows[6]["texts"], json!([]));
+    assert_eq!(
+        rows[6]["captures"][0],
+        json!({"binding":"Root:0","name":"value","span":[0,3],"text":"'😀'"})
+    );
+    assert_eq!(rows[7]["accepted"], true);
+    assert_eq!(rows[7]["allConsumed"], false);
+    assert_eq!(rows[7]["prefixCaptures"], rows[6]["captures"]);
+    let names: Vec<_> = rows[8]["captures"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(names, ["text", "text", "first", "second"]);
+    assert_eq!(rows[9]["value"], "T:(a)");
+    assert_eq!(rows[9]["texts"], json!([[0, 3, "(a)"]]));
+    assert_eq!(rows[10]["value"], "");
+    assert_eq!(rows[10]["texts"], json!([]));
+    assert_eq!(rows[11]["value"], "T:(a),L:x,T:(a)");
+    assert_eq!(rows[11]["texts"], json!([[0, 3, "(a)"], [6, 9, "(a)"]]));
+    assert_eq!(rows[12]["value"], "");
+    assert_eq!(rows[13]["accepted"], true);
+    assert_eq!(rows[13]["matched"], 2);
+    assert_eq!(rows[14]["ast"]["fields"]["value"], " \0 ");
+    assert_eq!(rows[15]["diagnostics"], json!([]));
+    assert_eq!(
+        rows[16]["diagnostics"],
+        json!([{"message":"back-reference mismatch: expected 'x' but got 'y'", "offset":2,"length":1,"severity":"ERROR","kind":"ERROR","expected":[],"origin":"ScopeStore"}])
+    );
+    assert_eq!(rows[17]["value"], "T:a,L:x,T:😀");
+    assert_eq!(rows[17]["texts"], json!([[1, 2, "a"], [5, 6, "😀"]]));
+    assert_eq!(rows[18]["value"], "T:a");
+    assert_eq!(rows[19]["ast"]["fields"]["value"], json!(["a", "b"]));
+    assert_eq!(rows[20]["ast"]["fields"]["value"], json!(["a /*c*/", "b"]));
+    cargo(
+        &generated,
+        &[
+            "clippy",
+            "--offline",
+            "--all-targets",
+            "--features",
+            "scanners",
+            "--",
+            "-D",
+            "warnings",
+        ],
+    );
+}

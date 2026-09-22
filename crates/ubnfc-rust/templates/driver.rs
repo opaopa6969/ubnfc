@@ -1,7 +1,7 @@
 use std::io::{self, BufRead, Write};
-use ubnfc_generated::{ast::*, DiagnosticKind, ParseOptions, Severity};
 #[cfg(not(feature = "scanners"))]
 use ubnfc_generated::parse_entry_with_options;
+use ubnfc_generated::{ast::*, DiagnosticKind, ParseOptions, Severity};
 #[path = "driver_json.rs"]
 mod json;
 use json::{Json, ToJson};
@@ -13,9 +13,12 @@ fn required<'a>(value: &'a Json, key: &str) -> Result<&'a Json, &'static str> {
 #[path = "scanners.rs"]
 mod scanners;
 
-fn parse_registered(grammar: &str, entry: Option<&str>, input: &str, options: ParseOptions)
-    -> Result<ubnfc_generated::ParseResult, &'static str>
-{
+fn parse_registered(
+    grammar: &str,
+    entry: Option<&str>,
+    input: &str,
+    options: ParseOptions,
+) -> Result<ubnfc_generated::ParseResult, &'static str> {
     #[cfg(feature = "scanners")]
     {
         let mut registry = scanners::Registry::new(EXTERN_CLASSES)?;
@@ -23,7 +26,9 @@ fn parse_registered(grammar: &str, entry: Option<&str>, input: &str, options: Pa
     }
     #[cfg(not(feature = "scanners"))]
     {
-        if !EXTERN_CLASSES.is_empty() { return Err("Extern scanner 未登録: scanners feature が必要です"); }
+        if !EXTERN_CLASSES.is_empty() {
+            return Err("Extern scanner 未登録: scanners feature が必要です");
+        }
         parse_entry_with_options(grammar, entry, input, options)
     }
 }
@@ -38,6 +43,13 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     let options = required(request, "options")?;
     let lexical = required(options, "lexical")?.boolean()?;
     let scope = required(options, "scope")?.boolean()?;
+    let observations = request.get("observations").unwrap_or(&Json::Null);
+    let family = observations.get("family").and_then(|v| v.string().ok());
+    let max_depth = match options.get("maxDepth") {
+        Some(Json::Number(n)) => n.parse().map_err(|_| "invalid maxDepth")?,
+        None => ParseOptions::default().max_depth,
+        _ => return Err("invalid maxDepth"),
+    };
     let prefix = parse_registered(
         grammar,
         entry,
@@ -45,7 +57,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         ParseOptions {
             build_ast: false,
             require_eof: false,
-            lexical: false,
+            lexical,
+            max_depth,
             ..Default::default()
         },
     )?;
@@ -57,15 +70,17 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             build_ast: true,
             require_eof: true,
             lexical,
+            max_depth,
             ..Default::default()
         },
     )?;
     let ast = result.ast.as_ref().map_or(Json::Null, ToJson::to_json);
-    let value = if result.ast.as_ref().is_some_and(operator_ast) {
-        numeric(&ast)?.map_or(Json::Null, |v| Json::Number(v.to_string()))
-    } else {
-        Json::Null
-    };
+    let (value, evaluation_error) =
+        match evaluate(&ast, family, result.ast.as_ref().is_some_and(operator_ast)) {
+            Ok(value) => (value, false),
+            Err(_) if family.is_some() => (None, true),
+            Err(error) => return Err(error),
+        };
     let mut mapping = Json::Null;
     let mut diagnostics = Vec::new();
     for d in &result.diagnostics {
@@ -107,7 +122,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             Severity::Hint => "HINT",
         };
         diagnostics.push(Json::object([
-            ("kind", "scope".to_json()),
+            ("kind", severity.to_json()),
+            ("origin", "ScopeStore".to_json()),
             ("offset", d.offset.to_json()),
             ("expected", Json::Array(vec![])),
             ("message", d.msg.to_json()),
@@ -121,7 +137,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         ("allConsumed", Json::Bool(result.ok)),
         ("consumed", prefix.consumed_cp.to_json()),
         ("matched", prefix.matched_cp.to_json()),
-        ("ast", ast),
+        ("ast", ast.clone()),
         ("diagnostics", Json::Array(diagnostics)),
         ("mappingError", mapping),
         (
@@ -142,7 +158,10 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
                     .collect(),
             ),
         ),
-        ("value", value),
+        (
+            "parsedStatus",
+            if prefix.ok { "succeeded" } else { "failed" }.to_json(),
+        ),
         (
             "catalogs",
             Json::Array(
@@ -179,13 +198,94 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     let Json::Object(fields) = &mut response else {
         unreachable!()
     };
+    if let Some(value) = value {
+        fields.insert("value".into(), value);
+    }
+    if evaluation_error {
+        fields.insert("evaluationError".into(), Json::Bool(true));
+    }
+    if ast != Json::Null {
+        fields.insert(
+            "texts".into(),
+            Json::Array(
+                result
+                    .value_spans
+                    .iter()
+                    .filter_map(|v| {
+                        v.text.as_ref().map(|text| {
+                            Json::Array(vec![
+                                v.span[0].to_json(),
+                                v.span[1].to_json(),
+                                text.to_json(),
+                            ])
+                        })
+                    })
+                    .collect(),
+            ),
+        );
+        fields.insert(
+            "nodes".into(),
+            Json::Array(
+                result
+                    .value_spans
+                    .iter()
+                    .filter_map(|v| {
+                        let node = at_path(&ast, &v.path)?;
+                        if !matches!(
+                            node.get("type").and_then(|v| v.string().ok()),
+                            Some("Leaf" | "Other" | "OtherLeaf")
+                        ) {
+                            return None;
+                        }
+                        let fields = node.get("fields")?;
+                        let text = fields.get("text").or_else(|| fields.get("value"))?;
+                        text.string().ok()?;
+                        Some(Json::Array(vec![
+                            v.span[0].to_json(),
+                            v.span[1].to_json(),
+                            text.clone(),
+                        ]))
+                    })
+                    .collect(),
+            ),
+        );
+        let mut selected = Vec::new();
+        for key in ["valueSpanField", "valueSpanListField"] {
+            if let Some(name) = observations.get(key).and_then(|v| v.string().ok()) {
+                let path = format!("/fields/{}", name.replace('~', "~0").replace('/', "~1"));
+                selected.extend(
+                    result
+                        .value_spans
+                        .iter()
+                        .filter(|v| {
+                            v.path == path
+                                || v.path
+                                    .strip_prefix(&(path.clone() + "/"))
+                                    .is_some_and(|suffix| suffix.parse::<usize>().is_ok())
+                        })
+                        .map(|v| v.span.to_json()),
+                );
+            }
+        }
+        if observations.get("captureNames").is_some()
+            || observations.get("valueSpanField").is_some()
+        {
+            fields.insert("valueSpans".into(), Json::Array(selected.clone()));
+            fields.insert("retainedValueSpans".into(), Json::Array(selected));
+        }
+    }
     if lexical {
+        fields.insert(
+            "prefixCaptures".into(),
+            captures(&prefix, input, false, true),
+        );
         fields.insert(
             "lexical".into(),
             Json::Array(
                 result
                     .lexical
-                    .iter().chain(&result.tokens)
+                    .iter()
+                    .chain(&result.tokens)
                     .map(|l| {
                         Json::object([
                             ("occurrenceId", l.occurrence_id.to_json()),
@@ -201,27 +301,16 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         );
         fields.insert(
             "captures".into(),
-            Json::Array(
-                result
-                    .captures
-                    .iter()
-                    .map(|c| {
-                        let text: String = input
-                            .chars()
-                            .skip(c.span[0])
-                            .take(c.span[1] - c.span[0])
-                            .collect();
-                        Json::object([
-                            ("name", c.name.to_json()),
-                            ("span", c.span.to_json()),
-                            ("text", text.to_json()),
-                        ])
-                    })
-                    .collect(),
+            captures(
+                &result,
+                input,
+                observations.get("captureNames").is_some(),
+                matches!(family, Some("oracle" | "evolution")),
             ),
         );
     }
     if scope {
+        fields.insert("scopeDepth".into(), result.scope.depth.to_json());
         fields.insert(
             "scope".into(),
             Json::object([
@@ -236,7 +325,15 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
                             .map(|event| {
                                 Json::object([
                                     ("order", event.order.to_json()),
-                                    ("action", event.action.to_json()),
+                                    (
+                                        "action",
+                                        if event.action == "use" {
+                                            "reference"
+                                        } else {
+                                            event.action
+                                        }
+                                        .to_json(),
+                                    ),
                                     ("mode", event.mode.to_json()),
                                     ("name", event.name.to_json()),
                                     ("offset", event.offset_cp.to_json()),
@@ -282,6 +379,154 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     }
     Ok(response)
 }
+fn at_path<'a>(mut value: &'a Json, path: &str) -> Option<&'a Json> {
+    for part in path.split('/').skip(1) {
+        value = match value {
+            Json::Array(items) => items.get(part.parse::<usize>().ok()?)?,
+            _ => value.get(&part.replace("~1", "/").replace("~0", "~"))?,
+        };
+    }
+    Some(value)
+}
+fn captures(
+    result: &ubnfc_generated::ParseResult,
+    input: &str,
+    rule_order: bool,
+    bindings: bool,
+) -> Json {
+    let mut captures: Vec<_> = result.captures.iter().collect();
+    if rule_order {
+        captures.sort_by_key(|c| c.rule_completion_order);
+    }
+    Json::Array(
+        captures
+            .into_iter()
+            .map(|c| {
+                let text: String = input
+                    .chars()
+                    .skip(c.span[0])
+                    .take(c.span[1] - c.span[0])
+                    .collect();
+                let mut row = Json::object([
+                    ("name", c.name.to_json()),
+                    ("span", c.span.to_json()),
+                    ("text", text.to_json()),
+                ]);
+                if bindings {
+                    if let Json::Object(fields) = &mut row {
+                        fields.insert(
+                            "binding".into(),
+                            CAPTURE_BINDINGS
+                                .iter()
+                                .find(|(id, _)| *id == c.site_id)
+                                .map_or(Json::Null, |(_, binding)| binding.to_json()),
+                        );
+                    }
+                }
+                row
+            })
+            .collect(),
+    )
+}
+fn values(value: &Json) -> &[Json] {
+    match value {
+        Json::Null => &[],
+        Json::Array(items) => items,
+        _ => std::slice::from_ref(value),
+    }
+}
+fn tagged(value: &Json) -> Result<String, &'static str> {
+    if let Json::String(text) = value {
+        return Ok(format!("T:{text}"));
+    }
+    let fields = value.get("fields").ok_or("unsupported semantic value")?;
+    let text = fields
+        .get("text")
+        .or_else(|| fields.get("value"))
+        .ok_or("missing semantic text")?;
+    match value.get("type").and_then(|v| v.string().ok()) {
+        Some("Leaf") => Ok(format!("L:{}", text.string()?)),
+        Some("Other" | "OtherLeaf") => Ok(format!("O:{}", text.string()?)),
+        Some("Value" | "Shared") => tagged(text),
+        _ => Err("unsupported semantic value"),
+    }
+}
+fn tags(value: &Json) -> Result<String, &'static str> {
+    values(value)
+        .iter()
+        .map(tagged)
+        .collect::<Result<Vec<_>, _>>()
+        .map(|v| v.join(","))
+}
+fn evaluate(
+    ast: &Json,
+    family: Option<&str>,
+    operator: bool,
+) -> Result<Option<Json>, &'static str> {
+    if *ast == Json::Null {
+        return Ok(Some(Json::Null));
+    }
+    let Some(fields) = ast.get("fields") else {
+        return Ok(None);
+    };
+    let field = |name| fields.get(name).unwrap_or(&Json::Null);
+    if family == Some("semantic-cardinality") && fields.get("values").is_some() {
+        return Ok(Some(tags(field("values"))?.to_json()));
+    }
+    if family == Some("mixed-values") {
+        if fields.get("head").is_some()
+            && fields.get("maybe").is_some()
+            && fields.get("items").is_some()
+        {
+            return Ok(Some(
+                format!(
+                    "{}|{}|{}",
+                    tagged(field("head"))?,
+                    if *field("maybe") == Json::Null {
+                        "-".into()
+                    } else {
+                        tagged(field("maybe"))?
+                    },
+                    tags(field("items"))?
+                )
+                .to_json(),
+            ));
+        }
+        if fields.get("value").is_some() {
+            return Ok(Some(tagged(field("value"))?.to_json()));
+        }
+    }
+    if family == Some("cardinality") && fields.get("flags").is_some() {
+        let mut total = if *field("head") == Json::Null {
+            0.0
+        } else {
+            numeric(field("head"))?.ok_or("invalid head")?
+        };
+        for item in values(field("values")) {
+            total += numeric(item)?.ok_or("invalid item")?;
+        }
+        total += if *field("tail") == Json::Null {
+            0.0
+        } else {
+            1.0
+        };
+        total += values(field("flags")).len() as f64;
+        return Ok(finite(total)?.map(|n| Json::Number(format!("{n:?}"))));
+    }
+    if operator
+        || matches!(
+            ast.get("type").and_then(|v| v.string().ok()),
+            Some("Number" | "Literal" | "Binary" | "Power" | "Negation" | "Conditional")
+        )
+        || matches!(
+            family,
+            Some("right-associative" | "associative" | "evolution")
+        )
+    {
+        return Ok(numeric(ast)?.map(|n| Json::Number(format!("{n:?}"))));
+    }
+    Ok(None)
+}
 fn finite(value: f64) -> Result<Option<f64>, &'static str> {
     if value.is_finite() {
         Ok(Some(value))
@@ -323,14 +568,33 @@ fn numeric(value: &Json) -> Result<Option<f64>, &'static str> {
     let Some(Json::Object(fields)) = value.get("fields") else {
         return Ok(None);
     };
+    if value.get("type").and_then(|v| v.string().ok()) == Some("Negation") {
+        return fields
+            .get("value")
+            .map_or(Ok(None), numeric)
+            .map(|v| v.map(|v| -v));
+    }
+    if value.get("type").and_then(|v| v.string().ok()) == Some("Conditional") {
+        let Some(condition) = fields.get("condition").map_or(Ok(None), numeric)? else {
+            return Ok(None);
+        };
+        return fields
+            .get(if condition != 0.0 {
+                "thenExpr"
+            } else {
+                "elseExpr"
+            })
+            .map_or(Ok(None), numeric);
+    }
     if fields.len() == 1 {
         return fields.get("value").map_or(Ok(None), numeric);
     }
-    let (Some(left), Some(Json::Array(ops)), Some(Json::Array(rights))) =
+    let (Some(left), Some(ops), Some(rights)) =
         (fields.get("left"), fields.get("op"), fields.get("right"))
     else {
         return Ok(None);
     };
+    let (ops, rights) = (values(ops), values(rights));
     if fields.len() != 3 {
         return Ok(None);
     }

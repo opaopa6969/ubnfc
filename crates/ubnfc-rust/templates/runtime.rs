@@ -19,7 +19,13 @@ pub(crate) enum Event {
         diag: Diag,
     },
     Join(EventId, EventId),
+    Values {
+        span: Span,
+        child: EventId,
+        wrap: bool,
+    },
     Capture {
+        token_extent: bool,
         site: usize,
         span: Span,
         child: EventId,
@@ -30,6 +36,7 @@ pub(crate) enum Event {
         child: EventId,
     },
     Token {
+        text_span: Option<Span>,
         expr: usize,
         rule: usize,
         span: Span,
@@ -114,6 +121,9 @@ pub(crate) struct Session<'a> {
     saved_effects: Vec<Effect>,
     pub statistics: Statistics,
     pub node_spans: Vec<NodeSpan>,
+    // Allocation identity is used only while mapping. finish resolves it into
+    // owned AST paths, so ParseResult remains valid after moves and clones.
+    pub text_spans: std::collections::HashMap<usize, Span>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -151,6 +161,7 @@ impl<'a> Session<'a> {
             saved_effects: vec![],
             statistics: Statistics::default(),
             node_spans: vec![],
+            text_spans: Default::default(),
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -201,7 +212,9 @@ impl<'a> Session<'a> {
     }
     pub fn text(&self, span: Span) -> String {
         self.text[span[0]..span[1]]
-            .trim_matches(|c: char| c <= '\u{20}')
+            .trim_matches(|c: char| {
+                c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
+            })
             .to_owned()
     }
     pub fn mark(&self) -> Mark {
@@ -408,6 +421,7 @@ impl<'a> Session<'a> {
                 state.advance::<MATCH>(length);
                 let mut step = Step::yes(state);
                 step.events = self.event(Event::Token {
+                    text_span: None,
                     expr: usize::MAX,
                     rule: usize::MAX,
                     span: [start, start + length],
@@ -535,7 +549,7 @@ impl<'a> Session<'a> {
         let start = state.position::<MATCH>();
         let mut p = start;
         if self.input.cp_at(p).is_none_or(|(c, _)| c != quote) {
-            return self.primitive::<MATCH>(state, None, label);
+            return self.fail(state, start, label);
         }
         p += 1;
         while let Some((c, n)) = self.input.cp_at(p) {
@@ -551,7 +565,7 @@ impl<'a> Session<'a> {
                 }
             }
         }
-        self.primitive::<MATCH>(state, None, label)
+        self.fail(state, start, label)
     }
     pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str) -> Step {
         let mut out = state.begin();
@@ -615,6 +629,7 @@ impl<'a> Session<'a> {
                 expr: usize::MAX,
                 rule: usize::MAX,
                 span: result.value_span,
+                text_span: Some(result.value_span),
             });
         } else {
             self.restore(mark);
@@ -633,10 +648,23 @@ impl<'a> Session<'a> {
                     stack.push((b, false));
                     stack.push((a, false));
                 }
-                Event::Capture { site, span, child } => {
+                Event::Values { child, .. } => stack.push((child, false)),
+                Event::Capture {
+                    site,
+                    span,
+                    child,
+                    token_extent,
+                } => {
                     if done {
                         if sites.contains(&site) {
-                            out.push((span, child));
+                            out.push((
+                                if token_extent {
+                                    self.selected_extent(child, span)
+                                } else {
+                                    span
+                                },
+                                child,
+                            ));
                         }
                     } else {
                         stack.push((id, true));
@@ -657,7 +685,7 @@ impl<'a> Session<'a> {
                     stack.push(b);
                     stack.push(a);
                 }
-                Event::Capture { child, .. } => stack.push(child),
+                Event::Capture { child, .. } | Event::Values { child, .. } => stack.push(child),
                 Event::Rule { span: child, .. } | Event::Token { span: child, .. } => {
                     span = Some(span.map_or(child, |s: Span| [s[0], child[1]]));
                 }
@@ -677,7 +705,9 @@ impl<'a> Session<'a> {
                     stack.push(a);
                     stack.push(b);
                 }
-                Event::Rule { child, .. } | Event::Capture { child, .. } => stack.push(child),
+                Event::Rule { child, .. }
+                | Event::Capture { child, .. }
+                | Event::Values { child, .. } => stack.push(child),
                 Event::Token { span, .. } => return Some(span[1]),
                 _ => {}
             }
@@ -693,7 +723,9 @@ impl<'a> Session<'a> {
                     stack.push(b);
                     stack.push(a);
                 }
-                Event::Capture { child, .. } | Event::Rule { child, .. } => stack.push(child),
+                Event::Capture { child, .. }
+                | Event::Rule { child, .. }
+                | Event::Values { child, .. } => stack.push(child),
                 _ => {}
             }
         }
@@ -703,7 +735,7 @@ impl<'a> Session<'a> {
         loop {
             match self.arena[root.0] {
                 Event::Recovery { .. } => return true,
-                Event::Capture { child, .. } => root = child,
+                Event::Capture { child, .. } | Event::Values { child, .. } => root = child,
                 _ => return false,
             }
         }
@@ -772,11 +804,72 @@ impl<'a> Session<'a> {
             diag: failed.diag,
         }
     }
-    pub fn field_text(&self, root: EventId, sites: &[usize]) -> Vec<String> {
+    pub fn has_value_group(&self, root: EventId) -> bool {
+        let mut stack = vec![root];
+        while let Some(id) = stack.pop() {
+            match self.arena[id.0] {
+                Event::Values { .. } => return true,
+                Event::Join(a, b) => {
+                    stack.push(b);
+                    stack.push(a);
+                }
+                Event::Rule { child, .. } | Event::Capture { child, .. } => stack.push(child),
+                _ => {}
+            }
+        }
+        false
+    }
+    pub fn mapped_text(&mut self, span: Span) -> String {
+        self.remember_text(self.text(span), span)
+    }
+    fn remember_text(&mut self, mut text: String, span: Span) -> String {
+        // Empty strings also need distinct identities until paths are resolved.
+        text.reserve(1);
+        self.text_spans
+            .insert(text.as_ptr() as usize, self.span(span));
+        text
+    }
+    pub fn has_token_text(&self, mut root: EventId) -> bool {
+        loop {
+            match self.arena[root.0] {
+                Event::Capture { child, .. }
+                | Event::Rule { child, .. }
+                | Event::Values { child, .. } => root = child,
+                Event::Token { text_span, .. } => return text_span.is_some(),
+                _ => return false,
+            }
+        }
+    }
+    pub fn text_extent(&self, mut root: EventId, fallback: Span) -> Span {
+        loop {
+            match self.arena[root.0] {
+                Event::Capture { child, .. }
+                | Event::Rule { child, .. }
+                | Event::Values { child, .. } => root = child,
+                Event::Token {
+                    text_span: Some(span),
+                    ..
+                } => return span,
+                _ => return fallback,
+            }
+        }
+    }
+    pub fn field_text(&mut self, root: EventId, sites: &[usize]) -> Vec<String> {
         self.owned_captures(root, sites)
             .into_iter()
-            .filter(|(_, child)| !self.directly_recovered(*child))
-            .map(|(span, _)| self.text(span))
+            .filter_map(|(span, child)| {
+                if self.directly_recovered(child) {
+                    None
+                } else {
+                    let extent = self.text_extent(child, span);
+                    let value = if self.has_token_text(child) {
+                        self.text[extent[0]..extent[1]].to_owned()
+                    } else {
+                        self.text(extent)
+                    };
+                    Some(self.remember_text(value, extent))
+                }
+            })
             .collect()
     }
     pub fn scope_captures(&self, root: EventId, sites: &[usize]) -> Vec<(usize, Span)> {
@@ -788,7 +881,10 @@ impl<'a> Session<'a> {
                     stack.push((b, false));
                     stack.push((a, false));
                 }
-                Event::Capture { site, span, child } => {
+                Event::Values { child, .. } => stack.push((child, false)),
+                Event::Capture {
+                    site, span, child, ..
+                } => {
                     if done {
                         if sites.contains(&site) {
                             let text = &self.text[span[0]..span[1]];

@@ -1,5 +1,11 @@
-fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
+fn occurrences(
+    &self,
+    root: EventId,
+) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
     let mut captures = Vec::new();
+    let mut capture_owners = Vec::new();
+    let mut rule_orders = Vec::new();
+    let mut rule_order = 0;
     let mut lexical = Vec::new();
     let mut tokens = Vec::new();
     let mut stack = vec![(root, None, false, None)];
@@ -10,11 +16,16 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, V
                 stack.push((b, parent, false, None));
                 stack.push((a, parent, false, None));
             }
-            Event::Capture { site, span, child } => {
+            Event::Values { child, .. } => stack.push((child, parent, false, None)),
+            Event::Capture {
+                site, span, child, ..
+            } => {
                 if done {
-                    if self.options.build_ast {
+                    if self.options.build_ast || self.options.lexical {
+                        capture_owners.push(parent);
                         let order = captures.len();
                         captures.push(Capture {
+                            rule_completion_order: 0,
                             occurrence_id: order,
                             site_id: SITES[site].0,
                             name: SITES[site].1,
@@ -27,7 +38,9 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, V
                     stack.push((child, parent, false, None));
                 }
             }
-            Event::Token { expr, rule, span } if self.options.lexical && expr != usize::MAX => {
+            Event::Token {
+                expr, rule, span, ..
+            } if self.options.lexical && expr != usize::MAX => {
                 tokens.push(LexicalOccurrence {
                     occurrence_id: tokens.len(),
                     parent_occurrence_id: parent,
@@ -41,12 +54,15 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, V
             Event::Rule { rule, span, child } => {
                 if done {
                     if let Some(index) = current {
+                        rule_orders[index] = rule_order;
+                        rule_order += 1;
                         let node: &mut LexicalOccurrence = &mut lexical[index];
                         node.completion_order = lexical_order;
                         lexical_order += 1;
                     }
                 } else {
-                    let index = if self.options.lexical {
+                    let index = if self.options.lexical || self.options.build_ast {
+                        rule_orders.push(0);
                         let index = lexical.len();
                         lexical.push(LexicalOccurrence {
                             occurrence_id: index,
@@ -67,7 +83,15 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, V
             _ => {}
         }
     }
-    for token in &mut tokens {token.occurrence_id += lexical.len();}
+    for (capture, owner) in captures.iter_mut().zip(capture_owners) {
+        capture.rule_completion_order = owner.map_or(0, |i| rule_orders[i]);
+    }
+    for token in &mut tokens {
+        token.occurrence_id += lexical.len();
+    }
+    if !self.options.lexical {
+        lexical.clear();
+    }
     (captures, lexical, tokens)
 }
 fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>) {
@@ -81,10 +105,10 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
                 stack.push((b, None));
                 stack.push((a, None));
             }
-            Event::Rule { child, .. } => stack.push((child, None)),
+            Event::Rule { child, .. } | Event::Values { child, .. } => stack.push((child, None)),
             Event::Capture { child, .. } => {
                 if let Some(start) = done {
-                    if self.options.build_ast {
+                    if self.options.build_ast || self.options.lexical {
                         for r in &mut recoveries[start..] {
                             r.capture_occurrence_ids.push(capture_order);
                         }
@@ -145,8 +169,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             ..Step::yes(State::default())
         };
     }
-    let trailing =
-        step.ok && self.options.require_eof && step.state.consumed != self.text.len();
+    let trailing = step.ok && self.options.require_eof && step.state.consumed != self.text.len();
     let ok = step.ok && !trailing;
     let consumed_cp = if step.ok {
         self.cp(step.state.consumed)
@@ -194,16 +217,17 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         .cloned()
         .collect();
     if trailing {
-        let (farthest_cp, farthest_expected, deepest_rule, rule_path) = diagnostics
-            .pop()
-            .map_or((consumed_cp, vec![], None, vec![]), |d| {
-                (
-                    d.farthest_cp,
-                    d.farthest_expected,
-                    d.deepest_rule,
-                    d.rule_path,
-                )
-            });
+        let (farthest_cp, farthest_expected, deepest_rule, rule_path) =
+            diagnostics
+                .pop()
+                .map_or((consumed_cp, vec![], None, vec![]), |d| {
+                    (
+                        d.farthest_cp,
+                        d.farthest_expected,
+                        d.deepest_rule,
+                        d.rule_path,
+                    )
+                });
         diagnostics.push(Diagnostic {
             kind: DiagnosticKind::TrailingInput,
             offset_cp: consumed_cp,
@@ -269,7 +293,12 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         .max(self.trivia_cache.max_probe_len());
     self.statistics.recipes = self.arena.len() - 1;
     self.statistics.ast_nodes = self.node_spans.len();
+    let mut value_spans = Vec::new();
+    if let Some(ast) = &ast {
+        ast.collect("", &self.text_spans, &mut value_spans);
+    }
     ParseResult {
+        value_spans,
         ok,
         consumed_cp,
         matched_cp,
@@ -298,6 +327,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         },
         statistics: self.statistics,
         scope: ScopeResult {
+            depth: self.scope.depth(),
             mode: SCOPE_MODES.to_vec(),
             events: if ok {
                 self.effects
