@@ -63,7 +63,8 @@ pub(crate) fn generate(ir: &GrammarIr) -> String {
             }
             AstType::Enum { variants, .. } => {
                 writeln!(s,"#[derive(Clone,Debug,PartialEq)] pub struct {n} {{ pub span:Span,pub node_id:usize,pub value:{n}Value }}\n#[derive(Clone,Copy,Debug,PartialEq,Eq)] pub enum {n}Value {{").unwrap();
-                for v in variants {
+                let mut seen = std::collections::BTreeSet::new();
+                for v in variants.iter().filter(|v| seen.insert(&v.rust_name)) {
                     writeln!(s, "{},", ident(&v.rust_name)).unwrap();
                 }
                 s.push_str("}\n");
@@ -114,6 +115,13 @@ pub(crate) fn generate(ir: &GrammarIr) -> String {
                 writeln!(s, "Self::{}(_)=>{name:?},", type_ident(ty)).unwrap();
             }
             _ => {}
+        }
+    }
+    s.push_str("}}\n");
+    s.push_str("pub fn type_id(&self)->&'static str {match self {Self::Text(_)=>\"text\",Self::Null=>\"null\",\n");
+    for ty in &ir.semantics.ast_types {
+        if !matches!(ty, AstType::TransparentUnion { .. }) {
+            writeln!(s, "Self::{}(_)=>{:?},", type_ident(ty), ty.id()).unwrap();
         }
     }
     s.push_str("}}\n");
@@ -178,7 +186,8 @@ pub(crate) fn generate(ir: &GrammarIr) -> String {
                     "Self::{n}(node)=>serde_json::Value::String(match node.value {{"
                 )
                 .unwrap();
-                for v in variants {
+                let mut seen = std::collections::BTreeSet::new();
+                for v in variants.iter().filter(|v| seen.insert(&v.rust_name)) {
                     writeln!(s, "{n}Value::{}=>{:?},", ident(&v.rust_name), v.variant).unwrap();
                 }
                 s.push_str("}.into()),\n");

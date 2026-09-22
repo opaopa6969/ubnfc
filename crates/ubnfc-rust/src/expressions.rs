@@ -29,6 +29,13 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:self.scope.state_version()}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
     }
     writeln!(s, "let mut out=self.b{i}_{suf}(state);\nif out.ok {{").unwrap();
+    if matches!(
+        expr.node,
+        ExprNode::Literal { .. } | ExprNode::TokenRef { .. } | ExprNode::Any {}
+    ) {
+        let rule = g.rules[expr.rule_id.as_str()];
+        writeln!(s, "if let Event::Token{{span,..}}=self.arena[out.events.0] {{out.events=self.event(Event::Token{{expr:{i},rule:{rule},span}});}}").unwrap();
+    }
     for site in &expr.capture_site_ids {
         let index = g.sites[site.as_str()];
         let capture = &g.ir.semantics.captures[index];
@@ -276,58 +283,68 @@ pub(crate) fn scope_events(
             ScopeEffectMode::Dynamic => "dynamic",
             ScopeEffectMode::SameRuleText => "sameRuleText",
         };
-        for event in effect.events.iter().filter(|e| e.when == when) {
-            if effect.mode == ScopeEffectMode::SameRuleText
-                && matches!(
-                    event.action,
-                    ScopeEffectEventsAction::Declare | ScopeEffectEventsAction::Use
-                )
-            {
-                if event.action == ScopeEffectEventsAction::Use {
-                    if let Some(site) = &event.capture_site_id {
-                        let declarations = effect
+        let selected: Vec<_> = effect
+            .events
+            .iter()
+            .filter(|e| {
+                e.when == when
+                    && !(effect.mode == ScopeEffectMode::SameRuleText
+                        && e.action == ScopeEffectEventsAction::Declare)
+            })
+            .collect();
+        let sites: Vec<_> = selected
+            .iter()
+            .filter_map(|e| e.capture_site_id.as_ref())
+            .map(|id| g.sites[id.as_str()])
+            .collect();
+        // One traversal for all sites preserves completion order across repeats,
+        // alternatives and nested captures. Action order at the same site is IR order.
+        if !sites.is_empty() {
+            writeln!(s, "for (site,span) in self.scope_captures({events},&{sites:?}) {{ let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;").unwrap();
+            for event in selected.iter().filter(|e| e.capture_site_id.is_some()) {
+                let site = g.sites[event.capture_site_id.as_ref().unwrap().as_str()];
+                if effect.mode != ScopeEffectMode::SameRuleText {
+                    writeln!(s, "if site=={site} {{").unwrap();
+                }
+                if effect.mode == ScopeEffectMode::SameRuleText {
+                    if event.action == ScopeEffectEventsAction::Use {
+                        let declarations: Vec<_> = effect
                             .events
                             .iter()
                             .filter(|d| {
                                 d.action == ScopeEffectEventsAction::Declare && d.name == event.name
                             })
                             .filter_map(|d| d.capture_site_id.as_ref())
-                            .map(|d| g.sites[d.as_str()])
-                            .collect::<Vec<_>>();
-                        writeln!(s,"if let Some(span)=self.scope_capture({events},{}) {{let name=self.text(span);if !{:?}.iter().any(|&site|self.scope_capture({events},site).is_some_and(|s|self.text(s)==name)) {{let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;self.effect(ScanEffect::Diagnostic{{message:format!(\"backreference mismatch: {{name}}\"),offset_cp,len_cp,severity:Severity::Error}});}}}}",g.sites[site.as_str()],declarations).unwrap();
+                            .map(|id| g.sites[id.as_str()])
+                            .collect();
+                        writeln!(s, "if site=={site} && !self.scope_captures({events},&{declarations:?}).iter().any(|(_,s)|self.text(*s)==name) {{self.effect(ScanEffect::Diagnostic{{message:format!(\"backreference mismatch: {{name}}\"),offset_cp,len_cp,severity:Severity::Error}});}}").unwrap();
+                    }
+                } else {
+                    match event.action {
+                        ScopeEffectEventsAction::Declare => writeln!(s,"self.effect_at(ScanEffect::Declare{{name:name.clone(),offset_cp}},{mode:?},offset_cp,len_cp);").unwrap(),
+                        ScopeEffectEventsAction::Use => writeln!(s,"self.effect_at(ScanEffect::Use{{name:name.clone(),offset_cp,len_cp}},{mode:?},offset_cp,len_cp);").unwrap(),
+                        _ => {}
                     }
                 }
-                continue;
-            }
-            match event.action {
-                ScopeEffectEventsAction::Enter => writeln!(
-                    s,
-                    "self.effect_at(ScanEffect::Enter,{mode:?},self.cp({state}.consumed),0);"
-                )
-                .unwrap(),
-                ScopeEffectEventsAction::Leave => writeln!(
-                    s,
-                    "self.effect_at(ScanEffect::Leave,{mode:?},self.cp({state}.consumed),0);"
-                )
-                .unwrap(),
-                ScopeEffectEventsAction::Clear => writeln!(
-                    s,
-                    "self.effect_at(ScanEffect::Clear,{mode:?},self.cp({state}.consumed),0);"
-                )
-                .unwrap(),
-                ScopeEffectEventsAction::Declare | ScopeEffectEventsAction::Use => {
-                    if let Some(site) = &event.capture_site_id {
-                        writeln!(s,"if let Some(span)=self.scope_capture({events},{}) {{let name=self.text(span);let offset_cp=self.cp(span[0]);",g.sites[site.as_str()]).unwrap();
-                    } else {
-                        writeln!(s,"{{let name={:?}.to_owned();let span=[{state}.consumed,{state}.consumed];let offset_cp=self.cp(span[0]);",event.name.as_deref().unwrap_or("")).unwrap();
-                    }
-                    if event.action == ScopeEffectEventsAction::Declare {
-                        writeln!(s,"let len_cp=self.cp(span[1])-offset_cp;self.effect_at(ScanEffect::Declare {{name,offset_cp}},{mode:?},offset_cp,len_cp);}}").unwrap();
-                    } else {
-                        writeln!(s,"let len_cp=self.cp(span[1])-offset_cp;self.effect_at(ScanEffect::Use {{name,offset_cp,len_cp}},{mode:?},offset_cp,len_cp);}}").unwrap();
-                    }
+                if effect.mode != ScopeEffectMode::SameRuleText {
+                    s.push_str("}\n");
                 }
             }
+            s.push_str("let _=(&name,offset_cp,len_cp); }\n");
+        }
+        for event in selected.iter().filter(|e| e.capture_site_id.is_none()) {
+            let action = match event.action {
+                ScopeEffectEventsAction::Enter => "ScanEffect::Enter".to_owned(),
+                ScopeEffectEventsAction::Leave => "ScanEffect::Leave".to_owned(),
+                ScopeEffectEventsAction::Clear => "ScanEffect::Clear".to_owned(),
+                ScopeEffectEventsAction::Declare => format!("ScanEffect::Declare{{name:{:?}.into(),offset_cp:self.cp({state}.consumed)}}",event.name.as_deref().unwrap_or("")),
+                ScopeEffectEventsAction::Use => format!("ScanEffect::Use{{name:{:?}.into(),offset_cp:self.cp({state}.consumed),len_cp:0}}",event.name.as_deref().unwrap_or("")),
+            };
+            writeln!(
+                s,
+                "self.effect_at({action},{mode:?},self.cp({state}.consumed),0);"
+            )
+            .unwrap();
         }
     }
     s

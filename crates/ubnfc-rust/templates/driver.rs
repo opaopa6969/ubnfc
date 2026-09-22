@@ -51,19 +51,33 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     for d in &result.diagnostics {
         let kind = match d.kind {
             DiagnosticKind::Syntax => "syntax",
+            DiagnosticKind::Resource => "resource",
+            DiagnosticKind::Recovery => "recovery",
             DiagnosticKind::TrailingInput => "trailing_input",
             DiagnosticKind::Mapping => {
                 mapping = d.message.to_json();
                 "mapping"
             }
         };
-        diagnostics.push(Json::object([
+        let mut row = Json::object([
             ("kind", kind.to_json()),
             ("offset", d.offset_cp.to_json()),
             ("expected", d.expected.to_json()),
             ("farthestOffset", d.farthest_cp.to_json()),
             ("farthestExpected", d.farthest_expected.to_json()),
-        ]));
+            ("deepestRule", d.deepest_rule.to_json()),
+            ("rulePath", d.rule_path.to_json()),
+        ]);
+        if let Some(id) = d.recovery_id {
+            if let Json::Object(fields) = &mut row {
+                fields.insert("length".into(), d.length_cp.to_json());
+                fields.insert("severity".into(), "ERROR".to_json());
+                fields.insert("origin".into(), "recovery".to_json());
+                fields.insert("ruleId".into(), result.recoveries[id].rule_id.to_json());
+                fields.insert("recoveryId".into(), id.to_json());
+            }
+        }
+        diagnostics.push(row);
     }
     for d in &result.scope_diagnostics {
         let severity = match d.severity {
@@ -90,12 +104,81 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         ("ast", ast),
         ("diagnostics", Json::Array(diagnostics)),
         ("mappingError", mapping),
+        (
+            "recoveredRegions",
+            Json::Array(
+                result
+                    .recoveries
+                    .iter()
+                    .map(|r| {
+                        Json::object([
+                            ("ruleId", r.rule_id.to_json()),
+                            ("mode", r.mode.to_json()),
+                            ("span", r.span.to_json()),
+                            ("syncSpan", r.sync_span.map_or(Json::Null, |s| s.to_json())),
+                            ("captureOccurrenceIds", r.capture_occurrence_ids.to_json()),
+                        ])
+                    })
+                    .collect(),
+            ),
+        ),
         ("value", value),
+        (
+            "catalogs",
+            Json::Array(
+                ubnfc_generated::metadata::CATALOGS
+                    .iter()
+                    .map(|c| {
+                        Json::object([
+                            ("rule", c.rule.to_json()),
+                            ("context", c.context.to_json()),
+                            ("captures", c.captures.to_json()),
+                        ])
+                    })
+                    .collect(),
+            ),
+        ),
+        (
+            "hints",
+            Json::Array(
+                result
+                    .hints
+                    .iter()
+                    .map(|d| {
+                        Json::object([
+                            ("offset", d.offset_cp.to_json()),
+                            ("expected", d.expected.to_json()),
+                            ("deepestRule", d.deepest_rule.to_json()),
+                            ("rulePath", d.rule_path.to_json()),
+                        ])
+                    })
+                    .collect(),
+            ),
+        ),
     ]);
     let Json::Object(fields) = &mut response else {
         unreachable!()
     };
     if lexical {
+        fields.insert(
+            "lexical".into(),
+            Json::Array(
+                result
+                    .lexical
+                    .iter().chain(&result.tokens)
+                    .map(|l| {
+                        Json::object([
+                            ("occurrenceId", l.occurrence_id.to_json()),
+                            ("parentOccurrenceId", l.parent_occurrence_id.to_json()),
+                            ("ruleId", l.rule_id.to_json()),
+                            ("exprId", l.expr_id.to_json()),
+                            ("span", l.span.to_json()),
+                            ("completionOrder", l.completion_order.to_json()),
+                        ])
+                    })
+                    .collect(),
+            ),
+        );
         fields.insert(
             "captures".into(),
             Json::Array(

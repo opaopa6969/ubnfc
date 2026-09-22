@@ -54,6 +54,7 @@ fn memo_growth_collisions_and_every_key_component() {
         table.insert(key, n);
         keys.push(key);
     }
+    assert!(table.max_probe_len() > 0);
     assert_eq!(table.len(), keys.len());
     for (n, &key) in keys.iter().enumerate() {
         assert_eq!(table.get(key), Some(n));

@@ -2,8 +2,10 @@
 mod ast;
 mod driver;
 mod emit;
+mod evaluator;
 mod expressions;
 mod mapping;
+mod metadata;
 mod tokens;
 mod validate;
 
@@ -46,7 +48,14 @@ impl GeneratedCrate {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EmitError {
     InvalidIr(String),
-    Unsupported { feature: String, detail: String },
+    Unsupported {
+        feature: String,
+        detail: String,
+    },
+    ResourceLimit {
+        resource: &'static str,
+        limit: usize,
+    },
 }
 impl fmt::Display for EmitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -55,12 +64,16 @@ impl fmt::Display for EmitError {
             Self::Unsupported { feature, detail } => {
                 write!(f, "unsupported IR feature {feature}: {detail}")
             }
+            Self::ResourceLimit { resource, limit } => {
+                write!(f, "generation resource limit: {resource} ({limit})")
+            }
         }
     }
 }
 impl std::error::Error for EmitError {}
 
 pub fn emit(ir: &GrammarIr, options: &EmitOptions) -> Result<GeneratedCrate, EmitError> {
+    validate::budget(ir)?;
     validate::validate(ir)?;
     emit::generate(ir, options)
 }

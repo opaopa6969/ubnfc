@@ -10,14 +10,7 @@ pub(crate) fn unsupported(feature: &str, detail: impl Into<String>) -> EmitError
 }
 pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
     for feature in &ir.required_features {
-        if matches!(
-            feature,
-            RequiredFeature::Recovery
-                | RequiredFeature::Eval
-                | RequiredFeature::Catalog
-                | RequiredFeature::Typeof
-                | RequiredFeature::LeftRecursionRewrite
-        ) {
+        if matches!(feature, RequiredFeature::LeftRecursionRewrite) {
             return Err(unsupported(
                 serde_json::to_value(feature).unwrap().as_str().unwrap(),
                 "not implemented in this backend",
@@ -47,7 +40,7 @@ pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
     }
     for expr in &ir.semantics.expressions {
         let expected = match expr.node {
-            ExprNode::Seq { .. } => ExecutionTransaction::Once,
+            ExprNode::Seq { .. } | ExprNode::Error { .. } => ExecutionTransaction::Once,
             ExprNode::Choice { .. } => ExecutionTransaction::PerAlternative,
             ExprNode::Repeat { .. } | ExprNode::Optional { .. } => ExecutionTransaction::Occurs,
             ExprNode::Separated { .. } => ExecutionTransaction::Once,
@@ -68,41 +61,22 @@ pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
                 ),
             ));
         }
-        if let ExprNode::Literal {
-            case_sensitive: false,
-            value,
-            ..
-        } = &expr.node
-        {
-            if !value.is_ascii() {
-                return Err(unsupported(
-                    "caseInsensitive.unicode",
-                    "Java simple case folding requires a versioned Unicode table",
-                ));
-            }
-        }
     }
     for token in &ir.semantics.tokens {
-        match &token.spec {
-            TokenSpec::Regex { .. } => {
-                if !ir.plan.lexical.iter().any(|p| {
-                    p.token_id == token.symbol_id
-                        && p.strategy == LexicalPlanStrategy::Dfa
-                        && p.dfa.is_some()
-                }) {
-                    return Err(unsupported(
-                        "regex",
-                        format!(
-                            "{} requires an analyzed DFA; Java Pattern fallback is unavailable",
-                            token.symbol_id
-                        ),
-                    ));
-                }
-            }
-            TokenSpec::CaseInsensitive { word, .. } if !word.is_ascii() => {
-                return Err(unsupported("caseInsensitive.unicode", &token.symbol_id))
-            }
-            _ => {}
+        if matches!(token.spec, TokenSpec::Regex { .. })
+            && !ir.plan.lexical.iter().any(|p| {
+                p.token_id == token.symbol_id
+                    && p.strategy == LexicalPlanStrategy::Dfa
+                    && p.dfa.is_some()
+            })
+        {
+            return Err(unsupported(
+                "regex",
+                format!(
+                    "{} requires an analyzed DFA; Java Pattern fallback is unavailable",
+                    token.symbol_id
+                ),
+            ));
         }
     }
     for plan in &ir.plan.lexical {
@@ -199,20 +173,6 @@ pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
                 }
             }
         }
-        if let AstType::Enum { variants, .. } = ty {
-            let mut variants_seen = BTreeSet::new();
-            let mut literals_seen = BTreeSet::new();
-            for variant in variants {
-                if !variants_seen.insert(crate::ast::ident(&variant.rust_name))
-                    || !literals_seen.insert(&variant.literal)
-                {
-                    return Err(EmitError::InvalidIr(format!(
-                        "duplicate enum name/literal: {}",
-                        ty.id()
-                    )));
-                }
-            }
-        }
     }
     for common in &ir.semantics.common_fields {
         for id in &common.variant_type_ids {
@@ -268,4 +228,53 @@ fn validate_value_type(ty: &ValueType) -> Result<(), EmitError> {
         }
         _ => Ok(()),
     }
+}
+
+// Check nested value types before the shared reference validator recurses into
+// them. Expression reachability itself is iterative in Generator::visit.
+pub(crate) fn budget(ir: &GrammarIr) -> Result<(), EmitError> {
+    let limit = |resource, limit| EmitError::ResourceLimit { resource, limit };
+    if ir.semantics.expressions.len() > 100_000 {
+        return Err(limit("expressions", 100_000));
+    }
+    if ir.semantics.rules.len() > 10_000 {
+        return Err(limit("rules", 10_000));
+    }
+    if ir.semantics.ast_types.len() > 256 {
+        return Err(limit("AST types", 256));
+    }
+    for e in &ir.semantics.expressions {
+        if e.node.children().len() > 256 {
+            return Err(limit("expression children", 256));
+        }
+    }
+    let mut pending = Vec::new();
+    for ty in &ir.semantics.ast_types {
+        if let AstType::Record { fields, .. } = ty {
+            if fields.len() > 256 {
+                return Err(limit("record fields", 256));
+            }
+            pending.extend(fields.iter().map(|f| (&f.value_type, 0)));
+        }
+    }
+    pending.extend(ir.semantics.captures.iter().map(|c| (&c.value_type, 0)));
+    pending.extend(
+        ir.semantics
+            .common_fields
+            .iter()
+            .map(|c| (&c.field.value_type, 0)),
+    );
+    while let Some((ty, depth)) = pending.pop() {
+        if depth >= 64 {
+            return Err(limit("value type depth", 64));
+        }
+        match ty {
+            ValueType::Mixed { members } => pending.extend(members.iter().map(|t| (t, depth + 1))),
+            ValueType::Optional { element } | ValueType::List { element } => {
+                pending.push((element, depth + 1))
+            }
+            _ => {}
+        }
+    }
+    Ok(())
 }

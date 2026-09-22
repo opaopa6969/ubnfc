@@ -10,6 +10,31 @@ pub struct ParseOptions {
     /// Maximum active rule calls; native stack budget may stop earlier.
     pub max_depth: usize,
     pub memo: bool,
+    pub limits: ResourceLimits,
+}
+/// Per-session hard limits, checked before indexing input or retaining data.
+#[derive(Clone, Copy, Debug)]
+pub struct ResourceLimits {
+    pub input_bytes: usize,
+    pub arena_entries: usize,
+    pub diagnostics: usize,
+    pub memo_entries: usize,
+    pub effect_entries: usize,
+    pub effect_bytes: usize,
+    pub mapping_depth: usize,
+}
+impl Default for ResourceLimits {
+    fn default() -> Self {
+        Self {
+            input_bytes: 16 * 1024 * 1024,
+            arena_entries: 2_000_000,
+            diagnostics: 2_000_000,
+            memo_entries: 1_000_000,
+            effect_entries: 1_000_000,
+            effect_bytes: 64 * 1024 * 1024,
+            mapping_depth: 512,
+        }
+    }
 }
 impl Default for ParseOptions {
     fn default() -> Self {
@@ -19,6 +44,7 @@ impl Default for ParseOptions {
             lexical: false,
             max_depth: 10_000,
             memo: true,
+            limits: ResourceLimits::default(),
         }
     }
 }
@@ -51,6 +77,8 @@ pub enum DiagnosticKind {
     Syntax,
     TrailingInput,
     Mapping,
+    Resource,
+    Recovery,
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Diagnostic {
@@ -62,6 +90,8 @@ pub struct Diagnostic {
     pub deepest_rule: Option<&'static str>,
     pub rule_path: Vec<&'static str>,
     pub message: Option<String>,
+    pub recovery_id: Option<usize>,
+    pub length_cp: usize,
 }
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Statistics {
@@ -70,6 +100,7 @@ pub struct Statistics {
     pub memo_entries: usize,
     pub recipes: usize,
     pub ast_nodes: usize,
+    pub memo_max_probe: usize,
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ParseResult {
@@ -78,9 +109,15 @@ pub struct ParseResult {
     pub matched_cp: usize,
     pub ast: Option<Ast>,
     pub captures: Vec<Capture>,
+    /// Rule occurrences, retained for frontend projection compatibility.
     pub lexical: Vec<LexicalOccurrence>,
+    /// Token occurrences; parents address the rule table, IDs follow rule IDs.
+    pub tokens: Vec<LexicalOccurrence>,
     pub node_spans: Vec<NodeSpan>,
     pub diagnostics: Vec<Diagnostic>,
+    /// Local farthest failures, including speculative failures on successful parses.
+    pub hints: Vec<Diagnostic>,
+    pub recoveries: Vec<Recovery>,
     pub declarations: Vec<Decl>,
     pub references: Vec<Reference>,
     pub scope_diagnostics: Vec<ScopeDiagnostic>,
@@ -169,4 +206,14 @@ pub struct ScopeResult {
     /// Grammar modes in declaration order (a grammar may mix lexical and dynamic effects).
     pub mode: Vec<&'static str>,
     pub events: Vec<ScopeEvent>,
+}
+
+/// Adopted recovery regions. The associated typed node is omitted, never fabricated.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Recovery {
+    pub rule_id: &'static str,
+    pub mode: &'static str,
+    pub span: Span,
+    pub sync_span: Option<Span>,
+    pub capture_occurrence_ids: Vec<usize>,
 }

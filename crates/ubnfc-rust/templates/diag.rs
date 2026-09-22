@@ -10,14 +10,25 @@ enum Node {
 }
 pub struct Diagnostics {
     nodes: Vec<(usize, Node)>,
+    limit: usize,
+    pub exhausted: bool,
 }
 impl Diagnostics {
     pub fn new() -> Self {
+        Self::with_limit(2_000_000)
+    }
+    pub fn with_limit(limit: usize) -> Self {
         Self {
             nodes: vec![(0, Node::Empty)],
+            limit: limit.min(u32::MAX as usize),
+            exhausted: false,
         }
     }
     fn push(&mut self, pos: usize, node: Node) -> Diag {
+        if self.nodes.len() >= self.limit {
+            self.exhausted = true;
+            return Diag(0);
+        }
         let id = Diag(self.nodes.len());
         self.nodes.push((pos, node));
         id
@@ -54,34 +65,58 @@ impl Diagnostics {
             return None;
         }
         let mut expected = Vec::new();
-        let mut deepest = Vec::new();
-        let mut path = Vec::new();
+        let mut labels = std::collections::HashSet::new();
+        // Local suffix depth is independent of the caller. Reconnect the chosen
+        // suffix from the root, so a shared node reached by a longer path wins.
+        let mut depths = std::collections::HashMap::<usize, usize>::new();
         let mut stack = vec![(root, false)];
         while let Some((id, leave)) = stack.pop() {
             if leave {
-                path.pop();
+                depths.insert(
+                    id.0,
+                    match self.nodes[id.0].1 {
+                        Node::Join(a, b) => depths[&a.0].max(depths[&b.0]),
+                        Node::Rule(_, child) => depths[&child.0] + 1,
+                        _ => 0usize,
+                    },
+                );
+                continue;
+            }
+            if depths.contains_key(&id.0) {
                 continue;
             }
             match self.nodes[id.0].1 {
-                Node::Empty => {}
+                Node::Empty => {
+                    depths.insert(id.0, 0);
+                }
                 Node::Failure(pos, label) => {
                     debug_assert_eq!(pos, self.nodes[root.0].0);
-                    if !expected.contains(&label) {
+                    if labels.insert(label) {
                         expected.push(label);
                     }
-                    if path.len() > deepest.len() {
-                        deepest.clone_from(&path);
-                    }
+                    depths.insert(id.0, 0);
                 }
                 Node::Join(a, b) => {
+                    stack.push((id, true));
                     stack.push((b, false));
                     stack.push((a, false));
                 }
-                Node::Rule(rule, child) => {
-                    path.push(rule);
+                Node::Rule(_, child) => {
                     stack.push((id, true));
                     stack.push((child, false));
                 }
+            }
+        }
+        let mut deepest = Vec::new();
+        let mut id = root;
+        loop {
+            match self.nodes[id.0].1 {
+                Node::Join(a, b) => id = if depths[&a.0] >= depths[&b.0] { a } else { b },
+                Node::Rule(rule, child) => {
+                    deepest.push(rule);
+                    id = child;
+                }
+                _ => break,
             }
         }
         Some((self.nodes[root.0].0, expected, deepest))

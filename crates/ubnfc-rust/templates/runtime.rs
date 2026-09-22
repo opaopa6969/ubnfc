@@ -11,6 +11,13 @@ pub(crate) struct EventId(pub usize);
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Event {
     Empty,
+    Recovery {
+        rule: usize,
+        mode: &'static str,
+        span: Span,
+        sync_span: Option<Span>,
+        diag: Diag,
+    },
     Join(EventId, EventId),
     Capture {
         site: usize,
@@ -23,6 +30,8 @@ pub(crate) enum Event {
         child: EventId,
     },
     Token {
+        expr: usize,
+        rule: usize,
         span: Span,
     },
 }
@@ -108,25 +117,33 @@ pub(crate) struct Session<'a> {
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
+    pub resource_failure: Option<(usize, &'static str)>,
+    effect_work: usize,
+    effect_bytes: usize,
+    mapping_depth: usize,
+    mapping_anchor: Option<usize>,
 }
 impl<'a> Session<'a> {
     pub fn new(text: &'a str, options: ParseOptions, scanner: &'a mut dyn TokenScanner) -> Self {
+        let rejected = text.len() > options.limits.input_bytes.min(u32::MAX as usize);
+        let text = if rejected { "" } else { text };
         Self {
             text,
             input: Input::new(text),
             options,
             scanner,
             arena: {
-                let mut arena =
-                    Vec::with_capacity(if options.build_ast || options.lexical || HAS_SCOPE {
+                let mut arena = Vec::with_capacity(
+                    if options.build_ast || options.lexical || HAS_SCOPE || HAS_RECOVERY {
                         text.len().saturating_mul(8).saturating_add(8).min(32768)
                     } else {
                         1
-                    });
+                    },
+                );
                 arena.push(Event::Empty);
                 arena
             },
-            diag: Diagnostics::new(),
+            diag: Diagnostics::with_limit(options.limits.diagnostics),
             memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
@@ -137,6 +154,11 @@ impl<'a> Session<'a> {
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
+            resource_failure: rejected.then_some((0, "input byte budget exceeded")),
+            effect_work: 0,
+            effect_bytes: 0,
+            mapping_depth: 0,
+            mapping_anchor: None,
         }
     }
     // Rust cannot recover from native stack overflow. Stop before consuming the
@@ -144,6 +166,13 @@ impl<'a> Session<'a> {
     // Check expressions too: one rule may contain a deeply nested expression tree.
     #[inline(never)]
     pub fn limit(&mut self, state: State) -> Option<Step> {
+        if self.diag.exhausted {
+            self.resource_failure
+                .get_or_insert((state.consumed, "diagnostic budget exceeded"));
+        }
+        if let Some((offset, label)) = self.resource_failure {
+            return Some(self.fail(state, offset, label));
+        }
         let frame = 0u8;
         let address = std::ptr::addr_of!(frame) as usize;
         let anchor = *self.stack_anchor.get_or_insert(address);
@@ -187,6 +216,19 @@ impl<'a> Session<'a> {
     }
     pub fn save_effects(&mut self, mark: Mark) -> Span {
         let start = self.saved_effects.len();
+        let count = self.effects.len() - mark.effects;
+        let bytes = self.effects[mark.effects..]
+            .iter()
+            .map(Self::effect_size)
+            .sum::<usize>();
+        if start.saturating_add(count) > self.options.limits.effect_entries.min(u32::MAX as usize)
+            || self.effect_bytes.saturating_add(bytes) > self.options.limits.effect_bytes
+        {
+            self.resource_failure
+                .get_or_insert((0, "saved effect budget exceeded"));
+            return [0, 0];
+        }
+        self.effect_bytes += bytes;
         self.saved_effects
             .extend_from_slice(&self.effects[mark.effects..]);
         [start, self.saved_effects.len()]
@@ -202,6 +244,13 @@ impl<'a> Session<'a> {
             );
         }
     }
+    fn effect_size(effect: &Effect) -> usize {
+        match &effect.value {
+            ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. } => name.len(),
+            ScanEffect::Diagnostic { message, .. } => message.len(),
+            _ => 0,
+        }
+    }
     pub fn effect(&mut self, effect: ScanEffect) {
         self.effect_at(effect, "lexical", 0, 0);
     }
@@ -212,6 +261,29 @@ impl<'a> Session<'a> {
         offset_cp: usize,
         length_cp: usize,
     ) {
+        if self.effect_work
+            >= self
+                .options
+                .limits
+                .effect_entries
+                .min(u32::MAX as usize - 1)
+        {
+            self.resource_failure
+                .get_or_insert((0, "effect budget exceeded"));
+            return;
+        }
+        let size = match &effect {
+            ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. } => name.len(),
+            ScanEffect::Diagnostic { message, .. } => message.len(),
+            _ => 0,
+        };
+        if self.effect_bytes.saturating_add(size) > self.options.limits.effect_bytes {
+            self.resource_failure
+                .get_or_insert((0, "effect byte budget exceeded"));
+            return;
+        }
+        self.effect_work += 1;
+        self.effect_bytes += size;
         match &effect {
             ScanEffect::Diagnostic {
                 message,
@@ -258,7 +330,12 @@ impl<'a> Session<'a> {
         Some(saved.step())
     }
     pub fn store(&mut self, key: Key, step: Step, mark: Mark) {
-        if !self.options.memo || self.depth_failure.is_some() {
+        if !self.options.memo || self.depth_failure.is_some() || self.resource_failure.is_some() {
+            return;
+        }
+        if self.memo.len() >= self.options.limits.memo_entries.min(u32::MAX as usize - 1) {
+            self.resource_failure
+                .get_or_insert((step.state.consumed, "memo budget exceeded"));
             return;
         }
         let effects = if step.ok {
@@ -269,7 +346,12 @@ impl<'a> Session<'a> {
         self.memo.insert(key, Saved::new(step, effects));
     }
     pub fn event(&mut self, event: Event) -> EventId {
-        if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE {
+        if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE && !HAS_RECOVERY {
+            return EventId(0);
+        }
+        if self.arena.len() >= self.options.limits.arena_entries.min(u32::MAX as usize) {
+            self.resource_failure
+                .get_or_insert((0, "arena budget exceeded"));
             return EventId(0);
         }
         let id = EventId(self.arena.len());
@@ -326,6 +408,8 @@ impl<'a> Session<'a> {
                 state.advance::<MATCH>(length);
                 let mut step = Step::yes(state);
                 step.events = self.event(Event::Token {
+                    expr: usize::MAX,
+                    rule: usize::MAX,
                     span: [start, start + length],
                 });
                 step
@@ -354,13 +438,7 @@ impl<'a> Session<'a> {
                     ok = false;
                     break;
                 };
-                let actual = match actual {
-                    '\u{130}' | '\u{131}' => 'i',
-                    '\u{17f}' => 's',
-                    '\u{212a}' => 'k',
-                    c => c.to_ascii_lowercase(),
-                };
-                if actual != expected.to_ascii_lowercase() {
+                if !super::rt::input::equal_ignore_case(actual, expected) {
                     ok = false;
                     break;
                 }
@@ -534,6 +612,8 @@ impl<'a> Session<'a> {
                 self.effect(effect);
             }
             step.events = self.event(Event::Token {
+                expr: usize::MAX,
+                rule: usize::MAX,
                 span: result.value_span,
             });
         } else {
@@ -578,24 +658,154 @@ impl<'a> Session<'a> {
                     stack.push(a);
                 }
                 Event::Capture { child, .. } => stack.push(child),
-                Event::Rule { span: child, .. } | Event::Token { span: child } => {
+                Event::Rule { span: child, .. } | Event::Token { span: child, .. } => {
                     span = Some(span.map_or(child, |s: Span| [s[0], child[1]]));
                 }
                 Event::Empty => {}
+                Event::Recovery { span: child, .. } => {
+                    span = Some(span.map_or(child, |s: Span| [s[0], child[1]]));
+                }
             }
         }
         span.unwrap_or(fallback)
     }
+    pub fn significant_end(&self, root: EventId) -> Option<usize> {
+        let mut stack = vec![root];
+        while let Some(id) = stack.pop() {
+            match self.arena[id.0] {
+                Event::Join(a, b) => {
+                    stack.push(a);
+                    stack.push(b);
+                }
+                Event::Rule { child, .. } | Event::Capture { child, .. } => stack.push(child),
+                Event::Token { span, .. } => return Some(span[1]),
+                _ => {}
+            }
+        }
+        None
+    }
+    pub fn has_recovery(&self, root: EventId) -> bool {
+        let mut stack = vec![root];
+        while let Some(id) = stack.pop() {
+            match self.arena[id.0] {
+                Event::Recovery { .. } => return true,
+                Event::Join(a, b) => {
+                    stack.push(b);
+                    stack.push(a);
+                }
+                Event::Capture { child, .. } | Event::Rule { child, .. } => stack.push(child),
+                _ => {}
+            }
+        }
+        false
+    }
+    pub fn directly_recovered(&self, mut root: EventId) -> bool {
+        loop {
+            match self.arena[root.0] {
+                Event::Recovery { .. } => return true,
+                Event::Capture { child, .. } => root = child,
+                _ => return false,
+            }
+        }
+    }
+    pub fn field_missing(&self, root: EventId, sites: &[usize]) -> bool {
+        self.owned_captures(root, sites)
+            .iter()
+            .any(|(_, child)| self.has_recovery(*child))
+    }
+    pub fn recover<const MATCH: bool>(
+        &mut self,
+        state: State,
+        failed: Step,
+        rule: usize,
+        mode: &'static str,
+        patterns: &[&str],
+    ) -> Step {
+        if self.depth_failure.is_some() || self.resource_failure.is_some() || self.diag.exhausted {
+            return failed;
+        }
+        let start = state.position::<MATCH>();
+        let mut end = start;
+        let mut sync_span = None;
+        if mode == "SKIP" && patterns.is_empty() {
+            end += self.input.cp_at(start).map_or(0, |(_, n)| n);
+        } else {
+            let fallback = mode == "AUTO" && patterns.is_empty();
+            let patterns = if fallback { &[";"][..] } else { patterns };
+            while let Some((_, n)) = self.input.cp_at(end) {
+                if let Some(sync) = patterns
+                    .iter()
+                    .find(|s| !s.is_empty() && self.input.starts_with(end, s))
+                {
+                    sync_span = Some([end, end + sync.len()]);
+                    if mode == "SYNC" || fallback {
+                        end += sync.len();
+                    }
+                    break;
+                }
+                end += n;
+            }
+            if sync_span.is_none() && mode != "SKIP" {
+                return failed;
+            }
+            if mode == "SKIP" && end == start {
+                end += self.input.cp_at(start).map_or(0, |(_, n)| n);
+            }
+        }
+        if end <= start {
+            return failed;
+        }
+        let mut child = state.begin();
+        child.advance::<MATCH>(end - start);
+        let diag = self.diag.rule(rule, failed.diag);
+        let events = self.event(Event::Recovery {
+            rule,
+            mode,
+            span: [start, end],
+            sync_span,
+            diag,
+        });
+        Step {
+            ok: true,
+            state: state.commit(child),
+            events,
+            diag: failed.diag,
+        }
+    }
     pub fn field_text(&self, root: EventId, sites: &[usize]) -> Vec<String> {
         self.owned_captures(root, sites)
             .into_iter()
+            .filter(|(_, child)| !self.directly_recovered(*child))
             .map(|(span, _)| self.text(span))
             .collect()
     }
-    pub fn scope_capture(&self, root: EventId, site: usize) -> Option<Span> {
-        self.owned_captures(root, &[site])
-            .last()
-            .map(|(span, _)| *span)
+    pub fn scope_captures(&self, root: EventId, sites: &[usize]) -> Vec<(usize, Span)> {
+        let mut out = Vec::new();
+        let mut stack = vec![(root, false)];
+        while let Some((id, done)) = stack.pop() {
+            match self.arena[id.0] {
+                Event::Join(a, b) => {
+                    stack.push((b, false));
+                    stack.push((a, false));
+                }
+                Event::Capture { site, span, child } => {
+                    if done {
+                        if sites.contains(&site) {
+                            let text = &self.text[span[0]..span[1]];
+                            let leading =
+                                text.len() - text.trim_start_matches(|c: char| c <= '\u{20}').len();
+                            let len = text.trim_matches(|c: char| c <= '\u{20}').len();
+                            out.push((site, [span[0] + leading, span[0] + leading + len]));
+                        }
+                    } else {
+                        stack.push((id, true));
+                        stack.push((child, false));
+                    }
+                }
+                _ => {}
+            }
+        }
+        out
     }
     pub fn node(&mut self, rule: &'static str, name: &'static str, span: Span) -> usize {
         let id = self.node_spans.len();

@@ -200,7 +200,8 @@ fn generated_crates_build_offline_and_match_all_golden() {
 #[test]
 fn unsupported_features_are_named_and_invalid_ir_is_rejected() {
     use ubnfc_front::ir::RequiredFeature::*;
-    for f in [Recovery, Eval, Catalog, Typeof, LeftRecursionRewrite] {
+    {
+        let f = LeftRecursionRewrite;
         let mut ir = tiny();
         ir.required_features.push(f);
         let error = emit(&ir, &Default::default()).unwrap_err().to_string();
@@ -238,7 +239,7 @@ fn cli_writes_the_same_modules_and_names_errors() {
     }
     let mut ir = tiny();
     ir.required_features
-        .push(ubnfc_front::ir::RequiredFeature::Recovery);
+        .push(ubnfc_front::ir::RequiredFeature::LeftRecursionRewrite);
     fs::write(&path, serde_json::to_string(&ir).unwrap()).unwrap();
     let result = Command::new(env!("CARGO_BIN_EXE_ubnfc-rust"))
         .arg("--ir")
@@ -248,5 +249,5 @@ fn cli_writes_the_same_modules_and_names_errors() {
         .output()
         .unwrap();
     assert!(!result.status.success());
-    assert!(String::from_utf8_lossy(&result.stderr).contains("recovery"));
+    assert!(String::from_utf8_lossy(&result.stderr).contains("leftRecursionRewrite"));
 }
