@@ -57,11 +57,11 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             TokenSpec::Eof{}=>writeln!(s,"self.eof::<MATCH>(state,label)").unwrap(),
             TokenSpec::Empty{}=>s.push_str("self.empty(state)\n"),
             TokenSpec::Until{terminator,..}=>writeln!(s,"self.until::<MATCH>(state,{terminator:?},{:?})",format!("'{terminator}'")).unwrap(),
-            TokenSpec::CaseInsensitive{word,..}=>writeln!(s,"self.literal::<MATCH>(state,{word:?},false,label)").unwrap(),
+            TokenSpec::CaseInsensitive{word,..}=>writeln!(s,"self.literal::<MATCH>(state,{word:?},false,u32::MAX,label)").unwrap(),
             TokenSpec::CharRange{min,max}=>writeln!(s,"let length=self.input.cp_at(state.position::<MATCH>()).filter(|(c,_)|({min}..={max}).contains(&(*c as u64))).map(|(_,n)|n);self.primitive::<MATCH>(state,length,label)").unwrap(),
             TokenSpec::Negation{excluded}=>writeln!(s,"let length=self.input.cp_at(state.position::<MATCH>()).filter(|(c,_)|!{excluded:?}.contains(*c)).map(|(_,n)|n);self.primitive::<MATCH>(state,length,label)").unwrap(),
             TokenSpec::Lookahead{pattern}|TokenSpec::NegativeLookahead{pattern}=>{
-                if pattern.is_empty() { s.push_str("let child=self.fail(state.begin(),state.begin().matched,label);\n"); } else { writeln!(s,"let child=self.literal::<true>(state.begin(),{pattern:?},true,label);").unwrap(); }
+                if pattern.is_empty() { s.push_str("let child=self.fail(state.begin(),state.begin().matched,label);\n"); } else { writeln!(s,"let child=self.literal::<true>(state.begin(),{pattern:?},true,{},label);",g.lexicon.id(pattern,true)).unwrap(); }
                 if matches!(t.spec,TokenSpec::NegativeLookahead{..}) {writeln!(s,"if child.ok {{self.fail(state,state.matched,label)}} else {{Step::yes(state.commit(state.begin()))}}").unwrap();}
                 else {s.push_str("Step {state:if child.ok {state.commit(child.state)} else {state},events:EventId(0),..child}\n");}
             },
@@ -158,7 +158,10 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             .unwrap();
             continue;
         }
-        writeln!(s,"fn skip_{i}<const MATCH:bool>(&self,state:State)->State {{let mut out=state;loop {{let before=out.position::<MATCH>();").unwrap();
+        // 診断を記録しない読み飛ばしは (policy, 位置, mode) だけの関数なので、位置で直接引ける
+        // 表に入れる（`next_non_trivia`）。policy は区切り集合で正規化する。
+        let canonical = crate::predict::canonical_policies(g.ir)[i];
+        writeln!(s,"fn skip_{i}<const MATCH:bool>(&self,state:State)->State {{let origin=state.position::<MATCH>();\nif self.lex_enabled {{if let Some((dc,dm))=self.trivia_skip.get({canonical},MATCH,origin) {{\nif dc==u32::MAX {{return state;}}\nlet mut hit=state;if MATCH {{hit.matched=origin+dm as usize;}} else {{hit.consumed=origin+dc as usize;hit.matched=origin+dm as usize;}}\nreturn hit;}}}}\nlet mut out=state;loop {{let before=out.position::<MATCH>();").unwrap();
         if let Some(bytes) = crate::predict::trivia_first_bytes(p) {
             let pattern = bytes
                 .iter()
@@ -182,7 +185,8 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             }
             s.push_str("}\n");
         }
-        s.push_str("if out.position::<MATCH>()==before {break;}}\nout}\n");
+        // u32::MAX は「1 文字も進まない」の番兵（出力 State は入力 State そのもの）。
+        writeln!(s,"if out.position::<MATCH>()==before {{break;}}}}\nif self.lex_enabled {{\nif out.position::<MATCH>()==origin {{self.trivia_skip.insert({canonical},MATCH,origin,(u32::MAX,0));}}\nelse if let (Ok(dc),Ok(dm))=(u32::try_from(out.consumed.saturating_sub(origin)),u32::try_from(out.matched.saturating_sub(origin))) {{\nif dc!=u32::MAX {{self.trivia_skip.insert({canonical},MATCH,origin,(dc,dm));}}}}}}\nout}}").unwrap();
     }
     Ok(s)
 }

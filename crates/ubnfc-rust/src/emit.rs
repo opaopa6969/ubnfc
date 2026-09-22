@@ -22,6 +22,8 @@ pub(crate) struct Generator<'a> {
     pub prediction: crate::predict::Prediction,
     /// 生成する失敗再生関数 `guard_e{i}_{mode}` の集合。
     pub guards: BTreeSet<(usize, bool)>,
+    /// 統合 DFA に入れる literal 終端と、その id（lexical.rs）。
+    pub lexicon: crate::lexical::Lexicon,
 }
 impl<'a> Generator<'a> {
     pub fn new(ir: &'a GrammarIr) -> Self {
@@ -65,6 +67,7 @@ impl<'a> Generator<'a> {
                 sizes: Vec::new(),
             },
             guards: BTreeSet::new(),
+            lexicon: crate::lexical::Lexicon::new(ir),
         };
         g.bodies = ir
             .semantics
@@ -231,17 +234,19 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
     files.insert("metadata.rs".into(), crate::metadata::generate(ir));
     files.insert("evaluator.rs".into(), crate::evaluator::generate(ir)?);
     let mut runtime = include_str!("../templates/runtime.rs").to_owned();
+    runtime.push_str(&crate::lexical::generate(&g));
     runtime.push_str(&crate::mapping::generate(&g)?);
     files.insert("runtime.rs".into(), runtime);
     files.insert(
         "rt/mod.rs".into(),
-        "pub mod cursor;\npub mod input;\npub mod memo;\npub mod diag;\npub mod scope;\n".into(),
+        "pub mod cursor;\npub mod input;\npub mod memo;\npub mod diag;\npub mod lexcache;\npub mod scope;\n".into(),
     );
     for (name, text) in [
         ("cursor", include_str!("../templates/cursor.rs")),
         ("input", include_str!("../templates/input.rs")),
         ("memo", include_str!("../templates/memo.rs")),
         ("diag", include_str!("../templates/diag.rs")),
+        ("lexcache", include_str!("../templates/lexcache.rs")),
         ("scope", include_str!("../templates/scope.rs")),
     ] {
         files.insert(format!("rt/{name}.rs"), text.into());

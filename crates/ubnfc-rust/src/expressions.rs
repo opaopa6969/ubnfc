@@ -264,7 +264,8 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         } => {
             writeln!(
                 s,
-                "out=self.literal::<{mode}>(out.state,{value:?},{case_sensitive},{label:?});"
+                "out=self.literal::<{mode}>(out.state,{value:?},{case_sensitive},{},{label:?});",
+                g.lexicon.id(value, *case_sensitive)
             )
             .unwrap();
         }
