@@ -19,6 +19,16 @@ impl Shape {
         self
     }
 }
+/// 量指定子が一度の成功解析で共存させる出現の個数。`{1}` は 1 個・`{0,1}` は 0/1 個で、
+/// List になるのは上限が 2 以上のときだけ（`docs/nested-capture-migration.md`）。
+pub(super) fn quantifier_count(atom: &A) -> Cardinality {
+    match atom {
+        A::Optional { .. } => Cardinality::Optional,
+        A::Bounded { min, max, .. } => Cardinality::quantified(*min, *max),
+        A::Repeat { .. } | A::OneOrMore { .. } | A::Separated { .. } => Cardinality::List,
+        _ => Cardinality::Scalar,
+    }
+}
 fn join_count(a: Cardinality, b: Cardinality) -> Cardinality {
     if a == Cardinality::List || b == Cardinality::List {
         Cardinality::List
@@ -83,14 +93,7 @@ fn body_captures(cx: &Context<'_>, body: &ResolvedBody, semantic: bool) -> BTree
                     let shape = if semantic {
                         captured(cx, &e.atom)
                     } else {
-                        Shape::text().wrap(match &e.atom {
-                            A::Optional { .. } => Cardinality::Optional,
-                            A::Repeat { .. }
-                            | A::OneOrMore { .. }
-                            | A::Bounded { .. }
-                            | A::Separated { .. } => Cardinality::List,
-                            _ => Cardinality::Scalar,
-                        })
+                        Shape::text().wrap(quantifier_count(&e.atom))
                     };
                     add(&mut out, name.clone(), shape, true);
                 }
@@ -126,9 +129,8 @@ fn atom_captures(cx: &Context<'_>, atom: &A, semantic: bool) -> BTreeMap<String,
         A::Group { body, .. } => (body_captures(cx, body, semantic), Cardinality::Scalar),
         A::Optional { body, .. } => (body_captures(cx, body, semantic), Cardinality::Optional),
         A::Repeat { body, .. } => (body_captures(cx, body, semantic), Cardinality::List),
-        A::OneOrMore { body, .. } | A::Bounded { body, .. } => {
-            (atom_captures(cx, body, semantic), Cardinality::List)
-        }
+        A::OneOrMore { body, .. } => (atom_captures(cx, body, semantic), Cardinality::List),
+        A::Bounded { body, .. } => (atom_captures(cx, body, semantic), quantifier_count(atom)),
         A::Separated {
             element, separator, ..
         } => {
@@ -146,12 +148,26 @@ fn atom_captures(cx: &Context<'_>, atom: &A, semantic: bool) -> BTreeMap<String,
     out
 }
 pub(super) fn captured(cx: &Context<'_>, atom: &A) -> Shape {
+    captured_at(cx, atom, true)
+}
+/// `site` は capture が直接貼られた原子。そこの量指定子は出現回数そのものなので必ず数える。
+/// 内側の量指定子は**意味値**の個数だけを増やす。text だけの領域は何回繰り返しても
+/// 一致範囲全体で一つの値なので増えない（`shape_atom` と同じ規則）。
+fn captured_at(cx: &Context<'_>, atom: &A, site: bool) -> Shape {
+    let wrap = |shape: Shape, count| {
+        if site {
+            shape.wrap(count)
+        } else {
+            semantic_wrap(shape, count)
+        }
+    };
     match atom {
-        A::Optional { body, .. } => capture_body(cx, body).wrap(Cardinality::Optional),
-        A::Repeat { body, .. } => capture_body(cx, body).wrap(Cardinality::List),
-        A::OneOrMore { body, .. }
-        | A::Bounded { body, .. }
-        | A::Separated { element: body, .. } => captured(cx, body).wrap(Cardinality::List),
+        A::Optional { body, .. } => wrap(capture_body(cx, body), Cardinality::Optional),
+        A::Repeat { body, .. } => wrap(capture_body(cx, body), Cardinality::List),
+        A::Bounded { body, .. } => wrap(captured_at(cx, body, false), quantifier_count(atom)),
+        A::OneOrMore { body, .. } | A::Separated { element: body, .. } => {
+            wrap(captured_at(cx, body, false), Cardinality::List)
+        }
         A::Ref { symbol, .. } => {
             if let Some(token) = cx
                 .grammar
@@ -183,7 +199,7 @@ pub(super) fn captured(cx: &Context<'_>, atom: &A) -> Shape {
 fn capture_body(cx: &Context<'_>, body: &ResolvedBody) -> Shape {
     if let [seq] = body.alternatives.as_slice() {
         if let [e] = seq.as_slice() {
-            return captured(cx, &e.atom);
+            return captured_at(cx, &e.atom, false);
         }
     }
     shape_body(cx, body, &mut BTreeSet::new())
@@ -218,9 +234,10 @@ fn shape_atom(cx: &Context<'_>, atom: &A, visiting: &mut BTreeSet<r::SymbolId>) 
             semantic_wrap(shape_body(cx, body, visiting), Cardinality::Optional)
         }
         A::Repeat { body, .. } => semantic_wrap(shape_body(cx, body, visiting), Cardinality::List),
-        A::OneOrMore { body, .. }
-        | A::Bounded { body, .. }
-        | A::Separated { element: body, .. } => {
+        A::Bounded { body, .. } => {
+            semantic_wrap(shape_atom(cx, body, visiting), quantifier_count(atom))
+        }
+        A::OneOrMore { body, .. } | A::Separated { element: body, .. } => {
             semantic_wrap(shape_atom(cx, body, visiting), Cardinality::List)
         }
         _ => Shape::text(),

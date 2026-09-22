@@ -196,13 +196,20 @@ fn compile_parsed_with_strict(
         analysis::analyze(&lowered.semantics).map_err(PipelineError::Analysis)?;
     analysis::attach_regex_plans(&mut lowered.semantics, &plan);
     for recovery in &mut lowered.semantics.recovery {
-        if recovery.mode == RecoveryMode::Auto {
-            recovery.resolved_sync_patterns = analysis
+        if matches!(recovery.mode, RecoveryMode::Auto | RecoveryMode::Skip) {
+            let follow = analysis
                 .rules
                 .iter()
                 .find(|r| r.rule_id == recovery.rule_id)
                 .and_then(|r| r.follow_sync_patterns.clone())
-                .ok_or_else(|| internal("/semantics/recovery", "AUTO の FOLLOW がありません"))?;
+                .ok_or_else(|| {
+                    internal("/semantics/recovery", "AUTO / SKIP の FOLLOW がありません")
+                })?;
+            // design §3.10: AUTO の同期集合は FOLLOW。空なら既定の `;` に落とすが、
+            // それは外側が待っている字句ではないので SYNC と同じく消費する。
+            let fallback = follow.is_empty() && recovery.mode == RecoveryMode::Auto;
+            recovery.resolved_sync_patterns = if fallback { vec![";".into()] } else { follow };
+            recovery.consume_sync = recovery.consume_sync || fallback;
         }
     }
     let entry = lowered.entries.pop().ok_or_else(|| {

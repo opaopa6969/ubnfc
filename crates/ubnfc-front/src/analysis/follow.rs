@@ -5,7 +5,13 @@ use std::collections::{BTreeMap, BTreeSet};
 /// FOLLOW は文字クラスと独立した、文法に書かれた終端文字列の有限集合。
 /// opaque token の spelling は捏造しない。EOF は同期文字列ではない。
 pub(super) fn compute(cx: &Context<'_>) -> BTreeMap<String, Vec<String>> {
-    if !cx.sem.recovery.iter().any(|r| r.mode == RecoveryMode::Auto) {
+    // AUTO と SKIP はどちらも FOLLOW を同期集合に使う（design §3.10）。
+    if !cx
+        .sem
+        .recovery
+        .iter()
+        .any(|r| matches!(r.mode, RecoveryMode::Auto | RecoveryMode::Skip))
+    {
         return BTreeMap::new();
     }
     let mut first = vec![BTreeSet::<String>::new(); cx.sem.expressions.len()];
@@ -136,12 +142,11 @@ pub(super) fn compute(cx: &Context<'_>) -> BTreeMap<String, Vec<String>> {
     cx.sem
         .recovery
         .iter()
-        .filter(|r| r.mode == RecoveryMode::Auto)
+        .filter(|r| matches!(r.mode, RecoveryMode::Auto | RecoveryMode::Skip))
         .map(|r| {
-            let mut patterns: Vec<_> = follow[cx.body(&r.rule_id)].iter().cloned().collect();
-            if patterns.is_empty() {
-                patterns.push(";".into());
-            }
+            // ここは FOLLOW そのもの。空の AUTO へ既定同期文字列を入れるのは
+            // 回復の方針なので pipeline 側で行う（analysis は文法の事実だけを持つ）。
+            let patterns: Vec<_> = follow[cx.body(&r.rule_id)].iter().cloned().collect();
             (r.rule_id.clone(), patterns)
         })
         .collect()

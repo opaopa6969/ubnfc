@@ -22,6 +22,6 @@ PY
 cargo run -q --bin ubnfc -- ir --grammar "$m3_scratch/NAME.ubnf" > "$m3_scratch/NAME.ir.json"
 ```
 
-AUTO/SKIP の fixture は front の旧 SYNC lowering もそのまま保存する。
-backend は legacyMarker と注釈の組合せに限定して mode と literal FOLLOW を補正する。
-`M3RecoveryTest` は明示 AUTO/SKIP の IR も別に作り、補正に依存しない実行経路を検証する。
+AUTO/SKIP の fixture は front が宣言どおりの mode・FOLLOW・`consumeSync` を載せた IR
+（2026-09-23 の A-1 修正以降）。backend 側の mode 補正は廃止したので、ここが正本である。
+`M3RecoveryTest` は明示 AUTO/SKIP の IR も別に作り、FOLLOW が空のときの経路も検証する。

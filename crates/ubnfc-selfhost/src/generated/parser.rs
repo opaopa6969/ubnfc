@@ -5877,6 +5877,7 @@ out
 }
 fn guard_e27_c(&mut self,state:State)->Step {
 if !self.can_replay(2) {return self.e27_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.e332_c(t1).diag;
@@ -5888,6 +5889,7 @@ Step {ok:false,state,events:EventId(0),diag:d4}
 }
 fn guard_e28_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e28_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"{");
@@ -5898,6 +5900,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e46_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e46_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"UNTIL");
@@ -5908,6 +5911,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e47_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e47_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"NEGATION");
@@ -5918,6 +5922,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e48_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e48_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"LOOKAHEAD");
@@ -5928,6 +5933,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e49_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e49_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"NEGATIVE_LOOKAHEAD");
@@ -5938,6 +5944,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e50_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e50_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"CHAR_RANGE");
@@ -5948,6 +5955,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e51_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e51_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"CI");
@@ -5958,6 +5966,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e52_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e52_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"REGEX");
@@ -5968,6 +5977,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e53_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e53_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"ANY");
@@ -5978,6 +5988,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e54_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e54_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"EOF");
@@ -5988,6 +5999,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e55_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e55_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"EMPTY");
@@ -5998,6 +6010,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e56_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e56_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.e332_c(t1).diag;
@@ -6007,6 +6020,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e108_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e108_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@root");
@@ -6017,6 +6031,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e109_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e109_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@mapping");
@@ -6027,6 +6042,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e110_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e110_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@eval");
@@ -6037,6 +6053,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e111_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e111_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@whitespace");
@@ -6047,6 +6064,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e112_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e112_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@interleave");
@@ -6057,6 +6075,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e113_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e113_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@backref");
@@ -6067,6 +6086,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e114_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e114_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@scopeTree");
@@ -6077,6 +6097,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e115_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e115_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@declares");
@@ -6087,6 +6108,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e116_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e116_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@catalog");
@@ -6097,6 +6119,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e117_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e117_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@leftAssoc");
@@ -6107,6 +6130,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e118_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e118_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@rightAssoc");
@@ -6117,6 +6141,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e119_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e119_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@longestChoice");
@@ -6127,6 +6152,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e120_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e120_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@predictiveChoice");
@@ -6137,6 +6163,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e121_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e121_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@precedence");
@@ -6147,6 +6174,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e122_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e122_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@doc");
@@ -6157,6 +6185,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e123_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e123_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@recovery");
@@ -6167,6 +6196,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e124_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e124_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@skip");
@@ -6177,6 +6207,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e125_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e125_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@commonField");
@@ -6187,6 +6218,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e126_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e126_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@enum");
@@ -6197,6 +6229,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e127_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e127_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"@");
@@ -6207,6 +6240,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e229_c(&mut self,state:State)->Step {
 if !self.can_replay(0) {return self.e229_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"sync");
@@ -6216,6 +6250,7 @@ Step {ok:false,state,events:EventId(0),diag:d2}
 }
 fn guard_e295_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e295_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"(");
@@ -6226,6 +6261,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e296_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e296_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"[");
@@ -6236,6 +6272,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e297_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e297_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"{");
@@ -6246,6 +6283,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e298_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e298_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.diag.fail(t1.position::<false>(),"ERROR");
@@ -6256,6 +6294,7 @@ Step {ok:false,state,events:EventId(0),diag:d3}
 }
 fn guard_e299_c(&mut self,state:State)->Step {
 if !self.can_replay(1) {return self.e299_c(state);}
+if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}
 self.display.reach(state.consumed.max(state.matched));
 let t1=self.trivia_0::<false>(state.entered(true,true)).state;
 let d2=self.e319_c(t1).diag;
