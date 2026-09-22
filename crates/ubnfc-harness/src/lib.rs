@@ -2,6 +2,7 @@
 pub mod canonical;
 pub mod corpus;
 pub mod divergence;
+pub mod runall;
 pub mod runner;
 
 pub use corpus::{Case, CorpusFile, Expectation, Family, GrammarSource, LoadError};
