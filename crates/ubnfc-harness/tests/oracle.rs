@@ -103,7 +103,20 @@ fn all_63_variants_and_168_cases_keep_their_measured_counts_and_stages() {
         count.0 += 1;
         count.1 += file.cases.len();
         for case in &file.cases {
-            match &case.expect {
+            let expect = match &case.expect {
+                Expectation::ExpectedRejection {
+                    original,
+                    stage,
+                    code,
+                    ..
+                } => {
+                    assert_eq!(case.id, "import-cycle/1");
+                    assert_eq!((stage.as_str(), code.as_str()), ("ir", "E-IMPORT-CYCLE"));
+                    original.as_ref()
+                }
+                other => other,
+            };
+            match expect {
                 Expectation::Oracle {
                     accepted: Some(_), ..
                 } => outcomes[0] += 1,
@@ -153,7 +166,20 @@ fn observations_imports_errors_and_source_revision_survive_normalization() {
             assert_eq!(case.id, row["id"]);
             assert_eq!(case.input, row["input"]);
             assert_eq!(case.grammar_ref, [0]);
-            match &case.expect {
+            let expect = match &case.expect {
+                Expectation::ExpectedRejection {
+                    original,
+                    stage,
+                    code,
+                    ..
+                } => {
+                    assert_eq!(case.id, "import-cycle/1");
+                    assert_eq!((stage.as_str(), code.as_str()), ("ir", "E-IMPORT-CYCLE"));
+                    original.as_ref()
+                }
+                other => other,
+            };
+            match expect {
                 Expectation::Oracle { .. } => {
                     assert_eq!(raw["stage"], "executed");
                     let encoded = serde_json::to_value(&case.expect).unwrap();

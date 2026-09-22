@@ -111,6 +111,13 @@ pub enum Expectation {
     GenerationFailure {
         message: String,
     },
+    /// 明示的な負の契約だけ。単なる既存生成失敗を期待拒否に読み替えない。
+    ExpectedRejection {
+        stage: String,
+        code: String,
+        evidence: String,
+        original: Box<Expectation>,
+    },
     /// 例: evolution/conformance.json は入力列だけで独立した結果 oracle がない。
     Raw(Value),
 }

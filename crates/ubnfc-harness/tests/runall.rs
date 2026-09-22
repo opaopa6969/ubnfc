@@ -15,7 +15,7 @@ fn associative_from_ubnf_has_24_pass_and_reports_rejected_metadata_variant() {
         "{}",
         String::from_utf8_lossy(&front.stderr)
     );
-    let jar = workspace.join("ubnfc-java/target/ubnfc-java-0.1.0-SNAPSHOT.jar");
+    let jar = Config::default().java_generator;
     if !jar.is_file() {
         let build = Command::new("mvn")
             .current_dir(workspace.join("ubnfc-java"))
@@ -48,7 +48,7 @@ fn associative_from_ubnf_has_24_pass_and_reports_rejected_metadata_variant() {
         .current_dir(&scratch.0)
         .output()
         .unwrap();
-    // 全文法を実行するため、正規文法に加えて precedence 順を反転する負の variant も含む。
+    // RustConformanceTest.java:391-455 は反転 metadata でも正常生成・実行を要求する。
     // front の E-PRECEDENCE-ORDER を隠す、期待値を変える、variant を除外することはしない。
     assert_eq!(
         output.status.code(),
