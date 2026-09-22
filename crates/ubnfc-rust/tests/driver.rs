@@ -267,7 +267,7 @@ fn scope_events_and_farthest_diagnostics_are_public_protocol_fields() {
     assert!(rows[1].get("scope").is_none());
     assert_eq!(
         rows[2]["diagnostics"][0],
-        json!({"kind":"trailing_input","offset":1,"expected":["end of input"],"farthestOffset":2,"farthestExpected":["x"],"deepestRule":"Operators::Root","rulePath":["Operators::Root"]})
+        json!({"kind":"trailing_input","offset":1,"expected":["end of input"],"farthestOffset":2,"farthestExpected":["'x'"],"origin":"Mapper.diagnose","deepestRule":"Operators::Root","rulePath":["Operators::Root"]})
     );
 }
 
@@ -437,6 +437,12 @@ fn round3_evaluation_and_retained_observations_follow_mapped_values() {
     assert_eq!(rows[7]["accepted"], true);
     assert_eq!(rows[7]["allConsumed"], false);
     assert_eq!(rows[7]["prefixCaptures"], rows[6]["captures"]);
+    assert_eq!(
+        rows[7]["prefixCaptures"][0],
+        json!({
+            "binding":"Root:0","name":"value","span":[0,3],"text":"'😀'"
+        })
+    );
     let names: Vec<_> = rows[8]["captures"]
         .as_array()
         .unwrap()
@@ -477,4 +483,48 @@ fn round3_evaluation_and_retained_observations_follow_mapped_values() {
             "warnings",
         ],
     );
+}
+
+#[test]
+fn farthest_candidates_match_independent_evolution_oracle_with_and_without_memo() {
+    // Java r3 と同じ独立 oracle。主 offset は D-014 の Rust fail_at を維持する。
+    let oracle: Value =
+        serde_json::from_str(include_str!("../../../corpus/oracle/evolution-v3.json")).unwrap();
+    let temp = Temp::new();
+    let source = temp.0.join("Evolution.ubnf");
+    fs::write(&source, oracle["grammar"].as_str().unwrap()).unwrap();
+    let ir = ubnfc_front::pipeline::compile(&source, &|p| fs::read_to_string(p))
+        .unwrap()
+        .ir;
+    let generated = temp.0.join("generated");
+    ubnfc_rust::emit(
+        &ir,
+        &ubnfc_rust::EmitOptions {
+            emit_driver: false,
+            ..Default::default()
+        },
+    )
+    .unwrap()
+    .write_to(&generated)
+    .unwrap();
+    let mut assertions = String::from("#[cfg(test)] mod round5 { use super::*; #[test] fn independent_oracle() { for memo in [false,true] {\n");
+    for row in oracle["cases"].as_array().unwrap() {
+        let Some(d) = row["diagnostics"].get(0) else {
+            continue;
+        };
+        let input = row["input"].as_str().unwrap();
+        let expected: Vec<_> = d["farthestExpected"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap())
+            .collect();
+        let offset = d["farthestOffset"].as_u64().unwrap();
+        assertions.push_str(&format!("let r=parse_with_options({input:?},ParseOptions{{memo,..Default::default()}});assert!(!r.ok);assert_eq!(r.diagnostics[0].farthest_cp,{offset},{input:?});assert_eq!(r.diagnostics[0].farthest_expected,vec!{expected:?},{input:?});\n"));
+    }
+    assertions.push_str("}}}\n");
+    let mut root = fs::read_to_string(generated.join("mod.rs")).unwrap();
+    root.push_str(&assertions);
+    fs::write(generated.join("mod.rs"), root).unwrap();
+    cargo(&generated, &["test", "--offline"]);
 }

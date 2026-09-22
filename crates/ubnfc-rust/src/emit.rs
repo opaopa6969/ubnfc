@@ -7,6 +7,7 @@ use ubnfc_front::ir::*;
 
 pub(crate) struct Generator<'a> {
     pub ir: &'a GrammarIr,
+    pub display: crate::diagnostics::Plan,
     pub expr: BTreeMap<&'a str, usize>,
     pub rules: BTreeMap<&'a str, usize>,
     pub tokens: BTreeMap<&'a str, usize>,
@@ -17,6 +18,7 @@ impl<'a> Generator<'a> {
     pub fn new(ir: &'a GrammarIr) -> Self {
         let mut g = Self {
             ir,
+            display: crate::diagnostics::Plan::new(ir),
             expr: ir
                 .semantics
                 .expressions
@@ -221,7 +223,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {
                 continue;
             }
-            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;let mark=self.mark();",suffix(mode)).unwrap();
+            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;self.display.enter(state.consumed.max(state.matched));let mark=self.mark();",suffix(mode)).unwrap();
             p.push_str(&crate::expressions::scope_events(
                 &g,
                 i,
@@ -259,6 +261,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
                 p.push_str("let end=out.state.consumed;\n");
             }
             writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,end],child:out.events}});\n}} else {{ self.restore(mark); }}").unwrap();
+            writeln!(p, "if !out.ok {{self.display.failures(state.consumed.max(state.matched),&{:?});}}self.display.reach(out.state.consumed.max(out.state.matched));", g.display.rule(rule.symbol_id.as_str())).unwrap();
             if let Some(recovery) = ir
                 .semantics
                 .recovery
@@ -279,7 +282,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             }
             writeln!(
                 p,
-                "self.depth-=1;out.diag=self.diag.rule({i},out.diag);out\n}}"
+                "self.depth-=1;self.display.leave();out.diag=self.diag.rule({i},out.diag);out\n}}"
             )
             .unwrap();
         }

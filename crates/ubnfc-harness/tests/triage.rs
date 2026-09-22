@@ -205,6 +205,40 @@ fn oracle_actual(accepted: bool, all_consumed: bool, diagnostics: Value) -> Actu
 }
 
 #[test]
+fn d020_rule_paths_are_informational_but_diagnostic_contract_stays_strict() {
+    // D-020 / RustConformanceTest.java:758: 旧 Java の内部 rule 経路は未検証。
+    let diagnostic = json!({"kind":"syntax","offset":0,"expected":["x"],
+        "farthestOffset":1,"farthestExpected":["x"],"origin":"Mapper.diagnose",
+        "rulePath":["RootParser","__CaptureSite"],"deepestRule":"__CaptureSite"});
+    let c = oracle_case("!", false, false, json!([diagnostic]));
+    for backend in [Backend::Java, Backend::Rust] {
+        let mut a = oracle_actual(false, false, json!([diagnostic]));
+        a.backend = backend;
+        a.response["diagnostics"][0]["rulePath"] = json!(["Generated::Root"]);
+        a.response["diagnostics"][0]["deepestRule"] = json!("Generated::Root");
+        pass(&c, &a);
+        let retained = a.response.clone();
+        pass(&c, &a);
+        assert_eq!(a.response, retained);
+        let row = a.response["diagnostics"][0].as_object_mut().unwrap();
+        row.remove("rulePath");
+        row.remove("deepestRule");
+        pass(&c, &a);
+        for (field, wrong) in [
+            ("kind", json!("trailing_input")),
+            ("offset", json!(2)),
+            ("farthestOffset", json!(2)),
+            ("farthestExpected", json!(["y"])),
+            ("expected", json!([])),
+        ] {
+            let mut wrong_actual = a.clone();
+            wrong_actual.response["diagnostics"][0][field] = wrong;
+            fails(&c, &wrong_actual);
+        }
+    }
+}
+
+#[test]
 fn oracle_captures_require_prefix_observation_even_after_full_parse_failure() {
     // OracleCollector.java:171-174 / SemanticsTest.java:143-151。
     let capture = json!({"name":"value","binding":"Root:0","span":[0,1],"text":"a"});
@@ -232,7 +266,8 @@ fn oracle_captures_require_prefix_observation_even_after_full_parse_failure() {
         a.response.as_object_mut().unwrap().remove("prefixCaptures");
         assert_eq!(compare(&c, &a, &[]), Verdict::Pass);
         assert_eq!(unobserved(&c, &a), ["/prefixCaptures"]);
-        let report = ubnfc_harness::runner::Report::from_actual(&[c.clone()], &[a]).unwrap();
+        let report =
+            ubnfc_harness::runner::Report::from_actual(std::slice::from_ref(&c), &[a]).unwrap();
         assert_eq!((report.unobserved, report.unobserved_cases), (1, 1));
     }
 }
@@ -355,7 +390,8 @@ fn regex_non_bmp_status_is_known_only_for_the_three_registered_observations() {
                 .known_divergences
                 .contains(&Observation::ParsedStatus))
             .count(),
-        3
+        // C15 の 3 件に加え、round5 で recovery-root/1（D-017 root recovery）を登録。
+        4
     );
 }
 
@@ -488,4 +524,44 @@ fn d019_native_failure_is_preserved_but_excluded_from_verdict_and_missing() {
     a.response["consumed"] = json!(0);
     a.response["diagnostics"] = json!([{"offset":1,"farthestOffset":3}]);
     fails(&c, &a);
+}
+
+#[test]
+fn d017_root_recovery_registers_only_its_prefix_status() {
+    use ubnfc_harness::divergence::Observation;
+    let cases = select(&load_all(default_root()).unwrap(), &["oracle".into()], None).unwrap();
+    let c = cases
+        .iter()
+        .find(|c| c.case.id == "recovery-root/1")
+        .unwrap();
+    assert!(c
+        .case
+        .known_divergences
+        .contains(&Observation::ParsedStatus));
+    let mut a = oracle_actual(true, true, json!([]));
+    a.backend = Backend::Rust;
+    a.response["consumed"] = json!(4);
+    a.response["matched"] = json!(4);
+    a.response["parsedStatus"] = json!("succeeded");
+    a.response["references"] = json!([]);
+    a.response["scopeDepth"] = json!(0);
+    assert!(matches!(
+        compare(c, &a, &c.case.known_divergences),
+        Verdict::KnownDivergence(_)
+    ));
+    let without: Vec<_> = c
+        .case
+        .known_divergences
+        .iter()
+        .copied()
+        .filter(|o| *o != Observation::ParsedStatus)
+        .collect();
+    assert!(matches!(compare(c, &a, &without), Verdict::Fail(_)));
+    assert!(!cases
+        .iter()
+        .find(|c| c.case.id == "recovery-root/2")
+        .unwrap()
+        .case
+        .known_divergences
+        .contains(&Observation::ParsedStatus));
 }

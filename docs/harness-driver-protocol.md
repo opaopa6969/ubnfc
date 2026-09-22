@@ -254,3 +254,16 @@ Extern probe の先読み前を表現する。
 tiny-string-token の single quote 内容抽出は残る Fail として報告する。
 scanner 自体の value span は両言語の契約テストで検証し、登録 E2E は corpus の
 `direct-eof` 文法の double quote 入力と拒否入力を使う。期待値・oracle・乖離登録は変更しない。
+
+## round5: prefix capture と内部診断情報
+
+Java/Rust とも `options.lexical=true` の応答で `prefixCaptures` を返す。
+各要素は `name / binding / span / text`。`span` は Unicode code point の半開区間で、
+`text` は引用符・trivia を含む元入力の当該区間。完了順と重複を保持する。
+全入力の `captures` と、prefix 解析の `prefixCaptures` は独立して返す。
+根拠: `OracleCollector.java:171-174`、`SemanticsTest.java:143-151`。
+
+D-020 により `rulePath` / `deepestRule` は raw 応答・レポートに保持するが、
+差・欠落を Verdict / 未観測に使わない。`kind / offset / farthestOffset /
+farthestExpected` の比較は維持する（D-014）。Extern の失敗候補は scanner が返す
+表示文字列を用い、scanner の Java クラス名や capture wrapper を追加しない。

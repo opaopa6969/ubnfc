@@ -162,7 +162,21 @@ pub(crate) fn compare_oracle_values(
     actual: &Value,
     known: &[Observation],
 ) -> Verdict {
-    let diffs = diff_values(expected, actual);
+    // D-020 (docs/design/03-design-v1.md §8): 旧 Java の内部 rule 経路は
+    // 情報として保持し Verdict に使わない。比較用コピーだけを投影する。
+    let project = |value: &Value| {
+        let mut value = value.clone();
+        if let Some(rows) = value.get_mut("diagnostics").and_then(Value::as_array_mut) {
+            for row in rows {
+                if let Some(row) = row.as_object_mut() {
+                    row.remove("rulePath");
+                    row.remove("deepestRule");
+                }
+            }
+        }
+        value
+    };
+    let diffs = diff_values(&project(expected), &project(actual));
     if diffs.is_empty() {
         Verdict::Pass
     } else if diffs

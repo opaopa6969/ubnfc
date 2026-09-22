@@ -134,10 +134,19 @@ final class DiagnosticPlan {
     List<String> rule(String id) { return hints(rules.get(id)); }
     List<String> expression(String id) {
         Expr e = expressions.get(id);
+        // D-014: Extern の候補は scanner の表示文字列。Java クラス名や
+        // capture wrapper は候補ではなく、scanner の診断に追加してはいけない。
+        if (e.node().kind().equals("tokenRef") && tokens.get(e.node().symbolId()).spec().kind().equals("extern"))
+            return List.of();
         var result = new ArrayList<String>();
         if (!bodies.containsKey(id) && !e.node().kind().equals("ruleRef") ) result.addAll(hints(bases.get(id)));
         if (!e.captureSiteIds().isEmpty()) result.addAll(hints(nodes.get(id)));
         return result.stream().distinct().toList();
     }
-    String tokenLabel(String id) { return hints(bases.get(id)).getFirst(); }
+    String tokenLabel(String id) {
+        Expr e = expressions.get(id);
+        if (e.node().kind().equals("tokenRef") && tokens.get(e.node().symbolId()).spec().kind().equals("extern"))
+            return names.get(e.node().symbolId());
+        return hints(bases.get(id)).getFirst();
+    }
 }

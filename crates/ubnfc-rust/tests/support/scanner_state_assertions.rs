@@ -46,9 +46,9 @@ mod scanner_state_regression {
                     };
                     let mut session = Session::new("abc", Default::default(), &mut scanner);
                     let out = if mode {
-                        session.token_0::<true>(state, "T")
+                        session.token_0::<true>(state, "T", "T")
                     } else {
-                        session.token_0::<false>(state, "T")
+                        session.token_0::<false>(state, "T", "T")
                     };
                     assert!(out.ok);
                     assert_eq!(out.state, state);

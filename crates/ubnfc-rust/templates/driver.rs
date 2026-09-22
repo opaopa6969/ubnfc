@@ -90,12 +90,13 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             DiagnosticKind::Recovery => "recovery",
             DiagnosticKind::TrailingInput => "trailing_input",
             DiagnosticKind::Mapping => {
-                mapping = d.message.to_json();
-                "mapping"
+                mapping = d.message.as_ref().map(|message| format!("java.lang.IllegalArgumentException: {message}")).to_json();
+                continue;
             }
         };
         let mut row = Json::object([
             ("kind", kind.to_json()),
+            ("origin", "Mapper.diagnose".to_json()),
             ("offset", d.offset_cp.to_json()),
             ("expected", d.expected.to_json()),
             ("farthestOffset", d.farthest_cp.to_json()),
@@ -275,6 +276,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         }
     }
     if lexical {
+        // OracleCollector.java:171-174: full parse が失敗しても prefix の
+        // 完了順・重複・binding と code point span/text をそのまま観測する。
         fields.insert(
             "prefixCaptures".into(),
             captures(&prefix, input, false, true),
