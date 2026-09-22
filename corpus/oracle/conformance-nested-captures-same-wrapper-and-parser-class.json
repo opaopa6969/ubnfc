@@ -1,0 +1,45 @@
+{
+  "feature": "nested-captures",
+  "grammar": "grammar BindingSites { @package: org.example.nestedcaptures token ID = org.unlaxer.parser.clang.IdentifierParser @root @mapping(Root, params=[left,right,value]) Root ::= ID @left ':' ID @right ':' (('😀') @value) @value; }",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "same-wrapper-and-parser-class/bindings-keep-site-and-code-point-spans",
+      "input": "one:two:😀",
+      "accepted": true,
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          9
+        ],
+        "fields": {
+          "left": "one",
+          "right": "two",
+          "value": [
+            "😀",
+            "😀"
+          ]
+        }
+      },
+      "declarations": [],
+      "valueSpans": [],
+      "retainedValueSpans": []
+    }
+  ],
+  "captureNames": [
+    "left",
+    "right",
+    "value"
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/NestedCaptureConformanceTest.java",
+    "sha256": "9acd30e90e069850b7dd0844a6a7d7aa1934bc57e05f5a08428a237b2a904b14",
+    "methods": "javaValueSpans, declarations, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "nested-captures/corpus.json",
+  "variant": "same-wrapper-and-parser-class",
+  "observation": "nested-captures"
+}

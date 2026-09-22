@@ -1,0 +1,87 @@
+{
+  "feature": "LOOKAHEAD",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token L=LOOKAHEAD('a') @root @mapping(Value) Root ::= L 'x';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "lookahead-failure/1",
+      "input": "a",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 1,
+          "expected": [
+            "'x'"
+          ],
+          "farthestOffset": 1,
+          "farthestExpected": [
+            "'x'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 0,
+        "matched": 1,
+        "expected": [
+          "'x'"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "6b9b3da481fd3775c5f73ff74ac859fcfe5d62d5937edbf09e3699191daf53b7",
+    "org/example/oracle/ProbeMapper.java": "825ba9c35b81b5d78ae63a388e34513a721cfe24cedebfe1f1300e7cb1ed5fe7",
+    "org/example/oracle/ProbeParsers.java": "cd43891406c47a46c46fcf71ebf41431c6e285a416959733b582e436f0d9a400"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/reobserved-lookahead-failure/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": []
+    }
+  ],
+  "stage": "executed",
+  "collection": "triage-2026-09-22",
+  "origin": "oracle/lookahead-failure.json",
+  "variant": "LOOKAHEAD",
+  "observation": "oracle"
+}

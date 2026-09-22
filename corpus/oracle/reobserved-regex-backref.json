@@ -1,0 +1,97 @@
+{
+  "feature": "REGEX",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token T=REGEX('(a+)\\\\1')\n @root @mapping(Value, params=[value]) Root ::=  T @value ;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "regex-backref/1",
+      "input": "aaaa",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 4,
+      "matched": 4,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          4
+        ],
+        "fields": {
+          "value": "aaaa"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            4
+          ],
+          "text": "aaaa"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 4,
+        "consumed": 4,
+        "matched": 4,
+        "expected": []
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "c5375f73bb86e35d30639fbbaa59005ee8cbf039293e54cc330019c361069253",
+    "org/example/oracle/ProbeMapper.java": "87c4d92f1b9d6b7d8bcff1d4df542f0b9d341294964d9af64a70de6b523ccb46",
+    "org/example/oracle/ProbeParsers.java": "81184ffbfe7c8c2ee9a659a3ed0f2db07f291303a8d2c2966da5bc27014ebaeb"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/reobserved-regex-backref/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed",
+  "collection": "triage-2026-09-22",
+  "origin": "oracle/regex-backref.json",
+  "variant": "REGEX",
+  "observation": "oracle"
+}

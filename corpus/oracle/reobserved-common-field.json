@@ -1,0 +1,161 @@
+{
+  "feature": "@commonField",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token ID=IdentifierParser @root @mapping(Node) @commonField(name) Root ::= A | B; @mapping(A, params=[name]) A ::= 'a:' ID @name; @mapping(B, params=[name]) B ::= 'b:' ID @name;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "common-field/1",
+      "input": "a:one",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 5,
+      "matched": 5,
+      "ast": {
+        "type": "A",
+        "span": [
+          0,
+          5
+        ],
+        "fields": {
+          "name": "one"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "name",
+          "binding": "A:0",
+          "span": [
+            2,
+            5
+          ],
+          "text": "one"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 5,
+        "consumed": 5,
+        "matched": 5,
+        "expected": [
+          "AlphabetNumericUnderScoreParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "common-field/3",
+      "input": "x:three",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'a:'",
+            "'b:'"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'a:'",
+            "'b:'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'a:'",
+          "'b:'"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "618ab2f94cee690b602bb33db45a1225f2c273e6e731330b3f0a050aa16b4932",
+    "org/example/oracle/ProbeMapper.java": "afcabfb1a9eae5c754047f04b7399ef319bb31c73a33ae9f9da2fb817739e7a9",
+    "org/example/oracle/ProbeParsers.java": "6075a30a32d1083ccc1fc543bc9cbb24f57b7f05711ce5173347d42a2ece8f8e"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/reobserved-common-field/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "A",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "name",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "name",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "Node",
+      "kind": "interface",
+      "methods": [
+        {
+          "name": "name",
+          "returnType": "java.lang.String",
+          "abstract": true
+        }
+      ]
+    }
+  ],
+  "stage": "executed",
+  "collection": "triage-2026-09-22",
+  "origin": "oracle/common-field.json",
+  "variant": "@commonField",
+  "observation": "oracle"
+}

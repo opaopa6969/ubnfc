@@ -1,0 +1,129 @@
+{
+  "feature": "@longestChoice",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @scopeTree(mode=lexical) @longestChoice @mapping(Node) Root ::= A | B | C; @declares(symbol=value) @mapping(A, params=[value]) A ::= 'a' @value; @declares(symbol=value) @mapping(B, params=[value]) B ::= 'ab' @value; @declares(symbol=value) @mapping(C, params=[value]) C ::= 'a' @value;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "longest/2",
+      "input": "ab",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "B",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": "ab"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "B:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "ab"
+        }
+      ],
+      "declarations": [
+        {
+          "name": "ab",
+          "sourceOffset": 0
+        }
+      ],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": []
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "919c1dc1bcde7002439f536198cd083e01213a14a31662f9b2b2b04ff1d43b00",
+    "org/example/oracle/ProbeMapper.java": "8d53d011a9f21a49f8455196b62f4e4f6bd7305df4677e7d0ff1f930699eb198",
+    "org/example/oracle/ProbeParsers.java": "7c9be7535b71e2c546c4e249b3c1f29dce77bde13945f3e3dbcfe13d54c7c547"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/reobserved-longest/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "A",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "C",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "Node",
+      "kind": "interface",
+      "methods": []
+    }
+  ],
+  "stage": "executed",
+  "collection": "triage-2026-09-22",
+  "origin": "oracle/longest.json",
+  "variant": "@longestChoice",
+  "observation": "oracle"
+}

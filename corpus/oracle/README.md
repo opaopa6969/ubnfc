@@ -233,3 +233,101 @@ UNTIL の終端なし EOF 成功、`%` の空入力拒否・末尾 separator の
 構文受理と `@typeof` / 数値変換例外の分離、backref 不一致時の受理＋ERROR が該当する。
 `lookahead-failure/1` は最終 C=M=0 でも最遠 C=0/M=1、公開 syntax offset=1 であり、
 診断位置を最終 consumed と同一視できないことも実測した。
+
+## triage U の追加採取（2026-09-22）
+
+採取元は上記と同じ **`ed4178e673f93e719b62a7bd181f3a219abf8ed1`**。
+初回 `docs/reports/2026-09-22-java-corpus.json` の `unobserved` は、保存済み結果の欠落と
+driver の出力不足が混在する。追加 **44 JSON / 230 ケース**を保存した。
+元の63 JSON と divergences.json は変更していない。
+
+| 系統 | ケース | ファイル | 採取した観測 |
+|---|---:|---:|---|
+| evolution | 148（37入力 × 4版） | 4 | prefix 受理、全消費、C/M、canonical AST/span、capture、scope、診断、評価値/評価エラー |
+| cardinality | 20 | 5 | 不受理 variant の全入力受理結果 |
+| mixed-values | 5 | 1 | 不受理 variant の全入力受理、prefix C/M |
+| scope-store | 9操作列 | 1 | 17 observe 地点の scope・両 cursor・resolve・履歴・保持 snapshot |
+| catalog | 2 | 2 | rule 宣言順、補完 context、ソート済みローカル capture 名 |
+| scope-annotations | 6 | 6 | 全入力受理、prefix、AST、scope、rule metadata、親 rollback 2件 |
+| nested-captures | 4 | 3 | AST、宣言、valueSpans、別 parse 後の retainedValueSpans |
+| oracle | 36 | 22 | 従来 OracleCollector の全実走項目を再採取 |
+
+nested-captures は初回 U の2件に、triage 後に未観測になった
+`text-node-and-mixed-values` の2件を追加した。初回2件の valueSpans は空列、
+追加2件は同値でも出現ごとの span を保存する。
+`reobserved-*.json` の36ケースは元 JSON のケースと**全フィールドが一致**した。
+これらは不足していた期待値ではなく、driver の binding/nativeFailure/parsedStatus 等の
+不足で未観測だった。採取成功を backend の比較成功とはみなさない。
+
+### 追加採取の実行経路と再現
+
+`tools/conformance_specifications.py` はレポートから対象 ID/variant を選び、
+upstream fixture から文法・入力・観測条件だけを取得する。
+AST、評価値、snapshot などの期待値は Java driver に渡さない。
+scope-store の `observe.expected` も入力時に除去し、実走 snapshot で埋める。
+
+`tools/ConformanceCollector.java` は既存テストのソースを読み取り専用で javac に渡し、
+`RustConformanceTest.compileJava/javaResult`、
+`ScopeStoreConformanceTest.executeJava`、`ScopeAnnotationConformanceTest.parseJava/javaMetadata`、
+`NestedCaptureConformanceTest.javaValueSpans/declarations` を反射で直接呼ぶ。
+テストクラス・生成クラス・JUnit TemporaryFolder はすべて `mktemp -d` 配下。
+JUnit のテスト全体や Rust backend は起動しない。catalog は
+`RustCatalogConformanceTest.javaFrontendPreservesContextAndSortedLocalCapturesInIr` と同じ
+UBNFMapper/GrammarValidator/RustGrammarLowering API 経路を実行する。
+使用したテストの path/SHA-256/methods は各 JSON の `observer` に記録した。
+
+evolution は4版の `Calculator.java.txt` を既存 compileJava 経由でコンパイルする。
+同テストの `javaResult` は全入力受理、AST の全 field/span、数値評価または評価エラー、
+不受理時の primary diagnostic を取得する。比較対象は診断 kind/offset、trailing_input の
+expected で、syntax expected の綴りそのものは同一性の契約ではない。
+依頼された共通 oracle schema の prefix/C/M/capture/scope も従来採取器で別 context から
+実測し、AST と全入力受理が `javaResult` と一致することを採取中に確認する。
+`evaluationError` は既存 javaResult に合わせ、成功時は**キーを省略**する。
+非有限値と IllegalArgumentException は true。false を補わない。
+
+再採取には JUnit 4.13.2 / hamcrest-core 1.3 のローカル jar も必要。
+参照 repo の source/pom/git は変更せず、offline compile は flatten.skip を付ける。
+出力先に同名ファイルがある場合、追加採取スクリプトは**上書き前に停止**する。
+
+```bash
+cd /home/opa/work/unlaxer-workspace/ubnfc-wt-oracle2
+oracle_check_dir=$(mktemp -d -t ubnfc-conformance-check.XXXXXXXX)
+bash corpus/oracle/tools/collect-conformance.sh \
+  /home/opa/work/unlaxer-workspace/unlaxer-parser "$oracle_check_dir/result"
+python3 corpus/oracle/tools/verify-conformance.py "$oracle_check_dir/result"
+python3 corpus/oracle/tools/verify.py
+```
+
+追加44ファイルを別 scratch で再採取し、byte 一致を確認した。
+検証器は対象全230件・17 snapshot・受理/評価の段階・元36観測との一致も確認する。
+
+### loader と未採取項目
+
+新 JSON は `Family::Oracle` で読む。evolution と reobserved は `Expectation::Oracle`、
+scope-store/catalog は `ScopeOps` / `Catalog`、その他は項目欠落を表せる `Ast` を使用する。
+`observation` が形式を識別し、元 raw JSON と観測条件を保持する。
+evolution の `grammarPath` は来歴であり、同梱 `grammar` により checkout の位置に依存しない。
+元 `evolution/conformance.json` の読み込みにも4版の実走値を照合し、37入力を版別148行へ
+展開して `Raw` を除去した。入力列は `raw.inputs`、版別の全観測は `raw.cases` に保持する。
+入力順・ID・文法が sidecar と違えば読み込みを失敗させる。
+
+元 corpus と oracle ファイルを同時に列挙する既存 API では、同じ入力への参照が両方に残る。
+loader の総数は **127ファイル / 1212行**（Oracle 107ファイル / 398行）であり、
+新規に採取した独立ケース数230とは区別する。evolution の148観測は両入口で完全に同じ値。
+runall/runner の driver 拡張は本採取の対象外であり、そこでの未観測判定は残り得る。
+
+対象230件で採取不能になったケースはない。以下は既存 Java テストが観測しないため省略した。
+
+- 不受理 cardinality/mixed-values の AST/value/texts。cardinality の prefix cursor も対象外。
+- nested-captures の capture 列は元テストでは Rust 側のみの観測なので転記しない。
+- scope-store/catalog の parser 受理/AST。操作列・静的 metadata を空入力 parser で代用しない。
+- Java が観測しない Rust evaluator の stale dispatch / missing semantics コンパイル義務。
+
+### 追加の疑義
+
+12. **evolution の数値 capture に後続コメントが含まれ、評価できない**。
+    全4版の `2/*a*/+3`、`1/*😀*/+1`、`1//end`、`1/**/` は全入力受理・診断なしだが
+    `evaluationError:true`。例えば `2/*a*/+3` の左 Number は value=`2/*a*/`、span=`[0,6]`。
+    構文拒否や正常な数値へ補正せず、AST と評価エラーをそのまま固定した。
+    各版の全入力受理は17/18/22/25、評価値ありは12/13/17/20。
+    各版5件の評価エラーの残り1件は `1e309` の非有限値で、既存テストが明示する評価契約。

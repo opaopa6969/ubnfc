@@ -1,0 +1,89 @@
+{
+  "feature": "transparent-mapping",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Node) Root ::= Alias; @mapping(Expr) Alias ::= Leaf; @mapping(Item) Leaf ::= 'a';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "mapping-alias/1",
+      "input": "a",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "Item",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": []
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "26226b3c645ae977aad2483149432c3d2def04008d75c22b6710e7495b623c9a",
+    "org/example/oracle/ProbeMapper.java": "7a529af60cf3566fdee751266f294f0cddb4c03e2d3fed5e35bf4dd2497d80d2",
+    "org/example/oracle/ProbeParsers.java": "48215f61d826e51d50c49d944ab59446c088ce61308ea167ff0b727082189f8c"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/reobserved-mapping-alias/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Expr",
+      "kind": "interface",
+      "methods": []
+    },
+    {
+      "name": "Item",
+      "kind": "record",
+      "methods": []
+    },
+    {
+      "name": "Node",
+      "kind": "interface",
+      "methods": []
+    }
+  ],
+  "stage": "executed",
+  "collection": "triage-2026-09-22",
+  "origin": "oracle/mapping-alias.json",
+  "variant": "transparent-mapping",
+  "observation": "oracle"
+}

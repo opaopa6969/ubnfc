@@ -1,0 +1,130 @@
+{
+  "feature": "scope-annotations",
+  "grammar": "grammar ParentRegistration { @package: org.example.scopeannotations token ID = org.unlaxer.parser.clang.IdentifierParser @root @mapping(Root, params=[decl,ref]) Root ::= ScopedDecl @decl Ref @ref; @scopeTree(mode=dynamic) @declares(symbol=name, description=ownedByParent) @mapping(ScopedDecl, params=[name]) ScopedDecl ::= '[' ID @name ']'; @backref(name=name) @mapping(Ref, params=[name]) Ref ::= ID @name; }",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "scope-and-declares-parent-registration/declaration-is-visible-after-own-scope-leaves",
+      "input": "[kept]kept",
+      "accepted": true,
+      "parentRollback": true,
+      "prefix": [
+        true,
+        10,
+        10
+      ],
+      "scope": {
+        "depth": 0,
+        "resolved": [
+          {
+            "query": "kept",
+            "symbol": {
+              "name": "kept",
+              "sourceOffset": 1
+            }
+          },
+          {
+            "query": "lost",
+            "symbol": null
+          }
+        ],
+        "declarations": [
+          {
+            "name": "kept",
+            "sourceOffset": 1
+          }
+        ],
+        "references": [
+          {
+            "name": "kept",
+            "offset": 6,
+            "length": 4
+          }
+        ],
+        "diagnostics": []
+      },
+      "rollback": {
+        "cursor": [
+          0,
+          0
+        ],
+        "scope": {
+          "depth": 0,
+          "resolved": [
+            {
+              "query": "kept",
+              "symbol": null
+            },
+            {
+              "query": "lost",
+              "symbol": null
+            }
+          ],
+          "declarations": [],
+          "references": [],
+          "diagnostics": []
+        }
+      },
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          10
+        ],
+        "fields": {
+          "decl": {
+            "type": "ScopedDecl",
+            "span": [
+              0,
+              6
+            ],
+            "fields": {
+              "name": "kept"
+            }
+          },
+          "ref": {
+            "type": "Ref",
+            "span": [
+              6,
+              10
+            ],
+            "fields": {
+              "name": "kept"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "queries": [
+    "kept",
+    "lost"
+  ],
+  "metadata": [
+    {
+      "rule": "ScopedDecl",
+      "scope": "dynamic",
+      "declares": {
+        "symbol": "name",
+        "description": "ownedByParent"
+      },
+      "backref": null
+    },
+    {
+      "rule": "Ref",
+      "scope": null,
+      "declares": null,
+      "backref": "name"
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/ScopeAnnotationConformanceTest.java",
+    "sha256": "73bd27e60ae50ecc5e31a87c627cc4a9ff89e5f38cd7e209519e16502c58c030",
+    "methods": "parseJava, javaMetadata, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "scope-annotations/corpus.json",
+  "variant": "scope-and-declares-parent-registration",
+  "observation": "scope-annotations"
+}

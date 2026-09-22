@@ -1,0 +1,2615 @@
+{
+  "feature": "evolution",
+  "grammar": "grammar Evolution {\n  @package: org.example.evolution\n  @whitespace: javaStyle\n  token NUMBER = NumberParser\n  @root\n  Expression ::= Binary | Literal ;\n  @mapping(Binary, params=[left, op, right])\n  Binary ::= Literal @left '+' @op Literal @right ;\n  @mapping(Number, params=[value])\n  Literal ::= Digits @value ;\n  Digits ::= NUMBER ;\n}\n",
+  "grammarPath": "evolution/0/Evolution.ubnf",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "evolution/0",
+      "input": "",
+      "accepted": false,
+      "allConsumed": true,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/1",
+      "input": " ",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 1,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 1,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/2",
+      "input": "0",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {
+          "value": "0"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "0"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 0.0
+    },
+    {
+      "id": "evolution/3",
+      "input": "12",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": "12"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "12"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 12.0
+    },
+    {
+      "id": "evolution/4",
+      "input": "-3",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": "-3"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "-3"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": -3.0
+    },
+    {
+      "id": "evolution/5",
+      "input": "+4",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": "+4"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "+4"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 4.0
+    },
+    {
+      "id": "evolution/6",
+      "input": ".5",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": ".5"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": ".5"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 0.5
+    },
+    {
+      "id": "evolution/7",
+      "input": "1.",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": "1."
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "1."
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser",
+          "OneOrMore"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 1.0
+    },
+    {
+      "id": "evolution/8",
+      "input": "1.5e+2",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 6,
+      "matched": 6,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          6
+        ],
+        "fields": {
+          "value": "1.5e+2"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            6
+          ],
+          "text": "1.5e+2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 6,
+        "consumed": 6,
+        "matched": 6,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'/*'",
+          "'//'",
+          "DigitParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 150.0
+    },
+    {
+      "id": "evolution/9",
+      "input": "2E-2",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 4,
+      "matched": 4,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          4
+        ],
+        "fields": {
+          "value": "2E-2"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            4
+          ],
+          "text": "2E-2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 4,
+        "consumed": 4,
+        "matched": 4,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'/*'",
+          "'//'",
+          "DigitParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 0.02
+    },
+    {
+      "id": "evolution/10",
+      "input": "1e",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 1,
+      "matched": 1,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 1,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 2,
+          "farthestExpected": [
+            "DigitParser",
+            "OneOrMore",
+            "SignParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "DigitParser",
+          "OneOrMore",
+          "SignParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/11",
+      "input": "1e+",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 1,
+      "matched": 1,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 1,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 3,
+          "farthestExpected": [
+            "DigitParser",
+            "OneOrMore"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "DigitParser",
+          "OneOrMore"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/12",
+      "input": "2+3",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Binary",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "left": {
+            "type": "Number",
+            "span": [
+              0,
+              1
+            ],
+            "fields": {
+              "value": "2"
+            }
+          },
+          "op": "+",
+          "right": {
+            "type": "Number",
+            "span": [
+              2,
+              3
+            ],
+            "fields": {
+              "value": "3"
+            }
+          }
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "2"
+        },
+        {
+          "name": "left",
+          "binding": "Binary:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "2"
+        },
+        {
+          "name": "op",
+          "binding": "Binary:1",
+          "span": [
+            1,
+            2
+          ],
+          "text": "+"
+        },
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            2,
+            3
+          ],
+          "text": "3"
+        },
+        {
+          "name": "right",
+          "binding": "Binary:2",
+          "span": [
+            2,
+            3
+          ],
+          "text": "3"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 5.0
+    },
+    {
+      "id": "evolution/13",
+      "input": "2*3",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 1,
+      "matched": 1,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 1,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 1,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "DigitParser",
+            "EParser",
+            "ExponentParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/14",
+      "input": "2-3",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 1,
+      "matched": 1,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 1,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 1,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "DigitParser",
+            "EParser",
+            "ExponentParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/15",
+      "input": "1+2+3",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 3,
+      "matched": 3,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        },
+        {
+          "name": "left",
+          "binding": "Binary:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        },
+        {
+          "name": "op",
+          "binding": "Binary:1",
+          "span": [
+            1,
+            2
+          ],
+          "text": "+"
+        },
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            2,
+            3
+          ],
+          "text": "2"
+        },
+        {
+          "name": "right",
+          "binding": "Binary:2",
+          "span": [
+            2,
+            3
+          ],
+          "text": "2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 3,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 3,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "DigitParser",
+            "EParser",
+            "ExponentParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/16",
+      "input": " 2 + 3 ",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 7,
+      "matched": 7,
+      "ast": {
+        "type": "Binary",
+        "span": [
+          0,
+          7
+        ],
+        "fields": {
+          "left": {
+            "type": "Number",
+            "span": [
+              1,
+              3
+            ],
+            "fields": {
+              "value": "2"
+            }
+          },
+          "op": "+",
+          "right": {
+            "type": "Number",
+            "span": [
+              5,
+              7
+            ],
+            "fields": {
+              "value": "3"
+            }
+          }
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            1,
+            3
+          ],
+          "text": "2 "
+        },
+        {
+          "name": "left",
+          "binding": "Binary:0",
+          "span": [
+            1,
+            3
+          ],
+          "text": "2 "
+        },
+        {
+          "name": "op",
+          "binding": "Binary:1",
+          "span": [
+            3,
+            4
+          ],
+          "text": "+"
+        },
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            5,
+            7
+          ],
+          "text": "3 "
+        },
+        {
+          "name": "right",
+          "binding": "Binary:2",
+          "span": [
+            5,
+            7
+          ],
+          "text": "3 "
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 7,
+        "consumed": 7,
+        "matched": 7,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'/*'",
+          "'//'"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 5.0
+    },
+    {
+      "id": "evolution/17",
+      "input": "2/*a*/+3",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 8,
+      "matched": 8,
+      "ast": {
+        "type": "Binary",
+        "span": [
+          0,
+          8
+        ],
+        "fields": {
+          "left": {
+            "type": "Number",
+            "span": [
+              0,
+              6
+            ],
+            "fields": {
+              "value": "2/*a*/"
+            }
+          },
+          "op": "+",
+          "right": {
+            "type": "Number",
+            "span": [
+              7,
+              8
+            ],
+            "fields": {
+              "value": "3"
+            }
+          }
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            6
+          ],
+          "text": "2/*a*/"
+        },
+        {
+          "name": "left",
+          "binding": "Binary:0",
+          "span": [
+            0,
+            6
+          ],
+          "text": "2/*a*/"
+        },
+        {
+          "name": "op",
+          "binding": "Binary:1",
+          "span": [
+            6,
+            7
+          ],
+          "text": "+"
+        },
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            7,
+            8
+          ],
+          "text": "3"
+        },
+        {
+          "name": "right",
+          "binding": "Binary:2",
+          "span": [
+            7,
+            8
+          ],
+          "text": "3"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 8,
+        "consumed": 8,
+        "matched": 8,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "evaluationError": true
+    },
+    {
+      "id": "evolution/18",
+      "input": "1/*😀*/+1",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 8,
+      "matched": 8,
+      "ast": {
+        "type": "Binary",
+        "span": [
+          0,
+          8
+        ],
+        "fields": {
+          "left": {
+            "type": "Number",
+            "span": [
+              0,
+              6
+            ],
+            "fields": {
+              "value": "1/*😀*/"
+            }
+          },
+          "op": "+",
+          "right": {
+            "type": "Number",
+            "span": [
+              7,
+              8
+            ],
+            "fields": {
+              "value": "1"
+            }
+          }
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            6
+          ],
+          "text": "1/*😀*/"
+        },
+        {
+          "name": "left",
+          "binding": "Binary:0",
+          "span": [
+            0,
+            6
+          ],
+          "text": "1/*😀*/"
+        },
+        {
+          "name": "op",
+          "binding": "Binary:1",
+          "span": [
+            6,
+            7
+          ],
+          "text": "+"
+        },
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            7,
+            8
+          ],
+          "text": "1"
+        },
+        {
+          "name": "right",
+          "binding": "Binary:2",
+          "span": [
+            7,
+            8
+          ],
+          "text": "1"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 8,
+        "consumed": 8,
+        "matched": 8,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "evaluationError": true
+    },
+    {
+      "id": "evolution/19",
+      "input": "neg(2*3)",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/20",
+      "input": "neg( 2 + 3 )",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/21",
+      "input": "neg(/*😀*/2)",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/22",
+      "input": "neg(neg(2))",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/23",
+      "input": "neg(2",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/24",
+      "input": "neg()",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/25",
+      "input": "if(0,neg(2*3),4+5)",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/26",
+      "input": "if(1,neg(2),3)",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/27",
+      "input": "if(0,1,if(1,2,3))",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/28",
+      "input": "if(1,2)",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/29",
+      "input": "12x",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 2,
+      "matched": 2,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "12"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 2,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 2,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "DigitParser",
+            "EParser",
+            "ExponentParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/30",
+      "input": "😀",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "' '",
+            "'*/'",
+            "'+'",
+            "'.'",
+            "'/*'",
+            "'//'",
+            "Chain",
+            "DigitParser",
+            "DigitsParser",
+            "ExpressionParser",
+            "LiteralParser",
+            "NumberParser",
+            "OneOrMore",
+            "SignParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "Chain",
+          "DigitParser",
+          "DigitsParser",
+          "ExpressionParser",
+          "LiteralParser",
+          "NumberParser",
+          "OneOrMore",
+          "SignParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/31",
+      "input": "/*😀*/1",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 6,
+      "matched": 6,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          6
+        ],
+        "fields": {
+          "value": "1"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            5,
+            6
+          ],
+          "text": "1"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 6,
+        "consumed": 6,
+        "matched": 6,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 1.0
+    },
+    {
+      "id": "evolution/32",
+      "input": "1//end",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 6,
+      "matched": 6,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          6
+        ],
+        "fields": {
+          "value": "1//end"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            6
+          ],
+          "text": "1//end"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 6,
+        "consumed": 6,
+        "matched": 6,
+        "expected": [
+          "'\n'",
+          "'\r\n'",
+          "'\r'",
+          "' '",
+          "'*/'",
+          "'+'",
+          "'/*'",
+          "'//'",
+          "WildCardCharacterParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "evaluationError": true
+    },
+    {
+      "id": "evolution/33",
+      "input": "1/*unterminated",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 1,
+      "matched": 1,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 1,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 15,
+          "farthestExpected": [
+            "'*/'",
+            "WildCardStringParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 15,
+        "consumed": 15,
+        "matched": 15,
+        "expected": [
+          "'*/'",
+          "WildCardStringParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "evolution/34",
+      "input": "1/**/",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 5,
+      "matched": 5,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          5
+        ],
+        "fields": {
+          "value": "1/**/"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            5
+          ],
+          "text": "1/**/"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 5,
+        "consumed": 5,
+        "matched": 5,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'/*'",
+          "'//'"
+        ]
+      },
+      "scopeDepth": 0,
+      "evaluationError": true
+    },
+    {
+      "id": "evolution/35",
+      "input": "1e309",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 5,
+      "matched": 5,
+      "ast": {
+        "type": "Number",
+        "span": [
+          0,
+          5
+        ],
+        "fields": {
+          "value": "1e309"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            5
+          ],
+          "text": "1e309"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 5,
+        "consumed": 5,
+        "matched": 5,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'+'",
+          "'/*'",
+          "'//'",
+          "DigitParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "evaluationError": true
+    },
+    {
+      "id": "evolution/36",
+      "input": "1\t+\t2",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 5,
+      "matched": 5,
+      "ast": {
+        "type": "Binary",
+        "span": [
+          0,
+          5
+        ],
+        "fields": {
+          "left": {
+            "type": "Number",
+            "span": [
+              0,
+              2
+            ],
+            "fields": {
+              "value": "1"
+            }
+          },
+          "op": "+",
+          "right": {
+            "type": "Number",
+            "span": [
+              4,
+              5
+            ],
+            "fields": {
+              "value": "2"
+            }
+          }
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "1\t"
+        },
+        {
+          "name": "left",
+          "binding": "Binary:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "1\t"
+        },
+        {
+          "name": "op",
+          "binding": "Binary:1",
+          "span": [
+            2,
+            3
+          ],
+          "text": "+"
+        },
+        {
+          "name": "value",
+          "binding": "Literal:0",
+          "span": [
+            4,
+            5
+          ],
+          "text": "2"
+        },
+        {
+          "name": "right",
+          "binding": "Binary:2",
+          "span": [
+            4,
+            5
+          ],
+          "text": "2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 5,
+        "consumed": 5,
+        "matched": 5,
+        "expected": [
+          "' '",
+          "'*/'",
+          "'.'",
+          "'/*'",
+          "'//'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0,
+      "value": 3.0
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/RustConformanceTest.java",
+    "sha256": "b3e69ebb9375cbccf28356ecdd6dc54cf39fa755fc12dc815c24f44f3dd9b17e",
+    "methods": "compileJava, javaResult, javaDiagnostic, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "evolution/conformance.json",
+  "variant": "0",
+  "observation": "evolution"
+}

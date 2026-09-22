@@ -1,0 +1,103 @@
+{
+  "feature": "scope-annotations",
+  "grammar": "grammar TrimmedGroup { @package: org.example.scopeannotations @root @mapping(Root, params=[decl,ref]) Root ::= ScopedDecl @decl Ref @ref; @scopeTree(mode=dynamic) @declares(symbol=name, description=emojiName) @mapping(ScopedDecl, params=[name]) ScopedDecl ::= '>' ('  ' '😀x' '  ') @name '<'; @backref(name=name) @mapping(Ref, params=[name]) Ref ::= '?' (' ' '😀x' ' ') @name; }",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "trimmed-group-non-bmp/ascii-trim-adjusts-code-point-offset-and-length",
+      "input": ">  😀x  <? 😀x ",
+      "accepted": true,
+      "prefix": [
+        true,
+        13,
+        13
+      ],
+      "scope": {
+        "depth": 0,
+        "resolved": [
+          {
+            "query": "😀x",
+            "symbol": {
+              "name": "😀x",
+              "sourceOffset": 3
+            }
+          }
+        ],
+        "declarations": [
+          {
+            "name": "😀x",
+            "sourceOffset": 3
+          }
+        ],
+        "references": [
+          {
+            "name": "😀x",
+            "offset": 10,
+            "length": 2
+          }
+        ],
+        "diagnostics": []
+      },
+      "rollback": null,
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          13
+        ],
+        "fields": {
+          "decl": {
+            "type": "ScopedDecl",
+            "span": [
+              0,
+              8
+            ],
+            "fields": {
+              "name": "😀x"
+            }
+          },
+          "ref": {
+            "type": "Ref",
+            "span": [
+              8,
+              13
+            ],
+            "fields": {
+              "name": "😀x"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "queries": [
+    "😀x"
+  ],
+  "metadata": [
+    {
+      "rule": "ScopedDecl",
+      "scope": "dynamic",
+      "declares": {
+        "symbol": "name",
+        "description": "emojiName"
+      },
+      "backref": null
+    },
+    {
+      "rule": "Ref",
+      "scope": null,
+      "declares": null,
+      "backref": "name"
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/ScopeAnnotationConformanceTest.java",
+    "sha256": "73bd27e60ae50ecc5e31a87c627cc4a9ff89e5f38cd7e209519e16502c58c030",
+    "methods": "parseJava, javaMetadata, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "scope-annotations/corpus.json",
+  "variant": "trimmed-group-non-bmp",
+  "observation": "scope-annotations"
+}

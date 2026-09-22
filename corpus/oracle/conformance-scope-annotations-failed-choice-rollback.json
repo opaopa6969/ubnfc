@@ -1,0 +1,93 @@
+{
+  "feature": "scope-annotations",
+  "grammar": "grammar FailedChoice { @package: org.example.scopeannotations token ID = org.unlaxer.parser.clang.IdentifierParser @root @mapping(Root, params=[value]) Root ::= (Attempt '!' | Good) @value; @scopeTree(mode=lexical) Attempt ::= Decl; @declares(symbol=name) Decl ::= ID @name; Good ::= ID; }",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "failed-choice-rollback/committed-first-alternative",
+      "input": "ghost!",
+      "accepted": true,
+      "parentRollback": true,
+      "prefix": [
+        true,
+        6,
+        6
+      ],
+      "scope": {
+        "depth": 0,
+        "resolved": [
+          {
+            "query": "ghost",
+            "symbol": null
+          }
+        ],
+        "declarations": [
+          {
+            "name": "ghost",
+            "sourceOffset": 0
+          }
+        ],
+        "references": [],
+        "diagnostics": []
+      },
+      "rollback": {
+        "cursor": [
+          0,
+          0
+        ],
+        "scope": {
+          "depth": 0,
+          "resolved": [
+            {
+              "query": "ghost",
+              "symbol": null
+            }
+          ],
+          "declarations": [],
+          "references": [],
+          "diagnostics": []
+        }
+      },
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          6
+        ],
+        "fields": {
+          "value": "ghost!"
+        }
+      }
+    }
+  ],
+  "queries": [
+    "ghost"
+  ],
+  "metadata": [
+    {
+      "rule": "Attempt",
+      "scope": "lexical",
+      "declares": null,
+      "backref": null
+    },
+    {
+      "rule": "Decl",
+      "scope": null,
+      "declares": {
+        "symbol": "name",
+        "description": null
+      },
+      "backref": null
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/ScopeAnnotationConformanceTest.java",
+    "sha256": "73bd27e60ae50ecc5e31a87c627cc4a9ff89e5f38cd7e209519e16502c58c030",
+    "methods": "parseJava, javaMetadata, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "scope-annotations/corpus.json",
+  "variant": "failed-choice-rollback",
+  "observation": "scope-annotations"
+}

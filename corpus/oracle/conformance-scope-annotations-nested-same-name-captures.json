@@ -1,0 +1,84 @@
+{
+  "feature": "scope-annotations",
+  "grammar": "grammar NestedSameCapture { @package: org.example.scopeannotations @root @scopeTree(mode=lexical) @mapping(Root, params=[value]) Root ::= Decl @value; @declares(symbol=name) Decl ::= ('a' @name 'b') @name; }",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "nested-same-name-captures/inner-then-outer-capture-occurrences",
+      "input": "ab",
+      "accepted": true,
+      "prefix": [
+        true,
+        2,
+        2
+      ],
+      "scope": {
+        "depth": 0,
+        "resolved": [
+          {
+            "query": "a",
+            "symbol": null
+          },
+          {
+            "query": "ab",
+            "symbol": null
+          }
+        ],
+        "declarations": [
+          {
+            "name": "a",
+            "sourceOffset": 0
+          },
+          {
+            "name": "ab",
+            "sourceOffset": 0
+          }
+        ],
+        "references": [],
+        "diagnostics": []
+      },
+      "rollback": null,
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": "ab"
+        }
+      }
+    }
+  ],
+  "queries": [
+    "a",
+    "ab"
+  ],
+  "metadata": [
+    {
+      "rule": "Root",
+      "scope": "lexical",
+      "declares": null,
+      "backref": null
+    },
+    {
+      "rule": "Decl",
+      "scope": null,
+      "declares": {
+        "symbol": "name",
+        "description": null
+      },
+      "backref": null
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/ScopeAnnotationConformanceTest.java",
+    "sha256": "73bd27e60ae50ecc5e31a87c627cc4a9ff89e5f38cd7e209519e16502c58c030",
+    "methods": "parseJava, javaMetadata, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "scope-annotations/corpus.json",
+  "variant": "nested-same-name-captures",
+  "observation": "scope-annotations"
+}

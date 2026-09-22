@@ -1,0 +1,123 @@
+{
+  "feature": "scope-annotations",
+  "grammar": "grammar CaptureSiteIdentity { @package: org.example.scopeannotations @whitespace: javaStyle token ID = org.unlaxer.parser.clang.IdentifierParser @root @scopeTree(mode=lexical) @mapping(Root, params=[decl,ref]) Root ::= Decl @decl Ref @ref; @declares(symbol=name, description=declarationDoc) @mapping(Decl, params=[noise,name]) Decl ::= ID @noise ':' ID @name ';'; @backref(name=name) @mapping(Ref, params=[noise,name]) Ref ::= ID @noise '->' ID @name; }",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "capture-site-identity/target-site-not-first-parser-class",
+      "input": "noise:known;other->known",
+      "accepted": true,
+      "prefix": [
+        true,
+        24,
+        24
+      ],
+      "scope": {
+        "depth": 0,
+        "resolved": [
+          {
+            "query": "known",
+            "symbol": null
+          },
+          {
+            "query": "missing",
+            "symbol": null
+          },
+          {
+            "query": "noise",
+            "symbol": null
+          },
+          {
+            "query": "other",
+            "symbol": null
+          }
+        ],
+        "declarations": [
+          {
+            "name": "known",
+            "sourceOffset": 6
+          }
+        ],
+        "references": [
+          {
+            "name": "known",
+            "offset": 19,
+            "length": 5
+          }
+        ],
+        "diagnostics": []
+      },
+      "rollback": null,
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          24
+        ],
+        "fields": {
+          "decl": {
+            "type": "Decl",
+            "span": [
+              0,
+              12
+            ],
+            "fields": {
+              "noise": "noise",
+              "name": "known"
+            }
+          },
+          "ref": {
+            "type": "Ref",
+            "span": [
+              12,
+              24
+            ],
+            "fields": {
+              "noise": "other",
+              "name": "known"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "queries": [
+    "known",
+    "missing",
+    "noise",
+    "other"
+  ],
+  "metadata": [
+    {
+      "rule": "Root",
+      "scope": "lexical",
+      "declares": null,
+      "backref": null
+    },
+    {
+      "rule": "Decl",
+      "scope": null,
+      "declares": {
+        "symbol": "name",
+        "description": "declarationDoc"
+      },
+      "backref": null
+    },
+    {
+      "rule": "Ref",
+      "scope": null,
+      "declares": null,
+      "backref": "name"
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/ScopeAnnotationConformanceTest.java",
+    "sha256": "73bd27e60ae50ecc5e31a87c627cc4a9ff89e5f38cd7e209519e16502c58c030",
+    "methods": "parseJava, javaMetadata, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "scope-annotations/corpus.json",
+  "variant": "capture-site-identity",
+  "observation": "scope-annotations"
+}
