@@ -7,6 +7,7 @@ pub struct SourceInput {
     pub path: PathBuf,
     pub logical_path: String,
     pub text: String,
+    pub ast: Option<a::GrammarAst>,
 }
 impl SourceInput {
     pub fn new(
@@ -18,6 +19,21 @@ impl SourceInput {
             path: path.into(),
             logical_path: logical_path.into(),
             text: text.into(),
+            ast: None,
+        }
+    }
+
+    pub fn parsed(
+        path: impl Into<PathBuf>,
+        logical_path: impl Into<String>,
+        text: impl Into<String>,
+        ast: a::GrammarAst,
+    ) -> Self {
+        Self {
+            path: path.into(),
+            logical_path: logical_path.into(),
+            text: text.into(),
+            ast: Some(ast),
         }
     }
 }
@@ -60,13 +76,17 @@ impl Sources {
                 errors.push(error("E-LOWER-SOURCE-DUPLICATE", path));
                 continue;
             }
-            let parsed = crate::syntax::parse_file(&input.text);
-            if !parsed.as_ref().is_ok_and(|p| {
+            let parsed = input
+                .ast
+                .clone()
+                .map(Ok)
+                .unwrap_or_else(|| crate::syntax::parse_file(&input.text));
+            if !parsed.as_ref().is_ok_and(|parsed| {
                 grammar
                     .units
                     .iter()
                     .filter(|u| u.path == unit.path)
-                    .all(|u| p.grammars.get(u.declaration_index) == Some(&u.ast))
+                    .all(|u| parsed.grammars.get(u.declaration_index) == Some(&u.ast))
             }) {
                 errors.push(error(
                     "E-LOWER-SOURCE-STALE",
