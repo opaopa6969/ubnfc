@@ -240,30 +240,43 @@ fn disjoint_choice_predicts_and_records_omission_proof() {
     }
 }
 
+/// 再帰 SCC でも rule 本体の memo が守るので、本体の局所木で単一所有の部分式は省略できる。
+/// 2 つの候補の `'a'` は別 Expr（別 memo key）なので、全 memo でも候補間で hit は起きない。
 #[test]
-fn recursive_overlapping_choice_keeps_entire_scc_memoized() {
+fn recursive_overlapping_choice_keeps_rule_body_memoized_and_omits_owned_subexpressions() {
     let mut s = empty_semantics();
     let mut branches = vec![];
+    let mut leaves = vec![];
     for end in ["b", "c"] {
         let a = lit(&mut s, "S", "a");
         let rec = call(&mut s, "S", "S");
         let b = lit(&mut s, "S", end);
+        leaves.extend([a.clone(), rec.clone(), b.clone()]);
         branches.push(seq(&mut s, "S", vec![a, rec, b]));
     }
     branches.push(expr(&mut s, "S", ExprNode::Empty {}));
-    let body = choice(&mut s, "S", branches);
+    let body = choice(&mut s, "S", branches.clone());
     rule(&mut s, "S", body.clone());
     let (a, p) = analyze(&s).unwrap();
     check_properties(&s, &a, &p);
     assert!(fact(&a, &body).nullable);
     assert_eq!(fact(&a, &body).min_consume, 0);
     assert!(a.sccs[0].recursive);
-    assert_eq!(a.sccs[0].memo_policy, SccMemoPolicy::AllEligible);
-    assert!(p
-        .memo
-        .entries
-        .iter()
-        .all(|m| m.cache_success && m.cache_failure));
+    assert_eq!(a.sccs[0].memo_policy, SccMemoPolicy::ProvedOmissions);
+    let entry = |id: &ExprId| p.memo.entries.iter().find(|m| &m.expr_id == id).unwrap();
+    assert!(entry(&body).cache_success && entry(&body).cache_failure);
+    assert_eq!(entry(&body).reason, MemoEntryReason::DefaultSafe);
+    for id in &branches {
+        assert_eq!(entry(id).reason, MemoEntryReason::ProvedOmission);
+        assert_eq!(
+            entry(id).omission_proof.as_ref().unwrap().kind,
+            ProofKind::ExclusiveCandidates
+        );
+    }
+    for id in &leaves {
+        assert!(!entry(id).cache_success && !entry(id).cache_failure);
+        assert_eq!(entry(id).reason, MemoEntryReason::ProvedOmission);
+    }
     assert_eq!(p.choices[0].strategy, ChoicePlanStrategy::Ordered);
 }
 
