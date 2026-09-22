@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import generated.api.Capture;
@@ -57,20 +58,36 @@ public final class Session {
     public final Input input;
     public final ParseOptions options;
     public final ScopeStore scope = new ScopeStore();
-    private final Diagnostics diagnostics = new Diagnostics();
+    private Diagnostics diagnostics = new Diagnostics();
     private final MemoTable memo = new MemoTable();
     private final ArrayList<Memo> payloads = new ArrayList<>();
     private final ArrayList<TokenScanner.Effect> effects = new ArrayList<>();
     private final ArrayList<String> expected = new ArrayList<>();
     private final Map<String, Integer> expectedIds = new LinkedHashMap<>();
     private final String[] ruleNames;
-    private int suppression;
+    private int depth;
     private int reached;
     private ParseResult<?> syntax;
     public final IdentityHashMap<Object, Span> spans = new IdentityHashMap<>();
     private final IdentityHashMap<Recipe, Object> built = new IdentityHashMap<>();
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) {
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
+    }
+    private static final class DepthLimit extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        private DepthLimit() { super(null, null, false, false); }
+    }
+    /** Abort the entire parse: an outer optional/choice must not swallow a resource limit. */
+    public Match parse(Call entry, Frame f) {
+        var start = mark(); Frame initial = f.copy(false);
+        try { return entry.parse(this, f); }
+        catch (DepthLimit | StackOverflowError limit) {
+            restore(start); f.commit(initial); f.reset = initial.reset;
+            diagnostics = new Diagnostics();
+            String reason = limit instanceof StackOverflowError ? "JVM stack limit; maxDepth=" : "maxDepth=";
+            fail(reached, "maximum parse depth exceeded (" + reason + options.maxDepth() + ")");
+            return null;
+        }
     }
     public int cp(int at) { return at < input.length() ? input.codePointAt(at) : -1; }
     public Span span(int start, int end) { return new Span(input.cpIndex(start), input.cpIndex(end)); }
@@ -94,21 +111,24 @@ public final class Session {
             default -> throw new IllegalArgumentException("Unsupported scanner effect: " + effect.action());
         }
     }
-    public Match rule(Frame f, int id, boolean successMemo, boolean failureMemo, Call body,
+    public Match rule(Frame f, int id, int memoId, boolean successMemo, boolean failureMemo, Call body,
                       String recipe, String fallback, String recipeKind, Field[] fields, Effect[] scopeEffects, boolean skip) {
         int c = f.c, m = f.m, state = scope.stateVersion();
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
-        boolean cache = options.memo() && suppression == 0 && (successMemo || failureMemo);
+        boolean cache = options.memo() && (successMemo || failureMemo);
         if (cache) {
-            int slot = memo.get(id, c, m, mode, state);
+            int slot = memo.get(memoId, c, m, mode, state);
             if (slot >= 0) {
                 Memo value = payloads.get(memo.payload(slot)); diagnostics.merge(value.diagnostics()); replay(value.effects());
                 f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = value.reset();
                 return value.match();
             }
         }
+        reached = Math.max(reached, Math.max(f.c, f.m));
+        if (depth >= options.maxDepth()) throw new DepthLimit();
+        depth++;
         var mark = mark(); diagnostics.enterRule(id);
-        applyEffects(scopeEffects, "entry", null);
+        applyEffects(scopeEffects, "entry", Match.empty(c, c));
         Match result = body.parse(this, f);
         if (result != null) {
             applyEffects(scopeEffects, "successBeforeLeave", result);
@@ -122,18 +142,46 @@ public final class Session {
                     var captures = new ArrayList<Value>();
                     for (var occurrence : result.local()) if (Arrays.asList(field.sites()).contains(occurrence.site())) {
                         Value v = occurrence.value();
-                        if (field.conversion().equals("node") && field.cardinality().equals("list") && !v.nodes().isEmpty())
+                        if (Set.of("node", "mixed").contains(field.conversion()) && field.cardinality().equals("list") && !v.nodes().isEmpty())
                             for (Recipe node : v.nodes()) captures.add(new Value(node.start(), node.end(), List.of(node)));
-                        else if (!(field.conversion().equals("node") && field.cardinality().equals("list") && v.start() == v.end() && v.nodes().isEmpty())) captures.add(v);
+                        else if (!(Set.of("node", "mixed").contains(field.conversion()) && field.cardinality().equals("list") && v.start() == v.end() && v.nodes().isEmpty())) captures.add(v);
                     }
                     values.put(field.name(), List.copyOf(captures));
                 }
                 nodes = List.of(new Recipe(recipe, c, f.c, values, fallback));
             }
             result = new Match(nodes, List.of(), result.captures(), result.traces(), c, f.c, result.mappingFailure());
-        } else { restore(mark); f.c = c; f.m = m; }
+        } else {
+            var local = diagnostics.snapshot();
+            if (local.farthest() == Math.max(c, m) && structural(local.expected())) fail(local.farthest(), ruleNames[id] + "Parser");
+            restore(mark); f.c = c; f.m = m;
+        }
+        depth--;
         var diagnostic = diagnostics.leaveRule();
         if (cache && (result != null ? successMemo : failureMemo)) {
+            int payload = payloads.size();
+            payloads.add(new Memo(result, f.reset, List.copyOf(effects.subList(mark.effects(), effects.size())), diagnostic));
+            memo.put(memoId, c, m, mode, state, result != null, f.c, f.m, payload);
+        }
+        return result;
+    }
+    private boolean structural(int[] ids) {
+        return Arrays.stream(ids).mapToObj(expected::get).anyMatch(label -> label.equals("Repeat") || label.equals("EndOfSourceParser"));
+    }
+    public Match expression(Frame f, int id, boolean successMemo, boolean failureMemo, Call body) {
+        if (!options.memo() || !successMemo && !failureMemo) return body.parse(this, f);
+        int c = f.c, m = f.m, state = scope.stateVersion();
+        int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
+        int slot = memo.get(id, c, m, mode, state);
+        if (slot >= 0) {
+            Memo value = payloads.get(memo.payload(slot)); diagnostics.merge(value.diagnostics()); replay(value.effects());
+            f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = value.reset();
+            return value.match();
+        }
+        var mark = mark(); diagnostics.enterExpression();
+        Match result = body.parse(this, f);
+        var diagnostic = diagnostics.leaveRule();
+        if (result != null ? successMemo : failureMemo) {
             int payload = payloads.size();
             payloads.add(new Memo(result, f.reset, List.copyOf(effects.subList(mark.effects(), effects.size())), diagnostic));
             memo.put(id, c, m, mode, state, result != null, f.c, f.m, payload);
@@ -145,7 +193,7 @@ public final class Session {
         for (Effect definition : definitions) {
             if (!definition.when().equals(when)) continue;
             if (definition.site() == null) {
-                effect(new TokenScanner.Effect(definition.action(), definition.name(), 0, 0)); continue;
+                effect(new TokenScanner.Effect(definition.action(), definition.name(), result == null ? 0 : input.cpIndex(result.end()), 0, definition.mode())); continue;
             }
             if (result == null) continue;
             for (Occurrence capture : result.local()) if (capture.site().equals(definition.site())) {
@@ -163,7 +211,7 @@ public final class Session {
                         for (Occurrence own : result.local()) if (own.site().equals(declaration.site())) target = source.substring(own.value().start(), own.value().end()).trim();
                     if (definition.action().equals("declare")) declared.put(key, name);
                     else if (definition.action().equals("use") && !name.equals(target)) effect(new TokenScanner.Effect("error", "Reference mismatch: " + name, input.cpIndex(trimmedStart), input.cpLength(trimmedStart, trimmedEnd)));
-                } else effect(new TokenScanner.Effect(definition.action(), name, input.cpIndex(trimmedStart), input.cpLength(trimmedStart, trimmedEnd)));
+                } else effect(new TokenScanner.Effect(definition.action(), name, input.cpIndex(trimmedStart), input.cpLength(trimmedStart, trimmedEnd), definition.mode()));
             }
         }
     }
@@ -171,7 +219,10 @@ public final class Session {
                          String rule, String expr) {
         int c = f.c, m = f.m; Match result = call.parse(this, f);
         reached = Math.max(reached, Math.max(f.c, f.m));
-        if (result == null) return null;
+        if (result == null) {
+            if (sites.length > 0 && diagnostics.farthest() == Math.max(c, m) && structural(diagnostics.expected())) fail(diagnostics.farthest(), "__CaptureSite");
+            return null;
+        }
         var locals = new ArrayList<>(result.local()); var captures = new ArrayList<>(result.captures());
         for (int i = 0; i < sites.length; i++) if (!skips[i]) {
             int start = spanRules[i].equals("matchedExtent") ? m : spanRules[i].equals("selectedChildExtent") ? result.start() : c;
@@ -219,11 +270,12 @@ public final class Session {
         return best;
     }
     public Match optional(Frame parent, Call child) {
-        var mark = mark(); Frame trial = parent.copy(true); Match result = child.parse(this, trial);
-        if (result == null) { restore(mark); return Match.empty(parent.c, parent.c); }
-        parent.commit(trial); return result;
+        return repeat(parent, child, 0, 1, null, new Boundary[0]);
     }
     public Match repeat(Frame parent, Call child, int min, int max, Call terminator, Boundary[] boundaries) {
+        return repeat(parent, child, min, max, terminator, boundaries, "Repeat");
+    }
+    private Match repeat(Frame parent, Call child, int min, int max, Call terminator, Boundary[] boundaries, String label) {
         var whole = mark(); Frame f = parent.copy(true); int start = f.c, count = 0;
         boundary(f, boundaries, "entry", -1); boundary(f, boundaries, "helperEntry", -1);
         var matches = new ArrayList<Match>();
@@ -239,12 +291,12 @@ public final class Session {
                 }
                 restore(mark);
             }
-            var mark = mark(); Frame trial = f.copy(true); Match result = child.parse(this, trial);
+            var mark = mark(); Match result = child.parse(this, f);
             if (result == null) { restore(mark); break; }
-            f.commit(trial); matches.add(result); count++;
+            matches.add(result); count++;
             if (before == f.position() || count >= max) break;
         }
-        if (count < min || count > max) { restore(whole); return null; }
+        if (count < min || count > max) { fail(Math.max(parent.c, parent.m), label); restore(whole); return null; }
         boundary(f, boundaries, "helperExit", -1); boundary(f, boundaries, "exit", -1);
         parent.commit(f); return combine(matches, start, f.c);
     }
@@ -270,13 +322,14 @@ public final class Session {
     }
     public Match look(Frame parent, Call child, boolean negative, String label) {
         var mark = mark(); Frame trial = parent.copy(true); trial.matched = true;
-        trial.invert = negative;
-        if (negative) { suppression++; diagnostics.suppressBegin(); }
+        var diagnosticMark = negative ? diagnostics.checkpoint() : null;
+        int priorReached = reached;
         Match result;
         try { result = child.parse(this, trial); }
-        finally { if (negative) { diagnostics.suppressEnd(); suppression--; } restore(mark); }
+        finally { restore(mark); }
         if (negative) {
             if (result != null) { fail(Math.max(parent.c, parent.m), label); return null; }
+            diagnostics.restore(diagnosticMark); reached = priorReached;
             parent.m = parent.reset ? parent.c : parent.m; return Match.empty(parent.c, parent.c);
         }
         if (result == null) return null;
@@ -284,7 +337,7 @@ public final class Session {
     }
     public Match literal(Frame f, String word, boolean sensitive, String label) {
         int at = f.position();
-        boolean ok = sensitive ? input.startsWith(at, word) : input.startsWithIgnoreCase(at, word);
+        boolean ok = !word.isEmpty() && (sensitive ? input.startsWith(at, word) : input.startsWithIgnoreCase(at, word));
         if (!ok) { fail(Math.max(f.c, f.m), label); f.advance(0); return null; }
         f.advance(word.length()); return Match.empty(at, at + word.length());
     }
@@ -293,7 +346,7 @@ public final class Session {
         int length = Character.charCount(cp(at)); f.advance(length); return Match.empty(at, at + length);
     }
     public Match empty(Frame f) { return optional(f, (s, p) -> s.look(p, (ss, pp) -> ss.any(pp, "ANY"), false, "EMPTY")); }
-    public Match eof(Frame f) { return repeat(f, (s, p) -> s.any(p, "EOF"), 0, 0, null, new Boundary[0]); }
+    public Match eof(Frame f) { return repeat(f, (s, p) -> s.any(p, "WildCardCharacterParser"), 0, 0, null, new Boundary[0], "EndOfSourceParser"); }
     public Match error(Frame f, String message) { fail(Math.max(f.c, f.m), message); return null; }
     private boolean digit(int p) { return cp(p) >= '0' && cp(p) <= '9'; }
     public Match number(Frame f) {
@@ -349,9 +402,9 @@ public final class Session {
         if (ch < 0 || ch < min || ch > max || excluded != null && excluded.codePoints().anyMatch(v -> v == ch)) return error(f, label);
         f.advance(Character.charCount(ch)); return Match.empty(at, f.position());
     }
-    public Match regex(Frame f, Pattern pattern) {
+    public Match regex(Frame f, Pattern pattern, String label) {
         int at = f.position(); var matcher = pattern.matcher(source).region(at, source.length());
-        if (!matcher.lookingAt() || matcher.end() == at) return error(f, pattern.pattern());
+        if (!matcher.lookingAt() || matcher.end() == at) return error(f, label);
         input.cpIndex(matcher.end()); f.advance(matcher.end() - at); return Match.empty(at, matcher.end());
     }
     public Match until(Frame f, String terminator) {
@@ -361,40 +414,51 @@ public final class Session {
     public Match external(Frame f, String id) {
         TokenScanner scanner = options.scanners().get(id);
         if (scanner == null) throw new IllegalArgumentException("Missing TokenScanner: " + id);
-        var result = scanner.scan(input, f.c, f.m);
+        var result = scanner.scan(input, new TokenScanner.ScanState(f.c, f.m, f.matched ? TokenScanner.Mode.matchOnly : TokenScanner.Mode.consumed, f.invert, f.reset));
         for (var diagnostic : result.diagnostics()) { input.cpIndex(diagnostic.offsetUtf16()); fail(diagnostic.offsetUtf16(), diagnostic.expected()); }
         if (!result.ok()) return null;
-        input.cpIndex(result.consumedEnd()); input.cpIndex(result.matchedEnd()); input.cpIndex(result.valueStart()); input.cpIndex(result.valueEnd());
-        if (result.consumedEnd() < f.c || result.matchedEnd() < result.consumedEnd() || result.valueEnd() < result.valueStart()) throw new IllegalArgumentException("Invalid TokenScanner cursors: " + id);
+        int valueStart = result.valueSpan() == null ? f.position() : result.valueSpan().start();
+        int valueEnd = result.valueSpan() == null ? (f.matched ? result.matchedEnd() : result.consumedEnd()) : result.valueSpan().end();
+        input.cpIndex(result.consumedEnd()); input.cpIndex(result.matchedEnd()); input.cpIndex(valueStart); input.cpIndex(valueEnd);
+        if (result.consumedEnd() < f.c || result.matchedEnd() < result.consumedEnd() || valueEnd < valueStart
+            || f.matched && result.consumedEnd() != f.c) throw new IllegalArgumentException("Invalid TokenScanner cursors: " + id);
         if (f.matched) f.m = result.matchedEnd(); else { f.c = result.consumedEnd(); f.m = result.matchedEnd(); }
-        replay(result.effects()); return Match.empty(result.valueStart(), result.valueEnd());
+        replay(result.effects()); return Match.empty(valueStart, valueEnd);
     }
     public void boundary(Frame f, Boundary[] boundaries, String at, int child) {
         for (var boundary : boundaries) if (boundary.at().equals(at) && boundary.child() == child) trivia(f, boundary.delimiters());
     }
     private void trivia(Frame f, Delimiter[] delimiters) {
-        int start = f.position(), p = start;
         boolean again = true;
         while (again) {
             again = false;
             for (var delimiter : delimiters) {
-                int next = p;
+                int p = f.position(), next = p, terminatorEnd = -1;
                 if (delimiter.kind().equals("characters")) {
                     if (cp(p) >= 0 && Arrays.binarySearch(delimiter.characters(), cp(p)) >= 0) next += Character.charCount(cp(p));
                 } else if (input.startsWith(p, delimiter.open())) {
                     if (delimiter.kind().equals("lineComment")) {
                         next += delimiter.open().length();
                         while (cp(next) >= 0 && cp(next) != '\r' && cp(next) != '\n') next += Character.charCount(cp(next));
+                        terminatorEnd = cp(next) == '\r' && cp(next + 1) == '\n' ? next + 2 : cp(next) >= 0 ? next + 1 : next;
                     } else {
                         int end = source.indexOf(delimiter.close(), p + delimiter.open().length());
                         if (end < 0) fail(input.length(), "'*/'");
                         else next = end + delimiter.close().length();
                     }
                 }
-                if (next > p) { p = next; again = true; break; }
+                if (next > p) {
+                    f.advance(next - p);
+                    // CPPComment's MatchOnly(LineTerminator) commits M, leaving C before the newline.
+                    if (!f.matched && terminatorEnd >= 0) f.m = terminatorEnd;
+                    reached = Math.max(reached, Math.max(f.c, f.m));
+                    again = true; break;
+                }
+                // A bare @comment delimiter uses CPPComment directly. Composite whitespace
+                // retains its own diagnostic profile, as in the Java-style delimiter scanner.
+                if (delimiters.length == 1 && delimiter.kind().equals("lineComment")) fail(Math.max(f.c, f.m), "'" + delimiter.open() + "'");
             }
         }
-        f.advance(p - start);
     }
     public Match recover(Frame f, Call child, String[] patterns, boolean consumeSync, String noSync, String projection, String recipe) {
         var mark = mark(); Frame trial = f.copy(false); Match result = child.parse(this, trial);
@@ -415,7 +479,7 @@ public final class Session {
     }
     public <N> ParseResult<N> result(Frame f, Match match, Map<String, String> catalogs) {
         boolean ok = match != null; String kind = ok ? "none" : "syntax"; int offset = -1;
-        if (ok && options.requireFullInput() && f.c != input.length()) { ok = false; kind = "trailing_input"; offset = f.c; fail(f.c, "EOF"); }
+        if (ok && options.requireFullInput() && f.c != input.length()) { ok = false; kind = "trailing_input"; offset = f.c; }
         if (!ok && offset < 0) offset = diagnostics.farthest() < 0 ? reached : diagnostics.farthest();
         var captures = new ArrayList<Capture>(); var lexical = new ArrayList<ParseResult.Lexical>();
         var catalog = new LinkedHashMap<String, List<Capture>>();
@@ -429,12 +493,15 @@ public final class Session {
             long[] counter = {0, 0}; for (var trace : match.traces()) trace(trace, -1, counter, lexical);
         }
         catalog.replaceAll((key, values) -> List.copyOf(values));
+        var farthestExpected = Arrays.stream(diagnostics.expected()).mapToObj(expected::get).sorted().toList();
+        var scopeEvents = new ArrayList<ParseResult.ScopeEvent>();
+        for (var effect : effects) scopeEvents.add(new ParseResult.ScopeEvent(scopeEvents.size(), effect.action(), effect.mode(), effect.name(), effect.offsetCp(), effect.lengthCp()));
         var diagnostic = new Diagnostic(kind, offset < 0 ? -1 : input.cpIndex(offset), diagnostics.farthest() < 0 ? -1 : input.cpIndex(diagnostics.farthest()),
-            Arrays.stream(diagnostics.expected()).mapToObj(expected::get).sorted().toList(),
+            kind.equals("trailing_input") ? List.of("end of input") : farthestExpected,
             diagnostics.deepestRule() < 0 ? null : ruleNames[diagnostics.deepestRule()],
-            Arrays.stream(diagnostics.ruleStack()).mapToObj(i -> ruleNames[i]).toList());
+            Arrays.stream(diagnostics.ruleStack()).mapToObj(i -> ruleNames[i]).toList(), farthestExpected);
         var result = new ParseResult<N>(ok, input.cpIndex(f.c), input.cpIndex(f.m), Optional.empty(), Map.of(), captures, lexical,
-            new ParseResult.Scope(scope.allDeclarations(), scope.references(), scope.diagnostics()), diagnostic, catalog);
+            new ParseResult.Scope(scope.allDeclarations(), scope.references(), scope.diagnostics(), scopeEvents), diagnostic, catalog);
         syntax = result; return result;
     }
     private void trace(Trace trace, long parent, long[] counter, List<ParseResult.Lexical> out) {
@@ -448,6 +515,7 @@ public final class Session {
         catch (NumberFormatException error) { throw mapping(value.start(), value.end(), "NUMBER cannot be mapped to int", error); }
     }
     public Recipe node(Value value, Recipe owner) {
+        if (value.nodes().size() > 1) throw mapping(value.start(), value.end(), "Scalar capture has multiple mapped nodes", null);
         if (!value.nodes().isEmpty()) return value.nodes().getFirst();
         if (owner.fallback() != null) return new Recipe("#leaf:" + owner.fallback(), value.start(), value.end(), Map.of(), null);
         throw mapping(value.start(), value.end(), "Missing mapped node", null);

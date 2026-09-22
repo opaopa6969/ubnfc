@@ -83,7 +83,8 @@ class DriverTest {
         assertEquals(1, integer(partial.get("consumed"))); assertNull(partial.get("ast")); assertNull(partial.get("value"));
         var diagnostic = Json.object(Json.array(partial.get("diagnostics")).getFirst());
         assertEquals("trailing_input", diagnostic.get("kind")); assertEquals(1, integer(diagnostic.get("offset")));
-        assertEquals(List.of("'('", "NUMBER"), diagnostic.get("expected"));
+        assertEquals(List.of("'('", "NUMBER"), diagnostic.get("farthestExpected"));
+        assertEquals(List.of("end of input"), diagnostic.get("expected"));
     }
     @Test void numericFoldAndNonFiniteValues() throws Exception {
         var rows = exchange(operators, List.of(Json.write(request("1/0")), Json.write(request("10-3-2")),

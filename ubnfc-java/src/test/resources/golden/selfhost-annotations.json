@@ -1,0 +1,13 @@
+[
+  {
+    "input": "grammar G { R ::= 'a'; }",
+    "annotations": []
+  },
+  {
+    "input": "grammar G { @root @mapping(V) R ::= 'a'; }",
+    "annotations": [
+      { "type": "RootAnnotation", "fields": {} },
+      { "type": "MappingAnnotation", "fields": { "className": "V", "paramNames": [] } }
+    ]
+  }
+]

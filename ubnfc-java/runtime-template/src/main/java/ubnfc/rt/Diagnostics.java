@@ -67,6 +67,34 @@ public final class Diagnostics {
 
     private record Frame(int ruleId, Accumulator local) {}
 
+    /** A speculative parse may discard diagnostics only after its outcome is known. */
+    public static final class Checkpoint {
+        private final Snapshot global;
+        private final Snapshot[] locals;
+        private Checkpoint(Diagnostics diagnostics) {
+            global = new Snapshot(diagnostics.global);
+            locals = diagnostics.frames.stream().map(f -> new Snapshot(f.local())).toArray(Snapshot[]::new);
+        }
+    }
+
+    public Checkpoint checkpoint() { return new Checkpoint(this); }
+
+    public void restore(Checkpoint checkpoint) {
+        if (frames.size() != checkpoint.locals.length) throw new IllegalStateException("Unbalanced diagnostic frames");
+        restoreInto(global, checkpoint.global);
+        for (int i = 0; i < frames.size(); i++) restoreInto(frames.get(i).local(), checkpoint.locals[i]);
+    }
+
+    private static void restoreInto(Accumulator target, Snapshot snapshot) {
+        target.farthest = snapshot.farthest;
+        target.expected = Arrays.copyOf(snapshot.expected, Math.max(4, snapshot.expected.length));
+        target.expectedSize = snapshot.expected.length;
+        target.ruleStack = snapshot.ruleStack.clone();
+    }
+
+    /** Expression memo needs a local accumulator without inventing a rule in the stack. */
+    public void enterExpression() { frames.add(new Frame(-1, new Accumulator())); }
+
     private final Accumulator global = new Accumulator();
     private final ArrayList<Frame> frames = new ArrayList<>();
     private int suppressionDepth;
@@ -151,11 +179,11 @@ public final class Diagnostics {
     }
 
     private int[] stackSuffix(int start, int[] suffix) {
-        int prefixSize = frames.size() - start;
+        int prefixSize = 0;
+        for (int i = start; i < frames.size(); i++) if (frames.get(i).ruleId() >= 0) prefixSize++;
         int[] stack = new int[prefixSize + (suffix == null ? 0 : suffix.length)];
-        for (int i = 0; i < prefixSize; i++) {
-            stack[i] = frames.get(start + i).ruleId();
-        }
+        int at = 0;
+        for (int i = start; i < frames.size(); i++) if (frames.get(i).ruleId() >= 0) stack[at++] = frames.get(i).ruleId();
         if (suffix != null) {
             System.arraycopy(suffix, 0, stack, prefixSize, suffix.length);
         }
