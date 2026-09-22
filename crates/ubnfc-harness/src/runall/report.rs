@@ -1,4 +1,4 @@
-use super::{BuildResult, CaseResult};
+use super::{Backend, BatchStats, BuildResult, CaseResult};
 use serde::Serialize;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -15,6 +15,7 @@ pub enum Outcome {
     Fail,
     DriverError,
     JavacFailure,
+    BuildFailure,
     GenerationRejected,
     IrFailure,
 }
@@ -24,6 +25,7 @@ pub struct Counts {
     pub ir_failure: usize,
     pub generation_rejected: usize,
     pub javac_failure: usize,
+    pub build_failure: usize,
     pub driver_error: usize,
     pub pass: usize,
     pub known_divergence: usize,
@@ -36,6 +38,7 @@ impl Counts {
             Outcome::IrFailure => &mut self.ir_failure,
             Outcome::GenerationRejected => &mut self.generation_rejected,
             Outcome::JavacFailure => &mut self.javac_failure,
+            Outcome::BuildFailure => &mut self.build_failure,
             Outcome::DriverError => &mut self.driver_error,
             Outcome::Pass => &mut self.pass,
             Outcome::KnownDivergence => &mut self.known_divergence,
@@ -47,6 +50,7 @@ impl Counts {
         self.ir_failure
             + self.generation_rejected
             + self.javac_failure
+            + self.build_failure
             + self.driver_error
             + self.pass
             + self.known_divergence
@@ -67,7 +71,10 @@ pub struct Report {
     pub backend: String,
     pub generator_sha256: Option<String>,
     pub front_sha256: Option<String>,
+    /// Java worker 数。Rust の実際の並列度は rust_build.jobs を参照。
     pub jobs: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rust_build: Option<BatchStats>,
     pub corpus_files: usize,
     pub grammar_variants: usize,
     pub unique_builds: usize,
@@ -83,6 +90,7 @@ pub struct Report {
 }
 impl Report {
     pub(super) fn new(
+        backend: Backend,
         jobs: usize,
         corpus_files: usize,
         grammar_variants: usize,
@@ -93,10 +101,15 @@ impl Report {
             (&a.corpus, &a.case_id, &a.grammar).cmp(&(&b.corpus, &b.case_id, &b.grammar))
         });
         let mut report = Self {
-            backend: "java".into(),
+            backend: match backend {
+                Backend::Java => "java",
+                Backend::Rust => "rust",
+            }
+            .into(),
             generator_sha256: None,
             front_sha256: None,
             jobs,
+            rust_build: None,
             corpus_files,
             grammar_variants,
             unique_builds: builds.len(),
@@ -146,7 +159,10 @@ impl Report {
                 ("ir", &build.ir),
                 ("generation", &build.generation),
                 ("javac", &build.javac),
-            ] {
+            ]
+            .into_iter()
+            .chain(build.cargo.as_ref().map(|stage| ("build", stage)))
+            {
                 for feature in &result.reasons {
                     let counts = refusals.entry(format!("{stage}/{feature}")).or_default();
                     counts.0.insert(&build.id);
@@ -180,14 +196,31 @@ impl Report {
         serde_json::to_string_pretty(self).expect("run-all report is JSON") + "\n"
     }
     pub fn summary_markdown(&self) -> String {
-        let mut out = format!("Java corpus run-all\n\n元 corpus: {} ファイル、{} ケース。文法 variant: {}、hash キャッシュ: {} build、展開後: {} 件（文法なし操作列を含む）。jobs={}。\n\n",
-            self.corpus_files, self.source_cases, self.grammar_variants, self.unique_builds, self.totals.total(), self.jobs);
+        let language = if self.backend == "rust" {
+            "Rust"
+        } else {
+            "Java"
+        };
+        let jobs = if self.backend == "rust" {
+            self.rust_build
+                .as_ref()
+                .and_then(|stats| stats.jobs)
+                .map_or_else(|| "cargo（既定）".into(), |n| format!("cargo --jobs={n}"))
+        } else {
+            self.jobs.to_string()
+        };
+        let mut out = format!("{language} corpus run-all\n\n元 corpus: {} ファイル、{} ケース。文法 variant: {}、hash キャッシュ: {} build、展開後: {} 件（文法なし操作列を含む）。jobs={}。\n\n",
+            self.corpus_files, self.source_cases, self.grammar_variants, self.unique_builds, self.totals.total(), jobs);
         out.push_str("集計単位は case × variant（文法なし操作列は各1件）。段階失敗後は比較しない。比較に差分がある場合は Fail / Known、差分がなく欠落観測がある場合は未観測、それ以外は Pass。Known/Fail に併存する未観測は JSON の missing と未観測項目表に残す。\n\n");
         if let Some(sha) = &self.generator_sha256 {
-            writeln!(out, "Java generator SHA-256: `{sha}`\n").unwrap();
+            writeln!(out, "{language} generator SHA-256: `{sha}`\n").unwrap();
         }
         if let Some(sha) = &self.front_sha256 {
             writeln!(out, "front SHA-256: `{sha}`\n").unwrap();
+        }
+        if let Some(stats) = &self.rust_build {
+            writeln!(out, "Rust 一括 cargo build --release --offline --workspace: {:.3} 秒。個別切り分け込み: {:.3} 秒、cargo 起動 {} 回。生成 {} crate、生成物 hash 重複除去後 {} crate、既存 cache hit {} 件。\n", stats.initial_build_seconds, stats.total_build_seconds, stats.cargo_invocations, stats.generated_crates, stats.unique_crates, stats.cache_hits).unwrap();
+            out.push_str("JSON の build_failure / builds[].cargo は Rust、javac_failure / builds[].javac は Java の build 段階。表の build 失敗は両者の合計。比較規則は共通で、診断 offset と数値字句は backend ごとの既存 oracle を使う。\n\n");
         }
         let rejections = self
             .cases
@@ -254,7 +287,10 @@ impl Report {
                 ("ir", &build.ir),
                 ("generation", &build.generation),
                 ("javac", &build.javac),
-            ] {
+            ]
+            .into_iter()
+            .chain(build.cargo.as_ref().map(|stage| ("build", stage)))
+            {
                 if !result.reasons.is_empty() {
                     writeln!(
                         out,
@@ -296,7 +332,7 @@ impl Report {
     }
 }
 fn table(out: &mut String, label: &str, rows: &BTreeMap<String, Counts>, total: &Counts) {
-    writeln!(out, "| {label} | ir 失敗 | 生成拒否 | javac 失敗 | 実行エラー | Pass | Known | Fail | 未観測 |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|").unwrap();
+    writeln!(out, "| {label} | ir 失敗 | 生成拒否 | build 失敗 | 実行エラー | Pass | Known | Fail | 未観測 |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|").unwrap();
     for (name, c) in rows
         .iter()
         .map(|(n, c)| (n.as_str(), c))
@@ -308,7 +344,7 @@ fn table(out: &mut String, label: &str, rows: &BTreeMap<String, Counts>, total: 
             cell(name),
             c.ir_failure,
             c.generation_rejected,
-            c.javac_failure,
+            c.javac_failure + c.build_failure,
             c.driver_error,
             c.pass,
             c.known_divergence,
