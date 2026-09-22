@@ -1,0 +1,110 @@
+[
+  {
+    "grammar": "Annotations",
+    "rule": "Root",
+    "code": "E-ASSOC-MAPPING-PARAM",
+    "message": "rule Root uses @leftAssoc but @mapping(Node.Item) params does not contain 'op'",
+    "hint": "Include left/op/right in @mapping params.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Root",
+    "code": "E-ASSOC-MISSING-CAPTURE",
+    "message": "rule Root uses @leftAssoc but capture @op is missing",
+    "hint": "Add @op capture in the rule body.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Root",
+    "code": "E-ASSOC-NO-REPEAT",
+    "message": "rule Root uses @leftAssoc but has no repeat segment",
+    "hint": "Use canonical operator pattern: Base { Op Right }.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Root",
+    "code": "E-ANNOTATION-INTERLEAVE-PROFILE",
+    "message": "rule Root uses unsupported @interleave profile: comments",
+    "hint": "Use @interleave(profile=javaStyle) or @interleave(profile=commentsAndSpaces).",
+    "severity": "ERROR",
+    "category": "ANNOTATION"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Root",
+    "code": "E-ANNOTATION-BACKREF-CAPTURE",
+    "message": "rule Root has no scope capture: value",
+    "hint": "Capture the target in this rule's body using @value.",
+    "severity": "ERROR",
+    "category": "ANNOTATION"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Other",
+    "code": "E-ASSOC-NO-MAPPING",
+    "message": "rule Other uses @rightAssoc but has no @mapping",
+    "hint": "Add @mapping(ClassName, params=[left, op, right]) to this rule.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Other",
+    "code": "E-ASSOC-MISSING-CAPTURE",
+    "message": "rule Other uses @rightAssoc but capture @left is missing",
+    "hint": "Add @left capture in the rule body.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Other",
+    "code": "E-ASSOC-MISSING-CAPTURE",
+    "message": "rule Other uses @rightAssoc but capture @op is missing",
+    "hint": "Add @op capture in the rule body.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Other",
+    "code": "E-ASSOC-MISSING-CAPTURE",
+    "message": "rule Other uses @rightAssoc but capture @right is missing",
+    "hint": "Add @right capture in the rule body.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Other",
+    "code": "E-ASSOC-NO-REPEAT",
+    "message": "rule Other uses @rightAssoc but has no repeat segment",
+    "hint": "Use canonical operator pattern: Base { Op Right }.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Other",
+    "code": "E-RIGHTASSOC-NONCANONICAL",
+    "message": "rule Other uses @rightAssoc but body is not canonical: expected Base { Op Other }",
+    "hint": "Rewrite right-assoc rule as Base { op Other }.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  },
+  {
+    "grammar": "Annotations",
+    "rule": "Other",
+    "code": "E-ASSOC-NO-PRECEDENCE",
+    "message": "rule Other uses @rightAssoc but has no @precedence",
+    "hint": "Add @precedence(level=...) to this operator rule.",
+    "severity": "ERROR",
+    "category": "ASSOCIATIVITY"
+  }
+]

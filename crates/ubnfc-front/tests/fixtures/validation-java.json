@@ -1,0 +1,1279 @@
+[
+  {
+    "case": "testValidMappingPasses:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(Root, params=[value])\n  Start ::= 'ok' @value ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testMissingCaptureFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(Root, params=[value, missing])\n  Start ::= 'ok' @value ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-MAPPING-MISSING-CAPTURE",
+        "message": "rule Start @mapping(Root) param 'missing' has no matching capture",
+        "hint": "Add @missing capture in the rule body or remove it from params.",
+        "severity": "ERROR",
+        "category": "MAPPING"
+      }
+    ]
+  },
+  {
+    "case": "testUnlistedCaptureFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(Root, params=[left])\n  Start ::= 'a' @left 'b' @right ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-MAPPING-UNLISTED-CAPTURE",
+        "message": "rule Start has capture @right not listed in @mapping(Root) params",
+        "hint": "Add 'right' to @mapping params.",
+        "severity": "ERROR",
+        "category": "MAPPING"
+      }
+    ]
+  },
+  {
+    "case": "testDuplicateParamsFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(Root, params=[value, value])\n  Start ::= 'ok' @value ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-MAPPING-DUPLICATE-PARAM",
+        "message": "rule Start @mapping(Root) has duplicate params: [value]",
+        "hint": "Remove duplicate parameter names in @mapping params.",
+        "severity": "ERROR",
+        "category": "MAPPING"
+      }
+    ]
+  },
+  {
+    "case": "testLeftAssocWithoutRepeatFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(Bin, params=[left, op, right])\n  @leftAssoc\n  Expr ::= 'a' @left '+' @op 'b' @right ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-REPEAT",
+        "message": "rule Expr uses @leftAssoc but has no repeat segment",
+        "hint": "Use canonical operator pattern: Base { Op Right }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Expr uses @leftAssoc but has no @precedence",
+        "hint": "Add @precedence(level=...) to this operator rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "testLeftAssocWithoutMappingFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @leftAssoc\n  Expr ::= Term @left { '+' @op Term @right } ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-MAPPING",
+        "message": "rule Expr uses @leftAssoc but has no @mapping",
+        "hint": "Add @mapping(ClassName, params=[left, op, right]) to this rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Expr uses @leftAssoc but has no @precedence",
+        "hint": "Add @precedence(level=...) to this operator rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "testRuleWhitespaceUnknownStyleFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @whitespace(custom)\n  Start ::= 'ok' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-WHITESPACE-RULE-STYLE",
+        "message": "rule Start uses unsupported @whitespace style: custom (allowed: javaStyle, none)",
+        "hint": "Use @whitespace or @whitespace(none).",
+        "severity": "ERROR",
+        "category": "WHITESPACE"
+      }
+    ]
+  },
+  {
+    "case": "testGlobalWhitespaceUnknownStyleFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @whitespace: custom\n  @root\n  Start ::= 'ok' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "E-WHITESPACE-GLOBAL-STYLE",
+        "message": "global @whitespace style must be javaStyle or none: custom",
+        "hint": "Use '@whitespace: javaStyle' or '@whitespace: none'.",
+        "severity": "ERROR",
+        "category": "WHITESPACE"
+      }
+    ]
+  },
+  {
+    "case": "testPrecedenceWithoutLeftAssocFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @precedence(level=10)\n  Expr ::= Term @left { '+' @op Term @right } ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-PRECEDENCE-NO-ASSOC",
+        "message": "rule Expr uses @precedence but has no @leftAssoc/@rightAssoc",
+        "hint": "Add one associativity annotation alongside @precedence.",
+        "severity": "ERROR",
+        "category": "PRECEDENCE"
+      }
+    ]
+  },
+  {
+    "case": "testDuplicatePrecedenceFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=10)\n  @precedence(level=20)\n  Expr ::= Term @left { '+' @op Term @right } ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-PRECEDENCE-DUPLICATE",
+        "message": "rule Expr has duplicate @precedence annotations",
+        "hint": "Keep a single @precedence(level=...) annotation.",
+        "severity": "ERROR",
+        "category": "PRECEDENCE"
+      }
+    ]
+  },
+  {
+    "case": "testRightAssocWithoutMappingFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @rightAssoc\n  Expr ::= Term @left { '^' @op Term @right } ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-MAPPING",
+        "message": "rule Expr uses @rightAssoc but has no @mapping",
+        "hint": "Add @mapping(ClassName, params=[left, op, right]) to this rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-RIGHTASSOC-NONCANONICAL",
+        "message": "rule Expr uses @rightAssoc but body is not canonical: expected Base { Op Expr }",
+        "hint": "Rewrite right-assoc rule as Base { op Expr }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Expr uses @rightAssoc but has no @precedence",
+        "hint": "Add @precedence(level=...) to this operator rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "testValidateReturnsStructuredIssues:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @rightAssoc\n  Expr ::= Term @left { '^' @op Term @right } ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-MAPPING",
+        "message": "rule Expr uses @rightAssoc but has no @mapping",
+        "hint": "Add @mapping(ClassName, params=[left, op, right]) to this rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-RIGHTASSOC-NONCANONICAL",
+        "message": "rule Expr uses @rightAssoc but body is not canonical: expected Base { Op Expr }",
+        "hint": "Rewrite right-assoc rule as Base { op Expr }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Expr uses @rightAssoc but has no @precedence",
+        "hint": "Add @precedence(level=...) to this operator rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "testBothAssocFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @leftAssoc\n  @rightAssoc\n  @precedence(level=10)\n  Expr ::= Term @left { '^' @op Term @right } ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-BOTH",
+        "message": "rule Expr cannot use both @leftAssoc and @rightAssoc",
+        "hint": "Keep exactly one associativity annotation per rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "testPrecedenceTopologyValid:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=10)\n  Expr ::= Term @left { '+' @op Term @right } ;\n  @mapping(TermNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=20)\n  Term ::= Factor @left { '*' @op Factor @right } ;\n  Factor ::= 'n' ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testPrecedenceTopologyInvalidOrderFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=20)\n  Expr ::= Term @left { '+' @op Term @right } ;\n  @mapping(TermNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=10)\n  Term ::= Factor @left { '*' @op Factor @right } ;\n  Factor ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-PRECEDENCE-ORDER",
+        "message": "rule Expr precedence 20 must be lower than referenced operator rule Term precedence 10",
+        "hint": "Decrease Expr level or increase Term level.",
+        "severity": "ERROR",
+        "category": "PRECEDENCE"
+      }
+    ]
+  },
+  {
+    "case": "testAssocWithoutPrecedenceFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @leftAssoc\n  Expr ::= Term @left { '+' @op Term @right } ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Expr uses @leftAssoc but has no @precedence",
+        "hint": "Add @precedence(level=...) to this operator rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "testMixedAssociativityAtSamePrecedenceFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=10)\n  Expr ::= Term @left { '+' @op Term @right } ;\n  @mapping(PowNode, params=[left, op, right])\n  @rightAssoc\n  @precedence(level=10)\n  Pow ::= Atom @left { '^' @op Pow @right } ;\n  Term ::= 'n' ;\n  Atom ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Pow",
+        "code": "E-PRECEDENCE-MIXED-ASSOC",
+        "message": "precedence level 10 mixes associativity: LEFT and RIGHT",
+        "hint": "Use one associativity per precedence level.",
+        "severity": "ERROR",
+        "category": "PRECEDENCE"
+      }
+    ]
+  },
+  {
+    "case": "testRightAssocNonCanonicalShapeFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(PowNode, params=[left, op, right])\n  @rightAssoc\n  @precedence(level=30)\n  Expr ::= Atom @left { '^' @op Atom @right } ;\n  Atom ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "E-RIGHTASSOC-NONCANONICAL",
+        "message": "rule Expr uses @rightAssoc but body is not canonical: expected Base { Op Expr }",
+        "hint": "Rewrite right-assoc rule as Base { op Expr }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "testDuplicateInterleaveFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @interleave(profile=javaStyle)\n  @interleave(profile=commentsAndSpaces)\n  Start ::= 'ok' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-DUPLICATE-INTERLEAVE",
+        "message": "rule Start has duplicate @interleave annotations",
+        "hint": "Keep a single @interleave(profile=...) annotation.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "testUnsupportedInterleaveProfileFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @interleave(profile=custom)\n  Start ::= 'ok' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-INTERLEAVE-PROFILE",
+        "message": "rule Start uses unsupported @interleave profile: custom",
+        "hint": "Use @interleave(profile=javaStyle) or @interleave(profile=commentsAndSpaces).",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "testUnsupportedScopeTreeModeFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @scopeTree(mode=custom)\n  Start ::= 'ok' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-SCOPETREE-MODE",
+        "message": "rule Start uses unsupported @scopeTree mode: custom",
+        "hint": "Use @scopeTree(mode=lexical) or @scopeTree(mode=dynamic).",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "testAdvancedAnnotationIssueCategory:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @interleave(profile=custom)\n  Start ::= 'ok' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-INTERLEAVE-PROFILE",
+        "message": "rule Start uses unsupported @interleave profile: custom",
+        "hint": "Use @interleave(profile=javaStyle) or @interleave(profile=commentsAndSpaces).",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "testScopeCapturesMustExistInTheirOwnRule:0",
+    "source": "grammar ScopeValidation {\n    @root @scopeTree(mode=lexical) Start ::= Decl Ref;\n    @declares(symbol=missing) Decl ::= Child;\n    @backref(name=missing) Ref ::= Child;\n    Child ::= 'x' @missing;\n}\n",
+    "issues": [
+      {
+        "grammar": "ScopeValidation",
+        "rule": "Decl",
+        "code": "E-ANNOTATION-DECLARES-CAPTURE",
+        "message": "rule Decl has no scope capture: missing",
+        "hint": "Capture the target in this rule's body using @missing.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      },
+      {
+        "grammar": "ScopeValidation",
+        "rule": "Ref",
+        "code": "E-ANNOTATION-BACKREF-CAPTURE",
+        "message": "rule Ref has no scope capture: missing",
+        "hint": "Capture the target in this rule's body using @missing.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "testDuplicateDeclaresRejectedAndMetadataCapturesAccepted:0",
+    "source": "grammar ScopeValidation {\n    @root @scopeTree(mode=dynamic) Start ::= Decl Ref;\n    @declares(symbol=name, description=doc) Decl ::= 'n' @noise { ('x' @name) };\n    @backref(name=name) Ref ::= [ 'x' @name ];\n}\n",
+    "issues": []
+  },
+  {
+    "case": "testDuplicateDeclaresRejectedAndMetadataCapturesAccepted:1",
+    "source": "grammar ScopeValidation {\n    @root @declares(symbol=name) @declares(symbol=name) Start ::= 'x' @name;\n}\n",
+    "issues": [
+      {
+        "grammar": "ScopeValidation",
+        "rule": "Start",
+        "code": "E-ANNOTATION-DUPLICATE-DECLARES",
+        "message": "rule Start has duplicate @declares annotations",
+        "hint": "Keep a single @declares(symbol=...) annotation.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "testScopeAbsentBackrefValidationContractUnchanged:0",
+    "source": "grammar ScopeValidation { @root @backref(name=old) Start ::= 'x'; }",
+    "issues": []
+  },
+  {
+    "case": "testUndefinedRuleRefFails:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  Start ::= Undefined ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Start references undefined rule or token 'Undefined'",
+        "hint": "Define a rule or token named 'Undefined'.",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testUndefinedRuleRefWithSuggestion:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  Start ::= Tern ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Start references undefined rule or token 'Tern'",
+        "hint": "Did you mean 'Term'?",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testDefinedRuleRefPasses:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  Start ::= Term ;\n  Term ::= 'n' ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testUndefinedRuleRefNoSuggestionForDistantName:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  Start ::= CompletelyWrong ;\n  Term ::= 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Start references undefined rule or token 'CompletelyWrong'",
+        "hint": "Define a rule or token named 'CompletelyWrong'.",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testValidateWithWarningsNoLeftRecursion:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  Start ::= Term ;\n  Term ::= 'n' ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testValidateWithWarningsDirectLeftRecursion:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  Expr ::= Expr | 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: Expr -> Expr",
+        "hint": "Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "testValidateWithWarningsIndirectLeftRecursion:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  A ::= B ;\n  B ::= A ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "A",
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: A -> B -> A",
+        "hint": "Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      },
+      {
+        "grammar": "G",
+        "rule": "B",
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: B -> A -> B",
+        "hint": "Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "testValidateWithWarningsDoesNotThrowOnExistingGrammars:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  @mapping(ExprNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=10)\n  Expr ::= Term @left { '+' @op Term @right } ;\n  @mapping(TermNode, params=[left, op, right])\n  @leftAssoc\n  @precedence(level=20)\n  Term ::= Factor @left { '*' @op Factor @right } ;\n  Factor ::= 'n' ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testValidateWithWarningsReturnsEmptyOptionalForNonRecursiveGrammar:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  S ::= A B ;\n  A ::= 'a' ;\n  B ::= 'b' ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testDetectLeftRecursionIssuesReturnsStructuredWarning:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  Expr ::= Expr | 'n' ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Expr",
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: Expr -> Expr",
+        "hint": "Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "testDetectLeftRecursionIssuesEmptyForCleanGrammar:0",
+    "source": "grammar G {\n  @package: org.example\n  @root\n  S ::= A ;\n  A ::= 'a' ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testTokenUnresolvedHintSuggestsFullyQualifiedName:0",
+    "source": "grammar G {\n  @package: org.example\n  token NUMBER = NumberParser\n  @root\n  Start ::= NUMBER ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser",
+        "hint": "Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "testTokenUnresolvedHintWithoutCandidateKeepsGenericHint:0",
+    "source": "grammar G {\n  @package: org.example\n  token X = NoSuchParserClass\n  @root\n  Start ::= X ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token X references unresolved parser class: NoSuchParserClass",
+        "hint": "Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "testRuleTokenParserNameCollisionIsRejected:0",
+    "source": "grammar G {\n  @package: org.example\n  token CODE_START = org.example.CodeStartParser\n  @root\n  CodeStart ::= CODE_START ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "CodeStart",
+        "code": "E-RULE-TOKEN-NAME-COLLISION",
+        "message": "rule CodeStart and token CODE_START both resolve to generated parser class CodeStartParser",
+        "hint": "Rename the rule or token so their generated parser class names differ.",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testShortTokenParserNameCollisionIsRejected:0",
+    "source": "grammar G {\n  @package: org.example\n  token VALUE = ValueParser\n  @root\n  Value ::= VALUE ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token VALUE references unresolved parser class: ValueParser",
+        "hint": "Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      },
+      {
+        "grammar": "G",
+        "rule": "Value",
+        "code": "E-RULE-TOKEN-NAME-COLLISION",
+        "message": "rule Value and token VALUE both resolve to generated parser class ValueParser",
+        "hint": "Rename the rule or token so their generated parser class names differ.",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testDifferentGeneratedTokenAndRuleParserNamesAreAccepted:0",
+    "source": "grammar G {\n  @package: org.example\n  token CODE_START = org.example.CodeStartParser\n  @root\n  CodeBlockStart ::= CODE_START ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testRegexTokenRuleNameCollisionIsRejected:0",
+    "source": "grammar G {\n  @package: org.example\n  token ID = REGEX('[a-z]+')\n  @root\n  Id ::= ID ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Id",
+        "code": "E-RULE-TOKEN-NAME-COLLISION",
+        "message": "rule Id and token ID both resolve to generated parser class IdParser",
+        "hint": "Rename the rule or token so their generated parser class names differ.",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testNegationTokenRuleNameCollisionIsRejected:0",
+    "source": "grammar G {\n  @package: org.example\n  token NOT_QUOTE = NEGATION('\"')\n  @root\n  NotQuote ::= NOT_QUOTE ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "NotQuote",
+        "code": "E-RULE-TOKEN-NAME-COLLISION",
+        "message": "rule NotQuote and token NOT_QUOTE both resolve to generated parser class NotQuoteParser",
+        "hint": "Rename the rule or token so their generated parser class names differ.",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testCharRangeTokenRuleNameCollisionIsRejected:0",
+    "source": "grammar G {\n  @package: org.example\n  token LOWER = CHAR_RANGE('a','z')\n  @root\n  Lower ::= LOWER ;\n}",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Lower",
+        "code": "E-RULE-TOKEN-NAME-COLLISION",
+        "message": "rule Lower and token LOWER both resolve to generated parser class LowerParser",
+        "hint": "Rename the rule or token so their generated parser class names differ.",
+        "severity": "ERROR",
+        "category": "RULE"
+      }
+    ]
+  },
+  {
+    "case": "testNonCollidingRegexTokenIsAccepted:0",
+    "source": "grammar G {\n  @package: org.example\n  token ID = REGEX('[a-z]+')\n  @root\n  Identifier ::= ID ;\n}",
+    "issues": []
+  },
+  {
+    "case": "testMemoSafeTokenAllowsMultipleDistinctSimpleAliases:0",
+    "source": "grammar G {\n  @package: org.example\n  @memoSafeToken: A\n  @memoSafeToken: B\n  token A = org.example.AParser\n  token B = org.example.BParser\n  @root Start ::= A B ;\n}\n",
+    "issues": []
+  },
+  {
+    "case": "testMemoSafeTokenValidationIsDeterministic:0",
+    "source": "grammar G {\n  @package: org.example\n  @memoSafeToken: MISSING\n  @memoSafeToken: SAFE\n  @memoSafeToken: SAFE\n  @memoSafeToken: BUILTIN\n  @memoSafeToken: { alias: 'SAFE' }\n  token SAFE = org.example.SafeParser\n  token BUILTIN = REGEX('[a-z]+')\n  @root Start ::= SAFE ;\n}\n",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "E-MEMO-SAFE-TOKEN-UNDEFINED",
+        "message": "global @memoSafeToken references undefined token alias: MISSING",
+        "hint": "Declare token MISSING or remove this @memoSafeToken setting.",
+        "severity": "ERROR",
+        "category": "MEMOIZATION"
+      },
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "E-MEMO-SAFE-TOKEN-DUPLICATE",
+        "message": "duplicate global @memoSafeToken alias: SAFE",
+        "hint": "Keep a single @memoSafeToken setting for alias SAFE.",
+        "severity": "ERROR",
+        "category": "MEMOIZATION"
+      },
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "E-MEMO-SAFE-TOKEN-KIND",
+        "message": "global @memoSafeToken alias must name a Simple token: BUILTIN",
+        "hint": "Remove the setting; built-in token declarations are already proven safe.",
+        "severity": "ERROR",
+        "category": "MEMOIZATION"
+      },
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "E-MEMO-SAFE-TOKEN-VALUE",
+        "message": "global @memoSafeToken requires a token alias string",
+        "hint": "Use one setting per alias, for example '@memoSafeToken: IDENTIFIER'.",
+        "severity": "ERROR",
+        "category": "MEMOIZATION"
+      }
+    ]
+  },
+  {
+    "case": "testUnknownGlobalSettingCompatibilityIsUnchanged:0",
+    "source": "grammar G {\n  @package: org.example\n  @futureSetting: value\n  @root Start ::= 'x' ;\n}\n",
+    "issues": []
+  },
+  {
+    "case": "supplement/longest/shape",
+    "source": "grammar G { @root @longestChoice Start ::= 'a'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-LONGEST-CHOICE-SHAPE",
+        "message": "rule Start uses @longestChoice without multiple alternatives",
+        "hint": "Use @longestChoice only on a rule with at least two '|' alternatives.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/longest/duplicate",
+    "source": "grammar G { @root @longestChoice @longestChoice Start ::= 'a' | 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-LONGEST-CHOICE-DUPLICATE",
+        "message": "rule Start has duplicate @longestChoice annotations",
+        "hint": "Keep a single @longestChoice annotation.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/longest/assoc",
+    "source": "grammar G { @root @longestChoice @leftAssoc Start ::= 'a' | 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-NO-MAPPING",
+        "message": "rule Start uses @leftAssoc but has no @mapping",
+        "hint": "Add @mapping(ClassName, params=[left, op, right]) to this rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Start uses @leftAssoc but capture @left is missing",
+        "hint": "Add @left capture in the rule body.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Start uses @leftAssoc but capture @op is missing",
+        "hint": "Add @op capture in the rule body.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Start uses @leftAssoc but capture @right is missing",
+        "hint": "Add @right capture in the rule body.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-NO-REPEAT",
+        "message": "rule Start uses @leftAssoc but has no repeat segment",
+        "hint": "Use canonical operator pattern: Base { Op Right }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-LONGEST-CHOICE-ASSOC",
+        "message": "rule Start combines @longestChoice with associativity rewriting",
+        "hint": "Move longest matching to a separate dispatch rule.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Start uses @leftAssoc but has no @precedence",
+        "hint": "Add @precedence(level=...) to this operator rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "supplement/predictive/shape",
+    "source": "grammar G { @root @predictiveChoice Start ::= 'a'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-PREDICTIVE-CHOICE-SHAPE",
+        "message": "rule Start uses @predictiveChoice without multiple alternatives",
+        "hint": "Use @predictiveChoice only on a rule with at least two '|' alternatives.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/predictive/duplicate",
+    "source": "grammar G { @root @predictiveChoice @predictiveChoice Start ::= 'a' | 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-PREDICTIVE-CHOICE-DUPLICATE",
+        "message": "rule Start has duplicate @predictiveChoice annotations",
+        "hint": "Keep a single @predictiveChoice annotation.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/predictive/assoc",
+    "source": "grammar G { @root @predictiveChoice @rightAssoc Start ::= 'a' | 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-NO-MAPPING",
+        "message": "rule Start uses @rightAssoc but has no @mapping",
+        "hint": "Add @mapping(ClassName, params=[left, op, right]) to this rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Start uses @rightAssoc but capture @left is missing",
+        "hint": "Add @left capture in the rule body.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Start uses @rightAssoc but capture @op is missing",
+        "hint": "Add @op capture in the rule body.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Start uses @rightAssoc but capture @right is missing",
+        "hint": "Add @right capture in the rule body.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-NO-REPEAT",
+        "message": "rule Start uses @rightAssoc but has no repeat segment",
+        "hint": "Use canonical operator pattern: Base { Op Right }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-RIGHTASSOC-NONCANONICAL",
+        "message": "rule Start uses @rightAssoc but body is not canonical: expected Base { Op Start }",
+        "hint": "Rewrite right-assoc rule as Base { op Start }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-PREDICTIVE-CHOICE-ASSOC",
+        "message": "rule Start combines @predictiveChoice with associativity rewriting",
+        "hint": "Move predictive dispatch to a separate rule.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Start uses @rightAssoc but has no @precedence",
+        "hint": "Add @precedence(level=...) to this operator rule.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "supplement/predictive/conflict",
+    "source": "grammar G { @root @predictiveChoice @longestChoice Start ::= 'a' | 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-PREDICTIVE-CHOICE-CONFLICT",
+        "message": "rule Start combines @predictiveChoice with @longestChoice",
+        "hint": "Choose ordered predictive dispatch or longest-match dispatch.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/enum/nonterminal",
+    "source": "grammar G { @root @enum Start ::= Item | 'a'; Item ::= 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ENUM-NON-TERMINAL",
+        "message": "@enum rule Start must consist only of terminal literals (e.g. 'a' | 'b')",
+        "hint": "Use only quoted string literals as alternatives in an @enum rule.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/enum/sequence",
+    "source": "grammar G { @root @enum Start ::= 'a' 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ENUM-NON-TERMINAL",
+        "message": "@enum rule Start must consist only of terminal literals (e.g. 'a' | 'b')",
+        "hint": "Use only quoted string literals as alternatives in an @enum rule.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/enum/quantified",
+    "source": "grammar G { @root @enum Start ::= 'a'+; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ENUM-NON-TERMINAL",
+        "message": "@enum rule Start must consist only of terminal literals (e.g. 'a' | 'b')",
+        "hint": "Use only quoted string literals as alternatives in an @enum rule.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/enum/valid",
+    "source": "grammar G { @root @enum Start ::= 'a' | 'b'; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/commonField/mismatch",
+    "source": "grammar G { @root @mapping(Node) @commonField(name) Start ::= A | B; @mapping(Node.A, params=[name]) A ::= 'a' @name; @mapping(Node.B) B ::= 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-COMMONFIELD-MISMATCH",
+        "message": "@commonField(name) is declared on Start but permit Node.B does not have param 'name'",
+        "hint": "Add @name capture to Node.B rule.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/commonField/valid",
+    "source": "grammar G { @root @mapping(Node) @commonField(name) Start ::= A | B; @mapping(Node.A, params=[name]) A ::= 'a' @name; @mapping(Node.B, params=[name]) B ::= 'b' @name; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/catalog/missing",
+    "source": "grammar G { @root @catalog(context='x') Start ::= 'a'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-CATALOG-NO-CAPTURE",
+        "message": "rule Start has @catalog but no capture names in its body",
+        "hint": "Add at least one @captureName in the rule body for catalog completion to work.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "supplement/catalog/nested",
+    "source": "grammar G { @root @catalog(context='x') Start ::= { 'a' @name }; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/typeof/unknown",
+    "source": "grammar G { @root Start ::= @typeof(missing) 'a' @name; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-TYPEOF-UNKNOWN-CAPTURE",
+        "message": "rule Start: @typeof(missing) refers to unknown capture 'missing'",
+        "hint": "Use a capture name defined in the same rule (e.g. @captureRef).",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/typeof/missing",
+    "source": "grammar G { @root Start ::= 'a' @name @typeof(name) 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-TYPEOF-MISSING-CAPTURE",
+        "message": "rule Start: @typeof(name) must be paired with a capture name (e.g. @typeof(x) @myCapture)",
+        "hint": "Add a capture name after @typeof(x).",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/typeof/both",
+    "source": "grammar G { @root Start ::= (@typeof(missing) 'a'); }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-TYPEOF-UNKNOWN-CAPTURE",
+        "message": "rule Start: @typeof(missing) refers to unknown capture 'missing'",
+        "hint": "Use a capture name defined in the same rule (e.g. @captureRef).",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-TYPEOF-MISSING-CAPTURE",
+        "message": "rule Start: @typeof(missing) must be paired with a capture name (e.g. @typeof(x) @myCapture)",
+        "hint": "Add a capture name after @typeof(x).",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/bounded/invalid",
+    "source": "grammar G { @root Start ::= 'a'{3,2}; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-BOUNDED-INVALID",
+        "message": "rule Start has BoundedRepeatElement with min=3 > max=2",
+        "hint": "Ensure min <= max in {min,max} quantifier.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/bounded/nested",
+    "source": "grammar G { @root Start ::= { [ ('a'{3,2}) ] }; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-BOUNDED-INVALID",
+        "message": "rule Start has BoundedRepeatElement with min=3 > max=2",
+        "hint": "Ensure min <= max in {min,max} quantifier.",
+        "severity": "ERROR",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/whitespace/globalDuplicate",
+    "source": "grammar G { @whitespace: javaStyle @whitespace: none @root Start ::= 'a'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "E-WHITESPACE-GLOBAL-DUPLICATE",
+        "message": "duplicate global @whitespace settings",
+        "hint": "Keep a single global @whitespace setting.",
+        "severity": "ERROR",
+        "category": "WHITESPACE"
+      }
+    ]
+  },
+  {
+    "case": "supplement/whitespace/globalBlock",
+    "source": "grammar G { @whitespace: { style: 'none' } @root Start ::= 'a'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": null,
+        "code": "E-WHITESPACE-GLOBAL-STYLE",
+        "message": "global @whitespace requires a style name",
+        "hint": "Use '@whitespace: javaStyle' or '@whitespace: none'.",
+        "severity": "ERROR",
+        "category": "WHITESPACE"
+      }
+    ]
+  },
+  {
+    "case": "supplement/whitespace/ruleDuplicate",
+    "source": "grammar G { @root @whitespace @whitespace(none) Start ::= 'a'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-WHITESPACE-RULE-DUPLICATE",
+        "message": "rule Start has duplicate @whitespace annotations",
+        "hint": "Keep a single @whitespace annotation.",
+        "severity": "ERROR",
+        "category": "WHITESPACE"
+      }
+    ]
+  },
+  {
+    "case": "supplement/annotations/duplicates",
+    "source": "grammar G { @root @backref(name=a) @backref(name=a) @scopeTree(mode=lexical) @scopeTree(mode=dynamic) Start ::= 'a' @a; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-DUPLICATE-BACKREF",
+        "message": "rule Start has duplicate @backref annotations",
+        "hint": "Keep a single @backref(name=...) annotation.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-DUPLICATE-SCOPETREE",
+        "message": "rule Start has duplicate @scopeTree annotations",
+        "hint": "Keep a single @scopeTree(mode=...) annotation.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "supplement/leftrec/optional",
+    "source": "grammar G { @root Start ::= [ 'a' ] Start | 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: Start -> Start",
+        "hint": "Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/leftrec/repeat",
+    "source": "grammar G { @root Start ::= { 'a' } Start | 'b'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: Start -> Start",
+        "hint": "Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "severity": "WARNING",
+        "category": "GENERAL"
+      }
+    ]
+  },
+  {
+    "case": "supplement/leftrec/groupBarrier",
+    "source": "grammar G { @root Start ::= ([ 'a' ]) Start | 'b'; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/leftrec/oneOrMoreBarrier",
+    "source": "grammar G { @root Start ::= Start+ | 'b'; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/captures/wrappers",
+    "source": "grammar G { @root @mapping(Node, params=[a,b,c,d,e]) Start ::= ('a' @a)+ ('b' @b){1,2} ('c' @c) % ('d' @d) ('e' @e)?; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/annotations/firstWins",
+    "source": "grammar G { @root @scopeTree(mode=lexical) @scopeTree(mode=wrong) @interleave(profile=javaStyle) @interleave(profile=wrong) Start ::= 'a'; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-DUPLICATE-INTERLEAVE",
+        "message": "rule Start has duplicate @interleave annotations",
+        "hint": "Keep a single @interleave(profile=...) annotation.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      },
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ANNOTATION-DUPLICATE-SCOPETREE",
+        "message": "rule Start has duplicate @scopeTree annotations",
+        "hint": "Keep a single @scopeTree(mode=...) annotation.",
+        "severity": "ERROR",
+        "category": "ANNOTATION"
+      }
+    ]
+  },
+  {
+    "case": "supplement/typeof/nestedConstraintBarrier",
+    "source": "grammar G { @root Start ::= 'a' @a @typeof(a) (@typeof(missing) 'b') @b; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/bounded/oneOrMoreBarrier",
+    "source": "grammar G { @root Start ::= ('a'{3,2})+; }",
+    "issues": []
+  },
+  {
+    "case": "supplement/assoc/oneOrMoreNotRepeat",
+    "source": "grammar G { @root @mapping(N, params=[left,op,right]) @leftAssoc @precedence(level=1) Start ::= 'a' @left ('+' @op 'a' @right)+; }",
+    "issues": [
+      {
+        "grammar": "G",
+        "rule": "Start",
+        "code": "E-ASSOC-NO-REPEAT",
+        "message": "rule Start uses @leftAssoc but has no repeat segment",
+        "hint": "Use canonical operator pattern: Base { Op Right }.",
+        "severity": "ERROR",
+        "category": "ASSOCIATIVITY"
+      }
+    ]
+  },
+  {
+    "case": "supplement/enum/singleValid",
+    "source": "grammar G { @root @enum Start ::= 'a'; }",
+    "issues": []
+  }
+]
