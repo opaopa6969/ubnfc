@@ -544,7 +544,8 @@ public final class Session {
                         terminatorEnd = cp(next) == '\r' && cp(next + 1) == '\n' ? next + 2 : cp(next) >= 0 ? next + 1 : next;
                     } else {
                         int end = source.indexOf(delimiter.close(), p + delimiter.open().length());
-                        if (end < 0) failures(input.length(), "'*/'", "WildCardStringParser");
+                        // Unterminated block: no progress; the candidate names the declared close string (D-018 comment-trivia).
+                        if (end < 0) failures(input.length(), "'" + delimiter.close() + "'", "WildCardStringParser");
                         else next = end + delimiter.close().length();
                     }
                 }
