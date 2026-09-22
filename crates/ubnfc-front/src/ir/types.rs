@@ -961,6 +961,28 @@ pub struct Dfa {
     pub states: Vec<DfaState>,
 }
 
+/// token に付随する optional 計画。状態 ID は 0..states、範囲は code point 閉区間。
+/// 入力の現在位置から最長の正長接頭辞を採用し、開始状態の受理だけでは成功しない。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RegexDfa {
+    pub states: u64,
+    pub start: u64,
+    pub accepting: Vec<u64>,
+    pub transitions: Vec<RegexDfaTransition>,
+    pub anchored_at_start: RegexDfaAnchoredAtStart,
+    pub longest_match: RegexDfaLongestMatch,
+    pub zero_width: TokenSpecRegexZeroWidth,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RegexDfaTransition {
+    pub from: u64,
+    pub ranges: Vec<[u64; 2]>,
+    pub to: u64,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct LexicalPlan {
@@ -1385,6 +1407,18 @@ pub enum TokenSpec {
         word: String,
     },
     Regex {
+        #[serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            deserialize_with = "super::json::present_value"
+        )]
+        dfa: Option<Option<RegexDfa>>,
+        #[serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            deserialize_with = "super::json::present_value"
+        )]
+        fallback: Option<RegexFallback>,
         java_fallback: TokenSpecRegexJavaFallback,
         matching: TokenSpecRegexMatching,
         pattern: String,
@@ -1469,4 +1503,33 @@ pub enum ValueType {
         element: Box<ValueType>,
     },
     Null {},
+}
+
+impl From<&Dfa> for RegexDfa {
+    fn from(dfa: &Dfa) -> Self {
+        Self {
+            states: dfa.states.len() as u64,
+            start: dfa.start_state,
+            accepting: dfa
+                .states
+                .iter()
+                .filter(|s| s.accepting)
+                .map(|s| s.id)
+                .collect(),
+            transitions: dfa
+                .states
+                .iter()
+                .flat_map(|s| {
+                    s.transitions.iter().map(|t| RegexDfaTransition {
+                        from: s.id,
+                        ranges: vec![[t.range.start, t.range.end]],
+                        to: t.target,
+                    })
+                })
+                .collect(),
+            anchored_at_start: RegexDfaAnchoredAtStart,
+            longest_match: RegexDfaLongestMatch,
+            zero_width: TokenSpecRegexZeroWidth,
+        }
+    }
 }

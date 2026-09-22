@@ -339,6 +339,7 @@ impl<'a> Validator<'a> {
             if let TokenSpec::Builtin { code_points, .. } = &token.spec {
                 self.code_points(code_points, &format!("{p}/spec/codePoints"));
             }
+            self.regex_plan(token, &format!("{p}/spec"));
         }
         for (i, expr) in s.expressions.iter().enumerate() {
             let p = format!("/semantics/expressions/{i}");
@@ -883,6 +884,78 @@ impl<'a> Validator<'a> {
         }
     }
 
+    fn regex_plan(&mut self, token: &Token, path: &str) {
+        let TokenSpec::Regex {
+            dfa: Some(dfa),
+            fallback,
+            regular_subset,
+            java_fallback,
+            ..
+        } = &token.spec
+        else {
+            return;
+        };
+        let plans: Vec<_> = self
+            .ir
+            .plan
+            .lexical
+            .iter()
+            .filter(|p| p.token_id == token.symbol_id)
+            .collect();
+        if plans.len() != 1 {
+            self.error(path, "analyzed regex requires exactly one lexical plan");
+            return;
+        }
+        let plan = plans[0];
+        if let Some(dfa) = dfa {
+            if !regular_subset
+                || fallback.is_some()
+                || *java_fallback != TokenSpecRegexJavaFallback::None
+                || plan.strategy != LexicalPlanStrategy::Dfa
+            {
+                self.error(path, "DFA regex has inconsistent fallback or strategy");
+            }
+            if plan.dfa.as_ref().map(RegexDfa::from).as_ref() != Some(dfa) {
+                self.error(path, "token DFA differs from lexical DFA");
+            }
+            if dfa.states == 0
+                || dfa.start >= dfa.states
+                || dfa.accepting.iter().any(|s| *s >= dfa.states)
+                || dfa.accepting.windows(2).any(|w| w[0] >= w[1])
+            {
+                self.error(path, "invalid DFA state or accepting set");
+            }
+            let mut ranges = BTreeMap::<u64, Vec<[u64; 2]>>::new();
+            for transition in &dfa.transitions {
+                if transition.from >= dfa.states
+                    || transition.to >= dfa.states
+                    || transition.ranges.is_empty()
+                {
+                    self.error(path, "invalid DFA transition state or empty ranges");
+                }
+                for &[lo, hi] in &transition.ranges {
+                    if lo > hi || hi > 0x10ffff {
+                        self.error(path, "invalid DFA code point range");
+                    }
+                    ranges.entry(transition.from).or_default().push([lo, hi]);
+                }
+            }
+            if ranges
+                .values()
+                .any(|rs| rs.windows(2).any(|w| w[0][1] >= w[1][0]))
+            {
+                self.error(path, "DFA ranges must be sorted and disjoint per state");
+            }
+        } else if *regular_subset
+            || fallback.is_none()
+            || *java_fallback != TokenSpecRegexJavaFallback::JavaUtilRegexPattern
+            || plan.strategy != LexicalPlanStrategy::JavaPattern
+            || plan.dfa.is_some()
+        {
+            self.error(path, "regex without DFA requires Java Pattern fallback");
+        }
+    }
+
     fn features(&mut self) {
         use RequiredFeature::*;
         let ir = self.ir;
@@ -943,15 +1016,7 @@ impl<'a> Validator<'a> {
             Operators,
             s.rules.iter().any(|r| r.operator.is_some()) || !ir.plan.operators.is_empty(),
         );
-        require(
-            LeftRecursionRewrite,
-            !s.normalizations.is_empty()
-                || ir
-                    .analysis
-                    .rules
-                    .iter()
-                    .any(|r| r.left_recursion == RuleAnalysisLeftRecursion::DirectRewritten),
-        );
+        // lowering 済みの履歴は backend に左再帰の処理を要求しない。
         require(Recovery, !s.recovery.is_empty());
         require(Imports, !ir.import_edges.is_empty());
         require(

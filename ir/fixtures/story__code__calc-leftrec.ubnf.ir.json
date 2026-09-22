@@ -2113,7 +2113,6 @@
     "backendDiagnostics",
     "cursorFrameFlag",
     "dualCursor",
-    "leftRecursionRewrite",
     "memoReplay",
     "operators",
     "orderedChoice",

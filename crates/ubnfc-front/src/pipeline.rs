@@ -194,6 +194,7 @@ fn compile_parsed_with_strict(
     }
     let (analysis, plan) =
         analysis::analyze(&lowered.semantics).map_err(PipelineError::Analysis)?;
+    analysis::attach_regex_plans(&mut lowered.semantics, &plan);
     for recovery in &mut lowered.semantics.recovery {
         if recovery.mode == RecoveryMode::Auto {
             recovery.resolved_sync_patterns = analysis
@@ -507,7 +508,7 @@ fn required_features(s: &Semantics, plan: &Plan, imports: &[ImportEdge]) -> Vec<
                 .any(|t| matches!(t.spec, TokenSpec::Regex { .. })),
         ),
         (Operators, s.rules.iter().any(|r| r.operator.is_some())),
-        (LeftRecursionRewrite, !s.normalizations.is_empty()),
+        // normalizations は lowering の記録。実行本体は通常の Seq/Repeat。
         (Recovery, !s.recovery.is_empty()),
         (Imports, !imports.is_empty()),
         (

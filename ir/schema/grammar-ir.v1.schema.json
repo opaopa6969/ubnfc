@@ -3008,6 +3008,21 @@
             },
             "zeroWidth": {
               "const": "fail"
+            },
+            "dfa": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/RegexDfa"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "optional な解析済み計画。省略は旧 IR、null は未対応構文または資源上限超過で DFA なし。非 null の場合 plan.lexical の同 token の DFA と等価。既存 matching=lookingAt は開始位置固定の契約として保持し、この計画の longestMatch=true が最長の正長接頭辞採用を指定する。Java Pattern の ordered alternation（a|ab など）の実走とは異なり得る。"
+            },
+            "fallback": {
+              "const": "javaPattern",
+              "description": "optional。dfa=null のとき Java は Pattern.lookingAt に委譲し、Rust は生成時エラー。後方参照、先読み/後読み、境界、lazy/possessive、Unicode property、未対応構文または構成上限超過を含む。"
             }
           },
           "required": [
@@ -3340,6 +3355,87 @@
           "type": "object"
         }
       ]
+    },
+    "RegexDfa": {
+      "additionalProperties": false,
+      "description": "正則部分集合を Thompson NFA と部分集合構成で解析した optional token 計画。states は状態数、ID は 0..states-1、start は開始 ID、accepting は昇順の受理 ID。現在の token 開始位置から code point の閉区間範囲遷移をたどり、到達した最後の正長受理位置を採用する。探索の開始位置をずらさない。開始状態が受理でもゼロ幅一致は失敗。遷移のない文字で停止し、同一 from の範囲は昇順・非重複。非 BMP は C15 の既知互換差分（Java oracle の UTF-16/code point 混在）であり scalar として実行する。既存 plan.lexical[].dfa と同じオートマトンを表し既存欄の意味を変更しない。",
+      "properties": {
+        "states": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "accepting": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegexDfaTransition"
+          }
+        },
+        "anchoredAtStart": {
+          "const": true
+        },
+        "longestMatch": {
+          "const": true
+        },
+        "zeroWidth": {
+          "const": "fail"
+        }
+      },
+      "required": [
+        "states",
+        "start",
+        "accepting",
+        "transitions",
+        "anchoredAtStart",
+        "longestMatch",
+        "zeroWidth"
+      ],
+      "type": "object"
+    },
+    "RegexDfaTransition": {
+      "additionalProperties": false,
+      "description": "from/to は状態 ID。ranges は [lo,hi] の code point 閉区間の集合。各端点は 0..0x10ffff、lo<=hi。入力は code point 単位で進める。",
+      "properties": {
+        "from": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "to": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ranges": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1114111
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "from",
+        "ranges",
+        "to"
+      ],
+      "type": "object"
     }
   },
   "$id": "urn:ubnfc:grammar-ir:v1:draft1",

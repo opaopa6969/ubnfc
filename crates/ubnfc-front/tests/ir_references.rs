@@ -239,7 +239,6 @@ fn additional_feature_gates_cover_semantics_and_plan() {
     let rule = original["semantics"]["rules"][0]["symbolId"].clone();
     let capture = original["semantics"]["captures"][0]["siteId"].clone();
     let ast = original["semantics"]["astTypes"][0]["id"].clone();
-    let expr = original["semantics"]["expressions"][0]["id"].clone();
     let cases = [
         (
             "regex",
@@ -300,11 +299,6 @@ fn additional_feature_gates_cover_semantics_and_plan() {
             "recovery",
             "/semantics/recovery",
             json!([{"ruleId":rule,"mode":"SYNC","resolvedSyncPatterns":[";"],"consumeSync":true,"noSyncAction":"fail","progressRule":"legacySync","applicationSites":[],"astProjection":"legacyMarker","recipeId":null}]),
-        ),
-        (
-            "leftRecursionRewrite",
-            "/semantics/normalizations",
-            json!([{"ruleId":rule,"originalBody":expr,"rewrittenBody":expr,"kind":"directLeftRecursionExtension","proof":{"kind":"leftRecursionNormalization","exprIds":[expr],"explanation":"fixture"}}]),
         ),
     ];
     for (feature, pointer, new_value) in cases {

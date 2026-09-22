@@ -58,5 +58,29 @@ nullable、minConsume、文字範囲/EOF/ゼロ消費条件、rule 解析、trie
 - CursorTransition は選択カーソルの進行要約だけで、M のリセット/後退条件、EMPTY の M+1、
   UNTIL の終端 commit を数式として格納できない。semantics.execution / contracts が正本。
 - climbing 非適用理由と診断再現手順の専用欄はなく、Proof の kind/exprIds/explanation に記録する。
-  DFA 生成は本解析の範囲外。正規部分集合は scalar、非正規 regex は JavaPattern の計画とする。
-  既存 ir API / schema / examples は変更していない。
+
+## REGEX の DFA 計画
+
+- `regex.rs` は Java Pattern のリテラル、`.`、文字クラス（否定・範囲）、
+  `\d/\w/\s` と各補集合、制御文字/記号の escape、グループ（`(?:...)` を含む）、
+  選択、`* + ? {n} {n,} {n,m}`、`^` を Thompson NFA → 部分集合 DFA にする。
+  `^` は token 開始位置でのみ通る epsilon とし、`a^b` を `ab` に変えない。
+  `.` は Java 既定の改行集合 LF/CR/NEL/LS/PS を除く。`\d/\w/\s` は ASCII 集合。
+- 正則と証明できない構文（後方参照、先読み/後読み、`\b`、Unicode property、flags、
+  lazy/possessive、class の交差/入れ子など）は JavaPattern に委譲し Rust は生成時エラー。
+  DFA/NFA 各10,000状態、構成処理量2,000,000、入れ子128段、pattern 65,536 byte、
+  class 1,024要素を上限とし、超過も同じ fallback にする。DFA は最小化しない。
+- `plan.lexical[].dfa` の既存状態別形式を保持し、pipeline は同じ表から token spec に
+  optional な `dfa={states,start,accepting,transitions,anchoredAtStart:true,longestMatch:true,
+  zeroWidth:"fail"}` を追加する。`states` は状態数、ID は0始まりの連番、遷移は
+  `{from,ranges:[[lo,hi]],to}`。未構成は `dfa:null,fallback:"javaPattern"`。
+  新旧の表・fallback の不整合は IR の参照検証で拒否する。
+- 入力の現在位置から code point 閉区間で遷移し、最後の正長受理位置を記録する。
+  開始状態が受理でもゼロ幅は失敗。Java Pattern の選択順とは異なり `a|ab` は
+  `ab` を2文字受理する（要求された最長一致）。`matching=lookingAt` の既存値は保持する。
+- `tests/regex_dfa.rs` の独立評価器は既存 oracle の ascii/zero の受理・消費・照合長と一致。
+  prefix/emoji は C15 の非 BMP 既知差分を明示的に検査する。prefix の Java 実走は
+  `😀` の後の `a` に失敗し、emoji は単独 `😀` に失敗、`😀x` 全体を消費する。
+  DFA は `😀` を1 code point とし、これらを Java の挙動に合わせて歪めない。
+- 左再帰の lowering 履歴（normalizations / directRewritten）は保持するが、
+  実行本体は通常の Seq/Repeat なので `leftRecursionRewrite` を requiredFeatures に要求しない。
