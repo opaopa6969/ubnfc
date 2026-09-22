@@ -349,10 +349,11 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         match self.build_values(step.events).and_then(|mut nodes| {
             if nodes.len() == 1 {
                 Ok(Some(nodes.remove(0)))
-            } else if nodes.is_empty() && self.has_recovery(step.events) {
+            } else if nodes.is_empty() {
+                // D-028: entry が AST 値を作らないのは mapping 失敗ではない（ast=null / mappingError=null）。
                 Ok(None)
             } else {
-                Err("entry must produce one AST value".into())
+                Err("entry produced more than one AST value".into())
             }
         }) {
             Ok(ast) => ast,
@@ -433,10 +434,12 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
                     .iter()
                     .enumerate()
                     .map(|(order, effect)| {
+                        // D-029: enter / leave / clear の name は scope を持つ規則名。
+                        let owner = || effect.name.map(str::to_owned);
                         let (action, name, offset_cp, length_cp) = match &*effect.value {
-                            ScanEffect::Enter => ("enter", None, effect.offset_cp, 0),
-                            ScanEffect::Leave => ("leave", None, effect.offset_cp, 0),
-                            ScanEffect::Clear => ("clear", None, effect.offset_cp, 0),
+                            ScanEffect::Enter => ("enter", owner(), effect.offset_cp, 0),
+                            ScanEffect::Leave => ("leave", owner(), effect.offset_cp, 0),
+                            ScanEffect::Clear => ("clear", owner(), effect.offset_cp, 0),
                             ScanEffect::Declare { name, offset_cp } => {
                                 ("declare", Some(name.clone()), *offset_cp, effect.length_cp)
                             }

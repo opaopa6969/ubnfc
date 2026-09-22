@@ -187,8 +187,10 @@ fn dispatches_each_grammar_root_and_reports_mapping_without_losing_acceptance() 
         assert_eq!(row["accepted"], true);
         assert_eq!(row["allConsumed"], true);
         if row["id"] == "Second" {
+            // D-028: entry が AST 値を作らないのは mapping 失敗ではない（Java driver と同じ観測）。
             assert_eq!(row["ast"], Value::Null);
-            assert!(row["mappingError"].is_string());
+            assert_eq!(row["mappingError"], Value::Null);
+            assert!(row.get("value").is_none());
         } else {
             assert_eq!(row["ast"], "a");
             assert_eq!(row["mappingError"], Value::Null);
@@ -259,10 +261,11 @@ fn scope_events_and_farthest_diagnostics_are_public_protocol_fields() {
     );
     assert_eq!(
         rows[0]["scope"],
-        json!({"mode":["dynamic"],"events":[
+        // D-025: `scope` は両 driver で同じ 6 キー。
+        json!({"depth":0,"mode":["dynamic"],"events":[
             {"order":0,"action":"enter","mode":"dynamic","name":null,"offset":0,"length":0},
             {"order":1,"action":"leave","mode":"dynamic","name":null,"offset":1,"length":0}
-        ]})
+        ],"declarations":[],"references":[],"diagnostics":[]})
     );
     assert!(rows[1].get("scope").is_none());
     assert_eq!(

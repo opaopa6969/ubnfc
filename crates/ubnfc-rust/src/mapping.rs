@@ -296,7 +296,10 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
                 };
                 let left = key(&reference.name)?;
                 let right = key(&own.name)?;
-                writeln!(s,"if let (Some(expected),Some(actual))=({left},{right}) {{if expected.0!=actual.0 {{let (expected,actual)=(expected.1,actual.1);return Err(format!({:?}));}}}}",format!("@typeof constraint violated: {} must be same type as {}, expected {{expected}} but got {{actual}}",own.name,reference.name)).unwrap();
+                // D-028: `@typeof` 違反の mappingError 文字列は旧 Java 実装の観測を固定した
+                // 契約値（`corpus/oracle/typeof.json`）。互換のためここでだけ例外クラス名を持つ。
+                // runtime 内部で作る他の mapping 失敗には付けない。
+                writeln!(s,"if let (Some(expected),Some(actual))=({left},{right}) {{if expected.0!=actual.0 {{let (expected,actual)=(expected.1,actual.1);return Err(format!({:?}));}}}}",format!("java.lang.IllegalArgumentException: @typeof constraint violated: {} must be same type as {}, expected {{expected}} but got {{actual}}",own.name,reference.name)).unwrap();
             }
             writeln!(s,"self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[{i}],{name:?},span);out.push(Ast::{ty_id}({ty_id}{{span,node_id,").unwrap();
             for (n, f) in fields.iter().enumerate() {

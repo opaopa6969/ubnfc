@@ -142,6 +142,8 @@ struct Effect {
     mode: &'static str,
     offset_cp: usize,
     length_cp: usize,
+    /// D-029: enter / leave が属する規則名。declare / use は効果自身が名前を持つ。
+    name: Option<&'static str>,
 }
 /// parse をまたいで再利用する大きな buffer（`ParseOptions::reuse_buffers`）。
 /// 内容は parse ごとに捨て、確保だけを thread ごとに 1 組保持する。大きな入力を扱った後は
@@ -492,6 +494,7 @@ impl<'a> Session<'a> {
                 effect.mode,
                 effect.offset_cp,
                 effect.length_cp,
+                effect.name,
             );
         }
     }
@@ -512,7 +515,24 @@ impl<'a> Session<'a> {
         offset_cp: usize,
         length_cp: usize,
     ) {
-        self.effect_shared(std::rc::Rc::new(effect), mode, offset_cp, length_cp);
+        self.effect_shared(std::rc::Rc::new(effect), mode, offset_cp, length_cp, None);
+    }
+    /// D-029: scope を開閉する効果は、その scope を持つ規則名を伴う。
+    pub fn effect_scope_at(
+        &mut self,
+        effect: ScanEffect,
+        mode: &'static str,
+        offset_cp: usize,
+        length_cp: usize,
+        name: &'static str,
+    ) {
+        self.effect_shared(
+            std::rc::Rc::new(effect),
+            mode,
+            offset_cp,
+            length_cp,
+            Some(name),
+        );
     }
     fn effect_shared(
         &mut self,
@@ -520,7 +540,17 @@ impl<'a> Session<'a> {
         mode: &'static str,
         offset_cp: usize,
         length_cp: usize,
+        name: Option<&'static str>,
     ) {
+        // D-029: trim 後に空になった記号名は記号ではない。宣言も参照も記録しない
+        // （Java の `Session.applyEffects` と同じ規則）。
+        if matches!(
+            &*effect,
+            ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. }
+if name.is_empty()
+        ) {
+            return;
+        }
         if self.effect_work
             >= self
                 .options
@@ -578,6 +608,7 @@ impl<'a> Session<'a> {
             mode,
             offset_cp,
             length_cp,
+            name,
         });
     }
     pub fn lookup(&mut self, key: Key) -> Option<Step> {
@@ -3240,10 +3271,11 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         match self.build_values(step.events).and_then(|mut nodes| {
             if nodes.len() == 1 {
                 Ok(Some(nodes.remove(0)))
-            } else if nodes.is_empty() && self.has_recovery(step.events) {
+            } else if nodes.is_empty() {
+                // D-028: entry が AST 値を作らないのは mapping 失敗ではない（ast=null / mappingError=null）。
                 Ok(None)
             } else {
-                Err("entry must produce one AST value".into())
+                Err("entry produced more than one AST value".into())
             }
         }) {
             Ok(ast) => ast,
@@ -3324,10 +3356,12 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
                     .iter()
                     .enumerate()
                     .map(|(order, effect)| {
+                        // D-029: enter / leave / clear の name は scope を持つ規則名。
+                        let owner = || effect.name.map(str::to_owned);
                         let (action, name, offset_cp, length_cp) = match &*effect.value {
-                            ScanEffect::Enter => ("enter", None, effect.offset_cp, 0),
-                            ScanEffect::Leave => ("leave", None, effect.offset_cp, 0),
-                            ScanEffect::Clear => ("clear", None, effect.offset_cp, 0),
+                            ScanEffect::Enter => ("enter", owner(), effect.offset_cp, 0),
+                            ScanEffect::Leave => ("leave", owner(), effect.offset_cp, 0),
+                            ScanEffect::Clear => ("clear", owner(), effect.offset_cp, 0),
                             ScanEffect::Declare { name, offset_cp } => {
                                 ("declare", Some(name.clone()), *offset_cp, effect.length_cp)
                             }

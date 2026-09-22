@@ -299,3 +299,74 @@ D-020 により `rulePath` / `deepestRule` は raw 応答・レポートに保�
 差・欠落を Verdict / 未観測に使わない。`kind / offset / farthestOffset /
 farthestExpected` の比較は維持する（D-014）。Extern の失敗候補は scanner が返す
 表示文字列を用い、scanner の Java クラス名や capture wrapper を追加しない。
+
+## 観測契約の統一（2026-09-23、D-024 〜 D-029）
+
+差分 fuzzing（`docs/reports/2026-09-23-differential-fuzzing.md`）が、二つの driver が別々の形で
+同じ観測を出していること、および「契約が決まっていない」項目を露出させた。以下を正とする。
+決定の根拠は `docs/design/03-design-v1.md` §8 の D-024 〜 D-029。
+
+### 二つの解析と、どの観測がどちらに属するか（D-024）
+
+生成 driver も手書き driver も、1 リクエストにつき **prefix 解析**（`requireAll=false` /
+`require_eof=false`）と**全入力解析**（`requireAll=true` / `require_eof=true`）を実行する。
+
+| 観測 | 由来 |
+|---|---|
+| `accepted` / `consumed` / `matched` / `prefixCaptures` / `parsedStatus` / `nativeFailure` | prefix 解析 |
+| `allConsumed` / `fullConsumed` / `fullMatched` / `ast` / `captures` / `lexical` / `diagnostics` / `mappingError` / `value` / `recoveries` / `scope` / `declarations` / `references` / `scopeDepth` / `texts` / `nodes` / `valueSpans` | 全入力解析 |
+
+- `allConsumed` は **全入力解析が構文成功したか**。`consumed` は別の解析のカーソルなので
+  `allConsumed == (consumed == 入力長)` は成り立たない（成り立たせる契約でもない）。
+- `fullConsumed` / `fullMatched` は全入力解析の二カーソル（code point）。
+  成り立つのは `allConsumed ⇒ fullConsumed == 入力長` と `allConsumed ⇒ accepted`。
+- 全入力解析が成功したのに prefix 解析が手前で止まることはある（`A ::= 'a' | 'ab'` に `"ab"`）。
+
+### `recoveries`（D-025）
+
+キーは `recoveries`。要素は
+`{ruleId, mode, span, syncPattern, skippedSpan, syncSpan, captureOccurrences}`。
+位置は code point の半開区間。`syncPattern` は同期文字列、見つからなければ `null`。
+`skippedSpan` は `mode=="SKIP"` または `syncSpan==null` なら `span`、それ以外は
+`[span[0], min(span[1], syncSpan[0])]`。`captureOccurrences` は回復領域に属する capture 出現の
+添字列。
+
+### `scope`（D-025）
+
+`options.scope=true` のとき、`scope` は
+`{depth, mode, events, declarations, references, diagnostics}` を持つ。
+`declarations` / `references` / `scopeDepth` は top-level にも同じ値を置く（既存互換）。
+
+- `mode`: **文法が宣言した scope mode**（`lexical` / `dynamic` / `sameRuleText`）の宣言順・重複除去。
+  入力に依存しない静的な値で、観測されたイベントの mode ではない。
+- `events`: `{order, action, mode, name, offset, length}`。`action` は
+  `enter` / `leave` / `declare` / `reference` / `clear` / `error`。
+  `name` は `declare` / `reference` では対象シンボル名、`enter` / `leave` / `clear` では
+  その scope を持つ**規則名**（D-029）。
+- `diagnostics`: `{message, offset, length, severity}` の列。
+- trim（U+0000〜U+0020）後に空になった記号名の `declare` / `reference` は記録しない（D-029）。
+
+### `catalogs`（D-025）
+
+`@catalog` の静的表を**両 driver が返す**。要素は `{rule, context, captures}` で、
+規則の宣言順・context は初出順・`captures` は重複除去してソート。入力に依存しない。
+
+### `diagnostics` と `hints`（D-026）
+
+- 全入力解析が構文成功した応答は `syntax` / `trailing_input` 診断を**含まない**。
+  成功経路内の投機的失敗は `hints` の領分（D-023）。
+- recovery / scope / mapping / resource 由来の診断は成功時も残る。
+- `hints` は言語別の情報出力で、Verdict にも未観測の判定にも使わない（D-019 / D-020 と同じ）。
+- `farthestOffset` / `farthestExpected` は共有契約のまま（D-014 / D-027）。ただし文法に現れない
+  合成 parser の表示名（`Repeat` / `OneOrMore` / `Bounded` / `Optional` / `__CaptureSite` /
+  `<Rule>…Parser`）は言語別で、corpus の Java 採取 oracle に固定された値だけを厳密比較する。
+
+### `mappingError` と `value`（D-028）
+
+- `mappingError` は意味変換が**実際に失敗した**ときだけ非 null。entry が AST 値を作らないこと
+  （`@mapping` の無い entry、根が空一致）は失敗ではなく、`ast=null` / `mappingError=null`。
+- 文字列は言語ネイティブの表現。driver は他言語の例外クラス名を足さない。
+  `@typeof` 違反だけは旧実装の観測を固定した契約値（`corpus/oracle/typeof.json`）なので、
+  生成器が互換の文字列を組み立てる。
+- `value` は driver が評価した結果があるときだけキーを置く。全入力解析が成功して AST が無い
+  ときは**キーごと出さない**（未観測）。観測済みの `null` は評価結果としての null。

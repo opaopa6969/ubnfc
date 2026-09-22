@@ -55,6 +55,31 @@ fn numeric(value: Value) -> Value {
     }
 }
 
+/// D-027: 文法に現れない合成 parser の表示名は言語別（旧 `ParseContext.java:1113-1143` の
+/// 「2 段 BFS が空のときだけクラス単純名」フォールバックに由来し、helper の作り方が言語で違う）。
+/// corpus は Java 採取 oracle を両 backend で厳密比較したままなので、緩めるのは oracle の無い
+/// ランダム文法だけ。`...Parser` で終わる token 表示名まで落ちる点は report に記録する。
+fn grammar_visible(hint: &str) -> bool {
+    !hint.ends_with("Parser")
+        && !matches!(
+            hint,
+            "Repeat" | "OneOrMore" | "Bounded" | "Optional" | "__CaptureSite"
+        )
+}
+
+fn project_hints(value: &Value) -> Value {
+    match value.as_array() {
+        None => value.clone(),
+        Some(items) => Value::Array(
+            items
+                .iter()
+                .filter(|hint| hint.as_str().is_none_or(grammar_visible))
+                .cloned()
+                .collect(),
+        ),
+    }
+}
+
 fn project_diagnostic(diagnostic: &Value) -> Value {
     let kind = get(diagnostic, "kind");
     let mut out = Map::new();
@@ -76,7 +101,7 @@ fn project_diagnostic(diagnostic: &Value) -> Value {
     out.insert("farthestOffset".into(), get(diagnostic, "farthestOffset"));
     out.insert(
         "farthestExpected".into(),
-        get(diagnostic, "farthestExpected"),
+        project_hints(&get(diagnostic, "farthestExpected")),
     );
     for key in ["message", "length", "severity"] {
         out.insert(key.into(), get(diagnostic, key));
@@ -313,12 +338,34 @@ pub fn invariants(input: &str, response: &Value) -> Vec<Violation> {
     }
     let accepted = response.get("accepted").and_then(Value::as_bool);
     let all_consumed = response.get("allConsumed").and_then(Value::as_bool);
-    if let (Some(all_consumed), Some(consumed)) = (all_consumed, consumed) {
-        if all_consumed != (consumed == len) {
+    // D-024: `allConsumed` は全入力解析の成否であって、prefix 解析の `consumed` からは導けない。
+    // 全入力解析が成功したなら、その解析のカーソルは入力末尾にある。
+    let full_consumed = response.get("fullConsumed").and_then(Value::as_i64);
+    let full_matched = response.get("fullMatched").and_then(Value::as_i64);
+    if let (Some(true), Some(full_consumed)) = (all_consumed, full_consumed) {
+        if full_consumed != len {
             violation(
                 &mut out,
                 "allconsumed-consistency",
-                format!("allConsumed={all_consumed} だが consumed={consumed} / 入力長={len}"),
+                format!("allConsumed=true だが fullConsumed={full_consumed} / 入力長={len}"),
+            );
+        }
+    }
+    if let (Some(full_consumed), Some(full_matched)) = (full_consumed, full_matched) {
+        if full_consumed > full_matched {
+            violation(
+                &mut out,
+                "cursor-order",
+                format!("fullConsumed {full_consumed} > fullMatched {full_matched}"),
+            );
+        }
+        if full_consumed < 0 || full_consumed > len || full_matched < 0 || full_matched > len {
+            violation(
+                &mut out,
+                "cursor-range",
+                format!(
+                    "fullConsumed {full_consumed} / fullMatched {full_matched} が入力長 {len} の外"
+                ),
             );
         }
     }
@@ -453,6 +500,7 @@ mod tests {
 
     fn response(extra: Value) -> Value {
         let mut base = json!({"accepted": true, "allConsumed": true, "consumed": 3, "matched": 3,
+            "fullConsumed": 3, "fullMatched": 3,
             "ast": null, "captures": [], "prefixCaptures": [], "declarations": [], "references": [],
             "scope": {}, "scopeDepth": 0, "parsedStatus": "succeeded", "diagnostics": [],
             "mappingError": null, "recoveries": []});
@@ -555,7 +603,17 @@ mod tests {
         );
         assert_eq!(
             ids("ab", json!({"consumed": 3, "matched": 3})),
-            ["cursor-range", "allconsumed-consistency"]
+            ["cursor-range", "allconsumed-consistency", "cursor-range"]
+        );
+        // D-024: allConsumed は全入力解析の成否。prefix の consumed とは別の解析なので、
+        // 両者が食い違っても違反ではない。破れるのは全入力解析のカーソルとの関係だけ。
+        assert_eq!(
+            ids("abc", json!({"consumed": 1, "matched": 1})),
+            Vec::<&str>::new()
+        );
+        assert_eq!(
+            ids("abc", json!({"fullConsumed": 2, "fullMatched": 2})),
+            ["allconsumed-consistency"]
         );
         assert_eq!(
             ids(
