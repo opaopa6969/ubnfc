@@ -229,7 +229,15 @@ impl<'a> Session<'a> {
         } else {
             1
         };
-        let diag_capacity = text.len().saturating_mul(24).saturating_add(64).min(1 << 20);
+        // fast mode（`ParseOptions::diagnostics == false`）は主診断 DAG も公開 farthest も
+        // 記録しない。arena は確保せず、予算（limit 0）も消費しない。
+        let diag_on = options.diagnostics;
+        let diag_limit = if diag_on { options.limits.diagnostics } else { 0 };
+        let diag_capacity = if diag_on {
+            text.len().saturating_mul(24).saturating_add(64).min(1 << 20)
+        } else {
+            0
+        };
         // memo は rule 本体単位（P4 実測 約 2.3 entry / byte。候補除外で失敗 entry が減った）。
         let memo_capacity = text.len().saturating_mul(3).saturating_add(64).min(1 << 20);
         let pooled = if options.reuse_buffers {
@@ -237,10 +245,10 @@ impl<'a> Session<'a> {
         } else {
             None
         };
-        let buffers = match pooled {
+        let mut buffers = match pooled {
             Some(mut b) => {
                 b.arena.clear();
-                b.diag.reset(options.limits.diagnostics);
+                b.diag.reset(diag_limit);
                 b.display.reset(options.limits.diagnostics);
                 b.memo.reset(memo_capacity);
                 // trivia cache は前回の entry 数を見積りにする（0 だと毎 parse 縮小と再拡張を繰り返す）。
@@ -255,7 +263,7 @@ impl<'a> Session<'a> {
             }
             None => Buffers {
                 arena: Vec::with_capacity(arena_capacity),
-                diag: Diagnostics::with_limit_and_capacity(options.limits.diagnostics, diag_capacity),
+                diag: Diagnostics::with_limit_and_capacity(diag_limit, diag_capacity),
                 display: DisplayDiagnostics::new(options.limits.diagnostics),
                 memo: Memo::with_capacity(memo_capacity),
                 trivia_cache: Memo::default(),
@@ -272,6 +280,8 @@ impl<'a> Session<'a> {
                 rule_caps: vec![],
             },
         };
+        buffers.diag.enable(diag_on);
+        buffers.display.enable(diag_on);
         let mut arena = buffers.arena;
         arena.push(Event::Empty);
         // AST node は入力 byte の約 1/2.5（P4 実測 332 byte / 131 node、20,923 byte / 8,195 node）。

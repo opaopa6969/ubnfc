@@ -134,6 +134,14 @@ skip cache は policy とカーソルをキーにした局所最適化であり�
   expected hints（リテラル/token の表示文字列、`ERROR('msg')`）、deepest rule。
 - 成功した rule 内の失敗も寄与、負の先読み内は抑止、memo hit 時は局所診断を再生し呼出し stack を付け替え。
 - 生成コードは成功経路の診断コストを抑える（局所 accumulator を rule 開始時にだけ作る）。
+- **二段構えの解析（2026-09-23）**: `ParseOptions.diagnostics` の既定は `false`（fast mode）で、
+  主診断 DAG も公開 farthest（D-014）も記録しない。入口（`parse` / `parse_with_options` /
+  `parse_entry_*`）は結果が診断を要するとき—失敗・入力の残り・recovery・scope / mapping /
+  resource 診断—だけ、同じ入力を `diagnostics: true` で解析し直して診断付きの結果を返す。
+  解析は決定的で観測可能な副作用を持たないので両者の結果は等しい。fast mode が落とす観測は
+  **成功した解析の `hints`（投機的失敗）だけ**で、これが要る利用者は `diagnostics: true` を渡す
+  （生成 driver は hints を常に出すので渡している）。`limits.diagnostics` は記録の予算なので、
+  fast mode では消費されず、成功した解析を予算超過で失敗にすることはない。
 
 ### 3.10 @recovery
 
@@ -270,4 +278,5 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | D-021 root の `@recovery` と既知バグ一致の検出 | 決定 | Java も `@root`（および直接 entry）の rule に recovery wrapper を適用する（`JavaEmitter.entryCall`、D-018 recovery-projection 2）。harness は `follow-spec` 登録済み観測群が実測と一致し、かつ観測済み（wire 欠落・旧 oracle null でない）なら **Fail「既知バグ再現」**（`comparison.rs reproduced_follow_spec`、`Case.follow_spec`）。`new-contract:*` の一致は従来どおり Pass。適用結果: `recovery-root/1` は両 backend で Known。同時に `comment-block/2`・`comment-line/2`・`comment-line/3`(diagnostics)・`comment-whitespace/3` が両 backend で「既知バグ再現」として露出（`@comment` の block/line 設定を旧実装どおり無視。次の修正対象、D-017 の決定は維持） |
 | D-018 `comment-trivia` の適用（round7） | 決定 | front の lowering が `@comment` の `line` 値と `block`/`blockOpen`+`blockClose` を `effectiveDelimiterSet` に反映（`crates/ubnfc-front/src/lower/trivia.rs`）。Java `Session.trivia` の未終端 block 候補を宣言した close に変更。harness は `reobserved-*.json` の同じ caseId へ `origin` の台帳を継承（README「全フィールドが一致」）。台帳に `comment-block/1#diagnostics`・`comment-block/2#parsedStatus`・`comment-whitespace/3#parsedStatus` の follow-spec を追加（既登録 accepted/consumed と同じ疑義 9 由来）。結果: 4 件は両 backend で Known、Java 1306/0、Rust 1292/0（`docs/reports/2026-09-22-{java,rust}-corpus-round7.md`） |
 | D-022 oracle 系統の数値 capture の比較契約 | 決定 | 旧 Java 採取 oracle の `int` 値と `NumberFormatException` は Java 契約（`Integer.parseInt`、`NumericCaptureRuntimeTest.java:31-49`、`generators.md`「数値 token の型境界」）。Rust は字句保持（`NumericCaptureRuntimeTest.java:55-89`: `fields.value == 入力字句`、`RustConformanceTest.java:561-575`、§1 表 11・§2）。harness は Rust backend でだけ Java oracle を投影する: (a) AST の int field は同名・同範囲・`parseInt` で同値の capture 原文（字句）へ置換して**厳密比較**（`+0007` は `"+0007"`）、(b) `NumberFormatException: For input string: "X"` は Rust では起きないので `mappingError=null` を期待し、Rust の AST に同名 capture の字句 `X` が入っていることを照合（欠落・別値・AST null は Fail）。Java backend は無投影。実装 `comparison.rs numeric_lexeme_contract`。numeric-capture 系統の `javaInt`/`rustLexeme` 二重 oracle と同じ規則 |
+| D-023 診断は opt-in、失敗時に決定的再解析 | 決定 | `ParseOptions.diagnostics`（既定 false）。既定の fast path は主診断 DAG も公開 farthest も記録しない。結果が診断を要する場合（失敗 / 全入力未消費 / recovery / mapping・resource 診断）だけ、同じ入力を診断モードで**もう一度**解析して返す（解析は決定的なので観測は同一）。副作用: (a) 成功解析の `hints` は既定で空（要求時に出る。driver は常に要求するので corpus 観測は不変）、(b) 再解析で `TokenScanner` が 2 回呼ばれる — **効果のある Extern scanner は `diagnostics: true` を要求する**（純粋宣言した scanner は影響なし）、(c) 拒否入力は約 1.8 倍のコスト。`limits.diagnostics` は fast mode では消費しない |
 | D-016 左再帰書換えの対象形 | 決定（lowering 実装） | 対象は `E ::= E Op Base \| Base` で参照先にも capture/mapping/scope/recovery が無く演算子側から自身へ戻らない形。他は明示拒否 | M2 で定義（nullable suffix、代替順、capture/trivia/scope/recovery の投影）。未対応形は明示拒否 |

@@ -7,11 +7,17 @@ use super::rt::{diag::Diag,memo::Key};
 pub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::default())}
 pub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {parse_with_scanner(text,options,&mut RejectExtern)}
 pub fn parse_with_scanner(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner)->ParseResult {
+let mut parser=Session::new(text,options,&mut *scanner);
+let step=parser.r0_c(State::default());
+let (result,escalate)=parser.finish_checked(step);
+if !escalate {return result;}
+let options=ParseOptions{diagnostics:true,..options};
 let mut parser=Session::new(text,options,scanner);
-let step=parser.r0_c(State::default());parser.finish(step)
+let step=parser.r0_c(State::default());
+parser.finish(step)
 }
-pub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {
-let mut scanner=RejectExtern;let mut parser=Session::new(text,options,&mut scanner);let step=match (grammar,entry) {
+fn entry_step(parser:&mut Session<'_>,grammar:&str,entry:Option<&str>)->Result<Step,&'static str> {
+Ok(match (grammar,entry) {
 ("UBNF",None)=>parser.r0_c(State::default()),
 ("UBNF",Some("UBNFFile"))=>parser.r0_c(State::default()),
 ("UBNF",Some("ImportDecl"))=>parser.r1_c(State::default()),
@@ -72,7 +78,17 @@ let mut scanner=RejectExtern;let mut parser=Session::new(text,options,&mut scann
 ("UBNF",Some("TypeofElement"))=>parser.r56_c(State::default()),
 ("UBNF",Some("DottedIdentifier"))=>parser.r57_c(State::default()),
 ("UBNF",Some("RuleBody"))=>parser.r58_c(State::default()),
-_=>return Err("unsupported grammar or entry"),};Ok(parser.finish(step))}
+_=>return Err("unsupported grammar or entry"),})}
+pub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {
+let mut scanner=RejectExtern;
+let mut parser=Session::new(text,options,&mut scanner);
+let step=entry_step(&mut parser,grammar,entry)?;
+let (result,escalate)=parser.finish_checked(step);
+if !escalate {return Ok(result);}
+let options=ParseOptions{diagnostics:true,..options};
+let mut parser=Session::new(text,options,&mut scanner);
+let step=entry_step(&mut parser,grammar,entry)?;
+Ok(parser.finish(step))}
 impl Session<'_> {
 fn r0_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e0_c(state);
