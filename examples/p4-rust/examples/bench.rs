@@ -42,47 +42,70 @@ static ALLOC: Counting = Counting;
 struct Case {
     name: &'static str,
     entry: Option<&'static str>,
+    /// 拒否される入力（診断が要る結果なので、二段構えの入口は診断モードで解析し直す）。
+    rejects: bool,
 }
 const CASES: &[Case] = &[
     Case {
         name: "complex",
         entry: None,
+        rejects: false,
     },
     Case {
         name: "complex-x4",
         entry: None,
+        rejects: false,
     },
     Case {
         name: "complex-x16",
         entry: None,
+        rejects: false,
     },
     Case {
         name: "complex-x64",
         entry: None,
+        rejects: false,
     },
     Case {
         name: "flat-arithmetic",
         entry: None,
+        rejects: false,
     },
     Case {
         name: "large-match",
         entry: None,
+        rejects: false,
     },
     Case {
         name: "comparison-heavy",
         entry: Some("BooleanExpression"),
+        rejects: false,
     },
     Case {
         name: "comparison-heavy-x4",
         entry: Some("BooleanExpression"),
+        rejects: false,
     },
     Case {
         name: "comparison-heavy-x16",
         entry: Some("BooleanExpression"),
+        rejects: false,
     },
     Case {
         name: "comparison-heavy-x64",
         entry: Some("BooleanExpression"),
+        rejects: false,
+    },
+    Case {
+        name: "invalid-syntax",
+        entry: None,
+        rejects: true,
+    },
+    // complex と同じ規模で拒否される入力（末尾を壊したもの）。診断モードでの再解析の代金が見える。
+    Case {
+        name: "complex-tail",
+        entry: None,
+        rejects: true,
     },
 ];
 
@@ -122,8 +145,12 @@ fn run(case: &Case, text: &str, build_ast: bool) -> ParseResult {
         None => parse_formula(black_box(text), black_box(options)),
         Some(entry) => parse_entry(Some(entry), black_box(text), black_box(options)).unwrap(),
     };
-    assert!(result.ok, "{}: {:?}", case.name, result.diagnostics);
-    assert_eq!(result.ast.is_some(), build_ast);
+    assert_eq!(
+        result.ok, !case.rejects,
+        "{}: {:?}",
+        case.name, result.diagnostics
+    );
+    assert_eq!(result.ast.is_some(), build_ast && !case.rejects);
     result
 }
 
@@ -225,7 +252,7 @@ fn counters(cases: &[&Case]) {
             let start = Instant::now();
             let result = parse_entry(entry, &text, options).unwrap();
             let elapsed = start.elapsed();
-            assert!(result.ok);
+            assert_eq!(result.ok, !case.rejects);
             let snap = counters::snapshot();
             println!(
                 "\n### counters: {} ({} bytes, {}), 計測込み {:.3} ms\n",

@@ -126,8 +126,8 @@ fn scanner_hook(ir: &GrammarIr, out: &mut String) {
             "options:ParseOptions,scanner:&mut dyn TokenScanner)",
             1,
         )
-        .replacen("let mut scanner=RejectExtern;", "", 1)
-        .replacen("&mut scanner", "scanner", 1);
+        .replacen("let mut scanner=RejectExtern;\n", "", 1)
+        .replace("&mut scanner", "&mut *scanner");
     out.push_str("\n#[cfg(feature=\"scanners\")] use ubnfc_generated::{api, ast, rt};\n#[cfg(feature=\"scanners\")] #[path=\"../../runtime.rs\"] #[allow(dead_code)] mod runtime;\n#[cfg(feature=\"scanners\")] mod scanner_parser {\n");
     out.push_str(parser);
     out.push_str(&entry);
