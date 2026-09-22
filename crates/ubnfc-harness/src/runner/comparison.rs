@@ -357,7 +357,28 @@ fn scope_fields(
             e.insert(key.clone(), value.clone());
             // ScopeAnnotationConformanceTest.java:138-141,222-249 は ScopeStore の record 列。
             // 全診断 wire から scope のみ射影。message/severity/offset/length は厳密。
-            let observed = if key == "diagnostics"
+            let observed = if key == "resolved" {
+                let mut observed = observed.clone();
+                if let (Some(expected), Some(actual)) = (value.as_array(), observed.as_array_mut())
+                {
+                    for (expected, actual) in expected.iter().zip(actual) {
+                        if let Some(actual) = actual.as_object_mut() {
+                            // ScopeAnnotationConformanceTest.java:219-235 は query/symbol のみ。
+                            // 未指定 declared は比較せず、明示 null は null または欠落を許す。
+                            match expected.get("declared") {
+                                None => {
+                                    actual.remove("declared");
+                                }
+                                Some(Value::Null) => {
+                                    actual.entry("declared").or_insert(Value::Null);
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+                observed
+            } else if key == "diagnostics"
                 && response
                     .get("scope")
                     .and_then(|scope| scope.get(key))
@@ -426,8 +447,16 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
         {
             continue;
         }
-        match response.get(key) {
-            None => missing.push(format!("/{key}")),
+        // OracleCollector.java:171-174 / SemanticsTest.java:143-151:
+        // oracle の capture は prefix 解析から採取され、全入力失敗でも残る。
+        // 未提供時に全入力 captures へ fallback しない（Rust driver は未出力）。
+        let wire_key = if key == "captures" {
+            "prefixCaptures"
+        } else {
+            key
+        };
+        match response.get(wire_key) {
+            None => missing.push(format!("/{wire_key}")),
             Some(row) => {
                 let mut row = row.clone();
                 if matches!(key.as_str(), "captures" | "diagnostics") {
@@ -529,14 +558,27 @@ pub fn compare(case: &RunCase, actual: &Actual, known: &[Observation]) -> Verdic
     if matches!(case.case.expect, Expectation::Oracle { .. }) {
         let (expected, observed, _) = oracle(case, actual);
         let verdict = clean(divergence::compare(&expected, &observed, known));
-        // raw にのみ残る references/scopeDepth 等も未登録差分なら必ず Fail。
-        if let Verdict::Fail(mut extra) = raw_compare(&p) {
-            if let Verdict::KnownDivergence(d) | Verdict::Fail(d) = verdict {
-                extra.extend(d);
+        // parsedStatus も明示登録された観測だけを既知扱いにする。
+        // references/scopeDepth 等の未登録・未知の観測は引き続き Fail。
+        let extra = divergence::compare_oracle_values(
+            &Value::Object(p.expected),
+            &Value::Object(p.actual),
+            known,
+        );
+        let failed = matches!(verdict, Verdict::Fail(_)) || matches!(extra, Verdict::Fail(_));
+        let mut differences = Vec::new();
+        for result in [extra, verdict] {
+            if let Verdict::Fail(d) | Verdict::KnownDivergence(d) = result {
+                differences.extend(d);
             }
-            return Verdict::Fail(extra);
         }
-        verdict
+        if failed {
+            Verdict::Fail(differences)
+        } else if differences.is_empty() {
+            Verdict::Pass
+        } else {
+            Verdict::KnownDivergence(differences)
+        }
     } else {
         raw_compare(&p)
     }

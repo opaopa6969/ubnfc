@@ -523,5 +523,26 @@
     "observation": "matched",
     "reason": "README.md#疑義 1: UTF-16/code point 混在を再現しない。accepted は allConsumed を含み、ast は capture 出現表を含む。非 BMP の正しい境界で受理・消費・capture・全入力時の AST・診断を比較する（D-017、D-007）。",
     "decision": "follow-spec"
+  },
+  {
+    "file": "regex-emoji.json",
+    "caseId": "regex-emoji/1",
+    "observation": "parsedStatus",
+    "reason": "README.md#疑義 1 / docs/compat-matrix.md C15: RegexTokenParser.java:38,45,50,54 の UTF-16/code point 混在による prefix の failed を再現しない。OracleCollector.java:171-174 の parsedStatus も code point 意味論で succeeded になる（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/1",
+    "observation": "parsedStatus",
+    "reason": "README.md#疑義 1 / docs/compat-matrix.md C15: RegexTokenParser.java:38,45,50,54 の UTF-16/code point 混在による prefix の failed を再現しない。OracleCollector.java:171-174 の parsedStatus も code point 意味論で succeeded になる（D-017、D-007）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "regex-prefix.json",
+    "caseId": "regex-prefix/2",
+    "observation": "parsedStatus",
+    "reason": "README.md#疑義 1 / docs/compat-matrix.md C15: RegexTokenParser.java:38,45,50,54 の UTF-16/code point 混在による prefix の failed を再現しない。OracleCollector.java:171-174 の parsedStatus も code point 意味論で succeeded になる（D-017、D-007）。",
+    "decision": "follow-spec"
   }
 ]

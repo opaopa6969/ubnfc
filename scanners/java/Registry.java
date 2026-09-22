@@ -114,8 +114,15 @@ public final class Registry {
                 valueEnd = p;
                 ok = word("x");
             }
-            if (!ok) return new ScanResult(false, state.consumed(), state.matched(),
-                null, List.of(new ScanDiagnostic(failure, expected)), List.of());
+            if (!ok) {
+                // ExternalCursorParser.java:10 / ParseContext.java:1097,1111-1148:
+                // Chain の先頭失敗では子の候補も収集され、MatchOnly の 'x' を含む。
+                var diagnostics = kind == Kind.EXTERNAL && expected.equals("'😀'")
+                    ? List.of(new ScanDiagnostic(failure, expected), new ScanDiagnostic(failure, "'x'"))
+                    : List.of(new ScanDiagnostic(failure, expected));
+                return new ScanResult(false, state.consumed(), state.matched(),
+                    null, diagnostics, List.of());
+            }
             return new ScanResult(true, consumed, p, valueStart, valueEnd, List.of(), List.of());
         }
     }

@@ -209,15 +209,24 @@ impl Scan<'_> {
             ok = self.word("x", "'x'");
         }
         if !ok {
+            // ExternalCursorParser.java:10 / ParseContext.java:1097,1111-1148:
+            // Chain の先頭失敗では MatchOnly の子候補 'x' も同じ位置に残る。
+            let mut diagnostics = vec![ScanDiagnostic {
+                offset: self.failure,
+                expected: self.expected,
+            }];
+            if matches!(kind, Kind::External) && self.expected == "'😀'" {
+                diagnostics.push(ScanDiagnostic {
+                    offset: self.failure,
+                    expected: "'x'",
+                });
+            }
             return ScanResult {
                 ok,
                 consumed_end: self.state.consumed,
                 matched_end: self.state.matched,
                 value_span: [self.state.consumed; 2],
-                diagnostics: vec![ScanDiagnostic {
-                    offset: self.failure,
-                    expected: self.expected,
-                }],
+                diagnostics,
                 effects: vec![],
             };
         }

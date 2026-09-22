@@ -17,6 +17,8 @@ pub enum Observation {
     Matched,
     /// prefix 受理 accepted と全入力消費 allConsumed の組。
     Accepted,
+    /// prefix parser の状態文字列。accepted の登録では自動的に免除しない。
+    ParsedStatus,
     Diagnostics,
     MappingError,
     /// 生成/コンパイルの成否または失敗メッセージ。未実行値を runtime と比較しない。
@@ -146,10 +148,30 @@ fn observation(path: &str) -> Option<Observation> {
         "consumed" => Some(Observation::Consumed),
         "matched" => Some(Observation::Matched),
         "accepted" | "allConsumed" => Some(Observation::Accepted),
+        "parsedStatus" => Some(Observation::ParsedStatus),
         "diagnostics" => Some(Observation::Diagnostics),
         "mappingError" => Some(Observation::MappingError),
         // declarations は台帳で免除できない。未知項目も自動で既知扱いにしない。
         _ => None,
+    }
+}
+
+/// Oracle の追加 wire 観測にも、同じ観測単位の明示登録を適用する。
+pub(crate) fn compare_oracle_values(
+    expected: &Value,
+    actual: &Value,
+    known: &[Observation],
+) -> Verdict {
+    let diffs = diff_values(expected, actual);
+    if diffs.is_empty() {
+        Verdict::Pass
+    } else if diffs
+        .iter()
+        .all(|d| observation(&d.path).is_some_and(|o| known.contains(&o)))
+    {
+        Verdict::KnownDivergence(diffs)
+    } else {
+        Verdict::Fail(diffs)
     }
 }
 
@@ -161,12 +183,7 @@ pub fn compare(expected: &Expectation, actual: &Expectation, known: &[Observatio
     let a = serde_json::to_value(actual).expect("Expectation は JSON に直列化可能");
     let (diffs, observations) = match (expected, actual) {
         (Expectation::Oracle { .. }, Expectation::Oracle { .. }) => {
-            let diffs = diff_values(&e["Oracle"], &a["Oracle"]);
-            let observations = diffs
-                .iter()
-                .map(|d| observation(&d.path))
-                .collect::<Vec<_>>();
-            (diffs, observations)
+            return compare_oracle_values(&e["Oracle"], &a["Oracle"], known);
         }
         (Expectation::GenerationFailure { .. }, Expectation::GenerationFailure { .. })
         | (Expectation::GenerationFailure { .. }, Expectation::Oracle { .. })

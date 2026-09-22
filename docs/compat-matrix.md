@@ -127,7 +127,7 @@ Tt の javaStyle コメントは global `@comment` 設定の証拠にならな�
 | C13 | `U/docs/ubnf-guide.md:224,429`、`specs/ubnf-syntax.md:553` の右結合例は正規形・必須 capture 等を満たさない | `J/GrammarValidator.java:503,531,538` は mapping・left/op/right・repeat・Base { Op Self } を要求。RA:28件の Power.ubnf は正規形 | 検証済み正規形を正とする（`v1:144`）。例の直接右再帰式が注釈付きでもそのまま通るとはしない |
 | C14 | `U/docs/ubnf-guide.md:467` の alias 利用、`v1:169` の統合表から多段も完全解決済みとは断定できない | `U/unlaxer-dsl/src/main/java/org/unlaxer/dsl/bootstrap/UBNFMapper.java:159,175,211` は再帰読込後に未統合 GrammarDecl を保存し、直接 import の名前だけ prefix、body は据置き。多段実行 oracle なし | 推移的解決の完成は未確認。ubnfc の qualifiedSymbolId 方針は v1 を採るが、既存との一致は多段テスト追加後に判定 |
 
-| C15 | `v1:105` は位置をcp、`docs/design/02-facts-tokens-bench-corpus.md:23` は REGEX を lookingAt と規定 | `U/unlaxer-dsl/src/main/java/org/unlaxer/dsl/runtime/RegexTokenParser.java:38,45,50,54` はcpのconsumedをUTF-16 substringの添字に使い、matcherのUTF-16長をCodePointLengthに渡す。非BMPの前置/マッチで単位が混在、corpusなし | cp契約を目標とするが、旧挙動の互換再現要否は未確定。ASCIIの確認だけでREGEXのUnicode対応を完了扱いにしない |
+| C15 | `v1:105` は位置をcp、`docs/design/02-facts-tokens-bench-corpus.md:23` は REGEX を lookingAt と規定 | `U/unlaxer-dsl/src/main/java/org/unlaxer/dsl/runtime/RegexTokenParser.java:38,45,50,54` はcpのconsumedをUTF-16 substringの添字に使い、matcherのUTF-16長をCodePointLengthに渡す。非BMPの前置/マッチで単位が混在。`corpus/oracle/regex-emoji.json`・`regex-prefix.json` に実測あり | 決定: D-017 に従い code point 意味論。既存の UTF-16 混在は再現しない。`regex-emoji/1`・`regex-prefix/1,2` の `parsedStatus` も `follow-spec` として台帳に登録（受理・AST/capture・cursor・診断は登録済み） |
 
 ## 3. ケース群の分類と loader の読み方
 

@@ -363,6 +363,7 @@ fn ast_declarations_and_oracle_fields_are_compared_without_waiving_unknowns() {
     response["matched"] = json!(2);
     response["diagnostics"] = json!([]);
     response["mappingError"] = Value::Null;
+    response["prefixCaptures"] = response["captures"].clone();
     let observed = actual(Backend::Rust, response.clone());
     assert_eq!(unobserved(&oracle, &observed), ["/captures/0/binding"]);
     assert!(matches!(
