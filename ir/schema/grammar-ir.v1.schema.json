@@ -1,0 +1,3451 @@
+{
+  "$defs": {
+    "Analysis": {
+      "additionalProperties": false,
+      "properties": {
+        "expressions": {
+          "items": {
+            "$ref": "#/$defs/ExprAnalysis"
+          },
+          "type": "array"
+        },
+        "prefixTries": {
+          "items": {
+            "$ref": "#/$defs/PrefixTrie"
+          },
+          "type": "array"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/RuleAnalysis"
+          },
+          "type": "array"
+        },
+        "sccs": {
+          "items": {
+            "$ref": "#/$defs/Scc"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "expressions",
+        "rules",
+        "prefixTries",
+        "sccs"
+      ],
+      "type": "object"
+    },
+    "Annotation": {
+      "additionalProperties": false,
+      "description": "原注釈を宣言順で保存する。実行意味論は各構造化フィールドに解決済み。未知注釈を黙って実行意味論に変換しない。",
+      "properties": {
+        "arguments": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Span"
+        }
+      },
+      "required": [
+        "name",
+        "arguments",
+        "source"
+      ],
+      "type": "object"
+    },
+    "AstField": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "enum": [
+            "scalar",
+            "optional",
+            "list"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "valueType": {
+          "$ref": "#/$defs/ValueType"
+        }
+      },
+      "required": [
+        "name",
+        "valueType",
+        "cardinality"
+      ],
+      "type": "object"
+    },
+    "AstType": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "enclosingTypeId": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "fields": {
+              "items": {
+                "$ref": "#/$defs/AstField"
+              },
+              "type": "array"
+            },
+            "id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "implements": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "kind": {
+              "const": "record"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "name",
+            "enclosingTypeId",
+            "implements",
+            "fields"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "enclosingTypeId": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "kind": {
+              "const": "transparentUnion"
+            },
+            "name": {
+              "type": "string"
+            },
+            "variants": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "name",
+            "enclosingTypeId",
+            "variants"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "enclosingTypeId": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "kind": {
+              "const": "enum"
+            },
+            "name": {
+              "type": "string"
+            },
+            "ruleId": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "variants": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "javaName": {
+                    "type": "string"
+                  },
+                  "literal": {
+                    "type": "string"
+                  },
+                  "rustName": {
+                    "type": "string"
+                  },
+                  "variant": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "literal",
+                  "variant",
+                  "javaName",
+                  "rustName"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "name",
+            "enclosingTypeId",
+            "ruleId",
+            "variants"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Boundary": {
+      "additionalProperties": false,
+      "description": "afterChild の childIndex は owner の文法順0始まり。その他は null。単一要素を helper 化しない既存生成境界も保持する。",
+      "properties": {
+        "at": {
+          "enum": [
+            "entry",
+            "afterChild",
+            "exit",
+            "helperEntry",
+            "helperExit"
+          ]
+        },
+        "childIndex": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ownerExprId": {
+          "$ref": "#/$defs/ExprId"
+        }
+      },
+      "required": [
+        "ownerExprId",
+        "at",
+        "childIndex"
+      ],
+      "type": "object"
+    },
+    "Capture": {
+      "additionalProperties": false,
+      "description": "siteId は ExprId + /capture/<同一式内の文法順番号>。静的 site と動的 occurrence は別。空 span を削除しない。数値・型検査を採用結果の mapping まで遅延する。",
+      "properties": {
+        "cardinality": {
+          "enum": [
+            "scalar",
+            "optional",
+            "list"
+          ]
+        },
+        "conversion": {
+          "enum": [
+            "text",
+            "number",
+            "node",
+            "mixed"
+          ]
+        },
+        "exprId": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "name": {
+          "type": "string"
+        },
+        "occurrenceOrder": {
+          "const": "completionInnerBeforeOuter"
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "siteId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "skip": {
+          "type": "boolean"
+        },
+        "spanRule": {
+          "enum": [
+            "consumedExtent",
+            "selectedChildExtent",
+            "matchedExtent"
+          ]
+        },
+        "valueType": {
+          "$ref": "#/$defs/ValueType"
+        }
+      },
+      "required": [
+        "siteId",
+        "exprId",
+        "ruleId",
+        "name",
+        "cardinality",
+        "valueType",
+        "conversion",
+        "spanRule",
+        "occurrenceOrder",
+        "skip"
+      ],
+      "type": "object"
+    },
+    "Catalog": {
+      "additionalProperties": false,
+      "description": "対象 capture の不在は検証エラー。",
+      "properties": {
+        "captureSiteId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "context": {
+          "type": "string"
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "context",
+        "ruleId",
+        "captureSiteId"
+      ],
+      "type": "object"
+    },
+    "CharRange": {
+      "additionalProperties": false,
+      "description": "両端を含む code point 集合。start<=end、重複なし・昇順を意味検証する。surrogate の扱いはバックエンド入力契約と照合する。",
+      "properties": {
+        "end": {
+          "maximum": 1114111,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start": {
+          "maximum": 1114111,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "type": "object"
+    },
+    "ChoicePlan": {
+      "additionalProperties": false,
+      "properties": {
+        "candidateOrder": {
+          "items": {
+            "$ref": "#/$defs/ExprId"
+          },
+          "type": "array"
+        },
+        "exprId": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "fallback": {
+          "enum": [
+            "none",
+            "fullChoice"
+          ]
+        },
+        "proof": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Proof"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "strategy": {
+          "enum": [
+            "ordered",
+            "predict",
+            "longest"
+          ]
+        },
+        "trieId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "exprId",
+        "strategy",
+        "candidateOrder",
+        "fallback",
+        "proof",
+        "trieId"
+      ],
+      "type": "object"
+    },
+    "CommonField": {
+      "additionalProperties": false,
+      "description": "@commonField は対象 variant 全体の型・cardinality を検証済み。Java は抽象メソッドとして生成。",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/AstField"
+        },
+        "interfaceTypeId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "variantTypeIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "interfaceTypeId",
+        "variantTypeIds",
+        "field"
+      ],
+      "type": "object"
+    },
+    "Contracts": {
+      "additionalProperties": false,
+      "properties": {
+        "choice": {
+          "const": "orderedFirstSuccess"
+        },
+        "cursor": {
+          "$ref": "#/$defs/CursorContract"
+        },
+        "leftRecursion": {
+          "const": "directRewriteExtensionIndirectError"
+        },
+        "longest": {
+          "const": "maxConsumedThenDeclarationOrder"
+        },
+        "mappingFailure": {
+          "const": "syntaxSuccessMappingFailure"
+        },
+        "mappingPhase": {
+          "const": "selectedResultOnly"
+        },
+        "occurrences": {
+          "$ref": "#/$defs/OccurrenceContract"
+        },
+        "predictive": {
+          "const": "conservativeFilterThenFullFallback"
+        },
+        "regexPolicy": {
+          "const": "regularDfaJavaPatternFallbackRustReject"
+        },
+        "repeat": {
+          "const": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds"
+        },
+        "repeatZeroMax": {
+          "const": "attemptChildBeforeCheckingMax"
+        },
+        "spanUnit": {
+          "const": "codePoint"
+        }
+      },
+      "required": [
+        "cursor",
+        "repeat",
+        "repeatZeroMax",
+        "choice",
+        "predictive",
+        "longest",
+        "mappingPhase",
+        "mappingFailure",
+        "occurrences",
+        "spanUnit",
+        "leftRecursion",
+        "regexPolicy"
+      ],
+      "type": "object"
+    },
+    "CursorContract": {
+      "additionalProperties": false,
+      "description": "D-013 補足案。M は最遠位置ではなく現在の照合位置で、巻戻し・consume(0) により減る。状態には mode / invertMatch / frameFlag が必要。Chain は親 flag=false にしてから begin。MatchOnly/Not は matchOnly mode を強制。EMPTY=Optional(MatchOnly(ANY))、EOF=Occurs(ANY,0,0)。UNTIL の terminator は calleeDefault で呼び、実際の Word は MatchOnly により M から読む。",
+      "properties": {
+        "begin": {
+          "const": "copy;M=flag?C:M"
+        },
+        "commit": {
+          "const": "copyChildCursorsOnly"
+        },
+        "consume": {
+          "const": "C+=length;M=C"
+        },
+        "coordinate": {
+          "const": "codePoint"
+        },
+        "frameFlag": {
+          "const": "resetMatchedWithConsumed"
+        },
+        "internalJava": {
+          "const": "utf16"
+        },
+        "internalRust": {
+          "const": "utf8Byte"
+        },
+        "matchOnly": {
+          "const": "M+=length"
+        },
+        "mode": {
+          "const": [
+            "consumed",
+            "matchOnly"
+          ]
+        },
+        "positions": {
+          "const": [
+            "consumed",
+            "matched"
+          ]
+        },
+        "rollback": {
+          "const": "restoreParentFrame"
+        }
+      },
+      "required": [
+        "positions",
+        "mode",
+        "frameFlag",
+        "coordinate",
+        "internalJava",
+        "internalRust",
+        "consume",
+        "matchOnly",
+        "begin",
+        "commit",
+        "rollback"
+      ],
+      "type": "object"
+    },
+    "CursorTransition": {
+      "additionalProperties": false,
+      "description": "モード別に「選択されたカーソル」が進むかの保守的要約。matched は consume や begin で後退し得る。詳細遷移は semantics の execution と cursor 契約から決まり、この要約だけで書き換えない。",
+      "properties": {
+        "consumedMode": {
+          "enum": [
+            "preserve",
+            "advance",
+            "mayAdvance"
+          ]
+        },
+        "failure": {
+          "enum": [
+            "restore",
+            "mayResetMatched",
+            "contextual"
+          ]
+        },
+        "flagEffect": {
+          "enum": [
+            "preserve",
+            "setFalse",
+            "contextual"
+          ]
+        },
+        "matchedMode": {
+          "enum": [
+            "preserve",
+            "advance",
+            "mayAdvance"
+          ]
+        },
+        "matchedOnConsume": {
+          "const": "resetToConsumed"
+        }
+      },
+      "required": [
+        "consumedMode",
+        "matchedMode",
+        "matchedOnConsume",
+        "failure",
+        "flagEffect"
+      ],
+      "type": "object"
+    },
+    "Delimiter": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "codePoints": {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "kind": {
+              "const": "characters"
+            }
+          },
+          "required": [
+            "kind",
+            "codePoints"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "lineComment"
+            },
+            "lineEndProfile": {
+              "const": "legacyLineTerminator"
+            },
+            "open": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "open",
+            "lineEndProfile"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "close": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "blockComment"
+            },
+            "open": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "open",
+            "close"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Diagnostics": {
+      "additionalProperties": false,
+      "description": "D-011: offset と farthestOffset を分離。Java syntax は失敗 frame 内 max(C,M) の最遠、失敗なしなら最大到達点。Rust は fail_at の記録位置（内部 byte→code point）。trailing_input は採用 prefix の消費末尾。expected は言語別表示契約。Java facade は expectedTokens をソート。corpus は一般の hints 完全一致や deepest rule を検証していない。負の先読みは成功時に子の失敗診断を捨て、自身の失敗は記録。",
+      "properties": {
+        "deepestRule": {
+          "const": "javaTrialMaxConsumedElseDeepestStack"
+        },
+        "expectedDisplay": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "exprId": {
+                "$ref": "#/$defs/ExprId"
+              },
+              "java": {
+                "type": "string"
+              },
+              "rust": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "exprId",
+              "java",
+              "rust"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "javaSyntaxOffset": {
+          "const": "maxFailedFrameConsumedMatched"
+        },
+        "merge": {
+          "const": "farthestThenUnionHints"
+        },
+        "negativeLookahead": {
+          "const": "discardChildFailuresOnSuccess"
+        },
+        "offsetUnit": {
+          "const": "codePoint"
+        },
+        "retainFarthestSeparately": {
+          "const": true
+        },
+        "rustSyntaxOffset": {
+          "const": "legacyRustFailureSite"
+        },
+        "successfulRuleFailures": {
+          "const": "retain"
+        },
+        "trailingInputOffset": {
+          "const": "acceptedConsumedEnd"
+        }
+      },
+      "required": [
+        "offsetUnit",
+        "javaSyntaxOffset",
+        "rustSyntaxOffset",
+        "trailingInputOffset",
+        "retainFarthestSeparately",
+        "merge",
+        "negativeLookahead",
+        "successfulRuleFailures",
+        "deepestRule",
+        "expectedDisplay"
+      ],
+      "type": "object"
+    },
+    "Eval": {
+      "additionalProperties": false,
+      "description": "自動 kind は binary_arithmetic / variable_ref / conditional / passthrough / literal。manual・未知 kind は abstractCallback。透明な和型の自動 eval は意味検証で拒否。",
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "strategy": {
+          "enum": [
+            "auto",
+            "manual",
+            "abstractCallback"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "strategy",
+        "params"
+      ],
+      "type": "object"
+    },
+    "Execution": {
+      "additionalProperties": false,
+      "description": "D-013 補足案。mode と transaction の resetMatchedWithConsumed を意味論として保持する。begin は flag=true なら M=C、false なら M を継承。consumed の長さ0加算でも M=C に戻る。commit は子の両位置だけを親へコピーし、flag はコピーしない。rollback は親 frame に戻る。フラグを親 frame へ書く処理は子 rollback だけでは取り消されない。",
+      "properties": {
+        "childMode": {
+          "enum": [
+            "inherit",
+            "matchOnly",
+            "calleeDefault"
+          ]
+        },
+        "entryFlag": {
+          "enum": [
+            "preserve",
+            "setFalse"
+          ]
+        },
+        "failureCursor": {
+          "enum": [
+            "restoreTransaction",
+            "primitiveMayResetMatched",
+            "delegate"
+          ]
+        },
+        "primitiveProfile": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "transaction": {
+          "enum": [
+            "none",
+            "once",
+            "perAlternative",
+            "occurs",
+            "delegate"
+          ]
+        }
+      },
+      "required": [
+        "entryFlag",
+        "transaction",
+        "childMode",
+        "failureCursor",
+        "primitiveProfile"
+      ],
+      "type": "object"
+    },
+    "Expr": {
+      "additionalProperties": false,
+      "properties": {
+        "captureSiteIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "diagnosticLabel": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "execution": {
+          "$ref": "#/$defs/Execution"
+        },
+        "id": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "node": {
+          "$ref": "#/$defs/ExprNode"
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Span"
+        }
+      },
+      "required": [
+        "id",
+        "ruleId",
+        "source",
+        "node",
+        "execution",
+        "captureSiteIds",
+        "diagnosticLabel"
+      ],
+      "type": "object"
+    },
+    "ExprAnalysis": {
+      "additionalProperties": false,
+      "description": "minConsume は consumed mode で成功時の code point 消費下限。未知は0。nullable はゼロ消費成功が可能（不明も true）。trivia を含む mayStart と素の字句 FIRST を混同しない。",
+      "properties": {
+        "cursorTransition": {
+          "$ref": "#/$defs/CursorTransition"
+        },
+        "effects": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "exprId": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "mayStart": {
+          "$ref": "#/$defs/MayStart"
+        },
+        "memoSafety": {
+          "$ref": "#/$defs/MemoSafety"
+        },
+        "minConsume": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "prefixTrieId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "exprId",
+        "nullable",
+        "minConsume",
+        "mayStart",
+        "cursorTransition",
+        "prefixTrieId",
+        "memoSafety",
+        "effects"
+      ],
+      "type": "object"
+    },
+    "ExprId": {
+      "description": "expr:<sourceId>:<start>:<end>:<role>。start/end は元 UTF-8 文法を復号した文字列の code point 半開区間。改行・Unicode 正規化はしない（CRLF は2）。sourceId は正規化済み論理相対パスを UTF-8 percent encode（/ と unreserved は保持、hex 大文字）。role は構文種別と同一区間内の文法順子経路（例 body/seq、body/seq/0/ref）。合成ノードは元 ExprId の role に /lower/<変換名>/<文法順番号> を足す。走査順の通番・絶対パス・hash map 順を用いない。同一ソースと解析版で安定し、ソース編集をまたぐ ID 不変性は保証しない。",
+      "pattern": "^expr:[A-Za-z0-9._~%/-]+:[0-9]+:[0-9]+:[A-Za-z0-9._/-]+$",
+      "type": "string"
+    },
+    "ExprNode": {
+      "description": "repeat は先に上限を判定しない。周回開始の getPosition(mode) と子成功後を比較し、同値でもその周回を数える。terminator は外側 mode を渡さず既定呼出し。成功かつ外側 consumed mode なら terminator の tokenKind で commit、それ以外は rollback。terminator 成功なら count を増やさず停止する。",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "items": {
+                "$ref": "#/$defs/ExprId"
+              },
+              "type": "array"
+            },
+            "kind": {
+              "const": "seq"
+            }
+          },
+          "required": [
+            "kind",
+            "items"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "alternatives": {
+              "items": {
+                "$ref": "#/$defs/ExprId"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "kind": {
+              "const": "choice"
+            },
+            "selection": {
+              "enum": [
+                "ordered",
+                "predictive",
+                "longest"
+              ]
+            },
+            "tieBreak": {
+              "const": "declarationOrder"
+            }
+          },
+          "required": [
+            "kind",
+            "alternatives",
+            "selection",
+            "tieBreak"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "child": {
+              "$ref": "#/$defs/ExprId"
+            },
+            "kind": {
+              "const": "optional"
+            }
+          },
+          "required": [
+            "kind",
+            "child"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "child": {
+              "$ref": "#/$defs/ExprId"
+            },
+            "kind": {
+              "const": "repeat"
+            },
+            "max": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "min": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "terminator": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ExprId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "child",
+            "min",
+            "max",
+            "terminator"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "element": {
+              "$ref": "#/$defs/ExprId"
+            },
+            "kind": {
+              "const": "separated"
+            },
+            "min": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "pairRollback": {
+              "const": true
+            },
+            "separator": {
+              "$ref": "#/$defs/ExprId"
+            }
+          },
+          "required": [
+            "kind",
+            "element",
+            "separator",
+            "min",
+            "pairRollback"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "child": {
+              "$ref": "#/$defs/ExprId"
+            },
+            "kind": {
+              "const": "group"
+            }
+          },
+          "required": [
+            "kind",
+            "child"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "caseSensitive": {
+              "type": "boolean"
+            },
+            "kind": {
+              "const": "literal"
+            },
+            "value": {
+              "type": "string"
+            },
+            "wordBoundary": {
+              "const": false
+            }
+          },
+          "required": [
+            "kind",
+            "value",
+            "caseSensitive",
+            "wordBoundary"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "ruleRef"
+            },
+            "symbolId": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "symbolId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "tokenRef"
+            },
+            "symbolId": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "symbolId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "error"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "message"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "child": {
+              "$ref": "#/$defs/ExprId"
+            },
+            "kind": {
+              "const": "lookahead"
+            }
+          },
+          "required": [
+            "kind",
+            "child"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "child": {
+              "$ref": "#/$defs/ExprId"
+            },
+            "kind": {
+              "const": "negativeLookahead"
+            }
+          },
+          "required": [
+            "kind",
+            "child"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "any"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "eof"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "empty"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "GrammarUnit": {
+      "additionalProperties": false,
+      "description": "GrammarUnit は出所 metadata。実行時シンボル表は semantics.symbols に統合済み。",
+      "properties": {
+        "annotations": {
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rawSettings": {
+          "$ref": "#/$defs/Settings"
+        },
+        "source": {
+          "$ref": "#/$defs/Span"
+        },
+        "sourceId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "sourceId",
+        "name",
+        "package",
+        "source",
+        "rawSettings",
+        "annotations"
+      ],
+      "type": "object"
+    },
+    "ImportEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bindings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "localName": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "qualifiedSymbolId": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "localName",
+              "qualifiedSymbolId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "fromGrammarId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "requestedPath": {
+          "type": "string"
+        },
+        "resolvedGrammarId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sourceId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceId",
+        "fromGrammarId",
+        "requestedPath",
+        "alias",
+        "resolvedGrammarId",
+        "bindings"
+      ],
+      "type": "object"
+    },
+    "JsonValue": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "LexicalPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "dfa": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "startState": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "states": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "accepting": {
+                        "type": "boolean"
+                      },
+                      "id": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "transitions": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "range": {
+                              "$ref": "#/$defs/CharRange"
+                            },
+                            "target": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "range",
+                            "target"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "accepting",
+                      "transitions"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "startState",
+                "states"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "strategy": {
+          "enum": [
+            "scalar",
+            "dfa",
+            "javaPattern",
+            "extern"
+          ]
+        },
+        "tokenId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "tokenId",
+        "strategy",
+        "dfa"
+      ],
+      "type": "object"
+    },
+    "MayStart": {
+      "additionalProperties": false,
+      "description": "先頭文字の必要条件の上界。負の先読みは FIRST の単純な補集合にしない。unknown（Extern を含む）は全候補を残す。nullable は空文字受理とは限らずゼロ消費成功可能性を表す。",
+      "properties": {
+        "certainty": {
+          "enum": [
+            "exact",
+            "conservative",
+            "unknown"
+          ]
+        },
+        "eof": {
+          "type": "boolean"
+        },
+        "includesTrivia": {
+          "type": "boolean"
+        },
+        "ranges": {
+          "items": {
+            "$ref": "#/$defs/CharRange"
+          },
+          "type": "array"
+        },
+        "zeroConsumeCondition": {
+          "enum": [
+            "never",
+            "always",
+            "atEof",
+            "predicate",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "certainty",
+        "ranges",
+        "eof",
+        "zeroConsumeCondition",
+        "includesTrivia"
+      ],
+      "type": "object"
+    },
+    "MemoEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "cacheFailure": {
+          "type": "boolean"
+        },
+        "cacheSuccess": {
+          "type": "boolean"
+        },
+        "exprId": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "omissionProof": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Proof"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "enum": [
+            "defaultSafe",
+            "unsafeExternClosure",
+            "provedOmission"
+          ]
+        }
+      },
+      "required": [
+        "exprId",
+        "cacheSuccess",
+        "cacheFailure",
+        "reason",
+        "omissionProof"
+      ],
+      "type": "object"
+    },
+    "MemoPlan": {
+      "additionalProperties": false,
+      "description": "全 memo は安全な領域内の全 memo。Extern 禁止領域まで memo しない。scope 効果は順序を保ち1回だけ再生。省略は証明付き。D-013 で frame flag と invertMatch を明示追加。",
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/MemoEntry"
+          },
+          "type": "array"
+        },
+        "referenceMode": {
+          "const": "allEligible"
+        },
+        "replay": {
+          "const": [
+            "endCursors",
+            "frameFlagEffects",
+            "constructionRecipe",
+            "captureOccurrences",
+            "lexicalOccurrences",
+            "scopeEffects",
+            "localDiagnostics",
+            "rebasedRuleStack"
+          ]
+        },
+        "requiredKey": {
+          "const": [
+            "exprId",
+            "consumed",
+            "matched",
+            "mode",
+            "invertMatch",
+            "resetMatchedWithConsumed",
+            "stateVersion"
+          ]
+        }
+      },
+      "required": [
+        "referenceMode",
+        "requiredKey",
+        "replay",
+        "entries"
+      ],
+      "type": "object"
+    },
+    "MemoSafety": {
+      "additionalProperties": false,
+      "description": "@memoSafeToken は alias 単位の保証。成功時の再現性も含む。保証のない Extern と到達可能な祖先は memo 不可。",
+      "properties": {
+        "assertedAlias": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failure": {
+          "type": "boolean"
+        },
+        "originalDeclaration": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "provenance": {
+          "enum": [
+            "builtinProof",
+            "userAliasAssertion",
+            "derivedProof",
+            "none"
+          ]
+        },
+        "purity": {
+          "enum": [
+            "pure",
+            "stateRead",
+            "effectful",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "failure",
+        "purity",
+        "originalDeclaration",
+        "provenance",
+        "assertedAlias",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "OccurrenceContract": {
+      "additionalProperties": false,
+      "description": "D-012 推奨。静的 RuleId/ExprId だけでは再帰呼出しの所属を復元できない。フロント変換では採用枝と親 occurrence、必要な非終端完了イベントを選択保持する。汎用 lexical 出力だけから再構文解析しない。",
+      "properties": {
+        "captureFields": {
+          "const": [
+            "occurrenceId",
+            "siteId",
+            "span",
+            "completionOrder"
+          ]
+        },
+        "diagnostics": {
+          "const": true
+        },
+        "lexicalFields": {
+          "const": [
+            "occurrenceId",
+            "parentOccurrenceId",
+            "ruleId",
+            "exprId",
+            "span",
+            "completionOrder"
+          ]
+        },
+        "lexicalOutput": {
+          "const": "optional"
+        },
+        "nodeSpans": {
+          "const": true
+        },
+        "scopeEvents": {
+          "const": true
+        },
+        "selfHostTransform": {
+          "const": "selectedStructuredOccurrences"
+        }
+      },
+      "required": [
+        "captureFields",
+        "lexicalFields",
+        "lexicalOutput",
+        "scopeEvents",
+        "nodeSpans",
+        "diagnostics",
+        "selfHostTransform"
+      ],
+      "type": "object"
+    },
+    "Operator": {
+      "additionalProperties": false,
+      "description": "数値 precedence は検証・metadata。実際の優先順位は参照階層。右結合も既存の各段ノードを復元する。",
+      "properties": {
+        "associativity": {
+          "enum": [
+            "left",
+            "right"
+          ]
+        },
+        "baseRuleId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "canonicalForm": {
+          "enum": [
+            "leftOpRightLists",
+            "baseOpSelfOrBase"
+          ]
+        },
+        "leftSiteId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "opSiteId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "operatorRuleId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "precedence": {
+          "type": "integer"
+        },
+        "rightSiteId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "associativity",
+        "precedence",
+        "canonicalForm",
+        "baseRuleId",
+        "operatorRuleId",
+        "leftSiteId",
+        "opSiteId",
+        "rightSiteId"
+      ],
+      "type": "object"
+    },
+    "OperatorPlan": {
+      "additionalProperties": false,
+      "description": "climbing は trivia・scope・recovery・先読みのない正規形で差分比較済みの場合のみ。lift は各段 AST/span を復元。",
+      "properties": {
+        "boundaryExprIds": {
+          "items": {
+            "$ref": "#/$defs/ExprId"
+          },
+          "type": "array"
+        },
+        "liftRecipeIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "proof": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Proof"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ruleIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "strategy": {
+          "enum": [
+            "tierFunctions",
+            "precedenceClimbing"
+          ]
+        }
+      },
+      "required": [
+        "ruleIds",
+        "strategy",
+        "liftRecipeIds",
+        "boundaryExprIds",
+        "proof"
+      ],
+      "type": "object"
+    },
+    "Plan": {
+      "additionalProperties": false,
+      "description": "最適化計画。semantics で定義した意味を変更しない。前提証明と未対応 feature/version を検査してから使用。",
+      "properties": {
+        "choices": {
+          "items": {
+            "$ref": "#/$defs/ChoicePlan"
+          },
+          "type": "array"
+        },
+        "lexical": {
+          "items": {
+            "$ref": "#/$defs/LexicalPlan"
+          },
+          "type": "array"
+        },
+        "memo": {
+          "$ref": "#/$defs/MemoPlan"
+        },
+        "operators": {
+          "items": {
+            "$ref": "#/$defs/OperatorPlan"
+          },
+          "type": "array"
+        },
+        "profile": {
+          "enum": [
+            "conservative",
+            "optimized"
+          ]
+        },
+        "triviaCache": {
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "key": {
+              "const": [
+                "policyId",
+                "consumed",
+                "matched",
+                "mode",
+                "resetMatchedWithConsumed"
+              ]
+            }
+          },
+          "required": [
+            "enabled",
+            "key"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "profile",
+        "memo",
+        "choices",
+        "operators",
+        "lexical",
+        "triviaCache"
+      ],
+      "type": "object"
+    },
+    "PrefixTrie": {
+      "additionalProperties": false,
+      "description": "候補順は元の選択肢順。未知候補を保持。node0 が root、prefix は code point。 completedCandidateExprIds は現在 prefix の途中までに既に完全一致した候補。後続辺がなくても保持する（var は variable の途中で除外できない）。",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "maxDepth": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "nodes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "acceptsEof": {
+                "type": "boolean"
+              },
+              "candidateExprIds": {
+                "items": {
+                  "$ref": "#/$defs/ExprId"
+                },
+                "type": "array"
+              },
+              "completedCandidateExprIds": {
+                "items": {
+                  "$ref": "#/$defs/ExprId"
+                },
+                "type": "array"
+              },
+              "edges": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "codePoint": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "target": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "codePoint",
+                    "target"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "index": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "unknownCandidateExprIds": {
+                "items": {
+                  "$ref": "#/$defs/ExprId"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "index",
+              "edges",
+              "candidateExprIds",
+              "unknownCandidateExprIds",
+              "acceptsEof",
+              "completedCandidateExprIds"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "maxDepth",
+        "nodes"
+      ],
+      "type": "object"
+    },
+    "Proof": {
+      "additionalProperties": false,
+      "description": "説明だけを証明器と見なさない。解析版と式参照に結びつく front の検証結果。証明不能なら保守経路。",
+      "properties": {
+        "explanation": {
+          "type": "string"
+        },
+        "exprIds": {
+          "items": {
+            "$ref": "#/$defs/ExprId"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "unreachableRevisit",
+            "singleExecutionPath",
+            "exclusiveCandidates",
+            "monotoneNoRollback",
+            "diagnosticEquivalent",
+            "noTriviaEffectsRecovery",
+            "leftRecursionNormalization",
+            "none"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "exprIds",
+        "explanation"
+      ],
+      "type": "object"
+    },
+    "Recipe": {
+      "additionalProperties": false,
+      "description": "CST オブジェクト木を要さない構築レシピ。transformId は版管理されたフロント専用変換。自己ホストでは手書き UBNF parser に戻らず、採用枝・呼出し occurrence と対応した構造イベントを使う。 assocLists の leafFallback は既存の共有結合型が未 mapping 葉を同型の (null,[字句],[]) に包む契約。一般の number capture の数値変換とは別。",
+      "properties": {
+        "fields": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "cardinality": {
+                "enum": [
+                  "scalar",
+                  "optional",
+                  "list"
+                ]
+              },
+              "conversion": {
+                "enum": [
+                  "text",
+                  "number",
+                  "node",
+                  "mixed"
+                ]
+              },
+              "field": {
+                "type": "string"
+              },
+              "siteIds": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "field",
+              "siteIds",
+              "conversion",
+              "cardinality"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "construct",
+            "transparent",
+            "text",
+            "enum",
+            "assocLists",
+            "skip",
+            "frontendTransform"
+          ]
+        },
+        "leafFallback": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "left": {
+                  "const": null
+                },
+                "op": {
+                  "const": "singleStrippedLeafText"
+                },
+                "right": {
+                  "const": []
+                },
+                "span": {
+                  "const": "leafConsumedExtent"
+                },
+                "typeId": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "typeId",
+                "left",
+                "op",
+                "right",
+                "span"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "onFailure": {
+          "const": "mappingFailure"
+        },
+        "phase": {
+          "const": "selectedMapping"
+        },
+        "resultTypeId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "transformId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "ruleId",
+        "resultTypeId",
+        "kind",
+        "fields",
+        "phase",
+        "onFailure",
+        "transformId",
+        "leafFallback"
+      ],
+      "type": "object"
+    },
+    "Recovery": {
+      "additionalProperties": false,
+      "description": "AUTO の FOLLOW が空なら ;。SYNC は同期文字列を消費し未検出なら失敗。ruleRef の適用 site を明記し root へ暗黙適用しない。typed AST への投影は独立に指定。",
+      "properties": {
+        "applicationSites": {
+          "items": {
+            "$ref": "#/$defs/ExprId"
+          },
+          "type": "array"
+        },
+        "astProjection": {
+          "enum": [
+            "legacyMarker",
+            "mappingFailure",
+            "explicitRecipe"
+          ]
+        },
+        "consumeSync": {
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "SYNC",
+            "AUTO",
+            "SKIP"
+          ]
+        },
+        "noSyncAction": {
+          "enum": [
+            "fail",
+            "consumeToEof",
+            "succeed"
+          ]
+        },
+        "progressRule": {
+          "enum": [
+            "legacySync",
+            "legacySkip"
+          ]
+        },
+        "recipeId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resolvedSyncPatterns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ruleId",
+        "mode",
+        "resolvedSyncPatterns",
+        "consumeSync",
+        "noSyncAction",
+        "progressRule",
+        "applicationSites",
+        "astProjection",
+        "recipeId"
+      ],
+      "type": "object"
+    },
+    "Rewrite": {
+      "additionalProperties": false,
+      "description": "元の順序付き選択と対応を保つ。nullable suffix・capture・trivia の投影規則を確定できない書換えを黙って適用しない。元式も IR に保持する。 最適化ではなく D-010 の拡張意味論の lowering 記録。Rule.body は rewrittenBody を参照する。",
+      "properties": {
+        "kind": {
+          "const": "directLeftRecursionExtension"
+        },
+        "originalBody": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "proof": {
+          "$ref": "#/$defs/Proof"
+        },
+        "rewrittenBody": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ruleId",
+        "originalBody",
+        "rewrittenBody",
+        "kind",
+        "proof"
+      ],
+      "type": "object"
+    },
+    "Rule": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
+        },
+        "body": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "eval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Eval"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mappingParams": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "mappingTypeId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Operator"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "skip": {
+          "type": "boolean"
+        },
+        "symbolId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "triviaPolicyId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "symbolId",
+        "body",
+        "triviaPolicyId",
+        "mappingTypeId",
+        "mappingParams",
+        "skip",
+        "operator",
+        "eval",
+        "annotations"
+      ],
+      "type": "object"
+    },
+    "RuleAnalysis": {
+      "additionalProperties": false,
+      "description": "FOLLOW の同期文字列は FIRST の文字集合と別。生成可能 IR で indirectRejected は許容しない。 recovery が要求しないため未解析なら null。解析済みの空集合 [] と区別し、null を AUTO の ; fallback に使ってはならない。",
+      "properties": {
+        "followSyncPatterns": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "leftRecursion": {
+          "enum": [
+            "none",
+            "directRewritten",
+            "indirectRejected"
+          ]
+        },
+        "progressProven": {
+          "type": "boolean"
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sccId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ruleId",
+        "followSyncPatterns",
+        "leftRecursion",
+        "sccId",
+        "progressProven"
+      ],
+      "type": "object"
+    },
+    "Scc": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "memoPolicy": {
+          "enum": [
+            "allEligible",
+            "provedOmissions"
+          ]
+        },
+        "recursive": {
+          "type": "boolean"
+        },
+        "ruleIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "ruleIds",
+        "recursive",
+        "memoPolicy"
+      ],
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "description": "同名再宣言の旧 lookup、pop 済み frame、診断 clear を undo に保存する。版 ID は分岐間で異なる状態に再利用しない。",
+      "properties": {
+        "effects": {
+          "items": {
+            "$ref": "#/$defs/ScopeEffect"
+          },
+          "type": "array"
+        },
+        "rollback": {
+          "const": "undoLog"
+        },
+        "trimMaxCodePoint": {
+          "const": 32
+        },
+        "versionChanges": {
+          "const": [
+            "enter",
+            "leave",
+            "declare",
+            "clear"
+          ]
+        }
+      },
+      "required": [
+        "rollback",
+        "versionChanges",
+        "trimMaxCodePoint",
+        "effects"
+      ],
+      "type": "object"
+    },
+    "ScopeEffect": {
+      "additionalProperties": false,
+      "description": "開始 enter、成功 leave、同 rule の declare は leave 後に親へ登録、declare 後に use。scope なし backref は同 rule 内テキスト一致、ERROR 診断。scope あり未定義 use は WARNING で構文成功。trim は U+0000..U+0020。",
+      "properties": {
+        "events": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "enum": [
+                  "enter",
+                  "leave",
+                  "declare",
+                  "use",
+                  "clear"
+                ]
+              },
+              "captureSiteId": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "name": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "when": {
+                "enum": [
+                  "entry",
+                  "successBeforeLeave",
+                  "successAfterLeave",
+                  "afterDeclarations"
+                ]
+              }
+            },
+            "required": [
+              "when",
+              "action",
+              "captureSiteId",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "mode": {
+          "enum": [
+            "lexical",
+            "dynamic",
+            "sameRuleText"
+          ]
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ruleId",
+        "mode",
+        "events"
+      ],
+      "type": "object"
+    },
+    "Semantics": {
+      "additionalProperties": false,
+      "properties": {
+        "astTypes": {
+          "items": {
+            "$ref": "#/$defs/AstType"
+          },
+          "type": "array"
+        },
+        "captures": {
+          "items": {
+            "$ref": "#/$defs/Capture"
+          },
+          "type": "array"
+        },
+        "catalogs": {
+          "items": {
+            "$ref": "#/$defs/Catalog"
+          },
+          "type": "array"
+        },
+        "commonFields": {
+          "items": {
+            "$ref": "#/$defs/CommonField"
+          },
+          "type": "array"
+        },
+        "contracts": {
+          "$ref": "#/$defs/Contracts"
+        },
+        "diagnostics": {
+          "$ref": "#/$defs/Diagnostics"
+        },
+        "expressions": {
+          "items": {
+            "$ref": "#/$defs/Expr"
+          },
+          "type": "array"
+        },
+        "normalizations": {
+          "items": {
+            "$ref": "#/$defs/Rewrite"
+          },
+          "type": "array"
+        },
+        "recipes": {
+          "items": {
+            "$ref": "#/$defs/Recipe"
+          },
+          "type": "array"
+        },
+        "recovery": {
+          "items": {
+            "$ref": "#/$defs/Recovery"
+          },
+          "type": "array"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/Rule"
+          },
+          "type": "array"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "symbols": {
+          "items": {
+            "$ref": "#/$defs/Symbol"
+          },
+          "type": "array"
+        },
+        "tokens": {
+          "items": {
+            "$ref": "#/$defs/Token"
+          },
+          "type": "array"
+        },
+        "trivia": {
+          "$ref": "#/$defs/Trivia"
+        },
+        "typeofConstraints": {
+          "items": {
+            "$ref": "#/$defs/Typeof"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "contracts",
+        "symbols",
+        "tokens",
+        "rules",
+        "expressions",
+        "trivia",
+        "captures",
+        "astTypes",
+        "commonFields",
+        "recipes",
+        "typeofConstraints",
+        "catalogs",
+        "scope",
+        "diagnostics",
+        "recovery",
+        "normalizations"
+      ],
+      "type": "object"
+    },
+    "Settings": {
+      "additionalProperties": false,
+      "properties": {
+        "comment": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "blockClose": {
+                  "type": "string"
+                },
+                "blockOpen": {
+                  "type": "string"
+                },
+                "line": {
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "interleave": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "whitespace": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "javaStyle"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "whitespace",
+        "interleave",
+        "comment"
+      ],
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "description": "path は明示したソースルート相対の POSIX パス。絶対パス・環境固有の作業ディレクトリを記録しない。sha256 は改行を含む原 UTF-8 バイト列。",
+      "properties": {
+        "codePointLength": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "sha256",
+        "codePointLength"
+      ],
+      "type": "object"
+    },
+    "Span": {
+      "additionalProperties": false,
+      "description": "文法ソース上の code point 半開区間。start <= end を意味検証する。入力解析結果の span と区別する。",
+      "properties": {
+        "end": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sourceId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sourceId",
+        "start",
+        "end"
+      ],
+      "type": "object"
+    },
+    "Symbol": {
+      "additionalProperties": false,
+      "description": "import alias を prefix した名前もここで解決する。id と qualifiedSymbolId の一意性、参照解決はフロントで検証する。",
+      "properties": {
+        "grammarId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "rule",
+            "token"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "originalName": {
+          "type": "string"
+        },
+        "qualifiedSymbolId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Span"
+        },
+        "sourceId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "qualifiedSymbolId",
+        "grammarId",
+        "sourceId",
+        "name",
+        "originalName",
+        "kind",
+        "source"
+      ],
+      "type": "object"
+    },
+    "Token": {
+      "additionalProperties": false,
+      "description": "Number は ASCII 数字の符号・小数・指数、Identifier は ASCII [A-Za-z_][A-Za-z0-9_]*。引用 token の escape は任意1 code point。builtin CodePointSet は集合を明記。charRange の surrogate 境界は意味検証で拒否。空 UNTIL は既存生成器で終端なし相当。 diagnosticProfiles は既知組込みの言語別観測契約。Java Number は ExponentParser の試行失敗を記録し、Rust Number の不完全指数巻戻しは診断を追加しない。backend が共通スキャナへの統合でこの差を消してはならない。",
+      "properties": {
+        "annotations": {
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
+        },
+        "diagnosticProfiles": {
+          "additionalProperties": false,
+          "properties": {
+            "java": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "rust": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "java",
+            "rust"
+          ],
+          "type": "object"
+        },
+        "memoSafety": {
+          "$ref": "#/$defs/MemoSafety"
+        },
+        "spec": {
+          "$ref": "#/$defs/TokenSpec"
+        },
+        "symbolId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "symbolId",
+        "spec",
+        "memoSafety",
+        "annotations",
+        "diagnosticProfiles"
+      ],
+      "type": "object"
+    },
+    "TokenSpec": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "codePoints": {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "kind": {
+              "const": "builtin"
+            },
+            "which": {
+              "enum": [
+                "Number",
+                "Identifier",
+                "SingleQuoted",
+                "Quoted",
+                "Digit",
+                "Alphabet",
+                "AlphabetUnderScore",
+                "AlphabetNumericUnderScore",
+                "Space",
+                "EndOfSource",
+                "CodePointSet"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "which",
+            "codePoints"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "emptyTerminator": {
+              "const": "consumeToEof"
+            },
+            "kind": {
+              "const": "until"
+            },
+            "missingTerminator": {
+              "const": "consumeToEofAndSucceed"
+            },
+            "preserveMatched": {
+              "const": true
+            },
+            "terminator": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "terminator",
+            "missingTerminator",
+            "emptyTerminator",
+            "preserveMatched"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "excluded": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "negation"
+            }
+          },
+          "required": [
+            "kind",
+            "excluded"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "lookahead"
+            },
+            "pattern": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "pattern"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "negativeLookahead"
+            },
+            "pattern": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "pattern"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "charRange"
+            },
+            "max": {
+              "maximum": 65535,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "min": {
+              "maximum": 65535,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "min",
+            "max"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "comparison": {
+              "const": "javaEqualsIgnoreCase"
+            },
+            "kind": {
+              "const": "caseInsensitive"
+            },
+            "word": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "word",
+            "comparison"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "javaFallback": {
+              "enum": [
+                "none",
+                "java.util.regex.Pattern"
+              ]
+            },
+            "kind": {
+              "const": "regex"
+            },
+            "matching": {
+              "const": "lookingAt"
+            },
+            "pattern": {
+              "type": "string"
+            },
+            "regularSubset": {
+              "type": "boolean"
+            },
+            "rustFallback": {
+              "const": "generationError"
+            },
+            "zeroWidth": {
+              "const": "fail"
+            }
+          },
+          "required": [
+            "kind",
+            "pattern",
+            "regularSubset",
+            "matching",
+            "zeroWidth",
+            "javaFallback",
+            "rustFallback"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "any"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "eof"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "empty"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "inputState": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "javaBinding": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "kind": {
+              "const": "extern"
+            },
+            "logicalId": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "originalClassName": {
+              "type": "string"
+            },
+            "resultFields": {
+              "const": [
+                "ok",
+                "consumedEnd",
+                "matchedEnd",
+                "valueSpan",
+                "diagnostics",
+                "effects"
+              ]
+            },
+            "rustBinding": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "logicalId",
+            "javaBinding",
+            "rustBinding",
+            "originalClassName",
+            "inputState",
+            "resultFields"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Trivia": {
+      "additionalProperties": false,
+      "description": "insertionPlan は意味論。最適化 plan へ移動・省略してはならない。chain の先頭・各要素後と helper 境界の実行順。",
+      "properties": {
+        "insertionPlan": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "boundary": {
+                "$ref": "#/$defs/Boundary"
+              },
+              "policyId": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "boundary",
+              "policyId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "policies": {
+          "items": {
+            "$ref": "#/$defs/TriviaPolicy"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "policies",
+        "insertionPlan"
+      ],
+      "type": "object"
+    },
+    "TriviaPolicy": {
+      "additionalProperties": false,
+      "description": "javaStyle は ASCII 9..13,32 と既存共有 delimiter のコメントを含む。line キーの値ではなく存在が CPPComment（//）を有効にする。delimiter の順序を保持。",
+      "properties": {
+        "effectiveDelimiterSet": {
+          "items": {
+            "$ref": "#/$defs/Delimiter"
+          },
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "precedence": {
+          "const": "ruleWhitespaceThenRuleInterleaveThenGrammar"
+        },
+        "rawSettings": {
+          "$ref": "#/$defs/Settings"
+        }
+      },
+      "required": [
+        "id",
+        "rawSettings",
+        "effectiveDelimiterSet",
+        "precedence"
+      ],
+      "type": "object"
+    },
+    "Typeof": {
+      "additionalProperties": false,
+      "properties": {
+        "comparisonKind": {
+          "const": "runtimeClassEquality"
+        },
+        "mismatch": {
+          "const": "mappingFailure"
+        },
+        "ownCapture": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "phase": {
+          "const": "mapping"
+        },
+        "referencedCapture": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "siteId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "siteId",
+        "ownCapture",
+        "referencedCapture",
+        "phase",
+        "comparisonKind",
+        "mismatch"
+      ],
+      "type": "object"
+    },
+    "ValueType": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "text"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "java": {
+              "const": "int32Exact"
+            },
+            "kind": {
+              "const": "number"
+            },
+            "rust": {
+              "const": "lexeme"
+            }
+          },
+          "required": [
+            "kind",
+            "java",
+            "rust"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "node"
+            },
+            "typeId": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "typeId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "mixed"
+            },
+            "members": {
+              "items": {
+                "$ref": "#/$defs/ValueType"
+              },
+              "minItems": 2,
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "members"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "element": {
+              "$ref": "#/$defs/ValueType"
+            },
+            "kind": {
+              "const": "optional"
+            }
+          },
+          "required": [
+            "kind",
+            "element"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "element": {
+              "$ref": "#/$defs/ValueType"
+            },
+            "kind": {
+              "const": "list"
+            }
+          },
+          "required": [
+            "kind",
+            "element"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "null"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "$id": "urn:ubnfc:grammar-ir:v1:draft1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "ubnfc 設計 v1 §3・§4 の実装境界の草案。semantics（認識・trivia・capture・mapping・scope・診断）と analysis（front の解析結果）、plan（最適化）を分離する。analysisVersion と requiredFeatures の未対応値を backend は明示拒否する。D-013（カーソル frame flag）、D-011 の言語別診断、D-012 の構造付きフロント変換は今回のレビューによる補足提案で、実装済みを意味しない。\n直列化契約 ubnfc-json.v1: UTF-8、BOMなし、LF、インデント2空白、末尾LF1個。全 object/map のキーを Unicode scalar 昇順に再帰ソート。整数は10進（先頭0・+・-0なし）、この IR の実行数値に浮動小数を使わない。文字列は Unicode を正規化せず非ASCIIをそのまま出力し、quote/backslash と制御文字のみ JSON escape（\\b,\\t,\\n,\\f,\\r 優先、他は小文字hexの\\u00xx）。/ を escape しない。source path は論理ソースルート相対 POSIX、. を除去し .. を解決、ルート越えと絶対パスを拒否。sourceId/ExprId は各定義に従い、作業ディレクトリやランダム採番に依存しない。\n配列は意味のある順序を保持する。特に source/grammar/import の宣言順、統合シンボルの import 展開順、rule、choice、同長 longest、capture site、AST field/enum、scope event、trivia insertion は並べ替え禁止。expressions は rule 宣言順の構文前順（親→文法順の子）。analysis と plan の式別配列も同じ順。集合である ranges/codePoints と feature 名だけ規定の昇順、SCC は最初の所属 rule 順。動的 capture は完了順・同名 nested は内側→外側。Schema 検証は object キー順やこの直列化形式を強制できないため serializer の別検証が必要。\n意味検証の責務: ID一意性・参照存在・ExprIdとsource spanの対応・全Expr解析網羅・min<=max・範囲端点・rule所属・capture/recipe/typeof/catalog型整合・memo安全性と省略証明・climbing前提・recovery適用site・import循環と未対応機能をフロントで検証。Schema 単独ではこれらの横断制約や解析結果の正しさを証明しない。",
+  "properties": {
+    "analysis": {
+      "$ref": "#/$defs/Analysis"
+    },
+    "analysisVersion": {
+      "const": "ubnfc-analysis.v1-draft1"
+    },
+    "entry": {
+      "additionalProperties": false,
+      "properties": {
+        "grammarId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "ruleId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "grammarId",
+        "ruleId"
+      ],
+      "type": "object"
+    },
+    "grammarUnits": {
+      "items": {
+        "$ref": "#/$defs/GrammarUnit"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "importEdges": {
+      "items": {
+        "$ref": "#/$defs/ImportEdge"
+      },
+      "type": "array"
+    },
+    "plan": {
+      "$ref": "#/$defs/Plan"
+    },
+    "requiredFeatures": {
+      "items": {
+        "enum": [
+          "dualCursor",
+          "cursorFrameFlag",
+          "orderedChoice",
+          "predictiveChoice",
+          "longestChoice",
+          "triviaInsertion",
+          "captures",
+          "deferredMapping",
+          "scopeUndo",
+          "backendDiagnostics",
+          "memoReplay",
+          "externTokens",
+          "regex",
+          "operators",
+          "leftRecursionRewrite",
+          "recovery",
+          "imports",
+          "enum",
+          "commonField",
+          "eval",
+          "catalog",
+          "typeof",
+          "structuredOccurrences"
+        ]
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "semantics": {
+      "$ref": "#/$defs/Semantics"
+    },
+    "serialization": {
+      "const": "ubnfc-json.v1"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "version",
+    "analysisVersion",
+    "requiredFeatures",
+    "serialization",
+    "sources",
+    "grammarUnits",
+    "importEdges",
+    "entry",
+    "semantics",
+    "analysis",
+    "plan"
+  ],
+  "title": "Grammar IR v1 草案",
+  "type": "object"
+}
