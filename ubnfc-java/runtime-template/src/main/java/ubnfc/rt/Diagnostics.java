@@ -9,13 +9,13 @@ import java.util.Objects;
 public final class Diagnostics {
     /** 配列を外部へ共有しない immutable な局所診断。stack は保存 rule からの suffix。 */
     public static final class Snapshot {
-        private final int farthest;
+        private final int farthest, reached;
         private final int consumed, matched;
         private final int[] expected;
         private final int[] ruleStack;
 
         private Snapshot(Accumulator accumulator) {
-            farthest = accumulator.farthest; consumed = accumulator.consumed; matched = accumulator.matched;
+            farthest = accumulator.farthest; reached = accumulator.reached; consumed = accumulator.consumed; matched = accumulator.matched;
             expected = Arrays.copyOf(accumulator.expected, accumulator.expectedSize);
             ruleStack = accumulator.ruleStack.clone();
         }
@@ -41,7 +41,7 @@ public final class Diagnostics {
     }
 
     private static final class Accumulator {
-        int farthest = -1;
+        int farthest = -1, reached = -1;
         int consumed, matched;
         int[] expected = new int[4];
         int expectedSize;
@@ -91,7 +91,7 @@ public final class Diagnostics {
     }
 
     private static void restoreInto(Accumulator target, Snapshot snapshot) {
-        target.farthest = snapshot.farthest; target.consumed = snapshot.consumed; target.matched = snapshot.matched;
+        target.farthest = snapshot.farthest; target.reached = snapshot.reached; target.consumed = snapshot.consumed; target.matched = snapshot.matched;
         target.expected = Arrays.copyOf(snapshot.expected, Math.max(4, snapshot.expected.length));
         target.expectedSize = snapshot.expected.length;
         target.ruleStack = snapshot.ruleStack.clone();
@@ -106,6 +106,14 @@ public final class Diagnostics {
 
     public int farthest() {
         return global.farthest;
+    }
+
+    public int reached() { return global.reached; }
+
+    public void reach(int position) {
+        if (suppressionDepth != 0) return;
+        global.reached = Math.max(global.reached, position);
+        for (var frame : frames) frame.local().reached = Math.max(frame.local().reached, position);
     }
 
     public int[] expected() {
@@ -176,9 +184,11 @@ public final class Diagnostics {
     /** memo hit 時、保存 rule を enter する前に呼ぶ。呼出元の stack を付け替える。 */
     public void merge(Snapshot snapshot) {
         Objects.requireNonNull(snapshot);
-        if (suppressionDepth != 0 || snapshot.farthest < 0) {
+        if (suppressionDepth != 0) {
             return;
         }
+        reach(snapshot.reached);
+        if (snapshot.farthest < 0) return;
         mergeInto(global, snapshot, stackSuffix(0, snapshot.ruleStack));
         for (int i = 0; i < frames.size(); i++) {
             mergeInto(frames.get(i).local(), snapshot, stackSuffix(i, snapshot.ruleStack));
