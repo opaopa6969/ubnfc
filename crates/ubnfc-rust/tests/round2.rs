@@ -110,35 +110,18 @@ fn round2_generated_contracts_and_m3() {
             .ir;
         if name == "dfa" {
             use ubnfc_front::ir::*;
-            assert!(ubnfc_rust::emit(&ir, &Default::default()).is_err());
-            ir.plan.lexical[0].strategy = LexicalPlanStrategy::Dfa;
-            ir.plan.lexical[0].dfa = Some(Dfa {
-                start_state: 0,
-                states: vec![
-                    DfaState {
-                        id: 0,
-                        accepting: false,
-                        transitions: vec![DfaTransition {
-                            range: CharRange {
-                                start: 0x1f600,
-                                end: 0x1f600,
-                            },
-                            target: 1,
-                        }],
-                    },
-                    DfaState {
-                        id: 1,
-                        accepting: true,
-                        transitions: vec![DfaTransition {
-                            range: CharRange {
-                                start: 0x1f600,
-                                end: 0x1f600,
-                            },
-                            target: 1,
-                        }],
-                    },
-                ],
-            });
+            // front は正則 REGEX に DFA 計画を供給する（leftmost-first）。
+            // DFA が無い（javaPattern fallback）IR は Rust backend が明示拒否することを確認する。
+            let mut without_dfa = ir.clone();
+            without_dfa.plan.lexical[0].strategy = LexicalPlanStrategy::JavaPattern;
+            without_dfa.plan.lexical[0].dfa = None;
+            assert!(ubnfc_rust::emit(&without_dfa, &Default::default()).is_err());
+            // 実行は front が供給した leftmost-first DFA をそのまま使う（token spec と plan の DFA は一致していなければならない）。
+            assert!(matches!(
+                ir.plan.lexical[0].strategy,
+                LexicalPlanStrategy::Dfa
+            ));
+            assert!(ir.plan.lexical[0].dfa.is_some());
         }
         if name == "enum_plain" {
             for ty in &mut ir.semantics.ast_types {
