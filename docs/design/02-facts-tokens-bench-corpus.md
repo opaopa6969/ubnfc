@@ -7,14 +7,14 @@
 | UBNF で参照される名前 | 実装（unlaxer-common） | 受理範囲（ubnfc の scan 仕様） |
 |---|---|---|
 | `NumberParser` | `elementary/NumberParser` = Optional(Sign) Choice(digits '.' digits \| digits '.' \| digits \| '.' digits) Optional(Exponent) | `[+-]? ( D+ '.' D+ \| D+ '.' \| D+ \| '.' D+ ) ( [eE] [+-]? D+ )?`。**先頭符号・末尾ドット・先頭ドット・指数を受理**する（Java AST の `int` 変換は別契約で失敗し得る） |
-| `IdentifierParser` | `clang/IdentifierParser` = AlphabetUnderScore ZeroOrMore(AlphabetNumericUnderScore) | `[A-Za-z_][A-Za-z0-9_]*`（Alphabet の Unicode 範囲は**未確認**: ASCII のみか `Character.isLetter` か） |
-| `SingleQuotedParser` | `QuotedParser(SingleQuoteParser)` = quote ZeroOrMore(Choice(EscapeInQuoted, non-quote)) quote | `' ( \\ . \| [^'] )* '`。EscapeInQuoted = BackSlash + WildCardString（WildCardString の長さは**未確認**：1 文字か貪欲か） |
+| `IdentifierParser` | `clang/IdentifierParser` = AlphabetUnderScore ZeroOrMore(AlphabetNumericUnderScore) | `[A-Za-z_][A-Za-z0-9_]*`（**ASCII のみ**。`posix/AlphabetUnderScoreParser` / `AlphabetNumericUnderScoreParser` は固定文字列の集合） |
+| `SingleQuotedParser` | `QuotedParser(SingleQuoteParser)` = quote ZeroOrMore(Choice(EscapeInQuoted, non-quote)) quote | `' ( \\ . \| [^'] )* '`。EscapeInQuoted = BackSlash + WildCardString、WildCardString は `SingleStringParser` なので **1 code point**（`\\` の次の任意 1 cp を取る。`'` 自体もエスケープ可） |
 | `QuotedParser` | 同上（二重引用符） | `" ( \\ . \| [^"] )* "` |
 | `EndOfSourceParser` | `LazyZero(WildCardCharacter)` | 入力末尾でのみ成功、ゼロ幅 |
 | `DigitParser` | `MappedSingleCharacterParser("0123456789")` | `[0-9]` 1 文字 |
 | `WordParser("x")` (リテラル `'x'`) | code point 列の完全一致。**単語境界チェックは無い** | 境界規則は生成器側（D-002、astra 確認中） |
 | `CI('w')` | `IgnoreCaseWordParser` = `WordParser(w, ignoreCase=true)` | `equalsIgnoreCase` 相当 |
-| `UNTIL('t')` | `WildCardStringTerminatorParser` = ZeroOrMore(WildCardString, terminator=**MatchOnly**(Word(t))) | 終端 `t` の直前まで消費し、**`t` 自体は消費しない**。終端未検出時の契約（EOF まで消費して成功か失敗か）は**未確認** |
+| `UNTIL('t')` | `WildCardStringTerminatorParser` = ZeroOrMore(WildCardString, terminator=**MatchOnly**(Word(t))) | 終端 `t` の直前まで消費し、**`t` 自体は消費しない**。終端未検出時は **EOF まで消費して成功**（`Occurs` ループは子＝任意 1 cp が EOF で失敗するまで回り、min=0 なので成功。`Occurs.java:31-72`）。0 文字でも成功 |
 | `NEGATION('cs')` | 生成クラス（`isMatch(int)` / `isMatch(char)`） | 集合外の 1 code point。空集合は任意 1 cp、EOF で失敗 |
 | `CHAR_RANGE('a','b')` | 生成クラス | 両端含む、`char` 境界（BMP 非 surrogate） |
 | `LOOKAHEAD('p')` / `NEGATIVE_LOOKAHEAD('p')` | `MatchOnly(Word)` / `Not(Word)` | ゼロ幅 |
@@ -54,5 +54,4 @@
 | 操作列 | scope-store（8 fixture の op 列）、catalog | | ScopeStore の操作と観測 |
 
 合計 ≈ 700 ケース。`golden/*.java.txt` は既存生成物のスナップショットなので **使わない**
-（ubnfc は生成物の形が違う）。`catalog/corpus.json` は非標準エスケープを含み Python json で
-読めない → loader は寛容パーサが要る（要確認）。
+（ubnfc は生成物の形が違う）。`catalog/corpus.json` は JSON として不正な `\'` エスケープを含む（9 行目）。既存 Java 側 loader は寛容。ubnfc の loader も `\'` を許容する（upstream は触らない）。
