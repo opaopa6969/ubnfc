@@ -111235,6 +111235,16 @@
           "success": true
         },
         "spec": {
+          "firstChars": [
+            {
+              "end": 34,
+              "start": 34
+            },
+            {
+              "end": 39,
+              "start": 39
+            }
+          ],
           "inputState": [
             "consumed",
             "matched",
@@ -111286,6 +111296,12 @@
           "success": true
         },
         "spec": {
+          "firstChars": [
+            {
+              "end": 96,
+              "start": 96
+            }
+          ],
           "inputState": [
             "consumed",
             "matched",
@@ -111361,6 +111377,12 @@
           "success": true
         },
         "spec": {
+          "firstChars": [
+            {
+              "end": 96,
+              "start": 96
+            }
+          ],
           "inputState": [
             "consumed",
             "matched",

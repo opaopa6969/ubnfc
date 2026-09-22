@@ -13,6 +13,15 @@ pub(crate) struct Generator<'a> {
     pub tokens: BTreeMap<&'a str, usize>,
     pub sites: BTreeMap<&'a str, usize>,
     pub modes: BTreeSet<(usize, bool)>,
+    /// rule 本体の expression index。memo・診断 frame は本体と共有 expression にだけ置く（expressions.rs 参照）。
+    pub bodies: BTreeSet<usize>,
+    /// 複数の親（expression の子、または rule 本体）から参照される expression。同一 rule の評価中に
+    /// 同じ状態で再訪され得るので、plan が許せば memo を置く。
+    pub shared: BTreeSet<usize>,
+    /// 選択の候補除外（§3.4）に使う先頭文字集合と再生可能性（predict.rs）。
+    pub prediction: crate::predict::Prediction,
+    /// 生成する失敗再生関数 `guard_e{i}_{mode}` の集合。
+    pub guards: BTreeSet<(usize, bool)>,
 }
 impl<'a> Generator<'a> {
     pub fn new(ir: &'a GrammarIr) -> Self {
@@ -48,10 +57,84 @@ impl<'a> Generator<'a> {
                 .map(|(i, c)| (c.site_id.as_str(), i))
                 .collect(),
             modes: BTreeSet::new(),
+            bodies: BTreeSet::new(),
+            shared: BTreeSet::new(),
+            prediction: crate::predict::Prediction {
+                starts: Vec::new(),
+                templatable: Vec::new(),
+                sizes: Vec::new(),
+            },
+            guards: BTreeSet::new(),
         };
+        g.bodies = ir
+            .semantics
+            .rules
+            .iter()
+            .map(|r| g.expr[r.body.as_str()])
+            .collect();
+        let mut incoming = vec![0usize; ir.semantics.expressions.len()];
+        for rule in &ir.semantics.rules {
+            incoming[g.expr[rule.body.as_str()]] += 1;
+        }
+        for expr in &ir.semantics.expressions {
+            for child in expr.node.children() {
+                incoming[g.expr[child.as_str()]] += 1;
+            }
+        }
+        g.shared = incoming
+            .iter()
+            .enumerate()
+            .filter(|(_, n)| **n > 1)
+            .map(|(i, _)| i)
+            .collect();
         for rule in &ir.semantics.rules {
             g.visit(g.expr[rule.body.as_str()], false);
         }
+        g.prediction = crate::predict::Prediction::new(&g);
+        let mut pending = Vec::new();
+        for &(i, mode) in &g.modes {
+            let expr = &ir.semantics.expressions[i];
+            if let ExprNode::Choice {
+                alternatives,
+                selection,
+                ..
+            } = &expr.node
+            {
+                let child_mode = match expr.execution.child_mode {
+                    ExecutionChildMode::Inherit => mode,
+                    ExecutionChildMode::MatchOnly => true,
+                    ExecutionChildMode::CalleeDefault => false,
+                };
+                let plan = ir.plan.choices.iter().find(|p| p.expr_id == expr.id);
+                let longest = plan.map_or(*selection == ChoiceSelection::Longest, |p| {
+                    p.strategy == ChoicePlanStrategy::Longest
+                });
+                let order = plan
+                    .map(|p| &p.candidate_order)
+                    .filter(|o| !o.is_empty())
+                    .unwrap_or(alternatives);
+                let (guarded, _) = crate::predict::guarded_alternatives(&g, order, longest);
+                pending.extend(guarded.iter().map(|x| (x.expr, child_mode)));
+                // 因数分解した群は共有先頭要素に対して候補除外を行う（factor.rs）。
+                if !longest {
+                    if let Some(plan) = crate::factor::plan(&g, order, &guarded) {
+                        for &(start, _) in &plan.groups {
+                            if guarded.iter().any(|x| x.index == start) {
+                                if let ExprNode::Seq { items } =
+                                    &ir.semantics.expressions[g.expr[order[start].as_str()]].node
+                                {
+                                    let elem = g.expr[items[0].as_str()];
+                                    if g.prediction.templatable[elem] {
+                                        pending.push((elem, child_mode));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        g.guards = pending.into_iter().collect();
         g
     }
     fn visit(&mut self, i: usize, mode: bool) {
@@ -91,6 +174,17 @@ impl<'a> Generator<'a> {
         format!("self.e{}_{}({state})", self.expr[id.as_str()], suffix(mode))
     }
     pub fn trivia(&self, id: &ExprId, at: BoundaryAt, index: Option<u64>, mode: bool) -> String {
+        self.trivia_with(id, at, index, mode, "out")
+    }
+    /// 境界 `at` の trivia を Step 変数 `var` に対して読み飛ばす文。
+    pub fn trivia_with(
+        &self,
+        id: &ExprId,
+        at: BoundaryAt,
+        index: Option<u64>,
+        mode: bool,
+        var: &str,
+    ) -> String {
         let mut s = String::new();
         for insertion in &self.ir.semantics.trivia.insertion_plan {
             if insertion.boundary.owner_expr_id == *id
@@ -107,7 +201,7 @@ impl<'a> Generator<'a> {
                     .unwrap();
                 writeln!(
                     s,
-                    "let trivia=self.trivia_{p}::<{mode}>(out.state);out=self.combine(out,trivia);"
+                    "let trivia=self.trivia_{p}::<{mode}>({var}.state);{var}=self.combine({var},trivia);"
                 )
                 .unwrap();
             }
@@ -223,7 +317,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {
                 continue;
             }
-            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;self.display.enter(state.consumed.max(state.matched));let mark=self.mark();",suffix(mode)).unwrap();
+            writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;let mark=self.mark();",suffix(mode)).unwrap();
             p.push_str(&crate::expressions::scope_events(
                 &g,
                 i,
@@ -261,7 +355,12 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
                 p.push_str("let end=out.state.consumed;\n");
             }
             writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,end],child:out.events}});\n}} else {{ self.restore(mark); }}").unwrap();
-            writeln!(p, "if !out.ok {{self.display.failures(state.consumed.max(state.matched),&{:?});}}self.display.reach(out.state.consumed.max(out.state.matched));", g.display.rule(rule.symbol_id.as_str())).unwrap();
+            writeln!(
+                p,
+                "if !out.ok {{self.display.failures(state.consumed.max(state.matched),&{:?});}}",
+                g.display.rule(rule.symbol_id.as_str())
+            )
+            .unwrap();
             if let Some(recovery) = ir
                 .semantics
                 .recovery
@@ -273,22 +372,26 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
                     RecoveryMode::Auto => "AUTO",
                     RecoveryMode::Skip => "SKIP",
                 };
+                // recovery は葉を通らずに位置を進めるので、rule の出口で到達位置を記録する。
                 writeln!(
                     p,
-                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?});}}",
+                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?});}}self.display.reach(out.state.consumed.max(out.state.matched));",
                     recovery.resolved_sync_patterns
                 )
                 .unwrap();
             }
             writeln!(
                 p,
-                "self.depth-=1;self.display.leave();out.diag=self.diag.rule({i},out.diag);out\n}}"
+                "self.depth-=1;out.diag=self.diag.rule({i},out.diag);out\n}}"
             )
             .unwrap();
         }
     }
     for &(i, mode) in &g.modes {
         p.push_str(&crate::expressions::generate(&g, i, mode)?);
+    }
+    for &(i, mode) in &g.guards {
+        p.push_str(&crate::predict::guard_function(&g, i, mode));
     }
     p.push_str(&crate::tokens::generate(&g)?);
     p.push_str("}\n");

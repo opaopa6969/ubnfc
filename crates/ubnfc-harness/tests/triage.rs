@@ -393,7 +393,9 @@ fn regex_non_bmp_status_is_known_only_for_the_three_registered_observations() {
                 .contains(&Observation::ParsedStatus))
             .count(),
         // C15 の 3 件に加え、round5 で recovery-root/1（D-017 root recovery）を登録。
-        4
+        // round7（D-018 comment-trivia）で comment-block/2・comment-whitespace/3 を登録し、
+        // reobserved-comment-block.json の comment-block/2 が origin から継承する。
+        7
     );
 }
 

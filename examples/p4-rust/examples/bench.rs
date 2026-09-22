@@ -92,11 +92,25 @@ fn fixture(name: &str) -> String {
 }
 /// 既定の診断予算 200 万 node は comparison-heavy-x4 以上で不足する（report 参照）。
 /// ベンチは受理を前提にするため予算だけ広げる。予算は事前確保ではないので計時に影響しない。
+/// `UBNFC_BENCH_OPTS="predict=0,factor=0,reuse=0,memo=0"` で個別の最適化を切って A/B する。
 fn options(build_ast: bool) -> ParseOptions {
     let mut options = ParseOptions {
         build_ast,
         ..Default::default()
     };
+    if let Ok(spec) = std::env::var("UBNFC_BENCH_OPTS") {
+        for item in spec.split(',').filter(|s| !s.is_empty()) {
+            let (key, value) = item.split_once('=').unwrap_or((item, "1"));
+            let on = value != "0";
+            match key {
+                "predict" => options.predict = on,
+                "factor" => options.factor = on,
+                "reuse" => options.reuse_buffers = on,
+                "memo" => options.memo = on,
+                other => panic!("unknown UBNFC_BENCH_OPTS key: {other}"),
+            }
+        }
+    }
     options.limits.diagnostics = 1 << 30;
     options.limits.arena_entries = 1 << 30;
     options.limits.memo_entries = 1 << 30;
@@ -235,7 +249,7 @@ fn counters(cases: &[&Case]) {
                 .map(|e| e.calls_consumed + e.calls_match_only)
                 .sum();
             let total_self: u64 = snap.rules.iter().map(|r| r.self_ns).sum();
-            println!("\nrule 関数呼出し合計 {total_rule_calls}、expression 関数呼出し合計 {total_expr_calls}、rule 自己時間合計 {:.3} ms\n", total_self as f64 / 1e6);
+            println!("\nrule 関数呼出し合計 {total_rule_calls}、expression 関数呼出し合計 {total_expr_calls}、rule 自己時間合計 {:.3} ms、失敗再生（guard）呼出し {} 回・自己時間合計 {:.3} ms\n", total_self as f64 / 1e6, snap.guards.calls_consumed, snap.guards.self_ns as f64 / 1e6);
             let mut rules: Vec<(usize, counters::RuleCounter)> =
                 snap.rules.iter().copied().enumerate().collect();
             rules.sort_by_key(|(_, r)| std::cmp::Reverse(r.self_ns));

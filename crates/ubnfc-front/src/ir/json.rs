@@ -26,8 +26,13 @@ pub fn to_canonical_json(ir: &GrammarIr) -> String {
             .sort_by_key(|range| (range.start, range.end));
     }
     for token in &mut ordered.semantics.tokens {
-        if let TokenSpec::Builtin { code_points, .. } = &mut token.spec {
-            code_points.sort_unstable();
+        match &mut token.spec {
+            TokenSpec::Builtin { code_points, .. } => code_points.sort_unstable(),
+            TokenSpec::Extern {
+                first_chars: Some(ranges),
+                ..
+            } => ranges.sort_by_key(|range| (range.start, range.end)),
+            _ => {}
         }
     }
     for policy in &mut ordered.semantics.trivia.policies {

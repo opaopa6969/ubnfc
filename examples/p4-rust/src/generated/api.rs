@@ -10,6 +10,20 @@ pub struct ParseOptions {
     /// Maximum active rule calls; native stack budget may stop earlier.
     pub max_depth: usize,
     pub memo: bool,
+    /// Predictive exclusion of ordered-choice alternatives that provably fail at
+    /// their first token (design v1 §3.4). false is the reference path that tries
+    /// every alternative; both produce the same result and diagnostics.
+    pub predict: bool,
+    /// Left factoring of ordered-choice alternatives that share a common prefix
+    /// (design v1 §3.4): the shared prefix is evaluated once and the continuations
+    /// are tried in declaration order. false is the reference path that evaluates
+    /// every alternative from its start; both produce the same result and diagnostics.
+    pub factor: bool,
+    /// Reuse the session's large buffers (memo table, diagnostics arena, event arena)
+    /// across parses on the same thread instead of allocating them per parse. The
+    /// retained set is bounded (`POOL_RETAIN_BYTES`) and only affects allocation
+    /// behaviour, never results.
+    pub reuse_buffers: bool,
     pub limits: ResourceLimits,
 }
 /// Per-session hard limits, checked before indexing input or retaining data.
@@ -44,6 +58,9 @@ impl Default for ParseOptions {
             lexical: false,
             max_depth: 10_000,
             memo: true,
+            predict: true,
+            factor: true,
+            reuse_buffers: true,
             limits: ResourceLimits::default(),
         }
     }

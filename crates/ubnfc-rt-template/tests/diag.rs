@@ -2,7 +2,7 @@ use ubnfc_rt_template::diag::{Diag, Diagnostics};
 #[test]
 fn zero_offset_failure_is_distinct_from_no_failure() {
     let mut d = Diagnostics::default();
-    assert_eq!(d.summary(Diag(0)), None);
+    assert_eq!(d.summary(Diag::NONE), None);
     let leaf = d.fail(0, "number");
     assert_eq!(d.summary(leaf), Some((0, vec!["number"], vec![])));
 }
@@ -93,8 +93,8 @@ fn empty_and_repeated_joins_are_harmless() {
     let mut d = Diagnostics::new();
     let a = d.fail(8, "a");
     let b = d.fail(8, "b");
-    assert_eq!(d.join(Diag(0), a), a);
-    assert_eq!(d.join(a, Diag(0)), a);
+    assert_eq!(d.join(Diag::NONE, a), a);
+    assert_eq!(d.join(a, Diag::NONE), a);
     assert_eq!(d.join(a, a), a);
     let both = d.join(a, b);
     let repeated = d.join(both, a);

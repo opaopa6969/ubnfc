@@ -74,7 +74,17 @@ fn instrument_parser(parser: &mut String) {
     let mut out = String::with_capacity(parser.len() + parser.len() / 8);
     for line in parser.split_inclusive('\n') {
         let mut line = line.to_owned();
-        if let Some(rest) = line
+        if let Some(rest) = line.strip_prefix("fn guard_e") {
+            let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
+            let tail = &rest[digits.len()..];
+            if !digits.is_empty()
+                && (tail.starts_with("_c") || tail.starts_with("_m"))
+                && tail[2..].starts_with(signature)
+            {
+                let head_len = 10 + digits.len() + 2 + signature.len();
+                line.insert_str(head_len, " let _guard=crate::counters::Guard::guard();");
+            }
+        } else if let Some(rest) = line
             .strip_prefix("fn r")
             .or_else(|| line.strip_prefix("fn e"))
         {
@@ -200,11 +210,11 @@ fn instrument_diag(diag: &mut String) {
         ),
         (
             "    pub fn reach(&mut self, reached: usize) {\n",
-            "        crate::counters::add(crate::counters::FRAME_ITER, self.frames.len() as u64);\n",
+            "        crate::counters::add(crate::counters::FRAME_ITER, 1);\n",
         ),
         (
             "    pub fn merge(&mut self, snapshot: DisplaySnapshot) {\n",
-            "        crate::counters::add(crate::counters::FRAME_ITER, self.frames.len() as u64);\n",
+            "        crate::counters::add(crate::counters::FRAME_ITER, 1);\n",
         ),
         (
             "    pub fn enter(&mut self, reached: usize) {\n",

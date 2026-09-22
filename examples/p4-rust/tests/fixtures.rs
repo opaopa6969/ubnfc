@@ -41,7 +41,8 @@ fn fixture(name: &str) -> String {
     std::fs::read_to_string(root().join("tests/fixtures").join(format!("{name}.tiny"))).unwrap()
 }
 /// 既定の診断予算（200 万 node）では complex-x4 以上・large-match・comparison-heavy-x4 以上が
-/// `diagnostic budget exceeded` になる（`default_diagnostic_budget_is_exceeded` で固定）。
+/// `diagnostic budget exceeded` になった。M5 で失敗 1 件が O(1) 件になり既定予算で通る
+/// （`default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_resource` で固定）。
 /// 受理検証は予算だけ広げる。予算は事前確保ではない。
 fn options(build_ast: bool, memo: bool) -> ParseOptions {
     let mut options = ParseOptions {
@@ -122,40 +123,56 @@ fn formula_accepts_and_matches_golden() {
 }
 
 #[test]
-fn default_diagnostic_budget_is_exceeded() {
-    // ParseOptions::default() の limits.diagnostics = 2,000,000 で失敗する fixture。
-    // 認識は正しく進むが、診断 DAG の node 数が予算に達し Resource 診断で全体失敗になる。
+fn default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_resource() {
+    // M5: `limits.diagnostics` は「記録した診断の件数」の上限。主診断 DAG の node 数と、
+    // 公開 farthest 候補（label）の記録数をそれぞれ数え、どちらかが超えると Resource 診断で
+    // 全体失敗になる。失敗 1 件が O(1) 件になったので、既定 2,000,000 で全 fixture が通る。
     let default = ParseOptions::default();
-    let ok = |name: &str, entry: Option<&str>| match entry {
-        None => parse_formula(&fixture(name), default),
-        Some(entry) => parse_entry(Some(entry), &fixture(name), default).unwrap(),
+    let run = |name: &str, entry: Option<&str>, options: ParseOptions| match entry {
+        None => parse_formula(&fixture(name), options),
+        Some(entry) => parse_entry(Some(entry), &fixture(name), options).unwrap(),
     };
     for (name, entry) in [
         ("complex", None),
+        ("complex-x4", None),
+        ("complex-x16", None),
+        ("complex-x64", None),
         ("flat-arithmetic", None),
+        ("large-match", None),
         ("valid-basic", None),
         ("valid-multiline", None),
         ("valid-unicode", None),
         ("comparison-heavy", Some("BooleanExpression")),
+        ("comparison-heavy-x4", Some("BooleanExpression")),
+        ("comparison-heavy-x16", Some("BooleanExpression")),
+        ("comparison-heavy-x64", Some("BooleanExpression")),
     ] {
-        let result = ok(name, entry);
+        let result = run(name, entry, default);
         assert!(
             result.ok,
             "{name}: 既定予算で受理されるはず: {:?}",
             result.diagnostics
         );
     }
+    // memo 無効でも complex は既定予算に収まる（rule 評価 168,262 回）。
+    let no_memo = run(
+        "complex",
+        None,
+        ParseOptions {
+            memo: false,
+            ..Default::default()
+        },
+    );
+    assert!(no_memo.ok, "{:?}", no_memo.diagnostics);
+    // 予算を小さくすると、認識は正しく進んでも Resource 診断 1 件で全体失敗になる。
+    let mut small = ParseOptions::default();
+    small.limits.diagnostics = 200;
     for (name, entry) in [
-        ("complex-x4", None),
-        ("complex-x16", None),
-        ("complex-x64", None),
-        ("large-match", None),
-        ("comparison-heavy-x4", Some("BooleanExpression")),
-        ("comparison-heavy-x16", Some("BooleanExpression")),
-        ("comparison-heavy-x64", Some("BooleanExpression")),
+        ("complex", None),
+        ("comparison-heavy", Some("BooleanExpression")),
     ] {
-        let result = ok(name, entry);
-        assert!(!result.ok, "{name}: 既定予算で失敗するはず");
+        let result = run(name, entry, small);
+        assert!(!result.ok, "{name}: 予算 200 で失敗するはず");
         assert_eq!(result.consumed_cp, 0, "{name}");
         assert_eq!(
             result.diagnostics.len(),
@@ -174,20 +191,8 @@ fn default_diagnostic_budget_is_exceeded() {
             vec!["diagnostic budget exceeded"],
             "{name}"
         );
+        assert!(result.ast.is_none(), "{name}");
     }
-    // memo 無効だと complex でも既定予算に達する。
-    let no_memo = parse_formula(
-        &fixture("complex"),
-        ParseOptions {
-            memo: false,
-            ..Default::default()
-        },
-    );
-    assert!(!no_memo.ok);
-    assert_eq!(
-        no_memo.diagnostics[0].expected,
-        vec!["diagnostic budget exceeded"]
-    );
 }
 
 #[test]
@@ -284,6 +289,84 @@ fn extern_scanners_are_reached() {
     assert!(!parse_formula("```java:org.example.Fn\nreturn 1;\n1", options(true, true)).ok);
 }
 
+/// `scanners/first-chars.json` の宣言（M5 round 3）は必要条件: 宣言した集合の外の先頭文字では
+/// 同梱 scanner が消費なしに失敗する。生成器はこの前提で Extern で始まる候補を除外する。
+#[test]
+fn extern_first_chars_declaration_matches_bundled_scanners() {
+    use ubnfc_p4_rust::{rt::scope::ScopeStore, scanners::Registry, State, TokenScanner};
+    let path = root().join("../../scanners/first-chars.json");
+    let text = std::fs::read_to_string(&path).unwrap();
+    let decl: serde_json::Value = serde_json::from_str(&text).unwrap();
+    let scanners = decl["scanners"].as_object().unwrap();
+    let classes: &'static [(&'static str, &'static str)] = Box::leak(
+        scanners
+            .keys()
+            .map(|class| {
+                let class: &'static str = Box::leak(class.clone().into_boxed_str());
+                (class, class)
+            })
+            .collect::<Vec<_>>()
+            .into_boxed_slice(),
+    );
+    let mut registry = Registry::new(classes).expect("宣言した全クラスは同梱 registry にある");
+    let scope = ScopeStore::new();
+    let mut checked = 0usize;
+    for (class, ranges) in scanners {
+        let Some(ranges) = ranges.as_array() else {
+            continue;
+        };
+        let allowed: Vec<(u32, u32)> = ranges
+            .iter()
+            .map(|r| match r {
+                serde_json::Value::String(s) => {
+                    let c = s.chars().next().unwrap() as u32;
+                    (c, c)
+                }
+                serde_json::Value::Number(n) => {
+                    let c = u32::try_from(n.as_u64().unwrap()).unwrap();
+                    (c, c)
+                }
+                serde_json::Value::Object(o) => {
+                    let cp = |v: &serde_json::Value| match v {
+                        serde_json::Value::String(s) => s.chars().next().unwrap() as u32,
+                        other => u32::try_from(other.as_u64().unwrap()).unwrap(),
+                    };
+                    (cp(&o["start"]), cp(&o["end"]))
+                }
+                other => panic!("{other}"),
+            })
+            .collect();
+        let outside = (0x20u32..0x7f)
+            .chain([0x0a, 0x09, 0xe9, 0x3042, 0x1f600])
+            .filter_map(char::from_u32)
+            .filter(|c| {
+                !allowed
+                    .iter()
+                    .any(|&(lo, hi)| (lo..=hi).contains(&(*c as u32)))
+            });
+        for c in outside {
+            for (prefix, consumed) in [("", 0usize), ("ab\n", 3)] {
+                let input = format!("{prefix}{c}xyz\n```java:a.b\n");
+                for (match_only, reset) in [(false, true), (true, true), (true, false)] {
+                    let state = State {
+                        consumed,
+                        matched: consumed,
+                        invert: false,
+                        reset,
+                    };
+                    let result = registry.scan(class, &input, state, match_only, &scope);
+                    assert!(
+                        !result.ok && result.consumed_end == consumed && result.matched_end == consumed,
+                        "{class}: 宣言外の先頭文字 {c:?}（match_only {match_only}, reset {reset}）で消費なしに失敗する: {result:?}"
+                    );
+                    checked += 1;
+                }
+            }
+        }
+    }
+    assert!(checked > 1000, "{checked}");
+}
+
 /// Java golden の単引用符付き文字列値 `'jp'` を `jp` に正規化し、正規化した個数を返す。
 fn strip_single_quotes(value: &mut serde_json::Value) -> usize {
     match value {
@@ -375,4 +458,76 @@ fn fixtures_are_unmodified_copies() {
     expected.sort();
     assert_eq!(names, expected);
     assert!(Path::new(&dir).join("complex.tiny").is_file());
+}
+
+/// §3.4 の候補除外（`ParseOptions::predict`）は参照経路（全候補を試行）と結果・診断が同じ。
+/// 全 fixture の完全入力に加え、切り詰め（各 byte 境界）と 1 文字破壊（`#`）で失敗経路を通す。
+/// 大きい fixture は間引く。memo の有無とも掛け合わせる。
+#[test]
+fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
+    let all: Vec<&str> = ACCEPTED
+        .iter()
+        .map(|(n, _)| *n)
+        .chain(REJECTED.iter().copied())
+        .collect();
+    let mut compared = 0usize;
+    for name in all {
+        let text = fixture(name);
+        let entry = if name.starts_with("comparison-heavy") {
+            Some("BooleanExpression")
+        } else {
+            None
+        };
+        let stride = match text.len() {
+            0..=400 => 1,
+            401..=1600 => 7,
+            1601..=6000 => 97,
+            _ => 1201,
+        };
+        let mut inputs: Vec<String> = vec![text.clone()];
+        let mut i = 0;
+        while i < text.len() {
+            if text.is_char_boundary(i) {
+                inputs.push(text[..i].to_owned());
+                let mut corrupted = text[..i].to_owned();
+                corrupted.push('#');
+                let rest = &text[i..];
+                let next = rest.chars().next().map_or(0, char::len_utf8);
+                corrupted.push_str(&rest[next..]);
+                inputs.push(corrupted);
+            }
+            i += stride;
+        }
+        for (index, input) in inputs.iter().enumerate() {
+            for memo in [true, false] {
+                // memo 無効の参照経路は遅い（complex で rule 評価 16 万回）ので間引く。
+                if !memo && (input.len() > 400 || index % 13 != 0) {
+                    continue;
+                }
+                let run = |predict: bool, factor: bool| {
+                    let mut options = options(true, memo);
+                    options.predict = predict;
+                    options.factor = factor;
+                    strip_statistics(match entry {
+                        None => parse_formula(input, options),
+                        Some(entry) => parse_entry(Some(entry), input, options).unwrap(),
+                    })
+                };
+                // 参照経路（候補除外なし・因数分解なし）と、各最適化の組合せを比較する。
+                let reference = run(false, false);
+                for (predict, factor) in [(true, true), (true, false), (false, true)] {
+                    let optimized = run(predict, factor);
+                    assert!(
+                        optimized == reference,
+                        "{name}: predict {predict} / factor {factor} differ from reference (memo {memo}) for input {:?}\nopt: {:?}\nref: {:?}",
+                        input,
+                        optimized.diagnostics,
+                        reference.diagnostics
+                    );
+                    compared += 1;
+                }
+            }
+        }
+    }
+    assert!(compared > 3000, "{compared}");
 }

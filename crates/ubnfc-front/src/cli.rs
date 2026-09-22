@@ -45,20 +45,32 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         stdout(&format_issues(&issues, options.format == "json"))?;
         return Ok(issue_exit_code(&issues, options.strict));
     }
-    let compiled = match pipeline::compile_with_strict(&options.grammar, &loader, options.strict) {
-        Ok(compiled) => compiled,
-        Err(error) => {
-            let code = match error {
-                PipelineError::Strict(_) => 5,
-                PipelineError::Io { .. } => 2,
-                _ => 1,
-            };
-            eprintln!("ubnfc: {error}");
-            return Ok(code);
-        }
-    };
+    let mut compiled =
+        match pipeline::compile_with_strict(&options.grammar, &loader, options.strict) {
+            Ok(compiled) => compiled,
+            Err(error) => {
+                let code = match error {
+                    PipelineError::Strict(_) => 5,
+                    PipelineError::Io { .. } => 2,
+                    _ => 1,
+                };
+                eprintln!("ubnfc: {error}");
+                return Ok(code);
+            }
+        };
     for warning in &compiled.warnings {
         eprintln!("{}", warning.format());
+    }
+    if let Some(path) = &options.extern_first_chars {
+        let text = std::fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
+        let declarations =
+            ir::parse_extern_first_chars(&text).map_err(|e| format!("{path}: {e}"))?;
+        let (_, missing) = ir::apply_extern_first_chars(&mut compiled.ir, &declarations);
+        for class in missing {
+            eprintln!(
+                "ubnfc: {path}: Extern class {class} has no firstChars declaration (kept unknown)"
+            );
+        }
     }
     let output = ir::to_canonical_json(&compiled.ir);
     if command == "gen" {
@@ -175,6 +187,8 @@ struct Options {
     target: Option<String>,
     strict: bool,
     format: String,
+    /// Extern token の先頭文字宣言ファイル（`scanners/first-chars.json`）。ir / gen だけ。
+    extern_first_chars: Option<String>,
 }
 
 impl Options {
@@ -192,6 +206,7 @@ impl Options {
             }
             let allowed = flag == "--grammar"
                 || (flag == "--out" && command != "validate")
+                || (flag == "--extern-first-chars" && command != "validate")
                 || (flag == "--target" && command == "gen")
                 || (flag == "--format" && command == "validate");
             if !allowed {
@@ -211,6 +226,7 @@ impl Options {
         let out = values.remove("--out");
         let target = values.remove("--target");
         let format = values.remove("--format").unwrap_or_else(|| "text".into());
+        let extern_first_chars = values.remove("--extern-first-chars");
         if !matches!(format.as_str(), "text" | "json") {
             return Err(format!("--format は text または json: {format}"));
         }
@@ -228,6 +244,7 @@ impl Options {
             target,
             strict,
             format,
+            extern_first_chars,
         })
     }
 }
@@ -305,11 +322,13 @@ fn diagnostic_issues(
 }
 
 const USAGE: &str = "usage: ubnfc <ir|validate|gen> [options]\n\n\
-  ubnfc ir --grammar X.ubnf [--out FILE|-] [--strict]\n\
+  ubnfc ir --grammar X.ubnf [--out FILE|-] [--strict] [--extern-first-chars FILE]\n\
   ubnfc validate --grammar X.ubnf [--strict] [--format text|json]\n\
-  ubnfc gen --grammar X.ubnf --target java|rust --out DIR\n\
+  ubnfc gen --grammar X.ubnf --target java|rust --out DIR [--extern-first-chars FILE]\n\
   ubnfc --version | --help\n\n\
 ir の既定出力は標準出力。--strict は WARNING を exit 5 にします。\n\
 validate は syntax / resolve / validate の診断を出力します。\n\
 gen は DIR/grammar.ir.json を書き、backend で driver 付きソースを生成します。\n\
+--extern-first-chars は scanner registry の先頭文字宣言（scanners/first-chars.json）を\n\
+Extern token の firstChars に写します（宣言の無いクラスは unknown のまま）。\n\
 exit: 0 成功、1 文法エラー、2 CLI/入出力エラー、3 backend が見つからない、5 strict 警告。\n";

@@ -1431,6 +1431,11 @@ pub enum TokenSpec {
     Eof {},
     Empty {},
     Extern {
+        /// scanner 実装が宣言する「成功し得る先頭 code point」の集合（昇順・互いに素な閉区間）。
+        /// 省略は unknown（backend は候補除外に使わない）。宣言は必要条件であり、
+        /// 集合外の先頭文字では scanner が消費なしで失敗することを scanner 側が保証する。
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        first_chars: Option<Vec<CharRange>>,
         input_state: Vec<String>,
         #[serde(deserialize_with = "super::json::required_nullable")]
         java_binding: Option<String>,

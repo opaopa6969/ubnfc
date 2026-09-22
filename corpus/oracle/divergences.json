@@ -551,5 +551,26 @@
     "observation": "parsedStatus",
     "reason": "README.md#疑義 3: @root の recovery(sync=';') を適用し、bad; を回復する（D-017）。OracleCollector.java:164-171 の parsedStatus は prefix parser の成功状態なので、既登録 accepted/consumed/matched と同じ root recovery 無効バグに由来する failed を再現しない。docs/decisions/D-018-undecided-divergences.md §(a) の Root[0,4] 回復契約。",
     "decision": "follow-spec"
+  },
+  {
+    "file": "comment-block.json",
+    "caseId": "comment-block/1",
+    "observation": "diagnostics",
+    "reason": "README.md#疑義 9: block='(* *)' の指定を無視するため、a/*x*/b の候補に設定した block 区切り '(*' '*)' が現れず 'b' だけになる。javaStyle の '/*' '*/' と同じ候補列挙で設定した区切りを報告する（D-017、D-018 comment-trivia）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-block.json",
+    "caseId": "comment-block/2",
+    "observation": "parsedStatus",
+    "reason": "README.md#疑義 9: block='(* *)' の指定を無視して a(*x*)b を拒否している。OracleCollector の parsedStatus は prefix parser の成功状態なので、既登録 accepted/consumed/matched と同じ block 区切り無視バグに由来する failed を再現しない（D-017、D-018 comment-trivia）。",
+    "decision": "follow-spec"
+  },
+  {
+    "file": "comment-whitespace.json",
+    "caseId": "comment-whitespace/3",
+    "observation": "parsedStatus",
+    "reason": "README.md#疑義 9: javaStyle が改行を扱う入力でも、設定した # コメントを拒否する。OracleCollector の parsedStatus は prefix parser の成功状態なので、既登録 accepted/consumed/matched と同じ line 値無視バグに由来する failed を再現しない（D-017、D-018 comment-trivia）。",
+    "decision": "follow-spec"
   }
 ]

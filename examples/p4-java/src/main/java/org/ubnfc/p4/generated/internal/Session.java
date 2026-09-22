@@ -76,7 +76,7 @@ public final class Session {
             return List.copyOf(result);
         }
     }
-    private static final Label L_SPACE = Label.of("' '"), L_BLOCK_END = Label.of("'*/'"), L_WILDCARD_STRING = Label.of("WildCardStringParser"),
+    private static final Label L_SPACE = Label.of("' '"), L_WILDCARD_STRING = Label.of("WildCardStringParser"),
         L_SIGN = Label.of("SignParser"), L_DIGIT = Label.of("DigitParser"), L_ONE_OR_MORE = Label.of("OneOrMore"), L_DOT = Label.of("'.'"),
         L_CHAIN = Label.of("Chain"), L_NUMBER = Label.of("NumberParser"), L_E = Label.of("EParser"), L_EXPONENT = Label.of("ExponentParser"),
         L_ALPHABET_UNDERSCORE = Label.of("AlphabetUnderScoreParser"), L_IDENTIFIER = Label.of("IdentifierParser"), L_ALNUM_UNDERSCORE = Label.of("AlphabetNumericUnderScoreParser"),
@@ -753,9 +753,10 @@ public final class Session {
                         int end = source.indexOf(delimiter.close, p + delimiter.open.length());
                         if (end < 0) {
                             // Started but unterminated: hints go to the end of input, not to this position.
+                            // The candidate names the declared close string (D-018 comment-trivia).
                             if (failed > 0) fail(at, set.prefixGroups[failed - 1]);
                             failed = -1;
-                            fail(input.length(), L_BLOCK_END); fail(input.length(), L_WILDCARD_STRING);
+                            fail(input.length(), delimiter.closeLabel); fail(input.length(), L_WILDCARD_STRING);
                         } else next = end + delimiter.close.length();
                     }
                 }
