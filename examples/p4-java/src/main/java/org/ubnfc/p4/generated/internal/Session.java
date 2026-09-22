@@ -185,7 +185,7 @@ public final class Session {
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) {
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         this.activeCounts = new int[ruleNames.length];
-        diagnostics = new Diagnostics(Label.count(), Math.max(256, Math.min(1 << 20, input.length() * 64)));
+        diagnostics = new Diagnostics(Label.count(), 1024);
         ruleParserLabels = new Label[ruleNames.length];
         // 観測: P4 で 1 文字あたり約 5 entry。成長の再ハッシュを避けつつ上限は固定する。
         memo = new MemoTable(Math.max(1024, Math.min(1 << 20, input.length() * 8)));
@@ -204,6 +204,10 @@ public final class Session {
             String reason = limit instanceof StackOverflowError ? "JVM stack limit; maxDepth=" : "maxDepth=";
             fail(reached, "maximum parse depth exceeded (" + reason + options.maxDepth() + ")");
             return null;
+        } finally {
+            // memo 表と診断 event log はここから先は読まれない（result() は global の集約だけを見る）。
+            // 大きな配列を thread local の pool へ返し、次の解析で中身を捨てて使い回す。
+            memo.release(); payloads.clear();
         }
     }
     public int cp(int at) { return at < input.length() ? input.codePointAt(at) : -1; }

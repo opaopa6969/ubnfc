@@ -8,6 +8,10 @@ public final class MemoTable {
     // 1 slot = 4 long: [expression key, position key, consumedEnd<<32 | matchedEnd, outcome<<32 | payload].
     // outcome 0 = empty, 1 = failure, 2 = success (so the last word is non-zero for every entry). One cache line per probe.
     private static final int STRIDE = 4;
+    /** 解析ごとの大きな表を thread local に 1 組だけ持ち越す（内容は持ち越さない）。 */
+    private static final ThreadLocal<long[]> POOL = new ThreadLocal<>();
+    /** 持ち越す上限（32 MB）。これを超える表は毎回確保する。 */
+    private static final int POOL_RETAIN_WORDS = 1 << 22;
     private long[] table;
     private int capacity;
     private int size;
@@ -130,9 +134,32 @@ public final class MemoTable {
         }
     }
 
+    /**
+     * 解析の終わりに表を pool へ返し、最小の表に戻す。内容は捨てるので次の解析の観測結果は変わらない。
+     * 返した後も put/get は（小さい表で）正しく動く。
+     */
+    public void release() {
+        long[] current = table;
+        this.capacity = 2;
+        table = new long[2 * STRIDE];
+        size = 0;
+        if (current.length > POOL_RETAIN_WORDS) return;
+        long[] pooled = POOL.get();
+        if (pooled == null || pooled.length < current.length) POOL.set(current);
+    }
+
     private void allocate(int capacity) {
         this.capacity = capacity;
-        table = new long[capacity * STRIDE];
+        int words = capacity * STRIDE;
+        long[] pooled = POOL.get();
+        // 同じ大きさ（最大 8 倍まで）の表があれば、outcome 語だけ消して再利用する。
+        if (pooled != null && pooled.length >= words && pooled.length <= (long) words * 8) {
+            POOL.remove();
+            table = pooled;
+            for (int i = 0; i < capacity; i++) table[i * STRIDE + 3] = 0;
+            return;
+        }
+        table = new long[words];
     }
 
     private void checkSlot(int slot) {

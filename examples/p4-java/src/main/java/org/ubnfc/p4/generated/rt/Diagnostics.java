@@ -7,13 +7,13 @@ import java.util.Objects;
 /**
  * 構文診断。semantic 診断の rollback とは独立し、成功 rule 内の失敗も保持する。
  *
- * <p>実装: 失敗は (a) 解析全体の accumulator（global）へ即時に、(b) 追記専用の event log へ、
- * (c) 最内 frame の要約（最遠位置・cursor・rule stack）へ O(1) で記録する。frame の expected
- * 集合は保持せず、必要になったとき（memo hit の merge、snapshot の expected()）に log の区間
- * [logStart, logEnd) から「最遠位置に一致する event」を集めて作る。frame を離れるときは要約だけを
- * 親へ吸収する。負の先読みの restore は global と live frame の要約を戻し、その区間の event を
- * 「先読みを囲む frame の走査からは除外」する（先読み内で memo 化された rule の snapshot は影響を
- * 受けない）。観測結果は「失敗ごとに全 frame へ即時記録する」実装と同値。
+ * <p>実装: 失敗は (a) 解析全体の accumulator（global）へ即時に、(b) 最内 frame の要約（最遠位置・cursor・
+ * rule stack）と、その frame の expected 集合へ O(1) で記録する。expected 集合は frame ごとの区間を
+ * 1 本の共有 stack（{@link #expectedStack}）に積み、frame を離れるときに「最遠位置が親より遠ければ置換、
+ * 同じなら合併、手前なら破棄」で親へ吸収する。区間の長さは最遠位置の候補数（数件）なので、吸収は O(k)。
+ * 負の先読みの restore は global・frame 要約・expected stack をまとめて checkpoint の内容へ戻す
+ * （先読み内で memo 化された rule の snapshot は作成時に複製済みなので影響を受けない）。
+ * 観測結果は「失敗ごとに全 frame へ即時記録する」実装と同値。
  *
  * <p>rule stack は不変の親リンク連結リスト（{@link Node}）で共有し、要約は（先頭 node, 長さ）だけを持つ。
  */
@@ -31,13 +31,11 @@ public final class Diagnostics {
         private final int consumed, matched;
         private final Node stackTop;
         private final int stackLength;
-        private final Diagnostics owner;
-        private final int logStart, logEnd;
-        private int[] expected;
+        private final int[] expected;
 
-        private Snapshot(Diagnostics owner, int farthest, int reached, int consumed, int matched, Node stackTop, int stackLength, int logStart, int logEnd, int[] expected) {
-            this.owner = owner; this.farthest = farthest; this.reached = reached; this.consumed = consumed; this.matched = matched;
-            this.stackTop = stackTop; this.stackLength = stackLength; this.logStart = logStart; this.logEnd = logEnd; this.expected = expected;
+        private Snapshot(int farthest, int reached, int consumed, int matched, Node stackTop, int stackLength, int[] expected) {
+            this.farthest = farthest; this.reached = reached; this.consumed = consumed; this.matched = matched;
+            this.stackTop = stackTop; this.stackLength = stackLength; this.expected = expected;
         }
 
         public int farthest() {
@@ -48,11 +46,10 @@ public final class Diagnostics {
         public int matched() { return matched; }
 
         public int[] expected() {
-            return ids().clone();
+            return expected.clone();
         }
 
         private int[] ids() {
-            if (expected == null) expected = owner.collect(farthest, logStart, logEnd);
             return expected;
         }
 
@@ -65,6 +62,8 @@ public final class Diagnostics {
         }
     }
 
+    private static final int[] NO_IDS = new int[0];
+
     private static int[] materialize(Node top, int length) {
         int[] stack = new int[length];
         Node node = top;
@@ -72,7 +71,7 @@ public final class Diagnostics {
         return stack;
     }
 
-    /** 解析全体の集約。expected の重複除去は id ごとの世代 stamp（log 走査用とは別）。 */
+    /** 解析全体の集約。expected の重複除去は id ごとの世代 stamp。 */
     private static final class Global {
         int farthest = -1, reached = -1;
         int consumed, matched;
@@ -112,8 +111,8 @@ public final class Diagnostics {
             }
         }
 
-        Snapshot snapshot(Diagnostics owner) {
-            return new Snapshot(owner, farthest, reached, consumed, matched, stackTop, stackLength, 0, 0, Arrays.copyOf(expected, expectedSize));
+        Snapshot snapshot() {
+            return new Snapshot(farthest, reached, consumed, matched, stackTop, stackLength, Arrays.copyOf(expected, expectedSize));
         }
 
         void restore(Snapshot snapshot) {
@@ -126,34 +125,21 @@ public final class Diagnostics {
         }
     }
 
-    /** log 走査（collect）の重複除去に使う stamp。 */
-    private int[] stamp;
-    private int generation = 1;
-
-    private void nextGeneration() {
-        if (++generation == Integer.MAX_VALUE) { Arrays.fill(stamp, 0); generation = 1; }
-    }
-
-    /** 現在の世代で未登録なら登録して true。 */
-    private boolean mark(int expectedId) {
-        if (expectedId >= stamp.length) stamp = Arrays.copyOf(stamp, Math.max(expectedId + 1, stamp.length * 2));
-        if (stamp[expectedId] == generation) return false;
-        stamp[expectedId] = generation;
-        return true;
-    }
-
     /** A speculative parse may discard diagnostics only after its outcome is known. */
     public static final class Checkpoint {
         private final Snapshot global;
-        private final int frames, logSize;
-        private final int[] farthest, reached, consumed, matched, stackLength;
+        private final int frames;
+        private final int[] farthest, reached, consumed, matched, stackLength, expectedStart;
         private final Node[] stackTop;
+        private final int[] expected;
         private Checkpoint(Diagnostics d) {
-            global = d.global.snapshot(d);
-            frames = d.frameCount; logSize = d.logSize;
+            global = d.global.snapshot();
+            frames = d.frameCount;
             farthest = Arrays.copyOf(d.frameFarthest, frames); reached = Arrays.copyOf(d.frameReached, frames);
             consumed = Arrays.copyOf(d.frameConsumed, frames); matched = Arrays.copyOf(d.frameMatched, frames);
             stackLength = Arrays.copyOf(d.frameStackLength, frames); stackTop = Arrays.copyOf(d.frameStackTop, frames);
+            expectedStart = Arrays.copyOf(d.frameExpectedStart, frames);
+            expected = Arrays.copyOf(d.expectedStack, d.expectedTop);
         }
     }
 
@@ -165,27 +151,24 @@ public final class Diagnostics {
         System.arraycopy(checkpoint.farthest, 0, frameFarthest, 0, frameCount); System.arraycopy(checkpoint.reached, 0, frameReached, 0, frameCount);
         System.arraycopy(checkpoint.consumed, 0, frameConsumed, 0, frameCount); System.arraycopy(checkpoint.matched, 0, frameMatched, 0, frameCount);
         System.arraycopy(checkpoint.stackLength, 0, frameStackLength, 0, frameCount); System.arraycopy(checkpoint.stackTop, 0, frameStackTop, 0, frameCount);
-        if (logSize > checkpoint.logSize) {
-            if (excludedCount == excludedStart.length) { excludedStart = Arrays.copyOf(excludedStart, excludedCount * 2); excludedEnd = Arrays.copyOf(excludedEnd, excludedCount * 2); }
-            excludedStart[excludedCount] = checkpoint.logSize; excludedEnd[excludedCount] = logSize; excludedCount++;
-        }
+        System.arraycopy(checkpoint.expectedStart, 0, frameExpectedStart, 0, frameCount);
+        if (checkpoint.expected.length > expectedStack.length) expectedStack = new int[checkpoint.expected.length];
+        System.arraycopy(checkpoint.expected, 0, expectedStack, 0, checkpoint.expected.length);
+        expectedTop = checkpoint.expected.length;
     }
 
     /** Expression memo needs a local accumulator without inventing a rule in the stack. */
     public void enterExpression() { push(-1); }
 
     private final Global global;
-    // frame は深さで並ぶ並列配列。要約だけを持つ。
-    private int[] frameRule = new int[32], frameBase = new int[32], frameLogStart = new int[32];
+    // frame は深さで並ぶ並列配列。要約と expected 区間の開始位置だけを持つ。
+    private int[] frameRule = new int[32], frameBase = new int[32], frameExpectedStart = new int[32];
     private int[] frameFarthest = new int[32], frameReached = new int[32], frameConsumed = new int[32], frameMatched = new int[32], frameStackLength = new int[32];
     private Node[] frameStackTop = new Node[32];
     private int frameCount;
-    // event log: (pos, id)。stack は frame 要約が持つので log には要らない。
-    private int[] logPos, logId;
-    private int logSize;
-    // 負の先読みで捨てた区間。囲む frame の走査からだけ除外する。
-    private int[] excludedStart = new int[4], excludedEnd = new int[4];
-    private int excludedCount;
+    // frame ごとの expected 区間を積む共有 stack。区間の長さは最遠位置の候補数（数件）。
+    private int[] expectedStack;
+    private int expectedTop;
     private Node top;
     private int ruleCount;
     private int suppressionDepth;
@@ -195,62 +178,44 @@ public final class Diagnostics {
     /** expectedIdHint は想定される expected id の上限（stamp 配列の初期長）。 */
     public Diagnostics(int expectedIdHint) { this(expectedIdHint, 256); }
 
-    /** logHint は想定される失敗 event 数（log 配列の初期長。P4 では入力 1 文字あたり約 40）。 */
-    public Diagnostics(int expectedIdHint, int logHint) {
-        stamp = new int[Math.max(16, expectedIdHint)]; global = new Global(expectedIdHint);
-        logPos = new int[Math.max(16, logHint)]; logId = new int[logPos.length];
+    /** stackHint は expected 区間 stack の初期長（深さ × 最遠位置の候補数の目安）。 */
+    public Diagnostics(int expectedIdHint, int stackHint) {
+        global = new Global(expectedIdHint);
+        expectedStack = new int[Math.max(16, stackHint)];
     }
 
     private void push(int ruleId) {
         if (frameCount == frameRule.length) {
             int n = frameCount * 2;
-            frameRule = Arrays.copyOf(frameRule, n); frameBase = Arrays.copyOf(frameBase, n); frameLogStart = Arrays.copyOf(frameLogStart, n);
+            frameRule = Arrays.copyOf(frameRule, n); frameBase = Arrays.copyOf(frameBase, n); frameExpectedStart = Arrays.copyOf(frameExpectedStart, n);
             frameFarthest = Arrays.copyOf(frameFarthest, n); frameReached = Arrays.copyOf(frameReached, n); frameConsumed = Arrays.copyOf(frameConsumed, n);
             frameMatched = Arrays.copyOf(frameMatched, n); frameStackLength = Arrays.copyOf(frameStackLength, n); frameStackTop = Arrays.copyOf(frameStackTop, n);
         }
         int i = frameCount++;
-        frameRule[i] = ruleId; frameBase[i] = ruleCount; frameLogStart[i] = logSize;
+        frameRule[i] = ruleId; frameBase[i] = ruleCount; frameExpectedStart[i] = expectedTop;
         frameFarthest[i] = -1; frameReached[i] = -1; frameConsumed[i] = 0; frameMatched[i] = 0; frameStackLength[i] = 0; frameStackTop[i] = null;
     }
 
-    private void log(int pos, int id) {
-        if (logSize == logPos.length) {
-            int n = logSize * 2;
-            logPos = Arrays.copyOf(logPos, n); logId = Arrays.copyOf(logId, n);
-        }
-        logPos[logSize] = pos; logId[logSize] = id; logSize++;
+    /** 最内 frame の区間へ 1 件追加する（既にあれば何もしない）。 */
+    private void addExpected(int start, int expectedId) {
+        for (int k = start; k < expectedTop; k++) if (expectedStack[k] == expectedId) return;
+        if (expectedTop == expectedStack.length) expectedStack = Arrays.copyOf(expectedStack, expectedTop * 2);
+        expectedStack[expectedTop++] = expectedId;
     }
 
-    /** 最内 frame の要約へ 1 件の失敗を記録する（Global.fail と同じ規則、expected は log 側）。 */
-    private void failTop(int pos, Node node, int length, int c, int m) {
+    /** 最内 frame の要約と expected 区間へ 1 件の失敗を記録する（Global.fail と同じ規則）。 */
+    private void failTop(int pos, int expectedId, Node node, int length, int c, int m) {
         int i = frameCount - 1;
         int farthest = frameFarthest[i];
         if (pos < farthest) return;
+        int start = frameExpectedStart[i];
         if (pos > farthest) {
             frameFarthest[i] = pos; frameConsumed[i] = c; frameMatched[i] = m; frameStackTop[i] = node; frameStackLength[i] = length;
+            expectedTop = start;
         } else if (length > frameStackLength[i]) {
             frameStackTop[i] = node; frameStackLength[i] = length;
         }
-    }
-
-    /** [start, end) の log から pos に一致する event の id を出現順・重複なしで集める。囲む先読み除外区間は飛ばす。 */
-    private int[] collect(int pos, int start, int end) {
-        if (pos < 0 || start >= end) return new int[0];
-        nextGeneration();
-        int[] result = new int[8];
-        int size = 0;
-        int i = start;
-        while (i < end) {
-            int skipTo = -1;
-            for (int x = 0; x < excludedCount; x++) if (excludedStart[x] >= start && excludedStart[x] <= i && i < excludedEnd[x] && excludedEnd[x] <= end && excludedEnd[x] > skipTo) skipTo = excludedEnd[x];
-            if (skipTo >= 0) { i = skipTo; continue; }
-            if (logPos[i] == pos && mark(logId[i])) {
-                if (size == result.length) result = Arrays.copyOf(result, size * 2);
-                result[size++] = logId[i];
-            }
-            i++;
-        }
-        return size == result.length ? result : Arrays.copyOf(result, size);
+        addExpected(start, expectedId);
     }
 
     public int farthest() {
@@ -300,22 +265,42 @@ public final class Diagnostics {
         }
         int leaving = --frameCount;
         if (frameRule[leaving] >= 0) { top = top.parent; ruleCount--; }
-        Snapshot result = snapshot ? new Snapshot(this, frameFarthest[leaving], frameReached[leaving], frameConsumed[leaving], frameMatched[leaving],
-            frameStackTop[leaving], frameStackLength[leaving], frameLogStart[leaving], logSize, null) : null;
+        int childStart = frameExpectedStart[leaving];
+        Snapshot result = snapshot ? new Snapshot(frameFarthest[leaving], frameReached[leaving], frameConsumed[leaving], frameMatched[leaving],
+            frameStackTop[leaving], frameStackLength[leaving],
+            expectedTop == childStart ? NO_IDS : Arrays.copyOfRange(expectedStack, childStart, expectedTop)) : null;
+        int absorbed = childStart;
         if (frameCount > 0) {
             int parent = frameCount - 1;
             if (frameReached[leaving] > frameReached[parent]) frameReached[parent] = frameReached[leaving];
             int farthest = frameFarthest[leaving];
             if (farthest >= 0 && farthest >= frameFarthest[parent]) {
                 int length = frameStackLength[leaving] + frameBase[leaving] - frameBase[parent];
+                int parentStart = frameExpectedStart[parent];
                 if (farthest > frameFarthest[parent]) {
                     frameFarthest[parent] = farthest; frameConsumed[parent] = frameConsumed[leaving]; frameMatched[parent] = frameMatched[leaving];
                     frameStackTop[parent] = frameStackTop[leaving]; frameStackLength[parent] = length;
-                } else if (length > frameStackLength[parent]) {
-                    frameStackTop[parent] = frameStackTop[leaving]; frameStackLength[parent] = length;
+                    // 親の区間を子の区間で置き換える（子の区間は親の直後にあるので前へ詰める）。
+                    int size = expectedTop - childStart;
+                    System.arraycopy(expectedStack, childStart, expectedStack, parentStart, size);
+                    absorbed = parentStart + size;
+                } else {
+                    if (length > frameStackLength[parent]) {
+                        frameStackTop[parent] = frameStackTop[leaving]; frameStackLength[parent] = length;
+                    }
+                    // 同じ位置: 親に無い子の id だけを親の区間の末尾へ詰める（書込位置は常に読出位置以下）。
+                    int write = childStart;
+                    for (int k = childStart; k < expectedTop; k++) {
+                        int id = expectedStack[k];
+                        boolean seen = false;
+                        for (int j = parentStart; j < write; j++) if (expectedStack[j] == id) { seen = true; break; }
+                        if (!seen) expectedStack[write++] = id;
+                    }
+                    absorbed = write;
                 }
             }
         }
+        expectedTop = absorbed;
         return result;
     }
 
@@ -337,8 +322,7 @@ public final class Diagnostics {
         }
         global.fail(pos, expectedId, top, ruleCount, consumed, matched);
         if (frameCount > 0) {
-            failTop(pos, top, ruleCount - frameBase[frameCount - 1], consumed, matched);
-            log(pos, expectedId);
+            failTop(pos, expectedId, top, ruleCount - frameBase[frameCount - 1], consumed, matched);
         }
     }
 
@@ -355,9 +339,11 @@ public final class Diagnostics {
 
     /** rule 内では最内 rule の局所結果、rule 外では解析全体の結果を返す。 */
     public Snapshot snapshot() {
-        if (frameCount == 0) return global.snapshot(this);
+        if (frameCount == 0) return global.snapshot();
         int i = frameCount - 1;
-        return new Snapshot(this, frameFarthest[i], frameReached[i], frameConsumed[i], frameMatched[i], frameStackTop[i], frameStackLength[i], frameLogStart[i], logSize, null);
+        int start = frameExpectedStart[i];
+        return new Snapshot(frameFarthest[i], frameReached[i], frameConsumed[i], frameMatched[i], frameStackTop[i], frameStackLength[i],
+            expectedTop == start ? NO_IDS : Arrays.copyOfRange(expectedStack, start, expectedTop));
     }
 
     /** memo hit 時、保存 rule を enter する前に呼ぶ。呼出元の stack を付け替える。 */
@@ -380,8 +366,12 @@ public final class Diagnostics {
         for (int id : ids) global.fail(snapshot.farthest, id, rebased, length, snapshot.consumed, snapshot.matched);
         if (local) {
             int localLength = ruleCount - frameBase[frameCount - 1] + snapshot.stackLength;
-            failTop(snapshot.farthest, rebased, localLength, snapshot.consumed, snapshot.matched);
-            for (int id : ids) log(snapshot.farthest, id);
+            failTop(snapshot.farthest, ids[0], rebased, localLength, snapshot.consumed, snapshot.matched);
+            int i = frameCount - 1;
+            if (frameFarthest[i] == snapshot.farthest) {
+                int start = frameExpectedStart[i];
+                for (int k = 1; k < ids.length; k++) addExpected(start, ids[k]);
+            }
         }
     }
 }
