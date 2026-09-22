@@ -10,4 +10,4 @@ pub use api::*;
 #[allow(unused_imports)]
 pub use ast::Ast;
 #[allow(unused_imports)]
-pub use parser::{parse,parse_with_options,parse_with_scanner};
+pub use parser::{parse,parse_with_options,parse_with_scanner,parse_entry_with_options};

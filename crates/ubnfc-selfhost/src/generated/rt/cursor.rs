@@ -1,4 +1,4 @@
-//! D-013: begin / consume(0) / commit と frame flag を区別する。
+// D-013: begin / consume(0) / commit と frame flag を区別する。
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct State {
     pub consumed: usize,

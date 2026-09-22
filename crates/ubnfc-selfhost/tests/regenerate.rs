@@ -28,7 +28,12 @@ fn files(root: &Path, current: &Path, result: &mut Vec<PathBuf>) {
 }
 
 fn assert_generated_bytes(ir: &ubnfc_front::ir::GrammarIr) {
-    let generated = ubnfc_rust::emit(ir, &Default::default()).unwrap();
+    // self-host はライブラリとして埋め込むので driver は生成しない（生成物一覧の比較対象外）。
+    let options = ubnfc_rust::EmitOptions {
+        emit_driver: false,
+        ..Default::default()
+    };
+    let generated = ubnfc_rust::emit(ir, &options).unwrap();
     let temp = Temporary::new();
     generated.write_to(&temp.0).unwrap();
     let committed = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/generated");
@@ -36,6 +41,8 @@ fn assert_generated_bytes(ir: &ubnfc_front::ir::GrammarIr) {
     let mut expected = Vec::new();
     files(&temp.0, &temp.0, &mut actual);
     files(&committed, &committed, &mut expected);
+    // 生成 crate の Cargo.toml は単体 crate 用。self-host は module として埋め込むので比較対象外。
+    actual.retain(|p| p != Path::new("Cargo.toml"));
     actual.sort();
     expected.sort();
     assert_eq!(actual, expected, "余分な生成物・欠落も検出する");
