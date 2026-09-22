@@ -300,3 +300,37 @@ fn semantic_grammar_synthesis_matches_upstream_and_positive_variants_never_expec
         .unwrap();
     fails(&c, &actual(json!({"allConsumed":true})));
 }
+
+#[test]
+fn d019_native_failure_is_preserved_but_excluded_from_verdict_and_missing() {
+    let mut c = case(
+        json!({"Accept":{"accepted":false,"prefix":[false,0,0]}}),
+        "lexical",
+        "x",
+    );
+    c.extra_expectations.insert(
+        "nativeFailure".into(),
+        json!({"offset":7,"expected":["OldParser"]}),
+    );
+    let saved = c.extra_expectations.clone();
+    let mut a = actual(
+        json!({"allConsumed":false,"accepted":false,"consumed":0,"matched":0,
+        "nativeFailure":{"offset":1,"expected":["NewParser"]}}),
+    );
+    let observed = a.response.clone();
+    pass(&c, &a);
+    assert_eq!(c.extra_expectations, saved);
+    assert_eq!(a.response, observed);
+    a.response.as_object_mut().unwrap().remove("nativeFailure");
+    pass(&c, &a);
+    a.response["consumed"] = json!(1);
+    fails(&c, &a);
+    // D-014 の公開診断は差分を維持する。
+    c.extra_expectations.insert(
+        "diagnostics".into(),
+        json!([{"offset":1,"farthestOffset":2}]),
+    );
+    a.response["consumed"] = json!(0);
+    a.response["diagnostics"] = json!([{"offset":1,"farthestOffset":3}]);
+    fails(&c, &a);
+}

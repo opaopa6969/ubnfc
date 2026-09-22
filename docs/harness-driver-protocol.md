@@ -102,7 +102,7 @@ prefix の認識と全入力の AST 構築を二回呼び出す。生成 driver 
 | Accept | 全入力受理、prefix、span、fields、指定 value。span/fields は canonical AST からも参照 |
 | Diagnostics | 最初の診断の kind と backend ごとの javaOffset/rustOffset |
 | Numeric | 全入力受理。Rust は rust_lexeme、Java は java_int と mappingError。java_int=null は mappingError 文字列を期待 |
-| Oracle | 型付き全フィールド、および raw に残る references/scopeDepth/nativeFailure/parsedStatus 等 |
+| Oracle | 型付き全フィールド、および raw に残る references/scopeDepth/parsedStatus 等（nativeFailure は D-019 により情報保存のみ） |
 | GenerationFailure | build 成功後の応答は生成成否の差分。通常の runtime 差分とは混ぜない |
 | ScopeOps/Catalog/Raw | driver にない操作結果・静的 metadata・期待値自体がない場合を未観測で報告 |
 
@@ -180,3 +180,77 @@ parser 本体・golden を補正せず、バックエンドの正しい mapping 
 - 診断は主診断の `offset`/`expected` に加えて `farthestOffset` / `farthestExpected` を持つ（primary と farthest の分離。
   全入力要求で末尾入力が残る場合、主診断は `trailing_input`）。
 - `ParseOptions.maxDepth`（既定 10,000）超過は `syntax` 失敗として返す（両バックエンド）。
+
+
+## Extern scanner の登録（round3）
+
+D-019（`docs/design/03-design-v1.md` §8）に従い、`nativeFailure` は期待値・実測値の
+report JSON に保持するが、Verdict と未観測の判定から除く。公開 `diagnostics` の
+主 offset、farthest、hints、deepest、kind の比較は維持する。
+
+生成 driver は IR の `originalClassName` と `logicalId` の対応を同梱する。
+registry は **完全な元クラス名**から scanner を引き、driver が論理 ID に結び直す。
+短名は登録した alias だけを認める。他 package の同名クラスには一致させない。
+未知クラスは登録エラーとして報告し、通常の構文拒否に置き換えない。
+
+Java は `--scanners <classes-dir|jar>` または `UBNFC_SCANNERS` を使用する。
+引数が環境変数に優先する。指定先に `ubnfc.scanners.Registry` を置き、公開 static
+`scanners()` が `Map<String, TokenScanner>` を返す。scanner は対象生成物と同じ
+package の `api.TokenScanner` / `rt.Input` に対してコンパイルする。
+`scanners/java/Registry.java` の `generated.` は生成 package に置換するための印である。
+生成 package が異なる jar の使い回しはしない。追加の Maven 依存はない。
+
+```sh
+java -cp generated-classes target.driver.Driver --scanners scanner-classes
+java -cp generated-classes target.driver.Driver --scanners scanners.jar
+UBNFC_SCANNERS=scanners.jar java -cp generated-classes target.driver.Driver
+```
+
+Rust は生成 crate の `src/bin/scanners.rs` に registry を同梱し、`scanners` feature で
+選択する。実行時の動的 crate ロードは行わない。module は
+`Registry::new(&'static [(&'static str, &'static str)]) -> Result<Registry, &'static str>` と
+`TokenScanner` 実装を提供する。同梱集合を使う場合は `scanners/rust/scanners.rs` と
+`scanners_tests.rs` を `src/bin/` にコピーする。
+
+```sh
+cargo build --offline --features scanners --bin driver
+cargo test --offline --features scanners --bin driver
+```
+
+Rust の既存公開 entry API には scanner 引数がないため、driver 生成フックが同じ
+parser 生成関数から driver 内の parser を作り、scanner を受け取る entry を追加する。
+元の grammar/root/entry 分岐を再利用し、root 以外の entry にも登録を適用する。
+公開 parser API と runtime テンプレートは変更しない。feature 無効時のコードは
+コンパイル対象外になる。Extern のある文法で feature を無効にすると未登録エラーになる。
+
+`Artifact::FromIr` は両言語の同梱集合を自動配置する。Java は registry を生成物と
+一緒に javac し、その classes を `--scanners` で渡す。Rust はコピー後に default
+feature を有効にする。run-all の一括 build も同じ準備関数を使う。
+Rust のキャッシュ key には scanner ソース・manifest・テストも含まれ、変更後の
+実行ファイルを以前のキャッシュと混同しない。既存 Prebuilt のソースは書き換えない。
+
+同梱 scanner はすべて `PURE = true` と宣言し、scope や外部状態を読まず、効果を返さない。
+memo の可否は引き続き入力 IR に従う。位置は Java が UTF-16、Rust が UTF-8 byte。
+`consumed` / `matched` / mode / invert / reset の5状態を受け取り、失敗時は入口の
+cursor を返す。value span は消費範囲と独立し、single quote の内側、フェンスの改行前、
+Extern probe の先読み前を表現する。
+
+| 元クラス（`org.unlaxer.` 以下） | 受理範囲 | 根拠 |
+|---|---|---|
+| `parser.elementary.DoubleQuotedParser` | double quote、任意1 code point の escape、改行・NUL 可 | `unlaxer-common/src/main/java/org/unlaxer/parser/elementary/DoubleQuotedParser.java:10`、`QuotedParser.java:55`、`EscapeInQuotedParser.java:22` |
+| `parser.elementary.SingleQuotedParser` | single quote、同じ escape。value は引用符の内側 | 同ディレクトリ `SingleQuotedParser.java:7`、`QuotedParser.java:55` |
+| `tinyexpression.parser.StringLiteralParser` | 上記2種の選択 | `tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/StringLiteralParser.java:19` |
+| `tinyexpression.parser.javalang.CodeStartParser` | 行頭、3 backtick、ASCII identifier、colon、dot 区切り ASCII identifier、CRLF/CR/LF/EOF | `tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/javalang/CodeStartParser.java:32`、`parser/javatype/JavaClassNameParser.java:28` |
+| `tinyexpression.parser.javalang.CodeEndParser` | 行頭、3 backtick、CRLF/CR/LF/EOF | 同ディレクトリ `CodeEndParser.java:21` |
+| `oracle.ExternalCursorParser`（完全名） | 😀 を消費し、続く x を先読み | `corpus/oracle/tools/ExternalCursorParser.java:8` |
+
+`unlaxer-common` の根拠は隣接 `unlaxer-parser` checkout、tinyexpression の根拠は
+同名の隣接 checkout にある。いずれも読み取り専用で参照した。
+共通補助の根拠は `unlaxer-common/src/main/java/org/unlaxer/parser/` 以下の
+`clang/IdentifierParser.java:24`、`elementary/StartOfLineParser.java:38`、
+`elementary/LineTerminatorParser.java:20`。scanner は whitespace/comment を暗黙に飛ばさない。
+
+現在の mapper には、Extern の value span より消費範囲を優先する経路があり、
+tiny-string-token の single quote 内容抽出は残る Fail として報告する。
+scanner 自体の value span は両言語の契約テストで検証し、登録 E2E は corpus の
+`direct-eof` 文法の double quote 入力と拒否入力を使う。期待値・oracle・乖離登録は変更しない。

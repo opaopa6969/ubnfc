@@ -1,6 +1,6 @@
 use crate::ast::{ident, type_ident};
 use std::fmt::Write;
-use ubnfc_front::ir::{AstType, GrammarIr};
+use ubnfc_front::ir::{AstType, GrammarIr, TokenSpec};
 
 pub(crate) const MANIFEST: &str = r#"[package]
 name = "ubnfc-generated"
@@ -12,6 +12,7 @@ autobins = false
 path = "mod.rs"
 [features]
 default = []
+scanners = []
 json = ["dep:serde", "dep:serde_json"]
 [dependencies]
 serde = { version = "1", optional = true }
@@ -21,6 +22,7 @@ pub(crate) const BIN: &str = "\n[[bin]]\nname = \"driver\"\npath = \"src/bin/dri
 
 pub(crate) fn generate(ir: &GrammarIr) -> String {
     let mut s = include_str!("../templates/driver.rs").to_owned();
+    scanner_hook(ir, &mut s);
     s.push_str("\nimpl ToJson for Ast { fn to_json(&self)->Json { match self { Self::Text(s)=>s.to_json(),Self::Null=>Json::Null,\n");
     for ty in &ir.semantics.ast_types {
         let n = type_ident(ty);
@@ -79,4 +81,46 @@ pub(crate) fn generate(ir: &GrammarIr) -> String {
         writeln!(s, "matches!(ast,{})\n}}", patterns.join("|")).unwrap();
     }
     s
+}
+
+// driver だけに scanner 対応の entry を追加する。公開 parser API と実行意味論は変更しない。
+// 同じ emit 関数の parser を利用し、entry/root 選択を別実装にしない。
+fn scanner_hook(ir: &GrammarIr, out: &mut String) {
+    let generated = crate::emit::generate(
+        ir,
+        &crate::EmitOptions {
+            documentation: None,
+            emit_driver: false,
+        },
+    )
+    .expect("検証済み IR の driver scanner hook");
+    let parser = &generated.files["parser.rs"];
+    let start = parser
+        .find("pub fn parse_entry_with_options(")
+        .expect("entry API");
+    let end = start + parser[start..].find("\nimpl Session").expect("entry 終端");
+    let entry = parser[start..end]
+        .replacen("parse_entry_with_options(", "parse_entry_with_scanner(", 1)
+        .replacen(
+            "options:ParseOptions)",
+            "options:ParseOptions,scanner:&mut dyn TokenScanner)",
+            1,
+        )
+        .replacen("let mut scanner=RejectExtern;", "", 1)
+        .replacen("&mut scanner", "scanner", 1);
+    out.push_str("\n#[cfg(feature=\"scanners\")] use ubnfc_generated::{api, ast, rt};\n#[cfg(feature=\"scanners\")] #[path=\"../../runtime.rs\"] mod runtime;\n#[cfg(feature=\"scanners\")] #[allow(dead_code)] mod scanner_parser {\n");
+    out.push_str(parser);
+    out.push_str(&entry);
+    out.push_str("\n}\nconst EXTERN_CLASSES: &[(&str,&str)] = &[\n");
+    for token in &ir.semantics.tokens {
+        if let TokenSpec::Extern {
+            logical_id,
+            original_class_name,
+            ..
+        } = &token.spec
+        {
+            writeln!(out, "({logical_id:?},{original_class_name:?}),").unwrap();
+        }
+    }
+    out.push_str("];\n");
 }
