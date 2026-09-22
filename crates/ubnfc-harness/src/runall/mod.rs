@@ -367,6 +367,8 @@ pub fn run(files: &[CorpusFile], config: &Config) -> Result<Report> {
     })?;
     config.java_generator = config.java_generator.canonicalize().map_err(|e| Error(format!(
         "Java 生成器がありません: {} ({e}); mvn -o -q -DskipTests package または UBNFC_JAVA_GENERATOR を指定", config.java_generator.display())))?;
+    let generator_sha256 = sha256(&config.java_generator)?;
+    let front_sha256 = sha256(&config.front)?;
     let plan = plan(files, &config.families)?;
     let scratch = Scratch::new()?;
     let next = AtomicUsize::new(0);
@@ -404,13 +406,34 @@ pub fn run(files: &[CorpusFile], config: &Config) -> Result<Report> {
         builds.push(build);
         cases.extend(rows);
     }
-    Ok(Report::new(
-        config.jobs,
-        plan.files,
-        plan.variants,
-        builds,
-        cases,
-    ))
+    let mut report = Report::new(config.jobs, plan.files, plan.variants, builds, cases);
+    if sha256(&config.java_generator)? != generator_sha256 || sha256(&config.front)? != front_sha256
+    {
+        return Err(Error(
+            "実行中に generator/front が更新されました。固定したコピーで再実行してください".into(),
+        ));
+    }
+    report.generator_sha256 = Some(generator_sha256);
+    report.front_sha256 = Some(front_sha256);
+    Ok(report)
+}
+fn sha256(path: &Path) -> Result<String> {
+    let output = Command::new("sha256sum").arg(path).output()?;
+    let digest = String::from_utf8_lossy(&output.stdout)
+        .split_whitespace()
+        .next()
+        .unwrap_or("")
+        .to_owned();
+    if !output.status.success()
+        || digest.len() != 64
+        || !digest.bytes().all(|c| c.is_ascii_hexdigit())
+    {
+        return Err(Error(format!(
+            "SHA-256 を取得できません: {}",
+            path.display()
+        )));
+    }
+    Ok(digest)
 }
 fn execute(work: &Work, config: &Config, directory: &Path) -> (BuildResult, Vec<CaseResult>) {
     let mut build = work.build.clone();
@@ -512,6 +535,24 @@ fn stopped(
 ) -> (BuildResult, Vec<CaseResult>) {
     for row in &mut rows {
         row.outcome = outcome;
+        if let Expectation::ExpectedRejection { stage, code, .. } = &row.expected {
+            let (actual_stage, result) = match outcome {
+                Outcome::IrFailure => ("ir", &build.ir),
+                Outcome::GenerationRejected => ("generation", &build.generation),
+                Outcome::JavacFailure => ("javac", &build.javac),
+                _ => unreachable!("stopped は build 段階の失敗のみ"),
+            };
+            if stage == actual_stage && result.reasons == [code.clone()] {
+                row.outcome = Outcome::Pass;
+            } else {
+                row.outcome = Outcome::Fail;
+                row.differences.push(Difference {
+                    path: "/rejection".into(),
+                    expected: Some(serde_json::json!({"stage":stage,"code":code})),
+                    actual: Some(serde_json::json!({"stage":actual_stage,"codes":result.reasons})),
+                });
+            }
+        }
     }
     normalize_logs(&mut build, directory);
     (build, rows)
@@ -790,4 +831,43 @@ mod tests {
             9
         );
     }
+}
+#[test]
+fn expected_rejection_requires_the_exact_stage_and_code_and_keeps_failure_evidence() {
+    // resolve.rs:143-155 の意図的な拒否。無関係な IR/生成失敗は Pass にしない。
+    let files = crate::load_all(crate::default_root()).unwrap();
+    let plan = plan(&files, &["oracle".into()]).unwrap();
+    let work = plan
+        .work
+        .iter()
+        .find(|w| w.rows.iter().any(|r| r.case_id == "import-cycle/1"))
+        .unwrap();
+    let directory = Path::new("/unused");
+    let mut build = work.build.clone();
+    build.ir = StageResult::failed("ir", "[code: E-IMPORT-CYCLE]".into());
+    let (kept, rows) = stopped(
+        build.clone(),
+        work.rows.clone(),
+        Outcome::IrFailure,
+        directory,
+    );
+    assert_eq!(rows[0].outcome, Outcome::Pass);
+    assert_eq!(kept.ir.status, StageStatus::Failed);
+    build.ir = StageResult::failed("ir", "[code: E-IMPORT-UNRESOLVED]".into());
+    let (_, rows) = stopped(
+        build.clone(),
+        work.rows.clone(),
+        Outcome::IrFailure,
+        directory,
+    );
+    assert_eq!(rows[0].outcome, Outcome::Fail);
+    assert_eq!(rows[0].differences[0].path, "/rejection");
+    build.generation = StageResult::failed("generation", "E-IMPORT-CYCLE".into());
+    let (_, rows) = stopped(
+        build,
+        work.rows.clone(),
+        Outcome::GenerationRejected,
+        directory,
+    );
+    assert_eq!(rows[0].outcome, Outcome::Fail);
 }

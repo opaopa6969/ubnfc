@@ -75,7 +75,21 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
             }
             p.wire("ast", json!(e.ast), response);
             if let Some(captures) = &e.captures {
-                p.wire("captures", json!(captures), response);
+                // NestedCaptureConformanceTest.java:283-284,320-327:
+                // fixture.captureNames で絞り、完了順と重複はそのまま比較する。
+                let observed = response.get("captures").map(|value| {
+                    match (
+                        case.fixture.get("captureNames").and_then(Value::as_array),
+                        value.as_array(),
+                    ) {
+                        (Some(names), Some(items)) => json!(items
+                            .iter()
+                            .filter(|item| item.get("name").is_none_or(|name| names.contains(name)))
+                            .collect::<Vec<_>>()),
+                        _ => value.clone(),
+                    }
+                });
+                p.field("captures", json!(captures), observed);
             }
             if e.declarations.is_some() || case.family == "nested-captures" {
                 p.wire(
@@ -94,8 +108,18 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
             if let Some(scope) = &e.scope {
                 scope_fields(&mut p, scope, response);
             }
-            if let Some(rollback) = e.parent_rollback {
-                p.wire("parentRollback", json!(rollback), response);
+            if e.parent_rollback.is_some() {
+                // ScopeAnnotationConformanceTest.java:162-169,238-257:
+                // キーの存在は probe 起動条件で、期待値は外側 rollback 後の状態。
+                let queries = case.fixture.get("queries").and_then(Value::as_array);
+                if let Some(queries) = queries {
+                    p.wire("rollback", json!({"cursor":[0,0],"scope":{
+                        "depth":0,"resolved":queries.iter().map(|query| json!({"query":query,"symbol":null})).collect::<Vec<_>>(),
+                        "declarations":[],"references":[],"diagnostics":[]
+                    }}), response);
+                } else {
+                    p.missing.push("/fixture/queries".into());
+                }
             }
             for (key, value) in &e.extra {
                 p.wire(key, value.clone(), response);
@@ -104,7 +128,13 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
         Expectation::TokenValue(e) => {
             p.full(e.value.is_some(), response);
             if let Some(value) = &e.value {
-                p.value(value, response);
+                // RustConformanceTest.java:561-575: value は評価値でなく mapped AST field。
+                p.wire(
+                    "ast",
+                    json!({"type":"Value", "span":[0,case.case.input.chars().count()],
+                    "fields":{"value":value}}),
+                    response,
+                );
             }
             if let Some(prefix) = &e.prefix {
                 p.prefix(prefix, response);
@@ -122,14 +152,28 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
             if let Some(prefix) = &e.prefix {
                 p.prefix(prefix, response);
             }
-            if let Some(texts) = &e.texts {
-                p.wire("texts", json!(texts), response);
-            }
-            if let Some(nodes) = &e.nodes {
-                p.wire("nodes", json!(nodes), response);
-            }
-            if let Some(expected) = &e.expected {
-                p.wire("expected", expected.clone(), response);
+            // RustConformanceTest.java:680-690 / SemanticCardinalityConformance.java:154-177:
+            // 不受理 variant では AST/value/span oracle を検証しない。
+            if accepted {
+                if let Some(texts) = &e.texts {
+                    // Java は canonical AST、Rust は owned Text の span も検証する。
+                    // RustConformanceTest.java:147-153、SemanticCardinalityConformance.java:175。
+                    if actual.backend == Backend::Rust
+                        || !["semantic-cardinality", "mixed-values"].contains(&case.family.as_str())
+                    {
+                        p.wire("texts", json!(texts), response);
+                    }
+                }
+                if let Some(nodes) = &e.nodes {
+                    p.wire("nodes", json!(nodes), response);
+                }
+                if let Some(expected) = &e.expected {
+                    if case.family == "cardinality" {
+                        p.wire("ast", cardinality_ast(expected, &case.case.input), response);
+                    } else {
+                        p.wire("expected", expected.clone(), response);
+                    }
+                }
             }
             for (key, value) in &e.extra {
                 p.wire(key, value.clone(), response);
@@ -145,7 +189,16 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
                 p.field("fields", json!(fields), rule_field(response, "fields"));
             }
             if let Some(value) = &e.value {
-                p.value(value, response);
+                // TinyStringTokenConformanceTest.java:230-237 は AST の value を読む。
+                if case.family == "tiny-string-token" {
+                    p.wire(
+                        "ast",
+                        json!({"type":"Value","span":e.span,"fields":{"value":value}}),
+                        response,
+                    );
+                } else {
+                    p.value(value, response);
+                }
             }
             for (key, value) in &e.extra {
                 p.wire(key, value.clone(), response);
@@ -169,7 +222,28 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
                     Backend::Java => e.java_offset,
                     Backend::Rust => e.rust_offset,
                 }),
-                diagnostic.map(|d| d.get("offset").cloned().unwrap_or(Value::Null)),
+                diagnostic
+                    .as_ref()
+                    .map(|d| d.get("offset").cloned().unwrap_or(Value::Null)),
+            );
+            // RustConformanceTest.java:756-765: syntax は非空、trailing_input は厳密比較。
+            p.field(
+                "expected",
+                if e.kind == "trailing_input" {
+                    json!(["end of input"])
+                } else {
+                    json!(true)
+                },
+                diagnostic.map(|d| {
+                    if e.kind == "trailing_input" {
+                        d.get("expected").cloned().unwrap_or(Value::Null)
+                    } else {
+                        json!(d
+                            .get("expected")
+                            .and_then(Value::as_array)
+                            .is_some_and(|v| !v.is_empty()))
+                    }
+                }),
             );
             for (key, value) in &e.extra {
                 p.wire(key, value.clone(), response);
@@ -178,10 +252,11 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
         Expectation::Numeric(e) => {
             p.full(true, response);
             match actual.backend {
-                Backend::Rust => p.value(&json!(e.rust_lexeme), response),
+                // NumericCaptureRuntimeTest.java:31-49,81-86: AST field の int/lexeme。
+                Backend::Rust => p.field("value", json!(e.rust_lexeme), mapped_value(response)),
                 Backend::Java => {
                     if let Some(value) = e.java_int {
-                        p.value(&json!(value), response);
+                        p.field("value", json!(value), mapped_value(response));
                         p.wire("mappingError", Value::Null, response);
                     } else {
                         p.field(
@@ -198,7 +273,9 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
                 p.wire(key, value.clone(), response);
             }
         }
-        Expectation::Oracle { .. } | Expectation::GenerationFailure { .. } => {}
+        Expectation::Oracle { .. }
+        | Expectation::GenerationFailure { .. }
+        | Expectation::ExpectedRejection { .. } => {}
         Expectation::ScopeOps(_) | Expectation::Catalog(_) => {
             let encoded = serde_json::to_value(&case.case.expect).unwrap();
             let fields = encoded.as_object().unwrap().values().next().unwrap();
@@ -220,6 +297,28 @@ fn rule_field(response: &Value, key: &str) -> Option<Value> {
             .get("ast")
             .map(|ast| ast.get(key).cloned().unwrap_or(Value::Null))
     })
+}
+fn mapped_value(response: &Value) -> Option<Value> {
+    response
+        .get("ast")
+        .map(|ast| ast["fields"]["value"].clone())
+}
+
+// RustConformanceTest.java:698-721: 簡略 oracle を canonical AST に展開する。
+// driver に fixture 固有の /expected キーを要求しない。
+fn cardinality_ast(expected: &Value, input: &str) -> Value {
+    fn item(value: &Value) -> Value {
+        if value.is_null() {
+            return Value::Null;
+        }
+        json!({"type":"Item","span":[value[1],value[2]],"fields":{"value":value[0]}})
+    }
+    json!({"type":"Container","span":[0,input.chars().count()],"fields":{
+        "head":item(&expected["head"]),
+        "values":expected["items"].as_array().unwrap().iter().map(item).collect::<Vec<_>>(),
+        "tail":expected["tail"],
+        "flags":expected["flags"].as_str().unwrap().chars().map(|c| c.to_string()).collect::<Vec<_>>()
+    }})
 }
 fn scope_fields(
     p: &mut Projection,
@@ -252,7 +351,36 @@ fn scope_fields(
             });
         if let Some(observed) = observed {
             e.insert(key.clone(), value.clone());
-            a.insert(key.clone(), observed.clone());
+            // ScopeAnnotationConformanceTest.java:138-141,222-249 は ScopeStore の record 列。
+            // 全診断 wire から scope のみ射影。message/severity/offset/length は厳密。
+            let observed = if key == "diagnostics"
+                && response
+                    .get("scope")
+                    .and_then(|scope| scope.get(key))
+                    .is_none()
+            {
+                observed
+                    .as_array()
+                    .map(|items| {
+                        json!(items
+                            .iter()
+                            .filter(|d| d["kind"] != "syntax" && d["kind"] != "trailing_input")
+                            .map(|d| {
+                                let mut d = d.clone();
+                                if let Some(d) = d.as_object_mut() {
+                                    for field in ["kind", "origin", "expected"] {
+                                        d.remove(field);
+                                    }
+                                }
+                                d
+                            })
+                            .collect::<Vec<_>>())
+                    })
+                    .unwrap_or_else(|| observed.clone())
+            } else {
+                observed.clone()
+            };
+            a.insert(key.clone(), observed);
         } else {
             p.missing.push(format!("/scope/{key}"));
         }
@@ -268,6 +396,24 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
     let mut expected = serde_json::to_value(&case.case.expect).unwrap();
     let mut observed = expected.clone();
     let mut missing = Vec::new();
+    let mut response = actual.response.clone();
+    // OracleCollector.java:175 / corpus/oracle/README.md:84-85:
+    // oracle の allConsumed は構文成否と独立な prefix cursor。wire は全入力構文受理。
+    if let Some(consumed) = response.get("consumed").and_then(Value::as_u64) {
+        response["allConsumed"] = json!(consumed == case.case.input.chars().count() as u64);
+    } else if let Some(object) = response.as_object_mut() {
+        object.remove("allConsumed");
+    }
+    // RustConformanceTest.java:563-575 / OracleCollector.java:198-203:
+    // diagnose は全入力成功なら空。成功枝の投機的 syntax 診断は nativeFailure 側。
+    if actual.response["allConsumed"] == true {
+        if let Some(items) = response
+            .get_mut("diagnostics")
+            .and_then(Value::as_array_mut)
+        {
+            items.retain(|d| d["kind"] != "syntax" && d["kind"] != "trailing_input");
+        }
+    }
     for (key, value) in expected["Oracle"].as_object_mut().unwrap() {
         if matches!(
             key.as_str(),
@@ -276,7 +422,7 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
         {
             continue;
         }
-        match actual.response.get(key) {
+        match response.get(key) {
             None => missing.push(format!("/{key}")),
             Some(row) => {
                 let mut row = row.clone();
@@ -295,6 +441,21 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
                                         missing.push(format!("/{key}/{i}/{field}"));
                                         a.insert(field.clone(), expected.clone());
                                     }
+                                }
+                                // RustConformanceTest.java:756-765,840-844。
+                                // primary syntax hints の表記は比較せず非空契約を守る。
+                                // trailing_input / nativeFailure / farthestExpected は弱めない。
+                                if key == "diagnostics"
+                                    && e.get("kind") == Some(&json!("syntax"))
+                                    && a.get("kind") == Some(&json!("syntax"))
+                                    && e.get("expected")
+                                        .and_then(Value::as_array)
+                                        .is_some_and(|v| !v.is_empty())
+                                    && a.get("expected")
+                                        .and_then(Value::as_array)
+                                        .is_some_and(|v| !v.is_empty())
+                                {
+                                    a.insert("expected".into(), e["expected"].clone());
                                 }
                             }
                         }
@@ -337,6 +498,13 @@ fn clean(verdict: Verdict) -> Verdict {
     }
 }
 pub fn compare(case: &RunCase, actual: &Actual, known: &[Observation]) -> Verdict {
+    if let Expectation::ExpectedRejection { stage, code, .. } = &case.case.expect {
+        return Verdict::Fail(vec![Difference {
+            path: "/rejection".into(),
+            expected: Some(json!({"stage":stage,"code":code})),
+            actual: Some(json!("runtime reached")),
+        }]);
+    }
     if let Some(error) = actual.response.get("error") {
         return Verdict::Fail(vec![Difference {
             path: "/error".into(),

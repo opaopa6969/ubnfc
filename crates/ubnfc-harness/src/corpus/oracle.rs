@@ -152,7 +152,7 @@ pub fn load(path: &Path) -> Result<CorpusFile, LoadError> {
                 format!("空または重複した case ID: {}", row.id),
             ));
         }
-        let expect = match &failure {
+        let mut expect = match &failure {
             Some(message) => Expectation::GenerationFailure {
                 message: message.clone(),
             },
@@ -168,6 +168,24 @@ pub fn load(path: &Path) -> Result<CorpusFile, LoadError> {
                 mapping_error: row.mapping_error,
             },
         };
+        // resolve.rs:143-155 は循環 import を明示的に拒否する契約。
+        // 採取済み apiError と照合する。RustConformanceTest.java:391-455 の
+        // reversed-metadata は正のテストなのでこの扱いにしない。
+        if path
+            .file_name()
+            .is_some_and(|name| name == "import-cycle.json")
+            && fixture.stage == Stage::GenerationFailed
+            && out.raw["generation"]["apiError"]
+                .as_str()
+                .is_some_and(|e| e.contains("循環 import"))
+        {
+            expect = Expectation::ExpectedRejection {
+                stage: "ir".into(),
+                code: "E-IMPORT-CYCLE".into(),
+                evidence: "crates/ubnfc-front/tests/resolve.rs:143-155; corpus/oracle/import-cycle.json generation.apiError".into(),
+                original: Box::new(expect),
+            };
+        }
         out.cases.push(Case {
             id: row.id,
             grammar_ref: vec![0],

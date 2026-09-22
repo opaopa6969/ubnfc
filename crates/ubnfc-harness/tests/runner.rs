@@ -35,6 +35,7 @@ fn case(expect: Value) -> RunCase {
         grammar: "Probe".into(),
         variant: "normal".into(),
         family: "test".into(),
+        fixture: Value::Null,
         options: Options {
             lexical: true,
             scope: true,
@@ -211,7 +212,7 @@ fn missing_is_counted_but_explicit_null_and_wrong_values_fail() {
     assert_eq!(compare(&c, &missing, &[]), Verdict::Pass);
     assert_eq!(
         unobserved(&c, &missing),
-        ["/allConsumed", "/value", "/matched"]
+        ["/allConsumed", "/ast", "/matched"]
     );
     let report =
         Report::from_actual(std::slice::from_ref(&c), std::slice::from_ref(&missing)).unwrap();
@@ -219,15 +220,15 @@ fn missing_is_counted_but_explicit_null_and_wrong_values_fail() {
         (report.pass, report.unobserved, report.unobserved_cases),
         (1, 3, 1)
     );
-    assert!(report.markdown().contains("/value"));
+    assert!(report.markdown().contains("/ast"));
     assert!(Report::from_actual(std::slice::from_ref(&c), &[]).is_err());
     let explicit_null = actual(
         Backend::Rust,
-        json!({"allConsumed":true,"value":null,"accepted":true,"consumed":2,"matched":1}),
+        json!({"allConsumed":true,"ast":null,"value":null,"accepted":true,"consumed":2,"matched":1}),
     );
     assert_eq!(
         fail_paths(compare(&c, &explicit_null, &[])),
-        ["/matched", "/value"]
+        ["/ast", "/matched"]
     );
 }
 
@@ -236,7 +237,7 @@ fn token_null_success_modes_rule_fields_texts_and_numeric_offsets() {
     let token = case(json!({"TokenValue":{"value":null,"prefix":[true,0,0]}}));
     let observed = actual(
         Backend::Rust,
-        json!({"value":null,"allConsumed":true,"accepted":true,"consumed":0,"matched":0}),
+        json!({"value":null,"ast":{"type":"Value","span":[0,2],"fields":{"value":null}},"allConsumed":true,"accepted":true,"consumed":0,"matched":0}),
     );
     assert_eq!(compare(&token, &observed, &[]), Verdict::Pass);
     let reject = case(json!({"TokenValue":{}}));
@@ -300,7 +301,10 @@ fn token_null_success_modes_rule_fields_texts_and_numeric_offsets() {
     assert_eq!(
         compare(
             &numeric,
-            &actual(Backend::Rust, json!({"allConsumed":true,"value":"1.5"})),
+            &actual(
+                Backend::Rust,
+                json!({"allConsumed":true,"ast":{"fields":{"value":"1.5"}}})
+            ),
             &[]
         ),
         Verdict::Pass
@@ -312,7 +316,7 @@ fn token_null_success_modes_rule_fields_texts_and_numeric_offsets() {
                 &diagnostic,
                 &actual(
                     backend,
-                    json!({"diagnostics":[{"kind":"syntax","offset":offset,"expected":[]}]})
+                    json!({"diagnostics":[{"kind":"syntax","offset":offset,"expected":["NUMBER"]}]})
                 ),
                 &[]
             ),
@@ -324,7 +328,7 @@ fn token_null_success_modes_rule_fields_texts_and_numeric_offsets() {
                 &actual(backend, json!({"diagnostics":[]})),
                 &[]
             )),
-            ["/kind", "/offset"]
+            ["/expected", "/kind", "/offset"]
         );
     }
 }

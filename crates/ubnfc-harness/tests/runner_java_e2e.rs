@@ -29,6 +29,9 @@ fn generator() -> &'static Path {
                 .status
                 .success());
         }
+        if let Some(path) = std::env::var_os("UBNFC_JAVA_GENERATOR") {
+            return PathBuf::from(path);
+        }
         let project = root().join("ubnfc-java");
         let classes = project.join("target/classes");
         if !classes.join("org/ubnfc/java/Main.class").is_file() {
@@ -153,6 +156,7 @@ fn tiny_case(id: usize, input: &str, accepted: bool, entry: Option<&str>) -> Run
         grammar: "TinyCalc".into(),
         variant: "normal".into(),
         family: "tinycalc".into(),
+        fixture: Value::Null,
         options: Options {
             lexical: true,
             scope: true,

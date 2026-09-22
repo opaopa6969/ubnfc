@@ -78,7 +78,7 @@ pub struct Options {
     pub scope: bool,
 }
 
-/// artifact は一つの variant を実装する。variant 名は比較用で wire には送らない。
+/// artifact は一つの variant を実装する。観測指定は文法の選択・変形には使わない。
 #[derive(Clone, Debug)]
 pub struct RunCase {
     pub case: Case,
@@ -86,6 +86,8 @@ pub struct RunCase {
     pub variant: String,
     pub family: String,
     pub options: Options,
+    /// 元 fixture の観測指定。captureNames 等を期待値から逆算しない。
+    pub fixture: Value,
     /// loader の型付き Oracle 以外も raw から保持する。
     pub extra_expectations: BTreeMap<String, Value>,
 }
@@ -94,8 +96,29 @@ impl RunCase {
         format!("{}:{}[{}]", self.family, self.case.id, self.variant)
     }
     fn request(&self, id: usize) -> Value {
+        // probe が必要とする fixture metadata。期待値や評価結果は渡さない。
+        // NestedCaptureConformanceTest.java:283-300、ScopeAnnotationConformanceTest.java:108-110。
+        let mut observations = serde_json::Map::new();
+        observations.insert("family".into(), json!(self.family));
+        observations.insert("variant".into(), json!(self.variant));
+        for key in [
+            "captureNames",
+            "queries",
+            "valueSpanField",
+            "valueSpanListField",
+        ] {
+            if let Some(value) = self.fixture.get(key) {
+                observations.insert(key.into(), value.clone());
+            }
+        }
+        if let crate::Expectation::Ast(expect) = &self.case.expect {
+            observations.insert(
+                "parentRollback".into(),
+                json!(expect.parent_rollback.is_some()),
+            );
+        }
         json!({"id": id, "grammar": self.grammar, "entry": self.case.entry_rule,
-            "input": self.case.input, "options": self.options})
+            "input": self.case.input, "options": self.options, "observations": observations})
     }
 }
 
@@ -161,6 +184,7 @@ pub fn select(
                     variant: String::new(),
                     family: family.into(),
                     options: Options::default(),
+                    fixture: Value::Null,
                     extra_expectations,
                 });
                 continue;
@@ -198,6 +222,10 @@ pub fn select(
                 options: Options {
                     lexical: true,
                     scope: true,
+                },
+                fixture: match grammar {
+                    GrammarSource::Inline { metadata, .. }
+                    | GrammarSource::File { metadata, .. } => metadata.clone(),
                 },
                 extra_expectations,
             });

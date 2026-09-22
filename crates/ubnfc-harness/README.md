@@ -106,3 +106,27 @@ Known と未観測だけでは非ゼロにしない。引数・入出力・準�
 associative は通常文法が24 Pass、reversed-metadata は現在の front により
 E-PRECEDENCE-ORDER で24件が IR 失敗となる。全文法を対象にするためこの variant も
 除外せず、CLI の E2E テストは24 Pass とこの明示拒否を両方確認する。
+
+## 2026-09-22 triage の比較契約
+
+根拠となる既存テストの行番号・分類・driver の追加仕様は
+[triage レポート](../../docs/reports/2026-09-22-triage.md) に記載する。
+従来の driver protocol 文書との差は以下。
+
+- primitives/lexical の `value` は `Value` AST の field。AST の型・span・全 fields を比較する。
+  numeric-capture は `ast.fields.value` の Java int / Rust lexeme、tiny-string も mapped field。
+  semantic/mixed/associative/cardinality の top-level `value` は評価値のまま。
+- cardinality の簡略 `expected` は canonical AST に展開して比較する。
+  不受理 variant に value/texts/nodes/expected を要求しない。
+  semantic/mixed の `texts` は既存 Rust probe の観測であり Java には要求しない。
+- Oracle の `allConsumed` は prefix cursor の全消費。wire の全入力構文受理とは区別する。
+  primary syntax expected は非空、trailing expected は `end of input` を厳密に比較する。
+  scope の診断は構文診断と分離し、文面・重大度・位置を維持する。
+- `observations` に fixture の captureNames/queries/valueSpanField/valueSpanListField と
+  parentRollback の起動条件、family/variant を送る。oracle 値は送らない。
+  parentRollback は boolean の成功応答でなく、`rollback` の cursor/scope snapshot を検証する。
+- `ExpectedRejection` は import-cycle の `ir/E-IMPORT-CYCLE` だけ。
+  元の生成失敗 oracle と build の実測失敗を保持し、別の失敗や予期しない成功を Pass にしない。
+  reversed-metadata は既存テストでは正常生成・実行を要求するため IR失敗のまま。
+- run-all は `sha256sum` を使い、generator/front の実行前後の SHA を照合してレポートに保存する。
+  Java の E2E テストは `UBNFC_JAVA_GENERATOR` があればその既存 jar を使う。

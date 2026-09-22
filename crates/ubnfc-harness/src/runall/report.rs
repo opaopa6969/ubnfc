@@ -65,6 +65,8 @@ pub struct RefusalCounts {
 #[derive(Clone, Debug, Serialize)]
 pub struct Report {
     pub backend: String,
+    pub generator_sha256: Option<String>,
+    pub front_sha256: Option<String>,
     pub jobs: usize,
     pub corpus_files: usize,
     pub grammar_variants: usize,
@@ -92,6 +94,8 @@ impl Report {
         });
         let mut report = Self {
             backend: "java".into(),
+            generator_sha256: None,
+            front_sha256: None,
             jobs,
             corpus_files,
             grammar_variants,
@@ -179,6 +183,23 @@ impl Report {
         let mut out = format!("Java corpus run-all\n\n元 corpus: {} ファイル、{} ケース。文法 variant: {}、hash キャッシュ: {} build、展開後: {} 件（文法なし操作列を含む）。jobs={}。\n\n",
             self.corpus_files, self.source_cases, self.grammar_variants, self.unique_builds, self.totals.total(), self.jobs);
         out.push_str("集計単位は case × variant（文法なし操作列は各1件）。段階失敗後は比較しない。比較に差分がある場合は Fail / Known、差分がなく欠落観測がある場合は未観測、それ以外は Pass。Known/Fail に併存する未観測は JSON の missing と未観測項目表に残す。\n\n");
+        if let Some(sha) = &self.generator_sha256 {
+            writeln!(out, "Java generator SHA-256: `{sha}`\n").unwrap();
+        }
+        if let Some(sha) = &self.front_sha256 {
+            writeln!(out, "front SHA-256: `{sha}`\n").unwrap();
+        }
+        let rejections = self
+            .cases
+            .iter()
+            .filter(|row| {
+                row.outcome == Outcome::Pass
+                    && matches!(row.expected, crate::Expectation::ExpectedRejection { .. })
+            })
+            .count();
+        if rejections > 0 {
+            writeln!(out, "Pass のうち明示的な期待拒否: {rejections}件。build の実測失敗と診断は拒否理由表に保持する。\n").unwrap();
+        }
         table(&mut out, "系統", &self.families, &self.totals);
         out
     }
