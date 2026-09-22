@@ -207,9 +207,16 @@ r.nodeSpans(); r.captures(); r.lexical();   // 出現表（lexical は opts で�
 r.scope(); r.diagnostics();
 ```
 Rust: 同等の `ParseResult { ok, consumed, matched, ast: Option<Ast>, spans, captures, lexical, scope, diagnostics }`。
-Extern token は Java `interface TokenScanner { ScanResult scan(Input in, int consumed, int matched); }` /
-Rust `trait TokenScanner`。`ScanResult { consumedEnd, matchedEnd, valueSpan, diagnostics }`。
-純粋 / 状態参照 / 効果あり を宣言（memo 可否に使う）。
+Extern token は Java `interface TokenScanner { ScanResult scan(Input in, ScanState state); }` /
+Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, resetMatchedWithConsumed }`（D-013 の 5 状態）、
+`ScanResult { consumedEnd, matchedEnd, valueSpan?, diagnostics? }`。純粋 / 状態参照 / 効果あり を宣言（memo 可否に使う）。
+
+追記（2026-09-22、Java レビュー修正後の契約）:
+- 診断は **primary `expected`**（主 offset の候補）と **`farthestExpected`**（最遠到達の候補）を分離して公開する。
+- `ParseResult.scope` は宣言・参照・診断に加え、**順序付き enter/leave イベント**と mode（lexical/dynamic）を公開する。
+- 再帰深度は `ParseOptions.maxDepth`（既定 10,000）で制限し、超過は `syntax` 失敗として報告する（既存には無い安全策。
+  JVM/スタック限界に達した場合も失敗へ変換するが、受理深度の `-Xss` 非依存化は未対応）。
+- 生成識別子が JDK 型・package を隠す場合はエスケープ（`java` → `java_`）し、canonical JSON では元名を保持する。
 
 ## 7. マイルストーン（astra 案を採用。完了条件は全互換で不変）
 
