@@ -23,7 +23,7 @@
 
 ### ゴール（第一段の完了条件 = 全互換 + self-host。性能は別建て）
 
-1. unlaxer-parser の全 `.ubnf`（25）+ tinyexpression P4（124 ルール）が生成・コンパイル・実行できる。
+1. unlaxer-parser の全 `.ubnf`（24）+ tinyexpression P4（124 ルール）が生成・コンパイル・実行できる。
 2. 既存 corpus（5 系統・約 700 ケース）を両バックエンドで通す。互換の対象は
    **認識結果・prefix/全入力判定・両カーソル・AST 型/値/全出現 span・mapping 失敗・scope 履歴・診断・metadata**。
    言語別 oracle（Java `int` / Rust 字句保持、javaOffset / rustOffset）は維持する。
@@ -215,10 +215,10 @@ Rust `trait TokenScanner`。`ScanResult { consumedEnd, matchedEnd, valueSpan, di
 
 | M | 内容 | 完了条件 |
 |---|---|---|
-| M0 | 互換対象の固定: corpus 5 系統 loader、仕様/oracle/実装の矛盾一覧（正常受理 / 意図した拒否 / mapping 失敗 の分類）、UBNF 構文モジュール | loader 全件読める、矛盾一覧が `docs/compat-matrix.md` に有る、25+P4 が GrammarAst に落ちる |
+| M0 | 互換対象の固定: corpus 5 系統 loader、仕様/oracle/実装の矛盾一覧（正常受理 / 意図した拒否 / mapping 失敗 の分類）、UBNF 構文モジュール | loader 全件読める、矛盾一覧が `docs/compat-matrix.md` に有る、24+P4 が GrammarAst に落ちる |
 | M1 | **縦断**を Java/Rust 両方で: 接頭辞リテラル・二重カーソル・trivia・空 capture・数値 mapping 失敗・scope rollback・longest・memo（全 memo 版）。ベンチ併設（認識のみ / AST 付き / 診断+scope 付き） | primitives / lexical / nested-captures / rule-trivia / scope-annotations の該当ケース緑 |
-| M2 | front を全構文へ拡大 + 意味論 IR + 解析。**生成 Rust frontend → GrammarAst の self-host 経路**を成立 | 25+P4 の IR、self-host 経路が動く |
-| M3 | 両バックエンドを機能単位で拡張: enum / typeof / eval / import / catalog / recovery / rightAssoc / longest / predictive | 全 corpus 緑、25+P4 compile |
+| M2 | front を全構文へ拡大 + 意味論 IR + 解析。**生成 Rust frontend → GrammarAst の self-host 経路**を成立 | 24+P4 の IR、self-host 経路が動く |
+| M3 | 両バックエンドを機能単位で拡張: enum / typeof / eval / import / catalog / recovery / rightAssoc / longest / predictive | 全 corpus 緑、24+P4 compile |
 | M4 | self-host 検証: 手書き / 生成 frontend を全対象文法 + 不正文法で比較、IR byte 一致、固定点 | 一致 |
 | M5 | 最適化生成（予測・memo 省略・climbing・trie・遅延診断）を保守的生成と差分比較。P4 でベンチ（長い正常入力・不完全入力・深い共通接頭辞） | 性能報告（達成/未達を明記） |
 

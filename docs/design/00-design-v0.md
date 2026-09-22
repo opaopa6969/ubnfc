@@ -14,7 +14,7 @@ UBNF を入力に、**コンビネータ・ランタイムを持たない**静�
 
 ### ゴール（第一段の完了条件 = 「既存 .ubnf 全互換」）
 
-1. unlaxer-parser 内の全 `.ubnf`（25 ファイル、`ubnf.ubnf` 304 行を含む）と
+1. unlaxer-parser 内の全 `.ubnf`（24 ファイル、`ubnf.ubnf` 304 行を含む）と
    tinyexpression P4 文法（124 ルール）が生成・コンパイル・実行できる。
 2. 既存 conformance corpus（`unlaxer-dsl/src/test/resources/*/corpus.json`：
    grammar + input + 期待 AST(JSON) + captures + declarations）を両バックエンドで通す。
@@ -189,7 +189,7 @@ AST に挿入 → 継続。第一段では corpus に有る範囲だけ。
 1. 既存 corpus（rule-trivia / nested-captures / scope-annotations / scope-store /
    numeric-capture / tiny-string-token / tiny-code-fence / golden / catalog / cardinality）
    を **そのまま読み込み**、両バックエンドで canonical JSON 一致。
-2. 全 25 fixture + P4: 生成 → compile（javac / rustc）成功。
+2. 全 24 fixture + P4: 生成 → compile（javac / rustc）成功。
 3. self-host byte 一致（§1-3）。
 4. `analysis` の単体: nullable/FIRST/左再帰の判定を小文法で golden テスト。
 5. ベンチ: 既存 `benchmarks/` の入力を流用、JMH（Java）/ criterion（Rust）。
@@ -200,11 +200,11 @@ AST に挿入 → 継続。第一段では corpus に有る範囲だけ。
 | M | 内容 | 完了条件 |
 |---|---|---|
 | M0 | repo / IR schema v1 / corpus loader / harness 骨格 | 既存 corpus を読み込み「未実装」で赤になる |
-| M1 | front: UBNF 手書き lexer+parser → GrammarAst → validate → IR | 25 fixture + P4 が IR JSON に落ちる。既存 E-* コード一致 |
+| M1 | front: UBNF 手書き lexer+parser → GrammarAst → validate → IR | 24 fixture + P4 が IR JSON に落ちる。既存 E-* コード一致 |
 | M2 | analysis | golden テスト。P4 の choice 戦略・memo 要否が出る |
 | M3 | Rust backend（parser + AST + canonical JSON） | corpus 緑（Rust 側） |
 | M4 | Java backend | corpus 緑（Java 側） |
-| M5 | scope / backref / recovery / longest / import / enum / eval / commonField / catalog | 全 corpus 緑、25 fixture + P4 compile |
+| M5 | scope / backref / recovery / longest / import / enum / eval / commonField / catalog | 全 corpus 緑、24 fixture + P4 compile |
 | M6 | self-host | IR byte 一致 |
 | M7 | bench + 最適化ループ（D-004 等） | ≥10× or 未達の根拠 |
 
