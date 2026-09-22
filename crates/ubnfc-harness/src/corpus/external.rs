@@ -118,6 +118,8 @@ pub(crate) fn numeric(path: &Path) -> Result<CorpusFile, LoadError> {
                 extra: row.extra,
             }),
             known_divergences: Vec::new(),
+            follow_spec: Vec::new(),
+            rust_oracle: None,
         })
         .collect();
     Ok(out)

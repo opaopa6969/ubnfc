@@ -59,14 +59,17 @@ pub fn parse_file(source: &str) -> Result<UbnfFile, SelfhostError> {
     let offsets = SourceOffsets::new(source);
     if !result.ok {
         // UBNFFile は GrammarDecl の反復なので失敗時 C は通常0。構文失敗の
-        // 最遠位置を使い、trailing-input の巻戻し位置と混同しない。
+        // 主経路の失敗位置 (hints の offset_cp) を使い、trailing-input の
+        // 巻戻し位置と混同しない。farthest_cp は D-014 の表示用最遠観測で、
+        // 未閉の文字列では EOF を指すため手書き lexer の開始位置と一致しない。
         let diagnostic = result
-            .diagnostics
+            .hints
             .iter()
+            .chain(&result.diagnostics)
             .filter(|d| d.kind == generated::DiagnosticKind::Syntax)
-            .max_by_key(|d| d.farthest_cp)
+            .max_by_key(|d| d.offset_cp)
             .or_else(|| result.diagnostics.last());
-        let cp = diagnostic.map_or(result.consumed_cp, |d| d.farthest_cp);
+        let cp = diagnostic.map_or(result.consumed_cp, |d| d.offset_cp);
         let span = syntax_error_span(source, &offsets, cp)?;
         return Err(SelfhostError::Syntax {
             span,

@@ -2,7 +2,7 @@ use super::*;
 use serde_json::json;
 
 #[test]
-fn only_the_28_documented_rejections_are_registered_for_both_backends() {
+fn only_the_documented_rejections_are_registered_per_backend() {
     let files = crate::load_all(crate::default_root()).unwrap();
     let originals = files.clone();
     for backend in [Backend::Java, Backend::Rust] {
@@ -42,23 +42,31 @@ fn only_the_28_documented_rejections_are_registered_for_both_backends() {
                         assert_eq!(row.case_id, "import-cycle/1");
                         assert!(matches!(**original, Expectation::GenerationFailure { .. }));
                     }
+                    "regex" => {
+                        // §3.2: Rust backend だけの生成時拒否。Java は Pattern 委譲で実行する。
+                        assert_eq!(backend, Backend::Rust);
+                        assert_eq!(row.case_id, "regex-backref/1");
+                        assert!(matches!(**original, Expectation::Oracle { .. }));
+                        assert!(evidence.contains("03-design-v1.md §3.2"));
+                    }
                     other => panic!("未登録の拒否: {other}"),
                 }
                 assert!(!evidence.is_empty());
-                if code != "E-IMPORT-CYCLE" {
+                if !matches!(code.as_str(), "E-IMPORT-CYCLE" | "regex") {
                     assert!(evidence.contains("docs/reports/2026-09-22-triage.md"));
                 }
             }
         }
-        assert_eq!(
-            counts,
-            BTreeMap::from([
-                (("validate", "E-PRECEDENCE-ORDER"), 24),
-                (("ir", "E-LOWER-COMMON-FIELD"), 2),
-                (("ir", "E-LOWER-SUM-EVAL"), 1),
-                (("ir", "E-IMPORT-CYCLE"), 1),
-            ])
-        );
+        let mut expected = BTreeMap::from([
+            (("validate", "E-PRECEDENCE-ORDER"), 24),
+            (("ir", "E-LOWER-COMMON-FIELD"), 2),
+            (("ir", "E-LOWER-SUM-EVAL"), 1),
+            (("ir", "E-IMPORT-CYCLE"), 1),
+        ]);
+        if backend == Backend::Rust {
+            expected.insert(("generation", "regex"), 2);
+        }
+        assert_eq!(counts, expected);
     }
     assert_eq!(files, originals);
 }

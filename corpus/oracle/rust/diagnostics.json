@@ -1,0 +1,172 @@
+{
+  "collection": "rust-oracle-2026-09-22",
+  "backend": "rust",
+  "observation": "diagnostics",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "sourceRepository": "/home/opa/work/unlaxer-workspace/unlaxer-parser（rust/ の既存 Rust 実装。git status は採取前後とも clean）",
+  "generator": "rust/unlaxer-generator（native）。cargo build --release --offline -p unlaxer-generator、unlaxer generate --target rust --grammar <採取元 JSON の grammar> --output <mktemp crate>/src/<module>/generated",
+  "generatorSha256": "6fbf87484b2818187c59c9f750f5161bb4bdbaa3b3eb6d7a66ae627145d631a1",
+  "runtime": "rust/unlaxer-runtime。generated::parser::parse_tree_detailed(input) の Err を ParseDiagnostic::canonical_json でそのまま保存。成功は空配列",
+  "procedure": "mktemp -d 配下に unlaxer-runtime へ path 依存する driver crate を作り、標準入力 1 行 1 ケース（module\\tid\\tinput）で実行。ubnfc の生成器・runtime・期待値は採取に使用していない。採取元 JSON の grammar と input を無変更で使用",
+  "rule": "D-011（docs/design/03-design-v1.md §8、04-cursor-and-diagnostics-contract.md §2）: syntax の主 offset は Java が失敗 frame 内 max(C,M) の最遠、Rust が fail_at の最遠失敗位置。Rust backend の比較では Java 採取 diagnostics[i] の offset（主位置）だけをこの採取値で置換する（件数と kind が index ごとに一致する場合）。farthestOffset は D-014 の最遠到達（共有契約）で Java 採取値を維持する（既存 Rust runtime の farthest.offset は主 offset の複製であり、ここでは提示のみ）。kind / expected / origin / 他の観測は Java 採取値のまま。Java backend には適用しない",
+  "cases": [
+    {
+      "file": "numeric.json",
+      "caseId": "numeric/1",
+      "input": "n2147483647;",
+      "diagnostics": []
+    },
+    {
+      "file": "numeric.json",
+      "caseId": "numeric/2",
+      "input": "n2147483648;",
+      "diagnostics": []
+    },
+    {
+      "file": "numeric.json",
+      "caseId": "numeric/3",
+      "input": "n-2147483649;",
+      "diagnostics": []
+    },
+    {
+      "file": "numeric.json",
+      "caseId": "numeric/4",
+      "input": "n1.5;",
+      "diagnostics": []
+    },
+    {
+      "file": "numeric.json",
+      "caseId": "numeric/5",
+      "input": "n1e2;",
+      "diagnostics": []
+    },
+    {
+      "file": "numeric.json",
+      "caseId": "numeric/6",
+      "input": "n+0007;",
+      "diagnostics": []
+    },
+    {
+      "file": "numeric.json",
+      "caseId": "numeric/7",
+      "input": "n1e+;",
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 2,
+          "expected": [
+            ";"
+          ],
+          "farthestOffset": 2,
+          "farthestExpected": [
+            ";"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "reobserved-numeric.json",
+      "caseId": "numeric/1",
+      "input": "n2147483647;",
+      "diagnostics": []
+    },
+    {
+      "file": "reobserved-numeric.json",
+      "caseId": "numeric/6",
+      "input": "n+0007;",
+      "diagnostics": []
+    },
+    {
+      "file": "lookahead-failure.json",
+      "caseId": "lookahead-failure/1",
+      "input": "a",
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "x"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "x"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "reobserved-lookahead-failure.json",
+      "caseId": "lookahead-failure/1",
+      "input": "a",
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "x"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "x"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "predictive-nullable.json",
+      "caseId": "predictive-nullable/1",
+      "input": "x",
+      "diagnostics": []
+    },
+    {
+      "file": "predictive-nullable.json",
+      "caseId": "predictive-nullable/2",
+      "input": "b",
+      "diagnostics": []
+    },
+    {
+      "file": "predictive-nullable.json",
+      "caseId": "predictive-nullable/3",
+      "input": "z",
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "a",
+            "b",
+            "x"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "a",
+            "b",
+            "x"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "reobserved-predictive-nullable.json",
+      "caseId": "predictive-nullable/3",
+      "input": "z",
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "a",
+            "b",
+            "x"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "a",
+            "b",
+            "x"
+          ]
+        }
+      ]
+    }
+  ]
+}

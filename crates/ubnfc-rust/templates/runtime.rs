@@ -1,6 +1,6 @@
 use super::api::*;
 use super::rt::{
-    diag::{Diag, Diagnostics},
+    diag::{Diag, Diagnostics, DisplayDiagnostics, DisplaySnapshot},
     input::Input,
     memo::{Key, Memo},
     scope::{Checkpoint, ScopeStore},
@@ -37,6 +37,7 @@ pub(crate) enum Event {
     },
     Token {
         text_span: Option<Span>,
+        content_span: Option<Span>,
         expr: usize,
         rule: usize,
         span: Span,
@@ -67,10 +68,12 @@ pub(crate) struct Saved {
     diag: u32,
     flags: u32,
     effects: [u32; 2],
+    display: DisplaySnapshot,
 }
 impl Saved {
-    fn new(step: Step, effects: Span) -> Self {
+    fn new(step: Step, effects: Span, display: DisplaySnapshot) -> Self {
         Self {
+            display,
             consumed: u32::try_from(step.state.consumed).expect("cursor"),
             matched: u32::try_from(step.state.matched).expect("cursor"),
             events: u32::try_from(step.events.0).expect("arena"),
@@ -114,9 +117,10 @@ pub(crate) struct Session<'a> {
     pub scanner: &'a mut dyn TokenScanner,
     pub arena: Vec<Event>,
     pub diag: Diagnostics,
+    pub display: DisplayDiagnostics,
     pub memo: Memo<Saved>,
     pub scope: ScopeStore,
-    pub trivia_cache: Memo<Step>,
+    pub trivia_cache: Memo<(Step, DisplaySnapshot)>,
     effects: Vec<Effect>,
     saved_effects: Vec<Effect>,
     pub statistics: Statistics,
@@ -154,6 +158,7 @@ impl<'a> Session<'a> {
                 arena
             },
             diag: Diagnostics::with_limit(options.limits.diagnostics),
+            display: DisplayDiagnostics::new(options.limits.diagnostics),
             memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
@@ -177,7 +182,7 @@ impl<'a> Session<'a> {
     // Check expressions too: one rule may contain a deeply nested expression tree.
     #[inline(never)]
     pub fn limit(&mut self, state: State) -> Option<Step> {
-        if self.diag.exhausted {
+        if self.diag.exhausted || self.display.arena.exhausted {
             self.resource_failure
                 .get_or_insert((state.consumed, "diagnostic budget exceeded"));
         }
@@ -318,7 +323,7 @@ impl<'a> Session<'a> {
                 self.scope.add_reference(name, *offset_cp, *len_cp);
                 if !self.scope.is_declared(name) {
                     self.scope.add_diagnostic(
-                        &format!("undefined: {name}"),
+                        &format!("未定義のシンボル: '{name}'"),
                         *offset_cp,
                         *len_cp,
                         Severity::Warning,
@@ -339,6 +344,7 @@ impl<'a> Session<'a> {
         }
         let saved = self.memo.get(key)?;
         self.statistics.memo_hits += 1;
+        self.display.merge(saved.display);
         self.replay_effects(saved.effects.map(|p| p as usize));
         Some(saved.step())
     }
@@ -356,7 +362,7 @@ impl<'a> Session<'a> {
         } else {
             [0, 0]
         };
-        self.memo.insert(key, Saved::new(step, effects));
+        self.memo.insert(key, Saved::new(step, effects, self.display.snapshot()));
     }
     pub fn event(&mut self, event: Event) -> EventId {
         if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE && !HAS_RECOVERY {
@@ -422,6 +428,7 @@ impl<'a> Session<'a> {
                 let mut step = Step::yes(state);
                 step.events = self.event(Event::Token {
                     text_span: None,
+                    content_span: None,
                     expr: usize::MAX,
                     rule: usize::MAX,
                     span: [start, start + length],
@@ -478,48 +485,53 @@ impl<'a> Session<'a> {
     }
     pub fn eof<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
         if state.begin().position::<MATCH>() == self.text.len() {
+            self.display.fail(state.consumed.max(state.begin().matched),"WildCardCharacterParser");
             Step::yes(state)
         } else {
             self.fail(state, state.position::<MATCH>(), label)
         }
     }
     pub fn number<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
+        // NumberParser.java の失敗試行を表示用に記録する。Rust の主 fail_at は
+        // 仮数なしの場合のみ進め、不完全指数のロールバック位置は維持する。
         let start = state.position::<MATCH>();
         let bytes = self.text.as_bytes();
         let mut p = start;
-        if matches!(bytes.get(p), Some(b'+' | b'-')) {
-            p += 1;
-        }
+        if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
+        else { self.display.fail(p, "SignParser"); }
         let digits = p;
-        while bytes.get(p).is_some_and(u8::is_ascii_digit) {
-            p += 1;
-        }
+        while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
+        self.display.fail(p, "DigitParser");
         let mut count = p - digits;
+        if count == 0 { self.display.fail(p, "OneOrMore"); }
         if bytes.get(p) == Some(&b'.') {
             p += 1;
             let fraction = p;
-            while bytes.get(p).is_some_and(u8::is_ascii_digit) {
-                p += 1;
-            }
+            while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
+            self.display.fail(p, "DigitParser");
+            if p == fraction { self.display.fail(p, "OneOrMore"); }
             count += p - fraction;
+            if count == 0 { self.display.fail(start,"Chain"); self.display.fail(start,"'.'"); }
+        } else {
+            self.display.fail(p, "'.'");
+            if count == 0 { self.display.fail(digits,"Chain"); }
         }
         if count == 0 {
-            return self.primitive::<MATCH>(state, None, label);
+            self.display.fail(start,"NumberParser");
+            let mut out = self.primitive::<MATCH>(state, None, label);
+            if !out.ok { out.diag = self.diag.fail(p,label); }
+            return out;
         }
         if matches!(bytes.get(p), Some(b'e' | b'E')) {
             let exponent = p;
             p += 1;
-            if matches!(bytes.get(p), Some(b'+' | b'-')) {
-                p += 1;
-            }
+            if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
+            else { self.display.fail(p,"SignParser"); }
             let digits = p;
-            while bytes.get(p).is_some_and(u8::is_ascii_digit) {
-                p += 1;
-            }
-            if digits == p {
-                p = exponent;
-            }
-        }
+            while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
+            self.display.fail(p,"DigitParser");
+            if digits == p { self.display.fail(p,"OneOrMore"); p = exponent; }
+        } else { self.display.fail(p,"EParser"); self.display.fail(p,"ExponentParser"); }
         self.primitive::<MATCH>(state, Some(p - start), label)
     }
     pub fn identifier<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
@@ -538,6 +550,8 @@ impl<'a> Session<'a> {
                 p += 1;
             }
         }
+        if p == start { self.display.fail(start,"AlphabetUnderScoreParser"); self.display.fail(start,"IdentifierParser"); }
+        else { self.display.fail(p,"AlphabetNumericUnderScoreParser"); }
         self.primitive::<MATCH>(state, (p > start).then_some(p - start), label)
     }
     pub fn quoted<const MATCH: bool>(
@@ -555,7 +569,12 @@ impl<'a> Session<'a> {
         while let Some((c, n)) = self.input.cp_at(p) {
             p += n;
             if c == quote {
-                return self.primitive::<MATCH>(state, Some(p - start), label);
+                let step = self.primitive::<MATCH>(state, Some(p - start), label);
+                if let Event::Token { text_span, content_span, .. } = &mut self.arena[step.events.0] {
+                    *text_span = Some([start, p]);
+                    *content_span = Some([start + 1, p - 1]);
+                }
+                return step;
             }
             if c == '\\' {
                 if let Some((_, n)) = self.input.cp_at(p) {
@@ -565,9 +584,10 @@ impl<'a> Session<'a> {
                 }
             }
         }
+        self.display.fail(p, if quote == '\'' {"SingleQuoted"} else {"Quoted"});
         self.fail(state, start, label)
     }
-    pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str) -> Step {
+    pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str, display: &'static str) -> Step {
         let mut out = state.begin();
         loop {
             if !terminator.is_empty() && self.input.starts_with(out.matched, terminator) {
@@ -576,7 +596,9 @@ impl<'a> Session<'a> {
                 }
                 return Step::yes(state.commit(out));
             }
+            if !terminator.is_empty() { self.display.fail(out.consumed.max(out.matched),display); }
             let Some((_, n)) = self.input.cp_at(out.position::<MATCH>()) else {
+                self.display.fail(out.consumed.max(out.matched),"ANY");
                 return Step::yes(state.commit(out));
             };
             out.advance::<MATCH>(n);
@@ -618,6 +640,7 @@ impl<'a> Session<'a> {
         });
         step.ok = result.ok;
         for d in result.diagnostics {
+            self.display.fail(d.offset, d.expected);
             let diag = self.diag.fail(d.offset, d.expected);
             step.diag = self.diag.join(step.diag, diag);
         }
@@ -630,6 +653,7 @@ impl<'a> Session<'a> {
                 rule: usize::MAX,
                 span: result.value_span,
                 text_span: Some(result.value_span),
+                content_span: None,
             });
         } else {
             self.restore(mark);
@@ -854,6 +878,21 @@ impl<'a> Session<'a> {
             }
         }
     }
+    fn text_content_extent(&self, mut root: EventId, fallback: Span) -> Span {
+        loop {
+            match self.arena[root.0] {
+                Event::Capture { child, .. } | Event::Rule { child, .. } | Event::Values { child, .. } => root = child,
+                Event::Token { content_span, text_span, .. } => return content_span.or(text_span).unwrap_or(fallback),
+                _ => return fallback,
+            }
+        }
+    }
+    pub fn semantic_text(&mut self, root: EventId, span: Span) -> String {
+        let extent = self.text_extent(root, span);
+        let content = self.text_content_extent(root, extent);
+        let value = if self.has_token_text(root) { self.text[content[0]..content[1]].to_owned() } else { self.text(content) };
+        self.remember_text(value, extent)
+    }
     pub fn field_text(&mut self, root: EventId, sites: &[usize]) -> Vec<String> {
         self.owned_captures(root, sites)
             .into_iter()
@@ -861,13 +900,7 @@ impl<'a> Session<'a> {
                 if self.directly_recovered(child) {
                     None
                 } else {
-                    let extent = self.text_extent(child, span);
-                    let value = if self.has_token_text(child) {
-                        self.text[extent[0]..extent[1]].to_owned()
-                    } else {
-                        self.text(extent)
-                    };
-                    Some(self.remember_text(value, extent))
+                    Some(self.semantic_text(child, span))
                 }
             })
             .collect()
