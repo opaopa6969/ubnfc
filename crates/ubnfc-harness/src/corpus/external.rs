@@ -61,6 +61,7 @@ pub(crate) fn evolution(path: &Path, diagnostics: bool) -> Result<CorpusFile, Lo
                 // upstream は Java の実行結果と比較しており、入力から期待値を捏造しない。
                 expect: Expectation::Raw(Value::String(input.clone())),
                 input,
+                known_divergences: Vec::new(),
             })
             .collect();
         Ok(out)
@@ -92,6 +93,7 @@ pub(crate) fn numeric(path: &Path) -> Result<CorpusFile, LoadError> {
                 rust_lexeme: row.input,
                 extra: row.extra,
             }),
+            known_divergences: Vec::new(),
         })
         .collect();
     Ok(out)

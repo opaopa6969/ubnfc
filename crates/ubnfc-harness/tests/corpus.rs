@@ -44,13 +44,20 @@ fn every_required_file_loads_with_the_measured_counts() {
         ("scope-store/corpus.json", Operations, 9),
         ("catalog/corpus.json", Operations, 2),
     ];
-    assert_eq!(corpus().len(), expected.len());
+    assert_eq!(corpus().len(), expected.len() + 63);
     for (suffix, family, count) in expected {
         let file = file(suffix);
         assert_eq!((file.family, file.cases.len()), (family, count), "{suffix}");
+    }
+    for file in corpus() {
         let mut ids = BTreeSet::new();
         for case in &file.cases {
-            assert!(ids.insert(&case.id), "{suffix}: duplicate {}", case.id);
+            assert!(
+                ids.insert(&case.id),
+                "{}: duplicate {}",
+                file.path.display(),
+                case.id
+            );
             assert!(case.grammar_ref.iter().all(|i| *i < file.grammars.len()));
             assert_eq!(
                 case.grammar_ref.is_empty(),
@@ -96,11 +103,17 @@ fn every_required_file_loads_with_the_measured_counts() {
                     cases: 11
                 }
             ),
+            (
+                Oracle,
+                Counts {
+                    files: 63,
+                    cases: 168
+                }
+            ),
         ])
     );
     let total: usize = corpus().iter().map(|file| file.cases.len()).sum();
-    assert!(total >= 650);
-    assert_eq!(total, 703);
+    assert_eq!(total, 871);
 }
 
 // 各元 row の期待値キーを正規化側と照合。型付けによるキーや null の欠落を検出する。
@@ -132,6 +145,10 @@ fn original_oracles_and_metadata_survive_normalization_and_serde_roundtrip() {
             let raw: Value =
                 serde_json::from_str(&std::fs::read_to_string(&file.path).unwrap()).unwrap();
             assert_eq!(file.raw, raw);
+        }
+        if file.family == Family::Oracle {
+            // object 形式の実走 oracle は tests/oracle.rs で各フィールドを照合する。
+            continue;
         }
         let mut rows = Vec::new();
         for fixture in file.raw.as_array().unwrap() {

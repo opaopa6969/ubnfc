@@ -1,7 +1,8 @@
-//! 5 系統の独立 oracle。生成器・実行時から期待値を導出しない。
+//! 6 系統の独立 oracle。生成器・実行時から期待値を導出しない。
 pub mod ast;
 pub mod external;
 pub mod operations;
+pub mod oracle;
 pub mod rule;
 pub mod token;
 
@@ -29,6 +30,7 @@ pub enum Family {
     Rule,
     ExternalGrammar,
     Operations,
+    Oracle,
 }
 impl fmt::Display for Family {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,6 +40,7 @@ impl fmt::Display for Family {
             Self::Rule => "ルール単体",
             Self::ExternalGrammar => "文法別置き",
             Self::Operations => "操作列・catalog",
+            Self::Oracle => "oracle",
         })
     }
 }
@@ -76,6 +79,9 @@ pub struct Case {
     pub entry_rule: Option<String>,
     pub input: String,
     pub expect: Expectation,
+    /// D-017 の follow-spec のみ。undecided は台帳に残し、比較の免除には使わない。
+    #[serde(default)]
+    pub known_divergences: Vec<crate::divergence::Observation>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -88,6 +94,23 @@ pub enum Expectation {
     Numeric(external::NumericExpectation),
     ScopeOps(operations::ScopeExpectation),
     Catalog(operations::CatalogExpectation),
+    /// Java を実走した観測。None は未観測であり false/0 とは異なる。
+    #[serde(rename_all = "camelCase")]
+    Oracle {
+        accepted: Option<bool>,
+        all_consumed: Option<bool>,
+        consumed: Option<usize>,
+        matched: Option<usize>,
+        ast: Option<crate::canonical::AstValue>,
+        captures: Vec<oracle::Capture>,
+        declarations: Vec<operations::Declaration>,
+        diagnostics: Vec<oracle::Diagnostic>,
+        mapping_error: Option<String>,
+    },
+    /// parser 未実行。生成失敗と生成 Java のコンパイル失敗を原文付きで保持。
+    GenerationFailure {
+        message: String,
+    },
     /// 例: evolution/conformance.json は入力列だけで独立した結果 oracle がない。
     Raw(Value),
 }
@@ -186,6 +209,7 @@ pub(crate) fn cases<T>(
             entry_rule: entry.map(str::to_owned),
             input: row.input,
             expect: wrap(row.expect),
+            known_divergences: Vec::new(),
         })
         .collect()
 }

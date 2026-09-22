@@ -36,7 +36,8 @@ fn list_uses_explicit_root_and_environment_and_rejects_missing_corpus() {
         String::from_utf8_lossy(&output.stderr)
     );
     let stdout = String::from_utf8(output.stdout).unwrap();
-    assert!(stdout.contains("| 合計 | 20 | 703 |"));
+    assert!(stdout.contains("| oracle | 63 | 168 |"));
+    assert!(stdout.contains("| 合計 | 83 | 871 |"));
     let configured = Command::new(binary)
         .arg("list")
         .env("UNLAXER_PARSER_DIR", &root)

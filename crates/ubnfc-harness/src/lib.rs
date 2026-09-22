@@ -1,6 +1,7 @@
 //! 適合性 corpus の読み込み・正規化と canonical AST 比較。生成・実行は扱わない。
 pub mod canonical;
 pub mod corpus;
+pub mod divergence;
 
 pub use corpus::{Case, CorpusFile, Expectation, Family, GrammarSource, LoadError};
 use std::{
@@ -18,6 +19,7 @@ pub fn default_root() -> PathBuf {
 
 /// root は unlaxer-parser repo。欠落や不正ファイルはパス付きエラー（skip しない）。
 /// JSON 件数には文法ファイルや .txt テンプレートを数えない。
+/// ubnfc 独自 oracle は root/cwd に依存せず、この crate と同じ checkout から読む。
 pub fn load_all(root: impl AsRef<Path>) -> Result<Vec<CorpusFile>, LoadError> {
     use corpus::{ast, external, operations, rule, token};
     let resources = root.as_ref().join("unlaxer-dsl/src/test/resources");
@@ -76,6 +78,7 @@ pub fn load_all(root: impl AsRef<Path>) -> Result<Vec<CorpusFile>, LoadError> {
         &resources.join("scope-store/corpus.json"),
     )?);
     out.push(operations::catalog(&resources.join("catalog/corpus.json"))?);
+    out.extend(corpus::oracle::load_all(corpus::oracle::default_root())?);
     Ok(out)
 }
 
