@@ -19,7 +19,13 @@ pub(crate) enum Event {
         diag: Diag,
     },
     Join(EventId, EventId),
+    Values {
+        span: Span,
+        child: EventId,
+        wrap: bool,
+    },
     Capture {
+        token_extent: bool,
         site: usize,
         span: Span,
         child: EventId,
@@ -30,6 +36,7 @@ pub(crate) enum Event {
         child: EventId,
     },
     Token {
+        text_span: Option<Span>,
         expr: usize,
         rule: usize,
         span: Span,
@@ -114,6 +121,9 @@ pub(crate) struct Session<'a> {
     saved_effects: Vec<Effect>,
     pub statistics: Statistics,
     pub node_spans: Vec<NodeSpan>,
+    // Allocation identity is used only while mapping. finish resolves it into
+    // owned AST paths, so ParseResult remains valid after moves and clones.
+    pub text_spans: std::collections::HashMap<usize, Span>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -151,6 +161,7 @@ impl<'a> Session<'a> {
             saved_effects: vec![],
             statistics: Statistics::default(),
             node_spans: vec![],
+            text_spans: Default::default(),
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -201,7 +212,9 @@ impl<'a> Session<'a> {
     }
     pub fn text(&self, span: Span) -> String {
         self.text[span[0]..span[1]]
-            .trim_matches(|c: char| c <= '\u{20}')
+            .trim_matches(|c: char| {
+                c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
+            })
             .to_owned()
     }
     pub fn mark(&self) -> Mark {
@@ -408,6 +421,7 @@ impl<'a> Session<'a> {
                 state.advance::<MATCH>(length);
                 let mut step = Step::yes(state);
                 step.events = self.event(Event::Token {
+                    text_span: None,
                     expr: usize::MAX,
                     rule: usize::MAX,
                     span: [start, start + length],
@@ -535,7 +549,7 @@ impl<'a> Session<'a> {
         let start = state.position::<MATCH>();
         let mut p = start;
         if self.input.cp_at(p).is_none_or(|(c, _)| c != quote) {
-            return self.primitive::<MATCH>(state, None, label);
+            return self.fail(state, start, label);
         }
         p += 1;
         while let Some((c, n)) = self.input.cp_at(p) {
@@ -551,7 +565,7 @@ impl<'a> Session<'a> {
                 }
             }
         }
-        self.primitive::<MATCH>(state, None, label)
+        self.fail(state, start, label)
     }
     pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str) -> Step {
         let mut out = state.begin();
@@ -615,6 +629,7 @@ impl<'a> Session<'a> {
                 expr: usize::MAX,
                 rule: usize::MAX,
                 span: result.value_span,
+                text_span: Some(result.value_span),
             });
         } else {
             self.restore(mark);
@@ -633,10 +648,23 @@ impl<'a> Session<'a> {
                     stack.push((b, false));
                     stack.push((a, false));
                 }
-                Event::Capture { site, span, child } => {
+                Event::Values { child, .. } => stack.push((child, false)),
+                Event::Capture {
+                    site,
+                    span,
+                    child,
+                    token_extent,
+                } => {
                     if done {
                         if sites.contains(&site) {
-                            out.push((span, child));
+                            out.push((
+                                if token_extent {
+                                    self.selected_extent(child, span)
+                                } else {
+                                    span
+                                },
+                                child,
+                            ));
                         }
                     } else {
                         stack.push((id, true));
@@ -657,7 +685,7 @@ impl<'a> Session<'a> {
                     stack.push(b);
                     stack.push(a);
                 }
-                Event::Capture { child, .. } => stack.push(child),
+                Event::Capture { child, .. } | Event::Values { child, .. } => stack.push(child),
                 Event::Rule { span: child, .. } | Event::Token { span: child, .. } => {
                     span = Some(span.map_or(child, |s: Span| [s[0], child[1]]));
                 }
@@ -677,7 +705,9 @@ impl<'a> Session<'a> {
                     stack.push(a);
                     stack.push(b);
                 }
-                Event::Rule { child, .. } | Event::Capture { child, .. } => stack.push(child),
+                Event::Rule { child, .. }
+                | Event::Capture { child, .. }
+                | Event::Values { child, .. } => stack.push(child),
                 Event::Token { span, .. } => return Some(span[1]),
                 _ => {}
             }
@@ -693,7 +723,9 @@ impl<'a> Session<'a> {
                     stack.push(b);
                     stack.push(a);
                 }
-                Event::Capture { child, .. } | Event::Rule { child, .. } => stack.push(child),
+                Event::Capture { child, .. }
+                | Event::Rule { child, .. }
+                | Event::Values { child, .. } => stack.push(child),
                 _ => {}
             }
         }
@@ -703,7 +735,7 @@ impl<'a> Session<'a> {
         loop {
             match self.arena[root.0] {
                 Event::Recovery { .. } => return true,
-                Event::Capture { child, .. } => root = child,
+                Event::Capture { child, .. } | Event::Values { child, .. } => root = child,
                 _ => return false,
             }
         }
@@ -772,11 +804,72 @@ impl<'a> Session<'a> {
             diag: failed.diag,
         }
     }
-    pub fn field_text(&self, root: EventId, sites: &[usize]) -> Vec<String> {
+    pub fn has_value_group(&self, root: EventId) -> bool {
+        let mut stack = vec![root];
+        while let Some(id) = stack.pop() {
+            match self.arena[id.0] {
+                Event::Values { .. } => return true,
+                Event::Join(a, b) => {
+                    stack.push(b);
+                    stack.push(a);
+                }
+                Event::Rule { child, .. } | Event::Capture { child, .. } => stack.push(child),
+                _ => {}
+            }
+        }
+        false
+    }
+    pub fn mapped_text(&mut self, span: Span) -> String {
+        self.remember_text(self.text(span), span)
+    }
+    fn remember_text(&mut self, mut text: String, span: Span) -> String {
+        // Empty strings also need distinct identities until paths are resolved.
+        text.reserve(1);
+        self.text_spans
+            .insert(text.as_ptr() as usize, self.span(span));
+        text
+    }
+    pub fn has_token_text(&self, mut root: EventId) -> bool {
+        loop {
+            match self.arena[root.0] {
+                Event::Capture { child, .. }
+                | Event::Rule { child, .. }
+                | Event::Values { child, .. } => root = child,
+                Event::Token { text_span, .. } => return text_span.is_some(),
+                _ => return false,
+            }
+        }
+    }
+    pub fn text_extent(&self, mut root: EventId, fallback: Span) -> Span {
+        loop {
+            match self.arena[root.0] {
+                Event::Capture { child, .. }
+                | Event::Rule { child, .. }
+                | Event::Values { child, .. } => root = child,
+                Event::Token {
+                    text_span: Some(span),
+                    ..
+                } => return span,
+                _ => return fallback,
+            }
+        }
+    }
+    pub fn field_text(&mut self, root: EventId, sites: &[usize]) -> Vec<String> {
         self.owned_captures(root, sites)
             .into_iter()
-            .filter(|(_, child)| !self.directly_recovered(*child))
-            .map(|(span, _)| self.text(span))
+            .filter_map(|(span, child)| {
+                if self.directly_recovered(child) {
+                    None
+                } else {
+                    let extent = self.text_extent(child, span);
+                    let value = if self.has_token_text(child) {
+                        self.text[extent[0]..extent[1]].to_owned()
+                    } else {
+                        self.text(extent)
+                    };
+                    Some(self.remember_text(value, extent))
+                }
+            })
             .collect()
     }
     pub fn scope_captures(&self, root: EventId, sites: &[usize]) -> Vec<(usize, Span)> {
@@ -788,7 +881,10 @@ impl<'a> Session<'a> {
                     stack.push((b, false));
                     stack.push((a, false));
                 }
-                Event::Capture { site, span, child } => {
+                Event::Values { child, .. } => stack.push((child, false)),
+                Event::Capture {
+                    site, span, child, ..
+                } => {
                     if done {
                         if sites.contains(&site) {
                             let text = &self.text[span[0]..span[1]];
@@ -829,9 +925,9 @@ const BODIES:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", 
 const SITES:&[(&str,&str)]=&[("expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/0/repeat/capture/0", "grammars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef/capture/0", "alias"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef/capture/0", "path"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1517:1527:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1550:1564:body/3/repeat/capture/0", "imports"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1584:1601:body/4/repeat/capture/0", "settings"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1619:1632:body/5/repeat/capture/0", "tokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1652:1664:body/6/repeat/capture/0", "rules"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2199:body/0/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2209:2215:body/2/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef/capture/0", "terminator"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef/capture/0", "chars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef/capture/0", "min"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef/capture/0", "max"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef/capture/0", "word"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4129:body/0/repeat/capture/0", "annotations"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4176:4184:body/3/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4946:4956:body/2/tokenRef/capture/0", "className"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4998:5008:body/3/0/4/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5027:5037:body/3/0/5/0/1/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5151:5163:body/2/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5179:5191:body/3/0/1/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5309:5319:body/1/0/1/tokenRef/capture/0", "style"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5449:5459:body/4/tokenRef/capture/0", "profile"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5574:5584:body/4/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5702:5712:body/4/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5844:5854:body/4/tokenRef/capture/0", "symbol"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5887:5893:body/5/0/3/tokenRef/capture/0", "description"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6020:6026:body/4/tokenRef/capture/0", "context"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6488:6504:body/4/tokenRef/capture/0", "level"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/2/tokenRef/capture/0", "text"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/2/tokenRef/capture/0", "syncTokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6750:6760:body/2/0/1/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7016:7026:body/2/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7045:7055:body/3/0/1/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7266:7276:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7408:body/0/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7429:7441:body/1/0/1/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/0/repeat/capture/0", "elements"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7729:7742:body/0/0/ruleRef/capture/0", "typeofConstraint"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7770:7783:body/1/ruleRef/capture/0", "element"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7887:7897:body/5/0/1/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8528:8536:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8640:8648:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8753:8761:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8883:8889:body/2/tokenRef/capture/0", "message"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/0/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9216:9226:body/0/0/0/tokenRef/capture/0", "namespace"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9244:9254:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9395:9405:body/2/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9536:body/0/tokenRef/capture/0", "parts"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9550:9560:body/1/0/1/tokenRef/capture/0", "parts")];
 impl Session<'_> {
 #[inline(never)] fn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err("maximum mapping depth exceeded".into());}self.mapping_depth+=1;let result=self.build_values_inner(root);self.mapping_depth-=1;result}
-fn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=vec![root];while let Some(id)=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push(b);stack.push(a);},Event::Capture{child,..}=>stack.push(child),Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}Ok(values)}
-fn field_nodes(&mut self,root:EventId,sites:&[usize],fallback:Option<usize>)->Result<Vec<Ast>,String> {let mut values=Vec::new();for (span,child) in self.owned_captures(root,sites) {let mut found=self.build_values(child)?;if found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) {found.push(Ast::Text(self.text(span)));}for value in found {values.push(if let (Some(ty),Ast::Text(text))=(fallback,&value) {self.leaf(ty,span,text.clone())?} else {value});}}Ok(values)}
-fn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let span=self.span(span);let _=(span,text);Err(format!("unknown leaf type {ty}"))}
+fn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=vec![root];while let Some(id)=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push(b);stack.push(a);},Event::Capture{child,..}=>stack.push(child),Event::Values{child,span,wrap}=>{let mut found=self.build_values(child)?;if wrap && (matches!(found.as_slice(),[Ast::Text(_)]) || (found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {found=vec![Ast::Text(self.mapped_text(span))];}values.extend(found);},Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}Ok(values)}
+fn field_nodes(&mut self,root:EventId,sites:&[usize],fallback:Option<usize>)->Result<Vec<Ast>,String> {let mut values=Vec::new();for (span,child) in self.owned_captures(root,sites) {let mut found=self.build_values(child)?;if found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child) {found.push(Ast::Text(self.mapped_text(span)));}for value in found {values.push(if let (Some(ty),Ast::Text(text))=(fallback,&value) {self.leaf(ty,span,text.clone())?} else {value});}}Ok(values)}
+fn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);let _=(span,text);Err(format!("unknown leaf type {ty}"))}
 fn build_rule(&mut self,rule:usize,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);match rule {
 0=>self.map_rule_0(span,child),
 1=>self.map_rule_1(span,child),
@@ -951,7 +1047,7 @@ let span=self.span(span);let node_id=self.node(RULES[3],"GlobalSetting",span);Ok
 g_key:f0,
 g_value:f1,
 })])}}
-fn map_rule_4(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
+fn map_rule_4(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
 fn map_rule_5(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_nodes(child,&[10],None)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_DottedIdentifier(_))) {return Err("value: mapped value type mismatch".into());}
@@ -995,7 +1091,7 @@ let span=self.span(span);let node_id=self.node(RULES[8],"TokenDecl",span);Ok(vec
 g_name:f0,
 g_value:f1,
 })])}}
-fn map_rule_9(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
+fn map_rule_9(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
 fn map_rule_10(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_text(child,&[16]);
 if f0.is_empty() && self.field_missing(child,&[16]) {return Ok(vec![]);}
@@ -1084,7 +1180,7 @@ g_annotations:f0,
 g_name:f1,
 g_body:f2,
 })])}}
-fn map_rule_21(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
+fn map_rule_21(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
 fn map_rule_22(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let span=self.span(span);let node_id=self.node(RULES[22],"RootAnnotation",span);Ok(vec![Ast::g_UBNFAST_2e_RootAnnotation(g_UBNFAST_2e_RootAnnotation{span,node_id,
 })])}}
@@ -1248,11 +1344,11 @@ g_element:f0,
 g_captureName:f1,
 g_typeofConstraint:f2,
 })])}}
-fn map_rule_45(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
-fn map_rule_46(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
-fn map_rule_47(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
-fn map_rule_48(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
-fn map_rule_49(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
+fn map_rule_45(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_46(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_47(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_48(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_49(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
 fn map_rule_50(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_nodes(child,&[52],None)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_ChoiceBody(_))) {return Err("body: mapped value type mismatch".into());}
@@ -1296,7 +1392,7 @@ let f0:String=f0;
 let span=self.span(span);let node_id=self.node(RULES[54],"TerminalElement",span);Ok(vec![Ast::g_UBNFAST_2e_TerminalElement(g_UBNFAST_2e_TerminalElement{span,node_id,
 g_value:f0,
 })])}}
-fn map_rule_55(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
+fn map_rule_55(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
 fn map_rule_56(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_text(child,&[59]);
 if f0.is_empty() && self.field_missing(child,&[59]) {return Ok(vec![]);}
@@ -1311,9 +1407,15 @@ let f0:Vec<String>=f0;
 let span=self.span(span);let node_id=self.node(RULES[57],"DottedIdentifier",span);Ok(vec![Ast::g_UBNFAST_2e_DottedIdentifier(g_UBNFAST_2e_DottedIdentifier{span,node_id,
 g_parts:f0,
 })])}}
-fn map_rule_58(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) {values.push(Ast::Text(self.text(span)));}Ok(values)}}
-fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
+fn map_rule_58(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn occurrences(
+    &self,
+    root: EventId,
+) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
     let mut captures = Vec::new();
+    let mut capture_owners = Vec::new();
+    let mut rule_orders = Vec::new();
+    let mut rule_order = 0;
     let mut lexical = Vec::new();
     let mut tokens = Vec::new();
     let mut stack = vec![(root, None, false, None)];
@@ -1324,11 +1426,16 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, V
                 stack.push((b, parent, false, None));
                 stack.push((a, parent, false, None));
             }
-            Event::Capture { site, span, child } => {
+            Event::Values { child, .. } => stack.push((child, parent, false, None)),
+            Event::Capture {
+                site, span, child, ..
+            } => {
                 if done {
-                    if self.options.build_ast {
+                    if self.options.build_ast || self.options.lexical {
+                        capture_owners.push(parent);
                         let order = captures.len();
                         captures.push(Capture {
+                            rule_completion_order: 0,
                             occurrence_id: order,
                             site_id: SITES[site].0,
                             name: SITES[site].1,
@@ -1341,7 +1448,9 @@ fn occurrences(&self, root: EventId) -> (Vec<Capture>, Vec<LexicalOccurrence>, V
                     stack.push((child, parent, false, None));
                 }
             }
-            Event::Token { expr, rule, span }
+            Event::Token {
+                expr, rule, span, ..
+            }
 if self.options.lexical && expr != usize::MAX => {
                 tokens.push(LexicalOccurrence {
                     occurrence_id: tokens.len(),
@@ -1356,12 +1465,15 @@ if self.options.lexical && expr != usize::MAX => {
             Event::Rule { rule, span, child } => {
                 if done {
                     if let Some(index) = current {
+                        rule_orders[index] = rule_order;
+                        rule_order += 1;
                         let node: &mut LexicalOccurrence = &mut lexical[index];
                         node.completion_order = lexical_order;
                         lexical_order += 1;
                     }
                 } else {
-                    let index = if self.options.lexical {
+                    let index = if self.options.lexical || self.options.build_ast {
+                        rule_orders.push(0);
                         let index = lexical.len();
                         lexical.push(LexicalOccurrence {
                             occurrence_id: index,
@@ -1382,7 +1494,15 @@ if self.options.lexical && expr != usize::MAX => {
             _ => {}
         }
     }
-    for token in &mut tokens {token.occurrence_id += lexical.len();}
+    for (capture, owner) in captures.iter_mut().zip(capture_owners) {
+        capture.rule_completion_order = owner.map_or(0, |i| rule_orders[i]);
+    }
+    for token in &mut tokens {
+        token.occurrence_id += lexical.len();
+    }
+    if !self.options.lexical {
+        lexical.clear();
+    }
     (captures, lexical, tokens)
 }
 fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>) {
@@ -1396,10 +1516,10 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
                 stack.push((b, None));
                 stack.push((a, None));
             }
-            Event::Rule { child, .. } => stack.push((child, None)),
+            Event::Rule { child, .. } | Event::Values { child, .. } => stack.push((child, None)),
             Event::Capture { child, .. } => {
                 if let Some(start) = done {
-                    if self.options.build_ast {
+                    if self.options.build_ast || self.options.lexical {
                         for r in &mut recoveries[start..] {
                             r.capture_occurrence_ids.push(capture_order);
                         }
@@ -1460,8 +1580,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             ..Step::yes(State::default())
         };
     }
-    let trailing =
-        step.ok && self.options.require_eof && step.state.consumed != self.text.len();
+    let trailing = step.ok && self.options.require_eof && step.state.consumed != self.text.len();
     let ok = step.ok && !trailing;
     let consumed_cp = if step.ok {
         self.cp(step.state.consumed)
@@ -1509,16 +1628,17 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         .cloned()
         .collect();
     if trailing {
-        let (farthest_cp, farthest_expected, deepest_rule, rule_path) = diagnostics
-            .pop()
-            .map_or((consumed_cp, vec![], None, vec![]), |d| {
-                (
-                    d.farthest_cp,
-                    d.farthest_expected,
-                    d.deepest_rule,
-                    d.rule_path,
-                )
-            });
+        let (farthest_cp, farthest_expected, deepest_rule, rule_path) =
+            diagnostics
+                .pop()
+                .map_or((consumed_cp, vec![], None, vec![]), |d| {
+                    (
+                        d.farthest_cp,
+                        d.farthest_expected,
+                        d.deepest_rule,
+                        d.rule_path,
+                    )
+                });
         diagnostics.push(Diagnostic {
             kind: DiagnosticKind::TrailingInput,
             offset_cp: consumed_cp,
@@ -1584,7 +1704,12 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         .max(self.trivia_cache.max_probe_len());
     self.statistics.recipes = self.arena.len() - 1;
     self.statistics.ast_nodes = self.node_spans.len();
+    let mut value_spans = Vec::new();
+    if let Some(ast) = &ast {
+        ast.collect("", &self.text_spans, &mut value_spans);
+    }
     ParseResult {
+        value_spans,
         ok,
         consumed_cp,
         matched_cp,
@@ -1613,6 +1738,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         },
         statistics: self.statistics,
         scope: ScopeResult {
+            depth: self.scope.depth(),
             mode: SCOPE_MODES.to_vec(),
             events: if ok {
                 self.effects
@@ -1655,3 +1781,216 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     }
 }
 }
+trait CollectValueSpans {
+    fn collect(
+        &self,
+        path: &str,
+        texts: &std::collections::HashMap<usize, Span>,
+        out: &mut Vec<ValueSpan>,
+    );
+}
+impl CollectValueSpans for String {
+    fn collect(
+        &self,
+        path: &str,
+        texts: &std::collections::HashMap<usize, Span>,
+        out: &mut Vec<ValueSpan>,
+    ) {
+        if let Some(span) = texts.get(&(self.as_ptr() as usize)) {
+            out.push(ValueSpan {
+                path: path.into(),
+                span: *span,
+                text: None,
+            });
+        }
+    }
+}
+impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
+    fn collect(
+        &self,
+        path: &str,
+        texts: &std::collections::HashMap<usize, Span>,
+        out: &mut Vec<ValueSpan>,
+    ) {
+        for (i, value) in self.iter().enumerate() {
+            value.collect(&format!("{path}/{i}"), texts, out);
+        }
+    }
+}
+impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
+    fn collect(
+        &self,
+        path: &str,
+        texts: &std::collections::HashMap<usize, Span>,
+        out: &mut Vec<ValueSpan>,
+    ) {
+        if let Some(value) = self {
+            value.collect(path, texts, out);
+        }
+    }
+}
+impl<T: CollectValueSpans> CollectValueSpans for Box<T> {
+    fn collect(
+        &self,
+        path: &str,
+        texts: &std::collections::HashMap<usize, Span>,
+        out: &mut Vec<ValueSpan>,
+    ) {
+        self.as_ref().collect(path, texts, out);
+    }
+}
+impl CollectValueSpans for Ast { fn collect(&self,path:&str,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.into(),span:*span,text:Some(text.clone())});}},Self::Null=>{},
+Self::g_UBNFAST_2e_UBNFFile(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_grammars.collect(&format!("{path}/fields/grammars"),texts,out);
+},
+Self::g_UBNFAST_2e_ImportDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_alias.collect(&format!("{path}/fields/alias"),texts,out);
+node.g_path.collect(&format!("{path}/fields/path"),texts,out);
+},
+Self::g_UBNFAST_2e_GrammarDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+node.g_imports.collect(&format!("{path}/fields/imports"),texts,out);
+node.g_settings.collect(&format!("{path}/fields/settings"),texts,out);
+node.g_tokens.collect(&format!("{path}/fields/tokens"),texts,out);
+node.g_rules.collect(&format!("{path}/fields/rules"),texts,out);
+},
+Self::g_UBNFAST_2e_GlobalSetting(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_key.collect(&format!("{path}/fields/key"),texts,out);
+node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+},
+Self::g_UBNFAST_2e_StringSettingValue(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+},
+Self::g_UBNFAST_2e_BlockSettingValue(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_entries.collect(&format!("{path}/fields/entries"),texts,out);
+},
+Self::g_UBNFAST_2e_KeyValuePair(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_key.collect(&format!("{path}/fields/key"),texts,out);
+node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+},
+Self::g_UBNFAST_2e_TokenDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+},
+Self::g_UBNFAST_2e_UntilExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_terminator.collect(&format!("{path}/fields/terminator"),texts,out);
+},
+Self::g_UBNFAST_2e_NegationExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_chars.collect(&format!("{path}/fields/chars"),texts,out);
+},
+Self::g_UBNFAST_2e_LookaheadExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_pattern.collect(&format!("{path}/fields/pattern"),texts,out);
+},
+Self::g_UBNFAST_2e_NegativeLookaheadExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_pattern.collect(&format!("{path}/fields/pattern"),texts,out);
+},
+Self::g_UBNFAST_2e_CharRangeExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_min.collect(&format!("{path}/fields/min"),texts,out);
+node.g_max.collect(&format!("{path}/fields/max"),texts,out);
+},
+Self::g_UBNFAST_2e_CIExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_word.collect(&format!("{path}/fields/word"),texts,out);
+},
+Self::g_UBNFAST_2e_RegexExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_pattern.collect(&format!("{path}/fields/pattern"),texts,out);
+},
+Self::g_UBNFAST_2e_AnyExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_EofExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_EmptyExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_RuleDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_annotations.collect(&format!("{path}/fields/annotations"),texts,out);
+node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+},
+Self::g_UBNFAST_2e_RootAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_MappingAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_className.collect(&format!("{path}/fields/className"),texts,out);
+node.g_paramNames.collect(&format!("{path}/fields/paramNames"),texts,out);
+},
+Self::g_UBNFAST_2e_EvalAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_entries.collect(&format!("{path}/fields/entries"),texts,out);
+},
+Self::g_UBNFAST_2e_WhitespaceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_style.collect(&format!("{path}/fields/style"),texts,out);
+},
+Self::g_UBNFAST_2e_InterleaveAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_profile.collect(&format!("{path}/fields/profile"),texts,out);
+},
+Self::g_UBNFAST_2e_BackrefAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+},
+Self::g_UBNFAST_2e_ScopeTreeAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_mode.collect(&format!("{path}/fields/mode"),texts,out);
+},
+Self::g_UBNFAST_2e_DeclaresAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_symbol.collect(&format!("{path}/fields/symbol"),texts,out);
+node.g_description.collect(&format!("{path}/fields/description"),texts,out);
+},
+Self::g_UBNFAST_2e_CatalogAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_context.collect(&format!("{path}/fields/context"),texts,out);
+},
+Self::g_UBNFAST_2e_LeftAssocAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_RightAssocAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_LongestChoiceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_PredictiveChoiceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_PrecedenceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_level.collect(&format!("{path}/fields/level"),texts,out);
+},
+Self::g_UBNFAST_2e_DocAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_text.collect(&format!("{path}/fields/text"),texts,out);
+},
+Self::g_UBNFAST_2e_RecoveryAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_mode.collect(&format!("{path}/fields/mode"),texts,out);
+node.g_syncTokens.collect(&format!("{path}/fields/syncTokens"),texts,out);
+},
+Self::g_UBNFAST_2e_SkipAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_CommonFieldAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_fieldNames.collect(&format!("{path}/fields/fieldNames"),texts,out);
+},
+Self::g_UBNFAST_2e_EnumAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+},
+Self::g_UBNFAST_2e_SimpleAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+},
+Self::g_UBNFAST_2e_ChoiceBody(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_alternatives.collect(&format!("{path}/fields/alternatives"),texts,out);
+},
+Self::g_UBNFAST_2e_SequenceBody(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_elements.collect(&format!("{path}/fields/elements"),texts,out);
+},
+Self::g_UBNFAST_2e_AnnotatedElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_element.collect(&format!("{path}/fields/element"),texts,out);
+node.g_captureName.collect(&format!("{path}/fields/captureName"),texts,out);
+node.g_typeofConstraint.collect(&format!("{path}/fields/typeofConstraint"),texts,out);
+},
+Self::g_UBNFAST_2e_GroupElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+},
+Self::g_UBNFAST_2e_OptionalElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+},
+Self::g_UBNFAST_2e_RepeatElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+},
+Self::g_UBNFAST_2e_ErrorElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_message.collect(&format!("{path}/fields/message"),texts,out);
+},
+Self::g_UBNFAST_2e_TerminalElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+},
+Self::g_UBNFAST_2e_TypeofElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_captureName.collect(&format!("{path}/fields/captureName"),texts,out);
+},
+Self::g_UBNFAST_2e_DottedIdentifier(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+node.g_parts.collect(&format!("{path}/fields/parts"),texts,out);
+},
+}}}

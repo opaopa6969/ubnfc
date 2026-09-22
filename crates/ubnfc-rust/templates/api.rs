@@ -50,6 +50,7 @@ impl Default for ParseOptions {
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Capture {
+    pub rule_completion_order: usize,
     pub occurrence_id: usize,
     pub site_id: &'static str,
     pub name: &'static str,
@@ -71,6 +72,13 @@ pub struct NodeSpan {
     pub rule_id: &'static str,
     pub node_type: &'static str,
     pub span: Span,
+}
+/// Retained mapped value span, addressed by a canonical AST JSON pointer.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ValueSpan {
+    pub path: String,
+    pub span: Span,
+    pub text: Option<String>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DiagnosticKind {
@@ -114,6 +122,7 @@ pub struct ParseResult {
     /// Token occurrences; parents address the rule table, IDs follow rule IDs.
     pub tokens: Vec<LexicalOccurrence>,
     pub node_spans: Vec<NodeSpan>,
+    pub value_spans: Vec<ValueSpan>,
     pub diagnostics: Vec<Diagnostic>,
     /// Local farthest failures, including speculative failures on successful parses.
     pub hints: Vec<Diagnostic>,
@@ -203,6 +212,7 @@ pub struct ScopeEvent {
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ScopeResult {
+    pub depth: usize,
     /// Grammar modes in declaration order (a grammar may mix lexical and dynamic effects).
     pub mode: Vec<&'static str>,
     pub events: Vec<ScopeEvent>,

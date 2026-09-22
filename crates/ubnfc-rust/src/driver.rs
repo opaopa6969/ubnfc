@@ -80,6 +80,26 @@ pub(crate) fn generate(ir: &GrammarIr) -> String {
             .collect::<Vec<_>>();
         writeln!(s, "matches!(ast,{})\n}}", patterns.join("|")).unwrap();
     }
+    s.push_str("const CAPTURE_BINDINGS: &[(&str,&str)] = &[\n");
+    let mut counts = std::collections::HashMap::<&str, usize>::new();
+    for capture in &ir.semantics.captures {
+        let rule = ir
+            .semantics
+            .symbols
+            .iter()
+            .find(|s| s.id == capture.rule_id)
+            .unwrap();
+        let count = counts.entry(&capture.rule_id).or_default();
+        writeln!(
+            s,
+            "({:?},{:?}),",
+            capture.site_id,
+            format!("{}:{}", rule.name, count)
+        )
+        .unwrap();
+        *count += 1;
+    }
+    s.push_str("];\n");
     s
 }
 
@@ -108,7 +128,7 @@ fn scanner_hook(ir: &GrammarIr, out: &mut String) {
         )
         .replacen("let mut scanner=RejectExtern;", "", 1)
         .replacen("&mut scanner", "scanner", 1);
-    out.push_str("\n#[cfg(feature=\"scanners\")] use ubnfc_generated::{api, ast, rt};\n#[cfg(feature=\"scanners\")] #[path=\"../../runtime.rs\"] mod runtime;\n#[cfg(feature=\"scanners\")] #[allow(dead_code)] mod scanner_parser {\n");
+    out.push_str("\n#[cfg(feature=\"scanners\")] use ubnfc_generated::{api, ast, rt};\n#[cfg(feature=\"scanners\")] #[path=\"../../runtime.rs\"] #[allow(dead_code)] mod runtime;\n#[cfg(feature=\"scanners\")] mod scanner_parser {\n");
     out.push_str(parser);
     out.push_str(&entry);
     out.push_str("\n}\nconst EXTERN_CLASSES: &[(&str,&str)] = &[\n");

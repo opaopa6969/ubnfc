@@ -518,7 +518,7 @@ fn r55_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e320_c(state);
 if out.ok {
 for (site,span) in self.scope_captures(out.events,&[58]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
-if site==58 && !self.scope_captures(out.events,&[]).iter().any(|(_,s)|self.text(*s)==name) {self.effect(ScanEffect::Diagnostic{message:format!("backreference mismatch: {name}"),offset_cp,len_cp,severity:Severity::Error});}
+if site==58 {if let Some((_,target))=self.scope_captures(out.events,&[58]).first() {let expected=self.text(*target);if expected!=name {self.effect(ScanEffect::Diagnostic{message:format!("back-reference mismatch: expected '{expected}' but got '{name}'"),offset_cp,len_cp,severity:Severity::Error});}}}
 let _=(&name,offset_cp,len_cp); }
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:55,span:[state.consumed,end],child:out.events});
@@ -555,6 +555,7 @@ let mark=self.mark();
 let key=Key {expression:0,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b0_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -575,7 +576,7 @@ let mark=self.mark();
 let key=Key {expression:1,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b1_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:0,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -584,7 +585,8 @@ fn b1_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e2_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e2_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:0,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -640,7 +642,7 @@ let mark=self.mark();
 let key=Key {expression:4,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b4_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:4,rule:1,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:4,rule:1,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -656,8 +658,8 @@ let mark=self.mark();
 let key=Key {expression:5,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b5_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:5,rule:1,span});}
-out.events=self.event(Event::Capture {site:1,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:5,rule:1,span,text_span});}
+out.events=self.event(Event::Capture {site:1,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -673,7 +675,7 @@ let mark=self.mark();
 let key=Key {expression:6,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b6_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:6,rule:1,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:6,rule:1,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -689,8 +691,8 @@ let mark=self.mark();
 let key=Key {expression:7,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b7_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:7,rule:1,span});}
-out.events=self.event(Event::Capture {site:2,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:7,rule:1,span,text_span});}
+out.events=self.event(Event::Capture {site:2,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -706,6 +708,7 @@ let mark=self.mark();
 let key=Key {expression:8,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b8_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -740,7 +743,7 @@ let mark=self.mark();
 let key=Key {expression:9,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b9_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:9,rule:2,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:9,rule:2,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -756,8 +759,8 @@ let mark=self.mark();
 let key=Key {expression:10,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b10_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:10,rule:2,span});}
-out.events=self.event(Event::Capture {site:3,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:10,rule:2,span,text_span});}
+out.events=self.event(Event::Capture {site:3,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -773,7 +776,7 @@ let mark=self.mark();
 let key=Key {expression:11,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b11_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:11,rule:2,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:11,rule:2,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -789,7 +792,7 @@ let mark=self.mark();
 let key=Key {expression:12,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b12_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:4,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -798,7 +801,8 @@ fn b12_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e13_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e13_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:4,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -828,7 +832,7 @@ let mark=self.mark();
 let key=Key {expression:14,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b14_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:5,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -837,7 +841,8 @@ fn b14_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e15_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e15_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:5,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -867,7 +872,7 @@ let mark=self.mark();
 let key=Key {expression:16,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b16_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:6,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -876,7 +881,8 @@ fn b16_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e17_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e17_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:6,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -906,7 +912,7 @@ let mark=self.mark();
 let key=Key {expression:18,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b18_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:7,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -915,7 +921,8 @@ fn b18_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e19_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e19_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:7,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -945,7 +952,7 @@ let mark=self.mark();
 let key=Key {expression:20,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b20_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:20,rule:2,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:20,rule:2,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -961,6 +968,7 @@ let mark=self.mark();
 let key=Key {expression:21,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b21_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -987,7 +995,7 @@ let mark=self.mark();
 let key=Key {expression:22,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b22_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:22,rule:3,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:22,rule:3,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1003,8 +1011,8 @@ let mark=self.mark();
 let key=Key {expression:23,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b23_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:23,rule:3,span});}
-out.events=self.event(Event::Capture {site:8,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:23,rule:3,span,text_span});}
+out.events=self.event(Event::Capture {site:8,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1020,7 +1028,7 @@ let mark=self.mark();
 let key=Key {expression:24,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b24_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:24,rule:3,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:24,rule:3,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1036,7 +1044,7 @@ let mark=self.mark();
 let key=Key {expression:25,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b25_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:9,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:9,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1103,6 +1111,7 @@ let mark=self.mark();
 let key=Key {expression:29,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b29_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1123,7 +1132,7 @@ let mark=self.mark();
 let key=Key {expression:30,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b30_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:10,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:10,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1139,6 +1148,7 @@ let mark=self.mark();
 let key=Key {expression:31,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b31_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1163,7 +1173,7 @@ let mark=self.mark();
 let key=Key {expression:32,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b32_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:32,rule:6,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:32,rule:6,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1179,7 +1189,7 @@ let mark=self.mark();
 let key=Key {expression:33,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b33_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:11,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1188,7 +1198,8 @@ fn b33_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e34_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e34_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:11,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -1218,7 +1229,7 @@ let mark=self.mark();
 let key=Key {expression:35,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b35_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:35,rule:6,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:35,rule:6,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1258,8 +1269,8 @@ let mark=self.mark();
 let key=Key {expression:37,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b37_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:37,rule:7,span});}
-out.events=self.event(Event::Capture {site:12,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:37,rule:7,span,text_span});}
+out.events=self.event(Event::Capture {site:12,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1275,7 +1286,7 @@ let mark=self.mark();
 let key=Key {expression:38,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b38_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:38,rule:7,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:38,rule:7,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1291,8 +1302,8 @@ let mark=self.mark();
 let key=Key {expression:39,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b39_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:39,rule:7,span});}
-out.events=self.event(Event::Capture {site:13,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:39,rule:7,span,text_span});}
+out.events=self.event(Event::Capture {site:13,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1308,6 +1319,7 @@ let mark=self.mark();
 let key=Key {expression:40,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b40_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1334,7 +1346,7 @@ let mark=self.mark();
 let key=Key {expression:41,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b41_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:41,rule:8,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:41,rule:8,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1350,8 +1362,8 @@ let mark=self.mark();
 let key=Key {expression:42,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b42_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:42,rule:8,span});}
-out.events=self.event(Event::Capture {site:14,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:42,rule:8,span,text_span});}
+out.events=self.event(Event::Capture {site:14,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1367,7 +1379,7 @@ let mark=self.mark();
 let key=Key {expression:43,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b43_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:43,rule:8,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:43,rule:8,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1383,7 +1395,7 @@ let mark=self.mark();
 let key=Key {expression:44,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b44_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:15,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:15,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1629,7 +1641,7 @@ let mark=self.mark();
 let key=Key {expression:58,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b58_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:58,rule:10,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:58,rule:10,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1645,7 +1657,7 @@ let mark=self.mark();
 let key=Key {expression:59,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b59_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:59,rule:10,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:59,rule:10,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1661,8 +1673,8 @@ let mark=self.mark();
 let key=Key {expression:60,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b60_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:60,rule:10,span});}
-out.events=self.event(Event::Capture {site:16,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:60,rule:10,span,text_span});}
+out.events=self.event(Event::Capture {site:16,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1678,7 +1690,7 @@ let mark=self.mark();
 let key=Key {expression:61,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b61_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:61,rule:10,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:61,rule:10,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1720,7 +1732,7 @@ let mark=self.mark();
 let key=Key {expression:63,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b63_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:63,rule:11,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:63,rule:11,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1736,7 +1748,7 @@ let mark=self.mark();
 let key=Key {expression:64,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b64_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:64,rule:11,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:64,rule:11,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1752,8 +1764,8 @@ let mark=self.mark();
 let key=Key {expression:65,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b65_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:65,rule:11,span});}
-out.events=self.event(Event::Capture {site:17,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:65,rule:11,span,text_span});}
+out.events=self.event(Event::Capture {site:17,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1769,7 +1781,7 @@ let mark=self.mark();
 let key=Key {expression:66,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b66_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:66,rule:11,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:66,rule:11,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1811,7 +1823,7 @@ let mark=self.mark();
 let key=Key {expression:68,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b68_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:68,rule:12,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:68,rule:12,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1827,7 +1839,7 @@ let mark=self.mark();
 let key=Key {expression:69,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b69_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:69,rule:12,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:69,rule:12,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1843,8 +1855,8 @@ let mark=self.mark();
 let key=Key {expression:70,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b70_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:70,rule:12,span});}
-out.events=self.event(Event::Capture {site:18,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:70,rule:12,span,text_span});}
+out.events=self.event(Event::Capture {site:18,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1860,7 +1872,7 @@ let mark=self.mark();
 let key=Key {expression:71,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b71_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:71,rule:12,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:71,rule:12,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1902,7 +1914,7 @@ let mark=self.mark();
 let key=Key {expression:73,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b73_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:73,rule:13,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:73,rule:13,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1918,7 +1930,7 @@ let mark=self.mark();
 let key=Key {expression:74,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b74_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:74,rule:13,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:74,rule:13,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1934,8 +1946,8 @@ let mark=self.mark();
 let key=Key {expression:75,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b75_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:75,rule:13,span});}
-out.events=self.event(Event::Capture {site:19,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:75,rule:13,span,text_span});}
+out.events=self.event(Event::Capture {site:19,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1951,7 +1963,7 @@ let mark=self.mark();
 let key=Key {expression:76,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b76_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:76,rule:13,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:76,rule:13,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -1997,7 +2009,7 @@ let mark=self.mark();
 let key=Key {expression:78,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b78_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:78,rule:14,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:78,rule:14,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2013,7 +2025,7 @@ let mark=self.mark();
 let key=Key {expression:79,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b79_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:79,rule:14,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:79,rule:14,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2029,8 +2041,8 @@ let mark=self.mark();
 let key=Key {expression:80,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b80_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:80,rule:14,span});}
-out.events=self.event(Event::Capture {site:20,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:80,rule:14,span,text_span});}
+out.events=self.event(Event::Capture {site:20,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2046,7 +2058,7 @@ let mark=self.mark();
 let key=Key {expression:81,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b81_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:81,rule:14,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:81,rule:14,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2062,8 +2074,8 @@ let mark=self.mark();
 let key=Key {expression:82,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b82_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:82,rule:14,span});}
-out.events=self.event(Event::Capture {site:21,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:82,rule:14,span,text_span});}
+out.events=self.event(Event::Capture {site:21,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2079,7 +2091,7 @@ let mark=self.mark();
 let key=Key {expression:83,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b83_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:83,rule:14,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:83,rule:14,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2121,7 +2133,7 @@ let mark=self.mark();
 let key=Key {expression:85,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b85_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:85,rule:15,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:85,rule:15,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2137,7 +2149,7 @@ let mark=self.mark();
 let key=Key {expression:86,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b86_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:86,rule:15,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:86,rule:15,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2153,8 +2165,8 @@ let mark=self.mark();
 let key=Key {expression:87,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b87_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:87,rule:15,span});}
-out.events=self.event(Event::Capture {site:22,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:87,rule:15,span,text_span});}
+out.events=self.event(Event::Capture {site:22,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2170,7 +2182,7 @@ let mark=self.mark();
 let key=Key {expression:88,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b88_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:88,rule:15,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:88,rule:15,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2212,7 +2224,7 @@ let mark=self.mark();
 let key=Key {expression:90,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b90_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:90,rule:16,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:90,rule:16,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2228,7 +2240,7 @@ let mark=self.mark();
 let key=Key {expression:91,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b91_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:91,rule:16,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:91,rule:16,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2244,8 +2256,8 @@ let mark=self.mark();
 let key=Key {expression:92,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b92_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:92,rule:16,span});}
-out.events=self.event(Event::Capture {site:23,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:92,rule:16,span,text_span});}
+out.events=self.event(Event::Capture {site:23,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2261,7 +2273,7 @@ let mark=self.mark();
 let key=Key {expression:93,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b93_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:93,rule:16,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:93,rule:16,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2297,7 +2309,7 @@ let mark=self.mark();
 let key=Key {expression:95,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b95_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:95,rule:17,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:95,rule:17,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2333,7 +2345,7 @@ let mark=self.mark();
 let key=Key {expression:97,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b97_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:97,rule:18,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:97,rule:18,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2369,7 +2381,7 @@ let mark=self.mark();
 let key=Key {expression:99,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b99_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:99,rule:19,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:99,rule:19,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2385,6 +2397,7 @@ let mark=self.mark();
 let key=Key {expression:100,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b100_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2413,7 +2426,7 @@ let mark=self.mark();
 let key=Key {expression:101,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b101_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:24,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2422,7 +2435,8 @@ fn b101_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e102_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e102_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:24,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -2452,8 +2466,8 @@ let mark=self.mark();
 let key=Key {expression:103,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b103_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:103,rule:20,span});}
-out.events=self.event(Event::Capture {site:25,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:103,rule:20,span,text_span});}
+out.events=self.event(Event::Capture {site:25,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2469,7 +2483,7 @@ let mark=self.mark();
 let key=Key {expression:104,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b104_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:104,rule:20,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:104,rule:20,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2485,7 +2499,7 @@ let mark=self.mark();
 let key=Key {expression:105,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b105_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:26,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:26,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2501,7 +2515,7 @@ let mark=self.mark();
 let key=Key {expression:106,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b106_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:106,rule:20,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:106,rule:20,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2894,7 +2908,7 @@ let mark=self.mark();
 let key=Key {expression:129,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b129_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:129,rule:22,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:129,rule:22,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2938,7 +2952,7 @@ let mark=self.mark();
 let key=Key {expression:131,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b131_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:131,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:131,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2954,7 +2968,7 @@ let mark=self.mark();
 let key=Key {expression:132,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b132_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:132,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:132,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2970,8 +2984,8 @@ let mark=self.mark();
 let key=Key {expression:133,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b133_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:133,rule:23,span});}
-out.events=self.event(Event::Capture {site:27,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:133,rule:23,span,text_span});}
+out.events=self.event(Event::Capture {site:27,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -2995,7 +3009,7 @@ fn b134_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e135_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e135_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -3043,7 +3057,7 @@ let mark=self.mark();
 let key=Key {expression:136,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b136_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:136,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:136,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3059,7 +3073,7 @@ let mark=self.mark();
 let key=Key {expression:137,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b137_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:137,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:137,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3075,7 +3089,7 @@ let mark=self.mark();
 let key=Key {expression:138,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b138_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:138,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:138,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3091,7 +3105,7 @@ let mark=self.mark();
 let key=Key {expression:139,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b139_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:139,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:139,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3107,8 +3121,8 @@ let mark=self.mark();
 let key=Key {expression:140,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b140_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:140,rule:23,span});}
-out.events=self.event(Event::Capture {site:28,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:140,rule:23,span,text_span});}
+out.events=self.event(Event::Capture {site:28,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3132,7 +3146,7 @@ fn b141_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e142_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e142_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -3169,7 +3183,7 @@ let mark=self.mark();
 let key=Key {expression:143,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b143_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:143,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:143,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3185,8 +3199,8 @@ let mark=self.mark();
 let key=Key {expression:144,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b144_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:144,rule:23,span});}
-out.events=self.event(Event::Capture {site:29,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:144,rule:23,span,text_span});}
+out.events=self.event(Event::Capture {site:29,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3202,7 +3216,7 @@ let mark=self.mark();
 let key=Key {expression:145,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b145_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:145,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:145,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3218,7 +3232,7 @@ let mark=self.mark();
 let key=Key {expression:146,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b146_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:146,rule:23,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:146,rule:23,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3234,6 +3248,7 @@ let mark=self.mark();
 let key=Key {expression:147,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b147_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3262,7 +3277,7 @@ let mark=self.mark();
 let key=Key {expression:148,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b148_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:148,rule:24,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:148,rule:24,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3278,7 +3293,7 @@ let mark=self.mark();
 let key=Key {expression:149,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b149_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:149,rule:24,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:149,rule:24,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3294,7 +3309,7 @@ let mark=self.mark();
 let key=Key {expression:150,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b150_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:30,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:30,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3310,6 +3325,7 @@ let mark=self.mark();
 let key=Key {expression:151,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b151_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3318,7 +3334,7 @@ fn b151_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e152_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e152_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -3333,6 +3349,7 @@ let mark=self.mark();
 let key=Key {expression:152,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b152_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3355,7 +3372,7 @@ let mark=self.mark();
 let key=Key {expression:153,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b153_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:153,rule:24,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:153,rule:24,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3371,7 +3388,7 @@ let mark=self.mark();
 let key=Key {expression:154,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b154_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:31,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:31,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3387,7 +3404,7 @@ let mark=self.mark();
 let key=Key {expression:155,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b155_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:155,rule:24,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:155,rule:24,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3425,7 +3442,7 @@ let mark=self.mark();
 let key=Key {expression:157,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b157_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:157,rule:25,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:157,rule:25,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3449,7 +3466,7 @@ fn b158_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e159_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e159_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -3489,7 +3506,7 @@ let mark=self.mark();
 let key=Key {expression:160,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b160_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:160,rule:25,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:160,rule:25,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3505,8 +3522,8 @@ let mark=self.mark();
 let key=Key {expression:161,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b161_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:161,rule:25,span});}
-out.events=self.event(Event::Capture {site:32,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:161,rule:25,span,text_span});}
+out.events=self.event(Event::Capture {site:32,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3522,7 +3539,7 @@ let mark=self.mark();
 let key=Key {expression:162,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b162_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:162,rule:25,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:162,rule:25,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3568,7 +3585,7 @@ let mark=self.mark();
 let key=Key {expression:164,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b164_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:164,rule:26,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:164,rule:26,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3584,7 +3601,7 @@ let mark=self.mark();
 let key=Key {expression:165,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b165_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:165,rule:26,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:165,rule:26,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3600,7 +3617,7 @@ let mark=self.mark();
 let key=Key {expression:166,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b166_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:166,rule:26,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:166,rule:26,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3616,7 +3633,7 @@ let mark=self.mark();
 let key=Key {expression:167,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b167_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:167,rule:26,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:167,rule:26,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3632,8 +3649,8 @@ let mark=self.mark();
 let key=Key {expression:168,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b168_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:168,rule:26,span});}
-out.events=self.event(Event::Capture {site:33,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:168,rule:26,span,text_span});}
+out.events=self.event(Event::Capture {site:33,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3649,7 +3666,7 @@ let mark=self.mark();
 let key=Key {expression:169,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b169_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:169,rule:26,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:169,rule:26,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3695,7 +3712,7 @@ let mark=self.mark();
 let key=Key {expression:171,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b171_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:171,rule:27,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:171,rule:27,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3711,7 +3728,7 @@ let mark=self.mark();
 let key=Key {expression:172,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b172_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:172,rule:27,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:172,rule:27,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3727,7 +3744,7 @@ let mark=self.mark();
 let key=Key {expression:173,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b173_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:173,rule:27,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:173,rule:27,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3743,7 +3760,7 @@ let mark=self.mark();
 let key=Key {expression:174,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b174_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:174,rule:27,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:174,rule:27,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3759,8 +3776,8 @@ let mark=self.mark();
 let key=Key {expression:175,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b175_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:175,rule:27,span});}
-out.events=self.event(Event::Capture {site:34,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:175,rule:27,span,text_span});}
+out.events=self.event(Event::Capture {site:34,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3776,7 +3793,7 @@ let mark=self.mark();
 let key=Key {expression:176,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b176_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:176,rule:27,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:176,rule:27,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3822,7 +3839,7 @@ let mark=self.mark();
 let key=Key {expression:178,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b178_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:178,rule:28,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:178,rule:28,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3838,7 +3855,7 @@ let mark=self.mark();
 let key=Key {expression:179,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b179_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:179,rule:28,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:179,rule:28,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3854,7 +3871,7 @@ let mark=self.mark();
 let key=Key {expression:180,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b180_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:180,rule:28,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:180,rule:28,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3870,7 +3887,7 @@ let mark=self.mark();
 let key=Key {expression:181,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b181_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:181,rule:28,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:181,rule:28,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3886,8 +3903,8 @@ let mark=self.mark();
 let key=Key {expression:182,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b182_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:182,rule:28,span});}
-out.events=self.event(Event::Capture {site:35,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:182,rule:28,span,text_span});}
+out.events=self.event(Event::Capture {site:35,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3903,7 +3920,7 @@ let mark=self.mark();
 let key=Key {expression:183,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b183_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:183,rule:28,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:183,rule:28,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3951,7 +3968,7 @@ let mark=self.mark();
 let key=Key {expression:185,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b185_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:185,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:185,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3967,7 +3984,7 @@ let mark=self.mark();
 let key=Key {expression:186,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b186_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:186,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:186,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3983,7 +4000,7 @@ let mark=self.mark();
 let key=Key {expression:187,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b187_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:187,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:187,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -3999,7 +4016,7 @@ let mark=self.mark();
 let key=Key {expression:188,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b188_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:188,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:188,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4015,8 +4032,8 @@ let mark=self.mark();
 let key=Key {expression:189,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b189_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:189,rule:29,span});}
-out.events=self.event(Event::Capture {site:36,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:189,rule:29,span,text_span});}
+out.events=self.event(Event::Capture {site:36,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4040,7 +4057,7 @@ fn b190_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e191_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e191_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -4082,7 +4099,7 @@ let mark=self.mark();
 let key=Key {expression:192,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b192_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:192,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:192,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4098,7 +4115,7 @@ let mark=self.mark();
 let key=Key {expression:193,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b193_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:193,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:193,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4114,7 +4131,7 @@ let mark=self.mark();
 let key=Key {expression:194,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b194_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:194,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:194,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4130,8 +4147,8 @@ let mark=self.mark();
 let key=Key {expression:195,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b195_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:195,rule:29,span});}
-out.events=self.event(Event::Capture {site:37,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:195,rule:29,span,text_span});}
+out.events=self.event(Event::Capture {site:37,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4147,7 +4164,7 @@ let mark=self.mark();
 let key=Key {expression:196,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b196_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:196,rule:29,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:196,rule:29,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4193,7 +4210,7 @@ let mark=self.mark();
 let key=Key {expression:198,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b198_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:198,rule:30,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:198,rule:30,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4209,7 +4226,7 @@ let mark=self.mark();
 let key=Key {expression:199,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b199_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:199,rule:30,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:199,rule:30,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4225,7 +4242,7 @@ let mark=self.mark();
 let key=Key {expression:200,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b200_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:200,rule:30,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:200,rule:30,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4241,7 +4258,7 @@ let mark=self.mark();
 let key=Key {expression:201,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b201_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:201,rule:30,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:201,rule:30,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4257,8 +4274,8 @@ let mark=self.mark();
 let key=Key {expression:202,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b202_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:202,rule:30,span});}
-out.events=self.event(Event::Capture {site:38,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:202,rule:30,span,text_span});}
+out.events=self.event(Event::Capture {site:38,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4274,7 +4291,7 @@ let mark=self.mark();
 let key=Key {expression:203,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b203_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:203,rule:30,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:203,rule:30,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4310,7 +4327,7 @@ let mark=self.mark();
 let key=Key {expression:205,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b205_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:205,rule:31,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:205,rule:31,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4346,7 +4363,7 @@ let mark=self.mark();
 let key=Key {expression:207,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b207_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:207,rule:32,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:207,rule:32,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4382,7 +4399,7 @@ let mark=self.mark();
 let key=Key {expression:209,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b209_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:209,rule:33,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:209,rule:33,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4418,7 +4435,7 @@ let mark=self.mark();
 let key=Key {expression:211,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b211_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:211,rule:34,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:211,rule:34,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4464,7 +4481,7 @@ let mark=self.mark();
 let key=Key {expression:213,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b213_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:213,rule:35,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:213,rule:35,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4480,7 +4497,7 @@ let mark=self.mark();
 let key=Key {expression:214,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b214_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:214,rule:35,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:214,rule:35,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4496,7 +4513,7 @@ let mark=self.mark();
 let key=Key {expression:215,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b215_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:215,rule:35,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:215,rule:35,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4512,7 +4529,7 @@ let mark=self.mark();
 let key=Key {expression:216,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b216_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:216,rule:35,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:216,rule:35,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4528,8 +4545,8 @@ let mark=self.mark();
 let key=Key {expression:217,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b217_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:217,rule:35,span});}
-out.events=self.event(Event::Capture {site:39,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:217,rule:35,span,text_span});}
+out.events=self.event(Event::Capture {site:39,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4545,7 +4562,7 @@ let mark=self.mark();
 let key=Key {expression:218,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b218_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:218,rule:35,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:218,rule:35,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4587,7 +4604,7 @@ let mark=self.mark();
 let key=Key {expression:220,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b220_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:220,rule:36,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:220,rule:36,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4603,7 +4620,7 @@ let mark=self.mark();
 let key=Key {expression:221,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b221_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:221,rule:36,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:221,rule:36,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4619,8 +4636,8 @@ let mark=self.mark();
 let key=Key {expression:222,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b222_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:222,rule:36,span});}
-out.events=self.event(Event::Capture {site:40,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:222,rule:36,span,text_span});}
+out.events=self.event(Event::Capture {site:40,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4636,7 +4653,7 @@ let mark=self.mark();
 let key=Key {expression:223,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b223_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:223,rule:36,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:223,rule:36,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4678,7 +4695,7 @@ let mark=self.mark();
 let key=Key {expression:225,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b225_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:225,rule:37,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:225,rule:37,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4694,7 +4711,7 @@ let mark=self.mark();
 let key=Key {expression:226,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b226_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:226,rule:37,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:226,rule:37,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4770,7 +4787,7 @@ let mark=self.mark();
 let key=Key {expression:230,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b230_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:230,rule:37,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:230,rule:37,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4786,7 +4803,7 @@ let mark=self.mark();
 let key=Key {expression:231,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b231_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:231,rule:37,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:231,rule:37,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4802,8 +4819,8 @@ let mark=self.mark();
 let key=Key {expression:232,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b232_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:232,rule:37,span});}
-out.events=self.event(Event::Capture {site:41,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:232,rule:37,span,text_span});}
+out.events=self.event(Event::Capture {site:41,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4819,8 +4836,8 @@ let mark=self.mark();
 let key=Key {expression:233,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b233_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:233,rule:37,span});}
-out.events=self.event(Event::Capture {site:42,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:233,rule:37,span,text_span});}
+out.events=self.event(Event::Capture {site:42,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4836,7 +4853,7 @@ let mark=self.mark();
 let key=Key {expression:234,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b234_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:234,rule:37,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:234,rule:37,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4872,7 +4889,7 @@ let mark=self.mark();
 let key=Key {expression:236,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b236_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:236,rule:38,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:236,rule:38,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4916,7 +4933,7 @@ let mark=self.mark();
 let key=Key {expression:238,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b238_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:238,rule:39,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:238,rule:39,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4932,7 +4949,7 @@ let mark=self.mark();
 let key=Key {expression:239,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b239_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:239,rule:39,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:239,rule:39,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4948,8 +4965,8 @@ let mark=self.mark();
 let key=Key {expression:240,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b240_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:240,rule:39,span});}
-out.events=self.event(Event::Capture {site:43,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:240,rule:39,span,text_span});}
+out.events=self.event(Event::Capture {site:43,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -4973,7 +4990,7 @@ fn b241_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e242_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e242_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -5010,7 +5027,7 @@ let mark=self.mark();
 let key=Key {expression:243,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b243_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:243,rule:39,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:243,rule:39,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5026,8 +5043,8 @@ let mark=self.mark();
 let key=Key {expression:244,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b244_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:244,rule:39,span});}
-out.events=self.event(Event::Capture {site:44,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:244,rule:39,span,text_span});}
+out.events=self.event(Event::Capture {site:44,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5043,7 +5060,7 @@ let mark=self.mark();
 let key=Key {expression:245,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b245_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:245,rule:39,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:245,rule:39,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5079,7 +5096,7 @@ let mark=self.mark();
 let key=Key {expression:247,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b247_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:247,rule:40,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:247,rule:40,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5117,7 +5134,7 @@ let mark=self.mark();
 let key=Key {expression:249,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b249_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:249,rule:41,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:249,rule:41,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5133,8 +5150,8 @@ let mark=self.mark();
 let key=Key {expression:250,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b250_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:250,rule:41,span});}
-out.events=self.event(Event::Capture {site:45,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:250,rule:41,span,text_span});}
+out.events=self.event(Event::Capture {site:45,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5150,6 +5167,7 @@ let mark=self.mark();
 let key=Key {expression:251,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b251_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5172,7 +5190,7 @@ let mark=self.mark();
 let key=Key {expression:252,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b252_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:46,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:46,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5188,6 +5206,7 @@ let mark=self.mark();
 let key=Key {expression:253,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b253_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5196,7 +5215,7 @@ fn b253_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e254_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e254_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -5211,6 +5230,7 @@ let mark=self.mark();
 let key=Key {expression:254,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b254_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5233,7 +5253,7 @@ let mark=self.mark();
 let key=Key {expression:255,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b255_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:255,rule:42,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:255,rule:42,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5249,7 +5269,7 @@ let mark=self.mark();
 let key=Key {expression:256,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b256_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:47,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:47,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5265,6 +5285,7 @@ let mark=self.mark();
 let key=Key {expression:257,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b257_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5285,7 +5306,7 @@ let mark=self.mark();
 let key=Key {expression:258,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b258_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:48,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5294,7 +5315,8 @@ fn b258_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e259_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e259_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:48,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -5324,6 +5346,7 @@ let mark=self.mark();
 let key=Key {expression:260,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b260_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5354,6 +5377,7 @@ let mark=self.mark();
 let key=Key {expression:261,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b261_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5362,7 +5386,7 @@ fn b261_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e262_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e262_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -5378,7 +5402,7 @@ let mark=self.mark();
 let key=Key {expression:262,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b262_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:49,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:49,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5394,7 +5418,7 @@ let mark=self.mark();
 let key=Key {expression:263,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b263_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:50,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:50,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5418,7 +5442,7 @@ fn b264_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e265_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e265_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -5457,7 +5481,7 @@ fn b266_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e267_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e267_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -5488,6 +5512,7 @@ let mark=self.mark();
 let key=Key {expression:268,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b268_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5496,7 +5521,7 @@ fn b268_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e269_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e269_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -5535,7 +5560,7 @@ fn b270_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e271_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e271_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -5573,7 +5598,7 @@ let mark=self.mark();
 let key=Key {expression:272,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b272_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:272,rule:44,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:272,rule:44,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5589,8 +5614,8 @@ let mark=self.mark();
 let key=Key {expression:273,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b273_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:273,rule:44,span});}
-out.events=self.event(Event::Capture {site:51,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:273,rule:44,span,text_span});}
+out.events=self.event(Event::Capture {site:51,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5641,7 +5666,7 @@ if let Some(limit)=self.limit(state) {return limit;}
 let mark=self.mark();
 let mut out=self.b275_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:275,rule:45,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:275,rule:45,span,text_span});}
 } else {self.restore(mark);}
 out
 }
@@ -5655,7 +5680,7 @@ if let Some(limit)=self.limit(state) {return limit;}
 let mark=self.mark();
 let mut out=self.b276_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:276,rule:45,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:276,rule:45,span,text_span});}
 } else {self.restore(mark);}
 out
 }
@@ -5669,7 +5694,7 @@ if let Some(limit)=self.limit(state) {return limit;}
 let mark=self.mark();
 let mut out=self.b277_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:277,rule:45,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:277,rule:45,span,text_span});}
 } else {self.restore(mark);}
 out
 }
@@ -5684,6 +5709,7 @@ let mark=self.mark();
 let key=Key {expression:278,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b278_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5706,7 +5732,7 @@ let mark=self.mark();
 let key=Key {expression:279,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b279_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:279,rule:46,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:279,rule:46,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5763,7 +5789,7 @@ let mark=self.mark();
 let key=Key {expression:282,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b282_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:282,rule:47,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:282,rule:47,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5802,7 +5828,7 @@ fn b284_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e285_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e285_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -5840,7 +5866,7 @@ let mark=self.mark();
 let key=Key {expression:286,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b286_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:286,rule:47,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:286,rule:47,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5864,7 +5890,7 @@ fn b287_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e288_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e288_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -5895,7 +5921,7 @@ let mark=self.mark();
 let key=Key {expression:289,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b289_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:289,rule:47,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:289,rule:47,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5933,7 +5959,7 @@ let mark=self.mark();
 let key=Key {expression:291,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b291_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:291,rule:48,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:291,rule:48,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -5957,7 +5983,7 @@ fn b292_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e293_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e293_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -5972,7 +5998,7 @@ let mark=self.mark();
 let key=Key {expression:293,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b293_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:293,rule:48,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:293,rule:48,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6107,6 +6133,7 @@ let mark=self.mark();
 let key=Key {expression:301,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b301_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6131,7 +6158,7 @@ let mark=self.mark();
 let key=Key {expression:302,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b302_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:302,rule:50,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:302,rule:50,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6147,7 +6174,7 @@ let mark=self.mark();
 let key=Key {expression:303,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b303_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:52,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:52,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6163,7 +6190,7 @@ let mark=self.mark();
 let key=Key {expression:304,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b304_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:304,rule:50,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:304,rule:50,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6179,6 +6206,7 @@ let mark=self.mark();
 let key=Key {expression:305,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b305_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6203,7 +6231,7 @@ let mark=self.mark();
 let key=Key {expression:306,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b306_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:306,rule:51,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:306,rule:51,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6219,7 +6247,7 @@ let mark=self.mark();
 let key=Key {expression:307,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b307_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:53,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:53,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6235,7 +6263,7 @@ let mark=self.mark();
 let key=Key {expression:308,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b308_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:308,rule:51,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:308,rule:51,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6251,6 +6279,7 @@ let mark=self.mark();
 let key=Key {expression:309,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b309_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6275,7 +6304,7 @@ let mark=self.mark();
 let key=Key {expression:310,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b310_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:310,rule:52,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:310,rule:52,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6291,7 +6320,7 @@ let mark=self.mark();
 let key=Key {expression:311,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b311_c(state);
 if out.ok {
-out.events=self.event(Event::Capture {site:54,span:[state.consumed,out.state.consumed],child:out.events});
+out.events=self.event(Event::Capture {site:54,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6307,7 +6336,7 @@ let mark=self.mark();
 let key=Key {expression:312,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b312_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:312,rule:52,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:312,rule:52,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6349,7 +6378,7 @@ let mark=self.mark();
 let key=Key {expression:314,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b314_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:314,rule:53,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:314,rule:53,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6365,7 +6394,7 @@ let mark=self.mark();
 let key=Key {expression:315,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b315_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:315,rule:53,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:315,rule:53,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6381,8 +6410,8 @@ let mark=self.mark();
 let key=Key {expression:316,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b316_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:316,rule:53,span});}
-out.events=self.event(Event::Capture {site:55,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:316,rule:53,span,text_span});}
+out.events=self.event(Event::Capture {site:55,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6398,7 +6427,7 @@ let mark=self.mark();
 let key=Key {expression:317,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b317_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:317,rule:53,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:317,rule:53,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6434,8 +6463,8 @@ let mark=self.mark();
 let key=Key {expression:319,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b319_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:319,rule:54,span});}
-out.events=self.event(Event::Capture {site:56,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:319,rule:54,span,text_span});}
+out.events=self.event(Event::Capture {site:56,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6481,7 +6510,7 @@ fn b321_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e322_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e322_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 if count>=1 {break;}
@@ -6519,8 +6548,8 @@ let mark=self.mark();
 let key=Key {expression:323,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b323_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:323,rule:55,span});}
-out.events=self.event(Event::Capture {site:57,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:323,rule:55,span,text_span});}
+out.events=self.event(Event::Capture {site:57,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6536,7 +6565,7 @@ let mark=self.mark();
 let key=Key {expression:324,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b324_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:324,rule:55,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:324,rule:55,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6552,8 +6581,8 @@ let mark=self.mark();
 let key=Key {expression:325,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b325_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:325,rule:55,span});}
-out.events=self.event(Event::Capture {site:58,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:325,rule:55,span,text_span});}
+out.events=self.event(Event::Capture {site:58,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6595,7 +6624,7 @@ let mark=self.mark();
 let key=Key {expression:327,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b327_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:327,rule:56,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:327,rule:56,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6611,7 +6640,7 @@ let mark=self.mark();
 let key=Key {expression:328,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b328_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:328,rule:56,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:328,rule:56,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6627,8 +6656,8 @@ let mark=self.mark();
 let key=Key {expression:329,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b329_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:329,rule:56,span});}
-out.events=self.event(Event::Capture {site:59,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:329,rule:56,span,text_span});}
+out.events=self.event(Event::Capture {site:59,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6644,7 +6673,7 @@ let mark=self.mark();
 let key=Key {expression:330,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b330_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:330,rule:56,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:330,rule:56,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6682,8 +6711,8 @@ let mark=self.mark();
 let key=Key {expression:332,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b332_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:332,rule:57,span});}
-out.events=self.event(Event::Capture {site:60,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:332,rule:57,span,text_span});}
+out.events=self.event(Event::Capture {site:60,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6707,7 +6736,7 @@ fn b333_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
-let child=self.e334_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+let mut child=self.e334_c(out.state);out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
 }
@@ -6744,7 +6773,7 @@ let mark=self.mark();
 let key=Key {expression:335,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b335_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:335,rule:57,span});}
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:335,rule:57,span,text_span});}
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6760,8 +6789,8 @@ let mark=self.mark();
 let key=Key {expression:336,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b336_c(state);
 if out.ok {
-if let Event::Token{span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:336,rule:57,span});}
-out.events=self.event(Event::Capture {site:61,span:[state.consumed,out.state.consumed],child:out.events});
+if let Event::Token{span,text_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:336,rule:57,span,text_span});}
+out.events=self.event(Event::Capture {site:61,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out
@@ -6777,6 +6806,7 @@ let mark=self.mark();
 let key=Key {expression:337,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 let mut out=self.b337_c(state);
 if out.ok {
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
 } else {self.restore(mark);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}
 out

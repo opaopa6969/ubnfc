@@ -34,26 +34,28 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         ExprNode::Literal { .. } | ExprNode::TokenRef { .. } | ExprNode::Any {}
     ) {
         let rule = g.rules[expr.rule_id.as_str()];
-        writeln!(s, "if let Event::Token{{span,..}}=self.arena[out.events.0] {{out.events=self.event(Event::Token{{expr:{i},rule:{rule},span}});}}").unwrap();
+        writeln!(s, "if let Event::Token{{span,text_span,..}}=self.arena[out.events.0] {{out.events=self.event(Event::Token{{expr:{i},rule:{rule},span,text_span}});}}").unwrap();
     }
-    for site in &expr.capture_site_ids {
-        let index = g.sites[site.as_str()];
-        let capture = &g.ir.semantics.captures[index];
-        if capture.skip {
-            continue;
+    if matches!(
+        expr.node,
+        ExprNode::Seq { .. }
+            | ExprNode::Group { .. }
+            | ExprNode::Optional { .. }
+            | ExprNode::Repeat { .. }
+    ) {
+        if let Some(count) = semantic_shape(g, &expr.id, &mut std::collections::BTreeSet::new()) {
+            // The lowered separator/element pair is plumbing, not a source
+            // group whose delimiters belong to a scalar text value.
+            let wrap =
+                count != Cardinality::List && !expr.id.as_str().ends_with("/lower/separated/2");
+            writeln!(s,"out.events=self.event(Event::Values{{span:[state.consumed,out.state.consumed],child:out.events,wrap:{wrap}}});").unwrap();
         }
-        let span = match capture.span_rule {
-            CaptureSpanRule::MatchedExtent => "[state.matched,out.state.matched]",
-            CaptureSpanRule::SelectedChildExtent => {
-                "self.selected_extent(out.events,[state.consumed,out.state.consumed])"
-            }
-            _ => "[state.consumed,out.state.consumed]",
-        };
-        writeln!(
-            s,
-            "out.events=self.event(Event::Capture {{site:{index},span:{span},child:out.events}});"
-        )
-        .unwrap();
+    }
+    if !matches!(
+        expr.node,
+        ExprNode::Optional { .. } | ExprNode::Repeat { .. }
+    ) {
+        s.push_str(&capture_events(g, expr, "state", "out"));
     }
     s.push_str("} else {self.restore(mark);}\n");
     if success || failure {
@@ -163,7 +165,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
                 }
                 s.push_str("break;}self.restore(mark);\n");
             }
-            writeln!(s,"let child={};out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {{self.restore(mark);break;}}\nout.events=self.join(out.events,child.events);count+=1;\nif before.position::<{mode}>()==out.state.position::<{mode}>() {{break;}}",g.call(child,child_mode,"out.state")).unwrap();
+            writeln!(s,"let mut child={};out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {{self.restore(mark);break;}}",g.call(child,child_mode,"out.state")).unwrap();
+            s.push_str(&capture_events(g, expr, "before", "child"));
+            writeln!(s,"out.events=self.join(out.events,child.events);count+=1;\nif before.position::<{mode}>()==out.state.position::<{mode}>() {{break;}}").unwrap();
             if let Some(max) = max {
                 writeln!(s, "if count>={} {{break;}}", max.max(1)).unwrap();
             }
@@ -308,16 +312,28 @@ pub(crate) fn scope_events(
                 }
                 if effect.mode == ScopeEffectMode::SameRuleText {
                     if event.action == ScopeEffectEventsAction::Use {
-                        let declarations: Vec<_> = effect
-                            .events
-                            .iter()
-                            .filter(|d| {
-                                d.action == ScopeEffectEventsAction::Declare && d.name == event.name
-                            })
-                            .filter_map(|d| d.capture_site_id.as_ref())
-                            .map(|id| g.sites[id.as_str()])
-                            .collect();
-                        writeln!(s, "if site=={site} && !self.scope_captures({events},&{declarations:?}).iter().any(|(_,s)|self.text(*s)==name) {{self.effect(ScanEffect::Diagnostic{{message:format!(\"backreference mismatch: {{name}}\"),offset_cp,len_cp,severity:Severity::Error}});}}").unwrap();
+                        let targets: Vec<_> =
+                            g.ir.semantics
+                                .captures
+                                .iter()
+                                .filter(|c| {
+                                    c.rule_id == effect.rule_id
+                                        && Some(c.name.as_str()) == event.name.as_deref()
+                                })
+                                .map(|c| g.sites[c.site_id.as_str()])
+                                .chain(
+                                    effect
+                                        .events
+                                        .iter()
+                                        .filter(|e| {
+                                            e.action == ScopeEffectEventsAction::Declare
+                                                && e.name == event.name
+                                        })
+                                        .filter_map(|e| e.capture_site_id.as_ref())
+                                        .map(|id| g.sites[id.as_str()]),
+                                )
+                                .collect();
+                        writeln!(s, "if site=={site} {{if let Some((_,target))=self.scope_captures({events},&{targets:?}).first() {{let expected=self.text(*target);if expected!=name {{self.effect(ScanEffect::Diagnostic{{message:format!(\"back-reference mismatch: expected '{{expected}}' but got '{{name}}'\"),offset_cp,len_cp,severity:Severity::Error}});}}}}}}").unwrap();
                     }
                 } else {
                     match event.action {
@@ -405,4 +421,121 @@ fn predict_literals(g: &Generator<'_>, order: &[ExprId], mode: bool) -> String {
     }
     s.push_str("child.state=out.state.commit(child.state);child.diag=self.diag.join(diagnostic,child.diag);break 'choice child;}}self.restore(mark); }\n");
     s
+}
+
+fn capture_events(g: &Generator<'_>, expr: &Expr, state: &str, out: &str) -> String {
+    let mut s = String::new();
+    for site in &expr.capture_site_ids {
+        let index = g.sites[site.as_str()];
+        let capture = &g.ir.semantics.captures[index];
+        if capture.skip {
+            continue;
+        }
+        let token_extent = match &expr.node {
+            ExprNode::Optional { child } | ExprNode::Repeat { child, .. } => direct_token(g, child),
+            _ => false,
+        };
+        let span = match capture.span_rule {
+            CaptureSpanRule::MatchedExtent => "[state.matched,out.state.matched]",
+            CaptureSpanRule::SelectedChildExtent => {
+                "self.selected_extent(out.events,[state.consumed,out.state.consumed])"
+            }
+            _ => "[state.consumed,out.state.consumed]",
+        };
+        writeln!(
+            s,
+            "out.events=self.event(Event::Capture {{site:{index},span:{span},child:out.events,token_extent:{token_extent}}});"
+        )
+        .unwrap();
+    }
+    s.replace("out.", &format!("{out}."))
+        .replace("[state.", &format!("[{state}."))
+}
+
+// Text-only syntax supplies one lexeme. Only references that can produce mapped
+// values participate in semantic cardinality; delimiters do not become values.
+fn semantic_shape(
+    g: &Generator<'_>,
+    id: &ExprId,
+    visiting: &mut std::collections::BTreeSet<ExprId>,
+) -> Option<Cardinality> {
+    semantic_shape_cached(g, id, visiting, &mut std::collections::BTreeMap::new())
+}
+fn semantic_shape_cached(
+    g: &Generator<'_>,
+    id: &ExprId,
+    visiting: &mut std::collections::BTreeSet<ExprId>,
+    cache: &mut std::collections::BTreeMap<ExprId, Option<Cardinality>>,
+) -> Option<Cardinality> {
+    if let Some(shape) = cache.get(id) {
+        return *shape;
+    }
+    if !visiting.insert(id.to_owned()) {
+        return None;
+    }
+    let shape = match &g.ir.semantics.expressions[g.expr[id.as_str()]].node {
+        ExprNode::RuleRef { symbol_id } => {
+            let rule = &g.ir.semantics.rules[g.rules[symbol_id.as_str()]];
+            if rule.skip {
+                None
+            } else if rule.mapping_type_id.is_some() {
+                Some(Cardinality::Scalar)
+            } else {
+                semantic_shape_cached(g, &rule.body, visiting, cache)
+            }
+        }
+        ExprNode::Seq { items } => {
+            let values: Vec<_> = items
+                .iter()
+                .filter_map(|id| semantic_shape_cached(g, id, visiting, cache))
+                .collect();
+            match values.as_slice() {
+                [] => None,
+                [one] => Some(*one),
+                _ => Some(Cardinality::List),
+            }
+        }
+        ExprNode::Choice { alternatives, .. } => alternatives
+            .iter()
+            .filter_map(|id| semantic_shape_cached(g, id, visiting, cache))
+            .reduce(|a, b| {
+                if a == Cardinality::List || b == Cardinality::List {
+                    Cardinality::List
+                } else if a == Cardinality::Optional || b == Cardinality::Optional {
+                    Cardinality::Optional
+                } else {
+                    Cardinality::Scalar
+                }
+            }),
+        ExprNode::Group { child } => semantic_shape_cached(g, child, visiting, cache),
+        ExprNode::Optional { child } => semantic_shape_cached(g, child, visiting, cache).map(|n| {
+            if n == Cardinality::List {
+                n
+            } else {
+                Cardinality::Optional
+            }
+        }),
+        ExprNode::Repeat { child, .. } | ExprNode::Separated { element: child, .. } => {
+            semantic_shape_cached(g, child, visiting, cache).map(|_| Cardinality::List)
+        }
+        _ => None,
+    };
+    visiting.remove(id);
+    cache.insert(id.clone(), shape);
+    shape
+}
+
+fn direct_token(g: &Generator<'_>, id: &ExprId) -> bool {
+    direct_token_inner(g, id, false)
+}
+fn direct_token_inner(g: &Generator<'_>, id: &ExprId, grouped: bool) -> bool {
+    match &g.ir.semantics.expressions[g.expr[id.as_str()]].node {
+        ExprNode::Seq { items } if items.len() == 1 => direct_token_inner(g, &items[0], grouped),
+        ExprNode::Group { child } if !grouped => direct_token_inner(g, child, true),
+        ExprNode::Choice { alternatives, .. } => alternatives
+            .iter()
+            .all(|id| direct_token_inner(g, id, grouped)),
+        ExprNode::Literal { .. } | ExprNode::TokenRef { .. } | ExprNode::Any {} => true,
+        _ => false,
+    }
 }
