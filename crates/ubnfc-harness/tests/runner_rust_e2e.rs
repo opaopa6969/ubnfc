@@ -123,6 +123,7 @@ fn tiny_case(id: usize, input: &str, accepted: bool, entry: Option<&str>) -> Run
             lexical: true,
             scope: true,
         },
+        fixture: Value::Null,
         extra_expectations: BTreeMap::new(),
     }
 }
