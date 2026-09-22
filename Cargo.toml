@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/ubnfc-front", "crates/ubnfc-rust", "crates/ubnfc-harness", "crates/ubnfc-rt-template", "examples/handwritten-target/rust"]
+members = ["crates/ubnfc-front", "crates/ubnfc-rust", "crates/ubnfc-selfhost", "crates/ubnfc-harness", "crates/ubnfc-rt-template", "examples/handwritten-target/rust"]
 
 [workspace.package]
 version = "0.1.0"

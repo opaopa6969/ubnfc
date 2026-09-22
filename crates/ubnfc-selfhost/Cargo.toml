@@ -1,0 +1,19 @@
+[package]
+name = "ubnfc-selfhost"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+default = []
+json = ["dep:serde", "dep:serde_json"]
+
+[dependencies]
+ubnfc-front = { path = "../ubnfc-front" }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+[dev-dependencies]
+ubnfc-rust = { path = "../ubnfc-rust" }
+serde_json.workspace = true

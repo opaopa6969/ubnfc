@@ -16,7 +16,7 @@ use crate::analysis::{self, AnalysisError};
 use crate::ir::{self, *};
 use crate::lower::{self, LowerError, SourceInput};
 use crate::resolve::{self, ResolveError, ResolvedGrammar};
-use crate::syntax::{self, SyntaxError};
+use crate::syntax::{self, GrammarAst, SyntaxError};
 use crate::validate::{self, ValidationIssue};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -24,6 +24,41 @@ pub struct Compiled {
     pub ir: GrammarIr,
     /// validate の警告に lower の互換性警告を加えた、決定的な順序の診断。
     pub warnings: Vec<ValidationIssue>,
+}
+
+/// 呼び出し側で解析済みの AST と、その AST が参照する元 UTF-8。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParsedSource {
+    pub text: String,
+    pub ast: GrammarAst,
+}
+
+impl ParsedSource {
+    pub fn new(text: impl Into<String>, ast: GrammarAst) -> Self {
+        Self {
+            text: text.into(),
+            ast,
+        }
+    }
+}
+
+/// `compile_parsed` の import loader が区別する読込失敗と構文失敗。
+#[derive(Debug)]
+pub enum ParsedLoadError {
+    Io(io::Error),
+    Syntax(SyntaxError),
+}
+
+impl From<io::Error> for ParsedLoadError {
+    fn from(error: io::Error) -> Self {
+        Self::Io(error)
+    }
+}
+
+impl From<SyntaxError> for ParsedLoadError {
+    fn from(error: SyntaxError) -> Self {
+        Self::Syntax(error)
+    }
 }
 
 #[derive(Debug)]
@@ -77,7 +112,26 @@ pub fn compile(
     main_path: impl AsRef<Path>,
     loader: &dyn Fn(&Path) -> io::Result<String>,
 ) -> Result<Compiled, PipelineError> {
-    compile_with_strict(main_path, loader, false)
+    let path = absolute_path(main_path.as_ref()).map_err(|error| PipelineError::Io {
+        path: main_path.as_ref().into(),
+        error,
+    })?;
+    let main = parse_source(&path, loader)?;
+    compile_parsed(&path, main, &|import| {
+        let text = loader(import).map_err(ParsedLoadError::Io)?;
+        let ast = syntax::parse_file(&text).map_err(ParsedLoadError::Syntax)?;
+        Ok(ParsedSource::new(text, ast))
+    })
+}
+
+/// 解析済み AST を起点に IR を構築する。呼び出し側は AST とその元 source を組にする。
+/// import loader も解析済み AST を返すため、この経路は手書き parser を呼ばない。
+pub fn compile_parsed(
+    main_path: impl AsRef<Path>,
+    main: ParsedSource,
+    loader: &dyn Fn(&Path) -> Result<ParsedSource, ParsedLoadError>,
+) -> Result<Compiled, PipelineError> {
+    compile_parsed_with_strict(main_path.as_ref(), main, loader, false)
 }
 
 /// strict は validate の警告を lower より前に拒否し、lower の警告も拒否する。
@@ -86,7 +140,30 @@ pub fn compile_with_strict(
     loader: &dyn Fn(&Path) -> io::Result<String>,
     strict: bool,
 ) -> Result<Compiled, PipelineError> {
-    let prepared = prepare(main_path.as_ref(), loader)?;
+    let path = absolute_path(main_path.as_ref()).map_err(|error| PipelineError::Io {
+        path: main_path.as_ref().into(),
+        error,
+    })?;
+    let main = parse_source(&path, loader)?;
+    compile_parsed_with_strict(
+        &path,
+        main,
+        &|import| {
+            let text = loader(import).map_err(ParsedLoadError::Io)?;
+            let ast = syntax::parse_file(&text).map_err(ParsedLoadError::Syntax)?;
+            Ok(ParsedSource::new(text, ast))
+        },
+        strict,
+    )
+}
+
+fn compile_parsed_with_strict(
+    main_path: &Path,
+    main: ParsedSource,
+    loader: &dyn Fn(&Path) -> Result<ParsedSource, ParsedLoadError>,
+    strict: bool,
+) -> Result<Compiled, PipelineError> {
+    let prepared = prepare_parsed(main_path, main, loader)?;
     let mut warnings = validate::validate(&prepared.grammar);
     if warnings.iter().any(|i| i.severity() == "ERROR") {
         return Err(PipelineError::Validation(warnings));
@@ -159,9 +236,17 @@ pub fn validate_file(
     main_path: impl AsRef<Path>,
     loader: &dyn Fn(&Path) -> io::Result<String>,
 ) -> Result<Vec<ValidationIssue>, PipelineError> {
-    Ok(validate::validate(
-        &prepare(main_path.as_ref(), loader)?.grammar,
-    ))
+    let path = absolute_path(main_path.as_ref()).map_err(|error| PipelineError::Io {
+        path: main_path.as_ref().into(),
+        error,
+    })?;
+    let main = parse_source(&path, loader)?;
+    let prepared = prepare_parsed(&path, main, &|import| {
+        let text = loader(import).map_err(ParsedLoadError::Io)?;
+        let ast = syntax::parse_file(&text).map_err(ParsedLoadError::Syntax)?;
+        Ok(ParsedSource::new(text, ast))
+    })?;
+    Ok(validate::validate(&prepared.grammar))
 }
 
 pub(crate) fn sort_issues(issues: &mut [ValidationIssue]) {
@@ -176,27 +261,39 @@ struct Prepared {
     sources: Vec<SourceInput>,
 }
 
-fn prepare(
+fn parse_source(
     main_path: &Path,
     loader: &dyn Fn(&Path) -> io::Result<String>,
+) -> Result<ParsedSource, PipelineError> {
+    let text = loader(main_path).map_err(|error| PipelineError::Io {
+        path: main_path.into(),
+        error,
+    })?;
+    let ast = syntax::parse_file(&text).map_err(|error| PipelineError::Syntax {
+        path: main_path.into(),
+        error,
+    })?;
+    Ok(ParsedSource::new(text, ast))
+}
+
+fn prepare_parsed(
+    main_path: &Path,
+    main: ParsedSource,
+    loader: &dyn Fn(&Path) -> Result<ParsedSource, ParsedLoadError>,
 ) -> Result<Prepared, PipelineError> {
     let path = absolute_path(main_path).map_err(|error| PipelineError::Io {
         path: main_path.into(),
         error,
     })?;
-    let text = loader(&path).map_err(|error| PipelineError::Io {
-        path: path.clone(),
-        error,
-    })?;
-    let ast = syntax::parse_file(&text).map_err(|error| PipelineError::Syntax {
-        path: path.clone(),
-        error,
-    })?;
-    let inputs = RefCell::new(BTreeMap::from([(path.clone(), text)]));
-    let grammar = resolve::resolve(&[(path.clone(), ast)], &|p| {
-        let text = loader(p)?;
-        inputs.borrow_mut().insert(p.to_path_buf(), text.clone());
-        Ok(text)
+    let inputs = RefCell::new(BTreeMap::from([(path.clone(), main.clone())]));
+    let grammar = resolve::resolve_with(&[(path.clone(), main.ast)], &|import| {
+        let parsed = loader(import).map_err(|error| match error {
+            ParsedLoadError::Io(error) => resolve::LoadError::Io(error),
+            ParsedLoadError::Syntax(error) => resolve::LoadError::Syntax(error),
+        })?;
+        let ast = parsed.ast.clone();
+        inputs.borrow_mut().insert(import.to_path_buf(), parsed);
+        Ok(ast)
     })
     .map_err(PipelineError::Resolve)?;
     let parent = path.parent().unwrap_or(Path::new("/"));
@@ -217,7 +314,7 @@ fn prepare(
     let sources = inputs
         .into_inner()
         .into_iter()
-        .map(|(path, text)| {
+        .map(|(path, parsed)| {
             let relative = path
                 .strip_prefix(&root)
                 .map_err(|_| internal("/sources", "ソースが論理ルートの外にあります"))?;
@@ -225,7 +322,7 @@ fn prepare(
                 .to_str()
                 .ok_or_else(|| internal("/sources", "ソースパスは UTF-8 が必要です"))?
                 .replace(std::path::MAIN_SEPARATOR, "/");
-            Ok(SourceInput::new(path, logical, text))
+            Ok(SourceInput::parsed(path, logical, parsed.text, parsed.ast))
         })
         .collect::<Result<_, PipelineError>>()?;
     Ok(Prepared { grammar, sources })

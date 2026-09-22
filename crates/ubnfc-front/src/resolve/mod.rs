@@ -15,7 +15,12 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::io;
 use std::path::{Component, Path, PathBuf};
 
-use crate::syntax::{ast::*, parse_file};
+use crate::syntax::{ast::*, parse_file, SyntaxError};
+
+pub(crate) enum LoadError {
+    Io(io::Error),
+    Syntax(SyntaxError),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResolveError {
@@ -43,6 +48,16 @@ impl std::error::Error for ResolveError {}
 pub fn resolve<P: AsRef<Path>>(
     files: &[(P, GrammarAst)],
     loader: &dyn Fn(&Path) -> io::Result<String>,
+) -> Result<ResolvedGrammar, Vec<ResolveError>> {
+    resolve_with(files, &|path| {
+        let source = loader(path).map_err(LoadError::Io)?;
+        parse_file(&source).map_err(LoadError::Syntax)
+    })
+}
+
+pub(crate) fn resolve_with<P: AsRef<Path>>(
+    files: &[(P, GrammarAst)],
+    loader: &dyn Fn(&Path) -> Result<GrammarAst, LoadError>,
 ) -> Result<ResolvedGrammar, Vec<ResolveError>> {
     let mut resolver = Resolver {
         loader,
@@ -137,7 +152,7 @@ struct PendingGrammar {
 }
 
 struct Resolver<'a> {
-    loader: &'a dyn Fn(&Path) -> io::Result<String>,
+    loader: &'a dyn Fn(&Path) -> Result<GrammarAst, LoadError>,
     files: BTreeMap<PathBuf, GrammarAst>,
     units: BTreeMap<(PathBuf, usize), UnitId>,
     checked: BTreeSet<UnitId>,
@@ -274,24 +289,22 @@ impl Resolver<'_> {
             }
             if !self.files.contains_key(&target) {
                 match (self.loader)(&target) {
-                    Ok(source) => match parse_file(&source) {
-                        Ok(file) => {
-                            self.files.insert(target.clone(), file);
-                        }
-                        Err(error) => {
-                            self.error(
-                                &pending.name,
-                                None,
-                                &target,
-                                error.span,
-                                "E-IMPORT-SYNTAX",
-                                format!("invalid imported grammar '{}': {error}", target.display()),
-                                "Fix the imported UBNF source.",
-                            );
-                            continue;
-                        }
-                    },
-                    Err(error) => {
+                    Ok(file) => {
+                        self.files.insert(target.clone(), file);
+                    }
+                    Err(LoadError::Syntax(error)) => {
+                        self.error(
+                            &pending.name,
+                            None,
+                            &target,
+                            error.span,
+                            "E-IMPORT-SYNTAX",
+                            format!("invalid imported grammar '{}': {error}", target.display()),
+                            "Fix the imported UBNF source.",
+                        );
+                        continue;
+                    }
+                    Err(LoadError::Io(error)) => {
                         self.error(
                             &pending.name,
                             None,
