@@ -1,0 +1,6769 @@
+[
+  {
+    "slug": "backref",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.backref",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "backref/1",
+        "input": "x:x",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:140:142:body/0/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:153:155:body/2/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 2,
+                "end": 3
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": [
+              {
+                "msg": "Reference mismatch: x",
+                "offset": 0,
+                "len": 1,
+                "severity": "ERROR"
+              },
+              {
+                "msg": "Reference mismatch: x",
+                "offset": 2,
+                "len": 1,
+                "severity": "ERROR"
+              }
+            ]
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "backref/2",
+        "input": "x:y",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": [
+            {
+              "message": "back-reference mismatch: expected 'x' but got 'y'",
+              "offset": 2,
+              "length": 1,
+              "severity": "ERROR",
+              "kind": "ERROR",
+              "expected": [],
+              "origin": "ScopeStore"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:140:142:body/0/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:153:155:body/2/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 2,
+                "end": 3
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": [
+              {
+                "msg": "Reference mismatch: x",
+                "offset": 0,
+                "len": 1,
+                "severity": "ERROR"
+              },
+              {
+                "msg": "Reference mismatch: y",
+                "offset": 2,
+                "len": 1,
+                "severity": "ERROR"
+              }
+            ]
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "backref/3",
+        "input": "x:",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 2,
+              "expected": [
+                "AlphabetUnderScoreParser",
+                "IdentifierParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 2,
+              "farthestExpected": [
+                "AlphabetUnderScoreParser",
+                "IdentifierParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 2,
+            "farthestCp": 2,
+            "expected": [
+              "IDENTIFIER"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "backref/4",
+        "input": "foo:foo",
+        "expected": {
+          "accepted": true,
+          "consumed": 7,
+          "matched": 7,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 7,
+          "matchedCp": 7,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:140:142:body/0/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 0,
+                "end": 3
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:153:155:body/2/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 4,
+                "end": 7
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": [
+              {
+                "msg": "Reference mismatch: foo",
+                "offset": 0,
+                "len": 3,
+                "severity": "ERROR"
+              },
+              {
+                "msg": "Reference mismatch: foo",
+                "offset": 4,
+                "len": 3,
+                "severity": "ERROR"
+              }
+            ]
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      }
+    ]
+  },
+  {
+    "slug": "catalog",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.catalog",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "catalog/1",
+        "input": "zZ",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:126:129:body/0/literal/capture/0",
+              "name": "name",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:136:139:body/1/literal/capture/0",
+              "name": "name",
+              "span": {
+                "start": 1,
+                "end": 2
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      },
+      {
+        "id": "catalog/2",
+        "input": "z",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'Z'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'Z'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'Z'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "catalog/3",
+        "input": "x",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'Z'",
+                "'z'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'Z'",
+                "'z'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'z'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "char-range",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.char_range",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "char-range/1",
+        "input": "`",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "CHAR_RANGE"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "char-range/2",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:127:128:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "char-range/3",
+        "input": "c",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:127:128:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "char-range/4",
+        "input": "d",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "CHAR_RANGE"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "char-range/5",
+        "input": "😀",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "CHAR_RANGE"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ci-unicode",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.ci_unicode",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "ci-unicode/1",
+        "input": "É",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:114:115:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "ci-unicode/2",
+        "input": "é",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:114:115:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "ci-unicode/3",
+        "input": "e",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'é'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'é'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "é"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ci",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.ci",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "ci/1",
+        "input": "LeT",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:116:117:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 3
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "ci/2",
+        "input": "LeT!",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 3,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 3,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:116:117:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 3
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "ci/3",
+        "input": "LET",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:116:117:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 3
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "ci/4",
+        "input": "le",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'let'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'let'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "let"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "comment-block",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.comment_block",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "comment-block/1",
+        "input": "a/*x*/b",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'b'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'b'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "comment-block/2",
+        "input": "a(*x*)b",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'b'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'b'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "comment-block/3",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      }
+    ]
+  },
+  {
+    "slug": "comment-line",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.comment_line",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "comment-line/1",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      },
+      {
+        "id": "comment-line/2",
+        "input": "a//x\nb",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 5,
+              "expected": [
+                "'//'",
+                "'b'"
+              ],
+              "farthestOffset": 5,
+              "farthestExpected": [
+                "'//'",
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 4,
+            "farthestCp": 4,
+            "expected": [
+              "'b'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "comment-line/3",
+        "input": "a#x\nb",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'//'",
+                "'b'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'//'",
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'b'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "comment-whitespace",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.comment_whitespace",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "comment-whitespace/1",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      },
+      {
+        "id": "comment-whitespace/2",
+        "input": "a//x\nb",
+        "expected": {
+          "accepted": true,
+          "consumed": 6,
+          "matched": 6,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 6,
+          "matchedCp": 6,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      },
+      {
+        "id": "comment-whitespace/3",
+        "input": "a#x\nb",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "' '",
+                "'*/'",
+                "'/*'",
+                "'//'",
+                "'b'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "' '",
+                "'*/'",
+                "'/*'",
+                "'//'",
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'b'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "common-field-missing",
+    "front": 1,
+    "frontError": "ubnfc: E-LOWER-COMMON-FIELD: ProbeAST.Node.name: variants の field 型/cardinality が不整合\n"
+  },
+  {
+    "slug": "common-field-type",
+    "front": 1,
+    "frontError": "ubnfc: E-LOWER-COMMON-FIELD: ProbeAST.Node.name: variants の field 型/cardinality が不整合\n"
+  },
+  {
+    "slug": "common-field",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.common_field",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "common-field/1",
+        "input": "a:one",
+        "expected": {
+          "accepted": true,
+          "consumed": 5,
+          "matched": 5,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 5,
+          "matchedCp": 5,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:169:171:body/1/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 2,
+                "end": 5
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 5
+        }
+      },
+      {
+        "id": "common-field/2",
+        "input": "b:two",
+        "expected": {
+          "accepted": true,
+          "consumed": 5,
+          "matched": 5,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 5,
+          "matchedCp": 5,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:217:219:body/1/tokenRef/capture/0",
+              "name": "name",
+              "span": {
+                "start": 2,
+                "end": 5
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'a:'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 5
+        }
+      },
+      {
+        "id": "common-field/3",
+        "input": "x:three",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a:'",
+                "'b:'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a:'",
+                "'b:'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a:'",
+              "'b:'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "digit",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.digit",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "digit/1",
+        "input": "7",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:156:157:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 1,
+            "expected": [
+              "EOF"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 3
+        }
+      },
+      {
+        "id": "digit/2",
+        "input": "73",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "EndOfSourceParser"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "EndOfSourceParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "digit/3",
+        "input": "７",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "Digit"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "digit/4",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "Digit"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "empty-one-two",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.empty_one_two",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "empty-one-two/1",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      }
+    ]
+  },
+  {
+    "slug": "empty-two",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.empty_two",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "empty-two/1",
+        "input": "ab",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "Repeat",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "Repeat",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "empty-zero",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.empty_zero",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "empty-zero/1",
+        "input": "ab",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "Repeat",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "Repeat",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "empty",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.empty",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "empty/1",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:112:113:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "empty/2",
+        "input": "",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:112:113:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "ANY"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "empty/3",
+        "input": "😀",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:112:113:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      }
+    ]
+  },
+  {
+    "slug": "enum-collision",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.enum_collision",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Duplicate enum name: ProbeAST.Mode\n\tat org.ubnfc.java.ir.Validation.require(Validation.java:24)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:75)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "enum-plain",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.enum_plain",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "enum-plain/1",
+        "input": "on",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "enum-plain/2",
+        "input": "off",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'on'"
+            ],
+            "deepestRule": "Mode",
+            "ruleStack": [
+              "Root",
+              "Mode"
+            ]
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "enum-plain/3",
+        "input": "other",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'off'",
+                "'on'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'off'",
+                "'on'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'off'",
+              "'on'"
+            ],
+            "deepestRule": "Mode",
+            "ruleStack": [
+              "Root",
+              "Mode"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "enum",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.g_enum",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "enum/1",
+        "input": "on",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:125:129:body/0/ruleRef/capture/0",
+              "name": "mode",
+              "span": {
+                "start": 0,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "enum/2",
+        "input": "off",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:125:129:body/0/ruleRef/capture/0",
+              "name": "mode",
+              "span": {
+                "start": 0,
+                "end": 3
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'on'"
+            ],
+            "deepestRule": "Mode",
+            "ruleStack": [
+              "Root",
+              "Mode"
+            ]
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "enum/3",
+        "input": "other",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'off'",
+              "'on'"
+            ],
+            "deepestRule": "Mode",
+            "ruleStack": [
+              "Root",
+              "Mode"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "eof",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eof",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "eof/1",
+        "input": "",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:110:111:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "EOF"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "eof/2",
+        "input": "a",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "EndOfSourceParser",
+                "RootParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "EndOfSourceParser",
+                "RootParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "eof/3",
+        "input": "😀",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "EndOfSourceParser",
+                "RootParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "EndOfSourceParser",
+                "RootParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "error",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.error",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: execution.transaction:error:once\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:55)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "eval-binary_arithmetic",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eval_binary_arithmetic",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: eval\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "eval-conditional",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eval_conditional",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: eval\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "eval-literal",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eval_literal",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: eval\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "eval-manual",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eval_manual",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: eval\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "eval-passthrough",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eval_passthrough",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: eval\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "eval-sum",
+    "front": 1,
+    "frontError": "ubnfc: E-LOWER-SUM-EVAL: Node: 自動 @eval(literal) は具象型が必要\n"
+  },
+  {
+    "slug": "eval-unknown",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eval_unknown",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: eval\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "eval-variable_ref",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.eval_variable_ref",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: eval\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "extern-full",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.extern_full",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: externTokens.inputState:Probe::T\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:168)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "extern",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.extern",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: externTokens.inputState:Probe::T\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:168)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "import-alias",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.import_alias",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "import-alias/1",
+        "input": "c",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:120:126:body/0/ruleRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "import-alias/2",
+        "input": "x",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'c'"
+            ],
+            "deepestRule": "b.Leaf",
+            "ruleStack": [
+              "Root",
+              "b.Leaf"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "import-alias/3",
+        "input": "",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'c'"
+            ],
+            "deepestRule": "b.Leaf",
+            "ruleStack": [
+              "Root",
+              "b.Leaf"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "import-cycle",
+    "front": 1,
+    "frontError": "ubnfc: 循環 import を検出しました: /tmp/ubnfc-adversarial.BDfMT9G9/oracle/import-cycle/B.ubnf (スタック: [/tmp/ubnfc-adversarial.BDfMT9G9/oracle/import-cycle/Probe.ubnf, /tmp/ubnfc-adversarial.BDfMT9G9/oracle/import-cycle/B.ubnf, /tmp/ubnfc-adversarial.BDfMT9G9/oracle/import-cycle/C.ubnf]) [code: E-IMPORT-CYCLE] [hint: Remove the circular import.]\n"
+  },
+  {
+    "slug": "import-two-level",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.import_two_level",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "import-two-level/1",
+        "input": "c",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:120:126:body/0/ruleRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 6
+        }
+      },
+      {
+        "id": "import-two-level/2",
+        "input": "b",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'c'"
+            ],
+            "deepestRule": "b.c.Atom",
+            "ruleStack": [
+              "Root",
+              "b.Leaf",
+              "b.c.Atom"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "import-two-level/3",
+        "input": "",
+        "expected": {
+          "accepted": null,
+          "consumed": null,
+          "matched": null,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'c'"
+            ],
+            "deepestRule": "b.c.Atom",
+            "ruleStack": [
+              "Root",
+              "b.Leaf",
+              "b.c.Atom"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "longest",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.longest",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "longest/1",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:188:191:body/0/literal/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [
+              {
+                "name": "a",
+                "offsetCp": 0
+              }
+            ],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'ab'"
+            ],
+            "deepestRule": "B",
+            "ruleStack": [
+              "Root",
+              "B"
+            ]
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "longest/2",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:258:262:body/0/literal/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [
+              {
+                "name": "ab",
+                "offsetCp": 0
+              }
+            ],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "longest/3",
+        "input": "ab!",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 2,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 2,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:258:262:body/0/literal/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [
+              {
+                "name": "ab",
+                "offsetCp": 0
+              }
+            ],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "longest/4",
+        "input": "x",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "'ab'",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "'ab'",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'",
+              "'ab'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "lookahead-failure",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.lookahead_failure",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "lookahead-failure/1",
+        "input": "a",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'x'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'x'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'x'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "lookahead-until",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.lookahead_until",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "lookahead-until/1",
+        "input": "a#",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 2,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 2,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:140:141:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      }
+    ]
+  },
+  {
+    "slug": "lookahead",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.lookahead",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "lookahead/1",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:121:122:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "lookahead/2",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:121:122:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "lookahead/3",
+        "input": "b",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "a"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "lookahead/4",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "a"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "mapping-alias",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.mapping_alias",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "mapping-alias/1",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 6
+        }
+      },
+      {
+        "id": "mapping-alias/2",
+        "input": "aa",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 1,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 6
+        }
+      },
+      {
+        "id": "mapping-alias/3",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Leaf",
+            "ruleStack": [
+              "Root",
+              "Alias",
+              "Leaf"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "mapping-dotted",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.mapping_dotted",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "mapping-dotted/1",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "mapping-dotted/2",
+        "input": "b",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "mapping-dotted/3",
+        "input": "c",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "'b'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'",
+              "'b'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "mapping-sum",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.mapping_sum",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "mapping-sum/1",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "mapping-sum/2",
+        "input": "b",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "mapping-sum/3",
+        "input": "c",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "'b'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'",
+              "'b'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "negation-empty",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.negation_empty",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "negation-empty/1",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "NEGATION"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "negation-empty/2",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:119:120:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "negation-empty/3",
+        "input": "😀",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:119:120:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      }
+    ]
+  },
+  {
+    "slug": "negative-lookahead",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.negative_lookahead",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "negative-lookahead/1",
+        "input": "",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:130:131:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "negative-lookahead/2",
+        "input": "b",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:130:131:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "negative-lookahead/3",
+        "input": "a",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "a"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "numeric",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.numeric",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "numeric/1",
+        "input": "n2147483647;",
+        "expected": {
+          "accepted": true,
+          "consumed": 12,
+          "matched": 12,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 12,
+          "matchedCp": 12,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:123:126:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 11
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "numeric/2",
+        "input": "n2147483648;",
+        "expected": {
+          "accepted": true,
+          "consumed": 12,
+          "matched": 12,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 12,
+          "matchedCp": 12,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:123:126:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 11
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "numeric/3",
+        "input": "n-2147483649;",
+        "expected": {
+          "accepted": true,
+          "consumed": 13,
+          "matched": 13,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 13,
+          "matchedCp": 13,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:123:126:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 12
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "numeric/4",
+        "input": "n1.5;",
+        "expected": {
+          "accepted": true,
+          "consumed": 5,
+          "matched": 5,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 5,
+          "matchedCp": 5,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:123:126:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 4
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "numeric/5",
+        "input": "n1e2;",
+        "expected": {
+          "accepted": true,
+          "consumed": 5,
+          "matched": 5,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 5,
+          "matchedCp": 5,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:123:126:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 4
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "numeric/6",
+        "input": "n+0007;",
+        "expected": {
+          "accepted": true,
+          "consumed": 7,
+          "matched": 7,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 7,
+          "matchedCp": 7,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:123:126:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 6
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "numeric/7",
+        "input": "n1e+;",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 4,
+              "expected": [
+                "DigitParser",
+                "OneOrMore"
+              ],
+              "farthestOffset": 4,
+              "farthestExpected": [
+                "DigitParser",
+                "OneOrMore"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 4,
+            "farthestCp": 4,
+            "expected": [
+              "NUMBER"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "posix",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.posix",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "posix/1",
+        "input": "A",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:146:147:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "posix/2",
+        "input": "1",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "Alphabet"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "posix/3",
+        "input": "あ",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "RootParser",
+                "TParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "Alphabet"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "posix/4",
+        "input": "Az",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 1,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:146:147:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      }
+    ]
+  },
+  {
+    "slug": "predictive-extern",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.predictive_extern",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: externTokens.inputState:Probe::T\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:168)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "predictive-nullable",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.predictive_nullable",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "predictive-nullable/1",
+        "input": "x",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 5
+        }
+      },
+      {
+        "id": "predictive-nullable/2",
+        "input": "b",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'a'",
+              "'x'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 5
+        }
+      },
+      {
+        "id": "predictive-nullable/3",
+        "input": "z",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'b'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'b'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'b'"
+            ],
+            "deepestRule": "B",
+            "ruleStack": [
+              "Root",
+              "B"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "predictive",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.predictive",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "predictive/1",
+        "input": "ax",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 5
+        }
+      },
+      {
+        "id": "predictive/2",
+        "input": "az",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'x'"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'x'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'x'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "predictive/3",
+        "input": "b",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 4
+        }
+      },
+      {
+        "id": "predictive/4",
+        "input": "z",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "'b'",
+                "'x'"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "'b'",
+                "'x'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'",
+              "'b'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "predictive/5",
+        "input": "",
+        "expected": {
+          "accepted": null,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'",
+              "'b'"
+            ],
+            "deepestRule": "A",
+            "ruleStack": [
+              "Root",
+              "A"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "recovery-auto",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.recovery_auto",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: recovery.legacyMarker\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:137)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "recovery-root",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.recovery_root",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: recovery.legacyMarker\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:137)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "recovery-skip",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.recovery_skip",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: recovery.legacyMarker\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:137)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "recovery-sync",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.recovery_sync",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: recovery.legacyMarker\n\tat org.ubnfc.java.ir.Validation.unsupported(Validation.java:23)\n\tat org.ubnfc.java.ir.Validation.validate(Validation.java:137)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:34)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "regex-ascii",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.regex_ascii",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "regex-ascii/1",
+        "input": "ab!",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 2,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 2,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:122:123:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "regex-ascii/2",
+        "input": "ab",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:122:123:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      }
+    ]
+  },
+  {
+    "slug": "regex-backref",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.regex_backref",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "regex-backref/1",
+        "input": "aaaa",
+        "expected": {
+          "accepted": true,
+          "consumed": 4,
+          "matched": 4,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 4,
+          "matchedCp": 4,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:123:124:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 4
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      }
+    ]
+  },
+  {
+    "slug": "regex-emoji",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.regex_emoji",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "regex-emoji/1",
+        "input": "😀",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "REGEX('😀')"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "REGEX('😀')"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:117:118:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "regex-emoji/2",
+        "input": "😀x",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:117:118:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      }
+    ]
+  },
+  {
+    "slug": "regex-prefix",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.regex_prefix",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "regex-prefix/1",
+        "input": "😀a",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "REGEX('a')"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "REGEX('a')"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:120:121:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      },
+      {
+        "id": "regex-prefix/2",
+        "input": "😀ab",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "REGEX('a')"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "REGEX('a')"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:120:121:body/1/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 1,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 3
+        }
+      }
+    ]
+  },
+  {
+    "slug": "regex-zero",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.regex_zero",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "regex-zero/1",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "REGEX('a*')"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "REGEX('a*')"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "a*"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "regex-zero/2",
+        "input": "b",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "REGEX('a*')"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "REGEX('a*')"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "a*"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "repeat-unbounded",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.repeat_unbounded",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "repeat-unbounded/1",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "Repeat",
+                "RootBounded0Parser",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "Repeat",
+                "RootBounded0Parser",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "repeat-unbounded/2",
+        "input": "a",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 1,
+              "expected": [
+                "'a'",
+                "RootBounded0Parser"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [
+                "'a'",
+                "RootBounded0Parser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": 1,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "repeat-unbounded/3",
+        "input": "aa",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 1,
+                "end": 2
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 2,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 10
+        }
+      },
+      {
+        "id": "repeat-unbounded/4",
+        "input": "aaa!",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 3,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 3,
+              "farthestExpected": [
+                "'a'",
+                "RootBounded0Parser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 1,
+                "end": 2
+              },
+              "completionOrder": 1
+            },
+            {
+              "occurrenceId": 2,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 2,
+                "end": 3
+              },
+              "completionOrder": 2
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 3,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 14
+        }
+      }
+    ]
+  },
+  {
+    "slug": "repeat-zero",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.repeat_zero",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "repeat-zero/1",
+        "input": "",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "repeat-zero/2",
+        "input": "a",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "separated",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.separated",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "separated/1",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser",
+                "RootSep0Parser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser",
+                "RootSep0Parser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      },
+      {
+        "id": "separated/2",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 1,
+            "expected": [
+              "','"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 6
+        }
+      },
+      {
+        "id": "separated/3",
+        "input": "a,a",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 2,
+                "end": 3
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 3,
+            "expected": [
+              "','"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 11
+        }
+      },
+      {
+        "id": "separated/4",
+        "input": "a,",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 1,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 2,
+              "farthestExpected": [
+                "'a'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:98:101:body/0/0/0/0/literal/capture/0",
+              "name": "values",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 2,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 6
+        }
+      },
+      {
+        "id": "separated/5",
+        "input": ",",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser",
+                "RootSep0Parser"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser",
+                "RootSep0Parser"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "skip",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.skip",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "skip/1",
+        "input": "a,a",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:171:174:body/0/literal/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:96:100:body/0/ruleRef/capture/0",
+              "name": "items",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 1
+            },
+            {
+              "occurrenceId": 2,
+              "siteId": "expr:Probe.ubnf:171:174:body/0/literal/capture/0",
+              "name": "value",
+              "span": {
+                "start": 2,
+                "end": 3
+              },
+              "completionOrder": 2
+            },
+            {
+              "occurrenceId": 3,
+              "siteId": "expr:Probe.ubnf:116:120:body/1/0/1/ruleRef/capture/0",
+              "name": "items",
+              "span": {
+                "start": 2,
+                "end": 3
+              },
+              "completionOrder": 3
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 3,
+            "expected": [
+              "','"
+            ],
+            "deepestRule": "Comma",
+            "ruleStack": [
+              "Root",
+              "Comma"
+            ]
+          },
+          "lexicalCount": 12
+        }
+      },
+      {
+        "id": "skip/2",
+        "input": "a",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:171:174:body/0/literal/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:96:100:body/0/ruleRef/capture/0",
+              "name": "items",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 1,
+            "expected": [
+              "','"
+            ],
+            "deepestRule": "Comma",
+            "ruleStack": [
+              "Root",
+              "Comma"
+            ]
+          },
+          "lexicalCount": 5
+        }
+      },
+      {
+        "id": "skip/3",
+        "input": "a,",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 1,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 2,
+              "farthestExpected": [
+                "'a'",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:171:174:body/0/literal/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            },
+            {
+              "occurrenceId": 1,
+              "siteId": "expr:Probe.ubnf:96:100:body/0/ruleRef/capture/0",
+              "name": "items",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 1
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 2,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Item",
+            "ruleStack": [
+              "Root",
+              "Item"
+            ]
+          },
+          "lexicalCount": 5
+        }
+      },
+      {
+        "id": "skip/4",
+        "input": "",
+        "expected": {
+          "accepted": false,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": [
+            {
+              "kind": "syntax",
+              "offset": 0,
+              "expected": [
+                "'a'",
+                "RootParser",
+                "__CaptureSite"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'a'",
+                "RootParser",
+                "__CaptureSite"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": false,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "syntax",
+            "offset": 0,
+            "farthestCp": 0,
+            "expected": [
+              "'a'"
+            ],
+            "deepestRule": "Item",
+            "ruleStack": [
+              "Root",
+              "Item"
+            ]
+          },
+          "lexicalCount": 0
+        }
+      }
+    ]
+  },
+  {
+    "slug": "typeof",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.typeof",
+    "generate": 1,
+    "generatorError": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported requiredFeatures: typeof\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:28)\n\tat org.ubnfc.java.ir.IrReader.read(IrReader.java:23)\n\tat org.ubnfc.java.Main.main(Main.java:26)\n"
+  },
+  {
+    "slug": "until",
+    "front": 0,
+    "frontError": "",
+    "pkg": "audit.until",
+    "generate": 0,
+    "generatorError": "",
+    "compile": 0,
+    "compileError": "",
+    "cases": [
+      {
+        "id": "until/1",
+        "input": "abc",
+        "expected": {
+          "accepted": true,
+          "consumed": 3,
+          "matched": 3,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 3,
+          "matchedCp": 3,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:117:118:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 3
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 3,
+            "expected": [
+              "#",
+              "ANY"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "until/2",
+        "input": "😀x",
+        "expected": {
+          "accepted": true,
+          "consumed": 2,
+          "matched": 2,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 2,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:117:118:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 2
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 2,
+            "expected": [
+              "#",
+              "ANY"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "until/3",
+        "input": "😀#tail",
+        "expected": {
+          "accepted": true,
+          "consumed": 1,
+          "matched": 2,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 1,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 0,
+              "farthestExpected": [
+                "'#'"
+              ],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 1,
+          "matchedCp": 2,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:117:118:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 1
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "#"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "until/4",
+        "input": "#tail",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 1,
+          "diagnostics": [
+            {
+              "kind": "trailing_input",
+              "offset": 0,
+              "expected": [
+                "end of input"
+              ],
+              "farthestOffset": 1,
+              "farthestExpected": [],
+              "origin": "Mapper.diagnose"
+            }
+          ]
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 1,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:117:118:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": -1,
+            "expected": [],
+            "deepestRule": null,
+            "ruleStack": []
+          },
+          "lexicalCount": 2
+        }
+      },
+      {
+        "id": "until/5",
+        "input": "",
+        "expected": {
+          "accepted": true,
+          "consumed": 0,
+          "matched": 0,
+          "diagnostics": []
+        },
+        "observed": {
+          "ok": true,
+          "consumedCp": 0,
+          "matchedCp": 0,
+          "ast": null,
+          "captures": [
+            {
+              "occurrenceId": 0,
+              "siteId": "expr:Probe.ubnf:117:118:body/0/tokenRef/capture/0",
+              "name": "value",
+              "span": {
+                "start": 0,
+                "end": 0
+              },
+              "completionOrder": 0
+            }
+          ],
+          "scope": {
+            "declarations": [],
+            "references": [],
+            "diagnostics": []
+          },
+          "diagnostics": {
+            "kind": "none",
+            "offset": -1,
+            "farthestCp": 0,
+            "expected": [
+              "#",
+              "ANY"
+            ],
+            "deepestRule": "Root",
+            "ruleStack": [
+              "Root"
+            ]
+          },
+          "lexicalCount": 2
+        }
+      }
+    ]
+  }
+]
