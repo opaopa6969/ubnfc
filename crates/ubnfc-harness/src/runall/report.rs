@@ -28,18 +28,25 @@ pub struct Counts {
     pub build_failure: usize,
     pub driver_error: usize,
     pub pass: usize,
+    /// Verdict は Pass。通常の pass とは排他的に数える。
+    pub expected_rejection_pass: usize,
     pub known_divergence: usize,
     pub fail: usize,
     pub unobserved: usize,
 }
 impl Counts {
-    fn record(&mut self, outcome: Outcome) {
-        *match outcome {
+    fn record(&mut self, row: &CaseResult) {
+        *match row.outcome {
             Outcome::IrFailure => &mut self.ir_failure,
             Outcome::GenerationRejected => &mut self.generation_rejected,
             Outcome::JavacFailure => &mut self.javac_failure,
             Outcome::BuildFailure => &mut self.build_failure,
             Outcome::DriverError => &mut self.driver_error,
+            Outcome::Pass
+                if matches!(row.expected, crate::Expectation::ExpectedRejection { .. }) =>
+            {
+                &mut self.expected_rejection_pass
+            }
             Outcome::Pass => &mut self.pass,
             Outcome::KnownDivergence => &mut self.known_divergence,
             Outcome::Fail => &mut self.fail,
@@ -53,6 +60,7 @@ impl Counts {
             + self.build_failure
             + self.driver_error
             + self.pass
+            + self.expected_rejection_pass
             + self.known_divergence
             + self.fail
             + self.unobserved
@@ -127,22 +135,22 @@ impl Report {
         for row in &report.cases {
             let key = (&row.corpus, &row.case_id);
             unique.insert(key);
-            report.totals.record(row.outcome);
+            report.totals.record(row);
             report
                 .families
                 .entry(row.family.clone())
                 .or_default()
-                .record(row.outcome);
+                .record(row);
             report
                 .kinds
                 .entry(row.kind.clone())
                 .or_default()
-                .record(row.outcome);
+                .record(row);
             report
                 .grammars
                 .entry(row.grammar.clone())
                 .or_default()
-                .record(row.outcome);
+                .record(row);
             for missing in &row.missing {
                 *report
                     .missing_observations
@@ -222,17 +230,7 @@ impl Report {
             writeln!(out, "Rust 一括 cargo build --release --offline --workspace: {:.3} 秒。個別切り分け込み: {:.3} 秒、cargo 起動 {} 回。生成 {} crate、生成物 hash 重複除去後 {} crate、既存 cache hit {} 件。\n", stats.initial_build_seconds, stats.total_build_seconds, stats.cargo_invocations, stats.generated_crates, stats.unique_crates, stats.cache_hits).unwrap();
             out.push_str("JSON の build_failure / builds[].cargo は Rust、javac_failure / builds[].javac は Java の build 段階。表の build 失敗は両者の合計。比較規則は共通で、診断 offset と数値字句は backend ごとの既存 oracle を使う。\n\n");
         }
-        let rejections = self
-            .cases
-            .iter()
-            .filter(|row| {
-                row.outcome == Outcome::Pass
-                    && matches!(row.expected, crate::Expectation::ExpectedRejection { .. })
-            })
-            .count();
-        if rejections > 0 {
-            writeln!(out, "Pass のうち明示的な期待拒否: {rejections}件。build の実測失敗と診断は拒否理由表に保持する。\n").unwrap();
-        }
+        writeln!(out, "期待拒否 Pass: {}件（Verdict は Pass）。通常の Pass・IR 失敗とは別列に排他的に計上する。build の実測失敗と診断は拒否理由表に保持する。\n", self.totals.expected_rejection_pass).unwrap();
         table(&mut out, "系統", &self.families, &self.totals);
         out
     }
@@ -332,7 +330,7 @@ impl Report {
     }
 }
 fn table(out: &mut String, label: &str, rows: &BTreeMap<String, Counts>, total: &Counts) {
-    writeln!(out, "| {label} | ir 失敗 | 生成拒否 | build 失敗 | 実行エラー | Pass | Known | Fail | 未観測 |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|").unwrap();
+    writeln!(out, "| {label} | ir 失敗 | 生成拒否 | build 失敗 | 実行エラー | Pass | 期待拒否 Pass | Known | Fail | 未観測 |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|").unwrap();
     for (name, c) in rows
         .iter()
         .map(|(n, c)| (n.as_str(), c))
@@ -340,13 +338,14 @@ fn table(out: &mut String, label: &str, rows: &BTreeMap<String, Counts>, total: 
     {
         writeln!(
             out,
-            "| {} | {} | {} | {} | {} | {} | {} | {} | {} |",
+            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
             cell(name),
             c.ir_failure,
             c.generation_rejected,
             c.javac_failure + c.build_failure,
             c.driver_error,
             c.pass,
+            c.expected_rejection_pass,
             c.known_divergence,
             c.fail,
             c.unobserved
