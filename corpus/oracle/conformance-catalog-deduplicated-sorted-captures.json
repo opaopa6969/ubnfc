@@ -1,0 +1,31 @@
+{
+  "feature": "catalog",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "deduplicated-sorted-captures",
+      "input": "",
+      "catalogs": [
+        {
+          "rule": "Root",
+          "context": "variable",
+          "captures": [
+            "alpha",
+            "zeta"
+          ]
+        }
+      ]
+    }
+  ],
+  "grammar": "grammar CatalogNames { @root @catalog(context='variable') @mapping(Root, params=[zeta,alpha]) Root ::= 'z' @zeta 'Z' @zeta ':' 'a' @alpha; }",
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/RustCatalogConformanceTest.java",
+    "sha256": "da641454ac95e2ac34b29f1e57ff9a943ee87706b310562010dac6e68f892136",
+    "methods": "javaFrontendPreservesContextAndSortedLocalCapturesInIr の Java API 経路"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "catalog/corpus.json",
+  "variant": "deduplicated-sorted-captures",
+  "observation": "catalog"
+}

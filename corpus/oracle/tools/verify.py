@@ -42,7 +42,15 @@ def canonical(value, context):
 def verify(directory):
     specs = json.loads(subprocess.check_output([sys.executable, str(ROOT / 'tools/specifications.py')]))
     expected_files = {s['slug'] + '.json' for s in specs}
-    require({p.name for p in directory.glob('*.json')} == expected_files, '不足または余分な JSON ファイル')
+    actual_files = set()
+    for path in directory.glob('*.json'):
+        if path.name == 'divergences.json':
+            continue
+        data = json.loads(path.read_text())
+        if data.get('collection') == 'triage-2026-09-22':
+            continue  # 追加採取は verify-conformance.py が別途全件検証する。
+        actual_files.add(path.name)
+    require(actual_files == expected_files, '不足または余分な JSON ファイル')
     counts = collections.Counter()
     executed = collections.Counter()
     stages = collections.Counter()

@@ -43,27 +43,51 @@ pub(crate) fn evolution(path: &Path, diagnostics: bool) -> Result<CorpusFile, Lo
         Ok(out)
     } else {
         let (inputs, raw) = read::<Vec<String>>(path)?;
-        let mut out = file(Family::ExternalGrammar, path, raw);
+        let mut out = file(
+            Family::ExternalGrammar,
+            path,
+            serde_json::json!({"inputs":raw,"cases":[]}),
+        );
         for stage in 0..4 {
             let stage = stage.to_string();
-            out.grammars.push(grammar_path(
-                path.with_file_name(&stage).join("Evolution.ubnf"),
-                &stage,
-            )?);
+            let oracle_path = oracle::default_root().join(format!("evolution-v{stage}.json"));
+            let measured = oracle::load(&oracle_path)?;
+            if measured.cases.len() != inputs.len() {
+                return Err(oracle::invalid(
+                    &oracle_path,
+                    "evolution の入力件数が一致しません",
+                ));
+            }
+            let grammar_file = path.with_file_name(&stage).join("Evolution.ubnf");
+            if measured.raw["grammar"].as_str() != Some(read_text(&grammar_file)?.as_str()) {
+                return Err(oracle::invalid(
+                    &oracle_path,
+                    "evolution の採取文法が一致しません",
+                ));
+            }
+            let grammar_index = out.grammars.len();
+            out.grammars.push(grammar_path(grammar_file, &stage)?);
+            for (i, (mut case, input)) in measured.cases.into_iter().zip(&inputs).enumerate() {
+                if &case.input != input || case.id != format!("evolution/{i}") {
+                    return Err(oracle::invalid(
+                        &oracle_path,
+                        "evolution の入力順序/ID が一致しません",
+                    ));
+                }
+                if !matches!(case.expect, Expectation::Oracle { .. }) {
+                    return Err(oracle::invalid(
+                        &oracle_path,
+                        "evolution の実走 oracle がありません",
+                    ));
+                }
+                case.id = format!("evolution/v{stage}/{i}");
+                case.grammar_ref = vec![grammar_index];
+                let mut row = measured.raw["cases"][i].clone();
+                row["id"] = case.id.clone().into();
+                out.raw["cases"].as_array_mut().unwrap().push(row);
+                out.cases.push(case);
+            }
         }
-        out.cases = inputs
-            .into_iter()
-            .enumerate()
-            .map(|(i, input)| Case {
-                id: format!("evolution/{i}"),
-                grammar_ref: vec![0, 1, 2, 3],
-                entry_rule: None,
-                // upstream は Java の実行結果と比較しており、入力から期待値を捏造しない。
-                expect: Expectation::Raw(Value::String(input.clone())),
-                input,
-                known_divergences: Vec::new(),
-            })
-            .collect();
         Ok(out)
     }
 }

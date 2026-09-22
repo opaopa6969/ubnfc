@@ -1,0 +1,42 @@
+{
+  "feature": "cardinality",
+  "grammar": "grammar Cardinality {\n  @package: org.example.cardinality\n  @whitespace: javaStyle\n  token NUMBER = NumberParser\n\n  @root\n  @mapping(Container, params=[head, values, tail, flags])\n  Root ::= [ Item ] @head ':' Item % ',' @values ':' [ '!' ] @tail ':' { 'x' } @flags ;\n\n  @mapping(Item, params=[value])\n  Item ::= Digits @value ';' ;\n  Digits ::= NUMBER ;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "Cardinality.ubnf/0",
+      "input": ":::",
+      "accepted": false
+    },
+    {
+      "id": "Cardinality.ubnf/1",
+      "input": "1;:2;3;:!:xxx",
+      "accepted": false
+    },
+    {
+      "id": "Cardinality.ubnf/4",
+      "input": ":2;3;4;::",
+      "accepted": false
+    },
+    {
+      "id": "Cardinality.ubnf/5",
+      "input": "1;:::x",
+      "accepted": false
+    },
+    {
+      "id": "Cardinality.ubnf/6",
+      "input": " /*😀*/ 1; : 2; 3; : ! : xx",
+      "accepted": false
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/RustConformanceTest.java",
+    "sha256": "b3e69ebb9375cbccf28356ecdd6dc54cf39fa755fc12dc815c24f44f3dd9b17e",
+    "methods": "compileJava; cardinalityPreservesOptionalListsSpansAndEvaluation / rustMixedCorpus の Java 観測"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "cardinality/corpus.json",
+  "variant": "separated",
+  "observation": "cardinality"
+}

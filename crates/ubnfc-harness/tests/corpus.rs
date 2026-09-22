@@ -35,7 +35,7 @@ fn every_required_file_loads_with_the_measured_counts() {
         ("mixed-values/corpus.json", Rule, 23),
         ("mixed-values/delimited-corpus.json", Rule, 15),
         ("mixed-values/shared-corpus.json", Rule, 11),
-        ("evolution/conformance.json", ExternalGrammar, 37),
+        ("evolution/conformance.json", ExternalGrammar, 148),
         ("evolution/diagnostics.json", ExternalGrammar, 8),
         ("associative/corpus.json", ExternalGrammar, 24),
         ("right-associative/corpus.json", ExternalGrammar, 28),
@@ -44,7 +44,7 @@ fn every_required_file_loads_with_the_measured_counts() {
         ("scope-store/corpus.json", Operations, 9),
         ("catalog/corpus.json", Operations, 2),
     ];
-    assert_eq!(corpus().len(), expected.len() + 63);
+    assert_eq!(corpus().len(), expected.len() + 107);
     for (suffix, family, count) in expected {
         let file = file(suffix);
         assert_eq!((file.family, file.cases.len()), (family, count), "{suffix}");
@@ -93,7 +93,7 @@ fn every_required_file_loads_with_the_measured_counts() {
                 ExternalGrammar,
                 Counts {
                     files: 6,
-                    cases: 124
+                    cases: 235
                 }
             ),
             (
@@ -106,14 +106,14 @@ fn every_required_file_loads_with_the_measured_counts() {
             (
                 Oracle,
                 Counts {
-                    files: 63,
-                    cases: 168
+                    files: 107,
+                    cases: 398
                 }
             ),
         ])
     );
     let total: usize = corpus().iter().map(|file| file.cases.len()).sum();
-    assert_eq!(total, 871);
+    assert_eq!(total, 1212);
 }
 
 // 各元 row の期待値キーを正規化側と照合。型付けによるキーや null の欠落を検出する。
@@ -141,6 +141,13 @@ fn original_oracles_and_metadata_survive_normalization_and_serde_roundtrip() {
         let serialized = serde_json::to_value(file).unwrap();
         let restored: CorpusFile = serde_json::from_value(serialized).unwrap();
         assert_eq!(*file, restored, "{}", file.path.display());
+        if file.path.ends_with("evolution/conformance.json") {
+            let raw: Value =
+                serde_json::from_str(&std::fs::read_to_string(&file.path).unwrap()).unwrap();
+            assert_eq!(file.raw["inputs"], raw);
+            // 版別 sidecar との全項目照合は conformance_oracle.rs。
+            continue;
+        }
         if !file.path.ends_with("catalog/corpus.json") {
             let raw: Value =
                 serde_json::from_str(&std::fs::read_to_string(&file.path).unwrap()).unwrap();
@@ -232,12 +239,9 @@ fn prefix_full_acceptance_null_and_backend_specific_expectations_stay_distinct()
 fn grammar_variants_and_catalog_metadata_are_preserved_without_inventing_an_oracle() {
     let evolution = file("evolution/conformance.json");
     assert_eq!(evolution.grammars.len(), 4);
-    for case in &evolution.cases {
-        assert_eq!(case.grammar_ref, [0, 1, 2, 3]);
-        assert_eq!(
-            case.expect,
-            Expectation::Raw(Value::String(case.input.clone()))
-        );
+    for (i, case) in evolution.cases.iter().enumerate() {
+        assert_eq!(case.grammar_ref, [i / 37]);
+        assert!(matches!(case.expect, Expectation::Oracle { .. }));
     }
     for (suffix, count) in [
         ("right-associative/corpus.json", 4),

@@ -1,0 +1,138 @@
+{
+  "feature": "CI",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token T=CI('let')\n @root @mapping(Value, params=[value]) Root ::=  T @value ;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "ci/1",
+      "input": "LeT",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "value": "LeT"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            3
+          ],
+          "text": "LeT"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": []
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "ci/3",
+      "input": "LET",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "value": "LET"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            3
+          ],
+          "text": "LET"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": []
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "c5375f73bb86e35d30639fbbaa59005ee8cbf039293e54cc330019c361069253",
+    "org/example/oracle/ProbeMapper.java": "87c4d92f1b9d6b7d8bcff1d4df542f0b9d341294964d9af64a70de6b523ccb46",
+    "org/example/oracle/ProbeParsers.java": "466507dcd22ffcd83b7704d272c18076da2f67aad522cd82a3fd99ae7c32e03f"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/reobserved-ci/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed",
+  "collection": "triage-2026-09-22",
+  "origin": "oracle/ci.json",
+  "variant": "CI",
+  "observation": "oracle"
+}

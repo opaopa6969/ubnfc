@@ -1,0 +1,165 @@
+{
+  "feature": "scope-annotations",
+  "grammar": "grammar NestedModes { @package: org.example.scopeannotations token ID = org.unlaxer.parser.clang.IdentifierParser @root @scopeTree(mode=lexical) @mapping(Root, params=[block]) Root ::= Block @block; @scopeTree(mode=dynamic) @mapping(Block, params=[outer,inner,after]) Block ::= '{' Decl @outer Inner @inner Ref @after '}'; @scopeTree(mode=lexical) @mapping(Inner, params=[decl,ref]) Inner ::= '[' Decl @decl Ref @ref ']'; @declares(symbol=name) @mapping(Decl, params=[name]) Decl ::= ID @name ';'; @backref(name=name) @mapping(Ref, params=[name]) Ref ::= ID @name ';'; }",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "nested-lexical-dynamic/shadow-then-resolve-outer-after-leave",
+      "input": "{x;[x;x;]x;}",
+      "accepted": true,
+      "prefix": [
+        true,
+        12,
+        12
+      ],
+      "scope": {
+        "depth": 0,
+        "resolved": [
+          {
+            "query": "x",
+            "symbol": null
+          }
+        ],
+        "declarations": [
+          {
+            "name": "x",
+            "sourceOffset": 1
+          },
+          {
+            "name": "x",
+            "sourceOffset": 4
+          }
+        ],
+        "references": [
+          {
+            "name": "x",
+            "offset": 6,
+            "length": 1
+          },
+          {
+            "name": "x",
+            "offset": 9,
+            "length": 1
+          }
+        ],
+        "diagnostics": []
+      },
+      "rollback": null,
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          12
+        ],
+        "fields": {
+          "block": {
+            "type": "Block",
+            "span": [
+              0,
+              12
+            ],
+            "fields": {
+              "outer": {
+                "type": "Decl",
+                "span": [
+                  1,
+                  3
+                ],
+                "fields": {
+                  "name": "x"
+                }
+              },
+              "inner": {
+                "type": "Inner",
+                "span": [
+                  3,
+                  9
+                ],
+                "fields": {
+                  "decl": {
+                    "type": "Decl",
+                    "span": [
+                      4,
+                      6
+                    ],
+                    "fields": {
+                      "name": "x"
+                    }
+                  },
+                  "ref": {
+                    "type": "Ref",
+                    "span": [
+                      6,
+                      8
+                    ],
+                    "fields": {
+                      "name": "x"
+                    }
+                  }
+                }
+              },
+              "after": {
+                "type": "Ref",
+                "span": [
+                  9,
+                  11
+                ],
+                "fields": {
+                  "name": "x"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "queries": [
+    "x"
+  ],
+  "metadata": [
+    {
+      "rule": "Root",
+      "scope": "lexical",
+      "declares": null,
+      "backref": null
+    },
+    {
+      "rule": "Block",
+      "scope": "dynamic",
+      "declares": null,
+      "backref": null
+    },
+    {
+      "rule": "Inner",
+      "scope": "lexical",
+      "declares": null,
+      "backref": null
+    },
+    {
+      "rule": "Decl",
+      "scope": null,
+      "declares": {
+        "symbol": "name",
+        "description": null
+      },
+      "backref": null
+    },
+    {
+      "rule": "Ref",
+      "scope": null,
+      "declares": null,
+      "backref": "name"
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/ScopeAnnotationConformanceTest.java",
+    "sha256": "73bd27e60ae50ecc5e31a87c627cc4a9ff89e5f38cd7e209519e16502c58c030",
+    "methods": "parseJava, javaMetadata, canonical"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "scope-annotations/corpus.json",
+  "variant": "nested-lexical-dynamic",
+  "observation": "scope-annotations"
+}

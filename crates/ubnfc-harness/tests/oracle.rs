@@ -88,16 +88,20 @@ fn all_63_variants_and_168_cases_keep_their_measured_counts_and_stages() {
     .collect::<BTreeMap<_, _>>();
     let actual = corpus()
         .iter()
+        .filter(|file| file.raw.get("collection").is_none())
         .map(|f| (f.path.file_stem().unwrap().to_str().unwrap(), f.cases.len()))
         .collect::<BTreeMap<_, _>>();
     assert_eq!(actual, expected);
-    assert_eq!(corpus().len(), 63);
+    assert_eq!(actual.len(), 63);
     assert_eq!(actual.values().sum::<usize>(), 168);
     assert!(corpus().windows(2).all(|f| f[0].path < f[1].path));
 
     let mut stages = BTreeMap::<&str, (usize, usize)>::new();
     let mut outcomes = [0; 4];
-    for file in corpus() {
+    for file in corpus()
+        .iter()
+        .filter(|f| f.raw.get("collection").is_none())
+    {
         let stage = file.raw["stage"].as_str().unwrap();
         let count = stages.entry(stage).or_default();
         count.0 += 1;
@@ -145,7 +149,10 @@ fn all_63_variants_and_168_cases_keep_their_measured_counts_and_stages() {
 
 #[test]
 fn observations_imports_errors_and_source_revision_survive_normalization() {
-    for file in corpus() {
+    for file in corpus()
+        .iter()
+        .filter(|f| f.raw.get("collection").is_none())
+    {
         assert_eq!(file.family, Family::Oracle);
         let raw: Value = serde_json::from_str(&fs::read_to_string(&file.path).unwrap()).unwrap();
         assert_eq!(file.raw, raw);

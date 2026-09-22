@@ -65,7 +65,7 @@ pub struct CorpusFile {
     pub path: PathBuf,
     pub grammars: Vec<GrammarSource>,
     pub cases: Vec<Case>,
-    /// 寛容処理後の元 JSON 全体。未知の fixture metadata も欠落させない。
+    /// 寛容処理後の元 JSON 全体。evolution 入力列は inputs、採取済み観測は cases に保持。
     pub raw: Value,
 }
 
@@ -118,7 +118,7 @@ pub enum Expectation {
         evidence: String,
         original: Box<Expectation>,
     },
-    /// 例: evolution/conformance.json は入力列だけで独立した結果 oracle がない。
+    /// 保存済みの比較 oracle がない入力。未観測を成功に読み替えない。
     Raw(Value),
 }
 

@@ -1,0 +1,67 @@
+{
+  "feature": "mixed-values",
+  "grammar": "grammar Mixed {\n  @package: org.example.mixed\n  @whitespace: javaStyle\n  token STRING = SingleQuotedParser\n  @root @mapping(Root, params=[head, maybe, items])\n  Document ::= Factor @head ':' [ Factor @maybe ] ':' { Factor @items };\n  Factor ::= 'a' | '😀' | STRING | LeafRule;\n  @mapping(Leaf, params=[value]) LeafRule ::= 'x' @value;\n  @mapping(OtherLeaf, params=[value]) OtherRule ::= 'y' @value;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "stage": "executed",
+  "cases": [
+    {
+      "id": "Mixed.ubnf/2",
+      "input": "y::",
+      "accepted": false,
+      "prefix": [
+        false,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Mixed.ubnf/3",
+      "input": "a:x:axy",
+      "accepted": false,
+      "prefix": [
+        true,
+        6,
+        6
+      ]
+    },
+    {
+      "id": "Mixed.ubnf/4",
+      "input": "x:a:yaa",
+      "accepted": false,
+      "prefix": [
+        true,
+        4,
+        4
+      ]
+    },
+    {
+      "id": "Mixed.ubnf/5",
+      "input": "😀:y:😀x😀",
+      "accepted": false,
+      "prefix": [
+        false,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Mixed.ubnf/6",
+      "input": "'b'::'c'xy'a'",
+      "accepted": false,
+      "prefix": [
+        true,
+        9,
+        9
+      ]
+    }
+  ],
+  "observer": {
+    "path": "unlaxer-dsl/src/test/java/org/unlaxer/dsl/codegen/RustConformanceTest.java",
+    "sha256": "b3e69ebb9375cbccf28356ecdd6dc54cf39fa755fc12dc815c24f44f3dd9b17e",
+    "methods": "compileJava; cardinalityPreservesOptionalListsSpansAndEvaluation / rustMixedCorpus の Java 観測"
+  },
+  "collection": "triage-2026-09-22",
+  "origin": "mixed-values/corpus.json",
+  "variant": "one",
+  "observation": "mixed-values"
+}

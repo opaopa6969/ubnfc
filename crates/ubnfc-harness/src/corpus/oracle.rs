@@ -53,8 +53,11 @@ struct OracleCase {
     consumed: Option<usize>,
     matched: Option<usize>,
     ast: Option<AstValue>,
+    #[serde(default)]
     captures: Vec<Capture>,
+    #[serde(default)]
     declarations: Vec<operations::Declaration>,
+    #[serde(default)]
     diagnostics: Vec<Diagnostic>,
     mapping_error: Option<String>,
 }
@@ -90,12 +93,13 @@ struct Compilation {
 #[derive(Deserialize)]
 struct Fixture {
     feature: String,
-    grammar: String,
+    grammar: Option<String>,
     source: String,
     stage: Stage,
     cases: Vec<OracleCase>,
-    generation: Generation,
+    generation: Option<Generation>,
     compilation: Option<Compilation>,
+    observation: Option<String>,
 }
 
 /// unlaxer-parser の root や呼出時 cwd と独立した、この checkout の oracle。
@@ -133,19 +137,62 @@ pub fn load(path: &Path) -> Result<CorpusFile, LoadError> {
                 serde_json::to_string(&compilation.diagnostics).expect("診断は JSON に直列化可能")
             ))
         }
-        Stage::GenerationFailed => Some(format!(
-            "generation_failed: {}",
-            serde_json::to_string(&fixture.generation).expect("生成結果は JSON に直列化可能")
-        )),
+        Stage::GenerationFailed => {
+            let generation = fixture
+                .generation
+                .ok_or_else(|| invalid(path, "generation_failed に生成診断がありません"))?;
+            Some(format!(
+                "generation_failed: {}",
+                serde_json::to_string(&generation).expect("生成結果は JSON に直列化可能")
+            ))
+        }
     };
-    out.grammars.push(GrammarSource::Inline {
-        name: fixture.feature,
-        source: fixture.grammar,
-        // source revision、imports、parseError 等も raw/metadata で完全に保持する。
-        metadata: metadata(&out.raw),
-    });
+    let observation = fixture.observation.as_deref().unwrap_or("oracle");
+    if !matches!(
+        observation,
+        "oracle"
+            | "evolution"
+            | "cardinality"
+            | "mixed-values"
+            | "nested-captures"
+            | "scope-annotations"
+            | "scope-store"
+            | "catalog"
+    ) {
+        return Err(invalid(path, format!("未知の observation: {observation}")));
+    }
+    if observation != "scope-store" {
+        out.grammars.push(GrammarSource::Inline {
+            name: fixture.feature,
+            source: fixture
+                .grammar
+                .ok_or_else(|| invalid(path, "parser/catalog oracle に grammar がありません"))?,
+            // source revision、imports、parseError 等も raw/metadata で完全に保持する。
+            metadata: metadata(&out.raw),
+        });
+    }
     let mut ids = BTreeSet::new();
-    for row in fixture.cases {
+    for (index, row) in fixture.cases.into_iter().enumerate() {
+        if matches!(observation, "oracle" | "evolution") {
+            for key in [
+                "accepted",
+                "allConsumed",
+                "consumed",
+                "matched",
+                "ast",
+                "captures",
+                "declarations",
+                "diagnostics",
+                "mappingError",
+            ] {
+                if out.raw["cases"][index].get(key).is_none() {
+                    return Err(invalid(
+                        path,
+                        format!("oracle の必須観測キーがありません: {key}"),
+                    ));
+                }
+            }
+        }
         if row.id.is_empty() || !ids.insert(row.id.clone()) {
             return Err(invalid(
                 path,
@@ -168,6 +215,22 @@ pub fn load(path: &Path) -> Result<CorpusFile, LoadError> {
                 mapping_error: row.mapping_error,
             },
         };
+        if failure.is_none() {
+            // 文法解析と操作列・静的 metadata を区別する。観測しない配列を空と捏造しない。
+            let mut measured = out.raw["cases"][index].clone();
+            let object = measured.as_object_mut().expect("case は object");
+            object.remove("id");
+            object.remove("input");
+            let text = measured.to_string();
+            expect = match observation {
+                "cardinality" | "mixed-values" | "nested-captures" | "scope-annotations" => {
+                    Expectation::Ast(Box::new(decode(path, &text)?))
+                }
+                "scope-store" => Expectation::ScopeOps(decode(path, &text)?),
+                "catalog" => Expectation::Catalog(decode(path, &text)?),
+                _ => expect,
+            };
+        }
         // resolve.rs:143-155 は循環 import を明示的に拒否する契約。
         // 採取済み apiError と照合する。RustConformanceTest.java:391-455 の
         // reversed-metadata は正のテストなのでこの扱いにしない。
@@ -188,7 +251,11 @@ pub fn load(path: &Path) -> Result<CorpusFile, LoadError> {
         }
         out.cases.push(Case {
             id: row.id,
-            grammar_ref: vec![0],
+            grammar_ref: if observation == "scope-store" {
+                Vec::new()
+            } else {
+                vec![0]
+            },
             // grammar の @root に従う。rule 名を決め打ちしない。
             entry_rule: None,
             input: row.input,
