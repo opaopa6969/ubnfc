@@ -66,3 +66,7 @@
 - 反復: 成功後に count++ → 進捗・max 確認。ゼロ幅成功も 1 回と数える。
 - **訂正**: `(NUMBER) @value`（group 包み）は既存生成器では `String` 型（generators.md #132）。手書き Java 目標は指示ミスで
   `int` にしている。lowering / backend は既存 `MapperTypeResolver` を正とする。
+- Rust（`examples/handwritten-target/rust`、68 テスト）: ベンチ（release、µs/parse、100,000 回 × 5 run 中央値）
+  `1+2*3` 2.32 / 3.32、括弧深さ 8: 20.0 / 26.1、512 atom: **1,015 / 1,062**。
+  **Rust が Java より遅い（512 atom で 2.5 倍）。M5 の最優先調査項目**（疑い: memo の `HashMap` 全 rule 適用、
+  レシピ arena の割当、trivia skip の重複）。数値評価は浮動小数点（既存 Java テストの解釈）。
