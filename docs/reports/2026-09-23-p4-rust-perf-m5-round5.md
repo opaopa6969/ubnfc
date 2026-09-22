@@ -25,6 +25,13 @@ complex AST 0.140 → 0.136、complex-x4 0.546 → 0.518、complex-x16 2.032 →
 （AST 12.43 → 12.59、対照の認識も 6.82 → 6.82 で雑音に埋もれている）。
 **確保の値は dede59f 上でも下の表と完全に同じ**なので、下の A/B（1788228 基準、load 4〜5 の窓）を本 round の結果とする。
 
+その後さらに master へ `perf/rust-profile`（9e97776、guard 再生の省略）が入ったので、これも merge して
+生成物を再生成し、test / clippy / fmt / corpus を取り直した（corpus は master 側の
+`2026-09-23-rust-corpus-profile.md` と一致）。この時点の branch の値は
+complex 認識 0.098 / AST **0.130** ms（確保 320 / 31,769、676 / 112,532）、
+complex-x64 認識 6.471 / AST **11.587** ms（確保 18,706 / 729,715、40,629 / 5,690,292）。
+本 round の寄与だけを切り出した A/B は下の表（1788228 基準）で読むこと。
+
 ## 結論
 
 - **finish（AST 付きの後処理）が 8〜11% 速くなった**。同一 run 内の `AST − 認識` で見ると
