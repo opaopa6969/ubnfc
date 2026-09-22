@@ -1,0 +1,553 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:error.ubnf:80:101:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": "trie:expr:error.ubnf:80:101:body/choice"
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:error.ubnf:80:83:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "preserve",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "preserve",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:error.ubnf:86:101:body/1/error",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [
+      {
+        "id": "trie:expr:error.ubnf:80:101:body/choice",
+        "maxDepth": 1,
+        "nodes": [
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:error.ubnf:80:83:body/0/literal",
+              "expr:error.ubnf:86:101:body/1/error"
+            ],
+            "completedCandidateExprIds": [],
+            "edges": [
+              {
+                "codePoint": 97,
+                "target": 1
+              }
+            ],
+            "index": 0,
+            "unknownCandidateExprIds": [
+              "expr:error.ubnf:86:101:body/1/error"
+            ]
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:error.ubnf:80:83:body/0/literal",
+              "expr:error.ubnf:86:101:body/1/error"
+            ],
+            "completedCandidateExprIds": [
+              "expr:error.ubnf:80:83:body/0/literal"
+            ],
+            "edges": [],
+            "index": 1,
+            "unknownCandidateExprIds": [
+              "expr:error.ubnf:86:101:body/1/error"
+            ]
+          }
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::Root",
+        "sccId": "scc:0"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::Root"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Probe",
+    "ruleId": "Probe::Root"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Probe",
+      "name": "Probe",
+      "package": "org.example.oracle",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": null
+      },
+      "source": {
+        "end": 104,
+        "sourceId": "error.ubnf",
+        "start": 0
+      },
+      "sourceId": "error.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [
+      {
+        "candidateOrder": [
+          "expr:error.ubnf:80:83:body/0/literal",
+          "expr:error.ubnf:86:101:body/1/error"
+        ],
+        "exprId": "expr:error.ubnf:80:101:body/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": "trie:expr:error.ubnf:80:101:body/choice"
+      }
+    ],
+    "lexical": [],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:error.ubnf:80:101:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:error.ubnf:80:83:body/0/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:error.ubnf:86:101:body/1/error",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "conservative",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "memoReplay",
+    "orderedChoice",
+    "structuredOccurrences"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "ProbeAST",
+        "kind": "transparentUnion",
+        "name": "ProbeAST",
+        "variants": [
+          "ProbeAST.Value"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [],
+        "id": "ProbeAST.Value",
+        "implements": [
+          "ProbeAST"
+        ],
+        "kind": "record",
+        "name": "Value"
+      }
+    ],
+    "captures": [],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:error.ubnf:80:83:body/0/literal",
+          "java": "'a'",
+          "rust": "a"
+        },
+        {
+          "exprId": "expr:error.ubnf:86:101:body/1/error",
+          "java": "need a",
+          "rust": "need a"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:error.ubnf:80:101:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:error.ubnf:80:83:body/0/literal",
+            "expr:error.ubnf:86:101:body/1/error"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 101,
+          "sourceId": "error.ubnf",
+          "start": 80
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'a'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:error.ubnf:80:83:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 83,
+          "sourceId": "error.ubnf",
+          "start": 80
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "need a",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:error.ubnf:86:101:body/1/error",
+        "node": {
+          "kind": "error",
+          "message": "need a"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 101,
+          "sourceId": "error.ubnf",
+          "start": 86
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [],
+        "id": "recipe:Root",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.Value",
+        "ruleId": "Probe::Root",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 54,
+              "sourceId": "error.ubnf",
+              "start": 49
+            }
+          },
+          {
+            "arguments": {
+              "className": "Value",
+              "params": []
+            },
+            "name": "mapping",
+            "source": {
+              "end": 70,
+              "sourceId": "error.ubnf",
+              "start": 55
+            }
+          }
+        ],
+        "body": "expr:error.ubnf:80:101:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": "ProbeAST.Value",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::Root",
+        "triviaPolicyId": "trivia:none"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::Root",
+        "kind": "rule",
+        "name": "Root",
+        "originalName": "Root",
+        "qualifiedSymbolId": "Probe::Root",
+        "source": {
+          "end": 102,
+          "sourceId": "error.ubnf",
+          "start": 71
+        },
+        "sourceId": "error.ubnf"
+      }
+    ],
+    "tokens": [],
+    "trivia": {
+      "insertionPlan": [],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [],
+          "id": "trivia:none",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": null
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 105,
+      "id": "error.ubnf",
+      "path": "error.ubnf",
+      "sha256": "dd4b859105bdc1aebd89ea44e31f05abb282d2a86b8622634e598aeebfda8b37"
+    }
+  ],
+  "version": 1
+}

@@ -1,0 +1,1391 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:100:133:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 98,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 3,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:100:104:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 98,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:111:114:body/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 58,
+              "start": 58
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:129:133:body/2/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 98,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:166:171:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 98,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:166:167:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:170:171:body/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 98,
+              "start": 98
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:191:194:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:191:194:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 97,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:214:217:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 98,
+              "start": 98
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:typeof.ubnf:214:217:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 98,
+              "start": 98
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::Root",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::Item",
+        "sccId": "scc:1"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::A",
+        "sccId": "scc:2"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::B",
+        "sccId": "scc:3"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::Root"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::Item"
+        ]
+      },
+      {
+        "id": "scc:2",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::A"
+        ]
+      },
+      {
+        "id": "scc:3",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::B"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Probe",
+    "ruleId": "Probe::Root"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Probe",
+      "name": "Probe",
+      "package": "org.example.oracle",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": null
+      },
+      "source": {
+        "end": 220,
+        "sourceId": "typeof.ubnf",
+        "start": 0
+      },
+      "sourceId": "typeof.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [
+      {
+        "candidateOrder": [
+          "expr:typeof.ubnf:166:167:body/0/ruleRef",
+          "expr:typeof.ubnf:170:171:body/1/ruleRef"
+        ],
+        "exprId": "expr:typeof.ubnf:166:171:body/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": null
+      }
+    ],
+    "lexical": [],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:typeof.ubnf:100:133:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:typeof.ubnf:100:104:body/0/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:typeof.ubnf:100:133:body/seq",
+              "expr:typeof.ubnf:100:104:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:typeof.ubnf:111:114:body/1/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:typeof.ubnf:100:133:body/seq",
+              "expr:typeof.ubnf:111:114:body/1/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:typeof.ubnf:129:133:body/2/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:typeof.ubnf:100:133:body/seq",
+              "expr:typeof.ubnf:129:133:body/2/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:typeof.ubnf:166:171:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:typeof.ubnf:166:167:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:typeof.ubnf:170:171:body/1/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:typeof.ubnf:191:194:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:typeof.ubnf:191:194:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:typeof.ubnf:191:194:body/seq",
+              "expr:typeof.ubnf:191:194:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:typeof.ubnf:214:217:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:typeof.ubnf:214:217:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:typeof.ubnf:214:217:body/seq",
+              "expr:typeof.ubnf:214:217:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "memoReplay",
+    "orderedChoice",
+    "structuredOccurrences",
+    "typeof"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "ProbeAST",
+        "kind": "transparentUnion",
+        "name": "ProbeAST",
+        "variants": [
+          "ProbeAST.Pair",
+          "ProbeAST.Node"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "left",
+            "valueType": {
+              "kind": "node",
+              "typeId": "ProbeAST.Node"
+            }
+          },
+          {
+            "cardinality": "scalar",
+            "name": "right",
+            "valueType": {
+              "kind": "node",
+              "typeId": "ProbeAST.Node"
+            }
+          }
+        ],
+        "id": "ProbeAST.Pair",
+        "implements": [
+          "ProbeAST"
+        ],
+        "kind": "record",
+        "name": "Pair"
+      },
+      {
+        "enclosingTypeId": null,
+        "id": "ProbeAST.Node",
+        "kind": "transparentUnion",
+        "name": "Node",
+        "variants": [
+          "ProbeAST.A",
+          "ProbeAST.B"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [],
+        "id": "ProbeAST.A",
+        "implements": [
+          "ProbeAST.Node"
+        ],
+        "kind": "record",
+        "name": "A"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [],
+        "id": "ProbeAST.B",
+        "implements": [
+          "ProbeAST.Node"
+        ],
+        "kind": "record",
+        "name": "B"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:typeof.ubnf:100:104:body/0/ruleRef",
+        "name": "left",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Probe::Root",
+        "siteId": "expr:typeof.ubnf:100:104:body/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "ProbeAST.Node"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:typeof.ubnf:129:133:body/2/ruleRef",
+        "name": "right",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Probe::Root",
+        "siteId": "expr:typeof.ubnf:129:133:body/2/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "ProbeAST.Node"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:typeof.ubnf:111:114:body/1/literal",
+          "java": "':'",
+          "rust": ":"
+        },
+        {
+          "exprId": "expr:typeof.ubnf:191:194:body/0/literal",
+          "java": "'a'",
+          "rust": "a"
+        },
+        {
+          "exprId": "expr:typeof.ubnf:214:217:body/0/literal",
+          "java": "'b'",
+          "rust": "b"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:typeof.ubnf:100:133:body/seq",
+        "node": {
+          "items": [
+            "expr:typeof.ubnf:100:104:body/0/ruleRef",
+            "expr:typeof.ubnf:111:114:body/1/literal",
+            "expr:typeof.ubnf:129:133:body/2/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 133,
+          "sourceId": "typeof.ubnf",
+          "start": 100
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:typeof.ubnf:100:104:body/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:typeof.ubnf:100:104:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Probe::Item"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 104,
+          "sourceId": "typeof.ubnf",
+          "start": 100
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "':'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:typeof.ubnf:111:114:body/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 114,
+          "sourceId": "typeof.ubnf",
+          "start": 111
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:typeof.ubnf:129:133:body/2/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:typeof.ubnf:129:133:body/2/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Probe::Item"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 133,
+          "sourceId": "typeof.ubnf",
+          "start": 129
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:typeof.ubnf:166:171:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:typeof.ubnf:166:167:body/0/ruleRef",
+            "expr:typeof.ubnf:170:171:body/1/ruleRef"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Probe::Item",
+        "source": {
+          "end": 171,
+          "sourceId": "typeof.ubnf",
+          "start": 166
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:typeof.ubnf:166:167:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Probe::A"
+        },
+        "ruleId": "Probe::Item",
+        "source": {
+          "end": 167,
+          "sourceId": "typeof.ubnf",
+          "start": 166
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:typeof.ubnf:170:171:body/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Probe::B"
+        },
+        "ruleId": "Probe::Item",
+        "source": {
+          "end": 171,
+          "sourceId": "typeof.ubnf",
+          "start": 170
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:typeof.ubnf:191:194:body/seq",
+        "node": {
+          "items": [
+            "expr:typeof.ubnf:191:194:body/0/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Probe::A",
+        "source": {
+          "end": 194,
+          "sourceId": "typeof.ubnf",
+          "start": 191
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'a'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:typeof.ubnf:191:194:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "ruleId": "Probe::A",
+        "source": {
+          "end": 194,
+          "sourceId": "typeof.ubnf",
+          "start": 191
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:typeof.ubnf:214:217:body/seq",
+        "node": {
+          "items": [
+            "expr:typeof.ubnf:214:217:body/0/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Probe::B",
+        "source": {
+          "end": 217,
+          "sourceId": "typeof.ubnf",
+          "start": 214
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'b'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:typeof.ubnf:214:217:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "b",
+          "wordBoundary": false
+        },
+        "ruleId": "Probe::B",
+        "source": {
+          "end": 217,
+          "sourceId": "typeof.ubnf",
+          "start": 214
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "left",
+            "siteIds": [
+              "expr:typeof.ubnf:100:104:body/0/ruleRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "right",
+            "siteIds": [
+              "expr:typeof.ubnf:129:133:body/2/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Root",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.Pair",
+        "ruleId": "Probe::Root",
+        "transformId": null
+      },
+      {
+        "fields": [],
+        "id": "recipe:Item",
+        "kind": "transparent",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.Node",
+        "ruleId": "Probe::Item",
+        "transformId": null
+      },
+      {
+        "fields": [],
+        "id": "recipe:A",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.A",
+        "ruleId": "Probe::A",
+        "transformId": null
+      },
+      {
+        "fields": [],
+        "id": "recipe:B",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.B",
+        "ruleId": "Probe::B",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 54,
+              "sourceId": "typeof.ubnf",
+              "start": 49
+            }
+          },
+          {
+            "arguments": {
+              "className": "Pair",
+              "params": [
+                "left",
+                "right"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 90,
+              "sourceId": "typeof.ubnf",
+              "start": 55
+            }
+          }
+        ],
+        "body": "expr:typeof.ubnf:100:133:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "left",
+          "right"
+        ],
+        "mappingTypeId": "ProbeAST.Pair",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::Root",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Node",
+              "params": []
+            },
+            "name": "mapping",
+            "source": {
+              "end": 156,
+              "sourceId": "typeof.ubnf",
+              "start": 142
+            }
+          }
+        ],
+        "body": "expr:typeof.ubnf:166:171:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": "ProbeAST.Node",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::Item",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "A",
+              "params": []
+            },
+            "name": "mapping",
+            "source": {
+              "end": 184,
+              "sourceId": "typeof.ubnf",
+              "start": 173
+            }
+          }
+        ],
+        "body": "expr:typeof.ubnf:191:194:body/seq",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": "ProbeAST.A",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::A",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "B",
+              "params": []
+            },
+            "name": "mapping",
+            "source": {
+              "end": 207,
+              "sourceId": "typeof.ubnf",
+              "start": 196
+            }
+          }
+        ],
+        "body": "expr:typeof.ubnf:214:217:body/seq",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": "ProbeAST.B",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::B",
+        "triviaPolicyId": "trivia:none"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::Root",
+        "kind": "rule",
+        "name": "Root",
+        "originalName": "Root",
+        "qualifiedSymbolId": "Probe::Root",
+        "source": {
+          "end": 141,
+          "sourceId": "typeof.ubnf",
+          "start": 91
+        },
+        "sourceId": "typeof.ubnf"
+      },
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::Item",
+        "kind": "rule",
+        "name": "Item",
+        "originalName": "Item",
+        "qualifiedSymbolId": "Probe::Item",
+        "source": {
+          "end": 172,
+          "sourceId": "typeof.ubnf",
+          "start": 157
+        },
+        "sourceId": "typeof.ubnf"
+      },
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::A",
+        "kind": "rule",
+        "name": "A",
+        "originalName": "A",
+        "qualifiedSymbolId": "Probe::A",
+        "source": {
+          "end": 195,
+          "sourceId": "typeof.ubnf",
+          "start": 185
+        },
+        "sourceId": "typeof.ubnf"
+      },
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::B",
+        "kind": "rule",
+        "name": "B",
+        "originalName": "B",
+        "qualifiedSymbolId": "Probe::B",
+        "source": {
+          "end": 218,
+          "sourceId": "typeof.ubnf",
+          "start": 208
+        },
+        "sourceId": "typeof.ubnf"
+      }
+    ],
+    "tokens": [],
+    "trivia": {
+      "insertionPlan": [],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [],
+          "id": "trivia:none",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": null
+          }
+        }
+      ]
+    },
+    "typeofConstraints": [
+      {
+        "comparisonKind": "runtimeClassEquality",
+        "mismatch": "mappingFailure",
+        "ownCapture": "expr:typeof.ubnf:129:133:body/2/ruleRef/capture/0",
+        "phase": "mapping",
+        "referencedCapture": "expr:typeof.ubnf:100:104:body/0/ruleRef/capture/0",
+        "siteId": "expr:typeof.ubnf:129:133:body/2/ruleRef/typeof/0"
+      }
+    ]
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 221,
+      "id": "typeof.ubnf",
+      "path": "typeof.ubnf",
+      "sha256": "a10b748968ecc1852a4a1c529f2a0ea3d2f120180bfd4df9298a6d905b1f1686"
+    }
+  ],
+  "version": 1
+}

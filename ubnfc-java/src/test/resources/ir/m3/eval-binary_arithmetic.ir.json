@@ -1,0 +1,1255 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:226:238:body/1/0/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:334:337:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::Root",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::Leaf",
+        "sccId": "scc:1"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::Root"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::Leaf"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Probe",
+    "ruleId": "Probe::Root"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Probe",
+      "name": "Probe",
+      "package": "org.example.oracle",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": null
+      },
+      "source": {
+        "end": 347,
+        "sourceId": "eval-binary_arithmetic.ubnf",
+        "start": 0
+      },
+      "sourceId": "eval-binary_arithmetic.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [],
+    "lexical": [
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Probe::NUM"
+      }
+    ],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+              "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+              "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:226:238:body/1/0/seq",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+              "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat",
+              "expr:eval-binary_arithmetic.ubnf:226:238:body/1/0/seq"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+              "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat",
+              "expr:eval-binary_arithmetic.ubnf:226:238:body/1/0/seq",
+              "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+              "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat",
+              "expr:eval-binary_arithmetic.ubnf:226:238:body/1/0/seq",
+              "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:334:337:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:eval-binary_arithmetic.ubnf:334:337:body/seq",
+              "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [
+      {
+        "boundaryExprIds": [
+          "expr:eval-binary_arithmetic.ubnf:213:247:body/seq"
+        ],
+        "liftRecipeIds": [
+          "recipe:Root"
+        ],
+        "proof": {
+          "explanation": "canonical operator metadata 外の capture を lift へ投影できない",
+          "exprIds": [
+            "expr:eval-binary_arithmetic.ubnf:213:247:body/seq"
+          ],
+          "kind": "none"
+        },
+        "ruleIds": [
+          "Probe::Root"
+        ],
+        "strategy": "tierFunctions"
+      }
+    ],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "eval",
+    "memoReplay",
+    "operators",
+    "structuredOccurrences"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "ProbeAST",
+        "kind": "transparentUnion",
+        "name": "ProbeAST",
+        "variants": [
+          "ProbeAST.Binary",
+          "ProbeAST.Literal"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "left",
+            "valueType": {
+              "kind": "node",
+              "typeId": "ProbeAST.Literal"
+            }
+          },
+          {
+            "cardinality": "list",
+            "name": "op",
+            "valueType": {
+              "kind": "text"
+            }
+          },
+          {
+            "cardinality": "list",
+            "name": "right",
+            "valueType": {
+              "kind": "node",
+              "typeId": "ProbeAST.Literal"
+            }
+          }
+        ],
+        "id": "ProbeAST.Binary",
+        "implements": [
+          "ProbeAST"
+        ],
+        "kind": "record",
+        "name": "Binary"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "java": "int32Exact",
+              "kind": "number",
+              "rust": "lexeme"
+            }
+          }
+        ],
+        "id": "ProbeAST.Literal",
+        "implements": [
+          "ProbeAST"
+        ],
+        "kind": "record",
+        "name": "Literal"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef",
+        "name": "left",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Probe::Root",
+        "siteId": "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "ProbeAST.Literal"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "text",
+        "exprId": "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal",
+        "name": "op",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Probe::Root",
+        "siteId": "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "node",
+        "exprId": "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef",
+        "name": "right",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Probe::Root",
+        "siteId": "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "ProbeAST.Literal"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "number",
+        "exprId": "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Probe::Leaf",
+        "siteId": "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "java": "int32Exact",
+          "kind": "number",
+          "rust": "lexeme"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal",
+          "java": "'+'",
+          "rust": "+"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+        "node": {
+          "items": [
+            "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef",
+            "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 247,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 213
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Probe::Leaf"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 217,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 213
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:224:247:body/1/repeat",
+        "node": {
+          "child": "expr:eval-binary_arithmetic.ubnf:226:238:body/1/0/seq",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 247,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 224
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:226:238:body/1/0/seq",
+        "node": {
+          "items": [
+            "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal",
+            "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 238,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 226
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal/capture/0"
+        ],
+        "diagnosticLabel": "'+'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 229,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 226
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Probe::Leaf"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 238,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 234
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:334:337:body/seq",
+        "node": {
+          "items": [
+            "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Probe::Leaf",
+        "source": {
+          "end": 337,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 334
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Probe::NUM"
+        },
+        "ruleId": "Probe::Leaf",
+        "source": {
+          "end": 337,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 334
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "left",
+            "siteIds": [
+              "expr:eval-binary_arithmetic.ubnf:213:217:body/0/ruleRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "text",
+            "field": "op",
+            "siteIds": [
+              "expr:eval-binary_arithmetic.ubnf:226:229:body/1/0/0/literal/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "node",
+            "field": "right",
+            "siteIds": [
+              "expr:eval-binary_arithmetic.ubnf:234:238:body/1/0/1/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Root",
+        "kind": "assocLists",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.Binary",
+        "ruleId": "Probe::Root",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "number",
+            "field": "value",
+            "siteIds": [
+              "expr:eval-binary_arithmetic.ubnf:334:337:body/0/tokenRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Leaf",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.Literal",
+        "ruleId": "Probe::Leaf",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 77,
+              "sourceId": "eval-binary_arithmetic.ubnf",
+              "start": 72
+            }
+          },
+          {
+            "arguments": {
+              "kind": "binary_arithmetic",
+              "strategy": "default"
+            },
+            "name": "eval",
+            "source": {
+              "end": 129,
+              "sourceId": "eval-binary_arithmetic.ubnf",
+              "start": 78
+            }
+          },
+          {
+            "arguments": {},
+            "name": "leftAssoc",
+            "source": {
+              "end": 140,
+              "sourceId": "eval-binary_arithmetic.ubnf",
+              "start": 130
+            }
+          },
+          {
+            "arguments": {
+              "level": 10
+            },
+            "name": "precedence",
+            "source": {
+              "end": 162,
+              "sourceId": "eval-binary_arithmetic.ubnf",
+              "start": 141
+            }
+          },
+          {
+            "arguments": {
+              "className": "Binary",
+              "params": [
+                "left",
+                "op",
+                "right"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 203,
+              "sourceId": "eval-binary_arithmetic.ubnf",
+              "start": 163
+            }
+          }
+        ],
+        "body": "expr:eval-binary_arithmetic.ubnf:213:247:body/seq",
+        "eval": {
+          "kind": "binary_arithmetic",
+          "params": {},
+          "strategy": "auto"
+        },
+        "mappingParams": [
+          "left",
+          "op",
+          "right"
+        ],
+        "mappingTypeId": "ProbeAST.Binary",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::Root",
+        "triviaPolicyId": "trivia:none"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "kind": "literal",
+              "strategy": "default"
+            },
+            "name": "eval",
+            "source": {
+              "end": 290,
+              "sourceId": "eval-binary_arithmetic.ubnf",
+              "start": 249
+            }
+          },
+          {
+            "arguments": {
+              "className": "Literal",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 324,
+              "sourceId": "eval-binary_arithmetic.ubnf",
+              "start": 291
+            }
+          }
+        ],
+        "body": "expr:eval-binary_arithmetic.ubnf:334:337:body/seq",
+        "eval": {
+          "kind": "literal",
+          "params": {},
+          "strategy": "auto"
+        },
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "ProbeAST.Literal",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::Leaf",
+        "triviaPolicyId": "trivia:none"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::NUM",
+        "kind": "token",
+        "name": "NUM",
+        "originalName": "NUM",
+        "qualifiedSymbolId": "Probe::NUM",
+        "source": {
+          "end": 71,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 49
+        },
+        "sourceId": "eval-binary_arithmetic.ubnf"
+      },
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::Root",
+        "kind": "rule",
+        "name": "Root",
+        "originalName": "Root",
+        "qualifiedSymbolId": "Probe::Root",
+        "source": {
+          "end": 248,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 204
+        },
+        "sourceId": "eval-binary_arithmetic.ubnf"
+      },
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::Leaf",
+        "kind": "rule",
+        "name": "Leaf",
+        "originalName": "Leaf",
+        "qualifiedSymbolId": "Probe::Leaf",
+        "source": {
+          "end": 345,
+          "sourceId": "eval-binary_arithmetic.ubnf",
+          "start": 325
+        },
+        "sourceId": "eval-binary_arithmetic.ubnf"
+      }
+    ],
+    "tokens": [
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaNumber",
+          "rust": "legacyRustNumber"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token NUM=NumberParser",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "既知の NumberParser の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Number"
+        },
+        "symbolId": "Probe::NUM"
+      }
+    ],
+    "trivia": {
+      "insertionPlan": [],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [],
+          "id": "trivia:none",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": null
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 348,
+      "id": "eval-binary_arithmetic.ubnf",
+      "path": "eval-binary_arithmetic.ubnf",
+      "sha256": "51d8db6a860b79eb2c1ef4dd5121c3e442e4ff56f9643b97dab1d4d6f40fa3fe"
+    }
+  ],
+  "version": 1
+}

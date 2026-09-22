@@ -1,0 +1,547 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-variable_ref.ubnf:171:173:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Probe::Root",
+        "sccId": "scc:0"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Probe::Root"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Probe",
+    "ruleId": "Probe::Root"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Probe",
+      "name": "Probe",
+      "package": "org.example.oracle",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": null
+      },
+      "source": {
+        "end": 182,
+        "sourceId": "eval-variable_ref.ubnf",
+        "start": 0
+      },
+      "sourceId": "eval-variable_ref.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [],
+    "lexical": [
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Probe::ID"
+      }
+    ],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:eval-variable_ref.ubnf:171:173:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:eval-variable_ref.ubnf:171:173:body/seq",
+              "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "eval",
+    "memoReplay",
+    "structuredOccurrences"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "ProbeAST",
+        "kind": "transparentUnion",
+        "name": "ProbeAST",
+        "variants": [
+          "ProbeAST.Variable"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "name",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "ProbeAST.Variable",
+        "implements": [
+          "ProbeAST"
+        ],
+        "kind": "record",
+        "name": "Variable"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef",
+        "name": "name",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Probe::Root",
+        "siteId": "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:eval-variable_ref.ubnf:171:173:body/seq",
+        "node": {
+          "items": [
+            "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 173,
+          "sourceId": "eval-variable_ref.ubnf",
+          "start": 171
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Probe::ID"
+        },
+        "ruleId": "Probe::Root",
+        "source": {
+          "end": 173,
+          "sourceId": "eval-variable_ref.ubnf",
+          "start": 171
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "name",
+            "siteIds": [
+              "expr:eval-variable_ref.ubnf:171:173:body/0/tokenRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Root",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "ProbeAST.Variable",
+        "ruleId": "Probe::Root",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 80,
+              "sourceId": "eval-variable_ref.ubnf",
+              "start": 75
+            }
+          },
+          {
+            "arguments": {
+              "kind": "variable_ref",
+              "strategy": "default"
+            },
+            "name": "eval",
+            "source": {
+              "end": 127,
+              "sourceId": "eval-variable_ref.ubnf",
+              "start": 81
+            }
+          },
+          {
+            "arguments": {
+              "className": "Variable",
+              "params": [
+                "name"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 161,
+              "sourceId": "eval-variable_ref.ubnf",
+              "start": 128
+            }
+          }
+        ],
+        "body": "expr:eval-variable_ref.ubnf:171:173:body/seq",
+        "eval": {
+          "kind": "variable_ref",
+          "params": {},
+          "strategy": "auto"
+        },
+        "mappingParams": [
+          "name"
+        ],
+        "mappingTypeId": "ProbeAST.Variable",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Probe::Root",
+        "triviaPolicyId": "trivia:none"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::ID",
+        "kind": "token",
+        "name": "ID",
+        "originalName": "ID",
+        "qualifiedSymbolId": "Probe::ID",
+        "source": {
+          "end": 74,
+          "sourceId": "eval-variable_ref.ubnf",
+          "start": 49
+        },
+        "sourceId": "eval-variable_ref.ubnf"
+      },
+      {
+        "grammarId": "grammar:Probe",
+        "id": "Probe::Root",
+        "kind": "rule",
+        "name": "Root",
+        "originalName": "Root",
+        "qualifiedSymbolId": "Probe::Root",
+        "source": {
+          "end": 180,
+          "sourceId": "eval-variable_ref.ubnf",
+          "start": 162
+        },
+        "sourceId": "eval-variable_ref.ubnf"
+      }
+    ],
+    "tokens": [
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaIdentifier",
+          "rust": "legacyRustIdentifier"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token ID=IdentifierParser",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "既知の IdentifierParser の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Identifier"
+        },
+        "symbolId": "Probe::ID"
+      }
+    ],
+    "trivia": {
+      "insertionPlan": [],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [],
+          "id": "trivia:none",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": null
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 183,
+      "id": "eval-variable_ref.ubnf",
+      "path": "eval-variable_ref.ubnf",
+      "sha256": "6d0afcd0061a6a5723861b97ec18ca7c7c2fbaf689de2ddf459d90dc90de3845"
+    }
+  ],
+  "version": 1
+}

@@ -48,6 +48,7 @@ public final class JavaEmitter {
         var result = new TreeMap<String, String>(); String prefix = pkg.replace('.', '/') + "/";
         result.put(prefix + ast + ".java", astSource());
         result.put(prefix + parser + ".java", parserSource());
+        result.put(prefix + grammar + "Evaluator.java", evaluatorSource());
         result.put(prefix + grammar + "Result.java", "package " + pkg + ";\nimport " + pkg + ".api.ParseResult;\npublic record " + grammar + "Result(ParseResult<" + ast + "> result) {}\n");
         for (String name : List.of("Span", "Capture", "Diagnostic", "MappingException", "ParseOptions", "ParseResult", "TokenScanner", "Json", "SourceName"))
             result.put(prefix + "api/" + name + ".java", resource("/templates/api/" + name + ".java").replace("generated.", pkg + "."));
@@ -119,6 +120,19 @@ public final class JavaEmitter {
         String type = javaType(field.valueType(), !field.cardinality().equals("scalar"));
         return switch (field.cardinality()) { case "optional" -> "java.util.Optional<" + type + ">"; case "list" -> "java.util.List<" + type + ">"; default -> type; };
     }
+    /** Keep original names, reserving them before assigning suffixes to collisions. */
+    private Map<String, String> enumNames(AstType type) {
+        var reserved = type.variants().stream().map(AstTypeVariantsItem::javaName).collect(Collectors.toSet());
+        var used = new LinkedHashSet<String>(); var result = new LinkedHashMap<String, String>();
+        for (var variant : type.variants()) {
+            String base = variant.javaName(), candidate = base; int suffix = 2;
+            while (used.contains(candidate)) {
+                do { candidate = base + "_" + suffix++; } while (reserved.contains(candidate));
+            }
+            used.add(candidate); result.put(variant.literal(), candidate);
+        }
+        return result;
+    }
     private String astSource() {
         var out = new StringBuilder("package " + pkg + ";\n\npublic sealed interface " + ast);
         var direct = types.values().stream().filter(t -> !root(t) && (parents(t).isEmpty() || parents(t).stream().anyMatch(p -> root(types.get(p))))).map(t -> typeName(t.id())).toList();
@@ -151,12 +165,77 @@ public final class JavaEmitter {
                     .append(type.variants().stream().map(v -> typeName(v.variant())).collect(Collectors.joining(", "))).append(" {\n");
                 for (var common : ir.semantics().commonFields()) if (common.interfaceTypeId().equals(type.id())) out.append(indent).append("    ").append(fieldType(common.field())).append(' ').append(name(common.field().name())).append("();\n");
             }
-            case "enum" -> out.append("enum ").append(name(type.name())).append(" implements ").append(supers).append(" { ")
-                .append(type.variants().stream().map(AstTypeVariantsItem::javaName).collect(Collectors.joining(", "))).append(";\n");
+            case "enum" -> {
+                var names = enumNames(type);
+                out.append("enum ").append(name(type.name())).append(" implements ").append(supers).append(" { ")
+                    .append(String.join(", ", names.values())).append(";\n")
+                    .append(indent).append("    public static ").append(name(type.name())).append(" fromText(java.lang.String text) {\n")
+                    .append(indent).append("        return switch (text) {\n");
+                for (var variant : names.entrySet()) out.append(indent).append("            case ").append(q(variant.getKey())).append(" -> ").append(variant.getValue()).append(";\n");
+                out.append(indent).append("            default -> throw new java.lang.IllegalArgumentException(").append(q("Unknown " + type.name() + ": ")).append(" + text);\n")
+                    .append(indent).append("        };\n").append(indent).append("    }\n");
+            }
             default -> throw new IllegalArgumentException(type.kind());
         }
         for (AstType child : types.values()) if (type.id().equals(child.enclosingTypeId())) astType(out, child, indent + "    ");
         out.append(indent).append("}\n");
+    }
+    private String evalMethod(AstType type) {
+        return "eval" + typeName(type.id()).substring(ast.length() + 1).replace(".", "");
+    }
+    private String evaluatorSource() {
+        var out = new StringBuilder("package " + pkg + ";\n\npublic abstract class " + grammar + "Evaluator<T> {\n");
+        out.append("    private DebugStrategy debugStrategy = DebugStrategy.NOOP;\n")
+            .append("    public void setDebugStrategy(DebugStrategy strategy) { debugStrategy = java.util.Objects.requireNonNull(strategy); }\n")
+            .append("    public T eval(").append(ast).append(" node) {\n")
+            .append("        debugStrategy.onEnter(node); T result = evalInternal(node); debugStrategy.onExit(node, result); return result;\n    }\n")
+            .append("    private T evalInternal(").append(ast).append(" node) {\n        return switch (node) {\n");
+        if (types.isEmpty()) out.append("            case ").append(ast).append(".Text n -> evalText(n);\n");
+        for (AstType type : types.values()) if (!type.kind().equals("transparentUnion"))
+            out.append("            case ").append(typeName(type.id())).append(" n -> ").append(evalMethod(type)).append("(n);\n");
+        out.append("        };\n    }\n");
+        if (types.isEmpty()) out.append("    protected abstract T evalText(").append(ast).append(".Text node);\n");
+        boolean binary = false, variable = false;
+        for (AstType type : types.values()) {
+            if (root(type)) continue;
+            Eval eval = rules.values().stream().filter(r -> type.id().equals(r.mappingTypeId()) && r.eval() != null)
+                .map(Rule::eval).findFirst().orElse(null);
+            String kind = eval != null && eval.strategy().equals("auto") ? eval.kind() : "manual";
+            String signature = "T " + evalMethod(type) + "(" + typeName(type.id()) + " node)";
+            String body;
+            if (type.kind().equals("transparentUnion")) body = "return evalInternal(node);";
+            else switch (kind) {
+                case "binary_arithmetic" -> {
+                    binary = true;
+                    body = "if (node.left() == null && node.right().isEmpty() && node.op().size() == 1) return evalLeaf(node.op().getFirst());\n"
+                        + "        if (node.left() != null && node.op().isEmpty() && node.right().isEmpty()) return eval(node.left());\n"
+                        + "        T current = eval(node.left());\n"
+                        + "        for (int i = 0; i < Math.min(node.op().size(), node.right().size()); i++) current = applyBinary(node.op().get(i), current, eval(node.right().get(i)));\n"
+                        + "        return current;";
+                }
+                case "variable_ref" -> {
+                    variable = true; String prefix = (String) eval.params().getOrDefault("strip_prefix", "");
+                    body = "String name = node.name();\n"
+                        + (prefix.isEmpty() ? "" : "        if (name != null && name.startsWith(" + q(prefix) + ")) name = name.substring(" + prefix.length() + ");\n")
+                        + "        return resolveVariable(name);";
+                }
+                case "conditional" -> body = "Object condition = eval(node.condition());\n"
+                    + "        boolean truth = Boolean.TRUE.equals(condition) || \"true\".equalsIgnoreCase(String.valueOf(condition));\n"
+                    + "        return truth ? eval(node.thenExpr()) : eval(node.elseExpr());";
+                case "passthrough" -> body = "Object value = node.value();\n        if (value instanceof " + ast + " child) return eval(child);\n        return (T) value;";
+                case "literal" -> body = "return (T) (Object) node.value();";
+                default -> { out.append("    protected abstract ").append(signature).append(";\n"); continue; }
+            }
+            if (kind.equals("literal") || kind.equals("passthrough")) out.append("    @SuppressWarnings(\"unchecked\")\n");
+            out.append("    protected ").append(signature).append(" {\n        ").append(body).append("\n    }\n");
+        }
+        if (binary) out.append("    protected abstract T evalLeaf(String literal);\n    protected abstract T applyBinary(String op, T left, T right);\n");
+        if (variable) out.append("    protected abstract T resolveVariable(String name);\n");
+        return out.append("    public interface DebugStrategy {\n        void onEnter(").append(ast).append(" node);\n        void onExit(").append(ast).append(" node, Object result);\n")
+            .append("        DebugStrategy NOOP = new DebugStrategy() {\n            public void onEnter(").append(ast).append(" node) {}\n            public void onExit(").append(ast).append(" node, Object result) {}\n        };\n    }\n")
+            .append("    public static class StepCounterStrategy implements DebugStrategy {\n        private int step;\n        private final java.util.function.BiConsumer<Integer, ").append(ast).append("> onStep;\n")
+            .append("        public StepCounterStrategy(java.util.function.BiConsumer<Integer, ").append(ast).append("> onStep) { this.onStep = onStep; }\n")
+            .append("        public void onEnter(").append(ast).append(" node) { onStep.accept(step++, node); }\n        public void onExit(").append(ast).append(" node, Object result) {}\n    }\n}\n").toString();
     }
     private String parserSource() {
         String defaultEntry = ir.semantics().symbols().stream().filter(s -> s.id().equals(ir.entry().ruleId())).findFirst().orElseThrow().name();
@@ -213,7 +292,8 @@ public final class JavaEmitter {
         String fields = recipe == null ? "" : recipe.fields().stream().map(f -> "new Field(" + q(f.field()) + "," + strings(f.siteIds()) + "," + q(f.conversion()) + "," + q(f.cardinality()) + ")").collect(Collectors.joining(","));
         out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(exprIds.size() + ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
-            .append(", new Field[]{").append(fields).append("}, new Effect[]{").append(effects).append("}, ").append(rule.skip()).append(");\n    }\n");
+            .append(", new Field[]{").append(fields).append("}, new Effect[]{").append(effects).append("}, ").append(rule.skip()).append(", ")
+            .append(strings(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().toList())).append(");\n    }\n");
     }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;
@@ -235,9 +315,17 @@ public final class JavaEmitter {
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(strings(expr.captureSiteIds())).append(", ").append(strings(sites.stream().map(Capture::name).toList())).append(", ").append(strings(sites.stream().map(Capture::spanRule).toList()))
-            .append(", new boolean[]{").append(sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(","))).append("}, ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(");\n    }\n");
+            .append(", new boolean[]{").append(sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(","))).append("}, ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(captureFailureHint(expr)).append(");\n    }\n");
         String body = expression(expr);
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
+    }
+    private boolean captureFailureHint(Expr expr) {
+        if (!expr.node().kind().equals("ruleRef")) return false;
+        AstType target = types.get(rules.get(expr.node().symbolId()).mappingTypeId());
+        // Mapped sum and recovery wrappers contribute __CaptureSite on entry failure.
+        // Primitive/operator references retain their existing diagnostic display profile.
+        return target != null && target.kind().equals("transparentUnion")
+            || ir.semantics().recovery().stream().anyMatch(r -> r.applicationSites().contains(expr.id()));
     }
     private String expression(Expr expr) {
         ExprNode n = expr.node(); String boundary = boundaries(expr.id());
@@ -256,15 +344,74 @@ public final class JavaEmitter {
             case "ruleRef" -> {
                 String call = parser + "::" + ruleMethod(n.symbolId());
                 var recovery = ir.semantics().recovery().stream().filter(r -> r.applicationSites().contains(expr.id())).findFirst().orElse(null);
-                yield recovery == null ? "return " + ruleMethod(n.symbolId()) + "(s, f);" : "return s.recover(f, " + call + ", " + strings(recovery.resolvedSyncPatterns()) + ", " + recovery.consumeSync() + ", " + q(recovery.noSyncAction()) + ", " + q(recovery.astProjection()) + ", " + q(recovery.recipeId()) + ");";
+                yield recovery == null ? "return " + ruleMethod(n.symbolId()) + "(s, f);" : recoveryCall(recovery, call);
             }
             case "tokenRef" -> "return " + token(tokens.get(n.symbolId()).spec(), label) + ";";
             case "lookahead", "negativeLookahead" -> "return s.look(f, " + call(n.child()) + ", " + n.kind().equals("negativeLookahead") + ", " + q(label) + ");";
             case "any" -> "return s.any(f, " + q(label) + ");";
             case "eof" -> "return s.eof(f);"; case "empty" -> "return s.empty(f);";
-            case "error" -> "return s.error(f, " + q(n.message()) + ");";
+            case "error" -> "return s.error(" + (expr.execution().transaction().equals("once") ? "f.copy(true)" : "f") + ", " + q(n.message()) + ");";
             default -> throw new IllegalArgumentException(n.kind());
         };
+    }
+    private String recoveryCall(Recovery recovery, String call) {
+        String mode = recovery.mode(); List<String> patterns = recovery.resolvedSyncPatterns();
+        boolean consume = recovery.consumeSync(); String noSync = recovery.noSyncAction();
+        // v1 front currently lowers bare @recovery(auto/skip) as SYNC. Recover the
+        // declared mode only for that legacy encoding; explicit IR remains authoritative.
+        String declared = rules.get(recovery.ruleId()).annotations().stream().filter(a -> a.name().equals("recovery"))
+            .map(a -> a.arguments().get("mode")).filter(String.class::isInstance).map(String.class::cast).findFirst().orElse(mode).toUpperCase(java.util.Locale.ROOT);
+        if (recovery.astProjection().equals("legacyMarker") && mode.equals("SYNC") && Set.of("AUTO", "SKIP").contains(declared)) {
+            mode = declared; patterns = followPatterns(recovery.ruleId());
+            consume = false; noSync = mode.equals("SKIP") ? "consumeToEof" : "fail";
+        }
+        if (!mode.equals("SKIP") && patterns.isEmpty()) { patterns = List.of(";"); consume = true; }
+        if (mode.equals("SYNC")) { consume = true; noSync = "fail"; }
+        return "return s.recover(f, " + call + ", " + q(recovery.ruleId()) + ", " + q(mode) + ", " + strings(patterns) + ", " + consume + ", " + q(noSync) + ", " + q(recovery.astProjection()) + ", " + q(recovery.recipeId()) + ");";
+    }
+    private List<String> followPatterns(String rule) {
+        var follows = new LinkedHashMap<String, Set<String>>();
+        rules.keySet().forEach(id -> follows.put(id, new LinkedHashSet<>()));
+        boolean changed;
+        do {
+            int before = follows.values().stream().mapToInt(Set::size).sum();
+            for (Rule definition : rules.values()) collectFollow(definition.body(), new LinkedHashSet<>(follows.get(definition.symbolId())), follows);
+            changed = before != follows.values().stream().mapToInt(Set::size).sum();
+        } while (changed);
+        return List.copyOf(follows.get(rule));
+    }
+    private void collectFollow(String id, Set<String> after, Map<String, Set<String>> follows) {
+        ExprNode node = expressions.get(id).node();
+        if (node.kind().equals("ruleRef")) { follows.get(node.symbolId()).addAll(after); return; }
+        if (node.kind().equals("seq")) {
+            var next = new LinkedHashSet<>(after);
+            for (String child : node.items().reversed()) {
+                collectFollow(child, next, follows);
+                if (!nullable(child)) next.clear();
+                next.addAll(firstPatterns(child, new LinkedHashSet<>()));
+            }
+        } else if (node.kind().equals("repeat")) {
+            var next = new LinkedHashSet<>(after); next.addAll(firstPatterns(node.child(), new LinkedHashSet<>()));
+            collectFollow(node.child(), next, follows);
+        } else if (node.kind().equals("separated")) {
+            var next = new LinkedHashSet<>(after); next.addAll(firstPatterns(node.separator(), new LinkedHashSet<>()));
+            collectFollow(node.element(), next, follows);
+            collectFollow(node.separator(), firstPatterns(node.element(), new LinkedHashSet<>()), follows);
+        } else for (String child : Validation.children(node)) collectFollow(child, after, follows);
+    }
+    private boolean nullable(String id) {
+        return ir.analysis().expressions().stream().filter(a -> a.exprId().equals(id)).findFirst().orElseThrow().nullable();
+    }
+    private Set<String> firstPatterns(String id, Set<String> seen) {
+        var result = new LinkedHashSet<String>(); if (!seen.add(id)) return result;
+        ExprNode node = expressions.get(id).node();
+        if (node.kind().equals("literal")) { if (!node.value().isEmpty()) result.add(node.value()); }
+        else if (node.kind().equals("ruleRef")) result.addAll(firstPatterns(rules.get(node.symbolId()).body(), seen));
+        else for (String child : Validation.children(node)) {
+            result.addAll(firstPatterns(child, new LinkedHashSet<>(seen)));
+            if (node.kind().equals("seq") && !nullable(child)) break;
+        }
+        return result;
     }
     private String token(TokenSpec spec, String label) {
         return switch (spec.kind()) {
@@ -309,10 +456,10 @@ public final class JavaEmitter {
     }
     private void emitBuild(StringBuilder out) {
         if (recipes.values().stream().noneMatch(r -> r.resultTypeId() != null && !Set.of("transparent", "text", "skip").contains(r.kind()))) {
-            out.append("    private static Object build(Recipe r, Session s) { throw s.mapping(r.start(), r.end(), \"No AST recipe\", null); }\n");
+            out.append("    private static Object build(Recipe r, Session s) { if (r.id().equals(\"#recovery\")) return null; throw s.mapping(r.start(), r.end(), \"No AST recipe\", null); }\n");
             return;
         }
-        out.append("    private static Object build(Recipe r, Session s) {\n        Object cached = s.built(r); if (cached != null) return cached;\n        Object node = switch (r.id()) {\n");
+        out.append("    private static Object build(Recipe r, Session s) {\n        if (s.hasBuilt(r)) return s.built(r);\n        if (r.id().equals(\"#recovery\")) return s.remember(r, null);\n        try {\n        Object node = switch (r.id()) {\n");
         var fallbacks = new LinkedHashSet<String>();
         for (Recipe recipe : recipes.values()) {
             if (recipe.resultTypeId() == null || Set.of("transparent", "text", "skip").contains(recipe.kind())) continue;
@@ -321,18 +468,30 @@ public final class JavaEmitter {
             out.append("            case ").append(q(recipe.id())).append(" -> ");
             if (type.kind().equals("enum")) {
                 out.append("switch (s.source.substring(r.start(), r.end()).strip()) {\n");
-                for (var variant : type.variants()) out.append("                case ").append(q(variant.literal())).append(" -> ").append(typeName(type.id())).append('.').append(variant.javaName()).append(";\n");
+                for (var variant : type.variants()) out.append("                case ").append(q(variant.literal())).append(" -> ").append(typeName(type.id())).append('.').append(enumNames(type).get(variant.literal())).append(";\n");
                 out.append("                default -> throw s.mapping(r.start(), r.end(), \"Unknown enum literal\", null);\n            };\n");
             } else {
-                out.append("new ").append(typeName(type.id())).append('(');
-                out.append(type.fields().stream().map(field -> {
-                    var mapping = recipe.fields().stream().filter(f -> f.field().equals(field.name())).findFirst().orElseThrow(() -> new IllegalArgumentException("Missing recipe field: " + recipe.id() + "." + field.name()));
-                    return "s." + mapping.cardinality() + "(r," + q(field.name()) + ",v -> " + convert(field.valueType(), mapping.conversion()) + ")";
-                }).collect(Collectors.joining(", "))).append(");\n");
+                out.append("{\n");
+                var locals = new LinkedHashMap<String, String>();
+                for (AstField field : type.fields()) {
+                    String local = "field" + locals.size(); locals.put(field.name(), local);
+                    var mapping = recipe.fields().stream().filter(f -> f.field().equals(field.name())).findFirst().orElseThrow();
+                    out.append("                ").append(fieldType(field)).append(' ').append(local).append(" = s.")
+                        .append(mapping.cardinality()).append("(r,").append(q(field.name())).append(",v -> ")
+                        .append(convert(field.valueType(), mapping.conversion())).append(");\n");
+                }
+                for (var constraint : ir.semantics().typeofConstraints()) {
+                    Capture own = captures.get(constraint.ownCapture()), referenced = captures.get(constraint.referencedCapture());
+                    if (own.ruleId().equals(recipe.ruleId())) out.append("                s.typeof(r, ")
+                        .append(q(own.name())).append(',').append(locals.get(own.name())).append(',')
+                        .append(q(referenced.name())).append(',').append(locals.get(referenced.name())).append(");\n");
+                }
+                out.append("                yield new ").append(typeName(type.id())).append('(')
+                    .append(String.join(", ", locals.values())).append(");\n            }\n");
             }
         }
         for (String fallback : fallbacks) out.append("            case ").append(q("#leaf:" + fallback)).append(" -> new ").append(typeName(fallback)).append("(null, List.of(s.source.substring(r.start(), r.end()).strip()), List.of());\n");
-        out.append("            default -> throw s.mapping(r.start(), r.end(), \"Cannot build recipe: \" + r.id(), null);\n        };\n        return s.remember(r, node);\n    }\n");
+        out.append("            default -> throw s.mapping(r.start(), r.end(), \"Cannot build recipe: \" + r.id(), null);\n        };\n        return s.remember(r, node);\n        } catch (Session.RecoveredNodeMissing missing) { return s.remember(r, null); }\n    }\n");
     }
     private String convert(ValueType type, String conversion) {
         String java = javaType(type, true);

@@ -35,7 +35,12 @@ public final class Validation {
         for (Rule rule : rules.values()) {
             reference(expressions, rule.body()); reference(policies, rule.triviaPolicyId());
             if (rule.mappingTypeId() != null) reference(types, rule.mappingTypeId());
-            if (rule.eval() != null) unsupported("eval");
+            if (rule.eval() != null && rule.eval().strategy().equals("auto") && rule.mappingTypeId() != null) {
+                reference(types, rule.mappingTypeId());
+                require(!types.get(rule.mappingTypeId()).kind().equals("transparentUnion"),
+                    "Automatic @eval requires a concrete mapping, not sum " + rule.mappingTypeId());
+                validateEval(rule.eval(), types.get(rule.mappingTypeId()));
+            }
         }
         for (Expr e : expressions.values()) {
             reference(rules, e.ruleId()); reference(analyses, e.id());
@@ -48,6 +53,7 @@ public final class Validation {
             Execution x = e.execution();
             String transaction = switch (n.kind()) {
                 case "seq", "lookahead", "negativeLookahead", "separated" -> "once";
+                case "error" -> x.transaction().equals("none") ? "none" : "once";
                 case "group" -> x.transaction().equals("delegate") ? "delegate" : "once";
                 case "choice" -> "perAlternative"; case "repeat", "eof", "optional" -> "occurs";
                 case "ruleRef", "tokenRef", "empty" -> "delegate"; default -> "none";
@@ -72,7 +78,7 @@ public final class Validation {
                 enclosing = enclosing.enclosingTypeId() == null ? null : types.get(enclosing.enclosingTypeId());
             }
             if (type.kind().equals("transparentUnion")) require(!type.variants().isEmpty(), "Empty sealed union: " + type.id());
-            if (type.kind().equals("enum")) require(type.variants().stream().map(AstTypeVariantsItem::javaName).distinct().count() == type.variants().size(), "Duplicate enum name: " + type.id());
+            if (type.kind().equals("enum")) require(type.variants().stream().map(AstTypeVariantsItem::literal).distinct().count() == type.variants().size(), "Duplicate enum literal: " + type.id());
             identifier(type.name()); if (type.enclosingTypeId() != null) reference(types, type.enclosingTypeId());
             for (String parent : type.implements_()) reference(types, parent);
             if (type.kind().equals("transparentUnion")) for (var variant : type.variants()) reference(types, variant.variant());
@@ -130,12 +136,26 @@ public final class Validation {
             if (!delimiter.kind().equals("characters")) require(!delimiter.open().isEmpty() && (delimiter.close() == null || !delimiter.close().isEmpty()), "Empty trivia delimiter");
         for (var effect : s.scope().effects()) { reference(rules, effect.ruleId()); for (var event : effect.events()) if (event.captureSiteId() != null) reference(captures, event.captureSiteId()); }
         for (var catalog : s.catalogs()) { reference(rules, catalog.ruleId()); reference(captures, catalog.captureSiteId()); }
-        if (!s.typeofConstraints().isEmpty()) unsupported("typeof");
+        for (var constraint : s.typeofConstraints()) {
+            reference(captures, constraint.ownCapture()); reference(captures, constraint.referencedCapture());
+            Capture own = captures.get(constraint.ownCapture()), referenced = captures.get(constraint.referencedCapture());
+            require(own.ruleId().equals(referenced.ruleId()), "typeof captures must be rule-local");
+            Recipe recipe = s.recipes().stream().filter(r -> r.ruleId().equals(own.ruleId())).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("typeof requires a mapping recipe"));
+            require(recipe.kind().equals("construct") || recipe.kind().equals("assocLists"), "typeof requires a concrete mapping");
+            for (String name : List.of(own.name(), referenced.name())) {
+                require(captures.values().stream().anyMatch(c -> c.ruleId().equals(own.ruleId()) && c.name().equals(name)), "Unresolved typeof capture: " + name);
+                require(recipe.fields().stream().anyMatch(f -> f.field().equals(name)), "Unmapped typeof capture: " + name);
+            }
+        }
         for (var recovery : s.recovery()) {
             reference(rules, recovery.ruleId());
-            if (!recovery.progressRule().equals("legacySync")) unsupported("recovery.legacySkip");
-            if (recovery.astProjection().equals("legacyMarker")) unsupported("recovery.legacyMarker");
-            for (String site : recovery.applicationSites()) { reference(expressions, site); require(expressions.get(site).node().kind().equals("ruleRef"), "recovery site must be ruleRef"); }
+            require(recovery.resolvedSyncPatterns().stream().noneMatch(String::isEmpty), "Empty recovery sync pattern");
+            for (String site : recovery.applicationSites()) {
+                reference(expressions, site);
+                require(expressions.get(site).node().kind().equals("ruleRef") && recovery.ruleId().equals(expressions.get(site).node().symbolId()), "recovery site must reference its rule");
+                require(s.recovery().stream().filter(r -> r.applicationSites().contains(site)).count() == 1, "Ambiguous recovery site: " + site);
+            }
             if (recovery.recipeId() != null) { reference(recipes, recovery.recipeId()); require(recipes.get(recovery.recipeId()).fields().isEmpty(), "Recovery recipe requires unavailable captures"); }
         }
         for (var normalization : s.normalizations()) {
@@ -181,6 +201,26 @@ public final class Validation {
         }
         // The front supplies lowering; never attempt seed-growing on an unlowered cycle.
         for (Rule rule : rules.values()) leftCycle(rule.symbolId(), rule.body(), expressions, rules, analyses, new HashSet<>());
+    }
+    private static void validateEval(Eval eval, AstType type) {
+        var fields = index(type.fields(), AstField::name);
+        List<String> required = switch (eval.kind()) {
+            case "binary_arithmetic" -> List.of("left", "op", "right");
+            case "variable_ref" -> List.of("name");
+            case "conditional" -> List.of("condition", "thenExpr", "elseExpr");
+            case "passthrough", "literal" -> List.of("value");
+            default -> List.of();
+        };
+        for (String field : required) {
+            reference(fields, field); AstField value = fields.get(field);
+            String cardinality = eval.kind().equals("binary_arithmetic") && !field.equals("left") ? "list" : "scalar";
+            require(value.cardinality().equals(cardinality), "Invalid @eval cardinality: " + type.name() + "." + field);
+            if (eval.kind().equals("conditional") || eval.kind().equals("binary_arithmetic") && !field.equals("op"))
+                require(value.valueType().kind().equals("node"), "@eval requires node field: " + field);
+            if (eval.kind().equals("variable_ref") || eval.kind().equals("binary_arithmetic") && field.equals("op"))
+                require(value.valueType().kind().equals("text"), "@eval requires text field: " + field);
+        }
+        if (eval.params().containsKey("strip_prefix")) require(eval.params().get("strip_prefix") instanceof String, "@eval strip_prefix must be text");
     }
     private static void valueType(ValueType value, Map<String, AstType> types) {
         if (value.kind().equals("optional") || value.kind().equals("list")) unsupported("nestedValueType:" + value.kind());
