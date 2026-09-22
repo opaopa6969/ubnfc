@@ -57,10 +57,17 @@ class M3RecoveryTest {
             assertEquals(List.of("end of input"), Json.object(diagnostics.get(1)).get("expected"));
         }
     }
-    @Test void rootAnnotationDoesNotWrapEntryAndSkipCompilesD017() throws Exception {
+    @Test void rootAnnotationWrapsEntryD021AndSkipCompilesD017() throws Exception {
         try (var h = new CompilerHarness(ir("recovery-root"), PKG)) {
             for (Object value : Json.array(oracle("recovery-root").get("cases"))) {
-                var row = Json.object(value); Object result = h.parse((String) row.get("input"));
+                var row = Json.object(value); String input = (String) row.get("input"); Object result = h.parse(input);
+                if (input.equals("bad;")) {
+                    // D-021 / D-018 recovery-projection 2: @root の recovery(sync=';') は entry にも適用する。
+                    // 旧 oracle（root の注釈が無効で構文失敗）は D-017 の既知バグであり再現しない。
+                    assertTrue(ok(result), row.get("id").toString()); assertEquals(4, get(result, "consumedCp"));
+                    assertEquals(row.get("ast"), h.canonical(result)); assertRegion(result, "SYNC", 0, 4, ";", 3);
+                    continue;
+                }
                 assertOracleSyntax(h, row, result); assertEquals(row.get("ast"), h.canonical(result)); assertTrue(recoveries(result).isEmpty());
                 if (!ok(result)) assertEquals(List.of("';'", "'ok'"), get(get(result, "diagnostics"), "expected"));
             }

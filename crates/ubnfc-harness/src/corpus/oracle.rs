@@ -260,6 +260,8 @@ pub fn load(path: &Path) -> Result<CorpusFile, LoadError> {
             input: row.input,
             expect,
             known_divergences: Vec::new(),
+            follow_spec: Vec::new(),
+            rust_oracle: None,
         });
     }
     Ok(out)
@@ -285,5 +287,6 @@ pub fn load_all(root: impl AsRef<Path>) -> Result<Vec<CorpusFile>, LoadError> {
         .map(|path| load(path))
         .collect::<Result<Vec<_>, _>>()?;
     divergence::apply(&root.join("divergences.json"), &mut files)?;
+    crate::rust_oracle::apply(&root.join("rust/diagnostics.json"), &mut files)?;
     Ok(files)
 }

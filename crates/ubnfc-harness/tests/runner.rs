@@ -31,6 +31,8 @@ fn case(expect: Value) -> RunCase {
             input: "a😀".into(),
             expect: serde_json::from_value(expect).unwrap(),
             known_divergences: vec![],
+            follow_spec: vec![],
+            rust_oracle: None,
         },
         grammar: "Probe".into(),
         variant: "normal".into(),

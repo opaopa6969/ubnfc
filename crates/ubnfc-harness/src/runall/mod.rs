@@ -309,7 +309,7 @@ fn plan(files: &[CorpusFile], filters: &[String], backend: Backend) -> Result<Pl
             }
             if !subset.cases.is_empty() {
                 for mut case in runner::select(&[subset], &[], None)? {
-                    expect_rejection(&corpus, &mut case);
+                    expect_rejection(&corpus, &mut case, backend);
                     let mut row = CaseResult::new(&corpus, &kind, &label, &case);
                     row.build_id = Some(work.build.id.clone());
                     work.cases.push(case);
@@ -322,8 +322,20 @@ fn plan(files: &[CorpusFile], filters: &[String], backend: Backend) -> Result<Pl
 }
 
 /// 元の採取値は保持し、case × variant に展開してから拒否契約を付ける。
-fn expect_rejection(corpus: &str, case: &mut RunCase) {
+/// backend 固有の契約（Rust の非正則 REGEX 拒否）は当該 backend にだけ登録する。
+fn expect_rejection(corpus: &str, case: &mut RunCase, backend: Backend) {
     let (stage, code, evidence) = match (corpus, case.variant.as_str(), case.case.id.as_str()) {
+        // docs/design/03-design-v1.md §3.2: Rust は正則部分集合のみ DFA 化し、後方参照等の
+        // 非正則 REGEX は生成時エラー。Java は java.util.regex.Pattern へ委譲するので runtime 比較。
+        ("oracle/regex-backref.json" | "oracle/reobserved-regex-backref.json", _, "regex-backref/1")
+            if backend == Backend::Rust =>
+        {
+            (
+                "generation",
+                "regex",
+                "docs/design/03-design-v1.md §3.2（Rust: 非正則 REGEX は生成時エラー）; crates/ubnfc-rust の regex 生成拒否「requires an analyzed DFA; Java Pattern fallback is unavailable」",
+            )
+        }
         ("associative/corpus.json", "reversed-metadata", _) => (
             "validate",
             "E-PRECEDENCE-ORDER",

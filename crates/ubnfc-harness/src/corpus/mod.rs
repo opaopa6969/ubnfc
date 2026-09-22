@@ -82,6 +82,13 @@ pub struct Case {
     /// D-017 の follow-spec のみ。undecided は台帳に残し、比較の免除には使わない。
     #[serde(default)]
     pub known_divergences: Vec<crate::divergence::Observation>,
+    /// known_divergences のうち decision が `follow-spec` のもの（D-021）。
+    /// 実測が旧 oracle と一致した場合は「既知バグ再現」として Fail にする。
+    #[serde(default)]
+    pub follow_spec: Vec<crate::divergence::Observation>,
+    /// D-011 の言語別 oracle。Rust backend の比較でだけ該当観測を置換する。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rust_oracle: Option<crate::rust_oracle::RustOracle>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -217,6 +224,8 @@ pub(crate) fn cases<T>(
             input: row.input,
             expect: wrap(row.expect),
             known_divergences: Vec::new(),
+            follow_spec: Vec::new(),
+            rust_oracle: None,
         })
         .collect()
 }

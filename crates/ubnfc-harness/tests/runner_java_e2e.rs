@@ -152,6 +152,8 @@ fn tiny_case(id: usize, input: &str, accepted: bool, entry: Option<&str>) -> Run
             expect: serde_json::from_value(json!({"Accept":{"accepted":accepted,"prefix":prefix}}))
                 .unwrap(),
             known_divergences: vec![],
+            follow_spec: vec![],
+            rust_oracle: None,
         },
         grammar: "TinyCalc".into(),
         variant: "normal".into(),

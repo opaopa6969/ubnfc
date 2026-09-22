@@ -262,9 +262,9 @@ public final class JavaEmitter {
             var roots = symbols.stream().filter(s -> rules.get(s.id()).annotations().stream().anyMatch(a -> a.name().equals("root"))).toList();
             String rootId = roots.size() == 1 ? roots.getFirst().id() : roots.isEmpty() && unit.id().equals(ir.entry().grammarId()) ? ir.entry().ruleId() : null;
             out.append("            case ").append(q(unit.name())).append(" -> switch (entry) {\n");
-            if (rootId != null) out.append("                case null -> ").append(parser).append("::").append(ruleMethod(rootId)).append(";\n");
+            if (rootId != null) out.append("                case null -> ").append(entryCall(rootId)).append(";\n");
             else out.append("                case null -> throw new IllegalArgumentException(\"Grammar has no unique root\");\n");
-            for (var symbol : symbols) out.append("                case ").append(q(symbol.name())).append(" -> ").append(parser).append("::").append(ruleMethod(symbol.id())).append(";\n");
+            for (var symbol : symbols) out.append("                case ").append(q(symbol.name())).append(" -> ").append(entryCall(symbol.id())).append(";\n");
             out.append("                default -> throw new IllegalArgumentException(\"Unsupported entry: \" + entry);\n            };\n");
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
@@ -317,6 +317,9 @@ public final class JavaEmitter {
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
             .append(", new Field[]{").append(fields).append("}, new Effect[]{").append(effects).append("}, ").append(rule.skip()).append(", ")
             .append(strings(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(", ").append(strings(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
+        Recovery recovery = entryRecovery(rule.symbolId());
+        if (recovery != null) out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("$entry(Session s, Frame f) {\n        ")
+            .append(recoveryCall(recovery, parser + "::" + ruleMethod(rule.symbolId()))).append("\n    }\n");
     }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;
@@ -368,6 +371,14 @@ public final class JavaEmitter {
             case "error" -> "return s.error(" + (expr.execution().transaction().equals("once") ? "f.copy(true)" : "f") + ", " + q(n.message()) + ");";
             default -> throw new IllegalArgumentException(n.kind());
         };
+    }
+    // D-021 / D-018 recovery-projection 2: @recovery は @root（および直接の entry）にも適用する。
+    // IR の applicationSites は rule 参照だけを持つので、entry 用の wrapper で同じ recover を通す。
+    private Recovery entryRecovery(String ruleId) {
+        return ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(ruleId)).findFirst().orElse(null);
+    }
+    private String entryCall(String ruleId) {
+        return parser + "::" + (entryRecovery(ruleId) == null ? ruleMethod(ruleId) : ruleMethod(ruleId) + "$entry");
     }
     private String recoveryCall(Recovery recovery, String call) {
         String mode = recovery.mode(); List<String> patterns = recovery.resolvedSyncPatterns();
