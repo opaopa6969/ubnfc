@@ -35,12 +35,12 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-const RUN_ALL_USAGE: &str = "ubnfc-harness run-all --backend java [--families a,b] [--report out.md] [--json out.json] [--jobs N] [--root DIR]";
+const RUN_ALL_USAGE: &str = "ubnfc-harness run-all --backend java|rust [--families a,b] [--report out.md] [--json out.json] [--jobs N] [--root DIR]";
 
 fn execute_all(args: &[std::ffi::OsString]) -> Result<(), String> {
     use ubnfc_harness::runall::{self, Config};
     if args.len() == 1 && (args[0] == "--help" || args[0] == "-h") {
-        println!("{RUN_ALL_USAGE}\n既定 jobs=4。UBNFC_BIN / UBNFC_JAVA_GENERATOR で実行ファイルを指定できます。");
+        println!("{RUN_ALL_USAGE}\nJava の既定 jobs=4。Rust の --jobs は Cargo に渡します（未指定時は Cargo の既定値）。UBNFC_BIN / UBNFC_JAVA_GENERATOR / UBNFC_RUST_GENERATOR で実行ファイルを指定できます。");
         return Ok(());
     }
     if args.len() % 2 != 0 {
@@ -68,16 +68,22 @@ fn execute_all(args: &[std::ffi::OsString]) -> Result<(), String> {
             return Err(format!("重複したオプション: {key}"));
         }
     }
-    if flags.get("--backend").and_then(|s| s.to_str()) != Some("java") {
-        return Err("--backend java が必要です".into());
-    }
-    let mut config = Config::default();
+    let backend = match flags.get("--backend").and_then(|s| s.to_str()) {
+        Some("java") => Backend::Java,
+        Some("rust") => Backend::Rust,
+        _ => return Err("--backend java|rust が必要です".into()),
+    };
+    let mut config = Config {
+        backend,
+        ..Config::default()
+    };
     if let Some(jobs) = flags.get("--jobs") {
         config.jobs = jobs
             .to_str()
             .and_then(|s| s.parse().ok())
             .filter(|n| *n > 0)
             .ok_or("--jobs は1以上の整数が必要です")?;
+        config.cargo_jobs = Some(config.jobs);
     }
     if let Some(families) = flags.get("--families") {
         config.families = families
@@ -110,7 +116,12 @@ fn execute_all(args: &[std::ffi::OsString]) -> Result<(), String> {
     }
     print!("{}", report.summary_markdown());
     let c = &report.totals;
-    let failures = c.ir_failure + c.generation_rejected + c.javac_failure + c.driver_error + c.fail;
+    let failures = c.ir_failure
+        + c.generation_rejected
+        + c.javac_failure
+        + c.build_failure
+        + c.driver_error
+        + c.fail;
     if failures == 0 {
         Ok(())
     } else {

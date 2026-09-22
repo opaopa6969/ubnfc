@@ -1,6 +1,8 @@
-//! 全 corpus の .ubnf → IR → Java → javac → driver → 独立 oracle 比較。
+//! 全 corpus の .ubnf → IR → Java/Rust → build → driver → 独立 oracle 比較。
 //! loader が既存 Conformance テストと同じ形に合成した文法を再解釈しない。
 mod report;
+mod rust;
+pub use crate::runner::rust::BatchStats;
 pub use report::{Counts, Outcome, RefusalCounts, Report};
 
 use crate::{
@@ -21,6 +23,10 @@ use std::{
 
 #[derive(Clone, Debug)]
 pub struct Config {
+    pub backend: Backend,
+    pub rust_generator: Option<PathBuf>,
+    /// Rust の並列度。未指定時は Cargo の既定値・環境設定を使う。
+    pub cargo_jobs: Option<usize>,
     pub front: PathBuf,
     pub java_generator: PathBuf,
     pub families: Vec<String>,
@@ -30,6 +36,9 @@ impl Default for Config {
     fn default() -> Self {
         let workspace = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
         Self {
+            backend: Backend::Java,
+            rust_generator: None,
+            cargo_jobs: None,
             front: std::env::var_os("UBNFC_BIN")
                 .map(PathBuf::from)
                 .unwrap_or_else(|| workspace.join("target/debug/ubnfc")),
@@ -105,6 +114,8 @@ pub struct BuildResult {
     pub ir: StageResult,
     pub generation: StageResult,
     pub javac: StageResult,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cargo: Option<StageResult>,
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct CaseResult {
@@ -186,7 +197,7 @@ pub fn source_hash(source: &str) -> String {
     });
     format!("{hash:016x}")
 }
-fn plan(files: &[CorpusFile], filters: &[String]) -> Result<Plan> {
+fn plan(files: &[CorpusFile], filters: &[String], backend: Backend) -> Result<Plan> {
     // 未知の filter と参照切れを既存 select と同じ契約で拒否する。
     runner::select(files, filters, None)?;
     let mut plan = Plan {
@@ -233,7 +244,7 @@ fn plan(files: &[CorpusFile], filters: &[String]) -> Result<Plan> {
                 row.missing = runner::unobserved(
                     &case,
                     &Actual {
-                        backend: Backend::Java,
+                        backend,
                         variant: case.variant.clone(),
                         response: serde_json::json!({}),
                     },
@@ -277,6 +288,7 @@ fn plan(files: &[CorpusFile], filters: &[String]) -> Result<Plan> {
                         ir: StageResult::default(),
                         generation: StageResult::default(),
                         javac: StageResult::default(),
+                        cargo: None,
                     },
                     cases: Vec::new(),
                     rows: Vec::new(),
@@ -355,7 +367,7 @@ pub fn materialize(grammar: &GrammarSource, directory: &Path) -> Result<PathBuf>
 
 /// build を単位に並列化する。文法の重複は実行前に束ね、生成・javac・driver 起動は各一度。
 pub fn run(files: &[CorpusFile], config: &Config) -> Result<Report> {
-    if config.jobs == 0 {
+    if config.jobs == 0 || config.cargo_jobs == Some(0) {
         return Err(Error("--jobs は1以上が必要です".into()));
     }
     let mut config = config.clone();
@@ -365,12 +377,40 @@ pub fn run(files: &[CorpusFile], config: &Config) -> Result<Report> {
             config.front.display()
         ))
     })?;
-    config.java_generator = config.java_generator.canonicalize().map_err(|e| Error(format!(
-        "Java 生成器がありません: {} ({e}); mvn -o -q -DskipTests package または UBNFC_JAVA_GENERATOR を指定", config.java_generator.display())))?;
-    let generator_sha256 = sha256(&config.java_generator)?;
+    let generator = match config.backend {
+        Backend::Java => {
+            config.java_generator = config.java_generator.canonicalize().map_err(|e| Error(format!(
+                "Java 生成器がありません: {} ({e}); mvn -o -q -DskipTests package または UBNFC_JAVA_GENERATOR を指定", config.java_generator.display())))?;
+            config.java_generator.clone()
+        }
+        Backend::Rust => {
+            let path = match &config.rust_generator {
+                Some(path) => path.canonicalize()?,
+                None => runner::rust::generator()?,
+            };
+            config.rust_generator = Some(path.clone());
+            path
+        }
+    };
+    let generator_sha256 = sha256(&generator)?;
     let front_sha256 = sha256(&config.front)?;
-    let plan = plan(files, &config.families)?;
+    let plan = plan(files, &config.families, config.backend)?;
     let scratch = Scratch::new()?;
+    let mut report = match config.backend {
+        Backend::Java => run_java(plan, &config, &scratch.0)?,
+        Backend::Rust => rust::run(plan, &config, &scratch.0)?,
+    };
+    if sha256(&generator)? != generator_sha256 || sha256(&config.front)? != front_sha256 {
+        return Err(Error(
+            "実行中に generator/front が更新されました。固定したコピーで再実行してください".into(),
+        ));
+    }
+    report.generator_sha256 = Some(generator_sha256);
+    report.front_sha256 = Some(front_sha256);
+    Ok(report)
+}
+
+fn run_java(plan: Plan, config: &Config, directory: &Path) -> Result<Report> {
     let next = AtomicUsize::new(0);
     let mut results = std::thread::scope(|scope| -> Result<Vec<_>> {
         let workers: Vec<_> = (0..config.jobs.min(plan.work.len()))
@@ -382,7 +422,7 @@ pub fn run(files: &[CorpusFile], config: &Config) -> Result<Report> {
                         let Some(work) = plan.work.get(index) else {
                             break;
                         };
-                        let result = execute(work, &config, &scratch.0.join(&work.build.id));
+                        let result = execute(work, config, &directory.join(&work.build.id));
                         results.push((index, result));
                     }
                     results
@@ -406,17 +446,16 @@ pub fn run(files: &[CorpusFile], config: &Config) -> Result<Report> {
         builds.push(build);
         cases.extend(rows);
     }
-    let mut report = Report::new(config.jobs, plan.files, plan.variants, builds, cases);
-    if sha256(&config.java_generator)? != generator_sha256 || sha256(&config.front)? != front_sha256
-    {
-        return Err(Error(
-            "実行中に generator/front が更新されました。固定したコピーで再実行してください".into(),
-        ));
-    }
-    report.generator_sha256 = Some(generator_sha256);
-    report.front_sha256 = Some(front_sha256);
-    Ok(report)
+    Ok(Report::new(
+        config.backend,
+        config.jobs,
+        plan.files,
+        plan.variants,
+        builds,
+        cases,
+    ))
 }
+
 fn sha256(path: &Path) -> Result<String> {
     let output = Command::new("sha256sum").arg(path).output()?;
     let digest = String::from_utf8_lossy(&output.stdout)
@@ -435,12 +474,14 @@ fn sha256(path: &Path) -> Result<String> {
     }
     Ok(digest)
 }
-fn execute(work: &Work, config: &Config, directory: &Path) -> (BuildResult, Vec<CaseResult>) {
-    let mut build = work.build.clone();
-    let mut rows = work.rows.clone();
+fn prepare_ir(
+    work: &Work,
+    config: &Config,
+    directory: &Path,
+) -> std::result::Result<(PathBuf, String), StageResult> {
     let grammar = materialize(&work.grammar, &directory.join("grammar"));
     let ir_path = directory.join("grammar.ir.json");
-    build.ir = match grammar {
+    let ir = match grammar {
         Ok(grammar) => {
             // File の場合も build の出力先だけは用意する。
             match fs::create_dir_all(directory) {
@@ -458,8 +499,8 @@ fn execute(work: &Work, config: &Config, directory: &Path) -> (BuildResult, Vec<
         }
         Err(error) => StageResult::failed("ir", error.to_string()),
     };
-    if build.ir.status == StageStatus::Failed {
-        return stopped(build, rows, Outcome::IrFailure, directory);
+    if ir.status == StageStatus::Failed {
+        return Err(ir);
     }
     // wire の grammar は構文解析済み IR の entry から得る（コメント中の grammar と混同しない）。
     let ir = fs::read(&ir_path)
@@ -477,10 +518,20 @@ fn execute(work: &Work, config: &Config, directory: &Path) -> (BuildResult, Vec<
             .map(str::to_owned)
             .ok_or_else(|| "IR に entry grammar がありません".into())
     });
-    let grammar_name = match grammar_name {
-        Ok(name) => name,
+    let grammar_name = grammar_name.map_err(|error| StageResult::failed("ir", error))?;
+    Ok((ir_path, grammar_name))
+}
+
+fn execute(work: &Work, config: &Config, directory: &Path) -> (BuildResult, Vec<CaseResult>) {
+    let mut build = work.build.clone();
+    let mut rows = work.rows.clone();
+    let (ir_path, grammar_name) = match prepare_ir(work, config, directory) {
+        Ok(prepared) => {
+            build.ir = StageResult::success();
+            prepared
+        }
         Err(error) => {
-            build.ir = StageResult::failed("ir", error);
+            build.ir = error;
             return stopped(build, rows, Outcome::IrFailure, directory);
         }
     };
@@ -540,6 +591,7 @@ fn stopped(
                 Outcome::IrFailure => ("ir", &build.ir),
                 Outcome::GenerationRejected => ("generation", &build.generation),
                 Outcome::JavacFailure => ("javac", &build.javac),
+                Outcome::BuildFailure => ("build", build.cargo.as_ref().expect("cargo failure")),
                 _ => unreachable!("stopped は build 段階の失敗のみ"),
             };
             if stage == actual_stage && result.reasons == [code.clone()] {
@@ -563,7 +615,10 @@ fn normalize_logs(build: &mut BuildResult, directory: &Path) {
         ("ir", &mut build.ir),
         ("generation", &mut build.generation),
         ("javac", &mut build.javac),
-    ] {
+    ]
+    .into_iter()
+    .chain(build.cargo.as_mut().map(|stage| ("build", stage)))
+    {
         stage.output = stage
             .output
             .replace(directory.to_string_lossy().as_ref(), "<build>");
@@ -593,6 +648,15 @@ fn reasons(stage: &str, output: &str) -> Vec<String> {
         }
     } else if stage == "generation" {
         for line in output.lines() {
+            if let Some((_, reason)) = line.split_once("unsupported IR feature ") {
+                reasons.insert(
+                    reason
+                        .split_once(": ")
+                        .map_or(reason, |(feature, _)| feature)
+                        .trim()
+                        .to_owned(),
+                );
+            }
             for prefix in ["Unsupported IR feature: ", "Unsupported requiredFeatures: "] {
                 if let Some((_, reason)) = line.split_once(prefix) {
                     reasons.insert(generation_feature(reason.trim()).to_owned());
@@ -677,7 +741,7 @@ mod tests {
     #[test]
     fn cache_deduplicates_sources_but_keeps_import_contents_and_all_variants() {
         let files = crate::load_all(crate::default_root()).unwrap();
-        let plan = plan(&files, &[]).unwrap();
+        let plan = plan(&files, &[], Backend::Java).unwrap();
         let executions: usize = files
             .iter()
             .flat_map(|f| &f.cases)
@@ -743,6 +807,13 @@ mod tests {
         assert_eq!(reasons("generation", "Exception in thread \"main\" java.lang.IllegalArgumentException: Unsupported IR feature: nestedValueType:list\n\tat x"),
             ["nestedValueType:list"]);
         assert_eq!(
+            reasons(
+                "generation",
+                "unsupported IR feature externTokens.inputState: G::T"
+            ),
+            ["externTokens.inputState"]
+        );
+        assert_eq!(
             reasons("generation", "Unsupported requiredFeatures: recovery"),
             ["recovery"]
         );
@@ -772,7 +843,7 @@ mod tests {
     #[test]
     fn aggregate_all_stage_results_and_keep_missing_separate_from_fail() {
         let files = crate::load_all(crate::default_root()).unwrap();
-        let mut plan = plan(&files, &["associative".into()]).unwrap();
+        let mut plan = plan(&files, &["associative".into()], Backend::Java).unwrap();
         let work = &mut plan.work[0];
         let base = work.rows[0].clone();
         let mut rows = Vec::new();
@@ -780,6 +851,7 @@ mod tests {
             Outcome::IrFailure,
             Outcome::GenerationRejected,
             Outcome::JavacFailure,
+            Outcome::BuildFailure,
             Outcome::DriverError,
             Outcome::Pass,
             Outcome::KnownDivergence,
@@ -795,7 +867,7 @@ mod tests {
             rows.push(row);
         }
         let mut missing = base.clone();
-        missing.case_id = "8".into();
+        missing.case_id = "9".into();
         missing.observe(
             &work.cases[0],
             Actual {
@@ -809,13 +881,14 @@ mod tests {
         rows.push(missing);
         work.build.generation =
             StageResult::failed("generation", "Unsupported IR feature: eval".into());
-        let report = Report::new(4, 1, 1, vec![work.build.clone()], rows);
+        let report = Report::new(Backend::Java, 4, 1, 1, vec![work.build.clone()], rows);
         assert_eq!(
             report.totals,
             Counts {
                 ir_failure: 1,
                 generation_rejected: 1,
                 javac_failure: 1,
+                build_failure: 1,
                 driver_error: 1,
                 pass: 1,
                 known_divergence: 1,
@@ -828,7 +901,7 @@ mod tests {
         assert!(report.markdown().contains("生成拒否"));
         assert_eq!(
             serde_json::from_str::<Value>(&report.json()).unwrap()["source_cases"],
-            9
+            10
         );
     }
 }
@@ -836,7 +909,7 @@ mod tests {
 fn expected_rejection_requires_the_exact_stage_and_code_and_keeps_failure_evidence() {
     // resolve.rs:143-155 の意図的な拒否。無関係な IR/生成失敗は Pass にしない。
     let files = crate::load_all(crate::default_root()).unwrap();
-    let plan = plan(&files, &["oracle".into()]).unwrap();
+    let plan = plan(&files, &["oracle".into()], Backend::Java).unwrap();
     let work = plan
         .work
         .iter()

@@ -1,7 +1,7 @@
 //! オフライン build と JSON Lines driver。実行値を oracle から補完しない。
 mod comparison;
 mod report;
-mod rust;
+pub(crate) mod rust;
 pub use comparison::{compare, unobserved};
 pub use report::Report;
 
