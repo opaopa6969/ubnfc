@@ -152,3 +152,12 @@ D-017 に登録せず、統合テストだけでこの一件の value 観測を�
 parser 本体・golden を補正せず、バックエンドの正しい mapping 実装を妨げない。
 
 検証: `cargo test -p ubnfc-harness`、`cargo clippy -p ubnfc-harness -- -D warnings`、`cargo fmt`。
+
+
+## 追記（2026-09-22、Java backend 接続後）
+
+- 「runner は生成器を呼ばない」は `--artifact`（Prebuilt）経路の記述。`--ir` 経路（`Artifact::FromIr`）では
+  runner が `ubnfc-java` の classes/jar（`cd ubnfc-java && mvn -o -q -DskipTests package` 済み）で IR → 生成 → `javac` を行う。
+- 生成 driver の簡易評価（`value`）は、IR に operator 指定がある `left/op/right` 形 AST に対する数値演算 `+ - * / ^` のみ。
+  それ以外は `null`（未観測ではなく「評価なし」）。
+- 生成 Java での実測: associative 24/24、right-associative 28/28、tinycalc 8/8（Known 0 / Fail 0 / 未観測 0）。
