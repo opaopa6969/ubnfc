@@ -10,5 +10,6 @@
 
 pub mod cli;
 pub mod ir;
+pub mod syntax;
 
 pub const IR_VERSION: u32 = 1;
