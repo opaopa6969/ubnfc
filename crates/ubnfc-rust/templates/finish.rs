@@ -56,22 +56,27 @@ fn occurrences(
                     if let Some(index) = current {
                         rule_orders[index] = rule_order;
                         rule_order += 1;
-                        let node: &mut LexicalOccurrence = &mut lexical[index];
-                        node.completion_order = lexical_order;
+                        // rule 出現は lexical のときだけ保持する（AST だけなら完了順だけ要る）。
+                        if self.options.lexical {
+                            let node: &mut LexicalOccurrence = &mut lexical[index];
+                            node.completion_order = lexical_order;
+                        }
                         lexical_order += 1;
                     }
                 } else {
                     let index = if self.options.lexical || self.options.build_ast {
+                        let index = rule_orders.len();
                         rule_orders.push(0);
-                        let index = lexical.len();
-                        lexical.push(LexicalOccurrence {
-                            occurrence_id: index,
-                            parent_occurrence_id: parent,
-                            rule_id: RULES[rule],
-                            expr_id: BODIES[rule],
-                            span: self.span(span),
-                            completion_order: 0,
-                        });
+                        if self.options.lexical {
+                            lexical.push(LexicalOccurrence {
+                                occurrence_id: index,
+                                parent_occurrence_id: parent,
+                                rule_id: RULES[rule],
+                                expr_id: BODIES[rule],
+                                span: self.span(span),
+                                completion_order: 0,
+                            });
+                        }
                         Some(index)
                     } else {
                         parent
@@ -88,9 +93,6 @@ fn occurrences(
     }
     for token in &mut tokens {
         token.occurrence_id += lexical.len();
-    }
-    if !self.options.lexical {
-        lexical.clear();
     }
     (captures, lexical, tokens)
 }
@@ -301,12 +303,16 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         .max(self.trivia_cache.max_probe_len());
     self.statistics.recipes = self.arena.len() - 1;
     self.statistics.ast_nodes = self.node_spans.len();
-    let mut value_spans = Vec::new();
+    let mut value_spans = Vec::with_capacity(if ast.is_some() {
+        self.node_spans.len() + self.text_spans.len()
+    } else {
+        0
+    });
     if let Some(ast) = &ast {
         let mut path = String::with_capacity(128);
         ast.collect(&mut path, &self.text_spans, &mut value_spans);
     }
-    ParseResult {
+    let result = ParseResult {
         value_spans,
         ok,
         consumed_cp,
@@ -315,7 +321,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         captures,
         lexical,
         tokens,
-        node_spans: self.node_spans,
+        node_spans: std::mem::take(&mut self.node_spans),
         diagnostics,
         hints,
         recoveries,
@@ -376,5 +382,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
                 vec![]
             },
         },
-    }
+    };
+    self.recycle();
+    result
 }

@@ -339,6 +339,27 @@ impl<'a> Validator<'a> {
             if let TokenSpec::Builtin { code_points, .. } = &token.spec {
                 self.code_points(code_points, &format!("{p}/spec/codePoints"));
             }
+            if let TokenSpec::Extern {
+                first_chars: Some(ranges),
+                ..
+            } = &token.spec
+            {
+                let q = format!("{p}/spec/firstChars");
+                if ranges.is_empty() {
+                    self.error(&q, "firstChars must not be empty (omit for unknown)");
+                }
+                for (j, r) in ranges.iter().enumerate() {
+                    if r.start > r.end || r.end > 0x10ffff {
+                        self.error(&format!("{q}/{j}"), "invalid firstChars range");
+                    }
+                    if j > 0 && ranges[j - 1].end >= r.start {
+                        self.error(
+                            &format!("{q}/{j}"),
+                            "firstChars must be ascending and disjoint",
+                        );
+                    }
+                }
+            }
             self.regex_plan(token, &format!("{p}/spec"));
         }
         for (i, expr) in s.expressions.iter().enumerate() {

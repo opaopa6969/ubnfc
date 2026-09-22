@@ -40,6 +40,18 @@ impl Diagnostics {
             exhausted: false,
         }
     }
+    /// 内容を捨てて再利用する（確保は保持）。
+    #[allow(dead_code)]
+    pub fn reset(&mut self, limit: usize) {
+        self.nodes.clear();
+        self.nodes.push(Node::Empty);
+        self.limit = limit.min(u32::MAX as usize);
+        self.exhausted = false;
+    }
+    #[allow(dead_code)]
+    pub fn capacity_bytes(&self) -> usize {
+        self.nodes.capacity() * std::mem::size_of::<Node>()
+    }
     fn push(&mut self, pos: usize, node: Node) -> Diag {
         if self.nodes.len() >= self.limit {
             self.exhausted = true;
@@ -254,6 +266,28 @@ impl DisplayDiagnostics {
             limit,
             exhausted: false,
         }
+    }
+    /// 内容を捨てて再利用する（確保は保持）。世代印を進めるので dedupe 表は空と同じ。
+    #[allow(dead_code)]
+    pub fn reset(&mut self, limit: usize) {
+        self.log.clear();
+        self.saved.clear();
+        self.frames.clear();
+        self.frames.push(Frame::default());
+        self.seen.generation = self.seen.generation.wrapping_add(1);
+        if self.seen.generation == 0 {
+            self.seen.slots.iter_mut().for_each(|s| *s = (0, 0));
+        }
+        self.floor = 0;
+        self.guards = 0;
+        self.work = 0;
+        self.limit = limit;
+        self.exhausted = false;
+    }
+    #[allow(dead_code)]
+    pub fn capacity_bytes(&self) -> usize {
+        (self.log.capacity() + self.saved.capacity()) * std::mem::size_of::<&'static str>()
+            + self.frames.capacity() * std::mem::size_of::<Frame>()
     }
     #[inline]
     pub fn enter(&mut self, reached: usize) {

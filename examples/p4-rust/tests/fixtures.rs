@@ -289,6 +289,84 @@ fn extern_scanners_are_reached() {
     assert!(!parse_formula("```java:org.example.Fn\nreturn 1;\n1", options(true, true)).ok);
 }
 
+/// `scanners/first-chars.json` の宣言（M5 round 3）は必要条件: 宣言した集合の外の先頭文字では
+/// 同梱 scanner が消費なしに失敗する。生成器はこの前提で Extern で始まる候補を除外する。
+#[test]
+fn extern_first_chars_declaration_matches_bundled_scanners() {
+    use ubnfc_p4_rust::{rt::scope::ScopeStore, scanners::Registry, State, TokenScanner};
+    let path = root().join("../../scanners/first-chars.json");
+    let text = std::fs::read_to_string(&path).unwrap();
+    let decl: serde_json::Value = serde_json::from_str(&text).unwrap();
+    let scanners = decl["scanners"].as_object().unwrap();
+    let classes: &'static [(&'static str, &'static str)] = Box::leak(
+        scanners
+            .keys()
+            .map(|class| {
+                let class: &'static str = Box::leak(class.clone().into_boxed_str());
+                (class, class)
+            })
+            .collect::<Vec<_>>()
+            .into_boxed_slice(),
+    );
+    let mut registry = Registry::new(classes).expect("宣言した全クラスは同梱 registry にある");
+    let scope = ScopeStore::new();
+    let mut checked = 0usize;
+    for (class, ranges) in scanners {
+        let Some(ranges) = ranges.as_array() else {
+            continue;
+        };
+        let allowed: Vec<(u32, u32)> = ranges
+            .iter()
+            .map(|r| match r {
+                serde_json::Value::String(s) => {
+                    let c = s.chars().next().unwrap() as u32;
+                    (c, c)
+                }
+                serde_json::Value::Number(n) => {
+                    let c = u32::try_from(n.as_u64().unwrap()).unwrap();
+                    (c, c)
+                }
+                serde_json::Value::Object(o) => {
+                    let cp = |v: &serde_json::Value| match v {
+                        serde_json::Value::String(s) => s.chars().next().unwrap() as u32,
+                        other => u32::try_from(other.as_u64().unwrap()).unwrap(),
+                    };
+                    (cp(&o["start"]), cp(&o["end"]))
+                }
+                other => panic!("{other}"),
+            })
+            .collect();
+        let outside = (0x20u32..0x7f)
+            .chain([0x0a, 0x09, 0xe9, 0x3042, 0x1f600])
+            .filter_map(char::from_u32)
+            .filter(|c| {
+                !allowed
+                    .iter()
+                    .any(|&(lo, hi)| (lo..=hi).contains(&(*c as u32)))
+            });
+        for c in outside {
+            for (prefix, consumed) in [("", 0usize), ("ab\n", 3)] {
+                let input = format!("{prefix}{c}xyz\n```java:a.b\n");
+                for (match_only, reset) in [(false, true), (true, true), (true, false)] {
+                    let state = State {
+                        consumed,
+                        matched: consumed,
+                        invert: false,
+                        reset,
+                    };
+                    let result = registry.scan(class, &input, state, match_only, &scope);
+                    assert!(
+                        !result.ok && result.consumed_end == consumed && result.matched_end == consumed,
+                        "{class}: 宣言外の先頭文字 {c:?}（match_only {match_only}, reset {reset}）で消費なしに失敗する: {result:?}"
+                    );
+                    checked += 1;
+                }
+            }
+        }
+    }
+    assert!(checked > 1000, "{checked}");
+}
+
 /// Java golden の単引用符付き文字列値 `'jp'` を `jp` に正規化し、正規化した個数を返す。
 fn strip_single_quotes(value: &mut serde_json::Value) -> usize {
     match value {
@@ -426,25 +504,30 @@ fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
                 if !memo && (input.len() > 400 || index % 13 != 0) {
                     continue;
                 }
-                let run = |predict: bool| {
+                let run = |predict: bool, factor: bool| {
                     let mut options = options(true, memo);
                     options.predict = predict;
+                    options.factor = factor;
                     strip_statistics(match entry {
                         None => parse_formula(input, options),
                         Some(entry) => parse_entry(Some(entry), input, options).unwrap(),
                     })
                 };
-                let (on, off) = (run(true), run(false));
-                assert!(
-                    on == off,
-                    "{name}: predict on/off differ (memo {memo}) for input {:?}\non:  {:?}\noff: {:?}",
-                    input,
-                    on.diagnostics,
-                    off.diagnostics
-                );
-                compared += 1;
+                // 参照経路（候補除外なし・因数分解なし）と、各最適化の組合せを比較する。
+                let reference = run(false, false);
+                for (predict, factor) in [(true, true), (true, false), (false, true)] {
+                    let optimized = run(predict, factor);
+                    assert!(
+                        optimized == reference,
+                        "{name}: predict {predict} / factor {factor} differ from reference (memo {memo}) for input {:?}\nopt: {:?}\nref: {:?}",
+                        input,
+                        optimized.diagnostics,
+                        reference.diagnostics
+                    );
+                    compared += 1;
+                }
             }
         }
     }
-    assert!(compared > 1000, "{compared}");
+    assert!(compared > 3000, "{compared}");
 }

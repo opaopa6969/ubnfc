@@ -62,6 +62,7 @@ impl<'a> Generator<'a> {
             prediction: crate::predict::Prediction {
                 starts: Vec::new(),
                 templatable: Vec::new(),
+                sizes: Vec::new(),
             },
             guards: BTreeSet::new(),
         };
@@ -114,6 +115,23 @@ impl<'a> Generator<'a> {
                     .unwrap_or(alternatives);
                 let (guarded, _) = crate::predict::guarded_alternatives(&g, order, longest);
                 pending.extend(guarded.iter().map(|x| (x.expr, child_mode)));
+                // 因数分解した群は共有先頭要素に対して候補除外を行う（factor.rs）。
+                if !longest {
+                    if let Some(plan) = crate::factor::plan(&g, order, &guarded) {
+                        for &(start, _) in &plan.groups {
+                            if guarded.iter().any(|x| x.index == start) {
+                                if let ExprNode::Seq { items } =
+                                    &ir.semantics.expressions[g.expr[order[start].as_str()]].node
+                                {
+                                    let elem = g.expr[items[0].as_str()];
+                                    if g.prediction.templatable[elem] {
+                                        pending.push((elem, child_mode));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         g.guards = pending.into_iter().collect();
@@ -156,6 +174,17 @@ impl<'a> Generator<'a> {
         format!("self.e{}_{}({state})", self.expr[id.as_str()], suffix(mode))
     }
     pub fn trivia(&self, id: &ExprId, at: BoundaryAt, index: Option<u64>, mode: bool) -> String {
+        self.trivia_with(id, at, index, mode, "out")
+    }
+    /// 境界 `at` の trivia を Step 変数 `var` に対して読み飛ばす文。
+    pub fn trivia_with(
+        &self,
+        id: &ExprId,
+        at: BoundaryAt,
+        index: Option<u64>,
+        mode: bool,
+        var: &str,
+    ) -> String {
         let mut s = String::new();
         for insertion in &self.ir.semantics.trivia.insertion_plan {
             if insertion.boundary.owner_expr_id == *id
@@ -172,7 +201,7 @@ impl<'a> Generator<'a> {
                     .unwrap();
                 writeln!(
                     s,
-                    "let trivia=self.trivia_{p}::<{mode}>(out.state);out=self.combine(out,trivia);"
+                    "let trivia=self.trivia_{p}::<{mode}>({var}.state);{var}=self.combine({var},trivia);"
                 )
                 .unwrap();
             }

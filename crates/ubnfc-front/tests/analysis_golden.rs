@@ -398,6 +398,7 @@ fn extern_closure_is_fail_closed_and_alias_guarantee_is_respected() {
         "B",
         "G::X",
         TokenSpec::Extern {
+            first_chars: None,
             logical_id: "X".into(),
             original_class_name: "custom.X".into(),
             java_binding: None,

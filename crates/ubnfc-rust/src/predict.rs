@@ -7,6 +7,9 @@
 //! そのとき候補は呼ばず、同じ前提の下で候補が実行したはずの runtime 呼出し
 //! （display の reach / failures、主診断 DAG の Failure / Rule / Join、rule 深さ検査）
 //! だけを再生する `guard_e{i}` 関数を呼ぶ。葉（literal / token）は本物の関数を呼ぶ。
+//! 再生は候補の失敗経路を全て展開できる（`INLINE_MAX` 以下の）候補にだけ置く。展開できない
+//! 部分木を本物の関数で呼ぶ再生も健全（同じ前提の下で同じ観測を残す）だが、rule 評価回数が
+//! 本物の経路と同じになり利得がない（M5 round 3）。
 //!
 //! 再生と本物の差は memo（lookup / store）と局所 frame（enter / leave）だけで、どちらも
 //! 観測量（farthest / expected / rulePath / AST / 効果列）を変えない（memo 有無の同値は
@@ -155,6 +158,9 @@ pub(crate) fn canonical_policies(ir: &GrammarIr) -> Vec<usize> {
 pub(crate) struct Prediction {
     pub starts: Vec<Start>,
     pub templatable: Vec<bool>,
+    /// 失敗経路を全て展開したときの node 数。展開できない部分（nullable な先頭、最長一致、
+    /// 先読み、入口効果・recovery を持つ rule、循環）を含めば None。
+    pub sizes: Vec<Option<usize>>,
 }
 
 fn is_leaf(node: &ExprNode) -> bool {
@@ -225,18 +231,49 @@ impl Prediction {
         }
         // 再生関数は経路を静的に展開する（共有しない）ので、展開の大きさを上限で抑える。
         // 例: `D28 ::= D27 | D27` の連鎖は指数的に広がるが、本物の経路は memo で線形に収まる。
+        // 展開は「全て展開できる（pure）」候補にだけ置く。部分的に本物の rule を呼ぶ再生は
+        // 本物の経路（候補 wrapper 1 段 + memo hit）と同じ回数の rule 評価になり、選択の
+        // 各候補が大きな共有 rule を先頭に持つ形では memo hit 1 回を再生で置き換えて遅くなった
+        // （M5 round 3 の計測）。共有先頭要素の候補列は左因数分解（factor.rs）で 1 回にする。
         let mut cache: Vec<Option<Option<usize>>> = vec![None; n];
+        let sizes: Vec<Option<usize>> = (0..n)
+            .map(|i| inline_size(g, i, &starts, &mut cache, &mut BTreeSet::new()))
+            .collect();
         let templatable = (0..n)
-            .map(|i| {
-                template_size(g, i, &starts, &mut cache, &mut BTreeSet::new())
-                    .is_some_and(|size| size <= MAX_TEMPLATE_SIZE)
-            })
+            .map(|i| walkable(g, i, &starts) && sizes[i].is_some_and(|size| size <= INLINE_MAX))
             .collect();
         Self {
             starts,
             templatable,
+            sizes,
         }
     }
+}
+
+/// 候補として再生関数を生成できる expression: 非 nullable の Known で、先頭要素の失敗が
+/// 候補の失敗になる構造（Seq の先頭が非 nullable、順序付き Choice、Group、RuleRef）。
+fn walkable(g: &Generator<'_>, i: usize, starts: &[Start]) -> bool {
+    let expr = &g.ir.semantics.expressions[i];
+    let nonnull = |j: usize| matches!(&starts[j], Start::Known(k) if !k.nullable);
+    if !nonnull(i) || expr.execution.child_mode != ExecutionChildMode::Inherit {
+        return false;
+    }
+    match &expr.node {
+        ExprNode::Seq { items } => items.first().is_some_and(|c| nonnull(g.expr[c.as_str()])),
+        ExprNode::Choice { .. } => !longest_choice(g, expr),
+        ExprNode::Group { .. } | ExprNode::RuleRef { .. } => true,
+        _ => false,
+    }
+}
+
+fn longest_choice(g: &Generator<'_>, expr: &Expr) -> bool {
+    let ExprNode::Choice { selection, .. } = &expr.node else {
+        return false;
+    };
+    let plan = g.ir.plan.choices.iter().find(|p| p.expr_id == expr.id);
+    plan.map_or(*selection == ChoiceSelection::Longest, |p| {
+        p.strategy == ChoicePlanStrategy::Longest
+    })
 }
 
 fn compute(
@@ -428,6 +465,23 @@ fn token_start(g: &Generator<'_>, symbol_id: &str) -> Start {
             (Ok(lo), Ok(hi)) => known(Ranges::range(lo, hi)),
             _ => Start::Unknown,
         },
+        // scanner registry の宣言（IR firstChars、`scanners/first-chars.json`）がある Extern だけ Known。
+        // 宣言は「集合外の先頭文字では消費なしで失敗する」必要条件で、再生では葉として本物の
+        // scanner を呼ぶので失敗診断も scanner が返すものと同じになる。
+        TokenSpec::Extern {
+            first_chars: Some(ranges),
+            ..
+        } if !ranges.is_empty() => {
+            let mut r = Ranges::default();
+            for range in ranges {
+                let (Ok(lo), Ok(hi)) = (u32::try_from(range.start), u32::try_from(range.end))
+                else {
+                    return Start::Unknown;
+                };
+                r = r.union(&Ranges::range(lo, hi));
+            }
+            known(r)
+        }
         _ => Start::Unknown,
     }
 }
@@ -451,10 +505,11 @@ fn rule_templatable(g: &Generator<'_>, r: usize) -> bool {
 }
 
 /// 再生関数 1 つが展開する node（葉・rule・選択）数の上限。
-const MAX_TEMPLATE_SIZE: usize = 192;
+const INLINE_MAX: usize = 192;
 
-/// 「最初の significant token で失敗する」前提の失敗経路を静的に再生できるなら、その展開の大きさ。
-fn template_size(
+/// 「最初の significant token で失敗する」前提の失敗経路を全て展開したときの大きさ。
+/// 展開できない node（nullable な先頭、最長一致、先読み等）と循環（左再帰）は None。
+fn inline_size(
     g: &Generator<'_>,
     i: usize,
     starts: &[Start],
@@ -469,59 +524,36 @@ fn template_size(
     }
     let expr = &g.ir.semantics.expressions[i];
     let nonnull = |j: usize| matches!(&starts[j], Start::Known(k) if !k.nullable);
-    let child = |g: &Generator<'_>,
-                 c: usize,
-                 cache: &mut Vec<Option<Option<usize>>>,
-                 visiting: &mut BTreeSet<usize>| {
-        if nonnull(c) {
-            template_size(g, c, starts, cache, visiting)
-        } else {
-            None
-        }
-    };
     let size = if !nonnull(i) || expr.execution.child_mode != ExecutionChildMode::Inherit {
         None
     } else {
         match &expr.node {
             ExprNode::Literal { .. } | ExprNode::TokenRef { .. } => Some(1),
-            ExprNode::Seq { items } => items
-                .first()
-                .and_then(|c| child(g, g.expr[c.as_str()], cache, visiting))
-                .map(|n| n + 1),
-            ExprNode::Choice {
-                alternatives,
-                selection,
-                ..
-            } => {
-                let plan = g.ir.plan.choices.iter().find(|p| p.expr_id == expr.id);
-                let longest = plan.map_or(*selection == ChoiceSelection::Longest, |p| {
-                    p.strategy == ChoicePlanStrategy::Longest
-                });
-                if longest {
-                    None
-                } else {
-                    let mut total = 1usize;
-                    let mut ok = true;
-                    for a in alternatives {
-                        match child(g, g.expr[a.as_str()], cache, visiting) {
-                            Some(n) => total = total.saturating_add(n),
-                            None => {
-                                ok = false;
-                                break;
-                            }
-                        }
-                    }
-                    ok.then_some(total)
+            ExprNode::Seq { items } => match items.first() {
+                Some(c) if nonnull(g.expr[c.as_str()]) => {
+                    inline_size(g, g.expr[c.as_str()], starts, cache, visiting).map(|n| n + 1)
                 }
+                _ => None,
+            },
+            ExprNode::Choice { alternatives, .. } if !longest_choice(g, expr) => {
+                let mut total = Some(1usize);
+                for a in alternatives {
+                    let n = inline_size(g, g.expr[a.as_str()], starts, cache, visiting);
+                    total = match (total, n) {
+                        (Some(t), Some(n)) => Some(t.saturating_add(n)),
+                        _ => None,
+                    };
+                }
+                total
             }
             ExprNode::Group { child: c } => {
-                child(g, g.expr[c.as_str()], cache, visiting).map(|n| n + 1)
+                inline_size(g, g.expr[c.as_str()], starts, cache, visiting).map(|n| n + 1)
             }
             ExprNode::RuleRef { symbol_id } => {
                 let r = g.rules[symbol_id.as_str()];
                 let body = g.expr[g.ir.semantics.rules[r].body.as_str()];
                 if rule_templatable(g, r) {
-                    child(g, body, cache, visiting).map(|n| n + 1)
+                    inline_size(g, body, starts, cache, visiting).map(|n| n + 1)
                 } else {
                     None
                 }
@@ -621,8 +653,18 @@ struct Fold<'g, 'a> {
     late: Vec<(String, Vec<String>)>,
     depth: usize,
     max_depth: usize,
+    /// 展開中の rule 本体（循環は本物の呼出しへ戻す）。
+    visiting: BTreeSet<usize>,
 }
 impl Fold<'_, '_> {
+    /// 部分木 `i` を展開するか（全て展開でき、循環していない）。候補全体が pure なら
+    /// 常に真で、偽の枝（本物の呼出しへの後退）は防御的に残す。
+    fn inline(&self, i: usize) -> bool {
+        self.g.prediction.sizes[i].is_some() && !self.visiting.contains(&i)
+    }
+    fn inline_rule(&self, r: usize, body: usize) -> bool {
+        rule_templatable(self.g, r) && self.inline(body)
+    }
     fn fresh(&mut self, prefix: &str) -> String {
         self.vars += 1;
         format!("{prefix}{}", self.vars)
@@ -717,6 +759,28 @@ impl Fold<'_, '_> {
                 return d;
             }
             _ => {
+                // 展開できない・大きい・循環する部分木は本物の expression 関数を呼ぶ。
+                // 本物は同じ前提の下で同じ観測を残し（memo と局所 frame の差だけ）、
+                // 観測に寄与する label / 主診断は wrapper が自分で記録する。
+                let nonnull =
+                    |j: usize| matches!(&g.prediction.starts[j], Start::Known(k) if !k.nullable);
+                let inline = expr.execution.child_mode == ExecutionChildMode::Inherit
+                    && nonnull(i)
+                    && match &expr.node {
+                        ExprNode::Seq { items } => {
+                            items.first().is_some_and(|c| nonnull(g.expr[c.as_str()]))
+                        }
+                        ExprNode::Choice { .. } => {
+                            !longest_choice(g, expr) && g.prediction.sizes[i].is_some()
+                        }
+                        ExprNode::Group { .. } | ExprNode::RuleRef { .. } => true,
+                        _ => false,
+                    };
+                if !inline {
+                    let d = self.fresh("d");
+                    writeln!(self.code, "let {d}={}.diag;", g.call(&expr.id, mode, var)).unwrap();
+                    return d;
+                }
                 let mut var = var.to_owned();
                 if expr.execution.entry_flag == ExecutionEntryFlag::SetFalse
                     || matches!(
@@ -762,17 +826,27 @@ impl Fold<'_, '_> {
                     ExprNode::RuleRef { symbol_id } => {
                         let r = g.rules[symbol_id.as_str()];
                         let rule = &g.ir.semantics.rules[r];
-                        self.depth += 1;
-                        self.max_depth = self.max_depth.max(self.depth);
                         let body = g.expr[rule.body.as_str()];
-                        let child = self.walk(body, &var);
-                        self.depth -= 1;
-                        self.record(&var, g.display.rule(rule.symbol_id.as_str()));
-                        let d = self.fresh("d");
-                        writeln!(self.code, "let {d}=self.diag.rule({r},{child});").unwrap();
-                        d
+                        if self.inline_rule(r, body) {
+                            self.depth += 1;
+                            self.max_depth = self.max_depth.max(self.depth);
+                            self.visiting.insert(body);
+                            let child = self.walk(body, &var);
+                            self.visiting.remove(&body);
+                            self.depth -= 1;
+                            self.record(&var, g.display.rule(rule.symbol_id.as_str()));
+                            let d = self.fresh("d");
+                            writeln!(self.code, "let {d}=self.diag.rule({r},{child});").unwrap();
+                            d
+                        } else {
+                            // 本物の rule 関数（入口検査・memo・Rule node・rule label を自分で行う）。
+                            let d = self.fresh("d");
+                            writeln!(self.code, "let {d}=self.r{r}_{}({var}).diag;", suffix(mode))
+                                .unwrap();
+                            d
+                        }
                     }
-                    _ => unreachable!("templatable expression"),
+                    _ => unreachable!("inline expression"),
                 }
             }
         };
@@ -796,6 +870,7 @@ pub(crate) fn guard_function(g: &Generator<'_>, i: usize, mode: bool) -> String 
         late: Vec::new(),
         depth: 0,
         max_depth: 0,
+        visiting: BTreeSet::new(),
     };
     let diag = fold.walk(i, "state");
     fold.flush_early();

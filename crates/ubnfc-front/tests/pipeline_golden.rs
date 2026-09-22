@@ -18,12 +18,20 @@ fn fixture_root(variable: &str, default: &str) -> PathBuf {
 fn golden_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../ir/fixtures")
 }
-fn run(root: &Path, command: &str, relative: &str) -> std::process::Output {
-    Command::new(env!("CARGO_BIN_EXE_ubnfc"))
-        .current_dir(root)
-        .args([command, "--grammar", relative])
-        .output()
+/// golden は同梱 scanner registry の先頭文字宣言（`scanners/first-chars.json`）を写した IR。
+fn first_chars() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../scanners/first-chars.json")
+        .canonicalize()
         .unwrap()
+}
+fn run(root: &Path, command: &str, relative: &str) -> std::process::Output {
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_ubnfc"));
+    cmd.current_dir(root).args([command, "--grammar", relative]);
+    if command != "validate" {
+        cmd.arg("--extern-first-chars").arg(first_chars());
+    }
+    cmd.output().unwrap()
 }
 const FILES: &[&str] = &[
     "story/code/calc-var.ubnf",
@@ -69,7 +77,8 @@ fn check_ir(root: &Path, relative: &str) -> Vec<u8> {
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .args(["ir", "--grammar"])
         .arg(root.join(relative))
-        .args(["--out", "-"])
+        .args(["--out", "-", "--extern-first-chars"])
+        .arg(first_chars())
         .output()
         .unwrap();
     assert!(

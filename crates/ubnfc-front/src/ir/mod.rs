@@ -5,11 +5,15 @@
 //! `to_canonical_json` は値の順序を保って ubnfc-json.v1 形式へ直列化する。
 
 mod constants;
+mod first_chars;
 mod json;
 mod references;
 mod types;
 
 pub use constants::*;
+pub use first_chars::{
+    apply_extern_first_chars, normalize_ranges, parse_extern_first_chars, ExternFirstChars,
+};
 pub use json::{from_json, to_canonical_json};
 pub use references::validate_references;
 pub use types::*;

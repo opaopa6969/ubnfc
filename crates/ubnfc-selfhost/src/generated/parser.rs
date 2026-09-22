@@ -572,9 +572,10 @@ self.depth-=1;out.diag=self.diag.rule(54,out.diag);out
 fn r55_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e320_c(state);
 if out.ok {
-for (site,span) in self.scope_captures(out.events,&[58]) { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
-if site==58 {if let Some((_,target))=self.scope_captures(out.events,&[58]).first() {let expected=self.text(*target);if expected!=name {self.effect(ScanEffect::Diagnostic{message:format!("back-reference mismatch: expected '{expected}' but got '{name}'"),offset_cp,len_cp,severity:Severity::Error});}}}
+let mut scope_sites=self.take_scope();self.scope_captures(out.events,&[58],&mut scope_sites);for &(site,span) in &scope_sites { let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;
+if site==58 {let mut targets=self.take_scope();self.scope_captures(out.events,&[58],&mut targets);if let Some((_,target))=targets.first() {let expected=self.text(*target);if expected!=name {self.effect(ScanEffect::Diagnostic{message:format!("back-reference mismatch: expected '{expected}' but got '{name}'"),offset_cp,len_cp,severity:Severity::Error});}}self.give_scope(targets);}
 let _=(&name,offset_cp,len_cp); }
+self.give_scope(scope_sites);
 let end=out.state.consumed;
 out.events=self.event(Event::Rule {rule:55,span:[state.consumed,end],child:out.events});
 } else { self.restore(mark); }
