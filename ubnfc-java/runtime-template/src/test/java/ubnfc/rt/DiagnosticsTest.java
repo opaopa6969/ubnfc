@@ -8,6 +8,23 @@ import org.junit.jupiter.api.Test;
 
 class DiagnosticsTest {
     @Test
+    void failureCursorsSurviveMemoReplayAndSpeculationRollback() {
+        var diagnostics = new Diagnostics();
+        diagnostics.enterRule(1);
+        diagnostics.failAt(2, 7, 0, 2);
+        diagnostics.failureCursor(2, 1, 3);
+        var memo = diagnostics.leaveRule();
+        assertEquals(1, memo.consumed()); assertEquals(3, memo.matched());
+        var other = new Diagnostics();
+        other.merge(memo);
+        var checkpoint = other.checkpoint();
+        other.failAt(9, 8, 9, 10);
+        other.restore(checkpoint);
+        assertEquals(2, other.farthest());
+        assertEquals(1, other.snapshot().consumed()); assertEquals(3, other.snapshot().matched());
+    }
+
+    @Test
     void speculationRestoresGlobalAndEveryEnclosingLocal() {
         Diagnostics diagnostics = new Diagnostics();
         diagnostics.failAt(10, 1);

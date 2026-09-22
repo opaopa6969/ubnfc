@@ -28,7 +28,15 @@ public final class IrReader {
             if (!FEATURES.contains(feature)) throw new IllegalArgumentException("Unsupported requiredFeatures: " + feature);
         try (var stream = IrReader.class.getResourceAsStream("/schema/grammar-ir.v1.schema.json")) {
             if (stream == null) throw new IllegalStateException("Missing bundled IR schema");
-            new Schema(Json.read(new String(stream.readAllBytes(), StandardCharsets.UTF_8)), true).validate(value);
+            var schema = Json.object(Json.read(new String(stream.readAllBytes(), StandardCharsets.UTF_8)));
+            // Accept the ordered DFA metadata while retaining compatibility with pre-round2 IR.
+            var definitions = Json.object(schema.get("$defs"));
+            var dfa = Json.object(definitions.get("RegexDfa"));
+            var required = new ArrayList<>(Json.array(dfa.get("required"))); required.remove("longestMatch");
+            dfa.put("required", required);
+            var properties = Json.object(dfa.get("properties")); properties.put("semantics", Map.of("const", "leftmostFirst"));
+            dfa.put("properties", properties); definitions.put("RegexDfa", dfa); schema.put("$defs", definitions);
+            new Schema(schema, true).validate(value);
         } catch (IOException error) { throw new IllegalStateException(error); }
         GrammarIr ir = (GrammarIr) bind(GrammarIr.class, value);
         Validation.validate(ir);

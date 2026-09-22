@@ -10,11 +10,12 @@ public final class Diagnostics {
     /** 配列を外部へ共有しない immutable な局所診断。stack は保存 rule からの suffix。 */
     public static final class Snapshot {
         private final int farthest;
+        private final int consumed, matched;
         private final int[] expected;
         private final int[] ruleStack;
 
         private Snapshot(Accumulator accumulator) {
-            farthest = accumulator.farthest;
+            farthest = accumulator.farthest; consumed = accumulator.consumed; matched = accumulator.matched;
             expected = Arrays.copyOf(accumulator.expected, accumulator.expectedSize);
             ruleStack = accumulator.ruleStack.clone();
         }
@@ -22,6 +23,9 @@ public final class Diagnostics {
         public int farthest() {
             return farthest;
         }
+
+        public int consumed() { return consumed; }
+        public int matched() { return matched; }
 
         public int[] expected() {
             return expected.clone();
@@ -38,16 +42,17 @@ public final class Diagnostics {
 
     private static final class Accumulator {
         int farthest = -1;
+        int consumed, matched;
         int[] expected = new int[4];
         int expectedSize;
         int[] ruleStack = new int[0];
 
-        void fail(int pos, int expectedId, int[] stack) {
+        void fail(int pos, int expectedId, int[] stack, int c, int m) {
             if (pos < farthest) {
                 return;
             }
             if (pos > farthest) {
-                farthest = pos;
+                farthest = pos; consumed = c; matched = m;
                 expectedSize = 0;
                 ruleStack = stack;
             } else if (stack.length > ruleStack.length) {
@@ -86,7 +91,7 @@ public final class Diagnostics {
     }
 
     private static void restoreInto(Accumulator target, Snapshot snapshot) {
-        target.farthest = snapshot.farthest;
+        target.farthest = snapshot.farthest; target.consumed = snapshot.consumed; target.matched = snapshot.matched;
         target.expected = Arrays.copyOf(snapshot.expected, Math.max(4, snapshot.expected.length));
         target.expectedSize = snapshot.expected.length;
         target.ruleStack = snapshot.ruleStack.clone();
@@ -131,16 +136,24 @@ public final class Diagnostics {
     }
 
     /** pos は呼出し側が選んだ一貫した位置単位。UTF-16 / code point 変換は行わない。 */
-    public void failAt(int pos, int expectedId) {
+    public void failAt(int pos, int expectedId) { failAt(pos, expectedId, pos, pos); }
+
+    public void failureCursor(int pos, int consumed, int matched) {
+        if (suppressionDepth != 0) return;
+        if (global.farthest == pos) { global.consumed = consumed; global.matched = matched; }
+        for (var frame : frames) if (frame.local().farthest == pos) { frame.local().consumed = consumed; frame.local().matched = matched; }
+    }
+
+    public void failAt(int pos, int expectedId, int consumed, int matched) {
         if (pos < 0 || expectedId < 0) {
             throw new IllegalArgumentException("Negative failure position or expected id");
         }
         if (suppressionDepth != 0) {
             return;
         }
-        global.fail(pos, expectedId, stackSuffix(0, null));
+        global.fail(pos, expectedId, stackSuffix(0, null), consumed, matched);
         for (int i = 0; i < frames.size(); i++) {
-            frames.get(i).local().fail(pos, expectedId, stackSuffix(i, null));
+            frames.get(i).local().fail(pos, expectedId, stackSuffix(i, null), consumed, matched);
         }
     }
 
@@ -174,7 +187,7 @@ public final class Diagnostics {
 
     private static void mergeInto(Accumulator target, Snapshot snapshot, int[] stack) {
         for (int expected : snapshot.expected) {
-            target.fail(snapshot.farthest, expected, stack);
+            target.fail(snapshot.farthest, expected, stack, snapshot.consumed, snapshot.matched);
         }
     }
 
