@@ -132,7 +132,10 @@ pub(super) fn rule(
                 }
             }
             A::Recovery { mode, sync, .. } => {
-                let mode = match mode.as_deref() {
+                // `@recovery(auto)` と `@recovery(AUTO)` は同じ注釈。綴りの大小で
+                // IR の mode が変わると backend ごとに受理が変わる（2026-09-23 A-1）。
+                let spelled = mode.as_deref().map(str::to_ascii_uppercase);
+                let mode = match spelled.as_deref() {
                     Some("AUTO") => RecoveryMode::Auto,
                     Some("SKIP") => RecoveryMode::Skip,
                     _ => RecoveryMode::Sync,
@@ -148,9 +151,12 @@ pub(super) fn rule(
                     } else {
                         vec![]
                     },
-                    consume_sync: mode != RecoveryMode::Skip,
+                    // 明示 SYNC だけが同期文字列自体を消費する（design §3.10）。
+                    // AUTO の同期文字列は FOLLOW、つまり外側が待っている字句なので
+                    // 消費しない（D-017「AUTO の過剰消費」は再現しない）。
+                    consume_sync: mode == RecoveryMode::Sync,
                     no_sync_action: if mode == RecoveryMode::Skip {
-                        RecoveryNoSyncAction::Succeed
+                        RecoveryNoSyncAction::ConsumeToEof
                     } else {
                         RecoveryNoSyncAction::Fail
                     },

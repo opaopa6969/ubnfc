@@ -78,6 +78,19 @@ pub enum Cardinality {
     List,
 }
 
+impl Cardinality {
+    /// 量指定子 `{min,max}` が**一度の成功解析で共存させ得る値の個数**。
+    /// 名前が文法に何回書かれているかではない（`docs/nested-capture-migration.md`）。
+    /// `max > 1`（上限なしを含む）だけが List、`{1}` は Scalar、`{0}` / `{0,1}` は Optional。
+    pub fn quantified(min: u64, max: Option<u64>) -> Self {
+        match max {
+            Some(0 | 1) if min == 0 => Self::Optional,
+            Some(1) => Self::Scalar,
+            Some(_) | None => Self::List,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum BoundaryAt {

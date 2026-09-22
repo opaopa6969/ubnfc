@@ -72,7 +72,16 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             .collect::<Vec<_>>()
     )
     .unwrap();
-    s.push_str("impl Session<'_> {\nfn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut out=Vec::new();self.build_values_into(root,&mut out)?;Ok(out)}\n#[inline(never)] fn build_values_into(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err(\"maximum mapping depth exceeded\".into());}self.mapping_depth+=1;let result=self.build_values_inner(root,out);self.mapping_depth-=1;result}\nfn build_values_inner(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child}=>self.build_rule(rule,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}\nfn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);match ty {\n");
+    s.push_str("impl Session<'_> {\nfn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut out=Vec::new();self.build_values_into(root,&mut out)?;Ok(out)}\n#[inline(never)] fn build_values_into(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err(\"maximum mapping depth exceeded\".into());}self.mapping_depth+=1;let result=self.build_values_inner(root,out);self.mapping_depth-=1;result}\nfn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<Ast>)->Result<(),String> {
+// 大半の呼出しは Join を含まない 1 本の枝（P4 実測: complex-x64 で 10,883 回すべてが 1 event）。
+// その場合は pool から stack を借りずに降りる。
+loop {match self.arena[root.0] {
+Event::Capture{child,..}=>root=child,
+Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}return Ok(());},
+Event::Rule{rule,span,child,caps}=>return self.build_rule(rule,caps,span,child,out),
+Event::Join(..)=>break,
+_=>return Ok(()),}}
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}\nfn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);match ty {\n");
     let mut leaves = std::collections::BTreeSet::new();
     for recipe in &g.ir.semantics.recipes {
         if let Some(leaf) = &recipe.leaf_fallback {
@@ -105,12 +114,12 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
     }
     if leaves.is_empty() {
         s = s.strip_suffix("match ty {\n").unwrap().to_owned();
-        s.push_str("let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}\nfn build_rule(&mut self,rule:usize,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);match rule {\n");
+        s.push_str("let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}\nfn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);match rule {\n");
     } else {
-        s.push_str("_=>{let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}}}\nfn build_rule(&mut self,rule:usize,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);match rule {\n");
+        s.push_str("_=>{let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}}}\nfn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);match rule {\n");
     }
     for i in 0..g.ir.semantics.rules.len() {
-        writeln!(s, "{i}=>self.map_rule_{i}(span,child,out),").unwrap();
+        writeln!(s, "{i}=>self.map_rule_{i}(caps,span,child,out),").unwrap();
     }
     s.push_str("_=>Err(format!(\"unknown rule {rule}\"))}}\n");
     for (i, rule) in g.ir.semantics.rules.iter().enumerate() {
@@ -121,7 +130,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             .trim_end()
             .strip_suffix(',')
             .unwrap();
-        writeln!(s,"fn map_rule_{i}(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {{let _=(span,child,&out);{body}}}").unwrap();
+        writeln!(s,"fn map_rule_{i}(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {{let _=(caps,span,child,&out);{body}}}").unwrap();
     }
     s.push_str(include_str!("../templates/finish.rs"));
     s.push_str("}\n");
@@ -175,7 +184,7 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
             }
             writeln!(
                 s,
-                "{i}=>{{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);"
+                "{i}=>{{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;"
             )
             .unwrap();
             for (n, f) in fields.iter().enumerate() {

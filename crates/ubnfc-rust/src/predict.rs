@@ -881,6 +881,14 @@ pub(crate) fn guard_function(g: &Generator<'_>, i: usize, mode: bool) -> String 
         fold.max_depth
     )
     .unwrap();
+    // 再生が作るのは失敗した候補の**観測**（display の reach / failures と主診断 DAG）だけで、
+    // カーソル・memo・scope・event には触れない。fast mode（D-023、`ParseOptions::diagnostics == false`）は
+    // その観測をどちらも記録しないので、再生する中身が無く、丸ごと省ける。
+    // 省かないと 1 parse あたり数百回、記録されない display 呼出しと本物の trivia 走査を行う
+    // （P4 complex で guard 819 回 / parse、認識の 7.7%）。診断モードでは従来どおり再生する。
+    s.push_str(
+        "if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}\n",
+    );
     s.push_str("self.display.reach(state.consumed.max(state.matched));\n");
     s.push_str(&fold.code);
     if let Some(t) = &fold.t_var {
