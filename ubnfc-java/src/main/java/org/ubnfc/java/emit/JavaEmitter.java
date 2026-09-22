@@ -96,6 +96,8 @@ public final class JavaEmitter {
         return constants.computeIfAbsent(type + " " + expression, key -> "K" + constants.size());
     }
     private String kStrings(List<String> list) { return constant("String[]", strings(list)); }
+    private String label(String text) { return constant("Label", "Label.of(" + q(text) + ")"); }
+    private String kLabels(List<String> list) { return constant("Label[]", "new Label[]{" + list.stream().map(t -> "Label.of(" + q(t) + ")").collect(Collectors.joining(",")) + "}"); }
     private String method(String id) { return "e" + exprIds.get(id); }
     private String call(String id) { return parser + "::" + method(id); }
     private String calls(List<String> ids) { return constant("Call[]", "new Call[]{" + ids.stream().map(this::call).collect(Collectors.joining(",")) + "}"); }
@@ -275,7 +277,7 @@ public final class JavaEmitter {
             out.append("                default -> throw new IllegalArgumentException(\"Unsupported entry: \" + entry);\n            };\n");
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
-            .append("        var s = new Session(source, options, ").append(strings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(");\n")
+            .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(");\n")
             .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
             .append("        if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }\n")
             .append("        ParseResult<").append(ast).append("> syntax = s.result(f, match, ").append(catalogs()).append(");\n")
@@ -314,7 +316,7 @@ public final class JavaEmitter {
         }).collect(Collectors.joining(",")) + ")";
     }
     private String catalogs() {
-        return "Map.ofEntries(" + ir.semantics().catalogs().stream().map(c -> "Map.entry(" + q(c.captureSiteId()) + "," + q(c.context()) + ")").collect(Collectors.joining(",")) + ")";
+        return constant("Map<String,String>", "Map.ofEntries(" + ir.semantics().catalogs().stream().map(c -> "Map.entry(" + q(c.captureSiteId()) + "," + q(c.context()) + ")").collect(Collectors.joining(",")) + ")");
     }
     private void emitRule(StringBuilder out, Rule rule) {
         Recipe recipe = recipes.get(rule.symbolId());
@@ -327,7 +329,7 @@ public final class JavaEmitter {
         out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(exprIds.size() + ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
             .append(", ").append(constant("Field[]", "new Field[]{" + fields + "}")).append(", ").append(constant("Effect[]", "new Effect[]{" + effects + "}")).append(", ").append(rule.skip()).append(", ")
-            .append(kStrings(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().map(hint -> "'" + hint + "'").toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(", ").append(kStrings(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
+            .append(kLabels(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().map(hint -> "'" + hint + "'").toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(", ").append(kLabels(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
     }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;
@@ -351,7 +353,7 @@ public final class JavaEmitter {
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(kStrings(expr.captureSiteIds())).append(", ").append(kStrings(sites.stream().map(Capture::name).toList())).append(", ").append(kStrings(sites.stream().map(Capture::spanRule).toList()))
-            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}")).append(", ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(kStrings(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
+            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}")).append(", ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(kLabels(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
         String body = expression(expr);
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
     }
@@ -365,20 +367,20 @@ public final class JavaEmitter {
             case "seq" -> "return s.sequence(f, " + calls(n.items()) + ", " + boundary + ");";
             case "group" -> expr.execution().transaction().equals("delegate") ? "return " + method(n.child()) + "(s, f);" : "return s.sequence(f, " + calls(List.of(n.child())) + ", " + boundary + ");";
             case "optional" -> "return s.optional(f, " + call(n.child()) + ");";
-            case "repeat" -> "return s.repeat(f, " + call(n.child()) + ", " + n.min() + ", " + (n.max() == null ? "Integer.MAX_VALUE" : n.max()) + ", " + (n.terminator() == null ? "null" : call(n.terminator())) + ", " + boundary + (Integer.valueOf(0).equals(n.max()) && repeatedLiteral(n.child()) != null ? "," + q("'" + repeatedLiteral(n.child()) + "'") : "") + ");";
+            case "repeat" -> "return s.repeat(f, " + call(n.child()) + ", " + n.min() + ", " + (n.max() == null ? "Integer.MAX_VALUE" : n.max()) + ", " + (n.terminator() == null ? "null" : call(n.terminator())) + ", " + boundary + (Integer.valueOf(0).equals(n.max()) && repeatedLiteral(n.child()) != null ? "," + label("'" + repeatedLiteral(n.child()) + "'") : "") + ");";
             case "separated" -> "return s.separated(f, " + call(n.element()) + ", " + call(n.separator()) + ", " + n.min() + ", " + boundary + ");";
             case "choice" -> choice(expr);
-            case "literal" -> "return s.literal(f, " + q(n.value()) + ", " + n.caseSensitive() + ", " + q(label) + ");";
+            case "literal" -> "return s.literal(f, " + q(n.value()) + ", " + n.caseSensitive() + ", " + label(label) + ");";
             case "ruleRef" -> {
                 String call = parser + "::" + ruleMethod(n.symbolId());
                 var recovery = ir.semantics().recovery().stream().filter(r -> r.applicationSites().contains(expr.id())).findFirst().orElse(null);
                 yield recovery == null ? "return " + ruleMethod(n.symbolId()) + "(s, f);" : recoveryCall(recovery, call);
             }
             case "tokenRef" -> "return " + token(tokens.get(n.symbolId()).spec(), diagnosticPlan.tokenLabel(expr.id())) + ";";
-            case "lookahead", "negativeLookahead" -> "return s.look(f, " + call(n.child()) + ", " + n.kind().equals("negativeLookahead") + ", " + q(label) + ");";
-            case "any" -> "return s.any(f, " + q(label) + ");";
+            case "lookahead", "negativeLookahead" -> "return s.look(f, " + call(n.child()) + ", " + n.kind().equals("negativeLookahead") + ", " + label(label) + ");";
+            case "any" -> "return s.any(f, " + label(label) + ");";
             case "eof" -> "return s.eof(f);"; case "empty" -> "return s.empty(f);";
-            case "error" -> "return s.error(" + (expr.execution().transaction().equals("once") ? "f.copy(true)" : "f") + ", " + q(n.message()) + ");";
+            case "error" -> "return s.error(" + (expr.execution().transaction().equals("once") ? "f.copy(true)" : "f") + ", " + label(n.message()) + ");";
             default -> throw new IllegalArgumentException(n.kind());
         };
     }
@@ -443,18 +445,20 @@ public final class JavaEmitter {
     }
     private String token(TokenSpec spec, String label) {
         return switch (spec.kind()) {
-            case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + constant("int[]", ints(spec.codePoints())) + "," + q(label) + ")";
+            case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + constant("int[]", ints(spec.codePoints())) + "," + label(label) + ")";
             case "until" -> "s.until(f," + q(spec.terminator()) + ")";
-            case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + q(label) + ")," + spec.kind().equals("negativeLookahead") + "," + q(label) + ")";
-            case "negation" -> "s.range(f,0,1114111," + q(spec.excluded()) + "," + q(label) + ")";
-            case "charRange" -> "s.range(f," + spec.min() + "," + spec.max() + ",null," + q(label) + ")";
-            case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + q(label) + ")";
+            case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + label(label) + ")," + spec.kind().equals("negativeLookahead") + "," + label(label) + ")";
+            case "negation" -> "s.range(f,0,1114111," + q(spec.excluded()) + "," + label(label) + ")";
+            case "charRange" -> "s.range(f," + spec.min() + "," + spec.max() + ",null," + label(label) + ")";
+            case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + label(label) + ")";
             case "regex" -> regex(spec, label);
-            case "extern" -> "s.external(f," + q(spec.logicalId()) + ")";
+            case "extern" -> "s.external(f," + q(spec.logicalId()) + "," + externIndex(spec.logicalId()) + ")";
             case "any" -> "s.any(f,\"ANY\")"; case "eof" -> "s.eof(f)"; case "empty" -> "s.empty(f)";
             default -> throw new IllegalArgumentException(spec.kind());
         };
     }
+    private final Map<String, Integer> externIndices = new LinkedHashMap<>();
+    private int externIndex(String logicalId) { return externIndices.computeIfAbsent(logicalId, key -> externIndices.size()); }
     private String repeatedLiteral(String id) {
         ExprNode node = expressions.get(id).node();
         if (node.kind().equals("literal")) return node.value();
@@ -468,7 +472,7 @@ public final class JavaEmitter {
             String transitions = dfa.transitions().stream().flatMap(t -> t.ranges().stream()
                 .map(r -> "new int[]{" + t.from() + "," + r.get(0) + "," + r.get(1) + "," + t.to() + "}"))
                 .collect(Collectors.joining(","));
-            return "s.dfa(f," + dfa.start() + "," + constant("int[]", ints(dfa.accepting())) + "," + constant("int[][]", "new int[][]{" + transitions + "}") + "," + q(label) + ")";
+            return "s.dfa(f," + dfa.start() + "," + constant("int[]", ints(dfa.accepting())) + "," + constant("int[][]", "new int[][]{" + transitions + "}") + "," + label(label) + ")";
         }
         var token = tokens.values().stream().filter(t -> t.spec() == spec).findFirst().orElseThrow();
         var plan = ir.plan().lexical().stream().filter(p -> p.tokenId().equals(token.symbolId()) && p.dfa() != null).findFirst().orElse(null);
@@ -477,17 +481,28 @@ public final class JavaEmitter {
                 .map(t -> "new int[]{" + state.id() + "," + t.range().start() + "," + t.range().end() + "," + t.target() + "}"))
                 .collect(Collectors.joining(","));
             return "s.dfa(f," + plan.dfa().startState() + "," + constant("int[]", ints(plan.dfa().states().stream().filter(s -> s.accepting()).map(s -> s.id()).toList()))
-                + "," + constant("int[][]", "new int[][]{" + transitions + "}") + "," + q(label) + ")";
+                + "," + constant("int[][]", "new int[][]{" + transitions + "}") + "," + label(label) + ")";
         }
-        return "s.regex(f," + constant("Pattern", "Pattern.compile(" + q(spec.pattern()) + ")") + "," + q(label) + ")";
+        return "s.regex(f," + constant("Pattern", "Pattern.compile(" + q(spec.pattern()) + ")") + "," + label(label) + ")";
     }
     private String boundaries(String id) {
         var policies = Validation.index(ir.semantics().trivia().policies(), TriviaPolicy::id);
-        return constant("Boundary[]", "new Boundary[]{" + ir.semantics().trivia().insertionPlan().stream().filter(p -> p.boundary().ownerExprId().equals(id)).map(p -> {
+        var plan = ir.semantics().trivia().insertionPlan().stream().filter(p -> p.boundary().ownerExprId().equals(id)).toList();
+        if (plan.isEmpty()) return "Trivia.NONE";
+        ExprNode node = expressions.get(id).node();
+        int children = node.kind().equals("seq") ? node.items().size() : 1;
+        var afterChild = new String[children]; java.util.Arrays.fill(afterChild, "null");
+        var phases = new java.util.HashMap<String, String>();
+        for (var p : plan) {
             Boundary b = p.boundary();
-            String delimiters = policies.get(p.policyId()).effectiveDelimiterSet().stream().map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + ")").collect(Collectors.joining(","));
-            return "new Boundary(" + q(b.at()) + "," + (b.childIndex() == null ? -1 : b.childIndex()) + "," + constant("Delimiter[]", "new Delimiter[]{" + delimiters + "}") + ")";
-        }).collect(Collectors.joining(",")) + "}");
+            String delimiters = constant("Delimiters", "new Delimiters(" + policies.get(p.policyId()).effectiveDelimiterSet().stream().map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + ")").collect(Collectors.joining(",")) + ")");
+            if (b.at().equals("afterChild")) afterChild[b.childIndex()] = delimiters;
+            else if (phases.put(b.at(), delimiters) != null) throw new IllegalStateException("Duplicate trivia boundary " + b.at() + " at " + id);
+        }
+        boolean anyAfter = java.util.Arrays.stream(afterChild).anyMatch(v -> !v.equals("null"));
+        return constant("Trivia", "new Trivia(" + phases.getOrDefault("entry", "null") + "," + phases.getOrDefault("helperEntry", "null") + ","
+            + (anyAfter ? constant("Delimiters[]", "new Delimiters[]{" + String.join(",", afterChild) + "}") : "null") + ","
+            + phases.getOrDefault("helperExit", "null") + "," + phases.getOrDefault("exit", "null") + ")");
     }
     private String choice(Expr expr) {
         var plan = ir.plan().choices().stream().filter(p -> p.exprId().equals(expr.id())).findFirst().orElse(null);

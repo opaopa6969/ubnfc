@@ -28,6 +28,59 @@ import generated.internal.Recipe.Value;
 /** Per-parse state; transactions preserve syntax diagnostics but undo semantic effects. */
 public final class Session {
     @FunctionalInterface public interface Call { Match parse(Session session, Frame frame); }
+    /** Expected-hint label with a process-wide stable id; generated code holds these as static constants so failures never hash strings. */
+    public static final class Label {
+        private static final java.util.concurrent.ConcurrentHashMap<String, Label> REGISTRY = new java.util.concurrent.ConcurrentHashMap<>();
+        private static volatile String[] texts = new String[256];
+        private static int count;
+        public final String text; public final int id;
+        /** A group label stands for several expected hints registered at one position (trivia delimiter sets); expanded on output. */
+        final Label[] members;
+        private Label(String text, int id, Label[] members) { this.text = text; this.id = id; this.members = members; }
+        public static Label of(String text) {
+            Label label = REGISTRY.get(text);
+            if (label != null) return label;
+            synchronized (Label.class) {
+                label = REGISTRY.get(text);
+                if (label == null) {
+                    if (count == texts.length) texts = Arrays.copyOf(texts, count * 2);
+                    texts[count] = text; label = new Label(text, count++, null); REGISTRY.put(text, label);
+                }
+                return label;
+            }
+        }
+        public static String text(int id) { return texts[id]; }
+        static Label group(Label[] members) {
+            var names = new StringBuilder("\u0000group");
+            for (Label member : members) names.append('\u0001').append(member.text);
+            String key = names.toString();
+            Label label = REGISTRY.get(key);
+            if (label != null) return label;
+            synchronized (Label.class) {
+                label = REGISTRY.get(key);
+                if (label == null) {
+                    if (count == texts.length) texts = Arrays.copyOf(texts, count * 2);
+                    texts[count] = key; label = new Label(key, count++, members.clone()); REGISTRY.put(key, label);
+                }
+                return label;
+            }
+        }
+        static int count() { return count; }
+        /** Expand ids into sorted distinct hint texts (group members flattened). */
+        static List<String> texts(int[] ids) {
+            var result = new java.util.TreeSet<String>();
+            for (int id : ids) {
+                Label label = REGISTRY.get(texts[id]);
+                if (label.members == null) result.add(label.text); else for (Label member : label.members) result.add(member.text);
+            }
+            return List.copyOf(result);
+        }
+    }
+    private static final Label L_SPACE = Label.of("' '"), L_BLOCK_END = Label.of("'*/'"), L_WILDCARD_STRING = Label.of("WildCardStringParser"),
+        L_SIGN = Label.of("SignParser"), L_DIGIT = Label.of("DigitParser"), L_ONE_OR_MORE = Label.of("OneOrMore"), L_DOT = Label.of("'.'"),
+        L_CHAIN = Label.of("Chain"), L_NUMBER = Label.of("NumberParser"), L_E = Label.of("EParser"), L_EXPONENT = Label.of("ExponentParser"),
+        L_ALPHABET_UNDERSCORE = Label.of("AlphabetUnderScoreParser"), L_IDENTIFIER = Label.of("IdentifierParser"), L_ALNUM_UNDERSCORE = Label.of("AlphabetNumericUnderScoreParser"),
+        L_ANY = Label.of("ANY"), L_EMPTY = Label.of("EMPTY"), L_WILDCARD_CHAR = Label.of("WildCardCharacterParser"), L_EOS = Label.of("EndOfSourceParser"), L_REPEAT = Label.of("Repeat");
     public static final class Frame {
         public int c, m;
         public boolean matched, invert, reset = true;
@@ -65,20 +118,20 @@ public final class Session {
         }
         public Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
                      List<Trace> traces, int start, int end) { this(nodes, local, captures, traces, start, end, false); }
-        public Match { nodes = List.copyOf(nodes); local = List.copyOf(local); captures = List.copyOf(captures); traces = List.copyOf(traces); recoveries = List.copyOf(recoveries); items = List.copyOf(items); values = values == null ? null : List.copyOf(values); }
+        // Lists are built only inside Session and never mutated after construction; no defensive copies.
         public static Match empty(int start, int end) { return new Match(List.of(), List.of(), List.of(), List.of(), start, end); }
     }
     /** Trivia delimiter with labels and an ASCII bitmap precomputed once (generated code builds these as static constants). */
     public static final class Delimiter {
         private final String kind, open, close; private final int[] characters;
-        final boolean isCharacters, isLineComment; final String openLabel, closeLabel; final long asciiLow, asciiHigh; final boolean asciiOnly;
+        final boolean isCharacters, isLineComment; final Label openLabel, closeLabel; final long asciiLow, asciiHigh; final boolean asciiOnly; final char first;
         public Delimiter(String kind, String open, String close, int[] characters) {
             this.kind = kind; this.open = open; this.close = close; this.characters = characters;
             isCharacters = kind.equals("characters"); isLineComment = kind.equals("lineComment");
-            openLabel = "'" + open + "'"; closeLabel = "'" + close + "'";
+            openLabel = open == null ? null : Label.of("'" + open + "'"); closeLabel = close == null ? null : Label.of("'" + close + "'");
             long low = 0, high = 0; boolean ascii = true;
             for (int ch : characters) { if (ch < 64) low |= 1L << ch; else if (ch < 128) high |= 1L << (ch - 64); else ascii = false; }
-            asciiLow = low; asciiHigh = high; asciiOnly = ascii;
+            asciiLow = low; asciiHigh = high; asciiOnly = ascii; first = open == null || open.isEmpty() ? 0 : open.charAt(0);
         }
         public String kind() { return kind; } public String open() { return open; } public String close() { return close; } public int[] characters() { return characters; }
         boolean contains(int ch) {
@@ -87,15 +140,27 @@ public final class Session {
             return !asciiOnly && Arrays.binarySearch(characters, ch) >= 0;
         }
     }
-    private static final Boundary[] NO_BOUNDARIES = new Boundary[0];
-    public static final int ENTRY = 0, HELPER_ENTRY = 1, AFTER_CHILD = 2, HELPER_EXIT = 3, EXIT = 4;
-    public static final class Boundary {
-        private final String at; private final int child; private final Delimiter[] delimiters; final int phase;
-        public Boundary(String at, int child, Delimiter[] delimiters) {
-            this.at = at; this.child = child; this.delimiters = delimiters;
-            phase = switch (at) { case "entry" -> ENTRY; case "helperEntry" -> HELPER_ENTRY; case "afterChild" -> AFTER_CHILD; case "helperExit" -> HELPER_EXIT; case "exit" -> EXIT; default -> throw new IllegalArgumentException(at); };
+    /** A delimiter set with the failure hint groups of each failing prefix precomputed (one registered id per trivia round). */
+    public static final class Delimiters {
+        final Delimiter[] items; final Label[] prefixGroups;
+        public Delimiters(Delimiter... items) {
+            this.items = items; prefixGroups = new Label[items.length];
+            var members = new ArrayList<Label>();
+            for (int i = 0; i < items.length; i++) {
+                if (items[i].isCharacters) members.add(L_SPACE);
+                else if (items[i].isLineComment) members.add(items[i].openLabel);
+                else { members.add(items[i].openLabel); members.add(items[i].closeLabel); }
+                prefixGroups[i] = members.size() == 1 ? members.getFirst() : Label.group(members.toArray(new Label[0]));
+            }
         }
-        public String at() { return at; } public int child() { return child; } public Delimiter[] delimiters() { return delimiters; }
+    }
+    /** Trivia insertion plan of one sequence/repeat: null means no trivia at that boundary. */
+    public static final class Trivia {
+        public static final Trivia NONE = new Trivia(null, null, null, null, null);
+        final Delimiters entry, helperEntry, helperExit, exit; final Delimiters[] afterChild;
+        public Trivia(Delimiters entry, Delimiters helperEntry, Delimiters[] afterChild, Delimiters helperExit, Delimiters exit) {
+            this.entry = entry; this.helperEntry = helperEntry; this.afterChild = afterChild; this.helperExit = helperExit; this.exit = exit;
+        }
     }
     public record Field(String name, String[] sites, String conversion, String cardinality) {}
     public record Effect(String when, String action, String site, String name, String mode) {}
@@ -104,12 +169,11 @@ public final class Session {
     public final Input input;
     public final ParseOptions options;
     public final ScopeStore scope = new ScopeStore();
-    private Diagnostics diagnostics = new Diagnostics();
+    private Diagnostics diagnostics;
     private final MemoTable memo;
     private final ArrayList<Memo> payloads = new ArrayList<>();
     private final ArrayList<TokenScanner.Effect> effects = new ArrayList<>();
-    private final ArrayList<String> expected = new ArrayList<>();
-    private final String[] ruleNames, ruleParserLabels;
+    private final String[] ruleNames; private final Label[] ruleParserLabels;
     private int depth;
     private int[] activeRules = new int[64]; private int activeDepth;
     private final int[] activeCounts;
@@ -121,8 +185,8 @@ public final class Session {
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) {
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         this.activeCounts = new int[ruleNames.length];
-        ruleParserLabels = new String[ruleNames.length];
-        for (int i = 0; i < ruleNames.length; i++) ruleParserLabels[i] = ruleNames[i] + "Parser";
+        diagnostics = new Diagnostics(Label.count(), Math.max(256, Math.min(1 << 20, input.length() * 64)));
+        ruleParserLabels = new Label[ruleNames.length];
         // 観測: P4 で 1 文字あたり約 5 entry。成長の再ハッシュを避けつつ上限は固定する。
         memo = new MemoTable(Math.max(1024, Math.min(1 << 20, input.length() * 8)));
     }
@@ -132,11 +196,11 @@ public final class Session {
     }
     /** Abort the entire parse: an outer optional/choice must not swallow a resource limit. */
     public Match parse(Call entry, Frame f) {
-        long start = mark(); Frame initial = f.copy(false);
+        long start = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
         try { return entry.parse(this, f); }
         catch (DepthLimit | StackOverflowError limit) {
-            restore(start); f.commit(initial); f.reset = initial.reset;
-            diagnostics = new Diagnostics();
+            restore(start); f.c = c0; f.m = m0; f.reset = reset0;
+            diagnostics = new Diagnostics(Label.count(), 256);
             String reason = limit instanceof StackOverflowError ? "JVM stack limit; maxDepth=" : "maxDepth=";
             fail(reached, "maximum parse depth exceeded (" + reason + options.maxDepth() + ")");
             return null;
@@ -147,32 +211,11 @@ public final class Session {
     private void progress(Frame f) {
         int at = Math.max(f.c, f.m); reached = Math.max(reached, at); diagnostics.reach(at);
     }
-    private void fail(int at, String label) { fail(at, label, at, at); }
-    private void fail(Frame frame, String label) { fail(Math.max(frame.c, frame.m), label, frame.c, frame.m); }
-    private void fail(int at, String label, int consumed, int matched) {
-        diagnostics.failAt(at, expectedId(label), consumed, matched); if (at > reached) reached = at;
-    }
-    /** Open-addressing label table; generated labels are shared String constants so identity hits first. */
-    private String[] labelKeys = new String[256]; private int[] labelIds = new int[256];
-    private int expectedId(String label) {
-        int mask = labelKeys.length - 1, slot = label.hashCode() & mask;
-        while (true) {
-            String key = labelKeys[slot];
-            if (key == null) break;
-            if (key == label || key.equals(label)) return labelIds[slot];
-            slot = (slot + 1) & mask;
-        }
-        int id = expected.size(); expected.add(label);
-        if (expected.size() * 2 > labelKeys.length) {
-            var keys = new String[labelKeys.length * 2]; var ids = new int[keys.length]; int grown = keys.length - 1;
-            for (int i = 0; i < labelKeys.length; i++) if (labelKeys[i] != null) {
-                int at = labelKeys[i].hashCode() & grown; while (keys[at] != null) at = (at + 1) & grown;
-                keys[at] = labelKeys[i]; ids[at] = labelIds[i];
-            }
-            labelKeys = keys; labelIds = ids; mask = grown; slot = label.hashCode() & mask;
-            while (labelKeys[slot] != null) slot = (slot + 1) & mask;
-        }
-        labelKeys[slot] = label; labelIds[slot] = id; return id;
+    private void fail(int at, String label) { fail(at, Label.of(label).id, at, at); }
+    private void fail(int at, Label label) { fail(at, label.id, at, at); }
+    private void fail(Frame frame, Label label) { fail(Math.max(frame.c, frame.m), label.id, frame.c, frame.m); }
+    private void fail(int at, int id, int consumed, int matched) {
+        diagnostics.failAt(at, id, consumed, matched); if (at > reached) reached = at;
     }
     private long mark() { return ((long) scope.checkpoint() << 32) | effects.size(); }
     private void restore(long mark) {
@@ -197,7 +240,7 @@ public final class Session {
         }
     }
     public Match rule(Frame f, int id, int memoId, boolean successMemo, boolean failureMemo, Call body,
-                      String recipe, String fallback, String recipeKind, Field[] fields, Effect[] scopeEffects, boolean skip, String[] recoveryHints, boolean rightAssociative, String[] failureHints) {
+                      String recipe, String fallback, String recipeKind, Field[] fields, Effect[] scopeEffects, boolean skip, Label[] recoveryHints, boolean rightAssociative, Label[] failureHints) {
         int c = f.c, m = f.m, state = scope.stateVersion();
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
         boolean cache = options.memo() && (successMemo || failureMemo);
@@ -228,12 +271,14 @@ public final class Session {
             boolean skipped = skip || "skip".equals(recipeKind);
             if (skipped) nodes = List.of();
             else if (recipe != null && !"transparent".equals(recipeKind) && !"text".equals(recipeKind)) {
-                var values = new LinkedHashMap<String, List<Value>>();
-                for (var field : fields) {
+                var names = new String[fields.length]; List<Value>[] lists = Recipe.lists(fields.length);
+                for (int fi = 0; fi < fields.length; fi++) {
+                    Field field = fields[fi];
                     var captures = new ArrayList<Value>();
                     boolean nodeLike = "node".equals(field.conversion()) || "mixed".equals(field.conversion());
                     boolean list = field.cardinality().equals("list"), scalar = field.cardinality().equals("scalar");
-                    for (var occurrence : result.local()) if (contains(field.sites(), occurrence.site())) {
+                    List<Occurrence> local = result.local();
+                    for (int k = 0, n = local.size(); k < n; k++) { Occurrence occurrence = local.get(k); if (!contains(field.sites(), occurrence.site())) continue;
                         Value v = occurrence.value();
                         if (nodeLike && !scalar && v.elements() != null)
                             captures.addAll(v.elements());
@@ -241,12 +286,18 @@ public final class Session {
                             for (Recipe node : v.nodes()) captures.add(new Value(node.start(), node.end(), List.of(node)));
                         else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) captures.add(v);
                     }
-                    values.put(field.name(), List.copyOf(captures));
+                    names[fi] = field.name(); lists[fi] = List.copyOf(captures);
                 }
-                int nodeEnd = rightAssociative && recursive ? values.values().stream().flatMap(List::stream).mapToInt(Value::end).max().orElse(f.c) : f.c;
-                nodes = List.of(new Recipe(recipe, c, nodeEnd, values, fallback));
+                int nodeEnd = f.c;
+                if (rightAssociative && recursive) {
+                    int max = Integer.MIN_VALUE;
+                    for (List<Value> list : lists) for (int k = 0; k < list.size(); k++) max = Math.max(max, list.get(k).end());
+                    if (max != Integer.MIN_VALUE) nodeEnd = max;
+                }
+                nodes = List.of(new Recipe(recipe, c, nodeEnd, names, lists, fallback));
             }
-            for (var occurrence : result.local()) occurrence.completed = nextCaptureCompletion++;
+            List<Occurrence> completed = result.local();
+            for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
             List<Value> values = result.values();
             if (skipped || nodes != result.nodes()) {
                 values = nodes.isEmpty() ? List.of() : List.of(new Value(nodes.getFirst().start(), nodes.getFirst().end(), nodes));
@@ -255,8 +306,8 @@ public final class Session {
                 result.mappingFailure(), result.recoveries(), List.of(), result.text(), values);
         } else {
             int localFarthest = diagnostics.localFarthest();
-            if (localFarthest == Math.max(c, m)) for (String hint : recoveryHints) fail(localFarthest, hint);
-            for (String hint : failureHints) fail(Math.max(c, m), hint);
+            if (localFarthest == Math.max(c, m)) for (Label hint : recoveryHints) fail(localFarthest, hint);
+            for (Label hint : failureHints) fail(Math.max(c, m), hint);
             restore(mark); f.c = c; f.m = m;
         }
         depth--; activeCounts[id]--; activeDepth--;
@@ -325,11 +376,11 @@ public final class Session {
         }
     }
     public Match capture(Frame f, Call call, String[] sites, String[] names, String[] spanRules, boolean[] skips,
-                         String rule, String expr, boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, String[] failureHints) {
+                         String rule, String expr, boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints) {
         int c = f.c, m = f.m; Match result = call.parse(this, f);
         progress(f);
         if (result == null) {
-            for (String hint : failureHints) fail(Math.max(c, m), hint);
+            for (Label hint : failureHints) fail(Math.max(c, m), hint);
             return null;
         }
         result = project(result, semanticKind, semanticMany);
@@ -380,7 +431,7 @@ public final class Session {
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
     }
     private static boolean allLeaves(List<Value> values) {
-        for (Value v : values) if (!v.nodes().isEmpty()) return false;
+        for (int k = 0, n = values.size(); k < n; k++) if (!values.get(k).nodes().isEmpty()) return false;
         return true;
     }
     private static Match combine(List<Match> items, int start, int end) {
@@ -390,7 +441,8 @@ public final class Session {
         }
         List<Recipe> nodes = List.of(); List<Occurrence> local = List.of(), captures = List.of(); List<Trace> traces = List.of();
         List<RecoveryEvent> recoveries = List.of(); List<Value> values = null; boolean failure = false;
-        for (Match item : items) {
+        for (int k = 0, n = items.size(); k < n; k++) {
+            Match item = items.get(k);
             if (!item.nodes().isEmpty()) nodes = concat(nodes, item.nodes());
             if (!item.local().isEmpty()) local = concat(local, item.local());
             if (!item.captures().isEmpty()) captures = concat(captures, item.captures());
@@ -407,57 +459,73 @@ public final class Session {
         if (tail.isEmpty()) return head;
         var merged = new ArrayList<T>(head.size() + tail.size()); merged.addAll(head); merged.addAll(tail); return merged;
     }
-    public Match sequence(Frame parent, Call[] children, Boundary[] boundaries) {
-        long mark = mark(); Frame f = parent.copy(true); int start = f.c;
-        if (boundaries.length > 0) { boundary(f, boundaries, ENTRY, -1); boundary(f, boundaries, HELPER_ENTRY, -1); }
-        var matches = new ArrayList<Match>(children.length);
+    // Transactions run on the caller's frame in place: begin saves (c, m, reset) and applies
+    // "m := c when reset"; failure restores c/m; either outcome restores reset (a commit never
+    // copied the child's reset flag). Observable cursor behaviour equals the frame-copy version.
+    public Match sequence(Frame f, Call[] children, Trivia trivia) {
+        long mark = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
+        if (reset0) f.m = f.c;
+        int start = f.c;
+        if (trivia.entry != null) trivia(f, trivia.entry); if (trivia.helperEntry != null) trivia(f, trivia.helperEntry);
+        var matches = new Match[children.length];
         for (int i = 0; i < children.length; i++) {
             Match result = children[i].parse(this, f);
-            if (result == null) { restore(mark); return null; }
-            matches.add(result); if (boundaries.length > 0) boundary(f, boundaries, AFTER_CHILD, i);
+            if (result == null) { restore(mark); f.c = c0; f.m = m0; f.reset = reset0; return null; }
+            matches[i] = result; if (trivia.afterChild != null && trivia.afterChild[i] != null) trivia(f, trivia.afterChild[i]);
         }
-        if (boundaries.length > 0) { boundary(f, boundaries, HELPER_EXIT, -1); boundary(f, boundaries, EXIT, -1); }
-        parent.commit(f); return combine(matches, start, f.c);
+        if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
+        f.reset = reset0; return combine(Arrays.asList(matches), start, f.c);
     }
-    public Match choice(Frame parent, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback) {
-        Match best = null; Frame bestFrame = null; List<TokenScanner.Effect> bestEffects = List.of();
+    public Match choice(Frame f, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback) {
+        Match best = null; int bestC = 0, bestM = 0; List<TokenScanner.Effect> bestEffects = List.of();
+        int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
         for (int pass = 0; pass < (fallback ? 2 : 1); pass++) {
             for (int i = 0; i < alternatives.length; i++) {
                 if (pass == 0 && eligible != null && !eligible[i]) continue;
-                long mark = mark(); Frame trial = parent.copy(true);
-                Match result = alternatives[i].parse(this, trial);
-                if (result != null && !longest) { parent.commit(trial); return result; }
-                if (result != null && (best == null || trial.c > bestFrame.c)) {
-                    best = result; bestFrame = trial; bestEffects = effectsSince(mark);
+                long mark = mark(); f.c = c0; f.m = reset0 ? c0 : m0; f.reset = reset0;
+                Match result = alternatives[i].parse(this, f);
+                if (result != null && !longest) { f.reset = reset0; return result; }
+                if (result != null && (best == null || f.c > bestC)) {
+                    best = result; bestC = f.c; bestM = f.m; bestEffects = effectsSince(mark);
                 }
                 restore(mark);
             }
             if (best != null) break;
         }
-        if (best != null) { parent.commit(bestFrame); replay(bestEffects); }
+        f.reset = reset0;
+        if (best != null) { f.c = bestC; f.m = bestM; replay(bestEffects); } else { f.c = c0; f.m = m0; }
         return best;
     }
     public Match optional(Frame parent, Call child) {
-        return repeat(parent, child, 0, 1, null, NO_BOUNDARIES);
+        return repeat(parent, child, 0, 1, null, Trivia.NONE);
     }
-    public Match repeat(Frame parent, Call child, int min, int max, Call terminator, Boundary[] boundaries) {
-        return repeat(parent, child, min, max, terminator, boundaries, "Repeat");
+    public Match repeat(Frame parent, Call child, int min, int max, Call terminator, Trivia trivia) {
+        return repeat(parent, child, min, max, terminator, trivia, L_REPEAT);
     }
-    public Match repeat(Frame parent, Call child, int min, int max, Call terminator, Boundary[] boundaries, String label) {
-        long whole = mark(); Frame f = parent.copy(true); int start = f.c, count = 0;
-        if (boundaries.length > 0) { boundary(f, boundaries, ENTRY, -1); boundary(f, boundaries, HELPER_ENTRY, -1); }
+    public Match repeat(Frame parent, Call child, int min, int max, Call terminator, Trivia trivia, String label) {
+        return repeat(parent, child, min, max, terminator, trivia, Label.of(label));
+    }
+    public Match repeat(Frame f, Call child, int min, int max, Call terminator, Trivia trivia, Label label) {
+        long whole = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset, matched0 = f.matched;
+        if (reset0) f.m = f.c;
+        int start = f.c, count = 0;
+        if (trivia.entry != null) trivia(f, trivia.entry); if (trivia.helperEntry != null) trivia(f, trivia.helperEntry);
         var matches = new ArrayList<Match>();
         while (true) {
             int before = f.position();
             if (terminator != null) {
-                long mark = mark(); Frame end = f.copy(true); end.matched = false;
-                Match done = terminator.parse(this, end);
+                // The terminator runs in consumed mode on a begun frame; its cursors commit only when the loop itself is in consumed mode.
+                long mark = mark(); int c1 = f.c, m1 = f.m; boolean reset1 = f.reset;
+                if (reset1) f.m = f.c;
+                f.matched = false;
+                Match done = terminator.parse(this, f);
+                f.matched = matched0; f.reset = reset1;
                 if (done != null) {
-                    if (!f.matched) { f.commit(end); matches.add(done); }
-                    else restore(mark);
+                    if (!matched0) matches.add(done);
+                    else { restore(mark); f.c = c1; f.m = m1; }
                     break;
                 }
-                restore(mark);
+                restore(mark); f.c = c1; f.m = m1;
             }
             long mark = mark(); Match result = child.parse(this, f);
             if (result == null) { restore(mark); break; }
@@ -465,94 +533,115 @@ public final class Session {
             if (before == f.position() || count >= max) break;
         }
         if (count < min || count > max) {
-            fail(parent, label);
-            if (label.startsWith("'") && activeDepth > 0) fail(Math.max(parent.c, parent.m), ruleParserLabels[activeRules[activeDepth - 1]]);
-            diagnostics.failureCursor(Math.max(parent.c, parent.m), f.c, f.m);
+            int at = Math.max(c0, m0), fc = f.c, fm = f.m;
+            f.c = c0; f.m = m0; f.reset = reset0;
+            fail(at, label.id, c0, m0);
+            if (label.text.startsWith("'") && activeDepth > 0) {
+                int rule = activeRules[activeDepth - 1];
+                if (ruleParserLabels[rule] == null) ruleParserLabels[rule] = Label.of(ruleNames[rule] + "Parser");
+                fail(at, ruleParserLabels[rule]);
+            }
+            diagnostics.failureCursor(at, fc, fm);
             restore(whole); return null;
         }
-        if (boundaries.length > 0) { boundary(f, boundaries, HELPER_EXIT, -1); boundary(f, boundaries, EXIT, -1); }
-        parent.commit(f); Match combined = combine(matches, start, f.c);
+        if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
+        f.reset = reset0; Match combined = combine(matches, start, f.c);
         return new Match(combined.nodes(), combined.local(), combined.captures(), combined.traces(), start, f.c, combined.mappingFailure(), combined.recoveries(), matches, combined.text(),
             matches.isEmpty() ? List.of() : combined.values());
     }
-    public Match separated(Frame parent, Call element, Call separator, int min, Boundary[] boundaries) {
-        long whole = mark(); Frame f = parent.copy(true); int start = f.c;
-        if (boundaries.length > 0) { boundary(f, boundaries, ENTRY, -1); boundary(f, boundaries, HELPER_ENTRY, -1); }
+    public Match separated(Frame f, Call element, Call separator, int min, Trivia trivia) {
+        long whole = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
+        if (reset0) f.m = f.c;
+        int start = f.c;
+        if (trivia.entry != null) trivia(f, trivia.entry); if (trivia.helperEntry != null) trivia(f, trivia.helperEntry);
         var matches = new ArrayList<Match>(); var elements = new ArrayList<Match>(); long first = mark();
         Match initial = element.parse(this, f);
-        if (initial == null) { restore(first); if (min > 0) { restore(whole); return null; } f = parent.copy(true); }
-        else {
+        if (initial == null) {
+            restore(first);
+            if (min > 0) { restore(whole); f.c = c0; f.m = m0; f.reset = reset0; return null; }
+            f.c = c0; f.m = reset0 ? c0 : m0; f.reset = reset0;
+        } else {
             matches.add(initial); elements.add(initial);
             while (true) {
-                long mark = mark(); Frame trial = f.copy(true); int before = trial.position();
-                Match sep = separator.parse(this, trial); Match next = sep == null ? null : element.parse(this, trial);
-                if (next == null) { restore(mark); break; }
-                f.commit(trial); matches.add(sep); matches.add(next); elements.add(next);
+                long mark = mark(); int c1 = f.c, m1 = f.m; boolean reset1 = f.reset;
+                if (reset1) f.m = f.c;
+                int before = f.position();
+                Match sep = separator.parse(this, f); Match next = sep == null ? null : element.parse(this, f);
+                f.reset = reset1;
+                if (next == null) { restore(mark); f.c = c1; f.m = m1; break; }
+                matches.add(sep); matches.add(next); elements.add(next);
                 if (before == f.position()) break;
             }
         }
-        if (initial != null && (matches.size() + 1) / 2 < min) { restore(whole); return null; }
-        if (boundaries.length > 0) { boundary(f, boundaries, HELPER_EXIT, -1); boundary(f, boundaries, EXIT, -1); }
-        parent.commit(f); Match result = combine(matches, start, f.c);
+        if (initial != null && (matches.size() + 1) / 2 < min) { restore(whole); f.c = c0; f.m = m0; f.reset = reset0; return null; }
+        if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
+        f.reset = reset0; Match result = combine(matches, start, f.c);
         return new Match(result.nodes(), result.local(), result.captures(), result.traces(), start, f.c,
             result.mappingFailure(), result.recoveries(), elements, result.text(), elements.isEmpty() ? List.of() : result.values());
     }
-    public Match look(Frame parent, Call child, boolean negative, String label) {
-        long mark = mark(); Frame trial = parent.copy(true); trial.matched = true;
+    public Match look(Frame parent, Call child, boolean negative, String label) { return look(parent, child, negative, Label.of(label)); }
+    public Match look(Frame f, Call child, boolean negative, Label label) {
+        long mark = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset, matched0 = f.matched;
+        if (reset0) f.m = f.c;
+        f.matched = true;
         var diagnosticMark = negative ? diagnostics.checkpoint() : null;
         int priorReached = reached;
         Match result;
-        try { result = child.parse(this, trial); }
-        finally { restore(mark); }
+        try { result = child.parse(this, f); }
+        finally { restore(mark); f.matched = matched0; f.reset = reset0; }
         if (negative) {
-            if (result != null) { fail(parent, label); return null; }
+            f.c = c0; f.m = m0;
+            if (result != null) { fail(f, label); return null; }
             diagnostics.restore(diagnosticMark); reached = priorReached;
-            parent.m = parent.reset ? parent.c : parent.m; return Match.empty(parent.c, parent.c);
+            f.m = reset0 ? c0 : m0; return Match.empty(c0, c0);
         }
-        if (result == null) return null;
-        parent.commit(trial); return Match.empty(parent.c, parent.c);
+        if (result == null) { f.c = c0; f.m = m0; return null; }
+        return Match.empty(f.c, f.c);
     }
-    public Match literal(Frame f, String word, boolean sensitive, String label) {
+    public Match literal(Frame f, String word, boolean sensitive, String label) { return literal(f, word, sensitive, Label.of(label)); }
+    public Match literal(Frame f, String word, boolean sensitive, Label label) {
         int at = f.position();
         boolean ok = !word.isEmpty() && (sensitive ? input.startsWith(at, word) : input.startsWithIgnoreCase(at, word));
         if (!ok) { fail(f, label); f.advance(0); return null; }
         f.advance(word.length()); return Match.empty(at, at + word.length());
     }
-    public Match any(Frame f, String label) {
+    public Match any(Frame f, String label) { return any(f, Label.of(label)); }
+    public Match any(Frame f, Label label) {
         int at = f.position(); if (cp(at) < 0) { fail(f, label); f.advance(0); return null; }
         int length = Character.charCount(cp(at)); f.advance(length); return Match.empty(at, at + length);
     }
-    public Match empty(Frame f) { return optional(f, (s, p) -> s.look(p, (ss, pp) -> ss.any(pp, "ANY"), false, "EMPTY")); }
-    public Match eof(Frame f) { return repeat(f, (s, p) -> s.any(p, "WildCardCharacterParser"), 0, 0, null, NO_BOUNDARIES, "EndOfSourceParser"); }
+    public Match empty(Frame f) { return optional(f, (s, p) -> s.look(p, (ss, pp) -> ss.any(pp, L_ANY), false, L_EMPTY)); }
+    public Match eof(Frame f) { return repeat(f, (s, p) -> s.any(p, L_WILDCARD_CHAR), 0, 0, null, Trivia.NONE, L_EOS); }
     public Match error(Frame f, String message) { fail(Math.max(f.c, f.m), message); return null; }
+    public Match error(Frame f, Label message) { fail(Math.max(f.c, f.m), message); return null; }
     private boolean digit(int p) { return cp(p) >= '0' && cp(p) <= '9'; }
-    private void failures(int at, String... labels) { for (String label : labels) fail(at, label); }
     public Match number(Frame f) {
         int at = f.position(), p = at;
-        if (cp(p) == '+' || cp(p) == '-') p++; else fail(p, "SignParser");
+        if (cp(p) == '+' || cp(p) == '-') p++; else fail(p, L_SIGN);
         int digits = p; while (digit(p)) p++;
-        fail(p, "DigitParser");
+        fail(p, L_DIGIT);
         boolean hasDigits = p > digits;
-        if (!hasDigits) fail(p, "OneOrMore");
+        if (!hasDigits) fail(p, L_ONE_OR_MORE);
         if (cp(p) == '.') {
             p++; int fraction = p; while (digit(p)) p++;
-            fail(p, "DigitParser");
-            if (p == fraction) fail(p, "OneOrMore");
-            if (!hasDigits && p == fraction) { fail(at, "Chain"); fail(at, "'.'"); fail(at, "NumberParser"); f.advance(0); return null; }
+            fail(p, L_DIGIT);
+            if (p == fraction) fail(p, L_ONE_OR_MORE);
+            if (!hasDigits && p == fraction) { fail(at, L_CHAIN); fail(at, L_DOT); fail(at, L_NUMBER); f.advance(0); return null; }
         } else {
-            fail(p, "'.'");
-            if (!hasDigits) { fail(digits, "Chain"); fail(at, "NumberParser"); f.advance(0); return null; }
+            fail(p, L_DOT);
+            if (!hasDigits) { fail(digits, L_CHAIN); fail(at, L_NUMBER); f.advance(0); return null; }
         }
         int mantissa = p;
         if (cp(p) == 'e' || cp(p) == 'E') {
-            p++; if (cp(p) == '+' || cp(p) == '-') p++; else fail(p, "SignParser");
+            p++; if (cp(p) == '+' || cp(p) == '-') p++; else fail(p, L_SIGN);
             int exponent = p; while (digit(p)) p++;
-            fail(p, "DigitParser");
-            if (p == exponent) { fail(p, "OneOrMore"); p = mantissa; }
-        } else { fail(p, "EParser"); fail(p, "ExponentParser"); }
+            fail(p, L_DIGIT);
+            if (p == exponent) { fail(p, L_ONE_OR_MORE); p = mantissa; }
+        } else { fail(p, L_E); fail(p, L_EXPONENT); }
         f.advance(p - at); return Match.empty(at, p);
     }
-    public Match builtin(Frame f, String kind, int[] characters, String label) {
+    public Match builtin(Frame f, String kind, int[] characters, String label) { return builtin(f, kind, characters, Label.of(label)); }
+    public Match builtin(Frame f, String kind, int[] characters, Label label) {
         if (kind.equals("Number")) return number(f);
         if (kind.equals("EndOfSource")) return eof(f);
         int start = f.position(), p = start;
@@ -566,9 +655,9 @@ public final class Session {
             }
             if (cp(p) < 0) { fail(p, kind); return null; } p++;
         } else if (kind.equals("Identifier")) {
-            if (!alphabet(cp(p)) && cp(p) != '_') { fail(f, "AlphabetUnderScoreParser"); return error(f, "IdentifierParser"); }
+            if (!alphabet(cp(p)) && cp(p) != '_') { fail(f, L_ALPHABET_UNDERSCORE); return error(f, L_IDENTIFIER); }
             p++; while (alphabet(cp(p)) || digit(p) || cp(p) == '_') p++;
-            fail(p, "AlphabetNumericUnderScoreParser");
+            fail(p, L_ALNUM_UNDERSCORE);
         } else {
             int ch = cp(p);
             boolean ok = ch >= 0 && switch (kind) {
@@ -586,12 +675,14 @@ public final class Session {
             kind.equals("Quoted") || kind.equals("SingleQuoted") ? source.substring(start + 1, p - 1) : null);
     }
     private static boolean alphabet(int ch) { return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z'; }
-    public Match range(Frame f, int min, int max, String excluded, String label) {
+    public Match range(Frame f, int min, int max, String excluded, String label) { return range(f, min, max, excluded, Label.of(label)); }
+    public Match range(Frame f, int min, int max, String excluded, Label label) {
         int at = f.position(), ch = cp(at);
         if (ch < 0 || ch < min || ch > max || excluded != null && excluded.codePoints().anyMatch(v -> v == ch)) { Match failed = error(f, label); f.advance(0); return failed; }
         f.advance(Character.charCount(ch)); return Match.empty(at, f.position());
     }
-    public Match dfa(Frame f, int state, int[] accepting, int[][] transitions, String label) {
+    public Match dfa(Frame f, int state, int[] accepting, int[][] transitions, String label) { return dfa(f, state, accepting, transitions, Label.of(label)); }
+    public Match dfa(Frame f, int state, int[] accepting, int[][] transitions, Label label) {
         int start = f.position(), at = start, candidate = -1;
         while (at < input.length()) {
             int point = cp(at), next = -1;
@@ -605,18 +696,26 @@ public final class Session {
         if (candidate <= start) return error(f, label);
         f.advance(candidate - start); return Match.empty(start, candidate);
     }
-    public Match regex(Frame f, Pattern pattern, String label) {
+    public Match regex(Frame f, Pattern pattern, String label) { return regex(f, pattern, Label.of(label)); }
+    public Match regex(Frame f, Pattern pattern, Label label) {
         int at = f.position(); var matcher = pattern.matcher(source).region(at, source.length());
         if (!matcher.lookingAt() || matcher.end() == at) return error(f, label);
         input.cpIndex(matcher.end()); f.advance(matcher.end() - at); return Match.empty(at, matcher.end());
     }
     public Match until(Frame f, String terminator) {
-        return repeat(f, (s, p) -> s.any(p, "ANY"), 0, Integer.MAX_VALUE,
-            terminator.isEmpty() ? null : (s, p) -> s.look(p, (ss, pp) -> ss.literal(pp, terminator, true, "'" + terminator + "'"), false, "'" + terminator + "'"), NO_BOUNDARIES);
+        Label label = Label.of("'" + terminator + "'");
+        return repeat(f, (s, p) -> s.any(p, L_ANY), 0, Integer.MAX_VALUE,
+            terminator.isEmpty() ? null : (s, p) -> s.look(p, (ss, pp) -> ss.literal(pp, terminator, true, label), false, label), Trivia.NONE);
     }
-    public Match external(Frame f, String id) {
-        TokenScanner scanner = options.scanners().get(id);
-        if (scanner == null) throw new IllegalArgumentException("Missing TokenScanner: " + id);
+    private TokenScanner[] scannerCache = new TokenScanner[0];
+    public Match external(Frame f, String id) { return external(f, id, -1); }
+    public Match external(Frame f, String id, int index) {
+        TokenScanner scanner = index >= 0 && index < scannerCache.length ? scannerCache[index] : null;
+        if (scanner == null) {
+            scanner = options.scanners().get(id);
+            if (scanner == null) throw new IllegalArgumentException("Missing TokenScanner: " + id);
+            if (index >= 0) { if (index >= scannerCache.length) scannerCache = Arrays.copyOf(scannerCache, index + 1); scannerCache[index] = scanner; }
+        }
         var result = scanner.scan(input, new TokenScanner.ScanState(f.c, f.m, f.matched ? TokenScanner.Mode.matchOnly : TokenScanner.Mode.consumed, f.invert, f.reset));
         for (var diagnostic : result.diagnostics()) { input.cpIndex(diagnostic.offsetUtf16()); fail(diagnostic.offsetUtf16(), diagnostic.expected()); }
         if (!result.ok()) return null;
@@ -628,53 +727,60 @@ public final class Session {
         if (f.matched) f.m = result.matchedEnd(); else { f.c = result.consumedEnd(); f.m = result.matchedEnd(); }
         replay(result.effects()); return new Match(List.of(), List.of(), List.of(), List.of(), valueStart, valueEnd, false, List.of(), List.of(), source.substring(valueStart, valueEnd));
     }
-    public void boundary(Frame f, Boundary[] boundaries, int phase, int child) {
-        for (var boundary : boundaries) if (boundary.phase == phase && boundary.child == child) trivia(f, boundary.delimiters);
-    }
-    private void trivia(Frame f, Delimiter[] delimiters) {
+    /**
+     * Each failing round registers the hints of its failing delimiter prefix as one group id
+     * (the same set as registering ' ', '//', '/*', '*\/' ... individually at that position). An
+     * unterminated block comment keeps the individual registration path. A bare @comment delimiter
+     * (CPPComment) registers its own label again, which is a set no-op.
+     */
+    private void trivia(Frame f, Delimiters set) {
+        Delimiter[] delimiters = set.items;
         boolean again = true;
         while (again) {
             again = false;
+            int p = f.position(), at = Math.max(f.c, f.m), failed = 0;
             for (var delimiter : delimiters) {
-                int p = f.position(), next = p, terminatorEnd = -1;
+                int next = p, terminatorEnd = -1;
                 if (delimiter.isCharacters) {
                     int ch = cp(p);
                     if (ch >= 0 && delimiter.contains(ch)) next += Character.charCount(ch);
-                } else if (input.startsWith(p, delimiter.open)) {
+                } else if (p < input.length() && input.charAt(p) == delimiter.first && input.startsWith(p, delimiter.open)) {
                     if (delimiter.isLineComment) {
                         next += delimiter.open.length();
                         while (cp(next) >= 0 && cp(next) != '\r' && cp(next) != '\n') next += Character.charCount(cp(next));
                         terminatorEnd = cp(next) == '\r' && cp(next + 1) == '\n' ? next + 2 : cp(next) >= 0 ? next + 1 : next;
                     } else {
                         int end = source.indexOf(delimiter.close, p + delimiter.open.length());
-                        if (end < 0) { fail(input.length(), "'*/'"); fail(input.length(), "WildCardStringParser"); }
-                        else next = end + delimiter.close.length();
+                        if (end < 0) {
+                            // Started but unterminated: hints go to the end of input, not to this position.
+                            if (failed > 0) fail(at, set.prefixGroups[failed - 1]);
+                            failed = -1;
+                            fail(input.length(), L_BLOCK_END); fail(input.length(), L_WILDCARD_STRING);
+                        } else next = end + delimiter.close.length();
                     }
                 }
                 if (next > p) {
+                    if (failed > 0) fail(at, set.prefixGroups[failed - 1]);
                     f.advance(next - p);
                     // CPPComment's MatchOnly(LineTerminator) commits M, leaving C before the newline.
                     if (!f.matched && terminatorEnd >= 0) f.m = terminatorEnd;
                     progress(f);
-                    again = true; break;
+                    again = true; failed = -1; break;
                 }
-                int at = Math.max(f.c, f.m);
-                if (delimiter.isCharacters) fail(at, "' '");
-                else if (delimiter.isLineComment) fail(at, delimiter.openLabel);
-                else if (!input.startsWith(p, delimiter.open)) { fail(at, delimiter.openLabel); fail(at, delimiter.closeLabel); }
-                // A bare @comment delimiter uses CPPComment directly. Composite whitespace
-                // retains its own diagnostic profile, as in the Java-style delimiter scanner.
-                if (delimiters.length == 1 && delimiter.isLineComment) fail(at, delimiter.openLabel);
+                if (failed >= 0) failed++;
             }
+            if (failed > 0) fail(at, set.prefixGroups[failed - 1]);
         }
     }
     public Match recover(Frame f, Call child, String rule, String mode, String[] patterns, boolean consumeSync,
                          String noSync, String projection, String recipe) {
-        long mark = mark(); Frame trial = f.copy(false);
+        long mark = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
         diagnostics.enterExpression();
-        Match result = child.parse(this, trial);
+        Match result = child.parse(this, f);
         var failure = diagnostics.leaveRule();
-        if (result != null) { f.commit(trial); return result; }
+        f.reset = reset0;
+        if (result != null) return result;
+        f.c = c0; f.m = m0;
         restore(mark); int start = f.position(), syncStart = -1, syncLength = 0;
         String selected = null;
         for (String pattern : patterns) {
@@ -692,7 +798,7 @@ public final class Session {
         } else end = syncStart + (consumeSync ? syncLength : 0);
         if (end <= start) return null;
         f.advance(end - start);
-        var hints = Arrays.stream(failure.expected()).mapToObj(expected::get).sorted().toList();
+        var hints = Label.texts(failure.expected());
         var diagnostic = new Diagnostic("recovery", input.cpIndex(start), failure.farthest() < 0 ? input.cpIndex(start) : input.cpIndex(failure.farthest()),
             hints, failure.deepestRule() < 0 ? null : ruleNames[failure.deepestRule()],
             Arrays.stream(failure.ruleStack()).mapToObj(i -> ruleNames[i]).toList(), hints, "ERROR", input.cpLength(start, end), "recovery");
@@ -718,7 +824,7 @@ public final class Session {
             long[] counter = {0, 0}; for (var trace : match.traces()) trace(trace, -1, counter, lexical);
         }
         catalog.replaceAll((key, values) -> List.copyOf(values));
-        var farthestExpected = Arrays.stream(diagnostics.expected()).mapToObj(expected::get).sorted().toList();
+        var farthestExpected = Label.texts(diagnostics.expected());
         var scopeEvents = new ArrayList<ParseResult.ScopeEvent>();
         for (var effect : effects) scopeEvents.add(new ParseResult.ScopeEvent(scopeEvents.size(), effect.action(), effect.mode(), effect.name(), effect.offsetCp(), effect.lengthCp()));
         var diagnostic = new Diagnostic(kind, offset < 0 ? -1 : input.cpIndex(offset), diagnostics.farthest() < 0 ? kind.equals("trailing_input") ? input.cpIndex(Math.max(diagnostics.reached(), Math.max(f.c, f.m))) : -1 : input.cpIndex(diagnostics.farthest()),
@@ -769,18 +875,22 @@ public final class Session {
         throw mapping(value.start(), value.end(), "Missing mapped node", null);
     }
     public <T> T scalar(Recipe recipe, String field, Function<Value, T> conversion) {
-        List<Value> values = recipe.fields().getOrDefault(field, List.of());
+        List<Value> values = recipe.field(field);
         if (values.isEmpty()) throw mapping(recipe.start(), recipe.end(), "Missing scalar capture: " + field, null);
         T value = conversion.apply(values.getFirst());
         if (value == null && !values.getFirst().nodes().isEmpty()) throw new RecoveredNodeMissing();
         return value;
     }
     public <T> Optional<T> optional(Recipe recipe, String field, Function<Value, T> conversion) {
-        List<Value> values = recipe.fields().getOrDefault(field, List.of());
+        List<Value> values = recipe.field(field);
         return values.isEmpty() ? Optional.empty() : Optional.ofNullable(conversion.apply(values.getFirst()));
     }
     public <T> List<T> list(Recipe recipe, String field, Function<Value, T> conversion) {
-        return recipe.fields().getOrDefault(field, List.of()).stream().map(conversion).filter(java.util.Objects::nonNull).toList();
+        List<Value> values = recipe.field(field);
+        if (values.isEmpty()) return List.of();
+        var result = new ArrayList<T>(values.size());
+        for (int k = 0, n = values.size(); k < n; k++) { T converted = conversion.apply(values.get(k)); if (converted != null) result.add(converted); }
+        return List.copyOf(result);
     }
     public MappingException mapping(int start, int end, String message, Throwable cause) { return new MappingException(syntax, span(start, end), message, cause); }
     /** A missing recovered scalar omits its parent; optional/list callers absorb that absence. */

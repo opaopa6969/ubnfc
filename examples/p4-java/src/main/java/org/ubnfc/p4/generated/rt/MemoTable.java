@@ -1,19 +1,15 @@
 // ubnfc runtime template: MemoTable
 package org.ubnfc.p4.generated.rt;
 
-import java.util.Arrays;
-
 /** 解析セッション専用の boxing なし memo table。payload は生成側 arena への int handle。 */
 public final class MemoTable {
     public static final int MAX_EXPR_ID = 0x00ff_ffff;
     public static final int MAX_MODE = 0xff;
-    private long[] expressionKeys;
-    private long[] positionKeys;
-    // 0 = empty, 1 = failure, 2 = success: zero-valued keys remain usable.
-    private int[] outcomes;
-    private int[] consumedEnds;
-    private int[] matchedEnds;
-    private int[] payloads;
+    // 1 slot = 4 long: [expression key, position key, consumedEnd<<32 | matchedEnd, outcome<<32 | payload].
+    // outcome 0 = empty, 1 = failure, 2 = success (so the last word is non-zero for every entry). One cache line per probe.
+    private static final int STRIDE = 4;
+    private long[] table;
+    private int capacity;
     private int size;
 
     public MemoTable() {
@@ -36,7 +32,7 @@ public final class MemoTable {
         long expression = expressionKey(exprId, mode, stateVersion);
         long position = positionKey(consumed, matched);
         int slot = locate(expression, position);
-        return outcomes[slot] == 0 ? -1 : slot;
+        return table[slot * STRIDE + 3] == 0 ? -1 : slot;
     }
 
     public int put(int exprId, int consumed, int matched, int mode, int stateVersion,
@@ -44,44 +40,42 @@ public final class MemoTable {
         long expression = expressionKey(exprId, mode, stateVersion);
         long position = positionKey(consumed, matched);
         int slot = locate(expression, position);
-        if (outcomes[slot] == 0) {
-            if (size == outcomes.length / 2) {
+        if (table[slot * STRIDE + 3] == 0) {
+            if (size == capacity / 2) {
                 grow();
                 slot = locate(expression, position);
             }
-            expressionKeys[slot] = expression;
-            positionKeys[slot] = position;
+            table[slot * STRIDE] = expression;
+            table[slot * STRIDE + 1] = position;
             size++;
         }
-        outcomes[slot] = ok ? 2 : 1;
-        consumedEnds[slot] = consumedEnd;
-        matchedEnds[slot] = matchedEnd;
-        payloads[slot] = payload;
+        table[slot * STRIDE + 2] = ((long) consumedEnd << 32) | (matchedEnd & 0xffff_ffffL);
+        table[slot * STRIDE + 3] = ((long) (ok ? 2 : 1) << 32) | (payload & 0xffff_ffffL);
         return slot;
     }
 
     public boolean ok(int slot) {
         checkSlot(slot);
-        return outcomes[slot] == 2;
+        return (table[slot * STRIDE + 3] >>> 32) == 2;
     }
 
     public int consumedEnd(int slot) {
         checkSlot(slot);
-        return consumedEnds[slot];
+        return (int) (table[slot * STRIDE + 2] >>> 32);
     }
 
     public int matchedEnd(int slot) {
         checkSlot(slot);
-        return matchedEnds[slot];
+        return (int) table[slot * STRIDE + 2];
     }
 
     public int payload(int slot) {
         checkSlot(slot);
-        return payloads[slot];
+        return (int) table[slot * STRIDE + 3];
     }
 
     public void clear() {
-        Arrays.fill(outcomes, 0);
+        for (int i = 0; i < capacity; i++) table[i * STRIDE + 3] = 0;
         size = 0;
     }
 
@@ -90,7 +84,7 @@ public final class MemoTable {
     }
 
     public int capacity() {
-        return outcomes.length;
+        return capacity;
     }
 
     private static long expressionKey(int exprId, int mode, int stateVersion) {
@@ -109,59 +103,40 @@ public final class MemoTable {
     }
 
     private int locate(long expression, long position) {
-        long hash = mix(expression) ^ Long.rotateLeft(mix(position), 23);
-        int mask = outcomes.length - 1;
-        int slot = (int) (hash ^ (hash >>> 32)) & mask;
-        while (outcomes[slot] != 0
-                && (expressionKeys[slot] != expression || positionKeys[slot] != position)) {
+        // 1 回の乗算混合。上位 bit を使うので 2 冪 mask でも位置と式 id の下位 bit 偏りを拾わない。
+        long hash = (expression ^ (position * 0x9e37_79b9_7f4a_7c15L)) * 0xbf58_476d_1ce4_e5b9L;
+        int mask = capacity - 1;
+        int slot = (int) (hash >>> 32) & mask;
+        long[] t = table;
+        while (t[slot * STRIDE + 3] != 0
+                && (t[slot * STRIDE] != expression || t[slot * STRIDE + 1] != position)) {
             slot = (slot + 1) & mask;
         }
         return slot;
     }
 
-    private static long mix(long value) {
-        value ^= value >>> 30;
-        value *= 0xbf58_476d_1ce4_e5b9L;
-        value ^= value >>> 27;
-        value *= 0x94d0_49bb_1331_11ebL;
-        return value ^ (value >>> 31);
-    }
-
     private void grow() {
-        if (outcomes.length == (1 << 29)) {
+        if (capacity == (1 << 29)) {
             throw new IllegalStateException("Memo table capacity exhausted");
         }
-        long[] oldExpressions = expressionKeys;
-        long[] oldPositions = positionKeys;
-        int[] oldOutcomes = outcomes;
-        int[] oldConsumed = consumedEnds;
-        int[] oldMatched = matchedEnds;
-        int[] oldPayloads = payloads;
-        allocate(oldOutcomes.length << 1);
-        for (int i = 0; i < oldOutcomes.length; i++) {
-            if (oldOutcomes[i] != 0) {
-                int slot = locate(oldExpressions[i], oldPositions[i]);
-                expressionKeys[slot] = oldExpressions[i];
-                positionKeys[slot] = oldPositions[i];
-                outcomes[slot] = oldOutcomes[i];
-                consumedEnds[slot] = oldConsumed[i];
-                matchedEnds[slot] = oldMatched[i];
-                payloads[slot] = oldPayloads[i];
+        long[] old = table;
+        int oldCapacity = capacity;
+        allocate(oldCapacity << 1);
+        for (int i = 0; i < oldCapacity; i++) {
+            if (old[i * STRIDE + 3] != 0) {
+                int slot = locate(old[i * STRIDE], old[i * STRIDE + 1]);
+                System.arraycopy(old, i * STRIDE, table, slot * STRIDE, STRIDE);
             }
         }
     }
 
     private void allocate(int capacity) {
-        expressionKeys = new long[capacity];
-        positionKeys = new long[capacity];
-        outcomes = new int[capacity];
-        consumedEnds = new int[capacity];
-        matchedEnds = new int[capacity];
-        payloads = new int[capacity];
+        this.capacity = capacity;
+        table = new long[capacity * STRIDE];
     }
 
     private void checkSlot(int slot) {
-        if (slot < 0 || slot >= outcomes.length || outcomes[slot] == 0) {
+        if (slot < 0 || slot >= capacity || table[slot * STRIDE + 3] == 0) {
             throw new IndexOutOfBoundsException("No memo entry at slot " + slot);
         }
     }

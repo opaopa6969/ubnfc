@@ -31,6 +31,11 @@ public final class Input {
         return chars.length;
     }
 
+    /** UTF-16 単位の 1 文字。サロゲートはそのまま返す（接頭辞の先頭判定用）。 */
+    public char charAt(int idx) {
+        return chars[idx];
+    }
+
     public int codePointAt(int idx) {
         char c = chars[idx];
         if (Character.isHighSurrogate(c) && idx + 1 < chars.length) {
