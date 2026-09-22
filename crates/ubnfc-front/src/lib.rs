@@ -8,6 +8,7 @@
 //! - `analysis` : nullable / FIRST / 左再帰 / 優先順位 / choice 戦略 / capture cardinality
 //! - `cli`      : `ubnfc` コマンド
 
+pub mod analysis;
 pub mod cli;
 pub mod ir;
 pub mod resolve;
