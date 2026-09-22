@@ -97,6 +97,8 @@ pub struct Counters {
     pub events: Vec<u64>,
     pub rules: Vec<RuleCounter>,
     pub expressions: Vec<ExpressionCounter>,
+    /// 候補除外の失敗再生関数 `guard_e*`（§3.4）の呼出しと時間。rule と同じ包含/自己の扱い。
+    pub guards: RuleCounter,
     /// 実行中 rule の子時間の累計（自己時間の算出用）。
     stack: Vec<u64>,
 }
@@ -111,6 +113,7 @@ impl Counters {
             events: vec![0; NAMES.len()],
             rules: Vec::new(),
             expressions: Vec::new(),
+            guards: RuleCounter::default(),
             stack: Vec::with_capacity(1024),
         }
     }
@@ -162,11 +165,23 @@ pub fn expression(id: usize, match_only: bool) {
 
 /// rule 関数の入口で作り、drop で包含時間と自己時間を記録する。
 pub struct Guard {
-    rule: usize,
+    /// None は失敗再生関数（guards に集計）。
+    rule: Option<usize>,
     start: Instant,
 }
 
 impl Guard {
+    pub fn guard() -> Self {
+        COUNTERS.with(|c| {
+            let mut c = c.borrow_mut();
+            c.guards.calls_consumed += 1;
+            c.stack.push(0);
+        });
+        Self {
+            rule: None,
+            start: Instant::now(),
+        }
+    }
     pub fn rule(rule: usize, match_only: bool) -> Self {
         COUNTERS.with(|c| {
             let mut c = c.borrow_mut();
@@ -181,7 +196,7 @@ impl Guard {
             c.stack.push(0);
         });
         Self {
-            rule,
+            rule: Some(rule),
             start: Instant::now(),
         }
     }
@@ -193,7 +208,10 @@ impl Drop for Guard {
         COUNTERS.with(|c| {
             let mut c = c.borrow_mut();
             let children = c.stack.pop().unwrap_or(0);
-            let counter = &mut c.rules[self.rule];
+            let counter = match self.rule {
+                Some(rule) => &mut c.rules[rule],
+                None => &mut c.guards,
+            };
             counter.inclusive_ns += elapsed;
             counter.self_ns += elapsed.saturating_sub(children);
             if let Some(parent) = c.stack.last_mut() {

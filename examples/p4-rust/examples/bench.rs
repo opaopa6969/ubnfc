@@ -235,7 +235,7 @@ fn counters(cases: &[&Case]) {
                 .map(|e| e.calls_consumed + e.calls_match_only)
                 .sum();
             let total_self: u64 = snap.rules.iter().map(|r| r.self_ns).sum();
-            println!("\nrule 関数呼出し合計 {total_rule_calls}、expression 関数呼出し合計 {total_expr_calls}、rule 自己時間合計 {:.3} ms\n", total_self as f64 / 1e6);
+            println!("\nrule 関数呼出し合計 {total_rule_calls}、expression 関数呼出し合計 {total_expr_calls}、rule 自己時間合計 {:.3} ms、失敗再生（guard）呼出し {} 回・自己時間合計 {:.3} ms\n", total_self as f64 / 1e6, snap.guards.calls_consumed, snap.guards.self_ns as f64 / 1e6);
             let mut rules: Vec<(usize, counters::RuleCounter)> =
                 snap.rules.iter().copied().enumerate().collect();
             rules.sort_by_key(|(_, r)| std::cmp::Reverse(r.self_ns));

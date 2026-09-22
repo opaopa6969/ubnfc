@@ -40,6 +40,18 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         (false, false)
     };
     let memoized = success || failure;
+    // 到達位置（display の reached）は葉（literal / token / any / eof / empty / error）の出口、
+    // trivia、memo frame の入口、memo hit の再生で記録すれば十分で、複合式と rule の入口・出口の
+    // 位置はいずれもそれらの位置のどれか（子の出口か自身の入口）に一致する。
+    let leaf = matches!(
+        expr.node,
+        ExprNode::Literal { .. }
+            | ExprNode::TokenRef { .. }
+            | ExprNode::Any {}
+            | ExprNode::Eof {}
+            | ExprNode::Empty {}
+            | ExprNode::Error { .. }
+    );
     let mut s = format!("fn e{i}_{suf}(&mut self,state:State)->Step {{\n");
     if memoized {
         s.push_str("let mark=self.mark();\n");
@@ -51,8 +63,10 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         };
         writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:{version}}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
         writeln!(s, "self.display.enter(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
+    } else if leaf {
+        writeln!(s, "let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
     } else {
-        writeln!(s, "self.display.reach(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
+        writeln!(s, "let mut out=self.b{i}_{suf}(state);\nif out.ok {{").unwrap();
     }
     if matches!(
         expr.node,
@@ -104,26 +118,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     if expr.execution.entry_flag == ExecutionEntryFlag::SetFalse {
         s.push_str("state.reset=false;\n");
     }
-    let label =
-        g.ir.semantics
-            .diagnostics
-            .expected_display
-            .iter()
-            .find(|d| d.expr_id == expr.id)
-            .map(|d| d.rust.as_str())
-            .or(expr.diagnostic_label.as_deref())
-            .unwrap_or_else(|| match &expr.node {
-                ExprNode::Literal { value, .. } => value,
-                ExprNode::Error { message } => message,
-                ExprNode::TokenRef { symbol_id } => {
-                    g.ir.semantics
-                        .symbols
-                        .iter()
-                        .find(|symbol| symbol.id == *symbol_id)
-                        .map_or(symbol_id.as_str(), |symbol| symbol.name.as_str())
-                }
-                _ => "expression",
-            });
+    let label = label_of(g, expr);
     let transaction = matches!(
         expr.execution.transaction,
         ExecutionTransaction::Once | ExecutionTransaction::Occurs
@@ -161,8 +156,20 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             if predict && !longest {
                 s.push_str(&predict_literals(g, order, child_mode));
             }
-            for alt in order {
-                writeln!(s,"self.restore(mark);let mut child={};diagnostic=self.diag.join(diagnostic,child.diag);",g.call(alt,child_mode,"out.state.begin()")).unwrap();
+            // §3.4: 先頭文字で失敗を証明できる候補は呼ばず、失敗経路の再生関数を呼ぶ（predict.rs）。
+            let (guarded, policy) = crate::predict::guarded_alternatives(g, order, longest);
+            if guarded.iter().any(|x| !x.known.direct.is_empty()) {
+                writeln!(s,"let c0=self.input.cp_at(out.state.begin().position::<{child_mode}>()).map(|(c,_)|c);").unwrap();
+            }
+            if guarded.iter().any(|x| !x.known.skipped.is_empty()) {
+                writeln!(s,"let ct=self.input.cp_at(self.skip_{}::<{child_mode}>(out.state.begin()).position::<{child_mode}>()).map(|(c,_)|c);",policy.expect("policy of skipped chars")).unwrap();
+            }
+            for (index, alt) in order.iter().enumerate() {
+                if let Some(x) = guarded.iter().find(|x| x.index == index) {
+                    writeln!(s,"self.restore(mark);let mut child=if {} {{self.guard_e{}_{}(out.state.begin())}} else {{{}}};diagnostic=self.diag.join(diagnostic,child.diag);",crate::predict::skip_condition(&x.known),x.expr,suffix(child_mode),g.call(alt,child_mode,"out.state.begin()")).unwrap();
+                } else {
+                    writeln!(s,"self.restore(mark);let mut child={};diagnostic=self.diag.join(diagnostic,child.diag);",g.call(alt,child_mode,"out.state.begin()")).unwrap();
+                }
                 if longest {
                     s.push_str("if child.ok && best.as_ref().is_none_or(|(b,_)|child.state.consumed>b.state.consumed) {child.state=out.state.commit(child.state);let effects=self.save_effects(mark);best=Some((child,effects));}\n");
                 } else {
@@ -314,6 +321,29 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     }
     s.push_str("out\n}\n");
     Ok(s)
+}
+
+/// 主診断 DAG に記録する expected label（expected_display > diagnosticLabel > 既定）。
+pub(crate) fn label_of<'a>(g: &'a Generator<'_>, expr: &'a Expr) -> &'a str {
+    g.ir.semantics
+        .diagnostics
+        .expected_display
+        .iter()
+        .find(|d| d.expr_id == expr.id)
+        .map(|d| d.rust.as_str())
+        .or(expr.diagnostic_label.as_deref())
+        .unwrap_or_else(|| match &expr.node {
+            ExprNode::Literal { value, .. } => value,
+            ExprNode::Error { message } => message,
+            ExprNode::TokenRef { symbol_id } => {
+                g.ir.semantics
+                    .symbols
+                    .iter()
+                    .find(|symbol| symbol.id == *symbol_id)
+                    .map_or(symbol_id.as_str(), |symbol| symbol.name.as_str())
+            }
+            _ => "expression",
+        })
 }
 
 /// plan.memo（無ければ analysis.memoSafety）が許す成功・失敗の memo。

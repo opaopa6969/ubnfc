@@ -10,6 +10,10 @@ pub struct ParseOptions {
     /// Maximum active rule calls; native stack budget may stop earlier.
     pub max_depth: usize,
     pub memo: bool,
+    /// Predictive exclusion of ordered-choice alternatives that provably fail at
+    /// their first token (design v1 §3.4). false is the reference path that tries
+    /// every alternative; both produce the same result and diagnostics.
+    pub predict: bool,
     pub limits: ResourceLimits,
 }
 /// Per-session hard limits, checked before indexing input or retaining data.
@@ -44,6 +48,7 @@ impl Default for ParseOptions {
             lexical: false,
             max_depth: 10_000,
             memo: true,
+            predict: true,
             limits: ResourceLimits::default(),
         }
     }

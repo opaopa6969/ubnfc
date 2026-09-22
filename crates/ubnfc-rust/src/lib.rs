@@ -7,6 +7,7 @@ mod evaluator;
 mod expressions;
 mod mapping;
 mod metadata;
+mod predict;
 mod tokens;
 mod validate;
 

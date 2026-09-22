@@ -3,7 +3,7 @@ trait CollectValueSpans {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     );
 }
@@ -11,7 +11,7 @@ impl CollectValueSpans for String {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         if let Some(span) = texts.get(&(self.as_ptr() as usize)) {
@@ -27,7 +27,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         for (i, value) in self.iter().enumerate() {
@@ -43,7 +43,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         if let Some(value) = self {
@@ -55,7 +55,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Box<T> {
     fn collect(
         &self,
         path: &mut String,
-        texts: &std::collections::HashMap<usize, Span>,
+        texts: &TextSpans,
         out: &mut Vec<ValueSpan>,
     ) {
         self.as_ref().collect(path, texts, out);

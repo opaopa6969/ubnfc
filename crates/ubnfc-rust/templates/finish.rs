@@ -343,7 +343,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
                     .iter()
                     .enumerate()
                     .map(|(order, effect)| {
-                        let (action, name, offset_cp, length_cp) = match &effect.value {
+                        let (action, name, offset_cp, length_cp) = match &*effect.value {
                             ScanEffect::Enter => ("enter", None, effect.offset_cp, 0),
                             ScanEffect::Leave => ("leave", None, effect.offset_cp, 0),
                             ScanEffect::Clear => ("clear", None, effect.offset_cp, 0),

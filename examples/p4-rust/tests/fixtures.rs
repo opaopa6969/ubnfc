@@ -381,3 +381,70 @@ fn fixtures_are_unmodified_copies() {
     assert_eq!(names, expected);
     assert!(Path::new(&dir).join("complex.tiny").is_file());
 }
+
+/// §3.4 の候補除外（`ParseOptions::predict`）は参照経路（全候補を試行）と結果・診断が同じ。
+/// 全 fixture の完全入力に加え、切り詰め（各 byte 境界）と 1 文字破壊（`#`）で失敗経路を通す。
+/// 大きい fixture は間引く。memo の有無とも掛け合わせる。
+#[test]
+fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
+    let all: Vec<&str> = ACCEPTED
+        .iter()
+        .map(|(n, _)| *n)
+        .chain(REJECTED.iter().copied())
+        .collect();
+    let mut compared = 0usize;
+    for name in all {
+        let text = fixture(name);
+        let entry = if name.starts_with("comparison-heavy") {
+            Some("BooleanExpression")
+        } else {
+            None
+        };
+        let stride = match text.len() {
+            0..=400 => 1,
+            401..=1600 => 7,
+            1601..=6000 => 97,
+            _ => 1201,
+        };
+        let mut inputs: Vec<String> = vec![text.clone()];
+        let mut i = 0;
+        while i < text.len() {
+            if text.is_char_boundary(i) {
+                inputs.push(text[..i].to_owned());
+                let mut corrupted = text[..i].to_owned();
+                corrupted.push('#');
+                let rest = &text[i..];
+                let next = rest.chars().next().map_or(0, char::len_utf8);
+                corrupted.push_str(&rest[next..]);
+                inputs.push(corrupted);
+            }
+            i += stride;
+        }
+        for (index, input) in inputs.iter().enumerate() {
+            for memo in [true, false] {
+                // memo 無効の参照経路は遅い（complex で rule 評価 16 万回）ので間引く。
+                if !memo && (input.len() > 400 || index % 13 != 0) {
+                    continue;
+                }
+                let run = |predict: bool| {
+                    let mut options = options(true, memo);
+                    options.predict = predict;
+                    strip_statistics(match entry {
+                        None => parse_formula(input, options),
+                        Some(entry) => parse_entry(Some(entry), input, options).unwrap(),
+                    })
+                };
+                let (on, off) = (run(true), run(false));
+                assert!(
+                    on == off,
+                    "{name}: predict on/off differ (memo {memo}) for input {:?}\non:  {:?}\noff: {:?}",
+                    input,
+                    on.diagnostics,
+                    off.diagnostics
+                );
+                compared += 1;
+            }
+        }
+    }
+    assert!(compared > 1000, "{compared}");
+}

@@ -88,6 +88,38 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         } else {
             "self.display.reach(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n"
         });
+        // 先頭 byte がどの区切りの先頭でもなければ、下の各 block は何も進めず候補 label を
+        // 記録して終わる。その label 列を 1 回の failures で記録して抜ける（記録内容・位置は同じ）。
+        if let Some(bytes) = crate::predict::trivia_first_bytes(p) {
+            let mut labels = Vec::new();
+            let mut diag = String::new();
+            for d in &p.effective_delimiter_set {
+                match d {
+                    Delimiter::Characters { .. } => labels.push("' '".to_owned()),
+                    Delimiter::LineComment { open, .. } => {
+                        labels.push(format!("'{open}'"));
+                        if p.effective_delimiter_set.len() == 1 {
+                            let label = format!("'{open}'");
+                            diag = format!("let d=self.diag.fail(out.state.consumed.max(out.state.matched),{label:?});out.diag=self.diag.join(out.diag,d);");
+                        }
+                    }
+                    Delimiter::BlockComment { open, close } => {
+                        labels.push(format!("'{open}'"));
+                        labels.push(format!("'{close}'"));
+                    }
+                }
+            }
+            let pattern = bytes
+                .iter()
+                .map(u8::to_string)
+                .collect::<Vec<_>>()
+                .join("|");
+            if pattern.is_empty() {
+                writeln!(s,"if true {{{diag}self.display.failures(out.state.consumed.max(out.state.matched),&{labels:?});break;}}").unwrap();
+            } else {
+                writeln!(s,"if !matches!(self.text.as_bytes().get(before),Some({pattern})) {{{diag}self.display.failures(out.state.consumed.max(out.state.matched),&{labels:?});break;}}").unwrap();
+            }
+        }
         for d in &p.effective_delimiter_set {
             s.push_str("{let start=out.state.position::<MATCH>();let mut p=start;\n");
             match d {
@@ -117,6 +149,40 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         } else {
             "self.display.reach(out.state.consumed.max(out.state.matched));out}\n"
         });
+        // 診断を記録しない読み飛ばし。候補除外の判定位置（predict.rs）にだけ使う。
+        if p.effective_delimiter_set.is_empty() {
+            writeln!(
+                s,
+                "fn skip_{i}<const MATCH:bool>(&self,state:State)->State {{state}}"
+            )
+            .unwrap();
+            continue;
+        }
+        writeln!(s,"fn skip_{i}<const MATCH:bool>(&self,state:State)->State {{let mut out=state;loop {{let before=out.position::<MATCH>();").unwrap();
+        if let Some(bytes) = crate::predict::trivia_first_bytes(p) {
+            let pattern = bytes
+                .iter()
+                .map(u8::to_string)
+                .collect::<Vec<_>>()
+                .join("|");
+            if !pattern.is_empty() {
+                writeln!(
+                    s,
+                    "if !matches!(self.text.as_bytes().get(before),Some({pattern})) {{break;}}"
+                )
+                .unwrap();
+            }
+        }
+        for d in &p.effective_delimiter_set {
+            s.push_str("{let start=out.position::<MATCH>();let mut p=start;\n");
+            match d {
+                Delimiter::Characters{code_points}=>writeln!(s,"while let Some((c,n))=self.input.cp_at(p) {{if !{:?}.contains(&(c as u64)) {{break;}}p+=n;}}if p>start {{out.advance::<MATCH>(p-start);continue;}}",code_points).unwrap(),
+                Delimiter::LineComment{open,..}=>writeln!(s,"if self.input.starts_with(p,{open:?}) {{p+={};while let Some((c,n))=self.input.cp_at(p) {{if matches!(c,'\\n'|'\\r') {{break;}}p+=n;}}let end=if self.input.starts_with(p,\"\\r\\n\") {{p+2}} else {{self.input.cp_at(p).map_or(p,|(_,n)|p+n)}};out.advance::<MATCH>(p-start);if !MATCH {{out.matched=end;}}continue;}}",open.len()).unwrap(),
+                Delimiter::BlockComment{open,close}=>writeln!(s,"if self.input.starts_with(p,{open:?}) {{let body=p+{};if let Some(n)=self.text[body..].find({close:?}) {{p=body+n+{};out.advance::<MATCH>(p-start);continue;}}}}",open.len(),close.len()).unwrap(),
+            }
+            s.push_str("}\n");
+        }
+        s.push_str("if out.position::<MATCH>()==before {break;}}\nout}\n");
     }
     Ok(s)
 }
