@@ -284,7 +284,7 @@
     },
     "Capture": {
       "additionalProperties": false,
-      "description": "siteId は ExprId + /capture/<同一式内の文法順番号>。静的 site と動的 occurrence は別。空 span を削除しない。数値・型検査を採用結果の mapping まで遅延する。",
+      "description": "siteId は ExprId + /capture/<同一式内の文法順番号>。静的 site と動的 occurrence は別。空 span を削除しない。数値・型検査を採用結果の mapping まで遅延する。valueType/conversion は site の局所型であり、同じ mapped class の全 rule を統合した AST field 型より狭い場合がある。",
       "properties": {
         "cardinality": {
           "enum": [
@@ -2017,6 +2017,7 @@
                 ]
               },
               "conversion": {
+                "description": "construct/assocLists は resultTypeId の AST field 型に整合する変換。共有 field が text/number/node を混在させる場合は mixed を使い、site ごとの型付き変換を保つ。node/null だけの mixed は node 変換も許す（共有結合の leafFallback）。",
                 "enum": [
                   "text",
                   "number",
@@ -3060,6 +3061,7 @@
           "additionalProperties": false,
           "properties": {
             "inputState": {
+              "description": "scanner 呼出し時に渡す解析状態の項目名。front は consumed/matched（code point 位置）、mode（consumed または matchOnly）、invertMatch、resetMatchedWithConsumed（現在の transaction frame の R）を要求する。matched は最遠診断位置ではなく現在の照合 cursor。backend は列挙された状態を scanner に渡し、省略や既定値への置換をしない。",
               "items": {
                 "minLength": 1,
                 "type": "string"

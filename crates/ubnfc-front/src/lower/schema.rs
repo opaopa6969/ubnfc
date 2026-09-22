@@ -405,17 +405,34 @@ fn recipe(cx: &mut Context<'_>, rule: &r::ResolvedRule) {
                     .iter()
                     .filter(|c| c.rule_id == id && &c.name == p)
                     .collect();
-                let value = captures
-                    .iter()
-                    .map(|c| c.value_type.clone())
-                    .reduce(captures::join)
-                    .unwrap_or(ValueType::Text {});
+                // 同じ mapped class の constructor 契約は family 全体で決まる。
+                // site の変換は局所型のまま保ち、recipe は join 済み schema に合わせる。
+                // MapperTypeResolver.inferType / mergeCapturedTypes と generators.md #145。
+                let schema = cx.out.semantics.ast_types.iter().find_map(|t| match t {
+                    AstType::Record { id, fields, .. } if Some(id) == result.as_ref() => {
+                        fields.iter().find(|f| &f.name == p)
+                    }
+                    _ => None,
+                });
+                let value = schema.map(|f| &f.value_type);
+                let conversion = match value {
+                    // 共有結合の null は leafFallback 専用。通常の operand は node。
+                    Some(ValueType::Mixed { members })
+                        if kind == RecipeKind::AssocLists
+                            && members.contains(&ValueType::Null {})
+                            && members.iter().all(|v| {
+                                matches!(v, ValueType::Node { .. } | ValueType::Null {})
+                            }) =>
+                    {
+                        Conversion::Node
+                    }
+                    Some(value) => captures::conversion(value),
+                    None => Conversion::Text,
+                };
                 RecipeField {
                     field: p.clone(),
-                    cardinality: cx.fields[&rule.id]
-                        .get(p)
-                        .map_or(Cardinality::Scalar, |s| s.count),
-                    conversion: captures::conversion(&value),
+                    cardinality: schema.map_or(Cardinality::Scalar, |f| f.cardinality),
+                    conversion,
                     site_ids: captures.iter().map(|c| c.site_id.clone()).collect(),
                 }
             })
@@ -430,7 +447,11 @@ fn recipe(cx: &mut Context<'_>, rule: &r::ResolvedRule) {
         },
         rule_id: id,
         kind,
-        fields,
+        fields: if kind == RecipeKind::Skip {
+            vec![]
+        } else {
+            fields
+        },
         result_type_id: result,
         leaf_fallback: leaf,
         on_failure: RecipeOnFailure,
