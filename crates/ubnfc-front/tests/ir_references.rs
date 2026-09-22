@@ -309,6 +309,10 @@ fn additional_feature_gates_cover_semantics_and_plan() {
     ];
     for (feature, pointer, new_value) in cases {
         let mut v = original.clone();
+        v["requiredFeatures"]
+            .as_array_mut()
+            .unwrap()
+            .retain(|declared| declared.as_str() != Some(feature));
         *v.pointer_mut(pointer).unwrap() = new_value;
         assert!(
             has_error(&errors(v), "/requiredFeatures", &format!("\"{feature}\"")),

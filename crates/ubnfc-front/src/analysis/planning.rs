@@ -114,7 +114,8 @@ fn effects(cx: &Context<'_>, root: usize) -> Vec<String> {
                 result.push(format!("recovery:{}", r.rule_id));
             }
         }
-        visiting.remove(&i);
+        // 同一 root の要約では共有部分グラフを一度だけ訪問する。
+        // effects は出現列ではなく、最初の出現順を保つ unique な要約。
     }
     let mut result = Vec::new();
     visit(cx, root, &mut BTreeSet::new(), &mut result);
