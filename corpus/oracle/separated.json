@@ -1,0 +1,285 @@
+{
+  "feature": "separated",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Value, params=[values]) Root ::= ('a' @values) % ',';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "separated/1",
+      "input": "",
+      "accepted": false,
+      "allConsumed": true,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'a'",
+            "RootParser",
+            "RootSep0Parser"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'a'",
+            "RootParser",
+            "RootSep0Parser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'a'",
+          "RootParser",
+          "RootSep0Parser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "separated/2",
+      "input": "a",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {
+          "values": [
+            "a"
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "a"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "','"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "separated/3",
+      "input": "a,a",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "values": [
+            "a",
+            "a"
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "a"
+        },
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            2,
+            3
+          ],
+          "text": "a"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "','"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "separated/4",
+      "input": "a,",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 1,
+      "matched": 1,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "values",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "a"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 1,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 2,
+          "farthestExpected": [
+            "'a'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "'a'"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "separated/5",
+      "input": ",",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "'a'",
+            "RootParser",
+            "RootSep0Parser"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "'a'",
+            "RootParser",
+            "RootSep0Parser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "'a'",
+          "RootParser",
+          "RootSep0Parser"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "ea4e1e728d6875e5397cc804486b04401c6d133aabaa6771eaa194f3d9c1dd73",
+    "org/example/oracle/ProbeMapper.java": "10d55b34404d947c61c71bc72d0af3f938b6e6eb6e851eaa799100eec63ca55e",
+    "org/example/oracle/ProbeParsers.java": "0ddbb3962dbcbb34fc99a9a0099f8ae5ec1bd5767de1e1ba152476a22e6531d9"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/separated/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "values",
+          "returnType": "java.util.List<java.lang.String>",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

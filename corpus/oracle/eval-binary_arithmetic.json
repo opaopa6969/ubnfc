@@ -1,0 +1,252 @@
+{
+  "feature": "@eval",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token NUM=NumberParser @root @eval(kind='binary_arithmetic', strategy='default') @leftAssoc @precedence(level=10) @mapping(Binary, params=[left,op,right]) Root ::= Leaf @left { '+' @op Leaf @right }; @eval(kind='literal', strategy='default') @mapping(Literal, params=[value]) Leaf ::= NUM @value;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "eval-binary_arithmetic/1",
+      "input": "1+2",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Binary",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "left": {
+            "type": "Literal",
+            "span": [
+              0,
+              1
+            ],
+            "fields": {
+              "value": 1
+            }
+          },
+          "op": [
+            "+"
+          ],
+          "right": [
+            {
+              "type": "Literal",
+              "span": [
+                2,
+                3
+              ],
+              "fields": {
+                "value": 2
+              }
+            }
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Leaf:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        },
+        {
+          "name": "left",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        },
+        {
+          "name": "op",
+          "binding": "Root:1",
+          "span": [
+            1,
+            2
+          ],
+          "text": "+"
+        },
+        {
+          "name": "value",
+          "binding": "Leaf:0",
+          "span": [
+            2,
+            3
+          ],
+          "text": "2"
+        },
+        {
+          "name": "right",
+          "binding": "Root:2",
+          "span": [
+            2,
+            3
+          ],
+          "text": "2"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "'+'",
+          "'.'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "1b269d98b1a71be80c4f9f930020f45697f55fe5378b34a24b15442465712876",
+    "org/example/oracle/ProbeMapper.java": "74f75168f7ece01d1d3c5d0f0ca52a74d357ec767797a4daff60e2be75331476",
+    "org/example/oracle/ProbeParsers.java": "5d0324ac6541c00c5f9c1515088c7bafeffeb44c4fac0ac1f75c84bcc6b46249"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/eval-binary_arithmetic/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Binary",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "op",
+          "returnType": "java.util.List<java.lang.String>",
+          "abstract": false
+        },
+        {
+          "name": "right",
+          "returnType": "java.util.List<org.example.oracle.ProbeAST$Literal>",
+          "abstract": false
+        },
+        {
+          "name": "left",
+          "returnType": "org.example.oracle.ProbeAST$Literal",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "Literal",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "int",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "evaluator": {
+    "sourceSha256": "257b0e792ae3ca054643d5d793619d1593f1f7fa5c921761c7a77207f25daa2a",
+    "compilation": {
+      "success": true,
+      "diagnostics": []
+    },
+    "methods": [
+      {
+        "name": "evalInternal",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "applyBinary",
+        "abstract": true,
+        "parameters": [
+          "java.lang.String",
+          "java.lang.Object",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "evalLeaf",
+        "abstract": true,
+        "parameters": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "evalBinary",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Binary"
+        ]
+      },
+      {
+        "name": "evalLiteral",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Literal"
+        ]
+      },
+      {
+        "name": "eval",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "setDebugStrategy",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeEvaluator$DebugStrategy"
+        ]
+      }
+    ],
+    "emptyConcreteSubclass": {
+      "success": false,
+      "diagnostics": [
+        {
+          "kind": "ERROR",
+          "code": "compiler.err.does.not.override.abstract",
+          "file": "EmptySemantics.java",
+          "line": 1,
+          "message": "org.example.oracle.EmptySemantics is not abstract and does not override abstract method applyBinary(java.lang.String,java.lang.Object,java.lang.Object) in org.example.oracle.ProbeEvaluator"
+        }
+      ]
+    }
+  },
+  "stage": "executed"
+}

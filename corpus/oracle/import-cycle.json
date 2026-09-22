@@ -1,0 +1,34 @@
+{
+  "feature": "@import",
+  "grammar": "grammar Probe {\n @import b from 'B.ubnf'\n @package: org.example.oracle\n  @root @mapping(Value) Root ::= 'a';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "imports": {
+    "B.ubnf": "grammar B { @import c from 'C.ubnf' Leaf ::= 'b'; }",
+    "C.ubnf": "grammar C { @import b from 'B.ubnf' Atom ::= 'c'; }"
+  },
+  "cases": [
+    {
+      "id": "import-cycle/1",
+      "input": "a",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "",
+    "apiError": "java.lang.IllegalStateException: 循環 import を検出しました: B.ubnf (スタック: [C.ubnf, B.ubnf])"
+  },
+  "stage": "generation_failed"
+}

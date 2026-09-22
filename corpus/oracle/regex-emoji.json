@@ -1,0 +1,130 @@
+{
+  "feature": "REGEX",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token T=REGEX('😀')\n @root @mapping(Value, params=[value]) Root ::=  T @value ;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "regex-emoji/1",
+      "input": "😀",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "REGEX('😀')"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "REGEX('😀')"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "REGEX('😀')"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "regex-emoji/2",
+      "input": "😀x",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 2,
+      "matched": 2,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          2
+        ],
+        "fields": {
+          "value": "😀x"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "😀x"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": []
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "c5375f73bb86e35d30639fbbaa59005ee8cbf039293e54cc330019c361069253",
+    "org/example/oracle/ProbeMapper.java": "87c4d92f1b9d6b7d8bcff1d4df542f0b9d341294964d9af64a70de6b523ccb46",
+    "org/example/oracle/ProbeParsers.java": "099cb30acc15ba396c9b5cb6647c2bf70c257664f7cfb9ff1d79878664cea10c"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/regex-emoji/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

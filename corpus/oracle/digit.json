@@ -1,0 +1,218 @@
+{
+  "feature": "DigitParser",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token E=EOF\n token T=org.unlaxer.parser.posix.DigitParser\n @root @mapping(Value, params=[value]) Root ::=  T @value E;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "digit/1",
+      "input": "7",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "Value",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {
+          "value": 7
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "7"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "WildCardCharacterParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "digit/2",
+      "input": "73",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 1,
+          "expected": [
+            "EndOfSourceParser"
+          ],
+          "farthestOffset": 1,
+          "farthestExpected": [
+            "EndOfSourceParser"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "EndOfSourceParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "digit/3",
+      "input": "７",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "RootParser",
+            "TParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "RootParser",
+            "TParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "RootParser",
+          "TParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "digit/4",
+      "input": "",
+      "accepted": false,
+      "allConsumed": true,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "RootParser",
+            "TParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "RootParser",
+            "TParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "RootParser",
+          "TParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "ef97daa835b1701e8d5fdd1b75c54fc7d8b571ad3d16b8c66c1b4982e135bb73",
+    "org/example/oracle/ProbeMapper.java": "35ff65b7b8cd89fe51a09c41ebdb0b099a1ef1fc6cc12316f251db78cf177d74",
+    "org/example/oracle/ProbeParsers.java": "7d5058410a5d3e7e2e55f1001095bb2ea4ee884e1453f328c28209596e531958"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/digit/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Value",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "int",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

@@ -1,0 +1,241 @@
+{
+  "feature": "@eval",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token NUM=NumberParser @root @eval(kind='conditional', strategy='default') @mapping(Conditional, params=[condition,thenExpr,elseExpr]) Root ::= Leaf @condition '?' Leaf @thenExpr ':' Leaf @elseExpr; @eval(kind='literal', strategy='default') @mapping(Literal, params=[value]) Leaf ::= NUM @value;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "eval-conditional/1",
+      "input": "1?2:3",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 5,
+      "matched": 5,
+      "ast": {
+        "type": "Conditional",
+        "span": [
+          0,
+          5
+        ],
+        "fields": {
+          "condition": {
+            "type": "Literal",
+            "span": [
+              0,
+              1
+            ],
+            "fields": {
+              "value": 1
+            }
+          },
+          "thenExpr": {
+            "type": "Literal",
+            "span": [
+              2,
+              3
+            ],
+            "fields": {
+              "value": 2
+            }
+          },
+          "elseExpr": {
+            "type": "Literal",
+            "span": [
+              4,
+              5
+            ],
+            "fields": {
+              "value": 3
+            }
+          }
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Leaf:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        },
+        {
+          "name": "condition",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "1"
+        },
+        {
+          "name": "value",
+          "binding": "Leaf:0",
+          "span": [
+            2,
+            3
+          ],
+          "text": "2"
+        },
+        {
+          "name": "thenExpr",
+          "binding": "Root:1",
+          "span": [
+            2,
+            3
+          ],
+          "text": "2"
+        },
+        {
+          "name": "value",
+          "binding": "Leaf:0",
+          "span": [
+            4,
+            5
+          ],
+          "text": "3"
+        },
+        {
+          "name": "elseExpr",
+          "binding": "Root:2",
+          "span": [
+            4,
+            5
+          ],
+          "text": "3"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 5,
+        "consumed": 5,
+        "matched": 5,
+        "expected": [
+          "'.'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "f2dc0eb831821bfcc6a3239e81f2398cb9f3283338f71f44f99e6d80f04af3a9",
+    "org/example/oracle/ProbeMapper.java": "30c94eb9e3b996ef850f0930164c0af63a2391ba01690495d2310fba3e0354ea",
+    "org/example/oracle/ProbeParsers.java": "5f34a2751823ed1a788acd50a37113e4823b9377580c57f54461e7dec92a8b2d"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/eval-conditional/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Conditional",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "condition",
+          "returnType": "org.example.oracle.ProbeAST$Literal",
+          "abstract": false
+        },
+        {
+          "name": "elseExpr",
+          "returnType": "org.example.oracle.ProbeAST$Literal",
+          "abstract": false
+        },
+        {
+          "name": "thenExpr",
+          "returnType": "org.example.oracle.ProbeAST$Literal",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "Literal",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "int",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "evaluator": {
+    "sourceSha256": "422c1442b6a22fc2fa86ac5f6803498be112be3e03ce5d3de7eea7c3c3680f6c",
+    "compilation": {
+      "success": true,
+      "diagnostics": []
+    },
+    "methods": [
+      {
+        "name": "evalInternal",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "evalConditional",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Conditional"
+        ]
+      },
+      {
+        "name": "evalLiteral",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Literal"
+        ]
+      },
+      {
+        "name": "eval",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "setDebugStrategy",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeEvaluator$DebugStrategy"
+        ]
+      }
+    ],
+    "emptyConcreteSubclass": {
+      "success": true,
+      "diagnostics": []
+    }
+  },
+  "stage": "executed"
+}

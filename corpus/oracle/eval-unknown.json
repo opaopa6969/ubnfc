@@ -1,0 +1,147 @@
+{
+  "feature": "@eval",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token NUM=NumberParser @root @eval(kind='unknown', strategy='default') @mapping(Literal, params=[value]) Root ::= NUM @value;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "eval-unknown/1",
+      "input": "7",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "Literal",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {
+          "value": 7
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "7"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "'.'",
+          "DigitParser",
+          "EParser",
+          "ExponentParser"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "9b4b3acf690998ddb9dda1dd4697e88e560ae602ceffa7c5d0b33f113fa426e2",
+    "org/example/oracle/ProbeMapper.java": "1a62cdd141d00c9a5c2fb8fc3fa5eb19c13c255ec73a4932f4e2d3de536bb7c5",
+    "org/example/oracle/ProbeParsers.java": "d9a7210f30093bdf89b940063f9428b7dde13e6e9b0edef3a5643947be2bfb94"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/eval-unknown/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Literal",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "int",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "evaluator": {
+    "sourceSha256": "ecadbccef62e405070af82f1d184362f9212b672d0778720c39eb69d23f6d02e",
+    "compilation": {
+      "success": true,
+      "diagnostics": []
+    },
+    "methods": [
+      {
+        "name": "evalInternal",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "evalLiteral",
+        "abstract": true,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Literal"
+        ]
+      },
+      {
+        "name": "eval",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "setDebugStrategy",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeEvaluator$DebugStrategy"
+        ]
+      }
+    ],
+    "emptyConcreteSubclass": {
+      "success": false,
+      "diagnostics": [
+        {
+          "kind": "ERROR",
+          "code": "compiler.err.does.not.override.abstract",
+          "file": "EmptySemantics.java",
+          "line": 1,
+          "message": "org.example.oracle.EmptySemantics is not abstract and does not override abstract method evalLiteral(org.example.oracle.ProbeAST.Literal) in org.example.oracle.ProbeEvaluator"
+        }
+      ]
+    }
+  },
+  "stage": "executed"
+}

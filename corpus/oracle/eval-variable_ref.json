@@ -1,0 +1,151 @@
+{
+  "feature": "@eval",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token ID=IdentifierParser @root @eval(kind='variable_ref', strategy='default') @mapping(Variable, params=[name]) Root ::= ID @name;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "eval-variable_ref/1",
+      "input": "x",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "Variable",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {
+          "name": "x"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "name",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "x"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": [
+          "AlphabetNumericUnderScoreParser"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "498c0b8a010af95444d768bfefc6abad2200dfa867e2d55352a4a9fa42c59523",
+    "org/example/oracle/ProbeMapper.java": "2e42015d15deaeae94bf91024a66073ab4bbfcabf4dff5246d2255db5515d9b1",
+    "org/example/oracle/ProbeParsers.java": "7153a8ecb5acbc00e890f055de103f734ac0f37d3702048c41c92347abc8d1a3"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/eval-variable_ref/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Variable",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "name",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "evaluator": {
+    "sourceSha256": "70a8e687e4820943db96451beec36c55dc030b195d48adbddbca49a1cf89ba17",
+    "compilation": {
+      "success": true,
+      "diagnostics": []
+    },
+    "methods": [
+      {
+        "name": "evalInternal",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "resolveVariable",
+        "abstract": true,
+        "parameters": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "evalVariable",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST$Variable"
+        ]
+      },
+      {
+        "name": "eval",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeAST"
+        ]
+      },
+      {
+        "name": "setDebugStrategy",
+        "abstract": false,
+        "parameters": [
+          "org.example.oracle.ProbeEvaluator$DebugStrategy"
+        ]
+      }
+    ],
+    "emptyConcreteSubclass": {
+      "success": false,
+      "diagnostics": [
+        {
+          "kind": "ERROR",
+          "code": "compiler.err.does.not.override.abstract",
+          "file": "EmptySemantics.java",
+          "line": 1,
+          "message": "org.example.oracle.EmptySemantics is not abstract and does not override abstract method resolveVariable(java.lang.String) in org.example.oracle.ProbeEvaluator"
+        }
+      ]
+    }
+  },
+  "stage": "executed"
+}

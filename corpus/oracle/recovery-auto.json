@@ -1,0 +1,160 @@
+{
+  "feature": "@recovery",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Root, params=[items]) Root ::= Stmt @items { Stmt @items }; @recovery(auto) @mapping(Stmt, params=[value]) Stmt ::= 'ok' @value ';';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "recovery-auto/1",
+      "input": "bad;ok;",
+      "accepted": true,
+      "allConsumed": false,
+      "consumed": 6,
+      "matched": 6,
+      "ast": null,
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "items",
+          "binding": "Root:0",
+          "span": [
+            0,
+            6
+          ],
+          "text": "bad;ok"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "trailing_input",
+          "offset": 6,
+          "expected": [
+            "end of input"
+          ],
+          "farthestOffset": 6,
+          "farthestExpected": [
+            "';'",
+            "'ok'",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 6,
+        "consumed": 6,
+        "matched": 6,
+        "expected": [
+          "';'",
+          "'ok'",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "recovery-auto/2",
+      "input": "",
+      "accepted": false,
+      "allConsumed": true,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "';'",
+            "'ok'",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "';'",
+            "'ok'",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "';'",
+          "'ok'",
+          "RootParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "5dee5783f11e71698df5a609891eb097cc87b7907399fed7673699e8c8c48ff1",
+    "org/example/oracle/ProbeMapper.java": "cca6a0728ff48b26cf0953e4046c2cf8d3f4bb1d4a76eff7bb8c516e76f9d437",
+    "org/example/oracle/ProbeParsers.java": "db71f695b3a22a64ce223b33f14b429e6c6458d6dbb0a145c7665bf329a0dae9"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/recovery-auto/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Root",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "items",
+          "returnType": "java.util.List<org.example.oracle.ProbeAST$Stmt>",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "Stmt",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

@@ -1,0 +1,173 @@
+{
+  "feature": "@recovery",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @recovery(sync=';') @mapping(Stmt, params=[value]) Root ::= 'ok' @value ';';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "recovery-root/1",
+      "input": "bad;",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "';'",
+            "'ok'"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "';'",
+            "'ok'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "';'",
+          "'ok'"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "recovery-root/2",
+      "input": "ok;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Stmt",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "value": "ok"
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "value",
+          "binding": "Root:0",
+          "span": [
+            0,
+            2
+          ],
+          "text": "ok"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": []
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "recovery-root/3",
+      "input": "",
+      "accepted": false,
+      "allConsumed": true,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "';'",
+            "'ok'"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "';'",
+            "'ok'"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "';'",
+          "'ok'"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "61c2989f39d1c0fe8464bb58e5af5a4a4fd1cae8477bf8cdaaff3c208f4d39d1",
+    "org/example/oracle/ProbeMapper.java": "c2ed06b362b465692a5f6e0f558c9d3dfadeea892acc81d8e939f19b47b6c9c0",
+    "org/example/oracle/ProbeParsers.java": "8add2a2e3afc4d9b47cc6c05b080cc39cc856263e7685e4cde799fdcad0a2c42"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/recovery-root/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Stmt",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

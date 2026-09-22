@@ -1,0 +1,83 @@
+{
+  "feature": "@eval",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @eval(kind='literal', strategy='default') @mapping(Node) Root ::= Leaf; @mapping(Item) Leaf ::= 'a';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "eval-sum/1",
+      "input": "a",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 1,
+      "matched": 1,
+      "ast": {
+        "type": "Item",
+        "span": [
+          0,
+          1
+        ],
+        "fields": {}
+      },
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 1,
+        "consumed": 1,
+        "matched": 1,
+        "expected": []
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "db5fbd921fae4a9501205f37a6d6e0d7e0fb851c470cebf7560f65f4bc0289ac",
+    "org/example/oracle/ProbeMapper.java": "87d0d7959c203c366b028746bcdadcee39fd013afe69d6e66e3e448b249476a1",
+    "org/example/oracle/ProbeParsers.java": "5043a700cbc164b7c269bff66d9df4de03a7296a938fc5b592acd193037eead0"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/eval-sum/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Item",
+      "kind": "record",
+      "methods": []
+    },
+    {
+      "name": "Node",
+      "kind": "interface",
+      "methods": []
+    }
+  ],
+  "evaluator": {
+    "generationError": "java.lang.IllegalArgumentException: Automatic @eval requires a concrete mapping, not sum Node; annotate its variants instead"
+  },
+  "stage": "executed"
+}

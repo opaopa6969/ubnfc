@@ -1,0 +1,270 @@
+{
+  "feature": "@backref-no-scope",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token ID=IdentifierParser @root @backref(name=name) @mapping(Pair, params=[name]) Root ::= ID @name ':' ID @name;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "backref/1",
+      "input": "x:x",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Pair",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "name": [
+            "x",
+            "x"
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "name",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "x"
+        },
+        {
+          "name": "name",
+          "binding": "Root:1",
+          "span": [
+            2,
+            3
+          ],
+          "text": "x"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "AlphabetNumericUnderScoreParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "backref/2",
+      "input": "x:y",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Pair",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "name": [
+            "x",
+            "y"
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "name",
+          "binding": "Root:0",
+          "span": [
+            0,
+            1
+          ],
+          "text": "x"
+        },
+        {
+          "name": "name",
+          "binding": "Root:1",
+          "span": [
+            2,
+            3
+          ],
+          "text": "y"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "message": "back-reference mismatch: expected 'x' but got 'y'",
+          "offset": 2,
+          "length": 1,
+          "severity": "ERROR",
+          "kind": "ERROR",
+          "expected": [],
+          "origin": "ScopeStore"
+        }
+      ],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "AlphabetNumericUnderScoreParser"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "backref/3",
+      "input": "x:",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 2,
+          "expected": [
+            "AlphabetUnderScoreParser",
+            "IdentifierParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 2,
+          "farthestExpected": [
+            "AlphabetUnderScoreParser",
+            "IdentifierParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 2,
+        "consumed": 2,
+        "matched": 2,
+        "expected": [
+          "AlphabetUnderScoreParser",
+          "IdentifierParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "backref/4",
+      "input": "foo:foo",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 7,
+      "matched": 7,
+      "ast": {
+        "type": "Pair",
+        "span": [
+          0,
+          7
+        ],
+        "fields": {
+          "name": [
+            "foo",
+            "foo"
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "name",
+          "binding": "Root:0",
+          "span": [
+            0,
+            3
+          ],
+          "text": "foo"
+        },
+        {
+          "name": "name",
+          "binding": "Root:1",
+          "span": [
+            4,
+            7
+          ],
+          "text": "foo"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 7,
+        "consumed": 7,
+        "matched": 7,
+        "expected": [
+          "AlphabetNumericUnderScoreParser"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "e5a6652b8d77d365803a84d29381d4dc8d28cb66cff5b178948fe9ae78410df7",
+    "org/example/oracle/ProbeMapper.java": "b80acee8004010b34e1ed24f7477a3e1b72d3862da85ccc31d80d22decf08f5a",
+    "org/example/oracle/ProbeParsers.java": "82122ec8933b7766dad76f681ec0b001fe6e9b8fb69b3625bb77aedf3a447da0"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/backref/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Pair",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "name",
+          "returnType": "java.util.List<java.lang.String>",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

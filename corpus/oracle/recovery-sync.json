@@ -1,0 +1,228 @@
+{
+  "feature": "@recovery",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Root, params=[items]) Root ::= Stmt @items { Stmt @items }; @recovery(sync=';') @mapping(Stmt, params=[value]) Stmt ::= 'ok' @value ';';\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "recovery-sync/1",
+      "input": "bad;ok;",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 7,
+      "matched": 7,
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          7
+        ],
+        "fields": {
+          "items": [
+            {
+              "type": "Stmt",
+              "span": [
+                4,
+                7
+              ],
+              "fields": {
+                "value": "ok"
+              }
+            }
+          ]
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "items",
+          "binding": "Root:0",
+          "span": [
+            0,
+            4
+          ],
+          "text": "bad;"
+        },
+        {
+          "name": "value",
+          "binding": "Stmt:0",
+          "span": [
+            4,
+            6
+          ],
+          "text": "ok"
+        },
+        {
+          "name": "items",
+          "binding": "Root:1",
+          "span": [
+            4,
+            7
+          ],
+          "text": "ok;"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 7,
+        "consumed": 7,
+        "matched": 7,
+        "expected": [
+          "';'",
+          "'ok'",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "recovery-sync/2",
+      "input": "bad",
+      "accepted": false,
+      "allConsumed": false,
+      "consumed": 0,
+      "matched": 0,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [
+        {
+          "kind": "syntax",
+          "offset": 0,
+          "expected": [
+            "';'",
+            "'ok'",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "farthestOffset": 0,
+          "farthestExpected": [
+            "';'",
+            "'ok'",
+            "RootParser",
+            "__CaptureSite"
+          ],
+          "origin": "Mapper.diagnose"
+        }
+      ],
+      "parsedStatus": "failed",
+      "nativeFailure": {
+        "offset": 0,
+        "consumed": 0,
+        "matched": 0,
+        "expected": [
+          "';'",
+          "'ok'",
+          "RootParser",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    },
+    {
+      "id": "recovery-sync/3",
+      "input": "😀;x",
+      "accepted": true,
+      "allConsumed": true,
+      "consumed": 3,
+      "matched": 3,
+      "ast": {
+        "type": "Root",
+        "span": [
+          0,
+          3
+        ],
+        "fields": {
+          "items": []
+        }
+      },
+      "mappingError": null,
+      "captures": [
+        {
+          "name": "items",
+          "binding": "Root:0",
+          "span": [
+            0,
+            3
+          ],
+          "text": "😀;x"
+        }
+      ],
+      "declarations": [],
+      "references": [],
+      "diagnostics": [],
+      "parsedStatus": "succeeded",
+      "nativeFailure": {
+        "offset": 3,
+        "consumed": 3,
+        "matched": 3,
+        "expected": [
+          "';'",
+          "'ok'",
+          "__CaptureSite"
+        ]
+      },
+      "scopeDepth": 0
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "5dee5783f11e71698df5a609891eb097cc87b7907399fed7673699e8c8c48ff1",
+    "org/example/oracle/ProbeMapper.java": "cca6a0728ff48b26cf0953e4046c2cf8d3f4bb1d4a76eff7bb8c516e76f9d437",
+    "org/example/oracle/ProbeParsers.java": "5d1eeb669249535168c9ea95bc357126325106ac0fd8b6b9f3c8d1a97805fd06"
+  },
+  "compilation": {
+    "success": true,
+    "diagnostics": [
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/recovery-sync/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "astTypes": [
+    {
+      "name": "Root",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "items",
+          "returnType": "java.util.List<org.example.oracle.ProbeAST$Stmt>",
+          "abstract": false
+        }
+      ]
+    },
+    {
+      "name": "Stmt",
+      "kind": "record",
+      "methods": [
+        {
+          "name": "value",
+          "returnType": "java.lang.String",
+          "abstract": false
+        }
+      ]
+    }
+  ],
+  "stage": "executed"
+}

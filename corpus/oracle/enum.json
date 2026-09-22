@@ -1,0 +1,95 @@
+{
+  "feature": "@enum",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @enum Mode ::= 'on' | 'off'; @root @mapping(Config, params=[mode]) Root ::= Mode @mode;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "enum/1",
+      "input": "on",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    },
+    {
+      "id": "enum/2",
+      "input": "off",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    },
+    {
+      "id": "enum/3",
+      "input": "other",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Unknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": ""
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "d410a8ecaf524d6196ce4da83d1028c9d612c1532c53146f22c23c5d8f7353fe",
+    "org/example/oracle/ProbeMapper.java": "5396442d625ea84a784ecec01174f9211eaca26f0272e52c3dc85cef6eb0a076",
+    "org/example/oracle/ProbeParsers.java": "e3d23661ef010ec90e4c2c94b91c1238cb7778e7b6c1fb14600387983ff0c8e3"
+  },
+  "compilation": {
+    "success": false,
+    "diagnostics": [
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.prob.found.req",
+        "file": "ProbeMapper.java",
+        "line": 544,
+        "message": "incompatible types: org.example.oracle.ProbeAST.Mode cannot be converted to java.lang.String"
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/enum/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.compressed.diags",
+        "file": null,
+        "line": -1,
+        "message": "Some messages have been simplified; recompile with -Xdiags:verbose to get full output"
+      }
+    ]
+  },
+  "stage": "compilation_failed"
+}

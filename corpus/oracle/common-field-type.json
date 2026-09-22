@@ -1,0 +1,60 @@
+{
+  "feature": "@commonField",
+  "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token NUM=NumberParser token ID=IdentifierParser @root @mapping(Node) @commonField(name) Root ::= A | B; @mapping(A, params=[name]) A ::= 'a:' ID @name; @mapping(B, params=[name]) B ::= 'b:' NUM @name;\n}\n",
+  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "cases": [
+    {
+      "id": "common-field-type/1",
+      "input": "b:1",
+      "accepted": null,
+      "allConsumed": null,
+      "consumed": null,
+      "matched": null,
+      "ast": null,
+      "mappingError": null,
+      "captures": [],
+      "declarations": [],
+      "references": [],
+      "diagnostics": []
+    }
+  ],
+  "generation": {
+    "lowercaseCliExit": 2,
+    "lowercaseCliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\nUnknown generator: parser\nAvailable: AST, DAP, DAPLauncher, Evaluator, LSP, Launcher, Mapper, Parser\n",
+    "cliGenerators": "Parser,AST,Mapper",
+    "cliExit": 0,
+    "cliError": "Validation warnings:\n - grammar Probe: token ID references unresolved parser class: IdentifierParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.clang.IdentifierParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n - grammar Probe: token NUM references unresolved parser class: NumberParser [code: W-TOKEN-UNRESOLVED] [hint: Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).]\n"
+  },
+  "generatedSourceSha256": {
+    "org/example/oracle/ProbeAST.java": "85bbb1200753659c84a22f6e5d232cd74f995b6f30888e4ce32ceacb02134d23",
+    "org/example/oracle/ProbeMapper.java": "867d75cbf3a12b15d5585ac475bfa1c18c1c9014e351a8e67881b3c2a1412cbe",
+    "org/example/oracle/ProbeParsers.java": "bf1915d665c58fc673374af8f5054d29955dbaf51428975b90f08442294ac484"
+  },
+  "compilation": {
+    "success": false,
+    "diagnostics": [
+      {
+        "kind": "ERROR",
+        "code": "compiler.err.does.not.override.abstract",
+        "file": "ProbeAST.java",
+        "line": 20,
+        "message": "org.example.oracle.ProbeAST.B is not abstract and does not override abstract method name() in org.example.oracle.ProbeAST.Node"
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.filename",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "<scratch>/common-field-type/generated/org/example/oracle/ProbeMapper.java uses or overrides a deprecated API."
+      },
+      {
+        "kind": "NOTE",
+        "code": "compiler.note.deprecated.recompile",
+        "file": "ProbeMapper.java",
+        "line": -1,
+        "message": "Recompile with -Xlint:deprecation for details."
+      }
+    ]
+  },
+  "stage": "compilation_failed"
+}
