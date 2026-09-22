@@ -41,7 +41,8 @@ fn fixture(name: &str) -> String {
     std::fs::read_to_string(root().join("tests/fixtures").join(format!("{name}.tiny"))).unwrap()
 }
 /// 既定の診断予算（200 万 node）では complex-x4 以上・large-match・comparison-heavy-x4 以上が
-/// `diagnostic budget exceeded` になる（`default_diagnostic_budget_is_exceeded` で固定）。
+/// `diagnostic budget exceeded` になった。M5 で失敗 1 件が O(1) 件になり既定予算で通る
+/// （`default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_resource` で固定）。
 /// 受理検証は予算だけ広げる。予算は事前確保ではない。
 fn options(build_ast: bool, memo: bool) -> ParseOptions {
     let mut options = ParseOptions {
@@ -122,40 +123,53 @@ fn formula_accepts_and_matches_golden() {
 }
 
 #[test]
-fn default_diagnostic_budget_is_exceeded() {
-    // ParseOptions::default() の limits.diagnostics = 2,000,000 で失敗する fixture。
-    // 認識は正しく進むが、診断 DAG の node 数が予算に達し Resource 診断で全体失敗になる。
+fn default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_resource() {
+    // M5: `limits.diagnostics` は「記録した診断の件数」の上限。主診断 DAG の node 数と、
+    // 公開 farthest 候補（label）の記録数をそれぞれ数え、どちらかが超えると Resource 診断で
+    // 全体失敗になる。失敗 1 件が O(1) 件になったので、既定 2,000,000 で全 fixture が通る。
     let default = ParseOptions::default();
-    let ok = |name: &str, entry: Option<&str>| match entry {
-        None => parse_formula(&fixture(name), default),
-        Some(entry) => parse_entry(Some(entry), &fixture(name), default).unwrap(),
+    let run = |name: &str, entry: Option<&str>, options: ParseOptions| match entry {
+        None => parse_formula(&fixture(name), options),
+        Some(entry) => parse_entry(Some(entry), &fixture(name), options).unwrap(),
     };
     for (name, entry) in [
         ("complex", None),
+        ("complex-x4", None),
+        ("complex-x16", None),
+        ("complex-x64", None),
         ("flat-arithmetic", None),
+        ("large-match", None),
         ("valid-basic", None),
         ("valid-multiline", None),
         ("valid-unicode", None),
         ("comparison-heavy", Some("BooleanExpression")),
+        ("comparison-heavy-x4", Some("BooleanExpression")),
+        ("comparison-heavy-x16", Some("BooleanExpression")),
+        ("comparison-heavy-x64", Some("BooleanExpression")),
     ] {
-        let result = ok(name, entry);
+        let result = run(name, entry, default);
         assert!(
             result.ok,
             "{name}: 既定予算で受理されるはず: {:?}",
             result.diagnostics
         );
     }
-    for (name, entry) in [
-        ("complex-x4", None),
-        ("complex-x16", None),
-        ("complex-x64", None),
-        ("large-match", None),
-        ("comparison-heavy-x4", Some("BooleanExpression")),
-        ("comparison-heavy-x16", Some("BooleanExpression")),
-        ("comparison-heavy-x64", Some("BooleanExpression")),
-    ] {
-        let result = ok(name, entry);
-        assert!(!result.ok, "{name}: 既定予算で失敗するはず");
+    // memo 無効でも complex は既定予算に収まる（rule 評価 168,262 回）。
+    let no_memo = run(
+        "complex",
+        None,
+        ParseOptions {
+            memo: false,
+            ..Default::default()
+        },
+    );
+    assert!(no_memo.ok, "{:?}", no_memo.diagnostics);
+    // 予算を小さくすると、認識は正しく進んでも Resource 診断 1 件で全体失敗になる。
+    let mut small = ParseOptions::default();
+    small.limits.diagnostics = 200;
+    for (name, entry) in [("complex", None), ("comparison-heavy", Some("BooleanExpression"))] {
+        let result = run(name, entry, small);
+        assert!(!result.ok, "{name}: 予算 200 で失敗するはず");
         assert_eq!(result.consumed_cp, 0, "{name}");
         assert_eq!(
             result.diagnostics.len(),
@@ -174,20 +188,8 @@ fn default_diagnostic_budget_is_exceeded() {
             vec!["diagnostic budget exceeded"],
             "{name}"
         );
+        assert!(result.ast.is_none(), "{name}");
     }
-    // memo 無効だと complex でも既定予算に達する。
-    let no_memo = parse_formula(
-        &fixture("complex"),
-        ParseOptions {
-            memo: false,
-            ..Default::default()
-        },
-    );
-    assert!(!no_memo.ok);
-    assert_eq!(
-        no_memo.diagnostics[0].expected,
-        vec!["diagnostic budget exceeded"]
-    );
 }
 
 #[test]

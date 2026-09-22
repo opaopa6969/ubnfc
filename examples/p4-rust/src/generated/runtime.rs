@@ -182,7 +182,7 @@ impl<'a> Session<'a> {
     // Check expressions too: one rule may contain a deeply nested expression tree.
     #[inline(never)]
     pub fn limit(&mut self, state: State) -> Option<Step> {
-        if self.diag.exhausted || self.display.arena.exhausted {
+        if self.diag.exhausted || self.display.exhausted {
             self.resource_failure
                 .get_or_insert((state.consumed, "diagnostic budget exceeded"));
         }
@@ -2489,7 +2489,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     if let Some(offset) = self.depth_failure {
         step = self.fail(State::default(), offset, "maximum parse depth exceeded");
     }
-    if self.diag.exhausted || self.display.arena.exhausted {
+    if self.diag.exhausted || self.display.exhausted {
         self.resource_failure
             .get_or_insert((0, "diagnostic budget exceeded"));
     }

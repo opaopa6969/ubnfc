@@ -130,73 +130,249 @@ impl Default for Diagnostics {
 }
 
 // D-014: 公開 farthest 候補の局所 frame。Rust の fail_at 主位置とは独立。
-// 成功 rule の失敗も残し、Not 成功時だけ checkpoint に戻す。memo は局所
-// snapshot を再生するため、保存時の親 frame を混ぜない。
+// 観測できるのは「最遠位置とその位置の label 集合」だけなので、frame ごとに
+// (far, base, reached) を持ち、label は 1 本の log に追記する。frame の生存 label は
+// log[base..] で、全て far 位置のもの。leave で親へ O(1)（同位置は連結済み、
+// より遠い場合は移動、近い場合は切り捨て）に伝播する。失敗 1 件は O(1)。
+// floor は Not の外で記録した最遠位置。Not の外の frame は破棄されないので、
+// floor は最終的な最遠位置の下界であり、それより手前の label は（memo に保存しても
+// 再生時に捨てられるため）記録しない。
+// 成功 rule の失敗も残し、Not 成功時だけ frame を破棄する。memo は局所
+// snapshot（far, reached, saved label 範囲）を再生するため、保存時の親 frame を混ぜない。
 #[derive(Clone, Copy, Debug, Default)]
 pub struct DisplaySnapshot {
-    pub diag: Diag,
-    pub reached: usize,
+    pub far: u32,
+    pub reached: u32,
+    pub labels: [u32; 2],
+}
+#[derive(Clone, Copy, Debug, Default)]
+struct Frame {
+    far: usize,
+    base: usize,
+    reached: usize,
 }
 pub struct DisplayDiagnostics {
-    pub arena: Diagnostics,
-    global: DisplaySnapshot,
-    frames: Vec<DisplaySnapshot>,
+    log: Vec<&'static str>,
+    saved: Vec<&'static str>,
+    frames: Vec<Frame>,
+    floor: usize,
+    guards: usize,
+    work: usize,
+    limit: usize,
+    pub exhausted: bool,
+}
+#[inline]
+fn same(a: &'static str, b: &'static str) -> bool {
+    // 静的 label は同じ文字列定数を指すことが多い。内容比較は summary だけで行う。
+    a.as_ptr() == b.as_ptr() && a.len() == b.len()
 }
 impl DisplayDiagnostics {
     pub fn new(limit: usize) -> Self {
         Self {
-            arena: Diagnostics::with_limit(limit),
-            global: DisplaySnapshot::default(),
-            frames: vec![],
+            log: Vec::with_capacity(64),
+            saved: vec![],
+            frames: vec![Frame::default()],
+            floor: 0,
+            guards: 0,
+            work: 0,
+            limit,
+            exhausted: false,
         }
     }
+    #[inline]
     pub fn enter(&mut self, reached: usize) {
-        self.frames.push(DisplaySnapshot::default());
-        self.reach(reached);
+        self.frames.push(Frame {
+            far: 0,
+            base: self.log.len(),
+            reached,
+        });
     }
-    pub fn leave(&mut self) -> DisplaySnapshot {
-        self.frames.pop().expect("balanced diagnostic frame")
+    // Not の子 frame。成功時（子失敗）は discard、失敗時（子成功）は leave_guard。
+    #[inline]
+    pub fn enter_guard(&mut self, reached: usize) {
+        self.guards += 1;
+        self.enter(reached);
     }
-    pub fn snapshot(&self) -> DisplaySnapshot {
-        self.frames.last().copied().unwrap_or(self.global)
-    }
-    pub fn checkpoint(&self) -> (DisplaySnapshot, Vec<DisplaySnapshot>) {
-        (self.global, self.frames.clone())
-    }
-    pub fn restore(&mut self, checkpoint: (DisplaySnapshot, Vec<DisplaySnapshot>)) {
-        debug_assert_eq!(self.frames.len(), checkpoint.1.len());
-        self.global = checkpoint.0;
-        self.frames = checkpoint.1;
-    }
-    pub fn reach(&mut self, reached: usize) {
-        self.global.reached = self.global.reached.max(reached);
-        for frame in &mut self.frames {
-            frame.reached = frame.reached.max(reached);
+    // 子 frame の観測を親へ伝える。
+    #[inline]
+    pub fn leave(&mut self) {
+        let inner = self.frames.pop().expect("balanced diagnostic frame");
+        let parent = self.frames.last_mut().expect("global diagnostic frame");
+        parent.reached = parent.reached.max(inner.reached);
+        let len = self.log.len();
+        if len == inner.base {
+            return;
+        }
+        if inner.base == parent.base {
+            parent.far = inner.far;
+        } else if inner.far > parent.far {
+            self.log.copy_within(inner.base..len, parent.base);
+            self.log.truncate(parent.base + (len - inner.base));
+            parent.far = inner.far;
+        } else if inner.far < parent.far {
+            self.log.truncate(inner.base);
         }
     }
+    #[inline]
+    pub fn leave_guard(&mut self) {
+        self.guards -= 1;
+        self.leave();
+        if self.guards == 0 {
+            // Not の外へ出た観測は破棄されない。
+            let frame = self.frames.last().expect("global diagnostic frame");
+            if self.log.len() > frame.base {
+                self.floor = self.floor.max(frame.far);
+            }
+        }
+    }
+    // Not 成功: 子 frame の観測（reached を含む）を捨てる。
+    #[inline]
+    pub fn discard(&mut self) {
+        self.guards -= 1;
+        let inner = self.frames.pop().expect("balanced diagnostic frame");
+        self.log.truncate(inner.base);
+    }
+    // 現在 frame の局所 snapshot。memo と trivia cache が保存する。
+    pub fn snapshot(&mut self) -> DisplaySnapshot {
+        let frame = *self.frames.last().expect("global diagnostic frame");
+        let start = self.saved.len();
+        if self.log.len() > frame.base && frame.far >= self.floor {
+            for i in frame.base..self.log.len() {
+                let label = self.log[i];
+                if !self.saved[start..].iter().any(|&s| same(s, label)) {
+                    self.saved.push(label);
+                }
+            }
+        }
+        DisplaySnapshot {
+            far: u32::try_from(frame.far).expect("input byte budget"),
+            reached: u32::try_from(frame.reached).expect("input byte budget"),
+            labels: [
+                u32::try_from(start).expect("saved labels"),
+                u32::try_from(self.saved.len()).expect("saved labels"),
+            ],
+        }
+    }
+    #[inline]
+    pub fn reach(&mut self, reached: usize) {
+        let frame = self.frames.last_mut().expect("global diagnostic frame");
+        frame.reached = frame.reached.max(reached);
+    }
+    // 予算は「候補が残った記録の回数」（fail / failures / merge 呼出し単位）。
+    #[inline]
+    fn budget(&mut self) -> bool {
+        self.work += 1;
+        if self.work > self.limit {
+            self.exhausted = true;
+            return false;
+        }
+        true
+    }
+    // 現在 frame に pos の label を置ける状態にし、置けるなら base を返す。
+    #[inline]
+    fn open(&mut self, pos: usize) -> Option<usize> {
+        let frame = self.frames.last_mut().expect("global diagnostic frame");
+        frame.reached = frame.reached.max(pos);
+        if pos < self.floor {
+            return None;
+        }
+        if self.log.len() == frame.base || pos > frame.far {
+            self.log.truncate(frame.base);
+            frame.far = pos;
+        } else if pos < frame.far {
+            return None;
+        }
+        if self.guards == 0 {
+            self.floor = pos;
+        }
+        Some(frame.base)
+    }
+    #[inline]
     pub fn fail(&mut self, pos: usize, label: &'static str) {
-        let diag = self.arena.fail(pos, label);
-        self.merge(DisplaySnapshot { diag, reached: pos });
+        let Some(base) = self.open(pos) else {
+            return;
+        };
+        if !self.budget() {
+            return;
+        }
+        self.log.push(label);
+        if self.log.len() - base >= 64 {
+            Self::dedupe(&mut self.log, base);
+        }
     }
     pub fn failures(&mut self, pos: usize, labels: &[&'static str]) {
-        for &label in labels {
-            self.fail(pos, label);
+        let Some(base) = self.open(pos) else {
+            return;
+        };
+        if labels.is_empty() || !self.budget() {
+            return;
+        }
+        self.log.extend_from_slice(labels);
+        if self.log.len() - base >= 64 {
+            Self::dedupe(&mut self.log, base);
         }
     }
+    // memo hit などで保存した局所 snapshot を現在 frame へ再生する。
     pub fn merge(&mut self, snapshot: DisplaySnapshot) {
-        self.reach(snapshot.reached);
-        self.global.diag = self.arena.join(self.global.diag, snapshot.diag);
-        for frame in &mut self.frames {
-            frame.diag = self.arena.join(frame.diag, snapshot.diag);
+        self.reach(snapshot.reached as usize);
+        let range = snapshot.labels[0] as usize..snapshot.labels[1] as usize;
+        if range.is_empty() {
+            return;
+        }
+        let Some(base) = self.open(snapshot.far as usize) else {
+            return;
+        };
+        if !self.budget() {
+            return;
+        }
+        self.log.extend_from_slice(&self.saved[range]);
+        if self.log.len() - base >= 64 {
+            Self::dedupe(&mut self.log, base);
         }
     }
+    // 同位置の label 集合は和集合。log が伸びたときだけ重複を落とす（意味は不変）。
+    fn dedupe(log: &mut Vec<&'static str>, base: usize) {
+        let mut keep = base;
+        for i in base..log.len() {
+            let label = log[i];
+            if !log[base..keep].iter().any(|&s| same(s, label)) {
+                log[keep] = label;
+                keep += 1;
+            }
+        }
+        log.truncate(keep);
+    }
+    // 全 frame を内側から畳み込む（parse 終了後は global frame だけ）。
     pub fn summary(&self) -> (usize, Vec<&'static str>) {
-        self.arena.summary(self.global.diag).map_or(
-            (self.global.reached, vec![]),
-            |(pos, mut labels, _)| {
-                labels.sort();
-                (pos, labels)
-            },
-        )
+        let mut reached = 0;
+        let mut far = 0;
+        let mut segments: Vec<(usize, usize)> = vec![];
+        let mut end = self.log.len();
+        for frame in self.frames.iter().rev() {
+            reached = reached.max(frame.reached);
+            if frame.base < end {
+                if segments.is_empty() || frame.far > far {
+                    far = frame.far;
+                    segments.clear();
+                    segments.push((frame.base, end));
+                } else if frame.far == far {
+                    segments.push((frame.base, end));
+                }
+            }
+            end = frame.base;
+        }
+        if segments.is_empty() {
+            return (reached, vec![]);
+        }
+        let mut labels = Vec::new();
+        for (start, end) in segments {
+            for &label in &self.log[start..end] {
+                if !labels.contains(&label) {
+                    labels.push(label);
+                }
+            }
+        }
+        labels.sort();
+        (far, labels)
     }
 }

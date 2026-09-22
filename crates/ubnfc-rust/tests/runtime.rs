@@ -98,27 +98,71 @@ fn public_failure_frames_keep_successes_discard_not_and_replay_only_local_candid
     let mut d = diag::DisplayDiagnostics::new(1000);
     d.enter(0);
     d.fail(1, "caller");
-    let before_not = d.checkpoint();
+    // Not: guard frame を開いてから評価し、成功時は discard する。
+    d.enter_guard(1);
     d.enter(1);
     d.failures(3, &["'x'", "'a'", "'x'"]);
     assert_eq!(d.snapshot().reached, 3);
-    let memo = d.leave();
+    let memo = d.snapshot();
+    d.leave();
     // A successful rule retains its failed alternative at the farthest point.
     assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));
     // Not succeeded because its child failed; child diagnostics must disappear.
-    d.restore(before_not);
+    d.discard();
     assert_eq!(d.summary(), (1, vec!["caller"]));
     d.enter(0);
     d.merge(memo);
     assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));
-    let replay = d.leave();
-    assert_eq!(d.arena.summary(replay.diag).unwrap().1, vec!["'x'", "'a'"]);
+    let replay = d.snapshot();
+    assert_eq!(replay.far, 3);
+    assert_eq!(replay.labels[1] - replay.labels[0], 2, "saved labels are deduplicated");
     d.leave();
+    d.leave();
+    assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));
+    // 近い位置の失敗は捨てられ、同じ位置は和集合、遠い位置は置き換える。
+    let mut d = diag::DisplayDiagnostics::new(1000);
+    d.enter(0);
+    d.fail(5, "far");
+    d.enter(0);
+    d.fail(2, "near");
+    d.leave();
+    assert_eq!(d.summary(), (5, vec!["far"]));
+    d.enter(0);
+    d.fail(5, "same");
+    d.leave();
+    assert_eq!(d.summary(), (5, vec!["far", "same"]));
+    d.enter(0);
+    d.fail(1, "dropped");
+    d.fail(7, "farther");
+    d.leave();
+    d.leave();
+    assert_eq!(d.summary(), (7, vec!["farther"]));
     let mut reached = diag::DisplayDiagnostics::new(100);
     reached.enter(0);
     reached.reach(4);
-    let successful_lookahead = reached.leave();
+    let successful_lookahead = reached.snapshot();
+    reached.leave();
     let mut replay = diag::DisplayDiagnostics::new(100);
     replay.merge(successful_lookahead);
     assert_eq!(replay.summary(), (4, vec![]));
+    // Not が失敗（子成功）したときは子の失敗を残す。floor より手前の失敗は捨てる。
+    let mut d = diag::DisplayDiagnostics::new(1000);
+    d.enter(0);
+    d.fail(4, "outer");
+    d.enter_guard(0);
+    d.fail(2, "behind");
+    d.fail(4, "inside");
+    d.leave_guard();
+    d.fail(3, "late");
+    d.leave();
+    assert_eq!(d.summary(), (4, vec!["inside", "outer"]));
+    // 予算: 候補が残った記録の回数で数える（label 数ではない）。
+    let mut budget = diag::DisplayDiagnostics::new(3);
+    budget.failures(0, &["a", "b", "c"]);
+    budget.fail(1, "d");
+    budget.fail(0, "dropped");
+    budget.fail(1, "e");
+    assert!(!budget.exhausted);
+    budget.fail(1, "f");
+    assert!(budget.exhausted);
 }

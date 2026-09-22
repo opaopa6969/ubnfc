@@ -182,7 +182,7 @@ impl<'a> Session<'a> {
     // Check expressions too: one rule may contain a deeply nested expression tree.
     #[inline(never)]
     pub fn limit(&mut self, state: State) -> Option<Step> {
-        if self.diag.exhausted || self.display.arena.exhausted {
+        if self.diag.exhausted || self.display.exhausted {
             self.resource_failure
                 .get_or_insert((state.consumed, "diagnostic budget exceeded"));
         }
