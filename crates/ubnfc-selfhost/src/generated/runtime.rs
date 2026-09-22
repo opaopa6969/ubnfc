@@ -56,7 +56,7 @@ impl Step {
             ok: true,
             state,
             events: EventId(0),
-            diag: Diag(0),
+            diag: Diag::NONE,
         }
     }
 }
@@ -66,6 +66,7 @@ pub(crate) struct Saved {
     matched: u32,
     events: u32,
     diag: u32,
+    diag_pos: u32,
     flags: u32,
     effects: [u32; 2],
     display: DisplaySnapshot,
@@ -77,7 +78,8 @@ impl Saved {
             consumed: u32::try_from(step.state.consumed).expect("cursor"),
             matched: u32::try_from(step.state.matched).expect("cursor"),
             events: u32::try_from(step.events.0).expect("arena"),
-            diag: u32::try_from(step.diag.0).expect("diagnostics"),
+            diag: step.diag.id,
+            diag_pos: step.diag.pos,
             flags: step.ok as u32
                 | ((step.state.invert as u32) << 1)
                 | ((step.state.reset as u32) << 2),
@@ -94,7 +96,10 @@ impl Saved {
                 reset: self.flags & 4 != 0,
             },
             events: EventId(self.events as usize),
-            diag: Diag(self.diag as usize),
+            diag: Diag {
+                id: self.diag,
+                pos: self.diag_pos,
+            },
         }
     }
 }
@@ -157,9 +162,13 @@ impl<'a> Session<'a> {
                 arena.push(Event::Empty);
                 arena
             },
-            diag: Diagnostics::with_limit(options.limits.diagnostics),
+            diag: Diagnostics::with_limit_and_capacity(
+                options.limits.diagnostics,
+                text.len().saturating_mul(24).saturating_add(64).min(1 << 20),
+            ),
             display: DisplayDiagnostics::new(options.limits.diagnostics),
-            memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
+            // memo は rule 本体単位（P4 実測 約 5 entry / byte）。
+            memo: Memo::with_capacity(text.len().saturating_mul(6).saturating_add(64).min(1 << 20)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
             effects: vec![],
@@ -182,7 +191,7 @@ impl<'a> Session<'a> {
     // Check expressions too: one rule may contain a deeply nested expression tree.
     #[inline(never)]
     pub fn limit(&mut self, state: State) -> Option<Step> {
-        if self.diag.exhausted || self.display.arena.exhausted {
+        if self.diag.exhausted || self.display.exhausted {
             self.resource_failure
                 .get_or_insert((state.consumed, "diagnostic budget exceeded"));
         }
@@ -657,7 +666,7 @@ impl<'a> Session<'a> {
             });
         } else {
             self.restore(mark);
-            if step.diag.0 == 0 {
+            if step.diag.id == 0 {
                 step.diag = self.diag.fail(state.position::<MATCH>(), label);
             }
         }
@@ -1603,7 +1612,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     if let Some(offset) = self.depth_failure {
         step = self.fail(State::default(), offset, "maximum parse depth exceeded");
     }
-    if self.diag.exhausted || self.display.arena.exhausted {
+    if self.diag.exhausted || self.display.exhausted {
         self.resource_failure
             .get_or_insert((0, "diagnostic budget exceeded"));
     }
@@ -1747,7 +1756,8 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     self.statistics.ast_nodes = self.node_spans.len();
     let mut value_spans = Vec::new();
     if let Some(ast) = &ast {
-        ast.collect("", &self.text_spans, &mut value_spans);
+        let mut path = String::with_capacity(128);
+        ast.collect(&mut path, &self.text_spans, &mut value_spans);
     }
     ParseResult {
         value_spans,
@@ -1822,10 +1832,11 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     }
 }
 }
+// value span の path は共有バッファに push / truncate で組み立てる（field ごとの format! を避ける）。
 trait CollectValueSpans {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     );
@@ -1833,13 +1844,13 @@ trait CollectValueSpans {
 impl CollectValueSpans for String {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         if let Some(span) = texts.get(&(self.as_ptr() as usize)) {
             out.push(ValueSpan {
-                path: path.into(),
+                path: path.clone(),
                 span: *span,
                 text: None,
             });
@@ -1849,19 +1860,23 @@ impl CollectValueSpans for String {
 impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         for (i, value) in self.iter().enumerate() {
-            value.collect(&format!("{path}/{i}"), texts, out);
+            let len = path.len();
+            path.push('/');
+            path.push_str(&i.to_string());
+            value.collect(path, texts, out);
+            path.truncate(len);
         }
     }
 }
 impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
@@ -1873,165 +1888,165 @@ impl<T: CollectValueSpans> CollectValueSpans for Option<T> {
 impl<T: CollectValueSpans> CollectValueSpans for Box<T> {
     fn collect(
         &self,
-        path: &str,
+        path: &mut String,
         texts: &std::collections::HashMap<usize, Span>,
         out: &mut Vec<ValueSpan>,
     ) {
         self.as_ref().collect(path, texts, out);
     }
 }
-impl CollectValueSpans for Ast { fn collect(&self,path:&str,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.into(),span:*span,text:Some(text.clone())});}},Self::Null=>{},
-Self::g_UBNFAST_2e_UBNFFile(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_grammars.collect(&format!("{path}/fields/grammars"),texts,out);
+impl CollectValueSpans for Ast { fn collect(&self,path:&mut String,texts:&std::collections::HashMap<usize,Span>,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.clone(),span:*span,text:Some(text.clone())});}},Self::Null=>{},
+Self::g_UBNFAST_2e_UBNFFile(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/grammars");node.g_grammars.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_ImportDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_alias.collect(&format!("{path}/fields/alias"),texts,out);
-node.g_path.collect(&format!("{path}/fields/path"),texts,out);
+Self::g_UBNFAST_2e_ImportDecl(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/alias");node.g_alias.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/path");node.g_path.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_GrammarDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_imports.collect(&format!("{path}/fields/imports"),texts,out);
-node.g_settings.collect(&format!("{path}/fields/settings"),texts,out);
-node.g_tokens.collect(&format!("{path}/fields/tokens"),texts,out);
-node.g_rules.collect(&format!("{path}/fields/rules"),texts,out);
+Self::g_UBNFAST_2e_GrammarDecl(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/imports");node.g_imports.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/settings");node.g_settings.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/tokens");node.g_tokens.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/rules");node.g_rules.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_GlobalSetting(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_key.collect(&format!("{path}/fields/key"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_UBNFAST_2e_GlobalSetting(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/key");node.g_key.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_StringSettingValue(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_UBNFAST_2e_StringSettingValue(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_BlockSettingValue(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_entries.collect(&format!("{path}/fields/entries"),texts,out);
+Self::g_UBNFAST_2e_BlockSettingValue(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/entries");node.g_entries.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_KeyValuePair(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_key.collect(&format!("{path}/fields/key"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_UBNFAST_2e_KeyValuePair(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/key");node.g_key.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_TokenDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_UBNFAST_2e_TokenDecl(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_UntilExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_terminator.collect(&format!("{path}/fields/terminator"),texts,out);
+Self::g_UBNFAST_2e_UntilExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/terminator");node.g_terminator.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_NegationExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_chars.collect(&format!("{path}/fields/chars"),texts,out);
+Self::g_UBNFAST_2e_NegationExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/chars");node.g_chars.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_LookaheadExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_pattern.collect(&format!("{path}/fields/pattern"),texts,out);
+Self::g_UBNFAST_2e_LookaheadExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/pattern");node.g_pattern.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_NegativeLookaheadExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_pattern.collect(&format!("{path}/fields/pattern"),texts,out);
+Self::g_UBNFAST_2e_NegativeLookaheadExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/pattern");node.g_pattern.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_CharRangeExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_min.collect(&format!("{path}/fields/min"),texts,out);
-node.g_max.collect(&format!("{path}/fields/max"),texts,out);
+Self::g_UBNFAST_2e_CharRangeExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/min");node.g_min.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/max");node.g_max.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_CIExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_word.collect(&format!("{path}/fields/word"),texts,out);
+Self::g_UBNFAST_2e_CIExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/word");node.g_word.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_RegexExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_pattern.collect(&format!("{path}/fields/pattern"),texts,out);
+Self::g_UBNFAST_2e_RegexExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/pattern");node.g_pattern.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_AnyExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_AnyExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_EofExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_EofExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_EmptyExpression(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_EmptyExpression(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_RuleDecl(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_annotations.collect(&format!("{path}/fields/annotations"),texts,out);
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
-node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+Self::g_UBNFAST_2e_RuleDecl(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/annotations");node.g_annotations.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/body");node.g_body.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_RootAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_RootAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_MappingAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_className.collect(&format!("{path}/fields/className"),texts,out);
-node.g_paramNames.collect(&format!("{path}/fields/paramNames"),texts,out);
+Self::g_UBNFAST_2e_MappingAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/className");node.g_className.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/paramNames");node.g_paramNames.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_EvalAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_entries.collect(&format!("{path}/fields/entries"),texts,out);
+Self::g_UBNFAST_2e_EvalAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/entries");node.g_entries.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_WhitespaceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_style.collect(&format!("{path}/fields/style"),texts,out);
+Self::g_UBNFAST_2e_WhitespaceAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/style");node.g_style.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_InterleaveAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_profile.collect(&format!("{path}/fields/profile"),texts,out);
+Self::g_UBNFAST_2e_InterleaveAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/profile");node.g_profile.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_BackrefAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+Self::g_UBNFAST_2e_BackrefAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_ScopeTreeAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_mode.collect(&format!("{path}/fields/mode"),texts,out);
+Self::g_UBNFAST_2e_ScopeTreeAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/mode");node.g_mode.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_DeclaresAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_symbol.collect(&format!("{path}/fields/symbol"),texts,out);
-node.g_description.collect(&format!("{path}/fields/description"),texts,out);
+Self::g_UBNFAST_2e_DeclaresAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/symbol");node.g_symbol.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/description");node.g_description.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_CatalogAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_context.collect(&format!("{path}/fields/context"),texts,out);
+Self::g_UBNFAST_2e_CatalogAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/context");node.g_context.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_LeftAssocAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_LeftAssocAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_RightAssocAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_RightAssocAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_LongestChoiceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_LongestChoiceAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_PredictiveChoiceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_PredictiveChoiceAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_PrecedenceAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_level.collect(&format!("{path}/fields/level"),texts,out);
+Self::g_UBNFAST_2e_PrecedenceAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/level");node.g_level.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_DocAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_text.collect(&format!("{path}/fields/text"),texts,out);
+Self::g_UBNFAST_2e_DocAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/text");node.g_text.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_RecoveryAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_mode.collect(&format!("{path}/fields/mode"),texts,out);
-node.g_syncTokens.collect(&format!("{path}/fields/syncTokens"),texts,out);
+Self::g_UBNFAST_2e_RecoveryAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/mode");node.g_mode.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/syncTokens");node.g_syncTokens.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_SkipAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_SkipAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_CommonFieldAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_fieldNames.collect(&format!("{path}/fields/fieldNames"),texts,out);
+Self::g_UBNFAST_2e_CommonFieldAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/fieldNames");node.g_fieldNames.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_EnumAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
+Self::g_UBNFAST_2e_EnumAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
 },
-Self::g_UBNFAST_2e_SimpleAnnotation(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_name.collect(&format!("{path}/fields/name"),texts,out);
+Self::g_UBNFAST_2e_SimpleAnnotation(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/name");node.g_name.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_ChoiceBody(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_alternatives.collect(&format!("{path}/fields/alternatives"),texts,out);
+Self::g_UBNFAST_2e_ChoiceBody(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/alternatives");node.g_alternatives.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_SequenceBody(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_elements.collect(&format!("{path}/fields/elements"),texts,out);
+Self::g_UBNFAST_2e_SequenceBody(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/elements");node.g_elements.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_AnnotatedElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_element.collect(&format!("{path}/fields/element"),texts,out);
-node.g_captureName.collect(&format!("{path}/fields/captureName"),texts,out);
-node.g_typeofConstraint.collect(&format!("{path}/fields/typeofConstraint"),texts,out);
+Self::g_UBNFAST_2e_AnnotatedElement(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/element");node.g_element.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/captureName");node.g_captureName.collect(path,texts,out);path.truncate(len);}
+{let len=path.len();path.push_str("/fields/typeofConstraint");node.g_typeofConstraint.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_GroupElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+Self::g_UBNFAST_2e_GroupElement(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/body");node.g_body.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_OptionalElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+Self::g_UBNFAST_2e_OptionalElement(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/body");node.g_body.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_RepeatElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_body.collect(&format!("{path}/fields/body"),texts,out);
+Self::g_UBNFAST_2e_RepeatElement(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/body");node.g_body.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_ErrorElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_message.collect(&format!("{path}/fields/message"),texts,out);
+Self::g_UBNFAST_2e_ErrorElement(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/message");node.g_message.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_TerminalElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_value.collect(&format!("{path}/fields/value"),texts,out);
+Self::g_UBNFAST_2e_TerminalElement(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/value");node.g_value.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_TypeofElement(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_captureName.collect(&format!("{path}/fields/captureName"),texts,out);
+Self::g_UBNFAST_2e_TypeofElement(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/captureName");node.g_captureName.collect(path,texts,out);path.truncate(len);}
 },
-Self::g_UBNFAST_2e_DottedIdentifier(node)=>{out.push(ValueSpan{path:path.into(),span:node.span,text:None});
-node.g_parts.collect(&format!("{path}/fields/parts"),texts,out);
+Self::g_UBNFAST_2e_DottedIdentifier(node)=>{out.push(ValueSpan{path:path.clone(),span:node.span,text:None});
+{let len=path.len();path.push_str("/fields/parts");node.g_parts.collect(path,texts,out);path.truncate(len);}
 },
 }}}

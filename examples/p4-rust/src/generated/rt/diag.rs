@@ -8,10 +8,6 @@ pub struct Diag {
 }
 impl Diag {
     pub const NONE: Diag = Diag { id: 0, pos: 0 };
-    #[inline]
-    pub fn is_none(self) -> bool {
-        self.id == 0
-    }
 }
 // node は 24 byte。位置は handle が持つので Failure は label だけを持つ。
 #[derive(Clone, Copy)]
@@ -36,7 +32,7 @@ impl Diagnostics {
     /// capacity は入力長から見積もる（P4 実測 約 18 node / byte）。予算より大きくは確保しない。
     pub fn with_limit_and_capacity(limit: usize, capacity: usize) -> Self {
         let limit = limit.min(u32::MAX as usize);
-        let mut nodes = Vec::with_capacity(capacity.min(limit).min(1 << 20).max(1));
+        let mut nodes = Vec::with_capacity(capacity.min(limit).clamp(1, 1 << 20));
         nodes.push(Node::Empty);
         Self {
             nodes,

@@ -115,7 +115,11 @@ fn public_failure_frames_keep_successes_discard_not_and_replay_only_local_candid
     assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));
     let replay = d.snapshot();
     assert_eq!(replay.far, 3);
-    assert_eq!(replay.labels[1] - replay.labels[0], 2, "saved labels are deduplicated");
+    assert_eq!(
+        replay.labels[1] - replay.labels[0],
+        2,
+        "saved labels are deduplicated"
+    );
     d.leave();
     d.leave();
     assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));

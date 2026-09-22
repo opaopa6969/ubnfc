@@ -8,10 +8,6 @@ pub struct Diag {
 }
 impl Diag {
     pub const NONE: Diag = Diag { id: 0, pos: 0 };
-    #[inline]
-    pub fn is_none(self) -> bool {
-        self.id == 0
-    }
 }
 // node は 24 byte。位置は handle が持つので Failure は label だけを持つ。
 #[derive(Clone, Copy)]

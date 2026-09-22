@@ -666,7 +666,7 @@ impl<'a> Session<'a> {
             });
         } else {
             self.restore(mark);
-            if step.diag.is_none() {
+            if step.diag.id == 0 {
                 step.diag = self.diag.fail(state.position::<MATCH>(), label);
             }
         }

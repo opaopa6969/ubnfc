@@ -28,7 +28,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     // 箇所にだけ置き、失敗時の rollback は choice / repeat / optional / separated /
     // lookahead / rule の各構造が自前で行う。
     let (success, failure) = cacheable(g, i);
-    let rule_body = g.expr[g.ir.semantics.rules[g.rules[expr.rule_id.as_str()]].body.as_str()];
+    let rule_body = g.expr[g.ir.semantics.rules[g.rules[expr.rule_id.as_str()]]
+        .body
+        .as_str()];
     let (success, failure) = if g.bodies.contains(&i)
         || g.shared.contains(&i)
         || cacheable(g, rule_body) == (false, false)
@@ -80,7 +82,13 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     ) {
         s.push_str(&capture_events(g, expr, "state", "out"));
     }
-    writeln!(s,"}} else {{{}self.display.failures(state.consumed.max(state.matched),&{:?});}}",if memoized {"self.restore(mark);"} else {""},g.display.expression(expr.id.as_str())).unwrap();
+    writeln!(
+        s,
+        "}} else {{{}self.display.failures(state.consumed.max(state.matched),&{:?});}}",
+        if memoized { "self.restore(mark);" } else { "" },
+        g.display.expression(expr.id.as_str())
+    )
+    .unwrap();
     if memoized {
         writeln!(
             s,
@@ -267,7 +275,12 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         }
         ExprNode::Lookahead { child } | ExprNode::NegativeLookahead { child } => {
             let not = matches!(expr.node, ExprNode::NegativeLookahead { .. });
-            writeln!(s,"let mark=self.mark();self.display.{}(state.consumed.max(state.matched));",if not {"enter_guard"} else {"enter"}).unwrap();
+            writeln!(
+                s,
+                "let mark=self.mark();self.display.{}(state.consumed.max(state.matched));",
+                if not { "enter_guard" } else { "enter" }
+            )
+            .unwrap();
             writeln!(
                 s,
                 "let child={};self.restore(mark);",

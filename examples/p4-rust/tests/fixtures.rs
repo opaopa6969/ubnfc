@@ -167,7 +167,10 @@ fn default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_res
     // 予算を小さくすると、認識は正しく進んでも Resource 診断 1 件で全体失敗になる。
     let mut small = ParseOptions::default();
     small.limits.diagnostics = 200;
-    for (name, entry) in [("complex", None), ("comparison-heavy", Some("BooleanExpression"))] {
+    for (name, entry) in [
+        ("complex", None),
+        ("comparison-heavy", Some("BooleanExpression")),
+    ] {
         let result = run(name, entry, small);
         assert!(!result.ok, "{name}: 予算 200 で失敗するはず");
         assert_eq!(result.consumed_cp, 0, "{name}");
