@@ -159,6 +159,32 @@ cache を引く側（範囲検査 + 世代照合 + bitset の 1 bit 取り出し
 統合 DFA は 91 位置でしか走らず、残り 457 回は bitset の 1 bit を読むだけ。**cache としては設計どおり効いている**。
 それでも遅いのは、置き換えた走査（1〜2 byte の `starts_with`）が cache の参照より安いからである。
 
+### 3.1 master 取り込み後の再計測（D-023 fast mode）
+
+本 branch を仕上げる間に master が進み、**D-023「診断の opt-in と決定的な再解析」**（既定の parse は
+診断を記録せず、必要になったら同じ入力を解析し直す）が入った。§2 で「認識時間の 3 割」と書いた
+display の記録が既定経路から消えるので、終端照合の相対的な比重は上がる。master を取り込んだうえで
+同じやり方（`taskset -c 28`、cache off / on を交互に 9 回、load average 13〜17）で測り直した。
+
+| 入力 | mode | cache off | cache on | on/off（中央値） | on/off（最小値） |
+|---|---|---:|---:|---:|---:|
+| complex | 認識 | 0.099 (0.091) | 0.097 (0.091) | −2.0% | **±0.0%** |
+| complex | AST | 0.140 (0.135) | 0.148 (0.138) | +5.7% | **+2.2%** |
+| complex-x4 | 認識 | 0.372 (0.358) | 0.392 (0.364) | +5.4% | **+1.7%** |
+| complex-x4 | AST | 0.514 (0.496) | 0.536 (0.498) | +4.3% | **+0.4%** |
+| complex-x16 | 認識 | 1.514 (1.449) | 1.675 (1.461) | +10.6% | **+0.8%** |
+| complex-x16 | AST | 2.106 (1.912) | 2.053 (1.935) | −2.5% | **+1.2%** |
+| complex-x64 | 認識 | 7.312 (6.108) | 6.878 (6.130) | −5.9% | **+0.4%** |
+| complex-x64 | AST | 12.286 (8.919) | 13.102 (9.346) | +6.6% | **+4.8%** |
+
+fast mode で認識は 1.6〜1.8 倍速くなった（complex 0.163 → 0.099、x64 13.0 → 7.3。cache off どうしの比較）。
+それでも **cache on は最小値で ±0.0% 〜 +4.8% で、得は無い**。complex の認識だけが損益分岐
+（0.091 → 0.091）になったのが、§2 の「display の記録が消えれば終端照合の比重は上がる」の裏付けである。
+確保は pool により on/off で完全に同じ（表は pool に載る）。
+
+結論は変わらない: **既定 off のまま**。A/B の表（§3）は merge-base fb0ed05 の binary との比較なので、
+そちらは master 取り込み前の値として読むこと。
+
 ## 4. crossover（どこまで小さい入力なら割に合うか / 表の費用）
 
 buffer pool（`ParseOptions::reuse_buffers`、既定 true）の有無で分けて 7 回ずつ交互に測った
@@ -202,6 +228,8 @@ buffer pool（`ParseOptions::reuse_buffers`、既定 true）の有無で分け�
 
 ## 5. corpus / 契約の検証
 
+以下は **master（09a81da、D-023 の fast mode を含む）を取り込んだあとの**結果。
+
 - `cargo test --workspace --offline` 全緑（`crates/ubnfc-rt-template/tests/lexcache.rs` に
   `LexCache` / `SkipCache` の単体テストを追加。世代印で parse をまたいで無効化すること、
   表の外は `None` を返して呼出し側が走査へ戻ること、policy / mode / 位置が混ざらないこと）。
@@ -212,12 +240,15 @@ buffer pool（`ParseOptions::reuse_buffers`、既定 true）の有無で分け�
 - 差分テスト `predict_matches_reference_path_on_truncated_and_corrupted_inputs` を
   **(predict, factor, lexical_cache) の 7 組合せ**に拡張（cache on/off の軸を追加）。
   16 fixture × 切り詰め・1 文字破壊 × memo on/off で、全て参照経路（3 つとも off）と結果・診断が一致。
+  master が入れた fast mode / 診断モードの同値検査は同じループに残してあり、fast mode の呼出しは
+  `run(true, true, false)`（cache off）で行う。
 - selfhost 固定点（`crates/ubnfc-selfhost/tests`）緑、`src/generated` を再生成して commit。
   `examples/p4-rust/scripts/generate.sh --check` で P4 生成物 byte 一致。
   handwritten-target の golden（Operators / Power、`crates/ubnfc-rust/tests/generated.rs`）byte 一致。
 - corpus（既定 = cache off）: `docs/reports/2026-09-23-rust-corpus-lexcache.{md,json}`。
   **Pass 1292 / 期待拒否 Pass 30 / Known 28 / Fail 0 / 未観測 75**。
-  `2026-09-23-rust-corpus-m5r4.md` との差は build 時間と generator / front の SHA-256 行だけ（系統別の表は完全一致）。
+  `2026-09-23-rust-corpus-m5r4.md` との差は build 時間と generator / front の SHA-256 行だけ（系統別・
+  loader 系統別・文法別の表、Fail 詳細、未観測項目まで完全一致）。
 - corpus（**cache on**、`UBNFC_LEXICAL_CACHE=1` で driver の `ParseOptions::lexical_cache` を立てる）:
   同じ corpus を cache 有効で回した結果は
   **cache off の報告と完全一致**（build 時間の行だけが違う。系統別・loader 系統別・文法別の表、
