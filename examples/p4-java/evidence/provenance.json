@@ -1,0 +1,111 @@
+{
+  "ubnfcBase": "d86f3a38adad359aeb68489659fe6ff861641f11",
+  "tinyexpressionHead": "c70416e1eddf825b8e2178cabe188867eddf195e",
+  "unlaxerSourceHead": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "generatorJarSha256": "1d0e408ff569d4f8a579ef079b6279d380c881acc87e3260c9e38689b697e010",
+  "irSha256": "1a566ed6b596a2c3943d1ec9962fe187dfee7c2ddc452ac6837429427553d13d",
+  "fixtures": {
+    "comparison-heavy-x16.tiny": {
+      "source": "benchmarks/fixtures/comparison-heavy-x16.tiny",
+      "sha256": "9638065022e60c0cd7d84fcb73a1e8ceabc67b52ceaacea8ea7262abbbc85b6a"
+    },
+    "comparison-heavy-x4.tiny": {
+      "source": "benchmarks/fixtures/comparison-heavy-x4.tiny",
+      "sha256": "bf2a346041c2bda0b1c4225544556ac0c540b32511dce52cc98ddd9565e68de9"
+    },
+    "comparison-heavy-x64.tiny": {
+      "source": "benchmarks/fixtures/comparison-heavy-x64.tiny",
+      "sha256": "73d425cb614a9a9d3ec70226615393d5693773adb9630173ba9b136b25340c5a"
+    },
+    "comparison-heavy.tiny": {
+      "source": "benchmarks/fixtures/comparison-heavy.tiny",
+      "sha256": "d421e625f37b2ca6050baff26528d70231cd3ae0639e4d0e4ae4d8d24d3be2eb"
+    },
+    "complex-half.tiny": {
+      "source": "benchmarks/fixtures/complex-half.tiny",
+      "sha256": "ed121635c0a65f83a6df720c9a0f5ea56fac8331b92dd7c66573b609d94635a9"
+    },
+    "complex-tail.tiny": {
+      "source": "benchmarks/fixtures/complex-tail.tiny",
+      "sha256": "727fa90fded98c8143fc102276a5127cbbad1c88919c1d126f2a20376fa00feb"
+    },
+    "complex-x16.tiny": {
+      "source": "benchmarks/fixtures/complex-x16.tiny",
+      "sha256": "64f82c14d3e782633bbda0bdf597505fe4868921ebd724ad32dece20034e84eb"
+    },
+    "complex-x4.tiny": {
+      "source": "benchmarks/fixtures/complex-x4.tiny",
+      "sha256": "8e57953f6dc62369586b254e929057956bb8d0911349720cee831e139ce89087"
+    },
+    "complex-x64.tiny": {
+      "source": "benchmarks/fixtures/complex-x64.tiny",
+      "sha256": "b638e684057b95bacb8e534ffb85247cd6d7d777348900fc748693e7afab5a05"
+    },
+    "complex.tiny": {
+      "source": "benchmarks/fixtures/complex.tiny",
+      "sha256": "bc7f46e3b93179d67cbdd51b20f6bc74dfe960d8edf6b86e34f46a195fe8e500"
+    },
+    "flat-arithmetic.tiny": {
+      "source": "benchmarks/fixtures/flat-arithmetic.tiny",
+      "sha256": "b2ab194bb5a30cd5e69d34a70db324a1127e6024e42fb41b34afc8797f016ebe"
+    },
+    "invalid-syntax.tiny": {
+      "source": "rust/tinyexpression-rs/tests/fixtures/invalid-syntax.tiny",
+      "sha256": "79cd8aa96ddd7e55f7d31c3d3b5a144fd746630e9ad3f8e8af0426598d0d79a0"
+    },
+    "large-match.tiny": {
+      "source": "benchmarks/fixtures/large-match.tiny",
+      "sha256": "81e0e27dba8609d446666ab7720f38f008cfb92538aa8e82cb63abc9874ef2d9"
+    },
+    "valid-basic.tiny": {
+      "source": "rust/tinyexpression-rs/tests/fixtures/valid-basic.tiny",
+      "sha256": "cb898749d76e51fdaf6c6636920ccdb4f415fc1cffd1e2497636b38cc2469807"
+    },
+    "valid-multiline.tiny": {
+      "source": "rust/tinyexpression-rs/tests/fixtures/valid-multiline.tiny",
+      "sha256": "e51106b12657d98f6728b3dcc1647566e93a0ecc5f0f9637f949f810d6d995bb"
+    },
+    "valid-unicode.tiny": {
+      "source": "rust/tinyexpression-rs/tests/fixtures/valid-unicode.tiny",
+      "sha256": "ab35ce797f54c5ba5611c527ad3d5e7daeaf9c5ecb5186935dd76b30dbeb9069"
+    }
+  },
+  "legacyArtifactsSha256": {
+    "org/unlaxer/tinyexpression/generated/p4/TinyExpressionP4Mapper.class": "13469a19f07d25b5276970df44bdb4a91cf07cbbc65ca9c2a4d0e2e3201bb79d",
+    "org/unlaxer/tinyexpression/generated/p4/TinyExpressionP4Parsers.class": "d7eb012813718f799d8051bab25bf711435cc2ace0ed56cbe931d1df32753ea1",
+    "org/unlaxer/tinyexpression/p4/P4PreferredAstMapper.class": "7ec9fcb87b93bc586037f84bb5b86916998b3ae4458335eeca5fc637256dbf7b",
+    "org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar": "1d39678696c93b2aff22b43983aaead26ffcc89142eab9693bb3d96a14494b40",
+    "org/unlaxer/unlaxer-dsl/3.0.15/unlaxer-dsl-3.0.15.jar": "e7871a9289e66481b654f871baf5682ddc022346900101c48c16aa4e86ee818d"
+  },
+  "scannerSourceSha256": {
+    "tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/StringLiteralParser.java": "4904bab00e7ef8e3ac0505f655440a039252111470dfbbb67557e3007dda283c",
+    "tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/javalang/CodeStartParser.java": "b8059964c28baf09d844974316e413682ed7ca090e413a2d4a478888130d9500",
+    "tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/javalang/CodeEndParser.java": "735b0a95ac69ba5b9fe230574cc82fdce8b9ebf2b32256484f58eee88e4cf1d1",
+    "tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/javalang/TripleBackTickParser.java": "cf9578453c088eb9d19cf2d4666234a181d83a91d65a4755873de160e3e1a287",
+    "tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/javatype/JavaClassNameParser.java": "91c078389561958ec3c7faae57ca3ce24df5b318cd05c3efd83c34fbb944910a",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/elementary/QuotedParser.java": "11e342f7d1948d88e99360f753aeddc1162d9659b657972944d241f3ccd5ce3a",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/elementary/EscapeInQuotedParser.java": "97d3829c77be98eb489e1addd63c1f3a078e7a10b2a376bb88ffe0021a27e249",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/elementary/WildCardStringParser.java": "70f224ab3279e226399833765153cb64f46a24de83fa4b7dcc39721745d34109",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/elementary/StartOfLineParser.java": "b61db050c23633621a0eccf8bfecb91f0d608f53e6697b1c7e1c8a97cfa4b07d",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/elementary/LineTerminatorParser.java": "eb4ccab91fbd58ed9bd62ea75c14a3748180a4999daa6b6a2373c7066d5578a1",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/combinator/NotPropagatableSource.java": "d1f4a8650d75bc2315fbe329021340f6730282a20cd637a9f3197641e9c43168",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/clang/IdentifierParser.java": "818beb607ff216f9c1987825baab5829c38fafba4844cd5d1f51f2e970a6a745",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/posix/AlphabetUnderScoreParser.java": "9851a0aee0936da6bedc5e17c69afb7090eb72d62bbd0eb6fce320718a93e6d5",
+    "unlaxer-parser/unlaxer-common/src/main/java/org/unlaxer/parser/posix/AlphabetNumericUnderScoreParser.java": "131488c616f7ea33721bdc5d897f7f9b789814e83563155a54fabc1aca3ffbad"
+  },
+  "regenerationAfterSharedJarUpdate": {
+    "updatedMasterJarSha256": "0e5ddd7fcc9f84a4fdb89c08bd0198e1a86fc21fc8e0beba2e2b9ac0c4bb65e9",
+    "differentFiles": 7,
+    "baselineSourceRevision": "d86f3a38adad359aeb68489659fe6ff861641f11",
+    "baselineSourceOutput": "22ファイルが byte 一致",
+    "differentGeneratedFiles": [
+      "TinyExpressionP4Parser.java",
+      "api/Capture.java",
+      "api/ParseResult.java",
+      "driver/Driver.java",
+      "internal/Recipe.java",
+      "internal/Session.java",
+      "rt/Diagnostics.java"
+    ]
+  }
+}

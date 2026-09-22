@@ -1,0 +1,4 @@
+読み込み元 org.unlaxer.parser.AbstractParser file:/home/opa/.m2/repository/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+読み込み元 org.unlaxer.context.ParseContext file:/home/opa/.m2/repository/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+読み込み元 org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper file:/home/opa/work/unlaxer-workspace/tinyexpression/target/classes/
+成功 src/test/resources/fixtures/large-match.tiny 1544.918 ms

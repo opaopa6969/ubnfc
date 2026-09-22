@@ -1,0 +1,31 @@
+org.unlaxer.parser.AbstractParser file:/home/opa/.m2/repository/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+org.unlaxer.context.ParseContext file:/home/opa/.m2/repository/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper file:/home/opa/work/unlaxer-workspace/tinyexpression/target/classes/
+Exception in thread "main" java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:118)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at LegacyProbe.main(LegacyProbe.java:7)
+Caused by: java.lang.IllegalArgumentException: P4 parse exceeded deadline
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper.toParseFailure(P4PreferredAstMapper.java:269)
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper.parseDetailed(P4PreferredAstMapper.java:125)
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper.parseDetailed(P4PreferredAstMapper.java:96)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at LegacyProbe.main(LegacyProbe.java:7)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at jdk.compiler/com.sun.tools.javac.launcher.Main.execute(Main.java:484)
+	at jdk.compiler/com.sun.tools.javac.launcher.Main.run(Main.java:208)
+	at jdk.compiler/com.sun.tools.javac.launcher.Main.main(Main.java:135)
+Caused by: org.unlaxer.tinyexpression.p4.P4PreferredAstMapper$ParseDeadlineExceededException: P4 parse exceeded deadline
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper$1.onBegin(P4PreferredAstMapper.java:411)
+	at org.unlaxer.context.TransactionListenerContainer.onBegin(TransactionListenerContainer.java:48)
+	at org.unlaxer.context.Transaction.begin(Transaction.java:55)
+	at org.unlaxer.parser.combinator.ChainInterface.parse(ChainInterface.java:29)
+	at org.unlaxer.parser.combinator.LazyChain.parse(LazyChain.java:28)
+	at org.unlaxer.parser.Parser.parse(Parser.java:28)
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper.parseWithRoot(P4PreferredAstMapper.java:380)
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper.parseRootToken(P4PreferredAstMapper.java:330)
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper.parseViaMapperCompat(P4PreferredAstMapper.java:283)
+	at org.unlaxer.tinyexpression.p4.P4PreferredAstMapper.parseDetailed(P4PreferredAstMapper.java:106)
+	... 9 more

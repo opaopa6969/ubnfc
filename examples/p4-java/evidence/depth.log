@@ -1,0 +1,51 @@
+JVM [-Xmx512m, -Xss256k]
+depth=8 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=8 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=16 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=16 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=32 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=32 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=64 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=64 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=128 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=128 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=256 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=256 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+JVM [-Xmx512m, -Xss1m]
+depth=8 ast=false ok=true consumed=17 diagnostic=なし
+depth=8 ast=true ok=true consumed=17 diagnostic=なし
+depth=16 ast=false ok=true consumed=33 diagnostic=なし
+depth=16 ast=true ok=true consumed=33 diagnostic=なし
+depth=32 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=32 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=64 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=64 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=128 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=128 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=256 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=256 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+JVM [-Xmx512m, -Xss4m]
+depth=8 ast=false ok=true consumed=17 diagnostic=なし
+depth=8 ast=true ok=true consumed=17 diagnostic=なし
+depth=16 ast=false ok=true consumed=33 diagnostic=なし
+depth=16 ast=true ok=true consumed=33 diagnostic=なし
+depth=32 ast=false ok=true consumed=65 diagnostic=なし
+depth=32 ast=true ok=true consumed=65 diagnostic=なし
+depth=64 ast=false ok=true consumed=129 diagnostic=なし
+depth=64 ast=true ok=true consumed=129 diagnostic=なし
+depth=128 ast=false ok=true consumed=257 diagnostic=なし
+depth=128 ast=true ok=true consumed=257 diagnostic=なし
+depth=256 ast=false ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+depth=256 ast=true ok=false consumed=0 diagnostic=[maximum parse depth exceeded (JVM stack limit; maxDepth=10000)]
+JVM [-Xmx512m, -Xss16m]
+depth=8 ast=false ok=true consumed=17 diagnostic=なし
+depth=8 ast=true ok=true consumed=17 diagnostic=なし
+depth=16 ast=false ok=true consumed=33 diagnostic=なし
+depth=16 ast=true ok=true consumed=33 diagnostic=なし
+depth=32 ast=false ok=true consumed=65 diagnostic=なし
+depth=32 ast=true ok=true consumed=65 diagnostic=なし
+depth=64 ast=false ok=true consumed=129 diagnostic=なし
+depth=64 ast=true ok=true consumed=129 diagnostic=なし
+depth=128 ast=false ok=true consumed=257 diagnostic=なし
+depth=128 ast=true ok=true consumed=257 diagnostic=なし
+depth=256 ast=false ok=true consumed=513 diagnostic=なし
