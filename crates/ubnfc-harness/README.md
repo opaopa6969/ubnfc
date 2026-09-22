@@ -24,6 +24,7 @@ NPE の `accepted:null`、prefix 成功と全入力消費、構文受理と mapp
 | observation | 比較対象 |
 |---|---|
 | accepted | `accepted` と `allConsumed`（prefix と全入力の受理状態） |
+| parsedStatus | prefix parser の状態文字列（`accepted` とは別の明示登録） |
 | consumed / matched | それぞれの code point cursor |
 | ast | canonical AST と構築元の順序付き `captures`（binding/span/text を含む） |
 | diagnostics | 公開診断列 |
@@ -43,9 +44,9 @@ NPE の `accepted:null`、prefix 成功と全入力消費、構文受理と mapp
 
 ## 台帳の判断
 
-README の疑義1〜11を実際の grammar/input/観測と照合し、29ケース・75項目を登録した。
-`follow-spec` 60項目、`undecided` 15項目。各項目の根拠は台帳の reason に記載する。
-未決定は次の契約が確定していないためで、採取値の修正や推測した期待値の追加はしない。
+README の疑義1〜11を実際の grammar/input/観測と照合し、29ケース・78項目を登録した。
+`follow-spec` 63項目、D-018 の `new-contract:*` 15項目。各項目の根拠は台帳の reason に記載する。
+D-018 以前に未決定だった理由は次の契約不足。採取値の修正や推測した期待値の追加はしない。
 
 - 回復した root/statement の AST 表現、および正常に回復した入力の診断契約。
 - `@whitespace` がない line comment の改行消費と、javaStyle と明示コメント設定の合成。
@@ -95,6 +96,21 @@ driver のプロトコル/実行エラーを比較 Fail から分ける。比較
 D-017/D-018 の登録をそのまま利用する。欠落項目だけなら未観測、既知差分があれば
 Known、未登録差分があれば Fail。Known/Fail に併存する未観測項目も保存する。
 Raw の evolution に結果 oracle を補完しない。
+
+`Expectation::Oracle` の `captures` は `OracleCollector.java:171-174` に従い
+prefix 解析の `prefixCaptures` と比較する。通常の AST fixture は全入力の `captures` を使う。
+`prefixCaptures` 未提供は未観測であり、全入力 capture に置き換えない。
+Rust driver に必要な出力は完了順・重複を保持した `name/binding/span/text`（span は code point）。
+scope の `resolved[].declared` は未指定なら比較せず、明示 null は実測 null または欠落、
+真偽値を指定した場合は厳密一致を要求する。`symbol:null` の必須比較は維持する。
+
+round4 の `extern/4`（入力 `a`）は scanner が先頭失敗時にも後続 MatchOnly の `'x'` を
+`ScanResult.diagnostics` に返す。根拠は `ExternalCursorParser.java:10` と upstream
+`ParseContext.java:1097,1111-1148` の子候補収集。Java/Rust の scanner 単体テストで検証する。
+Java r3 との個別実行では `'x'` の補完を確認したが、Java backend の `DiagnosticPlan` が
+`ExternalCursorParser`・`__CaptureSite` も追加するため、oracle の
+`['x', '😀', RootParser]` に対する余分な候補の差分は残る。backend 側の引き継ぎ事項とし、
+`farthestExpected` の比較や台帳で免除しない。
 
 Markdown は系統別・文法別の結果、拒否の機能/診断コード別件数、Fail の差分先頭3行、
 未観測項目を出す。JSON には文法原文/import、段階ログ、全ケースの期待値・実測値・

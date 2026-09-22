@@ -40,6 +40,30 @@ fn result(r: ScanResult, ok: bool, consumed: usize, matched: usize, value: [usiz
     }
 }
 #[test]
+fn external_failure_keeps_following_match_only_expectation() {
+    let external = "oracle.ExternalCursorParser";
+    for match_only in [false, true] {
+        for (input, expected) in [
+            ("a", vec![(0, "'😀'"), (0, "'x'")]),
+            ("", vec![(0, "'😀'"), (0, "'x'")]),
+            ("😀y", vec![(4, "'x'")]),
+        ] {
+            let r = scan(external, input, 0, 0, match_only, false, true);
+            assert_eq!(
+                r.diagnostics
+                    .iter()
+                    .map(|d| (d.offset, d.expected))
+                    .collect::<Vec<_>>(),
+                expected
+            );
+            result(r, false, 0, 0, [0, 0]);
+        }
+        assert!(scan(external, "😀x", 0, 0, match_only, false, true)
+            .diagnostics
+            .is_empty());
+    }
+}
+#[test]
 fn five_states_unicode_spans_and_transactional_failure() {
     let string = "org.unlaxer.tinyexpression.parser.StringLiteralParser";
     let start = "org.unlaxer.tinyexpression.parser.javalang.CodeStartParser";

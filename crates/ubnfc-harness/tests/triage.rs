@@ -200,8 +200,163 @@ fn oracle_case(input: &str, accepted: bool, all_consumed: bool, diagnostics: Val
 fn oracle_actual(accepted: bool, all_consumed: bool, diagnostics: Value) -> Actual {
     actual(
         json!({"accepted":accepted,"allConsumed":all_consumed,"consumed":0,"matched":0,
-        "ast":null,"captures":[],"declarations":[],"diagnostics":diagnostics,"mappingError":null}),
+        "ast":null,"captures":[],"prefixCaptures":[],"declarations":[],"diagnostics":diagnostics,"mappingError":null}),
     )
+}
+
+#[test]
+fn oracle_captures_require_prefix_observation_even_after_full_parse_failure() {
+    // OracleCollector.java:171-174 / SemanticsTest.java:143-151。
+    let capture = json!({"name":"value","binding":"Root:0","span":[0,1],"text":"a"});
+    let c = case(
+        json!({"Oracle":{"accepted":true,"allConsumed":false,"consumed":1,"matched":1,
+        "ast":null,"captures":[capture,capture],"declarations":[],"diagnostics":[],"mappingError":null}}),
+        "oracle",
+        "a!",
+    );
+    for backend in [Backend::Java, Backend::Rust] {
+        let mut a = oracle_actual(true, false, json!([]));
+        a.backend = backend;
+        a.response["consumed"] = json!(1);
+        a.response["matched"] = json!(1);
+        a.response["prefixCaptures"] = json!([capture, capture]);
+        pass(&c, &a);
+        // 全入力の capture の有無は prefix 観測を補完・上書きしない。
+        a.response["captures"] = json!([{"name":"wrong"}]);
+        pass(&c, &a);
+        a.response["prefixCaptures"] = json!([capture]);
+        fails(&c, &a);
+        a.response["prefixCaptures"] = Value::Null;
+        fails(&c, &a);
+        a.response["captures"] = json!([capture, capture]);
+        a.response.as_object_mut().unwrap().remove("prefixCaptures");
+        assert_eq!(compare(&c, &a, &[]), Verdict::Pass);
+        assert_eq!(unobserved(&c, &a), ["/prefixCaptures"]);
+        let report = ubnfc_harness::runner::Report::from_actual(&[c.clone()], &[a]).unwrap();
+        assert_eq!((report.unobserved, report.unobserved_cases), (1, 1));
+    }
+}
+
+#[test]
+fn scope_declared_distinguishes_unspecified_null_and_boolean_without_weakening_symbols() {
+    // ScopeAnnotationConformanceTest.java:219-235 は declared を出力しない。
+    let resolution = json!({"query":"x","symbol":null});
+    for expected_declared in [
+        None,
+        Some(Value::Null),
+        Some(json!(false)),
+        Some(json!(true)),
+    ] {
+        let mut expected = resolution.clone();
+        if let Some(value) = &expected_declared {
+            expected["declared"] = value.clone();
+        }
+        let c = case(
+            json!({"Ast":{"ast":null,"scope":{"depth":0,"resolved":[expected],
+            "references":[],"diagnostics":[]}}}),
+            "scope-annotations",
+            "x",
+        );
+        for actual_declared in [
+            None,
+            Some(Value::Null),
+            Some(json!(false)),
+            Some(json!(true)),
+        ] {
+            let mut observed = resolution.clone();
+            if let Some(value) = &actual_declared {
+                observed["declared"] = value.clone();
+            }
+            let a = actual(json!({"allConsumed":true,"ast":null,"scope":{"depth":0,
+                "resolved":[observed],"references":[],"diagnostics":[]}}));
+            let matches = match &expected_declared {
+                None => true,
+                Some(Value::Null) => actual_declared.as_ref().is_none_or(Value::is_null),
+                Some(value) => actual_declared.as_ref() == Some(value),
+            };
+            if matches {
+                pass(&c, &a);
+            } else {
+                fails(&c, &a);
+            }
+        }
+    }
+    let c = case(
+        json!({"Ast":{"ast":null,"scope":{"depth":0,"resolved":[resolution],
+        "references":[],"diagnostics":[]}}}),
+        "scope-annotations",
+        "x",
+    );
+    for resolved in [
+        json!([]),
+        json!([{"query":"x"}]),
+        json!([{"query":"y","symbol":null}]),
+        json!([{"query":"x","symbol":{"name":"x","sourceOffset":0}}]),
+    ] {
+        fails(
+            &c,
+            &actual(json!({"allConsumed":true,"ast":null,"scope":{"depth":0,
+            "resolved":resolved,"references":[],"diagnostics":[]}})),
+        );
+    }
+}
+
+#[test]
+fn regex_non_bmp_status_is_known_only_for_the_three_registered_observations() {
+    use ubnfc_harness::divergence::Observation;
+    let cases = select(&load_all(default_root()).unwrap(), &["oracle".into()], None).unwrap();
+    for (id, end, start, text) in [
+        ("regex-emoji/1", 1, 0, "😀"),
+        ("regex-prefix/1", 2, 1, "a"),
+        ("regex-prefix/2", 2, 1, "a"),
+    ] {
+        let c = cases.iter().find(|c| c.case.id == id).unwrap();
+        let full = id != "regex-prefix/2";
+        let a = actual(
+            json!({"accepted":true,"allConsumed":full,"consumed":end,"matched":end,
+            "ast":if full { json!({"type":"Value","span":[0,end],"fields":{"value":text}}) } else { Value::Null },
+            "captures":[],"prefixCaptures":[{"name":"value","binding":"Root:0","span":[start,end],"text":text}],
+            "declarations":[],"references":[],"scopeDepth":0,"mappingError":null,"parsedStatus":"succeeded",
+            "diagnostics":if full { json!([]) } else { json!([{"kind":"trailing_input","offset":end,
+                "expected":["end of input"],"farthestOffset":end,"farthestExpected":[],"origin":"Mapper.diagnose"}]) }}),
+        );
+        let known = &c.case.known_divergences;
+        assert!(known.contains(&Observation::ParsedStatus));
+        let Verdict::KnownDivergence(diffs) = compare(c, &a, known) else {
+            panic!("{}: {:?}", id, compare(c, &a, known));
+        };
+        assert!(diffs.iter().any(|d| d.path == "/parsedStatus"));
+        assert!(unobserved(c, &a).is_empty());
+        let without_status: Vec<_> = known
+            .iter()
+            .copied()
+            .filter(|o| *o != Observation::ParsedStatus)
+            .collect();
+        assert!(matches!(compare(c, &a, &without_status), Verdict::Fail(_)));
+        let mut wrong = a.clone();
+        wrong.response["scopeDepth"] = json!(1);
+        assert!(matches!(compare(c, &wrong, known), Verdict::Fail(_)));
+        let mut unrelated = c.clone();
+        unrelated
+            .extra_expectations
+            .insert("futureObservation".into(), json!(true));
+        wrong.response["scopeDepth"] = json!(0);
+        wrong.response["futureObservation"] = json!(false);
+        assert!(matches!(
+            compare(&unrelated, &wrong, known),
+            Verdict::Fail(_)
+        ));
+    }
+    assert_eq!(
+        cases
+            .iter()
+            .filter(|c| c
+                .case
+                .known_divergences
+                .contains(&Observation::ParsedStatus))
+            .count(),
+        3
+    );
 }
 
 #[test]

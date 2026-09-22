@@ -53,10 +53,13 @@ fn tiny_string_from_ir_registers_both_backends_without_oracle_rewriting() {
             build_dir: scratch.0.join(format!("{backend:?}")),
         };
         let mut executable = runner
-            .build(Artifact::FromIr {
-                ir_path: ir.clone(),
-                backend,
-            })
+            .build_with_java_generator(
+                Artifact::FromIr {
+                    ir_path: ir.clone(),
+                    backend,
+                },
+                &ubnfc_harness::runall::Config::default().java_generator,
+            )
             .unwrap();
         if backend == Backend::Java {
             let contract = scratch.0.join("RegistryTest.java");

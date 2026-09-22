@@ -30,11 +30,19 @@ pub struct Diagnostic {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Resolution {
     pub query: String,
-    #[serde(default)]
-    pub declared: Option<bool>,
+    // 未指定と明示 null を保持する。scope annotation の採取にはこのキーが無い。
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "declared"
+    )]
+    pub declared: Option<Option<bool>>,
     pub symbol: Option<Declaration>,
     #[serde(flatten)]
     pub extra: RawFields,
+}
+fn declared<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<Option<bool>>, D::Error> {
+    Option::<bool>::deserialize(d).map(Some)
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

@@ -3,6 +3,7 @@ package ubnfc.scanners;
 import generated.api.TokenScanner;
 import generated.api.TokenScanner.*;
 import generated.rt.Input;
+import java.util.List;
 
 /** -ea で実行。公開5状態、位置単位、value span、rollback を実 API に対して検証する。 */
 public final class RegistryTest {
@@ -23,6 +24,17 @@ public final class RegistryTest {
         String start = "org.unlaxer.tinyexpression.parser.javalang.CodeStartParser";
         String end = "org.unlaxer.tinyexpression.parser.javalang.CodeEndParser";
         String external = "oracle.ExternalCursorParser";
+        for (Mode mode : Mode.values()) {
+            for (String input : new String[]{"a", ""}) {
+                var r = scan(external, input, 0, 0, mode, false, true);
+                result(r, false, 0, 0, 0, 0);
+                assert r.diagnostics().equals(List.of(new ScanDiagnostic(0, "'😀'"), new ScanDiagnostic(0, "'x'"))) : r;
+            }
+            var later = scan(external, "😀y", 0, 0, mode, false, true);
+            result(later, false, 0, 0, 0, 0);
+            assert later.diagnostics().equals(List.of(new ScanDiagnostic(2, "'x'"))) : later;
+            assert scan(external, "😀x", 0, 0, mode, false, true).diagnostics().isEmpty();
+        }
         result(scan(string, "'😀'", 0, 0, Mode.consumed, false, true), true, 4, 4, 1, 3);
         result(scan("DoubleQuotedParser", "\"\\😀\"", 0, 0, Mode.matchOnly, false, false), true, 0, 5, 0, 5);
         result(scan(string, "''\"b\"", 0, 2, Mode.matchOnly, false, true), true, 0, 2, 1, 1);
