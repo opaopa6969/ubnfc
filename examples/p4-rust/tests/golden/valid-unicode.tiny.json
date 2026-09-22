@@ -1,0 +1,1 @@
+{"fields":{"declarations":[],"expression":{"fields":{"value":{"fields":{"left":"こんにちは😀","op":[],"right":[]},"span":[0,9],"type":"StringConcatExpr"}},"span":[0,9],"type":"ExpressionExpr"},"imports":[],"methods":[]},"span":[0,9],"type":"FormulaExpr"}

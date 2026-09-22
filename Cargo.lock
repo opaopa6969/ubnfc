@@ -103,6 +103,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ubnfc-p4-rust"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "ubnfc-front",
+ "ubnfc-p4-rust",
+ "ubnfc-rust",
+]
+
+[[package]]
 name = "ubnfc-rt-template"
 version = "0.1.0"
 
