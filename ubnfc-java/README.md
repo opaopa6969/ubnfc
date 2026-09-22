@@ -32,9 +32,67 @@ java -cp target/ubnfc-java-0.1.0-SNAPSHOT.jar org.ubnfc.java.Main \
   一時領域は `mktemp -d` で確保し、テスト後に削除する。
 
 生成先には `{Grammar}Parser.java`, `{Grammar}AST.java`, `{Grammar}Result.java`,
-`api/*`, `internal/*`, `rt/*` を配置する。通常の入口は
+`api/*`, `internal/*`, `rt/*`, `driver/Driver.java` を配置する。通常の入口は
 `{Grammar}Parser.parse(CharSequence[, ParseOptions]) -> ParseResult<{Grammar}AST>`。
 `ParseOptions` で AST 構築、全消費、lexical 出力、memo、Extern scanner を指定できる。
+
+## Harness driver
+
+`--emit-driver` は既定で有効。`--emit-driver false` または `--no-emit-driver` で無効にできる。
+API は `new JavaEmitter(ir, packageName, emitDriver)`。生成先は空のディレクトリを使う。
+`<package>.driver.Driver` は UTF-8 JSON Lines を読み、各応答の直後に flush する。
+JSON reader/writer は生成 `api/Json` を使い、JDK 以外の依存を持たない。
+
+`grammar` は IR に含まれる全 grammar unit の宣言名、`entry` はその unit の rule 名。
+`entry: null` はその unit の一意な `@root` を選ぶ。entry grammar では、root annotation が
+省略された正規化 IR の `entry.ruleId` も利用する。root のない他 unit は明示 entry が必要。
+未知・曖昧な root、未知 grammar/entry、壊れた JSON は `id` と `error` を返し、次の行へ進む。
+生成 parser の `parseEntry(grammar, entry, source, options)` も同じ dispatch を利用できる。
+
+prefix を認識し、全入力を AST 構築付きで解析する。応答は `accepted`, `allConsumed`,
+`consumed`, `matched`, canonical `ast`, `captures`, `declarations`, `references`,
+`diagnostics`, `mappingError`, `value`。位置は Unicode code point。
+`options.lexical: false` では captures、`options.scope: false` では宣言・参照を省略する。
+解析と scope 診断はオプションで変えない。診断は primary offset を使い、成功時にも残る
+expected は farthest offset とともに返す。scope 診断には `kind: "scope"`、空の expected と
+message/length/severity を付ける。mapping 失敗でも prefix と全入力の構文受理は保持する。
+
+`value` は IR の operator 指定がある AST 型を起点に、`left/op/right` のリストをたどり、
+数値の葉に対する `+`, `-`, `*`, `/`, `^` を double で計算する。
+右結合は AST の右の子の入れ子に従う。数値テキストの末尾の空白・Java コメントも扱う。
+`value` フィールドだけの数値葉、assocLists の leafFallback はこの fold 内でのみ使う。
+汎用の文法評価器ではなく、変数・宣言・プログラム全体・他の形・未知の演算子は null。
+NaN/Infinity はプロトコルのエラー応答。captures の binding 等の追加 metadata や
+`texts/nodes/valueSpans/scopeDepth` は出力しない。
+
+repo root から事前に jar を用意し、生成から corpus 比較まで実行できる。
+
+```sh
+(cd ubnfc-java && mvn -o -q package)
+cargo run -p ubnfc-harness -- run --backend java \
+  --ir ubnfc-java/src/test/resources/ir/operators.ir.json --families associative
+cargo run -p ubnfc-harness -- run --backend java \
+  --ir ubnfc-java/src/test/resources/ir/power.ir.json --families right-associative
+```
+
+runner の `Artifact::FromIr { ir_path, backend: Backend::Java }` は生成パッケージを `target` に
+固定して既存の `target.driver.Driver` 起動と接続する。jar は
+`ubnfc-java/target/ubnfc-java-0.1.0-SNAPSHOT.jar` を使い、runner は Maven を起動しない。
+`Artifact::Prebuilt { dir }` と従来の `runner.build(path)` も利用できる。
+`build_with_java_generator(artifact, classpath)` で生成器の jar/classes を明示できる。
+生成ソースと classes は build ごとに分離し、失敗時も生成ソースを削除する。
+E2E は `target/classes` を使い、なければプロセス内で一度だけオフライン package を行う。
+`java`/`javac` がない環境では失敗し、skip しない。
+
+| E2E | Pass | Known | Fail | 未観測項目 / ケース |
+|---|---:|---:|---:|---:|
+| associative | 24 | 0 | 0 | 0 / 0 |
+| right-associative | 28 | 0 | 0 | 0 / 0 |
+| tinycalc（独立した受理・prefix・entry の8件） | 8 | 0 | 0 | 0 / 0 |
+
+corpus の value 観測は除外しない。`1e2/4-0.5` も AST と value 24.5 を返す。
+JSON Lines の異常後の継続、任意の id、複数 grammar、scope イベント、mapping 失敗、
+非 BMP capture、採取オプション、非有限評価値も生成 driver のプロセス経由で検証する。
 
 ## 対応範囲
 
@@ -86,7 +144,7 @@ prefix trie、trivia cache は読み込み可能だが、現在は先頭 code po
 - 手書き目標の expected は発見順、IR 契約はソート済みなので、expected の集合・ソート後の値を比較する。
   Capture.siteId は手書きの整数と異なり、IR の安定 siteId 文字列を公開する。
 - Number の直接 capture を int にする別 IR で、採用枝だけの数値 mapping failure と認識成功を検証する。
-- 合計 86 テスト。生成 byte の決定性、未知キーの無視と feature 拒否、memo on/off、scope undo と replay、入れ子/enum/commonField、反復とカーソルの境界条件も検証する。
+- 合計 93 テスト。生成 byte の決定性、未知キーの無視と feature 拒否、memo on/off、scope undo と replay、入れ子/enum/commonField、反復とカーソルの境界条件も検証する。
 
 ## IR 契約で補足が必要な点
 
