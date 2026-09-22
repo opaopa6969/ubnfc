@@ -36,10 +36,17 @@
 
 - JMH: `tinyexpression/src/jmh/.../P4ParserBenchmark.java`（`Mode.AverageTime`、fixture を `@Param`）
 - criterion: `tinyexpression/rust/tinyexpression-rs/benches/parser.rs`
-- 既存記録（別 revision、直接比較不可）: Java facade complex 12.32 ms / complex-x64 958 ms、Rust complex 1.426 ms
+- **旧 Java 実装のベースライン（2026-09-23 に確定、[`../reports/2026-09-23-legacy-baseline.md`](../reports/2026-09-23-legacy-baseline.md)）**:
+  complex.tiny **認識 13.6 ms / AST 付き 14.5 ms**（割当 27.4〜27.8 MB/parse）、complex-x64 **認識 1,603 ms / AST 付き 1,693 ms**。
+  公開 facade `P4PreferredAstMapper.parseDetailed`（候補選択込み）は complex 10.8 ms で、副次値として持つ。
+  計測構成は tinyexpression `c70416e1` を unlaxer master `ed4178e` の isolated maven repo で再ビルドし、
+  tinyexpression 自身の classpath 順で `Memoization.SAFE_FAILURES` を有効にしたもの。
+- 旧記録 12.32 ms（JMH `publicFacade`）はこの構成で再現する（同じ run の `parseOnlySafe` は記録 15.049 ms に対し本日 14.96 ms）。
+  Rust は complex 1.426 ms（未再計測）。
 
 → ubnfc の性能目標は **complex / complex-x64 / comparison-heavy-x64** の 3 本で、
-既存 Java facade（memo 込み）と既存 Rust に対する比を採る。x64 で超線形が出ないことも見る。
+上記ベースラインの **認識 ↔ 認識、AST ↔ AST** で比を採る（facade は候補選択と `Diagnostics.AUTO` を含むので対比には使わない）。
+x64 で超線形が出ないことも見る。
 
 ## C. 流用する corpus（unlaxer-dsl/src/test/resources）
 

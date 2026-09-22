@@ -10,7 +10,7 @@ import java.util.Locale;
 
 /**
  * 旧生成物（tinyexpression の生成 parser / Mapper / facade）を反射で同じ計測法にかける任意ツール。
- * 引数: root|root-deferred|mapper|facade FIXTURE_DIR [fixture,...]。プロパティ: bench.warmup / bench.runs / bench.iterations / bench.deadlineSec。
+ * 引数: root|root-off|root-deferred|mapper|mapper-off|facade FIXTURE_DIR [fixture,...]。プロパティ: bench.warmup / bench.runs / bench.iterations / bench.deadlineSec。
  * 1 parse が deadline を超えた fixture は計測せず REJECTED として記録する。
  *
  * <p>{@code root} は tinyexpression の JMH {@code P4ParserBenchmark.parseFreshToken(memoized)} と同じ
@@ -20,6 +20,24 @@ import java.util.Locale;
  */
 public final class LegacyBenchmark {
     private static volatile Object sink;
+
+    /** 実行時にどの jar / ディレクトリから読まれたかを記録する主要クラス。 */
+    private static final String[] PROBED_CLASSES = {
+        "org.unlaxer.parser.AbstractParser",
+        "org.unlaxer.parser.Parser",
+        "org.unlaxer.parser.ParentHolderParser",
+        "org.unlaxer.parser.combinator.Chain",
+        "org.unlaxer.parser.combinator.Choice",
+        "org.unlaxer.parser.combinator.Occurs",
+        "org.unlaxer.context.ParseContext",
+        "org.unlaxer.context.PackratMemoTable",
+        "org.unlaxer.context.Memoization",
+        "org.unlaxer.context.SafeFailureMemoizable",
+        "org.unlaxer.context.SafeSuccessMemoizable",
+        "org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers",
+        "org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper",
+        "org.unlaxer.tinyexpression.p4.P4PreferredAstMapper",
+    };
 
     private static java.util.function.Function<String, Object> reflective(Method method) {
         return source -> {
@@ -31,21 +49,21 @@ public final class LegacyBenchmark {
 
     /** JMH P4ParserBenchmark.parseFreshToken(true) と同じ経路（root parser + SAFE_FAILURES）。 */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static java.util.function.Function<String, Object> rootParser(boolean deferred) throws Exception {
+    private static java.util.function.Function<String, Object> rootParser(boolean deferred, boolean memoized) throws Exception {
         Object root = Class.forName("org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers").getMethod("getRootParser").invoke(null);
         Class<?> parserClass = Class.forName("org.unlaxer.parser.Parser");
         Class<?> contextClass = Class.forName("org.unlaxer.context.ParseContext");
         Class<?> optionsClass = Class.forName("org.unlaxer.context.ParseOptions");
         Class<?> memoizationClass = Class.forName("org.unlaxer.context.Memoization");
         Class<?> sourceClass = Class.forName("org.unlaxer.StringSource");
-        Object safeFailures = Enum.valueOf((Class<Enum>) memoizationClass, "SAFE_FAILURES");
-        Object memoized = optionsClass.getMethod("withMemoization", memoizationClass).invoke(null, safeFailures);
+        Object policy = Enum.valueOf((Class<Enum>) memoizationClass, memoized ? "SAFE_FAILURES" : "OFF");
+        Object options0 = optionsClass.getMethod("withMemoization", memoizationClass).invoke(null, policy);
         if (deferred) {
             Class<?> diagnosticsClass = Class.forName("org.unlaxer.context.ParseOptions$Diagnostics");
-            memoized = optionsClass.getMethod("withDiagnostics", diagnosticsClass)
-                .invoke(memoized, Enum.valueOf((Class<Enum>) diagnosticsClass, "DETAILED_ON_FAILURE"));
+            options0 = optionsClass.getMethod("withDiagnostics", diagnosticsClass)
+                .invoke(options0, Enum.valueOf((Class<Enum>) diagnosticsClass, "DETAILED_ON_FAILURE"));
         }
-        final Object options = memoized;
+        final Object options = options0;
         Method createRootSource = sourceClass.getMethod("createRootSource", String.class);
         Class<?> effectorArray = java.lang.reflect.Array.newInstance(Class.forName("org.unlaxer.context.ParseContextEffector"), 0).getClass();
         Object noEffectors = java.lang.reflect.Array.newInstance(Class.forName("org.unlaxer.context.ParseContextEffector"), 0);
@@ -65,6 +83,26 @@ public final class LegacyBenchmark {
             catch (ReflectiveOperationException failure) { throw new IllegalStateException(failure); }
         };
     }
+    /**
+     * 生成 Mapper を {@code SAFE_FAILURES} で走らせる（JMH {@code parseAndMapSafe} 相当）。
+     * 引数 1 つの {@code parse(String)} は {@code ParseOptions.DEFAULT}＝memo OFF なので、
+     * AST モードの比較には使えない（それは {@code mapper-off}）。
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static java.util.function.Function<String, Object> memoizedMapper() throws Exception {
+        Class<?> optionsClass = Class.forName("org.unlaxer.context.ParseOptions");
+        Class<?> memoizationClass = Class.forName("org.unlaxer.context.Memoization");
+        Object options = optionsClass.getMethod("withMemoization", memoizationClass)
+            .invoke(null, Enum.valueOf((Class<Enum>) memoizationClass, "SAFE_FAILURES"));
+        Method parse = Class.forName("org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper")
+            .getMethod("parseWithOptions", String.class, optionsClass);
+        return source -> {
+            try { return parse.invoke(null, source, options); }
+            catch (InvocationTargetException failure) { throw new IllegalStateException(failure.getCause()); }
+            catch (IllegalAccessException failure) { throw new IllegalStateException(failure); }
+        };
+    }
+
     public static void main(String[] args) throws Exception {
         Locale.setDefault(Locale.ROOT);
         String kind = args[0]; Path fixtures = Path.of(args[1]);
@@ -72,11 +110,25 @@ public final class LegacyBenchmark {
         int warmup = Integer.getInteger("bench.warmup", 200), runs = Integer.getInteger("bench.runs", 5), fixed = Integer.getInteger("bench.iterations", 0);
         long deadline = Integer.getInteger("bench.deadlineSec", 20) * 1_000_000_000L;
         java.util.function.Function<String, Object> parse;
-        if (kind.equals("root") || kind.equals("root-deferred")) parse = rootParser(kind.endsWith("deferred"));
-        else if (kind.equals("mapper")) parse = reflective(Class.forName("org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper").getMethod("parse", String.class));
+        if (kind.startsWith("root")) parse = rootParser(kind.endsWith("deferred"), !kind.equals("root-off"));
+        else if (kind.equals("mapper-off")) parse = reflective(Class.forName("org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper").getMethod("parse", String.class));
+        else if (kind.equals("mapper")) parse = memoizedMapper();
         else parse = reflective(Class.forName("org.unlaxer.tinyexpression.p4.P4PreferredAstMapper").getMethod("parseDetailed", String.class));
-        for (String name : new String[]{"org.unlaxer.parser.AbstractParser", "org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper"})
-            System.out.println("# " + name + " <- " + Class.forName(name).getProtectionDomain().getCodeSource().getLocation());
+        for (String name : PROBED_CLASSES) {
+            String where;
+            try {
+                var source = Class.forName(name).getProtectionDomain().getCodeSource();
+                where = source == null ? "<no code source>" : source.getLocation().toString();
+            } catch (Throwable missing) { where = "ABSENT (" + missing.getClass().getSimpleName() + ")"; }
+            System.out.println("# " + name + " <- " + where);
+        }
+        try {
+            Object rootProbe = Class.forName("org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers").getMethod("getRootParser").invoke(null);
+            Class<?> safeSuccess = Class.forName("org.unlaxer.context.SafeSuccessMemoizable");
+            Class<?> safeFailure = Class.forName("org.unlaxer.context.SafeFailureMemoizable");
+            System.out.println("# root=" + rootProbe.getClass().getName()
+                + " safeSuccess=" + safeSuccess.isInstance(rootProbe) + " safeFailure=" + safeFailure.isInstance(rootProbe));
+        } catch (Throwable missing) { System.out.println("# marker probe unavailable: " + missing); }
         System.out.println("# java=" + System.getProperty("java.version") + " memoize=" + System.getProperty("tinyexpression.p4.memoize"));
         System.out.println("# jvm=" + ManagementFactory.getRuntimeMXBean().getInputArguments());
         System.out.println("fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse");
