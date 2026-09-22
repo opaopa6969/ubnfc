@@ -165,7 +165,7 @@ comparison-heavy の旧 facade 単発実行は成功したが、生成側 Formul
 M5 では `LegacyBenchmark` の `root` / `root-deferred` / `mapper` / `facade` の 4 経路を同じ
 ハーネスで測り直した（[`2026-09-22-p4-java-perf-m5.md`](2026-09-22-p4-java-perf-m5.md)「旧実装との比較」）。
 `docs/design/02-facts-tokens-bench-corpus.md` §B の記録
-（complex 12.32 ms / complex-x64 958 ms）は現在の checkout では再現できていない。
+（complex 12.32 ms（**旧記録。2026-09-23 に再計測して 13.6 ms（認識）/ 14.5 ms（AST）へ確定。`docs/reports/2026-09-23-legacy-baseline.md`**） / complex-x64 958 ms）は現在の checkout では再現できていない。
 この2値は AST 付き facade、別 revision・別ハーネスであり、認識のみの基準値ではない。
 旧 Rust complex 1.426 ms も別 revision の criterion 記録であり、参考値に限る。
 comparison-heavy / x64 の拒否処理時間は正常入力の性能値として出さない。

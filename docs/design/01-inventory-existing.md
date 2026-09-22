@@ -61,7 +61,7 @@ Java・Rust とも「文法グラフを汎用ランタイムで解釈実行す�
   - Java 独自ハーネス 2026-09-20 memo 無効: short 602 µs / long 40,363 µs / deep 172,871 µs
   - Rust Evolution 共有グラフ: setup 2.4 ns / parse 16,747 ns / parse+map 18,057 ns
   - TinyExpression Rust criterion: complex 1.426 ms / comparison-heavy 0.473 ms
-  - TinyExpression Java memo 後 facade: complex 12.32 ms / comparison-heavy 9.40 ms / complex-x64 958 ms
+  - TinyExpression Java memo 後 facade: complex 12.32 ms（**旧記録。2026-09-23 に再計測して 13.6 ms（認識）/ 14.5 ms（AST）へ確定。`docs/reports/2026-09-23-legacy-baseline.md`**） / comparison-heavy 9.40 ms / complex-x64 958 ms
   - `.tiny` fixture 本体は tinyexpression repo 側。式長・深さは未確認。
 
 ## 5. 静的生成で特別扱いが要る意味論（要点）
