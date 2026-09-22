@@ -55,3 +55,54 @@ README の疑義1〜11を実際の grammar/input/観測と照合し、29ケー�
 `comment-block/1` も未設定の /* */ を拒否した対照例なので登録しない。
 正常な root recovery 入力、同期文字列がない入力、README 末尾の特異だが既知の契約、
 CLI generator 名や短名警告などの運用差を、一律の乖離にはしない。
+
+## 全 corpus の Java 実行
+
+workspace ルートで front と Java 生成器を用意してから実行する。追加の Rust 依存は不要。
+
+~~~sh
+cargo build --bin ubnfc
+(cd ubnfc-java && mvn -o -q -DskipTests package)
+cargo run -q --bin ubnfc-harness -- run-all --backend java \
+  --report docs/reports/2026-09-22-java-corpus.md \
+  --json docs/reports/2026-09-22-java-corpus.json
+~~~
+
+--families associative,oracle または loader の6系統名
+inline-ast,token,rule,external-grammar,operations,oracle で対象を絞れる。
+--jobs は同時 build 数（既定4、1以上）。--root / UNLAXER_PARSER_DIR は
+upstream corpus の参照先。UBNFC_BIN と UBNFC_JAVA_GENERATOR には
+front バイナリと Java 生成器の jar/classes のパスを指定できる。
+既定はこの checkout の target/debug/ubnfc と
+ubnfc-java/target/ubnfc-java-0.1.0-SNAPSHOT.jar。自動インストールは行わない。
+
+文法合成は既存 loader を使う。token は RustConformanceTest.tokenCorpus の
+T / END / @mapping(Value, params=[value])、semantic-cardinality は
+SemanticCardinalityConformance の Grammar.ubnf.txt の置換、tiny 系は各
+Tiny*ConformanceTest.grammar に従う。whitespace は false でもフィールドがあれば
+@whitespace: javaStyle を付ける。inline は mktemp -d 内の .ubnf に書き、
+oracle の import 原文も同じディレクトリに展開する。File は元のパスを直接 front に渡す。
+scope-store は文法を持たない操作列なので未観測とし、parser 文法を捏造しない。
+
+全 grammar_ref / variant を展開する。表の単位は case × variant で、元の871行/runとは
+区別する。同一文法の IR / Java 生成 / javac / driver 起動は一度だけ。
+キャッシュは安定した FNV-1a/64 hash と原文一致で判定し、hash 衝突も分離する。
+import 内容も key に含め、File の相対 import は親パスを解決文脈に含める。
+並列完了順によらず corpus / case ID / 文法で結果を整列する。
+
+IR、生成、javac の成功・失敗・未実行を独立に保存し、段階失敗後は比較しない。
+driver のプロトコル/実行エラーを比較 Fail から分ける。比較は既存 runner と
+D-017/D-018 の登録をそのまま利用する。欠落項目だけなら未観測、既知差分があれば
+Known、未登録差分があれば Fail。Known/Fail に併存する未観測項目も保存する。
+Raw の evolution に結果 oracle を補完しない。
+
+Markdown は系統別・文法別の結果、拒否の機能/診断コード別件数、Fail の差分先頭3行、
+未観測項目を出す。JSON には文法原文/import、段階ログ、全ケースの期待値・実測値・
+全差分を残す。生成拒否件数は「最初に拒否された機能」であり、潜在する全未対応機能の
+件数ではない。拒否表には重複除去した build 数・元ケース数と展開後件数を併記する。
+
+終了コードは、段階失敗・実行エラー・Fail がなければ0、あればレポートを保存して1。
+Known と未観測だけでは非ゼロにしない。引数・入出力・準備エラーも1。
+associative は通常文法が24 Pass、reversed-metadata は現在の front により
+E-PRECEDENCE-ORDER で24件が IR 失敗となる。全文法を対象にするためこの variant も
+除外せず、CLI の E2E テストは24 Pass とこの明示拒否を両方確認する。
