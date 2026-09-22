@@ -1,7 +1,8 @@
-//! 適合性 corpus の読み込み・正規化と canonical AST 比較。生成・実行は扱わない。
+//! 適合性 corpus の読み込み・正規化、driver 実行と canonical AST 比較。
 pub mod canonical;
 pub mod corpus;
 pub mod divergence;
+pub mod runner;
 
 pub use corpus::{Case, CorpusFile, Expectation, Family, GrammarSource, LoadError};
 use std::{
