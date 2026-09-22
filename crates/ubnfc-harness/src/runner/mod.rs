@@ -2,6 +2,7 @@
 mod comparison;
 mod report;
 pub(crate) mod rust;
+pub(crate) mod scanners;
 pub use comparison::{compare, unobserved};
 pub use report::Report;
 
@@ -339,6 +340,7 @@ impl Runner {
                     .args(["--package", "target", "--emit-driver"])
                     .output()?;
                 check_build("Java IR generation", &output)?;
+                scanners::java(&sources.0)?;
                 let path = sources.0.clone();
                 generated = Some(sources);
                 path
@@ -417,11 +419,19 @@ impl Runner {
                 if !classes.0.join("target/driver/Driver.class").is_file() {
                     return Err(Error("target.driver.Driver がありません".into()));
                 }
-                let args = vec![
+                let scanner_registry = artifact
+                    .join("src/main/java/ubnfc/scanners/Registry.java")
+                    .is_file();
+                let classes = classes.persist();
+                let mut args = vec![
                     OsString::from("-cp"),
-                    classes.persist().into_os_string(),
+                    classes.clone().into_os_string(),
                     OsString::from("target.driver.Driver"),
                 ];
+                if scanner_registry {
+                    args.push("--scanners".into());
+                    args.push(classes.into_os_string());
+                }
                 // classes の寿命は呼出元の build_dir と同じ。CLI/test の Scratch が削除する。
                 Ok(Executable {
                     program: "java".into(),

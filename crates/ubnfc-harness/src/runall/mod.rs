@@ -588,6 +588,10 @@ fn execute(work: &Work, config: &Config, directory: &Path) -> (BuildResult, Vec<
     if build.generation.status == StageStatus::Failed {
         return stopped(build, rows, Outcome::GenerationRejected, directory);
     }
+    if let Err(error) = runner::scanners::java(&artifact) {
+        build.javac = StageResult::failed("javac", error.to_string());
+        return stopped(build, rows, Outcome::JavacFailure, directory);
+    }
     let runner = Runner {
         backend: Backend::Java,
         build_dir: directory.join("build"),

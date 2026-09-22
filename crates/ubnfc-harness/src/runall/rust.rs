@@ -34,6 +34,11 @@ pub(super) fn run(plan: Plan, config: &Config, directory: &Path) -> Result<Repor
             results.push(stopped(build, rows, Outcome::GenerationRejected, &path));
             continue;
         }
+        if let Err(error) = runner::scanners::rust(&artifact) {
+            build.cargo = Some(StageResult::failed("build", error.to_string()));
+            results.push(stopped(build, rows, Outcome::BuildFailure, &path));
+            continue;
+        }
         let mut cases = work.cases.clone();
         for case in &mut cases {
             case.grammar.clone_from(&grammar_name);

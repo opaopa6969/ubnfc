@@ -77,6 +77,7 @@ pub(super) fn build(ir_path: &Path, build_dir: &Path) -> Result<Executable> {
         .arg("--emit-driver")
         .output()?;
     check_build("Rust IR generation", &output)?;
+    super::scanners::rust(&generated.0)?;
     let entry = CacheEntry::read(&generated.0, build_dir)?;
     if let Some(executable) = entry.cached()? {
         return Ok(executable);

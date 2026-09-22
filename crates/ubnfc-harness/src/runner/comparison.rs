@@ -20,6 +20,10 @@ impl Projection {
         }
     }
     fn field(&mut self, name: &str, expected: Value, actual: Option<Value>) {
+        // D-019 (docs/design/03-design-v1.md §8): 内部診断は保存するが Verdict 契約には含めない。
+        if name == "nativeFailure" {
+            return;
+        }
         if let Some(actual) = actual {
             self.expected.insert(name.into(), expected);
             self.actual.insert(name.into(), actual);
@@ -444,7 +448,7 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
                                 }
                                 // RustConformanceTest.java:756-765,840-844。
                                 // primary syntax hints の表記は比較せず非空契約を守る。
-                                // trailing_input / nativeFailure / farthestExpected は弱めない。
+                                // trailing_input / farthestExpected は弱めない。
                                 if key == "diagnostics"
                                     && e.get("kind") == Some(&json!("syntax"))
                                     && a.get("kind") == Some(&json!("syntax"))

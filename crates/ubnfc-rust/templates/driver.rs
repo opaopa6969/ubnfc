@@ -1,11 +1,31 @@
 use std::io::{self, BufRead, Write};
-use ubnfc_generated::{ast::*, parse_entry_with_options, DiagnosticKind, ParseOptions, Severity};
+use ubnfc_generated::{ast::*, DiagnosticKind, ParseOptions, Severity};
+#[cfg(not(feature = "scanners"))]
+use ubnfc_generated::parse_entry_with_options;
 #[path = "driver_json.rs"]
 mod json;
 use json::{Json, ToJson};
 
 fn required<'a>(value: &'a Json, key: &str) -> Result<&'a Json, &'static str> {
     value.get(key).ok_or("missing request field")
+}
+#[cfg(feature = "scanners")]
+#[path = "scanners.rs"]
+mod scanners;
+
+fn parse_registered(grammar: &str, entry: Option<&str>, input: &str, options: ParseOptions)
+    -> Result<ubnfc_generated::ParseResult, &'static str>
+{
+    #[cfg(feature = "scanners")]
+    {
+        let mut registry = scanners::Registry::new(EXTERN_CLASSES)?;
+        scanner_parser::parse_entry_with_scanner(grammar, entry, input, options, &mut registry)
+    }
+    #[cfg(not(feature = "scanners"))]
+    {
+        if !EXTERN_CLASSES.is_empty() { return Err("Extern scanner 未登録: scanners feature が必要です"); }
+        parse_entry_with_options(grammar, entry, input, options)
+    }
 }
 fn execute(request: &Json) -> Result<Json, &'static str> {
     let id = required(request, "id")?.clone();
@@ -18,7 +38,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     let options = required(request, "options")?;
     let lexical = required(options, "lexical")?.boolean()?;
     let scope = required(options, "scope")?.boolean()?;
-    let prefix = parse_entry_with_options(
+    let prefix = parse_registered(
         grammar,
         entry,
         input,
@@ -29,7 +49,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             ..Default::default()
         },
     )?;
-    let result = parse_entry_with_options(
+    let result = parse_registered(
         grammar,
         entry,
         input,
@@ -340,6 +360,8 @@ fn numeric(value: &Json) -> Result<Option<f64>, &'static str> {
     Ok(Some(left))
 }
 fn main() -> io::Result<()> {
+    #[cfg(feature = "scanners")]
+    scanners::Registry::new(EXTERN_CLASSES).map_err(io::Error::other)?;
     let mut stdout = io::stdout().lock();
     for line in io::stdin().lock().lines() {
         let line = line?;

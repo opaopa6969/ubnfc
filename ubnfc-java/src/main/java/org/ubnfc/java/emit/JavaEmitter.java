@@ -282,7 +282,13 @@ public final class JavaEmitter {
             .map(r -> typeName(recipes.get(r.symbolId()).resultTypeId()) + ".class")
             .distinct().collect(Collectors.joining(", "));
         return resource("/templates/driver/Driver.java").replace("generated.", pkg + ".")
-            .replace("__PARSER__", parser).replace("__AST__", ast).replace("__OPERATOR_TYPES__", operatorTypes).replace("__BINDINGS__", bindings());
+            .replace("__PARSER__", parser).replace("__AST__", ast).replace("__OPERATOR_TYPES__", operatorTypes).replace("__BINDINGS__", bindings()).replace("__EXTERN_CLASSES__", externClasses());
+    }
+    private String externClasses() {
+        return "Map.ofEntries(" + tokens.values().stream().map(Token::spec)
+            .filter(spec -> "extern".equals(spec.kind()))
+            .map(spec -> "Map.entry(" + q(spec.logicalId()) + "," + q(spec.originalClassName()) + ")")
+            .distinct().collect(Collectors.joining(",")) + ")";
     }
     private String bindings() {
         var counts = new java.util.HashMap<String, Integer>();

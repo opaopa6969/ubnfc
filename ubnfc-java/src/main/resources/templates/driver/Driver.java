@@ -22,7 +22,37 @@ public final class Driver {
     private static final Map<String, String> BINDINGS = __BINDINGS__;
     private static final Pattern NUMBER = Pattern.compile("[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?");
 
+    private static final Map<String, String> EXTERN_CLASSES = __EXTERN_CLASSES__;
+    private static Map<String, TokenScanner> scanners = Map.of();
+    private static java.net.URLClassLoader scannerLoader;
+
+    // registry は対象生成物の api.TokenScanner でコンパイルする。クラス名から論理 ID に結び直す。
+    private static Map<String, TokenScanner> loadScanners(String[] args) throws java.io.IOException {
+        String path = System.getenv("UBNFC_SCANNERS");
+        for (int i = 0; i < args.length; i++) {
+            if (!args[i].equals("--scanners") || ++i == args.length)
+                throw new IllegalArgumentException("--scanners <dir|jar> が必要です");
+            path = args[i];
+        }
+        if (path == null || path.isBlank()) return Map.of();
+        try {
+            scannerLoader = new java.net.URLClassLoader(new java.net.URL[]{java.nio.file.Path.of(path).toUri().toURL()}, Driver.class.getClassLoader());
+            Object registry = scannerLoader.loadClass("ubnfc.scanners.Registry").getMethod("scanners").invoke(null);
+            if (!(registry instanceof Map<?, ?> entries)) throw new IllegalArgumentException("scanner registry は Map が必要です");
+            var result = new LinkedHashMap<String, TokenScanner>();
+            for (var binding : EXTERN_CLASSES.entrySet()) {
+                Object scanner = entries.get(binding.getValue());
+                if (scanner == null) throw new IllegalArgumentException("未登録の Extern クラス: " + binding.getValue());
+                if (!(scanner instanceof TokenScanner typed)) throw new IllegalArgumentException("不正な TokenScanner: " + binding.getValue());
+                result.put(binding.getKey(), typed);
+            }
+            return Map.copyOf(result);
+        } catch (ReflectiveOperationException error) {
+            throw new java.io.IOException("scanner registry をロードできません", error);
+        }
+    }
     public static void main(String[] args) throws java.io.IOException {
+        scanners = loadScanners(args);
         var input = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         var output = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
         for (String line; (line = input.readLine()) != null;) {
@@ -62,11 +92,11 @@ public final class Driver {
         boolean lexical = flag(options, "lexical"), scope = flag(options, "scope");
         Map<String, Object> observations = request.get("observations") instanceof Map<?, ?> ? Json.object(request.get("observations")) : Map.of();
         int maxDepth = options.get("maxDepth") instanceof Number number ? new java.math.BigDecimal(number.toString()).intValueExact() : ParseOptions.DEFAULT_MAX_DEPTH;
-        var prefix = __PARSER__.parseEntry(grammar, entry, input, new ParseOptions(false, false, lexical, true, Map.of(), maxDepth));
+        var prefix = __PARSER__.parseEntry(grammar, entry, input, new ParseOptions(false, false, lexical, true, scanners, maxDepth));
         ParseResult<?> result;
         String mapping = null, mappingKind = null, mappingMessage = null;
         try {
-            result = __PARSER__.parseEntry(grammar, entry, input, new ParseOptions(true, true, lexical, true, Map.of(), maxDepth));
+            result = __PARSER__.parseEntry(grammar, entry, input, new ParseOptions(true, true, lexical, true, scanners, maxDepth));
         } catch (MappingException error) {
             result = error.syntax();
             mapping = error.getCause() == null ? error.getMessage() : error.getCause().toString();
@@ -127,7 +157,7 @@ public final class Driver {
             response.put("scope", state);
             response.put("scopeDepth", result.scope().depth());
             if (Boolean.TRUE.equals(observations.get("parentRollback"))) {
-                var rolled = __PARSER__.parseEntryRollback(grammar, entry, input, new ParseOptions(false, false, lexical, true, Map.of(), maxDepth));
+                var rolled = __PARSER__.parseEntryRollback(grammar, entry, input, new ParseOptions(false, false, lexical, true, scanners, maxDepth));
                 var rollbackScope = scope(rolled, observations); rollbackScope.remove("events"); rollbackScope.remove("mode");
                 response.put("rollback", object("cursor", List.of(rolled.consumedCp(), rolled.matchedCp()), "scope", rollbackScope));
             }
