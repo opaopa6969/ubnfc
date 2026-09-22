@@ -403,64 +403,19 @@ public final class JavaEmitter {
     private String entryCall(String ruleId) {
         return parser + "::" + (entryRecovery(ruleId) == null ? ruleMethod(ruleId) : ruleMethod(ruleId) + "$entry");
     }
+    // design v1 §3.10: mode / 同期集合 / 同期文字列を消費するか / 未検出時の動作は
+    // すべて IR が正本。ここで mode を推定し直すと backend ごとに受理が変わる。
     private String recoveryCall(Recovery recovery, String call) {
-        String mode = recovery.mode(); List<String> patterns = recovery.resolvedSyncPatterns();
-        boolean consume = recovery.consumeSync(); String noSync = recovery.noSyncAction();
-        // v1 front currently lowers bare @recovery(auto/skip) as SYNC. Recover the
-        // declared mode only for that legacy encoding; explicit IR remains authoritative.
-        String declared = rules.get(recovery.ruleId()).annotations().stream().filter(a -> a.name().equals("recovery"))
-            .map(a -> a.arguments().get("mode")).filter(String.class::isInstance).map(String.class::cast).findFirst().orElse(mode).toUpperCase(java.util.Locale.ROOT);
-        if (recovery.astProjection().equals("legacyMarker") && mode.equals("SYNC") && Set.of("AUTO", "SKIP").contains(declared)) {
-            mode = declared; patterns = followPatterns(recovery.ruleId());
-            consume = false; noSync = mode.equals("SKIP") ? "consumeToEof" : "fail";
-        }
-        if (!mode.equals("SKIP") && patterns.isEmpty()) { patterns = List.of(";"); consume = true; }
-        if (mode.equals("SYNC")) { consume = true; noSync = "fail"; }
-        return "return s.recover(f, " + call + ", " + q(recovery.ruleId()) + ", " + q(mode) + ", " + kStrings(patterns) + ", " + consume + ", " + q(noSync) + ", " + q(recovery.astProjection()) + ", " + q(recovery.recipeId()) + ");";
-    }
-    private List<String> followPatterns(String rule) {
-        var follows = new LinkedHashMap<String, Set<String>>();
-        rules.keySet().forEach(id -> follows.put(id, new LinkedHashSet<>()));
-        boolean changed;
-        do {
-            int before = follows.values().stream().mapToInt(Set::size).sum();
-            for (Rule definition : rules.values()) collectFollow(definition.body(), new LinkedHashSet<>(follows.get(definition.symbolId())), follows);
-            changed = before != follows.values().stream().mapToInt(Set::size).sum();
-        } while (changed);
-        return List.copyOf(follows.get(rule));
-    }
-    private void collectFollow(String id, Set<String> after, Map<String, Set<String>> follows) {
-        ExprNode node = expressions.get(id).node();
-        if (node.kind().equals("ruleRef")) { follows.get(node.symbolId()).addAll(after); return; }
-        if (node.kind().equals("seq")) {
-            var next = new LinkedHashSet<>(after);
-            for (String child : node.items().reversed()) {
-                collectFollow(child, next, follows);
-                if (!nullable(child)) next.clear();
-                next.addAll(firstPatterns(child, new LinkedHashSet<>()));
-            }
-        } else if (node.kind().equals("repeat")) {
-            var next = new LinkedHashSet<>(after); next.addAll(firstPatterns(node.child(), new LinkedHashSet<>()));
-            collectFollow(node.child(), next, follows);
-        } else if (node.kind().equals("separated")) {
-            var next = new LinkedHashSet<>(after); next.addAll(firstPatterns(node.separator(), new LinkedHashSet<>()));
-            collectFollow(node.element(), next, follows);
-            collectFollow(node.separator(), firstPatterns(node.element(), new LinkedHashSet<>()), follows);
-        } else for (String child : Validation.children(node)) collectFollow(child, after, follows);
+        List<String> patterns = recovery.resolvedSyncPatterns(); boolean consume = recovery.consumeSync();
+        // §3.10: AUTO の FOLLOW が空なら既定の `;`。front は IR に載せて渡すが、
+        // 手書き IR でも同じ規則にする。既定文字列は FOLLOW ではないので消費する。
+        if (recovery.mode().equals("AUTO") && patterns.isEmpty()) { patterns = List.of(";"); consume = true; }
+        return "return s.recover(f, " + call + ", " + q(recovery.ruleId()) + ", " + q(recovery.mode()) + ", "
+            + strings(patterns) + ", " + consume + ", " + q(recovery.noSyncAction())
+            + ", " + q(recovery.astProjection()) + ", " + q(recovery.recipeId()) + ");";
     }
     private boolean nullable(String id) {
         return ir.analysis().expressions().stream().filter(a -> a.exprId().equals(id)).findFirst().orElseThrow().nullable();
-    }
-    private Set<String> firstPatterns(String id, Set<String> seen) {
-        var result = new LinkedHashSet<String>(); if (!seen.add(id)) return result;
-        ExprNode node = expressions.get(id).node();
-        if (node.kind().equals("literal")) { if (!node.value().isEmpty()) result.add(node.value()); }
-        else if (node.kind().equals("ruleRef")) result.addAll(firstPatterns(rules.get(node.symbolId()).body(), seen));
-        else for (String child : Validation.children(node)) {
-            result.addAll(firstPatterns(child, new LinkedHashSet<>(seen)));
-            if (node.kind().equals("seq") && !nullable(child)) break;
-        }
-        return result;
     }
     private String token(TokenSpec spec, String label) {
         return switch (spec.kind()) {

@@ -25,3 +25,15 @@ campaign が出した 92 クラスのうち、**A-2（入れ子ノード span �
 
 `front-*` の 2 件は runtime の差ではなく、生成文法が front に拒否された理由を
 `--minimize-front` で追ったもの（手で書いた README を持つ）。
+
+## 修正済みの所見（2026-09-23、`docs/reports/2026-09-23-fuzz-fixes-front-recovery.md`）
+
+再現しなくなったが、経緯として残す。seed を指定した再実行でも該当 signature は出ない。
+
+| 根本原因 | 再現しなくなった slug |
+|---|---|
+| A-1 `@recovery(AUTO)` の適用（受理そのものが変わる） | `diff-accepted-02147df8-seed269`、`diff-allconsumed-f9a21922-seed269`、`diff-consumed-ce9f4647-seed269`、`diff-matched-5923f95f-seed269`、`diff-parsedstatus-f5944912-seed269`、`diff-captures-span-94600c41-seed269`、`diff-captures-text-004b783b-seed269`、`diff-prefixcaptures-887bb90f-seed269`、`diff-prefixcaptures-span-039546d5-seed269`、`diff-prefixcaptures-text-445a73b7-seed269`、`diff-captures-name-4bfa2e37-seed272`、`diff-prefixcaptures-binding-80d2f5e1-seed272`、`diff-prefixcaptures-name-8f46bda3-seed272` |
+| D front が自分の契約に落ちる | `front-ir-recipe-cardinality`、`front-capture-cardinality-bounded`（seed 1..320 の front discard は 28 → 0） |
+
+回帰試験は `tests/campaign.rs`（`b_recovery_auto_keeps_acceptance_identical_across_backends` と
+固定 seed campaign の `discarded == 0`）。

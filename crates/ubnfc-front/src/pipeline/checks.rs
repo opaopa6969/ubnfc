@@ -213,11 +213,16 @@ fn check_semantics(s: &Semantics, errors: &mut Vec<IrError>) {
             }
             // Capture.cardinality は構文上の出現回数、recipe は意味値の個数。
             // Helper @value の一回の capture が Optional/List を返す場合もある。
+            // 演算子 recipe の left / right は正規形が決める（§3.11「左: left + op[] + right[]」）。
+            // operand が未 mapping helper 経由で複数値を返しても、塔の 1 段は 1 operand なので
+            // 意味値の個数では検査しない（旧実装も assoc rule は legacy 型のまま扱う）。
+            let spine = recipe.kind == RecipeKind::AssocLists
+                && matches!(field.field.as_str(), "left" | "right");
             let cardinality = captures
                 .iter()
                 .map(|c| values.captured(c))
                 .reduce(cardinality::join);
-            if cardinality.is_some_and(|c| c != field.cardinality) {
+            if !spine && cardinality.is_some_and(|c| c != field.cardinality) {
                 error(
                     errors,
                     &format!("{path}/cardinality"),

@@ -379,10 +379,16 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
                     RecoveryMode::Skip => "SKIP",
                 };
                 // recovery は葉を通らずに位置を進めるので、rule の出口で到達位置を記録する。
+                // 同期文字列を消費するか・未検出時にどうするかは IR が正本（design §3.10）。
+                let no_sync = match recovery.no_sync_action {
+                    RecoveryNoSyncAction::Fail => "fail",
+                    RecoveryNoSyncAction::ConsumeToEof => "consumeToEof",
+                    RecoveryNoSyncAction::Succeed => "succeed",
+                };
                 writeln!(
                     p,
-                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?});}}self.display.reach(out.state.consumed.max(out.state.matched));",
-                    recovery.resolved_sync_patterns
+                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?},{},{no_sync:?});}}self.display.reach(out.state.consumed.max(out.state.matched));",
+                    recovery.resolved_sync_patterns, recovery.consume_sync
                 )
                 .unwrap();
             }
