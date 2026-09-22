@@ -19,6 +19,8 @@ use crate::resolve::{self, ResolveError, ResolvedGrammar};
 use crate::syntax::{self, SyntaxError};
 use crate::validate::{self, ValidationIssue};
 
+mod checks;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Compiled {
     pub ir: GrammarIr,
@@ -147,10 +149,7 @@ pub fn compile_with_strict(
         grammar_units: lowered.grammar_units,
         import_edges: lowered.import_edges,
     };
-    let errors = ir::validate_references(&ir);
-    if !errors.is_empty() {
-        return Err(PipelineError::Internal(errors));
-    }
+    checks::check(&ir)?;
     Ok(Compiled { ir, warnings })
 }
 

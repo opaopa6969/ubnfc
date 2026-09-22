@@ -97859,7 +97859,7 @@
         "fields": [
           {
             "cardinality": "scalar",
-            "conversion": "node",
+            "conversion": "mixed",
             "field": "value",
             "siteIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17008:17027:body/0/0/ruleRef/capture/0",

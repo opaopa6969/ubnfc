@@ -1798,7 +1798,7 @@
         "fields": [
           {
             "cardinality": "scalar",
-            "conversion": "node",
+            "conversion": "mixed",
             "field": "value",
             "siteIds": [
               "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef/capture/0"
