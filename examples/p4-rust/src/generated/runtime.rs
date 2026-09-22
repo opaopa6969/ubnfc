@@ -155,6 +155,9 @@ pub(crate) struct Buffers {
     texts_pool: Vec<Vec<String>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
     text_spans: TextSpans,
+    caps_flat: Vec<Cap>,
+    caps_pending: Vec<Cap>,
+    rule_caps: Vec<(u32, u32)>,
 }
 const POOL_RETAIN_BYTES: usize = 64 << 20;
 thread_local! {
@@ -169,6 +172,9 @@ impl Buffers {
             + self.trivia_cache.capacity_bytes()
             + (self.effects.capacity() + self.saved_effects.capacity())
                 * std::mem::size_of::<Effect>()
+            + (self.caps_flat.capacity() + self.caps_pending.capacity())
+                * std::mem::size_of::<Cap>()
+            + self.rule_caps.capacity() * std::mem::size_of::<(u32, u32)>()
     }
 }
 pub(crate) struct Session<'a> {
@@ -196,6 +202,14 @@ pub(crate) struct Session<'a> {
     values_pool: Vec<Vec<Ast>>,
     texts_pool: Vec<Vec<String>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
+    /// 出現収集で組み立てる「rule ごとの直下 capture」表。AST 構築はここを読むだけで
+    /// 木を再走査しない（`rule_caps[rule event id] = (caps_flat の開始, 個数)`）。
+    /// `rule_caps` は event id で索く疎な表で、読む前に必ず同じ parse の走査が書く
+    /// （AST を作る parse では出現収集が build_values より前に全 Rule event を訪れる）ため
+    /// parse ごとの初期化は要らない。伸長だけする。
+    caps_flat: Vec<Cap>,
+    caps_pending: Vec<Cap>,
+    rule_caps: Vec<(u32, u32)>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -253,6 +267,9 @@ impl<'a> Session<'a> {
                 texts_pool: vec![],
                 scope_pool: vec![],
                 text_spans: Default::default(),
+                caps_flat: vec![],
+                caps_pending: vec![],
+                rule_caps: vec![],
             },
         };
         let mut arena = buffers.arena;
@@ -285,6 +302,9 @@ impl<'a> Session<'a> {
             values_pool: buffers.values_pool,
             texts_pool: buffers.texts_pool,
             scope_pool: buffers.scope_pool,
+            caps_flat: buffers.caps_flat,
+            caps_pending: buffers.caps_pending,
+            rule_caps: buffers.rule_caps,
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -314,6 +334,9 @@ impl<'a> Session<'a> {
             texts_pool: std::mem::take(&mut self.texts_pool),
             scope_pool: std::mem::take(&mut self.scope_pool),
             text_spans: std::mem::take(&mut self.text_spans),
+            caps_flat: std::mem::take(&mut self.caps_flat),
+            caps_pending: std::mem::take(&mut self.caps_pending),
+            rule_caps: std::mem::take(&mut self.rule_caps),
         };
         if buffers.bytes() <= POOL_RETAIN_BYTES {
             POOL.with(|p| *p.borrow_mut() = Some(buffers));
@@ -364,15 +387,20 @@ impl<'a> Session<'a> {
     pub fn cp(&self, byte: usize) -> usize {
         self.input.byte_to_cp(byte).expect("parser UTF-8 boundary")
     }
+    /// 空文字列にも固有の識別子が要るので、常に 1 byte 余分に確保して複製する。
+    fn owned_text(text: &str) -> String {
+        let mut owned = String::with_capacity(text.len() + 1);
+        owned.push_str(text);
+        owned
+    }
     pub fn span(&self, span: Span) -> Span {
         [self.cp(span[0]), self.cp(span[1])]
     }
     pub fn text(&self, span: Span) -> String {
-        self.text[span[0]..span[1]]
-            .trim_matches(|c: char| {
-                c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
-            })
-            .to_owned()
+        // remember_text の識別用 1 byte を最初から確保する（to_owned + reserve(1) は再確保になる）。
+        Self::owned_text(self.text[span[0]..span[1]].trim_matches(|c: char| {
+            c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
+        }))
     }
     pub fn mark(&self) -> Mark {
         Mark {
@@ -857,43 +885,13 @@ impl<'a> Session<'a> {
     pub fn give_stack(&mut self, stack: Vec<(EventId, bool)>) {
         self.stacks.push(stack);
     }
-    /// rule の局所 event（Join / Values / Capture）を 1 回だけ走査し、全 capture site の出現を
-    /// 完了順に集める。AST 構築は field ごとにここから site で選ぶ（field ごとの再走査をしない）。
-    pub fn collect_captures(&mut self, root: EventId, out: &mut Vec<Cap>) {
-        let mut stack = self.take_stack();
-        stack.push((root, false));
-        while let Some((id, done)) = stack.pop() {
-            match self.arena[id.0] {
-                Event::Join(a, b) => {
-                    stack.push((b, false));
-                    stack.push((a, false));
-                }
-                Event::Values { child, .. } => stack.push((child, false)),
-                Event::Capture {
-                    site,
-                    span,
-                    child,
-                    token_extent,
-                } => {
-                    if done {
-                        out.push((
-                            site,
-                            if token_extent {
-                                self.selected_extent(child, span)
-                            } else {
-                                span
-                            },
-                            child,
-                        ));
-                    } else {
-                        stack.push((id, true));
-                        stack.push((child, false));
-                    }
-                }
-                _ => {}
-            }
-        }
-        self.give_stack(stack);
+    /// rule の直下 capture 出現（完了順）を出現収集が作った表から写す。
+    /// 以前は rule ごとに局所 event を再走査していた（`collect_captures`）。同じ木を 2 度
+    /// 下るのをやめ、出現収集の 1 回の走査で rule ごとに切り出しておく。
+    pub fn rule_captures(&mut self, id: EventId, out: &mut Vec<Cap>) {
+        let (offset, len) = self.rule_caps[id.0];
+        let (offset, len) = (offset as usize, len as usize);
+        out.extend_from_slice(&self.caps_flat[offset..offset + len]);
     }
     pub fn take_captures(&mut self) -> Vec<Cap> {
         let mut v = self.captures_pool.pop().unwrap_or_default();
@@ -1207,7 +1205,7 @@ impl<'a> Session<'a> {
             Some((None, content)) => (span, content.unwrap_or(span), false),
             None => (span, span, false),
         };
-        let value = if token_text { self.text[content[0]..content[1]].to_owned() } else { self.text(content) };
+        let value = if token_text { Self::owned_text(&self.text[content[0]..content[1]]) } else { self.text(content) };
         self.remember_text(value, extent)
     }
     pub fn take_scope(&mut self) -> Vec<(usize, Span)> {
@@ -1273,137 +1271,146 @@ const SITES:&[(&str,&str)]=&[("expr:tools/tinyexpression-p4-lsp-vscode/grammar/t
 impl Session<'_> {
 fn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut out=Vec::new();self.build_values_into(root,&mut out)?;Ok(out)}
 #[inline(never)] fn build_values_into(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err("maximum mapping depth exceeded".into());}self.mapping_depth+=1;let result=self.build_values_inner(root,out);self.mapping_depth-=1;result}
-fn build_values_inner(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child}=>self.build_rule(rule,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
+fn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<Ast>)->Result<(),String> {
+// 大半の呼出しは Join を含まない 1 本の枝（P4 実測: complex-x64 で 10,883 回すべてが 1 event）。
+// その場合は pool から stack を借りずに降りる。
+loop {match self.arena[root.0] {
+Event::Capture{child,..}=>root=child,
+Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}return Ok(());},
+Event::Rule{rule,span,child}=>return self.build_rule(rule,root,span,child,out),
+Event::Join(..)=>break,
+_=>return Ok(()),}}
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child}=>self.build_rule(rule,id,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
 fn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);match ty {
 24=>{let node_id=self.node(RULES[40],"BinaryExpr",span);Ok(Ast::g_TinyExpressionP4AST_2e_BinaryExpr(g_TinyExpressionP4AST_2e_BinaryExpr{span,node_id,g_left:None,g_op:vec![text],g_right:vec![]}))},
 _=>{let _=(span,text);Err(format!("unknown leaf type {ty}"))}}}
-fn build_rule(&mut self,rule:usize,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);match rule {
-0=>self.map_rule_0(span,child,out),
-1=>self.map_rule_1(span,child,out),
-2=>self.map_rule_2(span,child,out),
-3=>self.map_rule_3(span,child,out),
-4=>self.map_rule_4(span,child,out),
-5=>self.map_rule_5(span,child,out),
-6=>self.map_rule_6(span,child,out),
-7=>self.map_rule_7(span,child,out),
-8=>self.map_rule_8(span,child,out),
-9=>self.map_rule_9(span,child,out),
-10=>self.map_rule_10(span,child,out),
-11=>self.map_rule_11(span,child,out),
-12=>self.map_rule_12(span,child,out),
-13=>self.map_rule_13(span,child,out),
-14=>self.map_rule_14(span,child,out),
-15=>self.map_rule_15(span,child,out),
-16=>self.map_rule_16(span,child,out),
-17=>self.map_rule_17(span,child,out),
-18=>self.map_rule_18(span,child,out),
-19=>self.map_rule_19(span,child,out),
-20=>self.map_rule_20(span,child,out),
-21=>self.map_rule_21(span,child,out),
-22=>self.map_rule_22(span,child,out),
-23=>self.map_rule_23(span,child,out),
-24=>self.map_rule_24(span,child,out),
-25=>self.map_rule_25(span,child,out),
-26=>self.map_rule_26(span,child,out),
-27=>self.map_rule_27(span,child,out),
-28=>self.map_rule_28(span,child,out),
-29=>self.map_rule_29(span,child,out),
-30=>self.map_rule_30(span,child,out),
-31=>self.map_rule_31(span,child,out),
-32=>self.map_rule_32(span,child,out),
-33=>self.map_rule_33(span,child,out),
-34=>self.map_rule_34(span,child,out),
-35=>self.map_rule_35(span,child,out),
-36=>self.map_rule_36(span,child,out),
-37=>self.map_rule_37(span,child,out),
-38=>self.map_rule_38(span,child,out),
-39=>self.map_rule_39(span,child,out),
-40=>self.map_rule_40(span,child,out),
-41=>self.map_rule_41(span,child,out),
-42=>self.map_rule_42(span,child,out),
-43=>self.map_rule_43(span,child,out),
-44=>self.map_rule_44(span,child,out),
-45=>self.map_rule_45(span,child,out),
-46=>self.map_rule_46(span,child,out),
-47=>self.map_rule_47(span,child,out),
-48=>self.map_rule_48(span,child,out),
-49=>self.map_rule_49(span,child,out),
-50=>self.map_rule_50(span,child,out),
-51=>self.map_rule_51(span,child,out),
-52=>self.map_rule_52(span,child,out),
-53=>self.map_rule_53(span,child,out),
-54=>self.map_rule_54(span,child,out),
-55=>self.map_rule_55(span,child,out),
-56=>self.map_rule_56(span,child,out),
-57=>self.map_rule_57(span,child,out),
-58=>self.map_rule_58(span,child,out),
-59=>self.map_rule_59(span,child,out),
-60=>self.map_rule_60(span,child,out),
-61=>self.map_rule_61(span,child,out),
-62=>self.map_rule_62(span,child,out),
-63=>self.map_rule_63(span,child,out),
-64=>self.map_rule_64(span,child,out),
-65=>self.map_rule_65(span,child,out),
-66=>self.map_rule_66(span,child,out),
-67=>self.map_rule_67(span,child,out),
-68=>self.map_rule_68(span,child,out),
-69=>self.map_rule_69(span,child,out),
-70=>self.map_rule_70(span,child,out),
-71=>self.map_rule_71(span,child,out),
-72=>self.map_rule_72(span,child,out),
-73=>self.map_rule_73(span,child,out),
-74=>self.map_rule_74(span,child,out),
-75=>self.map_rule_75(span,child,out),
-76=>self.map_rule_76(span,child,out),
-77=>self.map_rule_77(span,child,out),
-78=>self.map_rule_78(span,child,out),
-79=>self.map_rule_79(span,child,out),
-80=>self.map_rule_80(span,child,out),
-81=>self.map_rule_81(span,child,out),
-82=>self.map_rule_82(span,child,out),
-83=>self.map_rule_83(span,child,out),
-84=>self.map_rule_84(span,child,out),
-85=>self.map_rule_85(span,child,out),
-86=>self.map_rule_86(span,child,out),
-87=>self.map_rule_87(span,child,out),
-88=>self.map_rule_88(span,child,out),
-89=>self.map_rule_89(span,child,out),
-90=>self.map_rule_90(span,child,out),
-91=>self.map_rule_91(span,child,out),
-92=>self.map_rule_92(span,child,out),
-93=>self.map_rule_93(span,child,out),
-94=>self.map_rule_94(span,child,out),
-95=>self.map_rule_95(span,child,out),
-96=>self.map_rule_96(span,child,out),
-97=>self.map_rule_97(span,child,out),
-98=>self.map_rule_98(span,child,out),
-99=>self.map_rule_99(span,child,out),
-100=>self.map_rule_100(span,child,out),
-101=>self.map_rule_101(span,child,out),
-102=>self.map_rule_102(span,child,out),
-103=>self.map_rule_103(span,child,out),
-104=>self.map_rule_104(span,child,out),
-105=>self.map_rule_105(span,child,out),
-106=>self.map_rule_106(span,child,out),
-107=>self.map_rule_107(span,child,out),
-108=>self.map_rule_108(span,child,out),
-109=>self.map_rule_109(span,child,out),
-110=>self.map_rule_110(span,child,out),
-111=>self.map_rule_111(span,child,out),
-112=>self.map_rule_112(span,child,out),
-113=>self.map_rule_113(span,child,out),
-114=>self.map_rule_114(span,child,out),
-115=>self.map_rule_115(span,child,out),
-116=>self.map_rule_116(span,child,out),
-117=>self.map_rule_117(span,child,out),
-118=>self.map_rule_118(span,child,out),
-119=>self.map_rule_119(span,child,out),
-120=>self.map_rule_120(span,child,out),
-121=>self.map_rule_121(span,child,out),
-122=>self.map_rule_122(span,child,out),
-123=>self.map_rule_123(span,child,out),
+fn build_rule(&mut self,rule:usize,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);match rule {
+0=>self.map_rule_0(event,span,child,out),
+1=>self.map_rule_1(event,span,child,out),
+2=>self.map_rule_2(event,span,child,out),
+3=>self.map_rule_3(event,span,child,out),
+4=>self.map_rule_4(event,span,child,out),
+5=>self.map_rule_5(event,span,child,out),
+6=>self.map_rule_6(event,span,child,out),
+7=>self.map_rule_7(event,span,child,out),
+8=>self.map_rule_8(event,span,child,out),
+9=>self.map_rule_9(event,span,child,out),
+10=>self.map_rule_10(event,span,child,out),
+11=>self.map_rule_11(event,span,child,out),
+12=>self.map_rule_12(event,span,child,out),
+13=>self.map_rule_13(event,span,child,out),
+14=>self.map_rule_14(event,span,child,out),
+15=>self.map_rule_15(event,span,child,out),
+16=>self.map_rule_16(event,span,child,out),
+17=>self.map_rule_17(event,span,child,out),
+18=>self.map_rule_18(event,span,child,out),
+19=>self.map_rule_19(event,span,child,out),
+20=>self.map_rule_20(event,span,child,out),
+21=>self.map_rule_21(event,span,child,out),
+22=>self.map_rule_22(event,span,child,out),
+23=>self.map_rule_23(event,span,child,out),
+24=>self.map_rule_24(event,span,child,out),
+25=>self.map_rule_25(event,span,child,out),
+26=>self.map_rule_26(event,span,child,out),
+27=>self.map_rule_27(event,span,child,out),
+28=>self.map_rule_28(event,span,child,out),
+29=>self.map_rule_29(event,span,child,out),
+30=>self.map_rule_30(event,span,child,out),
+31=>self.map_rule_31(event,span,child,out),
+32=>self.map_rule_32(event,span,child,out),
+33=>self.map_rule_33(event,span,child,out),
+34=>self.map_rule_34(event,span,child,out),
+35=>self.map_rule_35(event,span,child,out),
+36=>self.map_rule_36(event,span,child,out),
+37=>self.map_rule_37(event,span,child,out),
+38=>self.map_rule_38(event,span,child,out),
+39=>self.map_rule_39(event,span,child,out),
+40=>self.map_rule_40(event,span,child,out),
+41=>self.map_rule_41(event,span,child,out),
+42=>self.map_rule_42(event,span,child,out),
+43=>self.map_rule_43(event,span,child,out),
+44=>self.map_rule_44(event,span,child,out),
+45=>self.map_rule_45(event,span,child,out),
+46=>self.map_rule_46(event,span,child,out),
+47=>self.map_rule_47(event,span,child,out),
+48=>self.map_rule_48(event,span,child,out),
+49=>self.map_rule_49(event,span,child,out),
+50=>self.map_rule_50(event,span,child,out),
+51=>self.map_rule_51(event,span,child,out),
+52=>self.map_rule_52(event,span,child,out),
+53=>self.map_rule_53(event,span,child,out),
+54=>self.map_rule_54(event,span,child,out),
+55=>self.map_rule_55(event,span,child,out),
+56=>self.map_rule_56(event,span,child,out),
+57=>self.map_rule_57(event,span,child,out),
+58=>self.map_rule_58(event,span,child,out),
+59=>self.map_rule_59(event,span,child,out),
+60=>self.map_rule_60(event,span,child,out),
+61=>self.map_rule_61(event,span,child,out),
+62=>self.map_rule_62(event,span,child,out),
+63=>self.map_rule_63(event,span,child,out),
+64=>self.map_rule_64(event,span,child,out),
+65=>self.map_rule_65(event,span,child,out),
+66=>self.map_rule_66(event,span,child,out),
+67=>self.map_rule_67(event,span,child,out),
+68=>self.map_rule_68(event,span,child,out),
+69=>self.map_rule_69(event,span,child,out),
+70=>self.map_rule_70(event,span,child,out),
+71=>self.map_rule_71(event,span,child,out),
+72=>self.map_rule_72(event,span,child,out),
+73=>self.map_rule_73(event,span,child,out),
+74=>self.map_rule_74(event,span,child,out),
+75=>self.map_rule_75(event,span,child,out),
+76=>self.map_rule_76(event,span,child,out),
+77=>self.map_rule_77(event,span,child,out),
+78=>self.map_rule_78(event,span,child,out),
+79=>self.map_rule_79(event,span,child,out),
+80=>self.map_rule_80(event,span,child,out),
+81=>self.map_rule_81(event,span,child,out),
+82=>self.map_rule_82(event,span,child,out),
+83=>self.map_rule_83(event,span,child,out),
+84=>self.map_rule_84(event,span,child,out),
+85=>self.map_rule_85(event,span,child,out),
+86=>self.map_rule_86(event,span,child,out),
+87=>self.map_rule_87(event,span,child,out),
+88=>self.map_rule_88(event,span,child,out),
+89=>self.map_rule_89(event,span,child,out),
+90=>self.map_rule_90(event,span,child,out),
+91=>self.map_rule_91(event,span,child,out),
+92=>self.map_rule_92(event,span,child,out),
+93=>self.map_rule_93(event,span,child,out),
+94=>self.map_rule_94(event,span,child,out),
+95=>self.map_rule_95(event,span,child,out),
+96=>self.map_rule_96(event,span,child,out),
+97=>self.map_rule_97(event,span,child,out),
+98=>self.map_rule_98(event,span,child,out),
+99=>self.map_rule_99(event,span,child,out),
+100=>self.map_rule_100(event,span,child,out),
+101=>self.map_rule_101(event,span,child,out),
+102=>self.map_rule_102(event,span,child,out),
+103=>self.map_rule_103(event,span,child,out),
+104=>self.map_rule_104(event,span,child,out),
+105=>self.map_rule_105(event,span,child,out),
+106=>self.map_rule_106(event,span,child,out),
+107=>self.map_rule_107(event,span,child,out),
+108=>self.map_rule_108(event,span,child,out),
+109=>self.map_rule_109(event,span,child,out),
+110=>self.map_rule_110(event,span,child,out),
+111=>self.map_rule_111(event,span,child,out),
+112=>self.map_rule_112(event,span,child,out),
+113=>self.map_rule_113(event,span,child,out),
+114=>self.map_rule_114(event,span,child,out),
+115=>self.map_rule_115(event,span,child,out),
+116=>self.map_rule_116(event,span,child,out),
+117=>self.map_rule_117(event,span,child,out),
+118=>self.map_rule_118(event,span,child,out),
+119=>self.map_rule_119(event,span,child,out),
+120=>self.map_rule_120(event,span,child,out),
+121=>self.map_rule_121(event,span,child,out),
+122=>self.map_rule_122(event,span,child,out),
+123=>self.map_rule_123(event,span,child,out),
 _=>Err(format!("unknown rule {rule}"))}}
-fn map_rule_0(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_0(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut f0=Vec::new();self.node_values(&caps,&[0],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ImportDeclarationExpr(_))) {return Err("imports: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
@@ -1424,10 +1431,10 @@ g_declarations:f1,
 g_expression:f2,
 g_methods:f3,
 }));Ok(())}}
-fn map_rule_1(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_1(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[1],"CodeBlockExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_CodeBlockExpr(g_TinyExpressionP4AST_2e_CodeBlockExpr{span,node_id,
 }));Ok(())}}
-fn map_rule_2(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_2(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[4],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_QualifiedNameExpr(_))) {return Err("className: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[4]) {return Ok(());}
@@ -1443,7 +1450,7 @@ g_className:f0,
 g_method:f1,
 g_alias:f2,
 }));Ok(())}}
-fn map_rule_3(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_3(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[7],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[7]) {return Ok(());}
 if t0.len()!=1 {return Err("head requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1453,8 +1460,8 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[3]
 g_head:f0,
 g_tail:f1,
 }));Ok(())}}
-fn map_rule_4(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_5(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_4(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_5(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[9],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[9]) {return Ok(());}
 if t0.len()!=1 {return Err("varName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1474,7 +1481,7 @@ g_onlyIfAbsent:f1,
 g_value:f2,
 g_desc:f3,
 }));Ok(())}}
-fn map_rule_6(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_6(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[13],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[13]) {return Ok(());}
 if t0.len()!=1 {return Err("varName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1494,7 +1501,7 @@ g_onlyIfAbsent:f1,
 g_value:f2,
 g_desc:f3,
 }));Ok(())}}
-fn map_rule_7(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_7(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[17],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[17]) {return Ok(());}
 if t0.len()!=1 {return Err("varName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1514,7 +1521,7 @@ g_onlyIfAbsent:f1,
 g_value:f2,
 g_desc:f3,
 }));Ok(())}}
-fn map_rule_8(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_8(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[21],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[21]) {return Ok(());}
 if t0.len()!=1 {return Err("varName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1534,20 +1541,20 @@ g_onlyIfAbsent:f1,
 g_value:f2,
 g_desc:f3,
 }));Ok(())}}
-fn map_rule_9(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_10(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_11(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_12(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_13(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_14(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_9(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_10(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_11(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_12(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_13(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_14(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[14],"OnlyIfAbsentExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr(g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr{span,node_id,
 }));Ok(())}}
-fn map_rule_15(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_16(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_17(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_18(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_19(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_20(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_15(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_16(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_17(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_18(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_19(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_20(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[25],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[25]) {return Ok(());}
 if t0.len()!=1 {return Err("methodName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1565,7 +1572,7 @@ g_methodName:f0,
 g_parameters:f1,
 g_expression:f2,
 }));Ok(())}}
-fn map_rule_21(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_21(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[28],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[28]) {return Ok(());}
 if t0.len()!=1 {return Err("methodName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1583,7 +1590,7 @@ g_methodName:f0,
 g_parameters:f1,
 g_expression:f2,
 }));Ok(())}}
-fn map_rule_22(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_22(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[31],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[31]) {return Ok(());}
 if t0.len()!=1 {return Err("methodName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1601,7 +1608,7 @@ g_methodName:f0,
 g_parameters:f1,
 g_expression:f2,
 }));Ok(())}}
-fn map_rule_23(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_23(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[34],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[34]) {return Ok(());}
 if t0.len()!=1 {return Err("methodName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1619,14 +1626,14 @@ g_methodName:f0,
 g_parameters:f1,
 g_expression:f2,
 }));Ok(())}}
-fn map_rule_24(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_24(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut f0=Vec::new();self.node_values(&caps,&[37, 38],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodParameterExpr(_))) {return Err("values: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[24],"MethodParametersExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_MethodParametersExpr(g_TinyExpressionP4AST_2e_MethodParametersExpr{span,node_id,
 g_values:f0,
 }));Ok(())}}
-fn map_rule_25(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_25(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[39],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[39]) {return Ok(());}
 if t0.len()!=1 {return Err("paramName requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1636,12 +1643,12 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[25
 g_paramName:f0,
 g_type:f1,
 }));Ok(())}}
-fn map_rule_26(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_27(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_28(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_29(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_30(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_31(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_26(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_27(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_28(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_29(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_30(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_31(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[41],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_QualifiedNameExpr(_))) {return Err("className: mapped value type mismatch".into());}
 if v0.len()>1 {return Err("className requires at most one node".into());}let f0=v0.pop().map(Box::new);self.give_values(v0);
@@ -1658,7 +1665,7 @@ g_className:f0,
 g_name:f1,
 g_args:f2,
 }));Ok(())}}
-fn map_rule_32(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_32(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[45],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_QualifiedNameExpr(_))) {return Err("className: mapped value type mismatch".into());}
 if v0.len()>1 {return Err("className requires at most one node".into());}let f0=v0.pop().map(Box::new);self.give_values(v0);
@@ -1675,7 +1682,7 @@ g_className:f0,
 g_name:f1,
 g_args:f2,
 }));Ok(())}}
-fn map_rule_33(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_33(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[49],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_QualifiedNameExpr(_))) {return Err("className: mapped value type mismatch".into());}
 if v0.len()>1 {return Err("className requires at most one node".into());}let f0=v0.pop().map(Box::new);self.give_values(v0);
@@ -1692,7 +1699,7 @@ g_className:f0,
 g_name:f1,
 g_args:f2,
 }));Ok(())}}
-fn map_rule_34(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_34(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[53],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_QualifiedNameExpr(_))) {return Err("className: mapped value type mismatch".into());}
 if v0.len()>1 {return Err("className requires at most one node".into());}let f0=v0.pop().map(Box::new);self.give_values(v0);
@@ -1709,8 +1716,8 @@ g_className:f0,
 g_name:f1,
 g_args:f2,
 }));Ok(())}}
-fn map_rule_35(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_36(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_35(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_36(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[57],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[57]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -1722,7 +1729,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[36
 g_name:f0,
 g_args:f1,
 }));Ok(())}}
-fn map_rule_37(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_37(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[59],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("condition: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[59]) {return Ok(());}
@@ -1743,7 +1750,7 @@ g_condition:f0,
 g_thenExpr:f1,
 g_elseExpr:f2,
 }));Ok(())}}
-fn map_rule_38(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_38(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[62, 63, 64, 65],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TernaryExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[62, 63, 64, 65]) {return Ok(());}
@@ -1752,14 +1759,14 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[38],"ArgumentExpressionExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(g_TinyExpressionP4AST_2e_ArgumentExpressionExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_39(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_39(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut f0=Vec::new();self.node_values(&caps,&[66, 67],None,&mut f0)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("values: mapped value type mismatch".into());}
 let f0:Vec<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[39],"ArgumentsExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ArgumentsExpr(g_TinyExpressionP4AST_2e_ArgumentsExpr{span,node_id,
 g_values:f0,
 }));Ok(())}}
-fn map_rule_40(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_40(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[68],Some(24),&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Null) || matches!(value,Ast::g_TinyExpressionP4AST_2e_AbsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanAndExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanCaseValueExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanDefaultCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanEqualityExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanFactorExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanXorExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BranchExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_CeilExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_CodeBlockExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_CosExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExpExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalBooleanInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalNumberInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_FloorExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_FormulaExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IfExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ImportDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InDayTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IsPresentExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_LengthDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_LengthExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_LogExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MaxExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodParameterExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodParametersExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MinExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberCaseValueExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberDefaultCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_PowExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_QualifiedNameExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_RandomExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_RoundExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SinExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SliceExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SqrtExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCaseValueExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCastVariableRefExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringDefaultCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TanExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TernaryExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToNumExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.len()>1 {return Err("left requires at most one node".into());}let f0=v0.pop().map(Box::new);self.give_values(v0);
@@ -1774,7 +1781,7 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_41(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_41(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[71],Some(24),&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Null) || matches!(value,Ast::g_TinyExpressionP4AST_2e_AbsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanAndExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanCaseValueExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanDefaultCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanEqualityExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanFactorExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanXorExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BranchExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_CeilExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_CodeBlockExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_CosExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExpExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalBooleanInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalNumberInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_FloorExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_FormulaExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IfExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ImportDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InDayTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IsPresentExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_LengthDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_LengthExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_LogExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MaxExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodParameterExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodParametersExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MinExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberCaseValueExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberDefaultCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_PowExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_QualifiedNameExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_RandomExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_RoundExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SinExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SliceExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SqrtExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCaseValueExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCastVariableRefExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringDefaultCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringMethodDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringVariableDeclarationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TanExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TernaryExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToNumExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.len()>1 {return Err("left requires at most one node".into());}let f0=v0.pop().map(Box::new);self.give_values(v0);
@@ -1789,10 +1796,10 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_42(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_43(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_44(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_45(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_42(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_43(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_44(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_45(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[74],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[74]) {return Ok(());}
@@ -1801,7 +1808,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[45],"SinExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_SinExpr(g_TinyExpressionP4AST_2e_SinExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_46(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_46(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[75],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[75]) {return Ok(());}
@@ -1810,7 +1817,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[46],"CosExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_CosExpr(g_TinyExpressionP4AST_2e_CosExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_47(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_47(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[76],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[76]) {return Ok(());}
@@ -1819,7 +1826,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[47],"TanExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_TanExpr(g_TinyExpressionP4AST_2e_TanExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_48(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_48(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[77],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[77]) {return Ok(());}
@@ -1828,7 +1835,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[48],"SqrtExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_SqrtExpr(g_TinyExpressionP4AST_2e_SqrtExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_49(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_49(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[78],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("first: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[78]) {return Ok(());}
@@ -1841,7 +1848,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[49
 g_first:f0,
 g_rest:f1,
 }));Ok(())}}
-fn map_rule_50(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_50(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[80],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("first: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[80]) {return Ok(());}
@@ -1854,10 +1861,10 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[50
 g_first:f0,
 g_rest:f1,
 }));Ok(())}}
-fn map_rule_51(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_51(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[51],"RandomExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_RandomExpr(g_TinyExpressionP4AST_2e_RandomExpr{span,node_id,
 }));Ok(())}}
-fn map_rule_52(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_52(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[82],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[82]) {return Ok(());}
@@ -1866,7 +1873,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[52],"AbsExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_AbsExpr(g_TinyExpressionP4AST_2e_AbsExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_53(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_53(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[83],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[83]) {return Ok(());}
@@ -1875,7 +1882,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[53],"RoundExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_RoundExpr(g_TinyExpressionP4AST_2e_RoundExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_54(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_54(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[84],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[84]) {return Ok(());}
@@ -1884,7 +1891,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[54],"CeilExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_CeilExpr(g_TinyExpressionP4AST_2e_CeilExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_55(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_55(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[85],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[85]) {return Ok(());}
@@ -1893,7 +1900,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[55],"FloorExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_FloorExpr(g_TinyExpressionP4AST_2e_FloorExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_56(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_56(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[86],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("base: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[86]) {return Ok(());}
@@ -1908,7 +1915,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[56
 g_base:f0,
 g_exponent:f1,
 }));Ok(())}}
-fn map_rule_57(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_57(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[88],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[88]) {return Ok(());}
@@ -1917,7 +1924,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[57],"LogExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_LogExpr(g_TinyExpressionP4AST_2e_LogExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_58(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_58(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[89],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ArgumentExpressionExpr(_))) {return Err("arg: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[89]) {return Ok(());}
@@ -1926,7 +1933,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[58],"ExpExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ExpExpr(g_TinyExpressionP4AST_2e_ExpExpr{span,node_id,
 g_arg:f0,
 }));Ok(())}}
-fn map_rule_59(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_59(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[90],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[90]) {return Ok(());}
@@ -1941,8 +1948,8 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[59
 g_value:f0,
 g_defaultValue:f1,
 }));Ok(())}}
-fn map_rule_60(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_61(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_60(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_61(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[92],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[92]) {return Ok(());}
@@ -1951,7 +1958,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[61],"ToUpperCaseExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(g_TinyExpressionP4AST_2e_ToUpperCaseExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_62(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_62(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[93],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[93]) {return Ok(());}
@@ -1960,7 +1967,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[62],"ToLowerCaseExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(g_TinyExpressionP4AST_2e_ToLowerCaseExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_63(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_63(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[94],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[94]) {return Ok(());}
@@ -1969,7 +1976,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[63],"TrimExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_TrimExpr(g_TinyExpressionP4AST_2e_TrimExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_64(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_64(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[95],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[95]) {return Ok(());}
@@ -1978,7 +1985,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[64],"LengthExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_LengthExpr(g_TinyExpressionP4AST_2e_LengthExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_65(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_65(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[96],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[96]) {return Ok(());}
@@ -1987,7 +1994,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[65],"LengthExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_LengthExpr(g_TinyExpressionP4AST_2e_LengthExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_66(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_66(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[97],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[97]) {return Ok(());}
@@ -1996,7 +2003,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[66],"ToUpperCaseDotExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_67(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_67(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[98],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[98]) {return Ok(());}
@@ -2005,7 +2012,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[67],"ToLowerCaseDotExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_68(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_68(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[99],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[99]) {return Ok(());}
@@ -2014,7 +2021,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[68],"TrimDotExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_TrimDotExpr(g_TinyExpressionP4AST_2e_TrimDotExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_69(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_69(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[100],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[100]) {return Ok(());}
@@ -2023,7 +2030,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[69],"LengthDotExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_LengthDotExpr(g_TinyExpressionP4AST_2e_LengthDotExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_70(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_70(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[101],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[101]) {return Ok(());}
@@ -2036,7 +2043,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[70
 g_value:f0,
 g_patterns:f1,
 }));Ok(())}}
-fn map_rule_71(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_71(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[104],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[104]) {return Ok(());}
@@ -2049,7 +2056,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[71
 g_value:f0,
 g_patterns:f1,
 }));Ok(())}}
-fn map_rule_72(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_72(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[107],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[107]) {return Ok(());}
@@ -2062,7 +2069,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[72
 g_value:f0,
 g_patterns:f1,
 }));Ok(())}}
-fn map_rule_73(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_73(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[110],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[110]) {return Ok(());}
@@ -2075,7 +2082,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[73
 g_value:f0,
 g_candidates:f1,
 }));Ok(())}}
-fn map_rule_74(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_74(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[113],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[113]) {return Ok(());}
@@ -2088,7 +2095,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[74
 g_value:f0,
 g_patterns:f1,
 }));Ok(())}}
-fn map_rule_75(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_75(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[116],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[116]) {return Ok(());}
@@ -2101,7 +2108,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[75
 g_value:f0,
 g_patterns:f1,
 }));Ok(())}}
-fn map_rule_76(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_76(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[119],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[119]) {return Ok(());}
@@ -2114,8 +2121,8 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[76
 g_value:f0,
 g_patterns:f1,
 }));Ok(())}}
-fn map_rule_77(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_78(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_77(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_78(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[122],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[122]) {return Ok(());}
@@ -2124,7 +2131,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[78],"IsPresentExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_IsPresentExpr(g_TinyExpressionP4AST_2e_IsPresentExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_79(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_79(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[123],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_))) {return Err("startHour: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[123]) {return Ok(());}
@@ -2139,7 +2146,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[79
 g_startHour:f0,
 g_endHour:f1,
 }));Ok(())}}
-fn map_rule_80(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_80(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[125],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[125]) {return Ok(());}
 if t0.len()!=1 {return Err("startDay requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -2162,12 +2169,12 @@ g_startHour:f1,
 g_endDay:f2,
 g_endHour:f3,
 }));Ok(())}}
-fn map_rule_81(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_82(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_83(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_84(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_85(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_86(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_81(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_82(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_83(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_84(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_85(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_86(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[129, 133, 136, 139, 141, 144, 146, 148],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Text(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SliceExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[129, 133, 136, 139, 141, 144, 146, 148]) {return Ok(());}
@@ -2191,7 +2198,7 @@ g_start:f1,
 g_end:f2,
 g_step:f3,
 }));Ok(())}}
-fn map_rule_87(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_87(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[149, 153, 156, 159, 161, 164, 166, 168],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Text(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SliceExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[149, 153, 156, 159, 161, 164, 166, 168]) {return Ok(());}
@@ -2215,8 +2222,8 @@ g_start:f1,
 g_end:f2,
 g_step:f3,
 }));Ok(())}}
-fn map_rule_88(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_89(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_88(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_89(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[169],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Text(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IfExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_SliceExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCastVariableRefExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToLowerCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ToUpperCaseExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_TrimExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[169]) {return Ok(());}
@@ -2232,23 +2239,23 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_90(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_91(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_92(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_90(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_91(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_92(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[172],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[172]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[92],"StringCastVariableRefExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_StringCastVariableRefExpr(g_TinyExpressionP4AST_2e_StringCastVariableRefExpr{span,node_id,
 g_name:f0,
 }));Ok(())}}
-fn map_rule_93(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_93(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[173],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[173]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[93],"StringTypedVariableRefExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr(g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr{span,node_id,
 g_name:f0,
 }));Ok(())}}
-fn map_rule_94(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_94(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[174],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanAndExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[174]) {return Ok(());}
@@ -2264,7 +2271,7 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_95(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_95(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[177],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanXorExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[177]) {return Ok(());}
@@ -2280,7 +2287,7 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_96(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_96(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[180],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanFactorExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[180]) {return Ok(());}
@@ -2296,7 +2303,7 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_97(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_97(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[183],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[183]) {return Ok(());}
@@ -2305,8 +2312,8 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[97],"NotExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_NotExpr(g_TinyExpressionP4AST_2e_NotExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_98(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_99(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_98(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_99(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[184],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Text(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalBooleanInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IfExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InDayTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IsPresentExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[184]) {return Ok(());}
@@ -2325,7 +2332,7 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_100(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_100(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[187, 188, 189, 190],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::Text(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanEqualityExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanMatchExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ContainsExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_EndsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalBooleanInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IfExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InDayTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_InTimeRangeExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_IsPresentExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_NotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithDotExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StartsWithExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[187, 188, 189, 190]) {return Ok(());}
@@ -2334,7 +2341,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[100],"BooleanFactorExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_BooleanFactorExpr(g_TinyExpressionP4AST_2e_BooleanFactorExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_101(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_101(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[191],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[191]) {return Ok(());}
@@ -2353,8 +2360,8 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_102(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_103(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_102(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_103(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[194],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_))) {return Err("left: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[194]) {return Ok(());}
@@ -2373,8 +2380,8 @@ g_left:f0,
 g_op:f1,
 g_right:f2,
 }));Ok(())}}
-fn map_rule_104(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_105(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_104(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_105(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[197, 198, 199, 200, 201, 202],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_VariableRefExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[197, 198, 199, 200, 201, 202]) {return Ok(());}
@@ -2383,7 +2390,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[105],"ObjectExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ObjectExpr(g_TinyExpressionP4AST_2e_ObjectExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_106(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_106(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[203],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("condition: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[203]) {return Ok(());}
@@ -2404,7 +2411,7 @@ g_condition:f0,
 g_thenExpr:f1,
 g_elseExpr:f2,
 }));Ok(())}}
-fn map_rule_107(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_107(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[206, 207, 208, 209, 210, 211, 212, 213],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanEqualityExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringComparisonExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[206, 207, 208, 209, 210, 211, 212, 213]) {return Ok(());}
@@ -2413,7 +2420,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[107],"BranchExpressionExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_BranchExpressionExpr(g_TinyExpressionP4AST_2e_BranchExpressionExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_108(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_108(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[214],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("condition: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[214]) {return Ok(());}
@@ -2434,7 +2441,7 @@ g_condition:f0,
 g_thenExpr:f1,
 g_elseExpr:f2,
 }));Ok(())}}
-fn map_rule_109(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_109(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[217],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberCaseExpr(_))) {return Err("firstCase: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[217]) {return Ok(());}
@@ -2453,7 +2460,7 @@ g_firstCase:f0,
 g_moreCases:f1,
 g_defaultCase:f2,
 }));Ok(())}}
-fn map_rule_110(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_110(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[220],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("condition: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[220]) {return Ok(());}
@@ -2468,7 +2475,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[11
 g_condition:f0,
 g_value:f1,
 }));Ok(())}}
-fn map_rule_111(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_111(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[222],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_NumberCaseValueExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[222]) {return Ok(());}
@@ -2477,7 +2484,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[111],"NumberDefaultCaseExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_NumberDefaultCaseExpr(g_TinyExpressionP4AST_2e_NumberDefaultCaseExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_112(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_112(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[223],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[223]) {return Ok(());}
@@ -2486,7 +2493,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[112],"NumberCaseValueExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_NumberCaseValueExpr(g_TinyExpressionP4AST_2e_NumberCaseValueExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_113(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_113(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[224],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCaseExpr(_))) {return Err("firstCase: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[224]) {return Ok(());}
@@ -2505,7 +2512,7 @@ g_firstCase:f0,
 g_moreCases:f1,
 g_defaultCase:f2,
 }));Ok(())}}
-fn map_rule_114(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_114(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[227],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("condition: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[227]) {return Ok(());}
@@ -2520,7 +2527,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[11
 g_condition:f0,
 g_value:f1,
 }));Ok(())}}
-fn map_rule_115(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_115(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[229],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringCaseValueExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[229]) {return Ok(());}
@@ -2529,7 +2536,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[115],"StringDefaultCaseExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_StringDefaultCaseExpr(g_TinyExpressionP4AST_2e_StringDefaultCaseExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_116(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_116(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[230],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[230]) {return Ok(());}
@@ -2538,7 +2545,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[116],"StringCaseValueExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_StringCaseValueExpr(g_TinyExpressionP4AST_2e_StringCaseValueExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_117(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_117(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[231],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanCaseExpr(_))) {return Err("firstCase: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[231]) {return Ok(());}
@@ -2557,7 +2564,7 @@ g_firstCase:f0,
 g_moreCases:f1,
 g_defaultCase:f2,
 }));Ok(())}}
-fn map_rule_118(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_118(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[234],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("condition: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[234]) {return Ok(());}
@@ -2572,7 +2579,7 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[11
 g_condition:f0,
 g_value:f1,
 }));Ok(())}}
-fn map_rule_119(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_119(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[236],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanCaseValueExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[236]) {return Ok(());}
@@ -2581,7 +2588,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[119],"BooleanDefaultCaseExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_BooleanDefaultCaseExpr(g_TinyExpressionP4AST_2e_BooleanDefaultCaseExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_120(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_120(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[237],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[237]) {return Ok(());}
@@ -2590,7 +2597,7 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[120],"BooleanCaseValueExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_BooleanCaseValueExpr(g_TinyExpressionP4AST_2e_BooleanCaseValueExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
-fn map_rule_121(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_121(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut t0=self.take_texts();self.text_values(&caps,&[238],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[238]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_texts(t0);
 let f0:String=f0;
@@ -2600,8 +2607,8 @@ self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[12
 g_name:f0,
 g_type:f1,
 }));Ok(())}}
-fn map_rule_122(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
-fn map_rule_123(&mut self,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(span,child,&out);{let mut caps=self.take_captures();self.collect_captures(child,&mut caps);
+fn map_rule_122(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(Ast::Text(text));}Ok(())}}
+fn map_rule_123(&mut self,event:EventId,span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(event,span,child,&out);{let mut caps=self.take_captures();self.rule_captures(event,&mut caps);
 let mut v0=self.take_values();self.node_values(&caps,&[240, 241, 242, 243, 244, 245],None,&mut v0)?;
 if !v0.iter().all(|value|matches!(value,Ast::g_TinyExpressionP4AST_2e_BinaryExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_BooleanOrExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ExpressionExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_MethodInvocationExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_ObjectExpr(_)) || matches!(value,Ast::g_TinyExpressionP4AST_2e_StringConcatExpr(_))) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[240, 241, 242, 243, 244, 245]) {return Ok(());}
@@ -2610,38 +2617,85 @@ let f0:Box<Ast>=f0;
 self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[123],"ExpressionExpr",span);out.push(Ast::g_TinyExpressionP4AST_2e_ExpressionExpr(g_TinyExpressionP4AST_2e_ExpressionExpr{span,node_id,
 g_value:f0,
 }));Ok(())}}
+/// 出現（capture / rule / token）の収集と、AST 構築が rule ごとに読む直下 capture 表を
+/// 1 回の走査で作る。以前は出現収集の後に AST 構築が rule ごとに `collect_captures` で
+/// 同じ木をもう一度下っていた。
+///
+/// 直下 capture 表の作り方: capture は完了順に `pending` へ積む。走査は深さ優先なので
+/// rule R に入った時点の `pending` の長さ `start` を覚えておけば、R が完了した時点の
+/// `pending[start..]` はちょうど「R の直下 capture（間に別の rule を挟まないもの）を完了順に
+/// 並べたもの」になる（内側の rule は自分の完了時に自分の分を抜き取って `pending` を
+/// `start` まで戻すため、R の分だけが連続して残る）。これを `caps_flat` へ移して
+/// `(開始, 個数)` を rule の event id に記録する。公開する出現（`captures` / `lexical` /
+/// `tokens`）の並びと番号付けは従来どおり。
 fn occurrences(
-    &self,
+    &mut self,
     root: EventId,
 ) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
     // 出現数は event 数で上から見積もる（capture / rule は event の一部）。伸長の複製を避ける。
-    let estimate = self.arena.len() / 4;
+    // P4 実測は capture も rule も event の 1/8 前後（complex 155+177 / 1,308、
+    // complex-x64 9,731+10,824 / 80,246）。1/4 は 2 倍以上の過大確保で、x64 では
+    // `Capture` 72 byte × 20,061 を確保して半分しか使っていなかった。
+    let estimate = self.arena.len() / 6 + 8;
     let mut captures = Vec::with_capacity(estimate);
-    let mut capture_owners = Vec::with_capacity(estimate);
-    let mut rule_orders = Vec::with_capacity(estimate);
-    let mut rule_order = 0;
     let mut lexical = Vec::new();
     let mut tokens = Vec::new();
-    // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは usize::MAX。
-    const NONE: usize = usize::MAX;
-    let mut stack: Vec<(EventId, usize, bool, usize)> = Vec::with_capacity(64);
-    stack.push((root, NONE, false, NONE));
+    let build_ast = self.options.build_ast;
+    let want_lexical = self.options.lexical;
+    let want_occurrences = build_ast || want_lexical;
+    // 未完了の rule に属する capture の番号（完了順）。rule の完了時にその rule の
+    // 完了順を直接書き込むので、所属表と後段の付け直しの走査は要らない。
+    let mut pending_ids: Vec<u32> = Vec::with_capacity(if want_occurrences { estimate } else { 0 });
+    let mut rule_starts: Vec<u32> = Vec::new();
+    let mut rule_occurrences: u32 = 0;
+    let mut rule_order: u32 = 0;
+    // 直下 capture 表（AST を作るときだけ）。event id で索く表は伸長だけする（本文の注記参照）。
+    let mut caps_flat = std::mem::take(&mut self.caps_flat);
+    let mut pending = std::mem::take(&mut self.caps_pending);
+    if want_occurrences {
+        rule_starts.reserve(64);
+    }
+    if build_ast {
+        caps_flat.clear();
+        caps_flat.reserve(estimate);
+        pending.clear();
+        if self.rule_caps.len() < self.arena.len() {
+            self.rule_caps.resize(self.arena.len(), (0, 0));
+        }
+    }
+    // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは u32::MAX。
+    // event id も出現番号も入力 byte 数（u32 上限）で抑えられるので u32 に詰める（1 要素 16 byte）。
+    const NONE: u32 = u32::MAX;
+    let mut stack: Vec<(u32, u32, bool, u32)> = Vec::with_capacity(64);
+    stack.push((root.0 as u32, NONE, false, NONE));
     let mut lexical_order = 0;
     while let Some((id, parent, done, current)) = stack.pop() {
-        let parent_index = (parent != NONE).then_some(parent);
+        let parent_index = (parent != NONE).then_some(parent as usize);
+        let id = EventId(id as usize);
         match self.arena[id.0] {
             Event::Join(a, b) => {
-                stack.push((b, parent, false, NONE));
-                stack.push((a, parent, false, NONE));
+                stack.push((b.0 as u32, parent, false, NONE));
+                stack.push((a.0 as u32, parent, false, NONE));
             }
-            Event::Values { child, .. } => stack.push((child, parent, false, NONE)),
+            Event::Values { child, .. } => stack.push((child.0 as u32, parent, false, NONE)),
             Event::Capture {
-                site, span, child, ..
+                site,
+                span,
+                child,
+                token_extent,
             } => {
                 if done {
-                    if self.options.build_ast || self.options.lexical {
-                        capture_owners.push(parent_index);
+                    if build_ast {
+                        let extent = if token_extent {
+                            self.selected_extent(child, span)
+                        } else {
+                            span
+                        };
+                        pending.push((site, extent, child));
+                    }
+                    if want_occurrences {
                         let order = captures.len();
+                        pending_ids.push(order as u32);
                         captures.push(Capture {
                             rule_completion_order: 0,
                             occurrence_id: order,
@@ -2652,14 +2706,14 @@ fn occurrences(
                         });
                     }
                 } else {
-                    stack.push((id, parent, true, NONE));
-                    stack.push((child, parent, false, NONE));
+                    stack.push((id.0 as u32, parent, true, NONE));
+                    stack.push((child.0 as u32, parent, false, NONE));
                 }
             }
             Event::Token {
                 expr, rule, span, ..
             }
-if self.options.lexical && expr != usize::MAX => {
+if want_lexical && expr != usize::MAX => {
                 tokens.push(LexicalOccurrence {
                     occurrence_id: tokens.len(),
                     parent_occurrence_id: parent_index,
@@ -2672,24 +2726,41 @@ if self.options.lexical && expr != usize::MAX => {
             }
             Event::Rule { rule, span, child } => {
                 if done {
+                    if want_occurrences {
+                        let start = rule_starts.pop().unwrap_or(0) as usize;
+                        if build_ast {
+                            let offset = caps_flat.len();
+                            caps_flat.extend_from_slice(&pending[start..]);
+                            pending.truncate(start);
+                            self.rule_caps[id.0] =
+                                (offset as u32, (caps_flat.len() - offset) as u32);
+                        }
+                        // この rule の直下 capture に rule 完了順を書く（後段の走査の代わり）。
+                        for &order in &pending_ids[start..] {
+                            captures[order as usize].rule_completion_order = rule_order as usize;
+                        }
+                        pending_ids.truncate(start);
+                    }
                     if current != NONE {
-                        let index = current;
-                        rule_orders[index] = rule_order;
+                        let index = current as usize;
                         rule_order += 1;
                         // rule 出現は lexical のときだけ保持する（AST だけなら完了順だけ要る）。
-                        if self.options.lexical {
+                        if want_lexical {
                             let node: &mut LexicalOccurrence = &mut lexical[index];
                             node.completion_order = lexical_order;
                         }
                         lexical_order += 1;
                     }
                 } else {
-                    let index = if self.options.lexical || self.options.build_ast {
-                        let index = rule_orders.len();
-                        rule_orders.push(0);
-                        if self.options.lexical {
+                    if want_occurrences {
+                        rule_starts.push(pending_ids.len() as u32);
+                    }
+                    let index = if want_occurrences {
+                        let index = rule_occurrences;
+                        rule_occurrences += 1;
+                        if want_lexical {
                             lexical.push(LexicalOccurrence {
-                                occurrence_id: index,
+                                occurrence_id: index as usize,
                                 parent_occurrence_id: parent_index,
                                 rule_id: RULES[rule],
                                 expr_id: BODIES[rule],
@@ -2701,19 +2772,18 @@ if self.options.lexical && expr != usize::MAX => {
                     } else {
                         parent
                     };
-                    stack.push((id, parent, true, index));
-                    stack.push((child, index, false, NONE));
+                    stack.push((id.0 as u32, parent, true, index));
+                    stack.push((child.0 as u32, index, false, NONE));
                 }
             }
             _ => {}
         }
     }
-    for (capture, owner) in captures.iter_mut().zip(capture_owners) {
-        capture.rule_completion_order = owner.map_or(0, |i| rule_orders[i]);
-    }
     for token in &mut tokens {
         token.occurrence_id += lexical.len();
     }
+    self.caps_flat = caps_flat;
+    self.caps_pending = pending;
     (captures, lexical, tokens)
 }
 fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>) {
@@ -3011,6 +3081,8 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
 }
 }
 // value span の path は共有バッファに push / truncate で組み立てる（field ごとの format! を避ける）。
+// 添字も `to_string` ではなく共有バッファへ直接書く（要素ごとの確保を避ける）。
+use std::fmt::Write as _;
 trait CollectValueSpans {
     fn collect(
         &self,
@@ -3044,8 +3116,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
     ) {
         for (i, value) in self.iter().enumerate() {
             let len = path.len();
-            path.push('/');
-            path.push_str(&i.to_string());
+            let _ = write!(path, "/{i}");
             value.collect(path, texts, out);
             path.truncate(len);
         }

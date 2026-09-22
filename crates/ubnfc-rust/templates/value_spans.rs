@@ -1,4 +1,6 @@
 // value span の path は共有バッファに push / truncate で組み立てる（field ごとの format! を避ける）。
+// 添字も `to_string` ではなく共有バッファへ直接書く（要素ごとの確保を避ける）。
+use std::fmt::Write as _;
 trait CollectValueSpans {
     fn collect(
         &self,
@@ -32,8 +34,7 @@ impl<T: CollectValueSpans> CollectValueSpans for Vec<T> {
     ) {
         for (i, value) in self.iter().enumerate() {
             let len = path.len();
-            path.push('/');
-            path.push_str(&i.to_string());
+            let _ = write!(path, "/{i}");
             value.collect(path, texts, out);
             path.truncate(len);
         }
