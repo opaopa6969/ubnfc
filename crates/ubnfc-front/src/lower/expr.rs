@@ -26,6 +26,7 @@ pub(super) fn lower(
         "body".into()
     };
     let mut builder = Builder {
+        occurrences: captures::occurrences(cx, rule),
         cx,
         rule,
         policy,
@@ -58,6 +59,7 @@ pub(super) fn lower(
     (body, sites)
 }
 struct Builder<'a, 'b> {
+    occurrences: BTreeMap<String, captures::Shape>,
     cx: &'a mut Context<'b>,
     rule: &'a ResolvedRule,
     policy: &'a str,
@@ -185,7 +187,7 @@ impl Builder<'_, '_> {
         // site 配列は構文前順。完了順は子の処理後に確定する。
         let ci = e.capture.as_ref().map(|name| {
             let index = self.cx.out.semantics.captures.len();
-            let shape = &self.cx.fields[&self.rule.id][name];
+            let shape = &self.occurrences[name];
             self.cx.out.semantics.captures.push(Capture {
                 cardinality: shape.count,
                 conversion: captures::conversion(&captures::captured(self.cx, &e.atom).value),
