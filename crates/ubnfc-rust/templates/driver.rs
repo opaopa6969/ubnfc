@@ -50,6 +50,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         None => ParseOptions::default().max_depth,
         _ => return Err("invalid maxDepth"),
     };
+    // 位置ごとの字句 cache は既定 off。corpus 全体を cache 有効で回すための脱出口。
+    let lexical_cache = std::env::var_os("UBNFC_LEXICAL_CACHE").is_some_and(|v| v != "0");
     let prefix = parse_registered(
         grammar,
         entry,
@@ -58,6 +60,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             build_ast: false,
             require_eof: false,
             lexical,
+            lexical_cache,
             max_depth,
             // driver は成功時も hints（投機的失敗）を出すので、診断を明示的に要求する。
             diagnostics: true,
@@ -72,6 +75,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             build_ast: true,
             require_eof: true,
             lexical,
+            lexical_cache,
             max_depth,
             diagnostics: true,
             ..Default::default()

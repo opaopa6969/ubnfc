@@ -1168,7 +1168,7 @@
       },
       {
         "id": "scc:1",
-        "memoPolicy": "allEligible",
+        "memoPolicy": "provedOmissions",
         "recursive": false,
         "ruleIds": [
           "Boundaries::Item"
@@ -1254,7 +1254,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:125:126:body/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:125:153:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:125:126:body/0/tokenRef"
@@ -1268,7 +1268,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:127:131:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:125:153:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:127:131:body/1/ruleRef"
@@ -1282,7 +1282,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:132:133:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:125:153:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:132:133:body/2/tokenRef"
@@ -1296,7 +1296,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:149:153:body/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:125:153:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:149:153:body/3/ruleRef"
@@ -1313,32 +1313,60 @@
           "reason": "defaultSafe"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:166:173:body/0/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:166:199:body/choice",
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:166:173:body/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:176:185:body/1/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:166:199:body/choice",
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:176:185:body/1/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:188:194:body/2/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:166:199:body/choice",
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:188:194:body/2/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:197:199:body/3/literal",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:166:199:body/choice",
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:197:199:body/3/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": true,
@@ -1352,7 +1380,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:290:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:290:body/0/ruleRef"
@@ -1366,7 +1394,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:291:297:body/1/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:291:297:body/1/group"
@@ -1380,7 +1408,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:292:296:body/1/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:291:297:body/1/group",
@@ -1395,7 +1423,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:292:296:body/1/0/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:291:297:body/1/group",
@@ -1411,7 +1439,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:298:303:body/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:298:303:body/2/ruleRef"
@@ -1425,7 +1453,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:304:313:body/3/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:304:313:body/3/group"
@@ -1439,7 +1467,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:305:312:body/3/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:304:313:body/3/group",
@@ -1454,7 +1482,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:305:308:body/3/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:304:313:body/3/group",
@@ -1470,7 +1498,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:309:312:body/3/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:313:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:304:313:body/3/group",
@@ -1493,7 +1521,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:327:330:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:327:330:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:327:330:body/0/literal"

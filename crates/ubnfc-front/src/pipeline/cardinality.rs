@@ -69,8 +69,15 @@ impl<'a> Values<'a> {
             ExprNode::Optional { child } => self
                 .count(child, visiting)
                 .map(|c| join(c, Cardinality::Optional)),
-            ExprNode::Repeat { child, .. } | ExprNode::Separated { element: child, .. } => {
-                self.count(child, visiting).map(|_| Cardinality::List)
+            // 量指定子は共存し得る値の個数を決める。`X?`（Repeat max=1）や `{1}` は
+            // 内側の個数をそのまま通し、List にはしない（docs/nested-capture-migration.md）。
+            ExprNode::Repeat {
+                child, min, max, ..
+            } => self
+                .count(child, visiting)
+                .map(|c| join(c, Cardinality::quantified(*min, *max))),
+            ExprNode::Separated { element, .. } => {
+                self.count(element, visiting).map(|_| Cardinality::List)
             }
             _ => None,
         };

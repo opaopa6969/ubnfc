@@ -202,3 +202,23 @@ report は `docs/reports/2026-09-23-{java,rust}-corpus-contract.{md,json}`。
 `ubnfc-java/**` は並行して `perf/java-m5` が触っている領域なので、ここで `--write` すると
 その作業を巻き込む。**本ブランチでは再生成しない**。commit 済み生成物の追従は
 `ubnfc-java` を所有するブランチで行う（`examples/p4-rust` 側は本ブランチで再生成済み・緑）。
+
+## 5. master 取り込み後の再確認
+
+本稿の commit のあとに `git merge master`（`perf/rust-lexical-cache` の字句キャッシュ、
+front の解析変更などを含む）を取り込み、全項目を回し直した。
+`ubnfc-java/src/main/java/org/ubnfc/java/emit/JavaEmitter.java` の 1 箇所（`token()` の
+extern / any の case）だけが衝突したので、master の extern 変更と本稿の `any` 変更を両方残した。
+生成物（`crates/ubnfc-selfhost/src/generated/**`、`examples/p4-rust/src/generated/**`）は
+手で解決せず emitter から再生成し、merge 結果と byte 一致することを確認した。
+
+| 項目 | 結果 |
+|---|---|
+| `cargo test --workspace --offline` | 緑（73 target、Fail 0。固定 seed campaign を含む） |
+| `cargo clippy --workspace --all-targets --offline -- -D warnings` / `cargo fmt --all -- --check` | 差分なし |
+| `cd ubnfc-java && mvn -o -q test` | 緑 |
+| corpus Java `run-all` | **Fail 0**。Pass 1310 / 期待拒否 28 / Known 28 / 未観測 59 |
+| corpus Rust `run-all` | **Fail 0**。Pass 1292 / 期待拒否 30 / Known 28 / 未観測 75 |
+
+添付した `docs/reports/2026-09-23-{java,rust}-corpus-contract.{md,json}` は
+この取り込み後の実行結果である。

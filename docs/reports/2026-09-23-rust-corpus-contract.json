@@ -1,16 +1,16 @@
 {
   "backend": "rust",
-  "generator_sha256": "9d10f109c825a8d1c64f0b282e727633c7b643fafd7b07a8a000e5a125e8bd4b",
-  "front_sha256": "87235a70f5156481c3ced03c120024f0cd010f23094d3b35240c068a5b486629",
+  "generator_sha256": "33673a413e9bf86cf177d5ab12a885c4b12323be5f4080bdc1250d4c53033f5f",
+  "front_sha256": "256740c898950cfe4359d6a34b5992294b47737d6139cd14659e1f4396ff1268",
   "jobs": 4,
   "rust_build": {
     "jobs": null,
     "generated_crates": 228,
-    "unique_crates": 227,
+    "unique_crates": 228,
     "cache_hits": 0,
     "cargo_invocations": 1,
-    "initial_build_seconds": 161.392344763,
-    "total_build_seconds": 161.392344763
+    "initial_build_seconds": 87.020292554,
+    "total_build_seconds": 87.020292554
   },
   "corpus_files": 127,
   "grammar_variants": 279,
@@ -172594,20 +172594,20 @@
             "captureOccurrences": [
               0
             ],
-            "mode": "SYNC",
+            "mode": "AUTO",
             "ruleId": "Probe::Stmt",
             "skippedSpan": [
               0,
-              3
+              4
             ],
             "span": [
               0,
               4
             ],
-            "syncPattern": ";",
+            "syncPattern": "ok",
             "syncSpan": [
-              3,
-              4
+              4,
+              6
             ]
           }
         ],
@@ -173574,20 +173574,20 @@
             "captureOccurrences": [
               0
             ],
-            "mode": "SYNC",
+            "mode": "SKIP",
             "ruleId": "Probe::Stmt",
             "skippedSpan": [
               0,
-              3
+              4
             ],
             "span": [
               0,
               4
             ],
-            "syncPattern": ";",
+            "syncPattern": "ok",
             "syncSpan": [
-              3,
-              4
+              4,
+              6
             ]
           }
         ],
@@ -173634,12 +173634,31 @@
       ],
       "outcome": "known_divergence",
       "actual": {
-        "accepted": false,
-        "allConsumed": false,
-        "ast": null,
-        "captures": [],
+        "accepted": true,
+        "allConsumed": true,
+        "ast": {
+          "fields": {
+            "items": []
+          },
+          "span": [
+            0,
+            3
+          ],
+          "type": "Root"
+        },
+        "captures": [
+          {
+            "binding": "Root:0",
+            "name": "items",
+            "span": [
+              0,
+              3
+            ],
+            "text": "bad"
+          }
+        ],
         "catalogs": [],
-        "consumed": 0,
+        "consumed": 3,
         "declarations": [],
         "diagnostics": [
           {
@@ -173648,30 +173667,30 @@
               "ok"
             ],
             "farthestExpected": [
-              "';'",
-              "'ok'",
-              "RootParser",
-              "__CaptureSite"
+              "ok"
             ],
             "farthestOffset": 0,
-            "kind": "syntax",
+            "kind": "recovery",
+            "length": 3,
             "offset": 0,
-            "origin": "Mapper.diagnose",
+            "origin": "recovery",
+            "recoveryId": 0,
+            "ruleId": "Probe::Stmt",
             "rulePath": [
-              "Probe::Root",
               "Probe::Stmt"
-            ]
+            ],
+            "severity": "ERROR"
           }
         ],
-        "fullConsumed": 0,
-        "fullMatched": 0,
+        "fullConsumed": 3,
+        "fullMatched": 3,
         "hints": [
           {
             "deepestRule": "Probe::Stmt",
             "expected": [
               "ok"
             ],
-            "offset": 0,
+            "offset": 3,
             "rulePath": [
               "Probe::Root",
               "Probe::Stmt"
@@ -173679,12 +173698,53 @@
           }
         ],
         "id": 1,
-        "lexical": [],
+        "lexical": [
+          {
+            "completionOrder": 0,
+            "exprId": "expr:__runall__.ubnf:95:122:body/seq",
+            "occurrenceId": 0,
+            "parentOccurrenceId": null,
+            "ruleId": "Probe::Root",
+            "span": [
+              0,
+              3
+            ]
+          }
+        ],
         "mappingError": null,
-        "matched": 0,
-        "parsedStatus": "failed",
-        "prefixCaptures": [],
-        "recoveries": [],
+        "matched": 3,
+        "nodes": [],
+        "parsedStatus": "succeeded",
+        "prefixCaptures": [
+          {
+            "binding": "Root:0",
+            "name": "items",
+            "span": [
+              0,
+              3
+            ],
+            "text": "bad"
+          }
+        ],
+        "recoveries": [
+          {
+            "captureOccurrences": [
+              0
+            ],
+            "mode": "SKIP",
+            "ruleId": "Probe::Stmt",
+            "skippedSpan": [
+              0,
+              3
+            ],
+            "span": [
+              0,
+              3
+            ],
+            "syncPattern": null,
+            "syncSpan": null
+          }
+        ],
         "references": [],
         "scope": {
           "declarations": [],
@@ -173695,7 +173755,7 @@
           "references": []
         },
         "scopeDepth": 0,
-        "value": null
+        "texts": []
       },
       "differences": [
         {

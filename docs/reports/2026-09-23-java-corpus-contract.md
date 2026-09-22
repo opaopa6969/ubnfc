@@ -4,9 +4,9 @@ Java corpus run-all
 
 集計単位は case × variant（文法なし操作列は各1件）。段階失敗後は比較しない。比較に差分がある場合は Fail / Known、差分がなく欠落観測がある場合は未観測、それ以外は Pass。Known/Fail に併存する未観測は JSON の missing と未観測項目表に残す。
 
-Java generator SHA-256: `41b4c1fda0b85a1a6614532377d979a00334a4569b0ec9b8c1246c4a610c5c59`
+Java generator SHA-256: `715b70c1d6a1d07d60d15939ec2e25c4047c9a1ecc5ece859ab674576a2c5aad`
 
-front SHA-256: `87235a70f5156481c3ced03c120024f0cd010f23094d3b35240c068a5b486629`
+front SHA-256: `256740c898950cfe4359d6a34b5992294b47737d6139cd14659e1f4396ff1268`
 
 期待拒否 Pass: 28件（Verdict は Pass）。通常の Pass・IR 失敗とは別列に排他的に計上する。build の実測失敗と診断は拒否理由表に保持する。
 

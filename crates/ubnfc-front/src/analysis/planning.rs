@@ -157,19 +157,36 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
     }).collect();
     let mut omissions = BTreeMap::<usize, Proof>::new();
     let mut omitted_rules = BTreeSet::new();
-    for group in &cx.rule_sccs {
-        if group.len() != 1 || cx.rule_graph[group[0]].contains(&group[0]) {
-            continue;
-        }
-        let r = group[0];
+    // 省略の根拠: rule 本体の memo（成功・失敗）を保持したまま、本体の局所木で単一所有
+    // （incoming == 1、Expr 木は tree）の部分式は、本体 1 回の評価内で同じ key
+    // (consumed, matched, mode, stateVersion) で 2 度評価されない。
+    //   - seq / group / lookahead: 各子を 1 回。
+    //   - choice: 各候補は 1 回（ordered は先頭成功まで、longest は全候補を共通開始状態から 1 回）。
+    //     予測 + fullChoice fallback だけは 2 pass で同じ候補を再評価し得るので、その下は保持する。
+    //   - repeat / optional / separated: 各周回の開始位置は厳密に前進し（無前進の周回で停止）、
+    //     terminator / separator も周回ごとに 1 回。
+    // 本体の再評価は memo により key ごとに 1 回なので、部分式の総評価回数は
+    // 「本体の distinct key 数 × 本体サイズ」で抑えられ、全 memo と同じ上界に留まる。
+    // 再帰 SCC も本体 memo が守るため対象。Extern 到達（unsafe）本体は memo されないので対象外。
+    let two_pass_choice = |i: usize| -> bool {
+        let e = &cx.sem.expressions[i];
+        let predictive = matches!(
+            e.node,
+            ExprNode::Choice {
+                selection: ChoiceSelection::Predictive,
+                ..
+            }
+        );
+        let plan = choices.iter().find(|c| c.expr_id == e.id);
+        let predict = predictive || plan.is_some_and(|c| c.strategy == ChoicePlanStrategy::Predict);
+        predict && plan.is_none_or(|c| c.fallback == ChoicePlanFallback::FullChoice)
+    };
+    for r in 0..cx.sem.rules.len() {
         let root = cx.index(&cx.sem.rules[r].body);
-        let local = cx.local_tree(root);
-        if local
-            .iter()
-            .any(|&i| unsafe_set[i] || cx.facts[i].trivia || !summaries[i].is_empty())
-        {
+        if unsafe_set[root] {
             continue;
         }
+        let local = cx.local_tree(root);
         let mut incoming = BTreeMap::<usize, usize>::new();
         for &i in &local {
             for id in children(&cx.sem.expressions[i].node) {
@@ -182,37 +199,34 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
             vec![cx.sem.expressions[root].id.clone()],
         )];
         while let Some((i, kind, path)) = stack.pop() {
-            if i != root && incoming[&i] != 1 {
+            if i != root && (incoming[&i] != 1 || unsafe_set[i]) {
                 continue;
             }
             if i != root {
-                omissions.insert(i,Proof { kind,expr_ids: path.clone(), explanation:
-                    "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。".into() });
+                omissions.insert(i, Proof { kind, expr_ids: path.clone(), explanation:
+                    "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。".into() });
                 omitted_rules.insert(r);
             }
-            let (next, next_kind) = match &cx.sem.expressions[i].node {
-                ExprNode::Seq { items } => (items.iter().collect::<Vec<_>>(), kind),
-                ExprNode::Group { child } => (vec![child], kind),
-                ExprNode::Choice { alternatives, .. }
-                    if choices.iter().any(|c| {
-                        c.expr_id == cx.sem.expressions[i].id
-                            && c.strategy == ChoicePlanStrategy::Predict
-                            && c.fallback == ChoicePlanFallback::None
-                    }) =>
-                {
-                    (
-                        alternatives.iter().collect(),
-                        ProofKind::ExclusiveCandidates,
-                    )
-                }
+            let (next, next_kind): (Vec<&ExprId>, ProofKind) = match &cx.sem.expressions[i].node {
+                ExprNode::Seq { items } => (items.iter().collect(), kind),
+                ExprNode::Group { child }
+                | ExprNode::Lookahead { child }
+                | ExprNode::NegativeLookahead { child } => (vec![child], kind),
+                ExprNode::Choice { .. } if two_pass_choice(i) => (Vec::new(), kind),
+                ExprNode::Choice { alternatives, .. } => (
+                    alternatives.iter().collect(),
+                    ProofKind::ExclusiveCandidates,
+                ),
+                ExprNode::Optional { child } => (vec![child], ProofKind::MonotoneNoRollback),
                 ExprNode::Repeat {
-                    child,
-                    terminator: None,
-                    max,
-                    ..
-                } if *max != Some(0) && cx.fact(child).minimum() > 0 => {
-                    (vec![child], ProofKind::MonotoneNoRollback)
-                }
+                    child, terminator, ..
+                } => (
+                    std::iter::once(child).chain(terminator.iter()).collect(),
+                    ProofKind::MonotoneNoRollback,
+                ),
+                ExprNode::Separated {
+                    element, separator, ..
+                } => (vec![element, separator], ProofKind::MonotoneNoRollback),
                 _ => (Vec::new(), kind),
             };
             for id in next.into_iter().rev() {

@@ -1,7 +1,7 @@
 {
   "backend": "java",
-  "generator_sha256": "41b4c1fda0b85a1a6614532377d979a00334a4569b0ec9b8c1246c4a610c5c59",
-  "front_sha256": "87235a70f5156481c3ced03c120024f0cd010f23094d3b35240c068a5b486629",
+  "generator_sha256": "715b70c1d6a1d07d60d15939ec2e25c4047c9a1ecc5ece859ab674576a2c5aad",
+  "front_sha256": "256740c898950cfe4359d6a34b5992294b47737d6139cd14659e1f4396ff1268",
   "jobs": 4,
   "corpus_files": 127,
   "grammar_variants": 279,
