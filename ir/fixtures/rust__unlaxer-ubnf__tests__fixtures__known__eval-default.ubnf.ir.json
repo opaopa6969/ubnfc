@@ -1,0 +1,405 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "EvalDefault::Root",
+        "sccId": "scc:0"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "EvalDefault::Root"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:EvalDefault",
+    "ruleId": "EvalDefault::Root"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:EvalDefault",
+      "name": "EvalDefault",
+      "package": null,
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": null
+      },
+      "source": {
+        "end": 82,
+        "sourceId": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
+        "start": 0
+      },
+      "sourceId": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [],
+    "lexical": [],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/seq",
+              "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "cursorFrameFlag",
+    "dualCursor",
+    "eval",
+    "memoReplay",
+    "structuredOccurrences"
+  ],
+  "semantics": {
+    "astTypes": [],
+    "captures": [],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/0/literal",
+          "java": "'x'",
+          "rust": "x"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/seq",
+        "node": {
+          "items": [
+            "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/0/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "EvalDefault::Root",
+        "source": {
+          "end": 79,
+          "sourceId": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
+          "start": 76
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'x'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "ruleId": "EvalDefault::Root",
+        "source": {
+          "end": 79,
+          "sourceId": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
+          "start": 76
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "kind": "variable_ref",
+              "strip_prefix": "$"
+            },
+            "name": "eval",
+            "source": {
+              "end": 66,
+              "sourceId": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
+              "start": 22
+            }
+          }
+        ],
+        "body": "expr:rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf:76:79:body/seq",
+        "eval": {
+          "kind": "variable_ref",
+          "params": {
+            "strip_prefix": "$"
+          },
+          "strategy": "auto"
+        },
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "EvalDefault::Root",
+        "triviaPolicyId": "trivia:none"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:EvalDefault",
+        "id": "EvalDefault::Root",
+        "kind": "rule",
+        "name": "Root",
+        "originalName": "Root",
+        "qualifiedSymbolId": "EvalDefault::Root",
+        "source": {
+          "end": 80,
+          "sourceId": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
+          "start": 67
+        },
+        "sourceId": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf"
+      }
+    ],
+    "tokens": [],
+    "trivia": {
+      "insertionPlan": [],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [],
+          "id": "trivia:none",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": null
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 83,
+      "id": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
+      "path": "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
+      "sha256": "40609d68291bbec8080d9715aae568f65875962a27e7558678e6282a7f0a5e5e"
+    }
+  ],
+  "version": 1
+}

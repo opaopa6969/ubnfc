@@ -1,0 +1,2120 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 58,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 3,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:193:197:body/0/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:206:209:body/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 58,
+              "start": 58
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:212:216:body/2/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:227:230:body/3/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 58,
+              "start": 58
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": true,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 33,
+              "start": 33
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:233:236:body/4/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 33,
+              "start": 33
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:245:248:body/5/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 58,
+              "start": 58
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 120,
+              "start": 120
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:328:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:325:328:body/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 59,
+              "start": 59
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/0/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Cardinality::Root",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Cardinality::Item",
+        "sccId": "scc:1"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Cardinality::Digits",
+        "sccId": "scc:2"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Cardinality::Root"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Cardinality::Item"
+        ]
+      },
+      {
+        "id": "scc:2",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Cardinality::Digits"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Cardinality",
+    "ruleId": "Cardinality::Root"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Cardinality",
+      "name": "Cardinality",
+      "package": "org.example.cardinality",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": "javaStyle"
+      },
+      "source": {
+        "end": 354,
+        "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+        "start": 0
+      },
+      "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [],
+    "lexical": [
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Cardinality::NUMBER"
+      }
+    ],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:193:197:body/0/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:206:209:body/1/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:212:216:body/2/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:227:230:body/3/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:233:236:body/4/0/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:245:248:body/5/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/0/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:328:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:325:328:body/1/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/0/tokenRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "conservative",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "memoReplay",
+    "structuredOccurrences",
+    "triviaInsertion"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "CardinalityAST",
+        "kind": "transparentUnion",
+        "name": "CardinalityAST",
+        "variants": [
+          "CardinalityAST.Container",
+          "CardinalityAST.Item"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "optional",
+            "name": "head",
+            "valueType": {
+              "kind": "node",
+              "typeId": "CardinalityAST.Item"
+            }
+          },
+          {
+            "cardinality": "list",
+            "name": "values",
+            "valueType": {
+              "kind": "node",
+              "typeId": "CardinalityAST.Item"
+            }
+          },
+          {
+            "cardinality": "optional",
+            "name": "tail",
+            "valueType": {
+              "kind": "text"
+            }
+          },
+          {
+            "cardinality": "list",
+            "name": "flags",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "CardinalityAST.Container",
+        "implements": [
+          "CardinalityAST"
+        ],
+        "kind": "record",
+        "name": "Container"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "CardinalityAST.Item",
+        "implements": [
+          "CardinalityAST"
+        ],
+        "kind": "record",
+        "name": "Item"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "optional",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional",
+        "name": "head",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Cardinality::Root",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "CardinalityAST.Item"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat",
+        "name": "values",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Cardinality::Root",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "CardinalityAST.Item"
+        }
+      },
+      {
+        "cardinality": "optional",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional",
+        "name": "tail",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Cardinality::Root",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat",
+        "name": "flags",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Cardinality::Root",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Cardinality::Item",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:206:209:body/1/literal",
+          "java": "':'",
+          "rust": ":"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:227:230:body/3/literal",
+          "java": "':'",
+          "rust": ":"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:233:236:body/4/0/literal",
+          "java": "'!'",
+          "rust": "!"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:245:248:body/5/literal",
+          "java": "':'",
+          "rust": ":"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/0/literal",
+          "java": "'x'",
+          "rust": "x"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:325:328:body/1/literal",
+          "java": "';'",
+          "rust": ";"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional",
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:206:209:body/1/literal",
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat",
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:227:230:body/3/literal",
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional",
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:245:248:body/5/literal",
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 256,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 191
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:193:197:body/0/0/ruleRef",
+          "kind": "optional"
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 199,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 191
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:193:197:body/0/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Cardinality::Item"
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 197,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 193
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "':'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:206:209:body/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 209,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 206
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:212:216:body/2/0/ruleRef",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 218,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 210
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:212:216:body/2/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Cardinality::Item"
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 216,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 212
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "':'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:227:230:body/3/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 230,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 227
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:233:236:body/4/0/literal",
+          "kind": "optional"
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 238,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 231
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'!'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:233:236:body/4/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "!",
+          "wordBoundary": false
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 236,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 233
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "':'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:245:248:body/5/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 248,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 245
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/seq",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 256,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 249
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/0/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 254,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 251
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'x'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "ruleId": "Cardinality::Root",
+        "source": {
+          "end": 254,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 251
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:328:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:325:328:body/1/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Cardinality::Item",
+        "source": {
+          "end": 328,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 311
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Cardinality::Digits"
+        },
+        "ruleId": "Cardinality::Item",
+        "source": {
+          "end": 317,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 311
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "';'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:325:328:body/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "ruleId": "Cardinality::Item",
+        "source": {
+          "end": 328,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 325
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/0/tokenRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Cardinality::Digits",
+        "source": {
+          "end": 350,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 344
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/0/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Cardinality::NUMBER"
+        },
+        "ruleId": "Cardinality::Digits",
+        "source": {
+          "end": 350,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 344
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "optional",
+            "conversion": "node",
+            "field": "head",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:199:body/0/optional/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "node",
+            "field": "values",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:210:218:body/2/repeat/capture/0"
+            ]
+          },
+          {
+            "cardinality": "optional",
+            "conversion": "text",
+            "field": "tail",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "text",
+            "field": "flags",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:249:256:body/6/repeat/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Root",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "CardinalityAST.Container",
+        "ruleId": "Cardinality::Root",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "value",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:317:body/0/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Item",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "CardinalityAST.Item",
+        "ruleId": "Cardinality::Item",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 121,
+              "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+              "start": 116
+            }
+          },
+          {
+            "arguments": {
+              "className": "Container",
+              "params": [
+                "head",
+                "values",
+                "tail",
+                "flags"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 179,
+              "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+              "start": 124
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "head",
+          "values",
+          "tail",
+          "flags"
+        ],
+        "mappingTypeId": "CardinalityAST.Container",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Cardinality::Root",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Item",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 299,
+              "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+              "start": 269
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:328:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "CardinalityAST.Item",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Cardinality::Item",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [],
+        "body": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/seq",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Cardinality::Digits",
+        "triviaPolicyId": "trivia:javaStyle"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Cardinality",
+        "id": "Cardinality::NUMBER",
+        "kind": "token",
+        "name": "NUMBER",
+        "originalName": "NUMBER",
+        "qualifiedSymbolId": "Cardinality::NUMBER",
+        "source": {
+          "end": 112,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 85
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf"
+      },
+      {
+        "grammarId": "grammar:Cardinality",
+        "id": "Cardinality::Root",
+        "kind": "rule",
+        "name": "Root",
+        "originalName": "Root",
+        "qualifiedSymbolId": "Cardinality::Root",
+        "source": {
+          "end": 265,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 182
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf"
+      },
+      {
+        "grammarId": "grammar:Cardinality",
+        "id": "Cardinality::Item",
+        "kind": "rule",
+        "name": "Item",
+        "originalName": "Item",
+        "qualifiedSymbolId": "Cardinality::Item",
+        "source": {
+          "end": 330,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 302
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf"
+      },
+      {
+        "grammarId": "grammar:Cardinality",
+        "id": "Cardinality::Digits",
+        "kind": "rule",
+        "name": "Digits",
+        "originalName": "Digits",
+        "qualifiedSymbolId": "Cardinality::Digits",
+        "source": {
+          "end": 352,
+          "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+          "start": 333
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf"
+      }
+    ],
+    "tokens": [
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaNumber",
+          "rust": "legacyRustNumber"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token NUMBER = NumberParser",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "既知の NumberParser の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Number"
+        },
+        "symbolId": "Cardinality::NUMBER"
+      }
+    ],
+    "trivia": {
+      "insertionPlan": [
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 2,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 3,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 4,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 5,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 6,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:191:256:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:328:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:328:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:311:328:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:344:350:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        }
+      ],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [
+            {
+              "codePoints": [
+                9,
+                10,
+                11,
+                12,
+                13,
+                32
+              ],
+              "kind": "characters"
+            },
+            {
+              "kind": "lineComment",
+              "lineEndProfile": "legacyLineTerminator",
+              "open": "//"
+            },
+            {
+              "close": "*/",
+              "kind": "blockComment",
+              "open": "/*"
+            }
+          ],
+          "id": "trivia:javaStyle",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": "javaStyle"
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 355,
+      "id": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+      "path": "unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf",
+      "sha256": "664b88f84e42995040f969f9de0999fd10ce938f07c7e1f7c1bb9844319492a8"
+    }
+  ],
+  "version": 1
+}

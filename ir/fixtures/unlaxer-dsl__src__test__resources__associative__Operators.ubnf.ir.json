@@ -1,0 +1,3422 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 45,
+              "start": 45
+            },
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 45,
+              "start": 45
+            },
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 45,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 42,
+              "start": 42
+            },
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 42,
+              "start": 42
+            },
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 42,
+              "start": 42
+            },
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 45,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": "trie:expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice"
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 45,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 42,
+              "start": 42
+            },
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": "trie:expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice"
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 42,
+              "start": 42
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:455:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 47,
+              "start": 47
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 3,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 40,
+              "start": 40
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:462:472:body/1/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 40,
+              "start": 40
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 41,
+              "start": 41
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 57,
+              "start": 45
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/0/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [
+      {
+        "id": "trie:expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+        "maxDepth": 1,
+        "nodes": [
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
+            ],
+            "completedCandidateExprIds": [],
+            "edges": [
+              {
+                "codePoint": 43,
+                "target": 1
+              },
+              {
+                "codePoint": 45,
+                "target": 2
+              }
+            ],
+            "index": 0,
+            "unknownCandidateExprIds": []
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal"
+            ],
+            "edges": [],
+            "index": 1,
+            "unknownCandidateExprIds": []
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
+            ],
+            "edges": [],
+            "index": 2,
+            "unknownCandidateExprIds": []
+          }
+        ]
+      },
+      {
+        "id": "trie:expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+        "maxDepth": 1,
+        "nodes": [
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
+            ],
+            "completedCandidateExprIds": [],
+            "edges": [
+              {
+                "codePoint": 42,
+                "target": 1
+              },
+              {
+                "codePoint": 47,
+                "target": 2
+              }
+            ],
+            "index": 0,
+            "unknownCandidateExprIds": []
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal"
+            ],
+            "edges": [],
+            "index": 1,
+            "unknownCandidateExprIds": []
+          },
+          {
+            "acceptsEof": false,
+            "candidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
+            ],
+            "completedCandidateExprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
+            ],
+            "edges": [],
+            "index": 2,
+            "unknownCandidateExprIds": []
+          }
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Operators::Expression",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Operators::Term",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Operators::AddOp",
+        "sccId": "scc:1"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Operators::MulOp",
+        "sccId": "scc:2"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Operators::Factor",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Operators::NumericLiteral",
+        "sccId": "scc:3"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "allEligible",
+        "recursive": true,
+        "ruleIds": [
+          "Operators::Expression",
+          "Operators::Term",
+          "Operators::Factor"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Operators::AddOp"
+        ]
+      },
+      {
+        "id": "scc:2",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Operators::MulOp"
+        ]
+      },
+      {
+        "id": "scc:3",
+        "memoPolicy": "allEligible",
+        "recursive": false,
+        "ruleIds": [
+          "Operators::NumericLiteral"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Operators",
+    "ruleId": "Operators::Expression"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Operators",
+      "name": "Operators",
+      "package": "org.example.operators",
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": "javaStyle"
+      },
+      "source": {
+        "end": 550,
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+        "start": 0
+      },
+      "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "plan": {
+    "choices": [
+      {
+        "candidateOrder": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
+        ],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+        "fallback": "none",
+        "proof": {
+          "explanation": "非 nullable・trivia なしの単文字 literal の mayStart が EOF を含め pairwise disjoint。元順で訪問される不一致候補は入口で失敗し consume(0) するため、その診断と M リセットを再生できる。採用枝より後は ordered choice と同じく訪問しない。",
+          "exprIds": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
+          ],
+          "kind": "exclusiveCandidates"
+        },
+        "strategy": "predict",
+        "trieId": "trie:expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice"
+      },
+      {
+        "candidateOrder": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
+        ],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+        "fallback": "none",
+        "proof": {
+          "explanation": "非 nullable・trivia なしの単文字 literal の mayStart が EOF を含め pairwise disjoint。元順で訪問される不一致候補は入口で失敗し consume(0) するため、その診断と M リセットを再生できる。採用枝より後は ordered choice と同じく訪問しない。",
+          "exprIds": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
+          ],
+          "kind": "exclusiveCandidates"
+        },
+        "strategy": "predict",
+        "trieId": "trie:expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice"
+      },
+      {
+        "candidateOrder": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:455:body/0/ruleRef",
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq"
+        ],
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": null
+      }
+    ],
+    "lexical": [
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Operators::NUMBER"
+      }
+    ],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:455:body/0/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:462:472:body/1/1/ruleRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/0/tokenRef",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [
+      {
+        "boundaryExprIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq"
+        ],
+        "liftRecipeIds": [
+          "recipe:Expression",
+          "recipe:Term"
+        ],
+        "proof": {
+          "explanation": "到達領域に trivia・副作用・recovery・先読み等がある、または塔が循環する",
+          "exprIds": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq"
+          ],
+          "kind": "none"
+        },
+        "ruleIds": [
+          "Operators::Expression",
+          "Operators::Term"
+        ],
+        "strategy": "tierFunctions"
+      }
+    ],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "memoReplay",
+    "operators",
+    "orderedChoice",
+    "predictiveChoice",
+    "structuredOccurrences",
+    "triviaInsertion"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "OperatorsAST",
+        "kind": "transparentUnion",
+        "name": "OperatorsAST",
+        "variants": [
+          "OperatorsAST.Binary",
+          "OperatorsAST.Number"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "left",
+            "valueType": {
+              "kind": "mixed",
+              "members": [
+                {
+                  "kind": "null"
+                },
+                {
+                  "kind": "node",
+                  "typeId": "OperatorsAST"
+                }
+              ]
+            }
+          },
+          {
+            "cardinality": "list",
+            "name": "op",
+            "valueType": {
+              "kind": "text"
+            }
+          },
+          {
+            "cardinality": "list",
+            "name": "right",
+            "valueType": {
+              "kind": "node",
+              "typeId": "OperatorsAST"
+            }
+          }
+        ],
+        "id": "OperatorsAST.Binary",
+        "implements": [
+          "OperatorsAST"
+        ],
+        "kind": "record",
+        "name": "Binary"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "OperatorsAST.Number",
+        "implements": [
+          "OperatorsAST"
+        ],
+        "kind": "record",
+        "name": "Number"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef",
+        "name": "left",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Operators::Expression",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "OperatorsAST"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef",
+        "name": "op",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Operators::Expression",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef",
+        "name": "right",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Operators::Expression",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "OperatorsAST"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef",
+        "name": "left",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Operators::Term",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "OperatorsAST"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef",
+        "name": "op",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Operators::Term",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "node",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef",
+        "name": "right",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Operators::Term",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "OperatorsAST"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Operators::NumericLiteral",
+        "siteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+          "java": "'+'",
+          "rust": "+"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal",
+          "java": "'-'",
+          "rust": "-"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+          "java": "'*'",
+          "rust": "*"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal",
+          "java": "'/'",
+          "rust": "/"
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal",
+          "java": "'('",
+          "rust": "("
+        },
+        {
+          "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal",
+          "java": "')'",
+          "rust": ")"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Operators::Expression",
+        "source": {
+          "end": 247,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 211
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::Term"
+        },
+        "ruleId": "Operators::Expression",
+        "source": {
+          "end": 215,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 211
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:222:247:body/1/repeat",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "Operators::Expression",
+        "source": {
+          "end": 247,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 222
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Operators::Expression",
+        "source": {
+          "end": 238,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 224
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::AddOp"
+        },
+        "ruleId": "Operators::Expression",
+        "source": {
+          "end": 229,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 224
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::Term"
+        },
+        "ruleId": "Operators::Expression",
+        "source": {
+          "end": 238,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 234
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Operators::Term",
+        "source": {
+          "end": 379,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 339
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::Factor"
+        },
+        "ruleId": "Operators::Term",
+        "source": {
+          "end": 345,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 339
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:352:379:body/1/repeat",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "Operators::Term",
+        "source": {
+          "end": 379,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 352
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Operators::Term",
+        "source": {
+          "end": 370,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 354
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::MulOp"
+        },
+        "ruleId": "Operators::Term",
+        "source": {
+          "end": 359,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 354
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::Factor"
+        },
+        "ruleId": "Operators::Term",
+        "source": {
+          "end": 370,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 364
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Operators::AddOp",
+        "source": {
+          "end": 403,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 394
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'+'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "ruleId": "Operators::AddOp",
+        "source": {
+          "end": 397,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 394
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'-'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "ruleId": "Operators::AddOp",
+        "source": {
+          "end": 403,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 400
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Operators::MulOp",
+        "source": {
+          "end": 426,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 417
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'*'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "ruleId": "Operators::MulOp",
+        "source": {
+          "end": 420,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 417
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'/'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "ruleId": "Operators::MulOp",
+        "source": {
+          "end": 426,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 423
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:455:body/0/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Operators::Factor",
+        "source": {
+          "end": 476,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 441
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:455:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::NumericLiteral"
+        },
+        "ruleId": "Operators::Factor",
+        "source": {
+          "end": 455,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 441
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:462:472:body/1/1/ruleRef",
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Operators::Factor",
+        "source": {
+          "end": 476,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 458
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'('",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "ruleId": "Operators::Factor",
+        "source": {
+          "end": 461,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 458
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:462:472:body/1/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Operators::Expression"
+        },
+        "ruleId": "Operators::Factor",
+        "source": {
+          "end": 472,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 462
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "')'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "ruleId": "Operators::Factor",
+        "source": {
+          "end": 476,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 473
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Operators::NumericLiteral",
+        "source": {
+          "end": 540,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 532
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group",
+        "node": {
+          "child": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq",
+          "kind": "group"
+        },
+        "ruleId": "Operators::NumericLiteral",
+        "source": {
+          "end": 540,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 532
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq",
+        "node": {
+          "items": [
+            "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/0/tokenRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Operators::NumericLiteral",
+        "source": {
+          "end": 539,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 533
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/0/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Operators::NUMBER"
+        },
+        "ruleId": "Operators::NumericLiteral",
+        "source": {
+          "end": 539,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 533
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "left",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "text",
+            "field": "op",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "node",
+            "field": "right",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Expression",
+        "kind": "assocLists",
+        "leafFallback": {
+          "left": null,
+          "op": "singleStrippedLeafText",
+          "right": [],
+          "span": "leafConsumedExtent",
+          "typeId": "OperatorsAST.Binary"
+        },
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "OperatorsAST.Binary",
+        "ruleId": "Operators::Expression",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "node",
+            "field": "left",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "text",
+            "field": "op",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "list",
+            "conversion": "node",
+            "field": "right",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Term",
+        "kind": "assocLists",
+        "leafFallback": {
+          "left": null,
+          "op": "singleStrippedLeafText",
+          "right": [],
+          "span": "leafConsumedExtent",
+          "typeId": "OperatorsAST.Binary"
+        },
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "OperatorsAST.Binary",
+        "ruleId": "Operators::Term",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "value",
+            "siteIds": [
+              "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/0/group/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:NumericLiteral",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "OperatorsAST.Number",
+        "ruleId": "Operators::NumericLiteral",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 117,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 112
+            }
+          },
+          {
+            "arguments": {
+              "className": "Binary",
+              "params": [
+                "left",
+                "op",
+                "right"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 160,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 118
+            }
+          },
+          {
+            "arguments": {},
+            "name": "leftAssoc",
+            "source": {
+              "end": 171,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 161
+            }
+          },
+          {
+            "arguments": {
+              "level": 10
+            },
+            "name": "precedence",
+            "source": {
+              "end": 193,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 172
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "left",
+          "op",
+          "right"
+        ],
+        "mappingTypeId": "OperatorsAST.Binary",
+        "operator": {
+          "associativity": "left",
+          "baseRuleId": "Operators::Term",
+          "canonicalForm": "leftOpRightLists",
+          "leftSiteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:215:body/0/ruleRef/capture/0",
+          "opSiteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:229:body/1/0/0/ruleRef/capture/0",
+          "operatorRuleId": "Operators::AddOp",
+          "precedence": 10,
+          "rightSiteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:234:238:body/1/0/1/ruleRef/capture/0"
+        },
+        "skip": false,
+        "symbolId": "Operators::Expression",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Binary",
+              "params": [
+                "left",
+                "op",
+                "right"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 294,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 252
+            }
+          },
+          {
+            "arguments": {},
+            "name": "leftAssoc",
+            "source": {
+              "end": 305,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 295
+            }
+          },
+          {
+            "arguments": {
+              "level": 20
+            },
+            "name": "precedence",
+            "source": {
+              "end": 327,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 306
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "left",
+          "op",
+          "right"
+        ],
+        "mappingTypeId": "OperatorsAST.Binary",
+        "operator": {
+          "associativity": "left",
+          "baseRuleId": "Operators::Factor",
+          "canonicalForm": "leftOpRightLists",
+          "leftSiteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:345:body/0/ruleRef/capture/0",
+          "opSiteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:359:body/1/0/0/ruleRef/capture/0",
+          "operatorRuleId": "Operators::MulOp",
+          "precedence": 20,
+          "rightSiteId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:364:370:body/1/0/1/ruleRef/capture/0"
+        },
+        "skip": false,
+        "symbolId": "Operators::Term",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [],
+        "body": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Operators::AddOp",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [],
+        "body": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Operators::MulOp",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [],
+        "body": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:441:476:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "Operators::Factor",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Number",
+              "params": [
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 512,
+              "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+              "start": 480
+            }
+          }
+        ],
+        "body": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "value"
+        ],
+        "mappingTypeId": "OperatorsAST.Number",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Operators::NumericLiteral",
+        "triviaPolicyId": "trivia:javaStyle"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Operators",
+        "id": "Operators::NUMBER",
+        "kind": "token",
+        "name": "NUMBER",
+        "originalName": "NUMBER",
+        "qualifiedSymbolId": "Operators::NUMBER",
+        "source": {
+          "end": 108,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 81
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+      },
+      {
+        "grammarId": "grammar:Operators",
+        "id": "Operators::Expression",
+        "kind": "rule",
+        "name": "Expression",
+        "originalName": "Expression",
+        "qualifiedSymbolId": "Operators::Expression",
+        "source": {
+          "end": 248,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 196
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+      },
+      {
+        "grammarId": "grammar:Operators",
+        "id": "Operators::Term",
+        "kind": "rule",
+        "name": "Term",
+        "originalName": "Term",
+        "qualifiedSymbolId": "Operators::Term",
+        "source": {
+          "end": 380,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 330
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+      },
+      {
+        "grammarId": "grammar:Operators",
+        "id": "Operators::AddOp",
+        "kind": "rule",
+        "name": "AddOp",
+        "originalName": "AddOp",
+        "qualifiedSymbolId": "Operators::AddOp",
+        "source": {
+          "end": 404,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 384
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+      },
+      {
+        "grammarId": "grammar:Operators",
+        "id": "Operators::MulOp",
+        "kind": "rule",
+        "name": "MulOp",
+        "originalName": "MulOp",
+        "qualifiedSymbolId": "Operators::MulOp",
+        "source": {
+          "end": 427,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 407
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+      },
+      {
+        "grammarId": "grammar:Operators",
+        "id": "Operators::Factor",
+        "kind": "rule",
+        "name": "Factor",
+        "originalName": "Factor",
+        "qualifiedSymbolId": "Operators::Factor",
+        "source": {
+          "end": 477,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 430
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+      },
+      {
+        "grammarId": "grammar:Operators",
+        "id": "Operators::NumericLiteral",
+        "kind": "rule",
+        "name": "NumericLiteral",
+        "originalName": "NumericLiteral",
+        "qualifiedSymbolId": "Operators::NumericLiteral",
+        "source": {
+          "end": 548,
+          "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+          "start": 513
+        },
+        "sourceId": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf"
+      }
+    ],
+    "tokens": [
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaNumber",
+          "rust": "legacyRustNumber"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token NUMBER = NumberParser",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "既知の NumberParser の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Number"
+        },
+        "symbolId": "Operators::NUMBER"
+      }
+    ],
+    "trivia": {
+      "insertionPlan": [
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:211:247:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:224:238:body/1/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:339:379:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:354:370:body/1/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 2,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:476:body/1/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:532:540:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:533:539:body/0/0/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        }
+      ],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [
+            {
+              "codePoints": [
+                9,
+                10,
+                11,
+                12,
+                13,
+                32
+              ],
+              "kind": "characters"
+            },
+            {
+              "kind": "lineComment",
+              "lineEndProfile": "legacyLineTerminator",
+              "open": "//"
+            },
+            {
+              "close": "*/",
+              "kind": "blockComment",
+              "open": "/*"
+            }
+          ],
+          "id": "trivia:javaStyle",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": "javaStyle"
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 551,
+      "id": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+      "path": "unlaxer-dsl/src/test/resources/associative/Operators.ubnf",
+      "sha256": "1ab3ecfbeac4ca959047fdf1f694fe60978cd60de3470434a2d72338633cc5d9"
+    }
+  ],
+  "version": 1
+}
