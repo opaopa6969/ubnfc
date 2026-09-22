@@ -962,7 +962,8 @@ pub struct Dfa {
 }
 
 /// token に付随する optional 計画。状態 ID は 0..states、範囲は code point 閉区間。
-/// 入力の現在位置から最長の正長接頭辞を採用し、開始状態の受理だけでは成功しない。
+/// 優先順位付き構成の受理到達で候補を更新し、入力終端または遷移なしで最後の候補を採用する。
+/// Java lookingAt と同じ leftmost-first。最終候補がゼロ幅なら成功しない。
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct RegexDfa {
@@ -971,7 +972,7 @@ pub struct RegexDfa {
     pub accepting: Vec<u64>,
     pub transitions: Vec<RegexDfaTransition>,
     pub anchored_at_start: RegexDfaAnchoredAtStart,
-    pub longest_match: RegexDfaLongestMatch,
+    pub semantics: RegexDfaSemantics,
     pub zero_width: TokenSpecRegexZeroWidth,
 }
 
@@ -1528,7 +1529,7 @@ impl From<&Dfa> for RegexDfa {
                 })
                 .collect(),
             anchored_at_start: RegexDfaAnchoredAtStart,
-            longest_match: RegexDfaLongestMatch,
+            semantics: RegexDfaSemantics,
             zero_width: TokenSpecRegexZeroWidth,
         }
     }

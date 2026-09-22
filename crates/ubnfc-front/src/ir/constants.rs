@@ -181,5 +181,5 @@ fixed_value!(ValueTypeNumberJava, "int32Exact");
 fixed_value!(ValueTypeNumberRust, "lexeme");
 
 fixed_value!(RegexDfaAnchoredAtStart, true);
-fixed_value!(RegexDfaLongestMatch, true);
+fixed_value!(RegexDfaSemantics, "leftmostFirst");
 fixed_value!(RegexFallback, "javaPattern");
