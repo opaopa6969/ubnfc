@@ -1659,7 +1659,7 @@ out
 }
 fn b18_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"import",true,"import");
+out=self.literal::<false>(out.state,"import",true,64,"import");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'import'");}
 out
 }
@@ -1722,7 +1722,7 @@ out
 }
 fn b22_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"#",true,"#");
+out=self.literal::<false>(out.state,"#",true,1,"#");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'#'");}
 out
 }
@@ -1748,7 +1748,7 @@ out
 }
 fn b24_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -1774,7 +1774,7 @@ out
 }
 fn b26_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,";",true,";");
+out=self.literal::<false>(out.state,";",true,22,";");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"';'");}
 out
 }
@@ -1858,7 +1858,7 @@ out
 }
 fn b31_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".",true,".");
+out=self.literal::<false>(out.state,".",true,11,".");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.'");}
 out
 }
@@ -2013,7 +2013,7 @@ out
 }
 fn b41_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"variable",true,"variable");
+out=self.literal::<false>(out.state,"variable",true,94,"variable");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'variable'");}
 out
 }
@@ -2026,7 +2026,7 @@ out
 }
 fn b42_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"var",true,"var");
+out=self.literal::<false>(out.state,"var",true,93,"var");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'var'");}
 out
 }
@@ -2039,7 +2039,7 @@ out
 }
 fn b43_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -2138,7 +2138,7 @@ out
 }
 fn b49_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"set",true,"set");
+out=self.literal::<false>(out.state,"set",true,82,"set");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'set'");}
 out
 }
@@ -2228,7 +2228,7 @@ out
 }
 fn b55_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,";",true,";");
+out=self.literal::<false>(out.state,";",true,22,";");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"';'");}
 out
 }
@@ -2301,7 +2301,7 @@ out
 }
 fn b59_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"variable",true,"variable");
+out=self.literal::<false>(out.state,"variable",true,94,"variable");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'variable'");}
 out
 }
@@ -2314,7 +2314,7 @@ out
 }
 fn b60_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"var",true,"var");
+out=self.literal::<false>(out.state,"var",true,93,"var");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'var'");}
 out
 }
@@ -2327,7 +2327,7 @@ out
 }
 fn b61_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -2426,7 +2426,7 @@ out
 }
 fn b67_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"set",true,"set");
+out=self.literal::<false>(out.state,"set",true,82,"set");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'set'");}
 out
 }
@@ -2516,7 +2516,7 @@ out
 }
 fn b73_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,";",true,";");
+out=self.literal::<false>(out.state,";",true,22,";");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"';'");}
 out
 }
@@ -2589,7 +2589,7 @@ out
 }
 fn b77_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"variable",true,"variable");
+out=self.literal::<false>(out.state,"variable",true,94,"variable");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'variable'");}
 out
 }
@@ -2602,7 +2602,7 @@ out
 }
 fn b78_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"var",true,"var");
+out=self.literal::<false>(out.state,"var",true,93,"var");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'var'");}
 out
 }
@@ -2615,7 +2615,7 @@ out
 }
 fn b79_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -2714,7 +2714,7 @@ out
 }
 fn b85_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"set",true,"set");
+out=self.literal::<false>(out.state,"set",true,82,"set");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'set'");}
 out
 }
@@ -2804,7 +2804,7 @@ out
 }
 fn b91_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,";",true,";");
+out=self.literal::<false>(out.state,";",true,22,";");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"';'");}
 out
 }
@@ -2877,7 +2877,7 @@ out
 }
 fn b95_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"variable",true,"variable");
+out=self.literal::<false>(out.state,"variable",true,94,"variable");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'variable'");}
 out
 }
@@ -2890,7 +2890,7 @@ out
 }
 fn b96_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"var",true,"var");
+out=self.literal::<false>(out.state,"var",true,93,"var");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'var'");}
 out
 }
@@ -2903,7 +2903,7 @@ out
 }
 fn b97_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -3002,7 +3002,7 @@ out
 }
 fn b103_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"set",true,"set");
+out=self.literal::<false>(out.state,"set",true,82,"set");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'set'");}
 out
 }
@@ -3092,7 +3092,7 @@ out
 }
 fn b109_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,";",true,";");
+out=self.literal::<false>(out.state,";",true,22,";");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"';'");}
 out
 }
@@ -3146,7 +3146,7 @@ out
 }
 fn b112_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -3199,7 +3199,7 @@ out
 }
 fn b115_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"number",true,"number");
+out=self.literal::<false>(out.state,"number",true,76,"number");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'number'");}
 out
 }
@@ -3212,7 +3212,7 @@ out
 }
 fn b116_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Number",true,"Number");
+out=self.literal::<false>(out.state,"Number",true,35,"Number");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Number'");}
 out
 }
@@ -3225,7 +3225,7 @@ out
 }
 fn b117_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"string",true,"string");
+out=self.literal::<false>(out.state,"string",true,86,"string");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'string'");}
 out
 }
@@ -3238,7 +3238,7 @@ out
 }
 fn b118_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"String",true,"String");
+out=self.literal::<false>(out.state,"String",true,39,"String");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'String'");}
 out
 }
@@ -3251,7 +3251,7 @@ out
 }
 fn b119_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"boolean",true,"boolean");
+out=self.literal::<false>(out.state,"boolean",true,48,"boolean");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'boolean'");}
 out
 }
@@ -3264,7 +3264,7 @@ out
 }
 fn b120_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Boolean",true,"Boolean");
+out=self.literal::<false>(out.state,"Boolean",true,31,"Boolean");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Boolean'");}
 out
 }
@@ -3277,7 +3277,7 @@ out
 }
 fn b121_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"object",true,"object");
+out=self.literal::<false>(out.state,"object",true,77,"object");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'object'");}
 out
 }
@@ -3290,7 +3290,7 @@ out
 }
 fn b122_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Object",true,"Object");
+out=self.literal::<false>(out.state,"Object",true,36,"Object");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Object'");}
 out
 }
@@ -3344,7 +3344,7 @@ out
 }
 fn b125_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -3389,7 +3389,7 @@ out
 }
 fn b128_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"number",true,"number");
+out=self.literal::<false>(out.state,"number",true,76,"number");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'number'");}
 out
 }
@@ -3402,7 +3402,7 @@ out
 }
 fn b129_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Number",true,"Number");
+out=self.literal::<false>(out.state,"Number",true,35,"Number");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Number'");}
 out
 }
@@ -3415,7 +3415,7 @@ out
 }
 fn b130_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"float",true,"float");
+out=self.literal::<false>(out.state,"float",true,61,"float");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'float'");}
 out
 }
@@ -3428,7 +3428,7 @@ out
 }
 fn b131_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Float",true,"Float");
+out=self.literal::<false>(out.state,"Float",true,33,"Float");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Float'");}
 out
 }
@@ -3482,7 +3482,7 @@ out
 }
 fn b134_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -3523,7 +3523,7 @@ out
 }
 fn b137_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"string",true,"string");
+out=self.literal::<false>(out.state,"string",true,86,"string");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'string'");}
 out
 }
@@ -3536,7 +3536,7 @@ out
 }
 fn b138_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"String",true,"String");
+out=self.literal::<false>(out.state,"String",true,39,"String");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'String'");}
 out
 }
@@ -3590,7 +3590,7 @@ out
 }
 fn b141_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -3631,7 +3631,7 @@ out
 }
 fn b144_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"boolean",true,"boolean");
+out=self.literal::<false>(out.state,"boolean",true,48,"boolean");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'boolean'");}
 out
 }
@@ -3644,7 +3644,7 @@ out
 }
 fn b145_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Boolean",true,"Boolean");
+out=self.literal::<false>(out.state,"Boolean",true,31,"Boolean");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Boolean'");}
 out
 }
@@ -3698,7 +3698,7 @@ out
 }
 fn b148_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -3739,7 +3739,7 @@ out
 }
 fn b151_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"object",true,"object");
+out=self.literal::<false>(out.state,"object",true,77,"object");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'object'");}
 out
 }
@@ -3752,7 +3752,7 @@ out
 }
 fn b152_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Object",true,"Object");
+out=self.literal::<false>(out.state,"Object",true,36,"Object");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Object'");}
 out
 }
@@ -3788,7 +3788,7 @@ out
 }
 fn b154_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"if",true,"if");
+out=self.literal::<false>(out.state,"if",true,63,"if");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'if'");}
 out
 }
@@ -3801,7 +3801,7 @@ out
 }
 fn b155_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"not",true,"not");
+out=self.literal::<false>(out.state,"not",true,75,"not");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'not'");}
 out
 }
@@ -3814,7 +3814,7 @@ out
 }
 fn b156_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"exists",true,"exists");
+out=self.literal::<false>(out.state,"exists",true,57,"exists");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'exists'");}
 out
 }
@@ -3850,7 +3850,7 @@ out
 }
 fn b158_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"description",true,"description");
+out=self.literal::<false>(out.state,"description",true,54,"description");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'description'");}
 out
 }
@@ -3863,7 +3863,7 @@ out
 }
 fn b159_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"=",true,"=");
+out=self.literal::<false>(out.state,"=",true,25,"=");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'='");}
 out
 }
@@ -3916,7 +3916,7 @@ out
 }
 fn b162_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"@",true,"@");
+out=self.literal::<false>(out.state,"@",true,30,"@");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'@'");}
 out
 }
@@ -3941,7 +3941,7 @@ out
 }
 fn b164_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -3986,7 +3986,7 @@ out
 }
 fn b167_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -4071,7 +4071,7 @@ out
 }
 fn b172_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -4131,7 +4131,7 @@ out
 }
 fn b176_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"=",true,"=");
+out=self.literal::<false>(out.state,"=",true,25,"=");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'='");}
 out
 }
@@ -4281,7 +4281,7 @@ out
 }
 fn b186_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -4327,7 +4327,7 @@ out
 }
 fn b189_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -4340,7 +4340,7 @@ out
 }
 fn b190_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -4365,7 +4365,7 @@ out
 }
 fn b192_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -4436,7 +4436,7 @@ out
 }
 fn b196_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -4482,7 +4482,7 @@ out
 }
 fn b199_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -4495,7 +4495,7 @@ out
 }
 fn b200_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -4520,7 +4520,7 @@ out
 }
 fn b202_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -4591,7 +4591,7 @@ out
 }
 fn b206_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -4637,7 +4637,7 @@ out
 }
 fn b209_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -4650,7 +4650,7 @@ out
 }
 fn b210_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -4675,7 +4675,7 @@ out
 }
 fn b212_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -4746,7 +4746,7 @@ out
 }
 fn b216_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -4792,7 +4792,7 @@ out
 }
 fn b219_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -4805,7 +4805,7 @@ out
 }
 fn b220_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -4830,7 +4830,7 @@ out
 }
 fn b222_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -4916,7 +4916,7 @@ out
 }
 fn b227_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -4964,7 +4964,7 @@ out
 }
 fn b230_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -5028,7 +5028,7 @@ out
 }
 fn b234_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -5073,7 +5073,7 @@ out
 }
 fn b237_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"number",true,"number");
+out=self.literal::<false>(out.state,"number",true,76,"number");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'number'");}
 out
 }
@@ -5086,7 +5086,7 @@ out
 }
 fn b238_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"float",true,"float");
+out=self.literal::<false>(out.state,"float",true,61,"float");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'float'");}
 out
 }
@@ -5118,7 +5118,7 @@ out
 }
 fn b240_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"string",true,"string");
+out=self.literal::<false>(out.state,"string",true,86,"string");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'string'");}
 out
 }
@@ -5150,7 +5150,7 @@ out
 }
 fn b242_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"boolean",true,"boolean");
+out=self.literal::<false>(out.state,"boolean",true,48,"boolean");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'boolean'");}
 out
 }
@@ -5182,7 +5182,7 @@ out
 }
 fn b244_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"object",true,"object");
+out=self.literal::<false>(out.state,"object",true,77,"object");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'object'");}
 out
 }
@@ -5299,7 +5299,7 @@ out
 }
 fn b251_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"external",true,"external");
+out=self.literal::<false>(out.state,"external",true,59,"external");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'external'");}
 out
 }
@@ -5350,7 +5350,7 @@ out
 }
 fn b254_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"returning",true,"returning");
+out=self.literal::<false>(out.state,"returning",true,80,"returning");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'returning'");}
 out
 }
@@ -5383,7 +5383,7 @@ out
 }
 fn b256_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -5427,7 +5427,7 @@ out
 }
 fn b259_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -5503,7 +5503,7 @@ out
 }
 fn b264_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"#",true,"#");
+out=self.literal::<false>(out.state,"#",true,1,"#");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'#'");}
 out
 }
@@ -5542,7 +5542,7 @@ out
 }
 fn b267_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -5588,7 +5588,7 @@ out
 }
 fn b270_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -5631,7 +5631,7 @@ out
 }
 fn b272_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"external",true,"external");
+out=self.literal::<false>(out.state,"external",true,59,"external");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'external'");}
 out
 }
@@ -5730,7 +5730,7 @@ out
 }
 fn b278_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"returning",true,"returning");
+out=self.literal::<false>(out.state,"returning",true,80,"returning");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'returning'");}
 out
 }
@@ -5763,7 +5763,7 @@ out
 }
 fn b280_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -5807,7 +5807,7 @@ out
 }
 fn b283_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -5840,7 +5840,7 @@ out
 }
 fn b285_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -5916,7 +5916,7 @@ out
 }
 fn b290_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"#",true,"#");
+out=self.literal::<false>(out.state,"#",true,1,"#");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'#'");}
 out
 }
@@ -5955,7 +5955,7 @@ out
 }
 fn b293_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -6001,7 +6001,7 @@ out
 }
 fn b296_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -6048,7 +6048,7 @@ out
 }
 fn b298_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"external",true,"external");
+out=self.literal::<false>(out.state,"external",true,59,"external");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'external'");}
 out
 }
@@ -6099,7 +6099,7 @@ out
 }
 fn b301_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"returning",true,"returning");
+out=self.literal::<false>(out.state,"returning",true,80,"returning");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'returning'");}
 out
 }
@@ -6132,7 +6132,7 @@ out
 }
 fn b303_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -6176,7 +6176,7 @@ out
 }
 fn b306_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -6252,7 +6252,7 @@ out
 }
 fn b311_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"#",true,"#");
+out=self.literal::<false>(out.state,"#",true,1,"#");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'#'");}
 out
 }
@@ -6291,7 +6291,7 @@ out
 }
 fn b314_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -6337,7 +6337,7 @@ out
 }
 fn b317_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -6384,7 +6384,7 @@ out
 }
 fn b319_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"external",true,"external");
+out=self.literal::<false>(out.state,"external",true,59,"external");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'external'");}
 out
 }
@@ -6435,7 +6435,7 @@ out
 }
 fn b322_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"returning",true,"returning");
+out=self.literal::<false>(out.state,"returning",true,80,"returning");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'returning'");}
 out
 }
@@ -6468,7 +6468,7 @@ out
 }
 fn b324_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -6512,7 +6512,7 @@ out
 }
 fn b327_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -6588,7 +6588,7 @@ out
 }
 fn b332_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"#",true,"#");
+out=self.literal::<false>(out.state,"#",true,1,"#");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'#'");}
 out
 }
@@ -6627,7 +6627,7 @@ out
 }
 fn b335_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -6673,7 +6673,7 @@ out
 }
 fn b338_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -6725,7 +6725,7 @@ out
 }
 fn b341_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"call",true,"call");
+out=self.literal::<false>(out.state,"call",true,49,"call");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'call'");}
 out
 }
@@ -6758,7 +6758,7 @@ out
 }
 fn b343_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"internal",true,"internal");
+out=self.literal::<false>(out.state,"internal",true,67,"internal");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'internal'");}
 out
 }
@@ -6771,7 +6771,7 @@ out
 }
 fn b344_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"internal",true,"internal");
+out=self.literal::<false>(out.state,"internal",true,67,"internal");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'internal'");}
 out
 }
@@ -6836,7 +6836,7 @@ out
 }
 fn b348_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -6882,7 +6882,7 @@ out
 }
 fn b351_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -6935,7 +6935,7 @@ out
 }
 fn b354_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"?",true,"?");
+out=self.literal::<false>(out.state,"?",true,29,"?");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'?'");}
 out
 }
@@ -6960,7 +6960,7 @@ out
 }
 fn b356_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -7131,7 +7131,7 @@ out
 }
 fn b367_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -7380,7 +7380,7 @@ out
 }
 fn b382_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"+",true,"+");
+out=self.literal::<false>(out.state,"+",true,7,"+");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'+'");}
 out
 }
@@ -7393,7 +7393,7 @@ out
 }
 fn b383_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"-",true,"-");
+out=self.literal::<false>(out.state,"-",true,9,"-");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'-'");}
 out
 }
@@ -7436,7 +7436,7 @@ out
 }
 fn b385_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"*",true,"*");
+out=self.literal::<false>(out.state,"*",true,6,"*");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'*'");}
 out
 }
@@ -7449,7 +7449,7 @@ out
 }
 fn b386_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"/",true,"/");
+out=self.literal::<false>(out.state,"/",true,20,"/");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'/'");}
 out
 }
@@ -7687,7 +7687,7 @@ out
 }
 fn b403_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"sin",true,"sin");
+out=self.literal::<false>(out.state,"sin",true,83,"sin");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'sin'");}
 out
 }
@@ -7700,7 +7700,7 @@ out
 }
 fn b404_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -7725,7 +7725,7 @@ out
 }
 fn b406_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -7764,7 +7764,7 @@ out
 }
 fn b408_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"cos",true,"cos");
+out=self.literal::<false>(out.state,"cos",true,52,"cos");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'cos'");}
 out
 }
@@ -7777,7 +7777,7 @@ out
 }
 fn b409_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -7802,7 +7802,7 @@ out
 }
 fn b411_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -7841,7 +7841,7 @@ out
 }
 fn b413_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"tan",true,"tan");
+out=self.literal::<false>(out.state,"tan",true,87,"tan");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'tan'");}
 out
 }
@@ -7854,7 +7854,7 @@ out
 }
 fn b414_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -7879,7 +7879,7 @@ out
 }
 fn b416_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -7918,7 +7918,7 @@ out
 }
 fn b418_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"sqrt",true,"sqrt");
+out=self.literal::<false>(out.state,"sqrt",true,84,"sqrt");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'sqrt'");}
 out
 }
@@ -7931,7 +7931,7 @@ out
 }
 fn b419_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -7956,7 +7956,7 @@ out
 }
 fn b421_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -7997,7 +7997,7 @@ out
 }
 fn b423_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"min",true,"min");
+out=self.literal::<false>(out.state,"min",true,74,"min");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'min'");}
 out
 }
@@ -8010,7 +8010,7 @@ out
 }
 fn b424_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8074,7 +8074,7 @@ out
 }
 fn b428_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -8099,7 +8099,7 @@ out
 }
 fn b430_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8140,7 +8140,7 @@ out
 }
 fn b432_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"max",true,"max");
+out=self.literal::<false>(out.state,"max",true,73,"max");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'max'");}
 out
 }
@@ -8153,7 +8153,7 @@ out
 }
 fn b433_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8217,7 +8217,7 @@ out
 }
 fn b437_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -8242,7 +8242,7 @@ out
 }
 fn b439_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8278,7 +8278,7 @@ out
 }
 fn b441_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"random",true,"random");
+out=self.literal::<false>(out.state,"random",true,79,"random");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'random'");}
 out
 }
@@ -8291,7 +8291,7 @@ out
 }
 fn b442_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8304,7 +8304,7 @@ out
 }
 fn b443_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8343,7 +8343,7 @@ out
 }
 fn b445_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"abs",true,"abs");
+out=self.literal::<false>(out.state,"abs",true,46,"abs");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'abs'");}
 out
 }
@@ -8356,7 +8356,7 @@ out
 }
 fn b446_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8381,7 +8381,7 @@ out
 }
 fn b448_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8420,7 +8420,7 @@ out
 }
 fn b450_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"round",true,"round");
+out=self.literal::<false>(out.state,"round",true,81,"round");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'round'");}
 out
 }
@@ -8433,7 +8433,7 @@ out
 }
 fn b451_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8458,7 +8458,7 @@ out
 }
 fn b453_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8497,7 +8497,7 @@ out
 }
 fn b455_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"ceil",true,"ceil");
+out=self.literal::<false>(out.state,"ceil",true,50,"ceil");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'ceil'");}
 out
 }
@@ -8510,7 +8510,7 @@ out
 }
 fn b456_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8535,7 +8535,7 @@ out
 }
 fn b458_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8574,7 +8574,7 @@ out
 }
 fn b460_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"floor",true,"floor");
+out=self.literal::<false>(out.state,"floor",true,62,"floor");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'floor'");}
 out
 }
@@ -8587,7 +8587,7 @@ out
 }
 fn b461_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8612,7 +8612,7 @@ out
 }
 fn b463_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8655,7 +8655,7 @@ out
 }
 fn b465_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"pow",true,"pow");
+out=self.literal::<false>(out.state,"pow",true,78,"pow");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'pow'");}
 out
 }
@@ -8668,7 +8668,7 @@ out
 }
 fn b466_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8693,7 +8693,7 @@ out
 }
 fn b468_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -8718,7 +8718,7 @@ out
 }
 fn b470_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8757,7 +8757,7 @@ out
 }
 fn b472_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"log",true,"log");
+out=self.literal::<false>(out.state,"log",true,71,"log");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'log'");}
 out
 }
@@ -8770,7 +8770,7 @@ out
 }
 fn b473_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8795,7 +8795,7 @@ out
 }
 fn b475_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8834,7 +8834,7 @@ out
 }
 fn b477_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"exp",true,"exp");
+out=self.literal::<false>(out.state,"exp",true,58,"exp");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'exp'");}
 out
 }
@@ -8847,7 +8847,7 @@ out
 }
 fn b478_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8872,7 +8872,7 @@ out
 }
 fn b480_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -8915,7 +8915,7 @@ out
 }
 fn b482_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"toNum",true,"toNum");
+out=self.literal::<false>(out.state,"toNum",true,89,"toNum");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'toNum'");}
 out
 }
@@ -8928,7 +8928,7 @@ out
 }
 fn b483_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -8953,7 +8953,7 @@ out
 }
 fn b485_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -8978,7 +8978,7 @@ out
 }
 fn b487_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9188,7 +9188,7 @@ out
 }
 fn b502_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9212,7 +9212,7 @@ out
 }
 fn b504_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9251,7 +9251,7 @@ out
 }
 fn b506_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"toUpperCase",true,"toUpperCase");
+out=self.literal::<false>(out.state,"toUpperCase",true,90,"toUpperCase");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'toUpperCase'");}
 out
 }
@@ -9264,7 +9264,7 @@ out
 }
 fn b507_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9289,7 +9289,7 @@ out
 }
 fn b509_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9328,7 +9328,7 @@ out
 }
 fn b511_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"toLowerCase",true,"toLowerCase");
+out=self.literal::<false>(out.state,"toLowerCase",true,88,"toLowerCase");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'toLowerCase'");}
 out
 }
@@ -9341,7 +9341,7 @@ out
 }
 fn b512_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9366,7 +9366,7 @@ out
 }
 fn b514_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9405,7 +9405,7 @@ out
 }
 fn b516_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"trim",true,"trim");
+out=self.literal::<false>(out.state,"trim",true,91,"trim");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'trim'");}
 out
 }
@@ -9418,7 +9418,7 @@ out
 }
 fn b517_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9443,7 +9443,7 @@ out
 }
 fn b519_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9482,7 +9482,7 @@ out
 }
 fn b521_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"length",true,"length");
+out=self.literal::<false>(out.state,"length",true,70,"length");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'length'");}
 out
 }
@@ -9495,7 +9495,7 @@ out
 }
 fn b522_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9520,7 +9520,7 @@ out
 }
 fn b524_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9559,7 +9559,7 @@ out
 }
 fn b526_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"len",true,"len");
+out=self.literal::<false>(out.state,"len",true,69,"len");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'len'");}
 out
 }
@@ -9572,7 +9572,7 @@ out
 }
 fn b527_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9597,7 +9597,7 @@ out
 }
 fn b529_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9648,7 +9648,7 @@ out
 }
 fn b532_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".toUpperCase",true,".toUpperCase");
+out=self.literal::<false>(out.state,".toUpperCase",true,18,".toUpperCase");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.toUpperCase'");}
 out
 }
@@ -9661,7 +9661,7 @@ out
 }
 fn b533_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9674,7 +9674,7 @@ out
 }
 fn b534_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9725,7 +9725,7 @@ out
 }
 fn b537_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".toLowerCase",true,".toLowerCase");
+out=self.literal::<false>(out.state,".toLowerCase",true,17,".toLowerCase");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.toLowerCase'");}
 out
 }
@@ -9738,7 +9738,7 @@ out
 }
 fn b538_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9751,7 +9751,7 @@ out
 }
 fn b539_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9802,7 +9802,7 @@ out
 }
 fn b542_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".trim",true,".trim");
+out=self.literal::<false>(out.state,".trim",true,19,".trim");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.trim'");}
 out
 }
@@ -9815,7 +9815,7 @@ out
 }
 fn b543_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9828,7 +9828,7 @@ out
 }
 fn b544_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9879,7 +9879,7 @@ out
 }
 fn b547_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".length",true,".length");
+out=self.literal::<false>(out.state,".length",true,15,".length");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.length'");}
 out
 }
@@ -9892,7 +9892,7 @@ out
 }
 fn b548_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9905,7 +9905,7 @@ out
 }
 fn b549_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -9950,7 +9950,7 @@ out
 }
 fn b551_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"startsWith",true,"startsWith");
+out=self.literal::<false>(out.state,"startsWith",true,85,"startsWith");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'startsWith'");}
 out
 }
@@ -9963,7 +9963,7 @@ out
 }
 fn b552_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -9988,7 +9988,7 @@ out
 }
 fn b554_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10052,7 +10052,7 @@ out
 }
 fn b558_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10077,7 +10077,7 @@ out
 }
 fn b560_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -10122,7 +10122,7 @@ out
 }
 fn b562_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"endsWith",true,"endsWith");
+out=self.literal::<false>(out.state,"endsWith",true,56,"endsWith");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'endsWith'");}
 out
 }
@@ -10135,7 +10135,7 @@ out
 }
 fn b563_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -10160,7 +10160,7 @@ out
 }
 fn b565_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10224,7 +10224,7 @@ out
 }
 fn b569_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10249,7 +10249,7 @@ out
 }
 fn b571_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -10294,7 +10294,7 @@ out
 }
 fn b573_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"contains",true,"contains");
+out=self.literal::<false>(out.state,"contains",true,51,"contains");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'contains'");}
 out
 }
@@ -10307,7 +10307,7 @@ out
 }
 fn b574_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -10332,7 +10332,7 @@ out
 }
 fn b576_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10396,7 +10396,7 @@ out
 }
 fn b580_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10421,7 +10421,7 @@ out
 }
 fn b582_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -10476,7 +10476,7 @@ out
 }
 fn b585_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".in",true,".in");
+out=self.literal::<false>(out.state,".in",true,14,".in");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.in'");}
 out
 }
@@ -10489,7 +10489,7 @@ out
 }
 fn b586_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -10553,7 +10553,7 @@ out
 }
 fn b590_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10578,7 +10578,7 @@ out
 }
 fn b592_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -10633,7 +10633,7 @@ out
 }
 fn b595_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".startsWith",true,".startsWith");
+out=self.literal::<false>(out.state,".startsWith",true,16,".startsWith");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.startsWith'");}
 out
 }
@@ -10646,7 +10646,7 @@ out
 }
 fn b596_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -10710,7 +10710,7 @@ out
 }
 fn b600_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10735,7 +10735,7 @@ out
 }
 fn b602_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -10790,7 +10790,7 @@ out
 }
 fn b605_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".endsWith",true,".endsWith");
+out=self.literal::<false>(out.state,".endsWith",true,13,".endsWith");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.endsWith'");}
 out
 }
@@ -10803,7 +10803,7 @@ out
 }
 fn b606_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -10867,7 +10867,7 @@ out
 }
 fn b610_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -10892,7 +10892,7 @@ out
 }
 fn b612_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -10947,7 +10947,7 @@ out
 }
 fn b615_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,".contains",true,".contains");
+out=self.literal::<false>(out.state,".contains",true,12,".contains");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'.contains'");}
 out
 }
@@ -10960,7 +10960,7 @@ out
 }
 fn b616_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -11024,7 +11024,7 @@ out
 }
 fn b620_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -11049,7 +11049,7 @@ out
 }
 fn b622_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -11157,7 +11157,7 @@ out
 }
 fn b629_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"isPresent",true,"isPresent");
+out=self.literal::<false>(out.state,"isPresent",true,68,"isPresent");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'isPresent'");}
 out
 }
@@ -11170,7 +11170,7 @@ out
 }
 fn b630_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -11195,7 +11195,7 @@ out
 }
 fn b632_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -11238,7 +11238,7 @@ out
 }
 fn b634_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"inTimeRange",true,"inTimeRange");
+out=self.literal::<false>(out.state,"inTimeRange",true,66,"inTimeRange");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'inTimeRange'");}
 out
 }
@@ -11251,7 +11251,7 @@ out
 }
 fn b635_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -11276,7 +11276,7 @@ out
 }
 fn b637_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -11301,7 +11301,7 @@ out
 }
 fn b639_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -11352,7 +11352,7 @@ out
 }
 fn b641_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"inDayTimeRange",true,"inDayTimeRange");
+out=self.literal::<false>(out.state,"inDayTimeRange",true,65,"inDayTimeRange");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'inDayTimeRange'");}
 out
 }
@@ -11365,7 +11365,7 @@ out
 }
 fn b642_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -11390,7 +11390,7 @@ out
 }
 fn b644_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -11415,7 +11415,7 @@ out
 }
 fn b646_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -11440,7 +11440,7 @@ out
 }
 fn b648_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -11465,7 +11465,7 @@ out
 }
 fn b650_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -11508,7 +11508,7 @@ out
 }
 fn b652_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"MONDAY",true,"MONDAY");
+out=self.literal::<false>(out.state,"MONDAY",true,34,"MONDAY");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'MONDAY'");}
 out
 }
@@ -11521,7 +11521,7 @@ out
 }
 fn b653_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"TUESDAY",true,"TUESDAY");
+out=self.literal::<false>(out.state,"TUESDAY",true,41,"TUESDAY");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'TUESDAY'");}
 out
 }
@@ -11534,7 +11534,7 @@ out
 }
 fn b654_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"WEDNESDAY",true,"WEDNESDAY");
+out=self.literal::<false>(out.state,"WEDNESDAY",true,42,"WEDNESDAY");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'WEDNESDAY'");}
 out
 }
@@ -11547,7 +11547,7 @@ out
 }
 fn b655_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"THURSDAY",true,"THURSDAY");
+out=self.literal::<false>(out.state,"THURSDAY",true,40,"THURSDAY");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'THURSDAY'");}
 out
 }
@@ -11560,7 +11560,7 @@ out
 }
 fn b656_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"FRIDAY",true,"FRIDAY");
+out=self.literal::<false>(out.state,"FRIDAY",true,32,"FRIDAY");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'FRIDAY'");}
 out
 }
@@ -11573,7 +11573,7 @@ out
 }
 fn b657_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"SATURDAY",true,"SATURDAY");
+out=self.literal::<false>(out.state,"SATURDAY",true,37,"SATURDAY");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'SATURDAY'");}
 out
 }
@@ -11586,7 +11586,7 @@ out
 }
 fn b658_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"SUNDAY",true,"SUNDAY");
+out=self.literal::<false>(out.state,"SUNDAY",true,38,"SUNDAY");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'SUNDAY'");}
 out
 }
@@ -11672,7 +11672,7 @@ out
 }
 fn b662_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -11696,7 +11696,7 @@ out
 }
 fn b664_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -12191,7 +12191,7 @@ out
 }
 fn b684_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12216,7 +12216,7 @@ out
 }
 fn b686_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12241,7 +12241,7 @@ out
 }
 fn b688_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12266,7 +12266,7 @@ out
 }
 fn b690_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -12318,7 +12318,7 @@ out
 }
 fn b693_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12343,7 +12343,7 @@ out
 }
 fn b695_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12368,7 +12368,7 @@ out
 }
 fn b697_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -12422,7 +12422,7 @@ out
 }
 fn b700_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12447,7 +12447,7 @@ out
 }
 fn b702_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12460,7 +12460,7 @@ out
 }
 fn b703_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12485,7 +12485,7 @@ out
 }
 fn b705_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -12535,7 +12535,7 @@ out
 }
 fn b708_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12560,7 +12560,7 @@ out
 }
 fn b710_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12573,7 +12573,7 @@ out
 }
 fn b711_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -12627,7 +12627,7 @@ out
 }
 fn b714_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12640,7 +12640,7 @@ out
 }
 fn b715_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12665,7 +12665,7 @@ out
 }
 fn b717_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12690,7 +12690,7 @@ out
 }
 fn b719_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -12740,7 +12740,7 @@ out
 }
 fn b722_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12753,7 +12753,7 @@ out
 }
 fn b723_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12778,7 +12778,7 @@ out
 }
 fn b725_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -12830,7 +12830,7 @@ out
 }
 fn b728_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12843,7 +12843,7 @@ out
 }
 fn b729_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12856,7 +12856,7 @@ out
 }
 fn b730_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12881,7 +12881,7 @@ out
 }
 fn b732_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -12929,7 +12929,7 @@ out
 }
 fn b735_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -12942,7 +12942,7 @@ out
 }
 fn b736_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -12955,7 +12955,7 @@ out
 }
 fn b737_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13245,7 +13245,7 @@ out
 }
 fn b741_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13270,7 +13270,7 @@ out
 }
 fn b743_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13295,7 +13295,7 @@ out
 }
 fn b745_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13320,7 +13320,7 @@ out
 }
 fn b747_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13372,7 +13372,7 @@ out
 }
 fn b750_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13397,7 +13397,7 @@ out
 }
 fn b752_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13422,7 +13422,7 @@ out
 }
 fn b754_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13476,7 +13476,7 @@ out
 }
 fn b757_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13501,7 +13501,7 @@ out
 }
 fn b759_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13514,7 +13514,7 @@ out
 }
 fn b760_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13539,7 +13539,7 @@ out
 }
 fn b762_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13589,7 +13589,7 @@ out
 }
 fn b765_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13614,7 +13614,7 @@ out
 }
 fn b767_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13627,7 +13627,7 @@ out
 }
 fn b768_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13681,7 +13681,7 @@ out
 }
 fn b771_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13694,7 +13694,7 @@ out
 }
 fn b772_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13719,7 +13719,7 @@ out
 }
 fn b774_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13744,7 +13744,7 @@ out
 }
 fn b776_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13794,7 +13794,7 @@ out
 }
 fn b779_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13807,7 +13807,7 @@ out
 }
 fn b780_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13832,7 +13832,7 @@ out
 }
 fn b782_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13884,7 +13884,7 @@ out
 }
 fn b785_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13897,7 +13897,7 @@ out
 }
 fn b786_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13910,7 +13910,7 @@ out
 }
 fn b787_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -13935,7 +13935,7 @@ out
 }
 fn b789_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -13983,7 +13983,7 @@ out
 }
 fn b792_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"[",true,"[");
+out=self.literal::<false>(out.state,"[",true,43,"[");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'['");}
 out
 }
@@ -13996,7 +13996,7 @@ out
 }
 fn b793_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -14009,7 +14009,7 @@ out
 }
 fn b794_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"]",true,"]");
+out=self.literal::<false>(out.state,"]",true,44,"]");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"']'");}
 out
 }
@@ -14138,7 +14138,7 @@ out
 }
 fn b802_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"+",true,"+");
+out=self.literal::<false>(out.state,"+",true,7,"+");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'+'");}
 out
 }
@@ -14187,7 +14187,7 @@ out
 }
 fn b805_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -14211,7 +14211,7 @@ out
 }
 fn b807_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -14477,7 +14477,7 @@ out
 }
 fn b826_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -14518,7 +14518,7 @@ out
 }
 fn b829_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"string",true,"string");
+out=self.literal::<false>(out.state,"string",true,86,"string");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'string'");}
 out
 }
@@ -14531,7 +14531,7 @@ out
 }
 fn b830_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"String",true,"String");
+out=self.literal::<false>(out.state,"String",true,39,"String");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'String'");}
 out
 }
@@ -14544,7 +14544,7 @@ out
 }
 fn b831_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -14557,7 +14557,7 @@ out
 }
 fn b832_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -14608,7 +14608,7 @@ out
 }
 fn b835_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -14634,7 +14634,7 @@ out
 }
 fn b837_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -14675,7 +14675,7 @@ out
 }
 fn b840_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"string",true,"string");
+out=self.literal::<false>(out.state,"string",true,86,"string");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'string'");}
 out
 }
@@ -14688,7 +14688,7 @@ out
 }
 fn b841_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"String",true,"String");
+out=self.literal::<false>(out.state,"String",true,39,"String");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'String'");}
 out
 }
@@ -14775,7 +14775,7 @@ out
 }
 fn b846_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"|",true,"|");
+out=self.literal::<false>(out.state,"|",true,96,"|");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'|'");}
 out
 }
@@ -14874,7 +14874,7 @@ out
 }
 fn b852_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"&",true,"&");
+out=self.literal::<false>(out.state,"&",true,3,"&");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'&'");}
 out
 }
@@ -14973,7 +14973,7 @@ out
 }
 fn b858_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"^",true,"^");
+out=self.literal::<false>(out.state,"^",true,45,"^");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'^'");}
 out
 }
@@ -15024,7 +15024,7 @@ out
 }
 fn b861_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"not",true,"not");
+out=self.literal::<false>(out.state,"not",true,75,"not");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'not'");}
 out
 }
@@ -15037,7 +15037,7 @@ out
 }
 fn b862_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -15062,7 +15062,7 @@ out
 }
 fn b864_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -15284,7 +15284,7 @@ out
 }
 fn b880_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"true",true,"true");
+out=self.literal::<false>(out.state,"true",true,92,"true");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'true'");}
 out
 }
@@ -15297,7 +15297,7 @@ out
 }
 fn b881_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"false",true,"false");
+out=self.literal::<false>(out.state,"false",true,60,"false");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'false'");}
 out
 }
@@ -15353,7 +15353,7 @@ out
 }
 fn b885_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -15377,7 +15377,7 @@ out
 }
 fn b887_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -15603,7 +15603,7 @@ out
 }
 fn b902_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"==",true,"==");
+out=self.literal::<false>(out.state,"==",true,26,"==");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'=='");}
 out
 }
@@ -15616,7 +15616,7 @@ out
 }
 fn b903_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"!=",true,"!=");
+out=self.literal::<false>(out.state,"!=",true,0,"!=");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'!='");}
 out
 }
@@ -15717,7 +15717,7 @@ out
 }
 fn b909_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"==",true,"==");
+out=self.literal::<false>(out.state,"==",true,26,"==");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'=='");}
 out
 }
@@ -15730,7 +15730,7 @@ out
 }
 fn b910_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"!=",true,"!=");
+out=self.literal::<false>(out.state,"!=",true,0,"!=");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'!='");}
 out
 }
@@ -15743,7 +15743,7 @@ out
 }
 fn b911_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"<=",true,"<=");
+out=self.literal::<false>(out.state,"<=",true,24,"<=");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'<='");}
 out
 }
@@ -15756,7 +15756,7 @@ out
 }
 fn b912_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,">=",true,">=");
+out=self.literal::<false>(out.state,">=",true,28,">=");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'>='");}
 out
 }
@@ -15769,7 +15769,7 @@ out
 }
 fn b913_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"<",true,"<");
+out=self.literal::<false>(out.state,"<",true,23,"<");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'<'");}
 out
 }
@@ -15782,7 +15782,7 @@ out
 }
 fn b914_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,">",true,">");
+out=self.literal::<false>(out.state,">",true,27,">");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'>'");}
 out
 }
@@ -15936,7 +15936,7 @@ out
 }
 fn b923_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"if",true,"if");
+out=self.literal::<false>(out.state,"if",true,63,"if");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'if'");}
 out
 }
@@ -15949,7 +15949,7 @@ out
 }
 fn b924_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -15974,7 +15974,7 @@ out
 }
 fn b926_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -15987,7 +15987,7 @@ out
 }
 fn b927_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -16012,7 +16012,7 @@ out
 }
 fn b929_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -16025,7 +16025,7 @@ out
 }
 fn b930_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"else",true,"else");
+out=self.literal::<false>(out.state,"else",true,55,"else");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'else'");}
 out
 }
@@ -16038,7 +16038,7 @@ out
 }
 fn b931_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -16063,7 +16063,7 @@ out
 }
 fn b933_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -16237,7 +16237,7 @@ out
 }
 fn b944_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -16262,7 +16262,7 @@ out
 }
 fn b946_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"?",true,"?");
+out=self.literal::<false>(out.state,"?",true,29,"?");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'?'");}
 out
 }
@@ -16287,7 +16287,7 @@ out
 }
 fn b948_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,":",true,":");
+out=self.literal::<false>(out.state,":",true,21,":");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"':'");}
 out
 }
@@ -16312,7 +16312,7 @@ out
 }
 fn b950_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -16357,7 +16357,7 @@ out
 }
 fn b952_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"match",true,"match");
+out=self.literal::<false>(out.state,"match",true,72,"match");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'match'");}
 out
 }
@@ -16370,7 +16370,7 @@ out
 }
 fn b953_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -16434,7 +16434,7 @@ out
 }
 fn b957_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -16459,7 +16459,7 @@ out
 }
 fn b959_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -16484,7 +16484,7 @@ out
 }
 fn b961_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -16533,7 +16533,7 @@ out
 }
 fn b964_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"->",true,"->");
+out=self.literal::<false>(out.state,"->",true,10,"->");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'->'");}
 out
 }
@@ -16582,7 +16582,7 @@ out
 }
 fn b967_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"default",true,"default");
+out=self.literal::<false>(out.state,"default",true,53,"default");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'default'");}
 out
 }
@@ -16595,7 +16595,7 @@ out
 }
 fn b968_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"->",true,"->");
+out=self.literal::<false>(out.state,"->",true,10,"->");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'->'");}
 out
 }
@@ -16684,7 +16684,7 @@ out
 }
 fn b973_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"match",true,"match");
+out=self.literal::<false>(out.state,"match",true,72,"match");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'match'");}
 out
 }
@@ -16697,7 +16697,7 @@ out
 }
 fn b974_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -16761,7 +16761,7 @@ out
 }
 fn b978_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -16786,7 +16786,7 @@ out
 }
 fn b980_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -16811,7 +16811,7 @@ out
 }
 fn b982_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -16860,7 +16860,7 @@ out
 }
 fn b985_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"->",true,"->");
+out=self.literal::<false>(out.state,"->",true,10,"->");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'->'");}
 out
 }
@@ -16909,7 +16909,7 @@ out
 }
 fn b988_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"default",true,"default");
+out=self.literal::<false>(out.state,"default",true,53,"default");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'default'");}
 out
 }
@@ -16922,7 +16922,7 @@ out
 }
 fn b989_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"->",true,"->");
+out=self.literal::<false>(out.state,"->",true,10,"->");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'->'");}
 out
 }
@@ -17011,7 +17011,7 @@ out
 }
 fn b994_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"match",true,"match");
+out=self.literal::<false>(out.state,"match",true,72,"match");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'match'");}
 out
 }
@@ -17024,7 +17024,7 @@ out
 }
 fn b995_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"{",true,"{");
+out=self.literal::<false>(out.state,"{",true,95,"{");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'{'");}
 out
 }
@@ -17088,7 +17088,7 @@ out
 }
 fn b999_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -17113,7 +17113,7 @@ out
 }
 fn b1001_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,",",true,",");
+out=self.literal::<false>(out.state,",",true,8,",");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"','");}
 out
 }
@@ -17138,7 +17138,7 @@ out
 }
 fn b1003_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"}",true,"}");
+out=self.literal::<false>(out.state,"}",true,97,"}");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'}'");}
 out
 }
@@ -17187,7 +17187,7 @@ out
 }
 fn b1006_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"->",true,"->");
+out=self.literal::<false>(out.state,"->",true,10,"->");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'->'");}
 out
 }
@@ -17236,7 +17236,7 @@ out
 }
 fn b1009_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"default",true,"default");
+out=self.literal::<false>(out.state,"default",true,53,"default");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'default'");}
 out
 }
@@ -17249,7 +17249,7 @@ out
 }
 fn b1010_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"->",true,"->");
+out=self.literal::<false>(out.state,"->",true,10,"->");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'->'");}
 out
 }
@@ -17329,7 +17329,7 @@ out
 }
 fn b1015_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"$",true,"$");
+out=self.literal::<false>(out.state,"$",true,2,"$");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'$'");}
 out
 }
@@ -17413,7 +17413,7 @@ out
 }
 fn b1020_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"as",true,"as");
+out=self.literal::<false>(out.state,"as",true,47,"as");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'as'");}
 out
 }
@@ -17474,7 +17474,7 @@ out
 }
 fn b1023_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"number",true,"number");
+out=self.literal::<false>(out.state,"number",true,76,"number");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'number'");}
 out
 }
@@ -17487,7 +17487,7 @@ out
 }
 fn b1024_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Number",true,"Number");
+out=self.literal::<false>(out.state,"Number",true,35,"Number");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Number'");}
 out
 }
@@ -17500,7 +17500,7 @@ out
 }
 fn b1025_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"float",true,"float");
+out=self.literal::<false>(out.state,"float",true,61,"float");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'float'");}
 out
 }
@@ -17513,7 +17513,7 @@ out
 }
 fn b1026_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Float",true,"Float");
+out=self.literal::<false>(out.state,"Float",true,33,"Float");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Float'");}
 out
 }
@@ -17526,7 +17526,7 @@ out
 }
 fn b1027_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"string",true,"string");
+out=self.literal::<false>(out.state,"string",true,86,"string");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'string'");}
 out
 }
@@ -17539,7 +17539,7 @@ out
 }
 fn b1028_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"String",true,"String");
+out=self.literal::<false>(out.state,"String",true,39,"String");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'String'");}
 out
 }
@@ -17552,7 +17552,7 @@ out
 }
 fn b1029_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"boolean",true,"boolean");
+out=self.literal::<false>(out.state,"boolean",true,48,"boolean");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'boolean'");}
 out
 }
@@ -17565,7 +17565,7 @@ out
 }
 fn b1030_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Boolean",true,"Boolean");
+out=self.literal::<false>(out.state,"Boolean",true,31,"Boolean");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Boolean'");}
 out
 }
@@ -17578,7 +17578,7 @@ out
 }
 fn b1031_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"object",true,"object");
+out=self.literal::<false>(out.state,"object",true,77,"object");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'object'");}
 out
 }
@@ -17591,7 +17591,7 @@ out
 }
 fn b1032_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"Object",true,"Object");
+out=self.literal::<false>(out.state,"Object",true,36,"Object");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'Object'");}
 out
 }
@@ -17714,7 +17714,7 @@ out
 }
 fn b1040_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,"(",true,"(");
+out=self.literal::<false>(out.state,"(",true,4,"(");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"'('");}
 out
 }
@@ -17739,7 +17739,7 @@ out
 }
 fn b1042_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
-out=self.literal::<false>(out.state,")",true,")");
+out=self.literal::<false>(out.state,")",true,5,")");
 if !out.ok {self.display.fail(state.consumed.max(state.matched),"')'");}
 out
 }
@@ -19909,7 +19909,12 @@ if self.input.starts_with(start,"/*") {self.display.fail(self.text.len(),"'*/'")
 }
 if out.state.position::<MATCH>()==before {break;}}
 self.display.reach(out.state.consumed.max(out.state.matched));out}
-fn skip_0<const MATCH:bool>(&self,state:State)->State {let mut out=state;loop {let before=out.position::<MATCH>();
+fn skip_0<const MATCH:bool>(&self,state:State)->State {let origin=state.position::<MATCH>();
+if self.lex_enabled {if let Some((dc,dm))=self.trivia_skip.get(0,MATCH,origin) {
+if dc==u32::MAX {return state;}
+let mut hit=state;if MATCH {hit.matched=origin+dm as usize;} else {hit.consumed=origin+dc as usize;hit.matched=origin+dm as usize;}
+return hit;}}
+let mut out=state;loop {let before=out.position::<MATCH>();
 if !matches!(self.text.as_bytes().get(before),Some(9|10|11|12|13|32|47)) {break;}
 {let start=out.position::<MATCH>();let mut p=start;
 while let Some((c,n))=self.input.cp_at(p) {if ![9, 10, 11, 12, 13, 32].contains(&(c as u64)) {break;}p+=n;}
@@ -19922,6 +19927,10 @@ if self.input.starts_with(p,"//") {p+=2;while let Some((c,n))=self.input.cp_at(p
 if self.input.starts_with(p,"/*") {let body=p+2;if let Some(n)=self.text[body..].find("*/") {p=body+n+2;out.advance::<MATCH>(p-start);continue;}}
 }
 if out.position::<MATCH>()==before {break;}}
+if self.lex_enabled {
+if out.position::<MATCH>()==origin {self.trivia_skip.insert(0,MATCH,origin,(u32::MAX,0));}
+else if let (Ok(dc),Ok(dm))=(u32::try_from(out.consumed.saturating_sub(origin)),u32::try_from(out.matched.saturating_sub(origin))) {
+if dc!=u32::MAX {self.trivia_skip.insert(0,MATCH,origin,(dc,dm));}}}
 out}
 fn trivia_1<const MATCH:bool>(&mut self,state:State)->Step {
 self.display.reach(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();
@@ -19941,7 +19950,12 @@ if self.input.starts_with(start,"/*") {self.display.fail(self.text.len(),"'*/'")
 }
 if out.state.position::<MATCH>()==before {break;}}
 self.display.reach(out.state.consumed.max(out.state.matched));out}
-fn skip_1<const MATCH:bool>(&self,state:State)->State {let mut out=state;loop {let before=out.position::<MATCH>();
+fn skip_1<const MATCH:bool>(&self,state:State)->State {let origin=state.position::<MATCH>();
+if self.lex_enabled {if let Some((dc,dm))=self.trivia_skip.get(0,MATCH,origin) {
+if dc==u32::MAX {return state;}
+let mut hit=state;if MATCH {hit.matched=origin+dm as usize;} else {hit.consumed=origin+dc as usize;hit.matched=origin+dm as usize;}
+return hit;}}
+let mut out=state;loop {let before=out.position::<MATCH>();
 if !matches!(self.text.as_bytes().get(before),Some(9|10|11|12|13|32|47)) {break;}
 {let start=out.position::<MATCH>();let mut p=start;
 while let Some((c,n))=self.input.cp_at(p) {if ![9, 10, 11, 12, 13, 32].contains(&(c as u64)) {break;}p+=n;}
@@ -19954,5 +19968,9 @@ if self.input.starts_with(p,"//") {p+=2;while let Some((c,n))=self.input.cp_at(p
 if self.input.starts_with(p,"/*") {let body=p+2;if let Some(n)=self.text[body..].find("*/") {p=body+n+2;out.advance::<MATCH>(p-start);continue;}}
 }
 if out.position::<MATCH>()==before {break;}}
+if self.lex_enabled {
+if out.position::<MATCH>()==origin {self.trivia_skip.insert(0,MATCH,origin,(u32::MAX,0));}
+else if let (Ok(dc),Ok(dm))=(u32::try_from(out.consumed.saturating_sub(origin)),u32::try_from(out.matched.saturating_sub(origin))) {
+if dc!=u32::MAX {self.trivia_skip.insert(0,MATCH,origin,(dc,dm));}}}
 out}
 }

@@ -320,6 +320,10 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         .max(self.trivia_cache.max_probe_len());
     self.statistics.recipes = self.arena.len() - 1;
     self.statistics.ast_nodes = self.node_spans.len();
+    self.statistics.lexical_runs = self.lex.runs;
+    self.statistics.lexical_probes = self.lex.probes;
+    self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
+    self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
     let mut value_spans = Vec::with_capacity(if ast.is_some() {
         self.node_spans.len() + self.text_spans.len()
     } else {
