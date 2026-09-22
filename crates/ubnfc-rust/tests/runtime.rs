@@ -92,3 +92,33 @@ fn diagnostic_replay_rebases_without_copying_caller_stacks() {
     let joined = d.join(joined, farther);
     assert_eq!(d.summary(joined), Some((4, vec!["end"], vec![])));
 }
+
+#[test]
+fn public_failure_frames_keep_successes_discard_not_and_replay_only_local_candidates() {
+    let mut d = diag::DisplayDiagnostics::new(1000);
+    d.enter(0);
+    d.fail(1, "caller");
+    let before_not = d.checkpoint();
+    d.enter(1);
+    d.failures(3, &["'x'", "'a'", "'x'"]);
+    assert_eq!(d.snapshot().reached, 3);
+    let memo = d.leave();
+    // A successful rule retains its failed alternative at the farthest point.
+    assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));
+    // Not succeeded because its child failed; child diagnostics must disappear.
+    d.restore(before_not);
+    assert_eq!(d.summary(), (1, vec!["caller"]));
+    d.enter(0);
+    d.merge(memo);
+    assert_eq!(d.summary(), (3, vec!["'a'", "'x'"]));
+    let replay = d.leave();
+    assert_eq!(d.arena.summary(replay.diag).unwrap().1, vec!["'x'", "'a'"]);
+    d.leave();
+    let mut reached = diag::DisplayDiagnostics::new(100);
+    reached.enter(0);
+    reached.reach(4);
+    let successful_lookahead = reached.leave();
+    let mut replay = diag::DisplayDiagnostics::new(100);
+    replay.merge(successful_lookahead);
+    assert_eq!(replay.summary(), (4, vec![]));
+}

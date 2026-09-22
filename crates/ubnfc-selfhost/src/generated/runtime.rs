@@ -1,6 +1,6 @@
 use super::api::*;
 use super::rt::{
-    diag::{Diag, Diagnostics},
+    diag::{Diag, Diagnostics, DisplayDiagnostics, DisplaySnapshot},
     input::Input,
     memo::{Key, Memo},
     scope::{Checkpoint, ScopeStore},
@@ -37,6 +37,7 @@ pub(crate) enum Event {
     },
     Token {
         text_span: Option<Span>,
+        content_span: Option<Span>,
         expr: usize,
         rule: usize,
         span: Span,
@@ -67,10 +68,12 @@ pub(crate) struct Saved {
     diag: u32,
     flags: u32,
     effects: [u32; 2],
+    display: DisplaySnapshot,
 }
 impl Saved {
-    fn new(step: Step, effects: Span) -> Self {
+    fn new(step: Step, effects: Span, display: DisplaySnapshot) -> Self {
         Self {
+            display,
             consumed: u32::try_from(step.state.consumed).expect("cursor"),
             matched: u32::try_from(step.state.matched).expect("cursor"),
             events: u32::try_from(step.events.0).expect("arena"),
@@ -114,9 +117,10 @@ pub(crate) struct Session<'a> {
     pub scanner: &'a mut dyn TokenScanner,
     pub arena: Vec<Event>,
     pub diag: Diagnostics,
+    pub display: DisplayDiagnostics,
     pub memo: Memo<Saved>,
     pub scope: ScopeStore,
-    pub trivia_cache: Memo<Step>,
+    pub trivia_cache: Memo<(Step, DisplaySnapshot)>,
     effects: Vec<Effect>,
     saved_effects: Vec<Effect>,
     pub statistics: Statistics,
@@ -154,6 +158,7 @@ impl<'a> Session<'a> {
                 arena
             },
             diag: Diagnostics::with_limit(options.limits.diagnostics),
+            display: DisplayDiagnostics::new(options.limits.diagnostics),
             memo: Memo::with_capacity(text.len().saturating_mul(10).saturating_add(64).min(32768)),
             scope: ScopeStore::new(),
             trivia_cache: Memo::default(),
@@ -177,7 +182,7 @@ impl<'a> Session<'a> {
     // Check expressions too: one rule may contain a deeply nested expression tree.
     #[inline(never)]
     pub fn limit(&mut self, state: State) -> Option<Step> {
-        if self.diag.exhausted {
+        if self.diag.exhausted || self.display.arena.exhausted {
             self.resource_failure
                 .get_or_insert((state.consumed, "diagnostic budget exceeded"));
         }
@@ -318,7 +323,7 @@ impl<'a> Session<'a> {
                 self.scope.add_reference(name, *offset_cp, *len_cp);
                 if !self.scope.is_declared(name) {
                     self.scope.add_diagnostic(
-                        &format!("undefined: {name}"),
+                        &format!("未定義のシンボル: '{name}'"),
                         *offset_cp,
                         *len_cp,
                         Severity::Warning,
@@ -339,6 +344,7 @@ impl<'a> Session<'a> {
         }
         let saved = self.memo.get(key)?;
         self.statistics.memo_hits += 1;
+        self.display.merge(saved.display);
         self.replay_effects(saved.effects.map(|p| p as usize));
         Some(saved.step())
     }
@@ -356,7 +362,7 @@ impl<'a> Session<'a> {
         } else {
             [0, 0]
         };
-        self.memo.insert(key, Saved::new(step, effects));
+        self.memo.insert(key, Saved::new(step, effects, self.display.snapshot()));
     }
     pub fn event(&mut self, event: Event) -> EventId {
         if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE && !HAS_RECOVERY {
@@ -422,6 +428,7 @@ impl<'a> Session<'a> {
                 let mut step = Step::yes(state);
                 step.events = self.event(Event::Token {
                     text_span: None,
+                    content_span: None,
                     expr: usize::MAX,
                     rule: usize::MAX,
                     span: [start, start + length],
@@ -478,48 +485,53 @@ impl<'a> Session<'a> {
     }
     pub fn eof<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
         if state.begin().position::<MATCH>() == self.text.len() {
+            self.display.fail(state.consumed.max(state.begin().matched),"WildCardCharacterParser");
             Step::yes(state)
         } else {
             self.fail(state, state.position::<MATCH>(), label)
         }
     }
     pub fn number<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
+        // NumberParser.java の失敗試行を表示用に記録する。Rust の主 fail_at は
+        // 仮数なしの場合のみ進め、不完全指数のロールバック位置は維持する。
         let start = state.position::<MATCH>();
         let bytes = self.text.as_bytes();
         let mut p = start;
-        if matches!(bytes.get(p), Some(b'+' | b'-')) {
-            p += 1;
-        }
+        if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
+        else { self.display.fail(p, "SignParser"); }
         let digits = p;
-        while bytes.get(p).is_some_and(u8::is_ascii_digit) {
-            p += 1;
-        }
+        while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
+        self.display.fail(p, "DigitParser");
         let mut count = p - digits;
+        if count == 0 { self.display.fail(p, "OneOrMore"); }
         if bytes.get(p) == Some(&b'.') {
             p += 1;
             let fraction = p;
-            while bytes.get(p).is_some_and(u8::is_ascii_digit) {
-                p += 1;
-            }
+            while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
+            self.display.fail(p, "DigitParser");
+            if p == fraction { self.display.fail(p, "OneOrMore"); }
             count += p - fraction;
+            if count == 0 { self.display.fail(start,"Chain"); self.display.fail(start,"'.'"); }
+        } else {
+            self.display.fail(p, "'.'");
+            if count == 0 { self.display.fail(digits,"Chain"); }
         }
         if count == 0 {
-            return self.primitive::<MATCH>(state, None, label);
+            self.display.fail(start,"NumberParser");
+            let mut out = self.primitive::<MATCH>(state, None, label);
+            if !out.ok { out.diag = self.diag.fail(p,label); }
+            return out;
         }
         if matches!(bytes.get(p), Some(b'e' | b'E')) {
             let exponent = p;
             p += 1;
-            if matches!(bytes.get(p), Some(b'+' | b'-')) {
-                p += 1;
-            }
+            if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
+            else { self.display.fail(p,"SignParser"); }
             let digits = p;
-            while bytes.get(p).is_some_and(u8::is_ascii_digit) {
-                p += 1;
-            }
-            if digits == p {
-                p = exponent;
-            }
-        }
+            while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
+            self.display.fail(p,"DigitParser");
+            if digits == p { self.display.fail(p,"OneOrMore"); p = exponent; }
+        } else { self.display.fail(p,"EParser"); self.display.fail(p,"ExponentParser"); }
         self.primitive::<MATCH>(state, Some(p - start), label)
     }
     pub fn identifier<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
@@ -538,6 +550,8 @@ impl<'a> Session<'a> {
                 p += 1;
             }
         }
+        if p == start { self.display.fail(start,"AlphabetUnderScoreParser"); self.display.fail(start,"IdentifierParser"); }
+        else { self.display.fail(p,"AlphabetNumericUnderScoreParser"); }
         self.primitive::<MATCH>(state, (p > start).then_some(p - start), label)
     }
     pub fn quoted<const MATCH: bool>(
@@ -555,7 +569,12 @@ impl<'a> Session<'a> {
         while let Some((c, n)) = self.input.cp_at(p) {
             p += n;
             if c == quote {
-                return self.primitive::<MATCH>(state, Some(p - start), label);
+                let step = self.primitive::<MATCH>(state, Some(p - start), label);
+                if let Event::Token { text_span, content_span, .. } = &mut self.arena[step.events.0] {
+                    *text_span = Some([start, p]);
+                    *content_span = Some([start + 1, p - 1]);
+                }
+                return step;
             }
             if c == '\\' {
                 if let Some((_, n)) = self.input.cp_at(p) {
@@ -565,9 +584,10 @@ impl<'a> Session<'a> {
                 }
             }
         }
+        self.display.fail(p, if quote == '\'' {"SingleQuoted"} else {"Quoted"});
         self.fail(state, start, label)
     }
-    pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str) -> Step {
+    pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str, display: &'static str) -> Step {
         let mut out = state.begin();
         loop {
             if !terminator.is_empty() && self.input.starts_with(out.matched, terminator) {
@@ -576,7 +596,9 @@ impl<'a> Session<'a> {
                 }
                 return Step::yes(state.commit(out));
             }
+            if !terminator.is_empty() { self.display.fail(out.consumed.max(out.matched),display); }
             let Some((_, n)) = self.input.cp_at(out.position::<MATCH>()) else {
+                self.display.fail(out.consumed.max(out.matched),"ANY");
                 return Step::yes(state.commit(out));
             };
             out.advance::<MATCH>(n);
@@ -618,6 +640,7 @@ impl<'a> Session<'a> {
         });
         step.ok = result.ok;
         for d in result.diagnostics {
+            self.display.fail(d.offset, d.expected);
             let diag = self.diag.fail(d.offset, d.expected);
             step.diag = self.diag.join(step.diag, diag);
         }
@@ -630,6 +653,7 @@ impl<'a> Session<'a> {
                 rule: usize::MAX,
                 span: result.value_span,
                 text_span: Some(result.value_span),
+                content_span: None,
             });
         } else {
             self.restore(mark);
@@ -854,6 +878,21 @@ impl<'a> Session<'a> {
             }
         }
     }
+    fn text_content_extent(&self, mut root: EventId, fallback: Span) -> Span {
+        loop {
+            match self.arena[root.0] {
+                Event::Capture { child, .. } | Event::Rule { child, .. } | Event::Values { child, .. } => root = child,
+                Event::Token { content_span, text_span, .. } => return content_span.or(text_span).unwrap_or(fallback),
+                _ => return fallback,
+            }
+        }
+    }
+    pub fn semantic_text(&mut self, root: EventId, span: Span) -> String {
+        let extent = self.text_extent(root, span);
+        let content = self.text_content_extent(root, extent);
+        let value = if self.has_token_text(root) { self.text[content[0]..content[1]].to_owned() } else { self.text(content) };
+        self.remember_text(value, extent)
+    }
     pub fn field_text(&mut self, root: EventId, sites: &[usize]) -> Vec<String> {
         self.owned_captures(root, sites)
             .into_iter()
@@ -861,13 +900,7 @@ impl<'a> Session<'a> {
                 if self.directly_recovered(child) {
                     None
                 } else {
-                    let extent = self.text_extent(child, span);
-                    let value = if self.has_token_text(child) {
-                        self.text[extent[0]..extent[1]].to_owned()
-                    } else {
-                        self.text(extent)
-                    };
-                    Some(self.remember_text(value, extent))
+                    Some(self.semantic_text(child, span))
                 }
             })
             .collect()
@@ -925,8 +958,8 @@ const BODIES:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", 
 const SITES:&[(&str,&str)]=&[("expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/0/repeat/capture/0", "grammars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef/capture/0", "alias"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef/capture/0", "path"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1517:1527:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1550:1564:body/3/repeat/capture/0", "imports"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1584:1601:body/4/repeat/capture/0", "settings"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1619:1632:body/5/repeat/capture/0", "tokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1652:1664:body/6/repeat/capture/0", "rules"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2199:body/0/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2209:2215:body/2/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef/capture/0", "terminator"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef/capture/0", "chars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef/capture/0", "min"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef/capture/0", "max"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef/capture/0", "word"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4129:body/0/repeat/capture/0", "annotations"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4176:4184:body/3/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4946:4956:body/2/tokenRef/capture/0", "className"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4998:5008:body/3/0/4/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5027:5037:body/3/0/5/0/1/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5151:5163:body/2/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5179:5191:body/3/0/1/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5309:5319:body/1/0/1/tokenRef/capture/0", "style"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5449:5459:body/4/tokenRef/capture/0", "profile"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5574:5584:body/4/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5702:5712:body/4/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5844:5854:body/4/tokenRef/capture/0", "symbol"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5887:5893:body/5/0/3/tokenRef/capture/0", "description"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6020:6026:body/4/tokenRef/capture/0", "context"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6488:6504:body/4/tokenRef/capture/0", "level"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/2/tokenRef/capture/0", "text"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/2/tokenRef/capture/0", "syncTokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6750:6760:body/2/0/1/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7016:7026:body/2/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7045:7055:body/3/0/1/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7266:7276:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7408:body/0/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7429:7441:body/1/0/1/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/0/repeat/capture/0", "elements"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7729:7742:body/0/0/ruleRef/capture/0", "typeofConstraint"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7770:7783:body/1/ruleRef/capture/0", "element"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7887:7897:body/5/0/1/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8528:8536:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8640:8648:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8753:8761:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8883:8889:body/2/tokenRef/capture/0", "message"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/0/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9216:9226:body/0/0/0/tokenRef/capture/0", "namespace"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9244:9254:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9395:9405:body/2/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9536:body/0/tokenRef/capture/0", "parts"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9550:9560:body/1/0/1/tokenRef/capture/0", "parts")];
 impl Session<'_> {
 #[inline(never)] fn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err("maximum mapping depth exceeded".into());}self.mapping_depth+=1;let result=self.build_values_inner(root);self.mapping_depth-=1;result}
-fn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=vec![root];while let Some(id)=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push(b);stack.push(a);},Event::Capture{child,..}=>stack.push(child),Event::Values{child,span,wrap}=>{let mut found=self.build_values(child)?;if wrap && (matches!(found.as_slice(),[Ast::Text(_)]) || (found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {found=vec![Ast::Text(self.mapped_text(span))];}values.extend(found);},Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}Ok(values)}
-fn field_nodes(&mut self,root:EventId,sites:&[usize],fallback:Option<usize>)->Result<Vec<Ast>,String> {let mut values=Vec::new();for (span,child) in self.owned_captures(root,sites) {let mut found=self.build_values(child)?;if found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child) {found.push(Ast::Text(self.mapped_text(span)));}for value in found {values.push(if let (Some(ty),Ast::Text(text))=(fallback,&value) {self.leaf(ty,span,text.clone())?} else {value});}}Ok(values)}
+fn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=vec![root];while let Some(id)=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push(b);stack.push(a);},Event::Capture{child,..}=>stack.push(child),Event::Values{child,span,wrap}=>{let mut found=self.build_values(child)?;if wrap && (matches!(found.as_slice(),[Ast::Text(_)]) || (found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {found=vec![Ast::Text(self.semantic_text(child,span))];}values.extend(found);},Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}Ok(values)}
+fn field_nodes(&mut self,root:EventId,sites:&[usize],fallback:Option<usize>)->Result<Vec<Ast>,String> {let mut values=Vec::new();for (span,child) in self.owned_captures(root,sites) {let mut found=self.build_values(child)?;if found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child) {found.push(Ast::Text(self.semantic_text(child,span)));}for value in found {values.push(if let (Some(ty),Ast::Text(text))=(fallback,&value) {self.leaf(ty,span,text.clone())?} else {value});}}Ok(values)}
 fn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);let _=(span,text);Err(format!("unknown leaf type {ty}"))}
 fn build_rule(&mut self,rule:usize,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);match rule {
 0=>self.map_rule_0(span,child),
@@ -1047,7 +1080,7 @@ let span=self.span(span);let node_id=self.node(RULES[3],"GlobalSetting",span);Ok
 g_key:f0,
 g_value:f1,
 })])}}
-fn map_rule_4(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_4(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
 fn map_rule_5(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_nodes(child,&[10],None)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_DottedIdentifier(_))) {return Err("value: mapped value type mismatch".into());}
@@ -1091,7 +1124,7 @@ let span=self.span(span);let node_id=self.node(RULES[8],"TokenDecl",span);Ok(vec
 g_name:f0,
 g_value:f1,
 })])}}
-fn map_rule_9(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_9(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
 fn map_rule_10(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_text(child,&[16]);
 if f0.is_empty() && self.field_missing(child,&[16]) {return Ok(vec![]);}
@@ -1180,7 +1213,7 @@ g_annotations:f0,
 g_name:f1,
 g_body:f2,
 })])}}
-fn map_rule_21(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_21(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
 fn map_rule_22(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let span=self.span(span);let node_id=self.node(RULES[22],"RootAnnotation",span);Ok(vec![Ast::g_UBNFAST_2e_RootAnnotation(g_UBNFAST_2e_RootAnnotation{span,node_id,
 })])}}
@@ -1344,11 +1377,11 @@ g_element:f0,
 g_captureName:f1,
 g_typeofConstraint:f2,
 })])}}
-fn map_rule_45(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
-fn map_rule_46(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
-fn map_rule_47(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
-fn map_rule_48(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
-fn map_rule_49(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_45(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
+fn map_rule_46(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
+fn map_rule_47(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
+fn map_rule_48(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
+fn map_rule_49(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
 fn map_rule_50(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_nodes(child,&[52],None)?;
 if !f0.iter().all(|value|matches!(value,Ast::g_UBNFAST_2e_ChoiceBody(_))) {return Err("body: mapped value type mismatch".into());}
@@ -1392,7 +1425,7 @@ let f0:String=f0;
 let span=self.span(span);let node_id=self.node(RULES[54],"TerminalElement",span);Ok(vec![Ast::g_UBNFAST_2e_TerminalElement(g_UBNFAST_2e_TerminalElement{span,node_id,
 g_value:f0,
 })])}}
-fn map_rule_55(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_55(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
 fn map_rule_56(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{
 let mut f0=self.field_text(child,&[59]);
 if f0.is_empty() && self.field_missing(child,&[59]) {return Ok(vec![]);}
@@ -1407,7 +1440,7 @@ let f0:Vec<String>=f0;
 let span=self.span(span);let node_id=self.node(RULES[57],"DottedIdentifier",span);Ok(vec![Ast::g_UBNFAST_2e_DottedIdentifier(g_UBNFAST_2e_DottedIdentifier{span,node_id,
 g_parts:f0,
 })])}}
-fn map_rule_58(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.mapped_text(span)));}Ok(values)}}
+fn map_rule_58(&mut self,span:Span,child:EventId)->Result<Vec<Ast>,String> {let _=(span,child);{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {values.push(Ast::Text(self.semantic_text(child,span)));}Ok(values)}}
 fn occurrences(
     &self,
     root: EventId,
@@ -1570,7 +1603,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     if let Some(offset) = self.depth_failure {
         step = self.fail(State::default(), offset, "maximum parse depth exceeded");
     }
-    if self.diag.exhausted {
+    if self.diag.exhausted || self.display.arena.exhausted {
         self.resource_failure
             .get_or_insert((0, "diagnostic budget exceeded"));
     }
@@ -1622,6 +1655,14 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             length_cp: 0,
         });
     }
+    // D-014: farthest は失敗 frame / 成功枝内の失敗も含む独立観測。
+    let (display_pos, display_expected) = self.display.summary();
+    for diagnostic in &mut diagnostics {
+        if diagnostic.kind == DiagnosticKind::Syntax {
+            diagnostic.farthest_cp = self.cp(display_pos);
+            diagnostic.farthest_expected = display_expected.clone();
+        }
+    }
     let hints = diagnostics
         .iter()
         .filter(|d| d.kind == DiagnosticKind::Syntax)
@@ -1631,7 +1672,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         let (farthest_cp, farthest_expected, deepest_rule, rule_path) =
             diagnostics
                 .pop()
-                .map_or((consumed_cp, vec![], None, vec![]), |d| {
+                .map_or((self.cp(display_pos), display_expected, None, vec![]), |d| {
                     (
                         d.farthest_cp,
                         d.farthest_expected,
@@ -1721,17 +1762,17 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         diagnostics,
         hints,
         recoveries,
-        declarations: if ok {
+        declarations: if step.ok {
             self.scope.all_declarations().to_vec()
         } else {
             vec![]
         },
-        references: if ok {
+        references: if step.ok {
             self.scope.references().to_vec()
         } else {
             vec![]
         },
-        scope_diagnostics: if ok {
+        scope_diagnostics: if step.ok {
             self.scope.diagnostics().to_vec()
         } else {
             vec![]
@@ -1740,7 +1781,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         scope: ScopeResult {
             depth: self.scope.depth(),
             mode: SCOPE_MODES.to_vec(),
-            events: if ok {
+            events: if step.ok {
                 self.effects
                     .iter()
                     .enumerate()

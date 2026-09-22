@@ -21,7 +21,8 @@ impl Projection {
     }
     fn field(&mut self, name: &str, expected: Value, actual: Option<Value>) {
         // D-019 (docs/design/03-design-v1.md §8): 内部診断は保存するが Verdict 契約には含めない。
-        if name == "nativeFailure" {
+        // D-020: 旧 Java の rule 経路も情報のみ。受信値・report は変更しない。
+        if matches!(name, "nativeFailure" | "rulePath" | "deepestRule") {
             return;
         }
         if let Some(actual) = actual {
@@ -449,7 +450,7 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
         }
         // OracleCollector.java:171-174 / SemanticsTest.java:143-151:
         // oracle の capture は prefix 解析から採取され、全入力失敗でも残る。
-        // 未提供時に全入力 captures へ fallback しない（Rust driver は未出力）。
+        // 未提供時に全入力 captures へ fallback しない。
         let wire_key = if key == "captures" {
             "prefixCaptures"
         } else {
@@ -465,6 +466,12 @@ fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<Str
                         for (i, (e, a)) in e.iter().zip(a).enumerate() {
                             if let (Some(e), Some(a)) = (e.as_object(), a.as_object_mut()) {
                                 for (field, expected) in e {
+                                    // D-020: 内部 rule 経路は欠落していても未観測に数えない。
+                                    if key == "diagnostics"
+                                        && matches!(field.as_str(), "rulePath" | "deepestRule")
+                                    {
+                                        continue;
+                                    }
                                     let mandatory = if key == "captures" {
                                         ["name", "span", "text"].contains(&field.as_str())
                                     } else {

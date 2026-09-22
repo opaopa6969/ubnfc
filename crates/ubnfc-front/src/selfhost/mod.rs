@@ -317,8 +317,20 @@ impl<'a> Converter<'a> {
             .map(|c| self.offsets.text(c.span_cp))
             .collect()
     }
-    fn value(&self, i: usize, field: &str) -> Result<String> {
-        let values = self.values(i, field)?;
+    /// STRING capture の原文 (引用符付き)。型付き AST の値は引用符を除いた
+    /// 内容なので、raw 保持と escape 復号は capture span の原文から行う。
+    fn raw_values(&self, i: usize, field: &str) -> Result<Vec<&str>> {
+        self.owned_captures[i]
+            .iter()
+            .map(|&c| &self.captures[c])
+            .filter(|c| c.name == field)
+            .map(|c| {
+                let span = self.offsets.content_span(c.span_cp)?;
+                Ok(&self.offsets.source[span.start..span.end])
+            })
+            .collect()
+    }
+    fn scalar(&self, i: usize, field: &str, values: Vec<&str>) -> Result<String> {
         if values.len() != 1 {
             return Err(self.error(
                 i,
@@ -327,13 +339,18 @@ impl<'a> Converter<'a> {
         }
         Ok(values[0].to_owned())
     }
-    fn optional(&self, i: usize, field: &str) -> Result<Option<String>> {
-        let values = self.values(i, field)?;
+    fn at_most_one(&self, i: usize, field: &str, values: Vec<&str>) -> Result<Option<String>> {
         match values.as_slice() {
             [] => Ok(None),
             [value] => Ok(Some((*value).to_owned())),
             _ => Err(self.error(i, format!("{field} の optional capture が重複しています"))),
         }
+    }
+    fn value(&self, i: usize, field: &str) -> Result<String> {
+        self.scalar(i, field, self.values(i, field)?)
+    }
+    fn optional(&self, i: usize, field: &str) -> Result<Option<String>> {
+        self.at_most_one(i, field, self.values(i, field)?)
     }
     fn strings(&self, i: usize, field: &str) -> Result<Vec<String>> {
         Ok(self
@@ -342,11 +359,14 @@ impl<'a> Converter<'a> {
             .map(str::to_owned)
             .collect())
     }
+    fn raw_string(&self, i: usize, field: &str) -> Result<String> {
+        self.scalar(i, field, self.raw_values(i, field)?)
+    }
     fn string(&self, i: usize, field: &str) -> Result<String> {
-        decode_string(&self.value(i, field)?, self.span(i)?)
+        decode_string(&self.raw_string(i, field)?, self.span(i)?)
     }
     fn optional_string(&self, i: usize, field: &str) -> Result<Option<String>> {
-        self.optional(i, field)?
+        self.at_most_one(i, field, self.raw_values(i, field)?)?
             .map(|v| decode_string(&v, self.span(i)?))
             .transpose()
     }
@@ -698,7 +718,7 @@ impl<'a> Converter<'a> {
             },
             "TerminalElement" => Atom::Literal {
                 value: self.string(j, "value")?,
-                raw: self.value(j, "value")?,
+                raw: self.raw_string(j, "value")?,
                 span,
             },
             "QuantifiedRef" => Atom::Ref {

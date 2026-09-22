@@ -159,7 +159,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
     if let Some(offset) = self.depth_failure {
         step = self.fail(State::default(), offset, "maximum parse depth exceeded");
     }
-    if self.diag.exhausted {
+    if self.diag.exhausted || self.display.arena.exhausted {
         self.resource_failure
             .get_or_insert((0, "diagnostic budget exceeded"));
     }
@@ -211,6 +211,14 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
             length_cp: 0,
         });
     }
+    // D-014: farthest は失敗 frame / 成功枝内の失敗も含む独立観測。
+    let (display_pos, display_expected) = self.display.summary();
+    for diagnostic in &mut diagnostics {
+        if diagnostic.kind == DiagnosticKind::Syntax {
+            diagnostic.farthest_cp = self.cp(display_pos);
+            diagnostic.farthest_expected = display_expected.clone();
+        }
+    }
     let hints = diagnostics
         .iter()
         .filter(|d| d.kind == DiagnosticKind::Syntax)
@@ -220,7 +228,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         let (farthest_cp, farthest_expected, deepest_rule, rule_path) =
             diagnostics
                 .pop()
-                .map_or((consumed_cp, vec![], None, vec![]), |d| {
+                .map_or((self.cp(display_pos), display_expected, None, vec![]), |d| {
                     (
                         d.farthest_cp,
                         d.farthest_expected,
@@ -310,17 +318,17 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         diagnostics,
         hints,
         recoveries,
-        declarations: if ok {
+        declarations: if step.ok {
             self.scope.all_declarations().to_vec()
         } else {
             vec![]
         },
-        references: if ok {
+        references: if step.ok {
             self.scope.references().to_vec()
         } else {
             vec![]
         },
-        scope_diagnostics: if ok {
+        scope_diagnostics: if step.ok {
             self.scope.diagnostics().to_vec()
         } else {
             vec![]
@@ -329,7 +337,7 @@ pub(crate) fn finish(mut self, mut step: Step) -> ParseResult {
         scope: ScopeResult {
             depth: self.scope.depth(),
             mode: SCOPE_MODES.to_vec(),
-            events: if ok {
+            events: if step.ok {
                 self.effects
                     .iter()
                     .enumerate()

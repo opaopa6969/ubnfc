@@ -128,3 +128,75 @@ impl Default for Diagnostics {
         Self::new()
     }
 }
+
+// D-014: 公開 farthest 候補の局所 frame。Rust の fail_at 主位置とは独立。
+// 成功 rule の失敗も残し、Not 成功時だけ checkpoint に戻す。memo は局所
+// snapshot を再生するため、保存時の親 frame を混ぜない。
+#[derive(Clone, Copy, Debug, Default)]
+pub struct DisplaySnapshot {
+    pub diag: Diag,
+    pub reached: usize,
+}
+pub struct DisplayDiagnostics {
+    pub arena: Diagnostics,
+    global: DisplaySnapshot,
+    frames: Vec<DisplaySnapshot>,
+}
+impl DisplayDiagnostics {
+    pub fn new(limit: usize) -> Self {
+        Self {
+            arena: Diagnostics::with_limit(limit),
+            global: DisplaySnapshot::default(),
+            frames: vec![],
+        }
+    }
+    pub fn enter(&mut self, reached: usize) {
+        self.frames.push(DisplaySnapshot::default());
+        self.reach(reached);
+    }
+    pub fn leave(&mut self) -> DisplaySnapshot {
+        self.frames.pop().expect("balanced diagnostic frame")
+    }
+    pub fn snapshot(&self) -> DisplaySnapshot {
+        self.frames.last().copied().unwrap_or(self.global)
+    }
+    pub fn checkpoint(&self) -> (DisplaySnapshot, Vec<DisplaySnapshot>) {
+        (self.global, self.frames.clone())
+    }
+    pub fn restore(&mut self, checkpoint: (DisplaySnapshot, Vec<DisplaySnapshot>)) {
+        debug_assert_eq!(self.frames.len(), checkpoint.1.len());
+        self.global = checkpoint.0;
+        self.frames = checkpoint.1;
+    }
+    pub fn reach(&mut self, reached: usize) {
+        self.global.reached = self.global.reached.max(reached);
+        for frame in &mut self.frames {
+            frame.reached = frame.reached.max(reached);
+        }
+    }
+    pub fn fail(&mut self, pos: usize, label: &'static str) {
+        let diag = self.arena.fail(pos, label);
+        self.merge(DisplaySnapshot { diag, reached: pos });
+    }
+    pub fn failures(&mut self, pos: usize, labels: &[&'static str]) {
+        for &label in labels {
+            self.fail(pos, label);
+        }
+    }
+    pub fn merge(&mut self, snapshot: DisplaySnapshot) {
+        self.reach(snapshot.reached);
+        self.global.diag = self.arena.join(self.global.diag, snapshot.diag);
+        for frame in &mut self.frames {
+            frame.diag = self.arena.join(frame.diag, snapshot.diag);
+        }
+    }
+    pub fn summary(&self) -> (usize, Vec<&'static str>) {
+        self.arena.summary(self.global.diag).map_or(
+            (self.global.reached, vec![]),
+            |(pos, mut labels, _)| {
+                labels.sort();
+                (pos, labels)
+            },
+        )
+    }
+}

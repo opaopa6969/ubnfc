@@ -227,13 +227,14 @@ fn observations_imports_errors_and_source_revision_survive_normalization() {
 #[test]
 fn every_divergence_resolves_and_only_follow_spec_is_attached() {
     let entries = divergence::load(&oracle::default_root().join("divergences.json")).unwrap();
-    assert_eq!(entries.len(), 78);
+    // round5: recovery-root/1 の parsedStatus（D-017 follow-spec）を追加して 79 件。
+    assert_eq!(entries.len(), 79);
     assert_eq!(
         entries
             .iter()
             .filter(|e| e.decision == Decision::FollowSpec)
             .count(),
-        63
+        64
     );
     // D-018 で undecided 15 件は名前付き契約（new-contract:*）に決定した。
     assert_eq!(
@@ -272,7 +273,7 @@ fn every_divergence_resolves_and_only_follow_spec_is_attached() {
         .flat_map(|f| &f.cases)
         .map(|c| c.known_divergences.len())
         .sum();
-    assert_eq!(attached, 78);
+    assert_eq!(attached, 79);
 
     // 登録されていない観測（recovery-sync/1 の consumed）を変えると、他に既知登録があっても免除しない。
     let case = corpus()

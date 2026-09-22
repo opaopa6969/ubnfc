@@ -544,5 +544,12 @@
     "observation": "parsedStatus",
     "reason": "README.md#疑義 1 / docs/compat-matrix.md C15: RegexTokenParser.java:38,45,50,54 の UTF-16/code point 混在による prefix の failed を再現しない。OracleCollector.java:171-174 の parsedStatus も code point 意味論で succeeded になる（D-017、D-007）。",
     "decision": "follow-spec"
+  },
+  {
+    "file": "recovery-root.json",
+    "caseId": "recovery-root/1",
+    "observation": "parsedStatus",
+    "reason": "README.md#疑義 3: @root の recovery(sync=';') を適用し、bad; を回復する（D-017）。OracleCollector.java:164-171 の parsedStatus は prefix parser の成功状態なので、既登録 accepted/consumed/matched と同じ root recovery 無効バグに由来する failed を再現しない。docs/decisions/D-018-undecided-divergences.md §(a) の Root[0,4] 回復契約。",
+    "decision": "follow-spec"
   }
 ]

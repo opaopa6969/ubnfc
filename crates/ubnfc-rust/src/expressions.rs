@@ -28,13 +28,13 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     if success || failure {
         writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:self.scope.state_version()}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
     }
-    writeln!(s, "let mut out=self.b{i}_{suf}(state);\nif out.ok {{").unwrap();
+    writeln!(s, "self.display.enter(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
     if matches!(
         expr.node,
         ExprNode::Literal { .. } | ExprNode::TokenRef { .. } | ExprNode::Any {}
     ) {
         let rule = g.rules[expr.rule_id.as_str()];
-        writeln!(s, "if let Event::Token{{span,text_span,..}}=self.arena[out.events.0] {{out.events=self.event(Event::Token{{expr:{i},rule:{rule},span,text_span}});}}").unwrap();
+        writeln!(s, "if let Event::Token{{span,text_span,content_span,..}}=self.arena[out.events.0] {{out.events=self.event(Event::Token{{expr:{i},rule:{rule},span,text_span,content_span}});}}").unwrap();
     }
     if matches!(
         expr.node,
@@ -57,7 +57,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     ) {
         s.push_str(&capture_events(g, expr, "state", "out"));
     }
-    s.push_str("} else {self.restore(mark);}\n");
+    writeln!(s,"}} else {{self.restore(mark);self.display.failures(state.consumed.max(state.matched),&{:?});}}",g.display.expression(expr.id.as_str())).unwrap();
     if success || failure {
         writeln!(
             s,
@@ -67,7 +67,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     }
     writeln!(
         s,
-        "out\n}}\nfn b{i}_{suf}(&mut self,mut state:State)->Step {{"
+        "self.display.leave();out\n}}\nfn b{i}_{suf}(&mut self,mut state:State)->Step {{"
     )
     .unwrap();
     if expr.execution.entry_flag == ExecutionEntryFlag::SetFalse {
@@ -211,8 +211,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         ExprNode::TokenRef { symbol_id } => {
             writeln!(
                 s,
-                "out=self.token_{}::<{child_mode}>(out.state,{label:?});",
-                g.tokens[symbol_id.as_str()]
+                "out=self.token_{}::<{child_mode}>(out.state,{label:?},{:?});",
+                g.tokens[symbol_id.as_str()],
+                g.display.token_label(expr.id.as_str())
             )
             .unwrap();
         }
@@ -242,7 +243,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             .unwrap();
         }
         ExprNode::Lookahead { child } | ExprNode::NegativeLookahead { child } => {
-            s.push_str("let mark=self.mark();\n");
+            s.push_str("let mark=self.mark();let display_checkpoint=self.display.checkpoint();\n");
             writeln!(
                 s,
                 "let child={};self.restore(mark);",
@@ -250,11 +251,22 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             )
             .unwrap();
             if matches!(expr.node, ExprNode::NegativeLookahead { .. }) {
-                writeln!(s,"out=if child.ok {{let mut failed=self.fail(state,state.position::<{mode}>(),{label:?});failed.diag=self.diag.join(child.diag,failed.diag);failed}} else {{Step::yes(state.commit(out.state))}};").unwrap();
+                writeln!(s,"out=if child.ok {{let mut failed=self.fail(state,state.position::<{mode}>(),{label:?});failed.diag=self.diag.join(child.diag,failed.diag);failed}} else {{self.display.restore(display_checkpoint);Step::yes(state.commit(out.state))}};").unwrap();
             } else {
-                s.push_str("out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
+                s.push_str("let _=display_checkpoint;out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
             }
         }
+    }
+    if matches!(
+        expr.node,
+        ExprNode::Literal { .. } | ExprNode::Any {} | ExprNode::Eof {} | ExprNode::Error { .. }
+    ) {
+        let display = g.display.token_label(expr.id.as_str());
+        writeln!(
+            s,
+            "if !out.ok {{self.display.fail(state.consumed.max(state.matched),{display:?});}}"
+        )
+        .unwrap();
     }
     s.push_str("if out.ok {\n");
     s.push_str(&g.trivia(&expr.id, BoundaryAt::Exit, None, mode));

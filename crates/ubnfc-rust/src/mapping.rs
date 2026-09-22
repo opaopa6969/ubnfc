@@ -72,7 +72,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             .collect::<Vec<_>>()
     )
     .unwrap();
-    s.push_str("impl Session<'_> {\n#[inline(never)] fn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err(\"maximum mapping depth exceeded\".into());}self.mapping_depth+=1;let result=self.build_values_inner(root);self.mapping_depth-=1;result}\nfn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=vec![root];while let Some(id)=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push(b);stack.push(a);},Event::Capture{child,..}=>stack.push(child),Event::Values{child,span,wrap}=>{let mut found=self.build_values(child)?;if wrap && (matches!(found.as_slice(),[Ast::Text(_)]) || (found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {found=vec![Ast::Text(self.mapped_text(span))];}values.extend(found);},Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}Ok(values)}\nfn field_nodes(&mut self,root:EventId,sites:&[usize],fallback:Option<usize>)->Result<Vec<Ast>,String> {let mut values=Vec::new();for (span,child) in self.owned_captures(root,sites) {let mut found=self.build_values(child)?;if found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child) {found.push(Ast::Text(self.mapped_text(span)));}for value in found {values.push(if let (Some(ty),Ast::Text(text))=(fallback,&value) {self.leaf(ty,span,text.clone())?} else {value});}}Ok(values)}\nfn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);match ty {\n");
+    s.push_str("impl Session<'_> {\n#[inline(never)] fn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err(\"maximum mapping depth exceeded\".into());}self.mapping_depth+=1;let result=self.build_values_inner(root);self.mapping_depth-=1;result}\nfn build_values_inner(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut values=Vec::new();let mut stack=vec![root];while let Some(id)=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push(b);stack.push(a);},Event::Capture{child,..}=>stack.push(child),Event::Values{child,span,wrap}=>{let mut found=self.build_values(child)?;if wrap && (matches!(found.as_slice(),[Ast::Text(_)]) || (found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {found=vec![Ast::Text(self.semantic_text(child,span))];}values.extend(found);},Event::Rule{rule,span,child}=>values.extend(self.build_rule(rule,span,child)?),_=>{}}}Ok(values)}\nfn field_nodes(&mut self,root:EventId,sites:&[usize],fallback:Option<usize>)->Result<Vec<Ast>,String> {let mut values=Vec::new();for (span,child) in self.owned_captures(root,sites) {let mut found=self.build_values(child)?;if found.is_empty() && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child) {found.push(Ast::Text(self.semantic_text(child,span)));}for value in found {values.push(if let (Some(ty),Ast::Text(text))=(fallback,&value) {self.leaf(ty,span,text.clone())?} else {value});}}Ok(values)}\nfn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);match ty {\n");
     let mut leaves = std::collections::BTreeSet::new();
     for recipe in &g.ir.semantics.recipes {
         if let Some(leaf) = &recipe.leaf_fallback {
@@ -141,7 +141,7 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
         return Ok(s);
     }
     let Some(recipe) = recipe else {
-        writeln!(s,"{i}=>{{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {{values.push(Ast::Text(self.mapped_text(span)));}}Ok(values)}},").unwrap();
+        writeln!(s,"{i}=>{{let mut values=self.build_values(child)?;if values.is_empty() && !self.has_recovery(child) && !self.has_value_group(child) {{values.push(Ast::Text(self.semantic_text(child,span)));}}Ok(values)}},").unwrap();
         return Ok(s);
     };
     if recipe.kind == RecipeKind::Transparent {
@@ -149,7 +149,7 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
         return Ok(s);
     }
     if recipe.kind == RecipeKind::Text {
-        writeln!(s, "{i}=>if self.directly_recovered(child) {{Ok(vec![])}} else {{Ok(vec![Ast::Text(self.mapped_text(span))])}},").unwrap();
+        writeln!(s, "{i}=>if self.directly_recovered(child) {{Ok(vec![])}} else {{Ok(vec![Ast::Text(self.semantic_text(child,span))])}},").unwrap();
         return Ok(s);
     }
     let Some(type_id) = &recipe.result_type_id else {

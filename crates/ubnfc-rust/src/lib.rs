@@ -1,5 +1,6 @@
 //! Grammar IR v1 から、外部 runtime に依存しない Rust モジュールを生成する。
 mod ast;
+mod diagnostics;
 mod driver;
 mod emit;
 mod evaluator;
