@@ -21,6 +21,22 @@ public final class Validation {
             throw new IllegalArgumentException("Invalid Java identifier: " + name);
     }
     public static void unsupported(String name) { throw new IllegalArgumentException("Unsupported IR feature: " + name); }
+    private static void validateDfa(RegexDfa dfa) {
+        require(dfa.states() != null && dfa.states() > 0 && dfa.start() != null && dfa.start() >= 0 && dfa.start() < dfa.states(), "Invalid DFA start");
+        require(Boolean.TRUE.equals(dfa.anchoredAtStart()) && "fail".equals(dfa.zeroWidth()), "Invalid DFA anchoring/zeroWidth");
+        require("leftmostFirst".equals(dfa.semantics()) || dfa.semantics() == null && Boolean.TRUE.equals(dfa.longestMatch()), "Unsupported DFA semantics");
+        for (int state : dfa.accepting()) require(state >= 0 && state < dfa.states(), "Invalid DFA accepting state");
+        var ranges = new java.util.HashMap<Integer, java.util.List<int[]>>();
+        for (var transition : dfa.transitions()) {
+            require(transition.from() >= 0 && transition.from() < dfa.states() && transition.to() >= 0 && transition.to() < dfa.states(), "Invalid DFA transition state");
+            for (var range : transition.ranges()) {
+                require(range.size() == 2 && range.get(0) >= 0 && range.get(1) <= 0x10ffff && range.get(0) <= range.get(1), "Invalid DFA range");
+                var previous = ranges.computeIfAbsent(transition.from(), key -> new java.util.ArrayList<>());
+                require(previous.stream().noneMatch(r -> range.get(0) <= r[1] && r[0] <= range.get(1)), "Overlapping DFA transitions");
+                previous.add(new int[]{range.get(0), range.get(1)});
+            }
+        }
+    }
     private static void require(boolean condition, String reason) { if (!condition) throw new IllegalArgumentException(reason); }
     private static void reference(Map<String, ?> map, String id) { require(id != null && map.containsKey(id), "Unresolved reference: " + id); }
     public static void validate(GrammarIr ir) {
@@ -165,7 +181,6 @@ public final class Validation {
         }
         for (var analysis : ir.analysis().rules()) if (analysis.leftRecursion().equals("indirectRejected")) unsupported("indirectLeftRecursion:" + analysis.ruleId());
         for (var plan : ir.plan().operators()) if (!plan.strategy().equals("tierFunctions")) unsupported("precedenceClimbing");
-        for (var lexical : ir.plan().lexical()) if (lexical.strategy().equals("dfa")) unsupported("lexical.dfa");
         for (var choice : ir.plan().choices()) {
             reference(expressions, choice.exprId());
             var alternatives = expressions.get(choice.exprId()).node().alternatives();
@@ -178,14 +193,16 @@ public final class Validation {
             TokenSpec spec = token.spec();
             if (spec.kind().equals("charRange")) require(spec.min() <= spec.max()
                 && !(spec.min() >= 0xd800 && spec.min() <= 0xdfff) && !(spec.max() >= 0xd800 && spec.max() <= 0xdfff), "Invalid charRange endpoints");
-            if (spec.kind().equals("regex")) {
+            if (spec.kind().equals("regex") && spec.dfa() == null) {
                 try { java.util.regex.Pattern.compile(spec.pattern()); }
                 catch (java.util.regex.PatternSyntaxException error) { throw new IllegalArgumentException("Invalid regex: " + token.symbolId(), error); }
             }
             int previous = -1;
             for (int point : spec.codePoints()) { require(point > previous && point <= 0x10ffff, "Invalid codePoints: " + token.symbolId()); previous = point; }
             if (!token.memoSafety().success() || !token.memoSafety().failure()) unsafe.add(token.symbolId());
-            if (token.spec().kind().equals("regex") && token.spec().javaFallback().equals("none")) unsupported("regex.dfaRequired");
+            if (spec.kind().equals("regex") && spec.dfa() != null) validateDfa(spec.dfa());
+            if (spec.kind().equals("regex") && spec.dfa() == null && spec.javaFallback().equals("none")
+                && ir.plan().lexical().stream().noneMatch(p -> p.tokenId().equals(token.symbolId()) && p.dfa() != null)) unsupported("regex.dfaRequired");
         }
         boolean changed;
         do {

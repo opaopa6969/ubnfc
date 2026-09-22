@@ -1,2 +1,6 @@
 package generated.api;
-public record Capture(long occurrenceId, String siteId, String name, Span span, long completionOrder) {}
+public record Capture(long occurrenceId, String siteId, String name, Span span, long completionOrder, long ruleCompletionOrder) {
+    public Capture(long occurrenceId, String siteId, String name, Span span, long completionOrder) {
+        this(occurrenceId, siteId, name, span, completionOrder, completionOrder);
+    }
+}

@@ -81,6 +81,11 @@ class DriverTest {
         var partial = exchange(operators, request("1+"));
         assertEquals(true, partial.get("accepted")); assertEquals(false, partial.get("allConsumed"));
         assertEquals(1, integer(partial.get("consumed"))); assertNull(partial.get("ast")); assertNull(partial.get("value"));
+        assertFalse(Json.array(partial.get("prefixCaptures")).isEmpty());
+        assertNotNull(Json.object(Json.array(partial.get("prefixCaptures")).getFirst()).get("binding"));
+        assertEquals("succeeded", partial.get("parsedStatus"));
+        var limited = request("1"); limited.put("options", obj("lexical", true, "scope", true, "maxDepth", 1));
+        assertEquals(false, exchange(operators, limited).get("accepted"));
         var diagnostic = Json.object(Json.array(partial.get("diagnostics")).getFirst());
         assertEquals("trailing_input", diagnostic.get("kind")); assertEquals(1, integer(diagnostic.get("offset")));
         assertEquals(List.of("'('", "NUMBER"), diagnostic.get("farthestExpected"));
@@ -92,7 +97,7 @@ class DriverTest {
         assertTrue(rows.get(0).get("error").toString().contains("Non-finite"));
         assertEquals(5.0, ((Number) rows.get(1).get("value")).doubleValue());
         assertEquals(24.5, ((Number) rows.get(2).get("value")).doubleValue());
-        assertEquals(true, rows.get(3).get("allConsumed")); assertNull(rows.get(3).get("value"));
+        assertEquals(true, rows.get(3).get("allConsumed")); assertEquals(12.0, ((Number) rows.get(3).get("value")).doubleValue());
     }
     @Test void scopeEventsAndOptionsDoNotChangeParsing() throws Exception {
         var f = new IrFixture();
@@ -109,9 +114,9 @@ class DriverTest {
             assertEquals(Json.read("[{\"name\":\"😀\",\"sourceOffset\":0}]"), on.get("declarations"));
             assertEquals(Json.read("[{\"name\":\"z\",\"offset\":1,\"length\":1}]"), on.get("references"));
             var diagnostic = Json.object(Json.array(on.get("diagnostics")).getFirst());
-            assertEquals("scope", diagnostic.get("kind")); assertEquals(1, integer(diagnostic.get("offset")));
+            assertEquals("WARNING", diagnostic.get("kind")); assertEquals(1, integer(diagnostic.get("offset")));
             assertEquals(List.of(), diagnostic.get("expected"));
-            for (String key : List.of("captures", "declarations", "references")) { assertFalse(off.containsKey(key)); on.remove(key); }
+            for (String key : List.of("captures", "prefixCaptures", "lexical", "declarations", "references", "scope", "scopeDepth")) { assertFalse(off.containsKey(key)); on.remove(key); }
             assertEquals(on, off); assertEquals(true, on.get("allConsumed"));
         }
     }
@@ -124,7 +129,9 @@ class DriverTest {
             assertEquals(true, result.get("accepted")); assertEquals(true, result.get("allConsumed"));
             assertEquals(10, integer(result.get("consumed"))); assertEquals(10, integer(result.get("matched")));
             assertNull(result.get("ast")); assertNull(result.get("value"));
-            assertTrue(result.get("mappingError").toString().contains("NUMBER cannot be mapped to int"));
+            assertTrue(result.get("mappingMessage").toString().contains("NUMBER cannot be mapped to int"));
+            assertTrue(result.get("mappingError").toString().startsWith("java.lang.NumberFormatException:"));
+            assertEquals("java.lang.NumberFormatException", result.get("mappingErrorKind"));
             assertEquals(1, Json.array(result.get("captures")).size());
         }
     }
@@ -150,6 +157,14 @@ class DriverTest {
             assertEquals("Secondary", Json.object(rows.get(1).get("ast")).get("type"));
             assertTrue(rows.get(4).get("error") instanceof String);
             assertTrue(rows.get(5).get("error") instanceof String);
+        }
+    }
+    @Test void unsupportedEvaluationIsAbsentAndLeafWithoutTextDoesNotCrash() throws Exception {
+        var f = new IrFixture(); f.rule("Root", f.literal("Root", "c")); f.mapping("Root", "Leaf", List.of(), List.of());
+        try (var h = f.compile()) {
+            var response = exchange(h, request(null, "Probe", null, "c", true, true));
+            assertEquals(true, response.get("allConsumed")); assertFalse(response.containsKey("error"));
+            assertFalse(response.containsKey("value")); assertEquals(List.of(), response.get("nodes"));
         }
     }
     @Test void emissionIsDefaultAndCanBeDisabledByApiOrCli() throws Exception {

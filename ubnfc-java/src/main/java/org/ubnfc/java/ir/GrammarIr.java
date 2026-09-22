@@ -66,7 +66,10 @@ public record GrammarIr(Analysis analysis, String analysisVersion, GrammarIrEntr
     public record Symbol(String grammarId, String id, String kind, String name, String originalName, String qualifiedSymbolId, Span source, String sourceId) {}
     public record Token(List<Annotation> annotations, TokenDiagnosticProfiles diagnosticProfiles, MemoSafety memoSafety, TokenSpec spec, String symbolId) {}
     public record TokenDiagnosticProfiles(String java_, String rust) {}
-    public record TokenSpec(List<Integer> codePoints, String kind, String which, String emptyTerminator, String missingTerminator, Boolean preserveMatched, String terminator, String excluded, String pattern, Integer max, Integer min, String comparison, String word, String javaFallback, String matching, Boolean regularSubset, String rustFallback, String zeroWidth, List<String> inputState, String javaBinding, String logicalId, String originalClassName, List<String> resultFields, String rustBinding) {}
+    public record RegexDfa(Integer states, Integer start, List<Integer> accepting, List<RegexTransition> transitions,
+                           Boolean anchoredAtStart, Boolean longestMatch, String semantics, String zeroWidth) {}
+    public record RegexTransition(Integer from, Integer to, List<List<Integer>> ranges) {}
+    public record TokenSpec(List<Integer> codePoints, String kind, String which, String emptyTerminator, String missingTerminator, Boolean preserveMatched, String terminator, String excluded, String pattern, Integer max, Integer min, String comparison, String word, String javaFallback, String matching, Boolean regularSubset, String rustFallback, String zeroWidth, List<String> inputState, String javaBinding, String logicalId, String originalClassName, List<String> resultFields, String rustBinding, RegexDfa dfa, String fallback) {}
     public record Trivia(List<TriviaInsertionPlanItem> insertionPlan, List<TriviaPolicy> policies) {}
     public record TriviaInsertionPlanItem(Boundary boundary, String policyId) {}
     public record TriviaPolicy(List<Delimiter> effectiveDelimiterSet, String id, String precedence, Settings rawSettings) {}
