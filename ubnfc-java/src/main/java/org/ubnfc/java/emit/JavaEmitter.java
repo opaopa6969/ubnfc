@@ -29,6 +29,7 @@ public final class JavaEmitter {
     private final Map<String, Recipe> recipes;
     private final SemanticShape semanticShapes;
     private final DiagnosticPlan diagnosticPlan;
+    private final Prediction prediction;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
     /** Generated constants (arrays of boundaries, fields, hints, ...) hoisted to static finals: expression text -> field name. */
     private final Map<String, String> constants = new LinkedHashMap<>();
@@ -49,6 +50,7 @@ public final class JavaEmitter {
         diagnosticPlan = new DiagnosticPlan(ir);
         for (String id : expressions.keySet()) exprIds.put(id, exprIds.size());
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
+        prediction = new Prediction(ir, expressions, rules, tokens, ruleIds, diagnosticPlan, this::labelText);
     }
     public Map<String, String> sources() throws IOException {
         var result = new TreeMap<String, String>(); String prefix = pkg.replace('.', '/') + "/";
@@ -360,12 +362,18 @@ public final class JavaEmitter {
         String body = expression(expr);
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
     }
-    private String expression(Expr expr) {
-        ExprNode n = expr.node(); String boundary = boundaries(expr.id());
+    /** The label a primitive expression registers on failure (shared with Prediction). */
+    String labelText(Expr expr) {
+        ExprNode n = expr.node();
         String label = expr.diagnosticLabel();
         var display = ir.semantics().diagnostics().expectedDisplay().stream().filter(d -> d.exprId().equals(expr.id())).findFirst().orElse(null);
         if (display != null) label = display.java_();
         if (label == null) label = n.kind().equals("literal") ? "'" + n.value() + "'" : n.kind();
+        return label;
+    }
+    private String expression(Expr expr) {
+        ExprNode n = expr.node(); String boundary = boundaries(expr.id());
+        String label = labelText(expr);
         return switch (n.kind()) {
             case "seq" -> "return s.sequence(f, " + calls(n.items()) + ", " + boundary + ");";
             case "group" -> expr.execution().transaction().equals("delegate") ? "return " + method(n.child()) + "(s, f);" : "return s.sequence(f, " + calls(List.of(n.child())) + ", " + boundary + ");";
@@ -506,7 +514,7 @@ public final class JavaEmitter {
         var phases = new java.util.HashMap<String, String>();
         for (var p : plan) {
             Boundary b = p.boundary();
-            String delimiters = constant("Delimiters", "new Delimiters(" + policies.get(p.policyId()).effectiveDelimiterSet().stream().map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + ")").collect(Collectors.joining(",")) + ")");
+            String delimiters = delimiters(p.policyId());
             if (b.at().equals("afterChild")) afterChild[b.childIndex()] = delimiters;
             else if (phases.put(b.at(), delimiters) != null) throw new IllegalStateException("Duplicate trivia boundary " + b.at() + " at " + id);
         }
@@ -534,7 +542,29 @@ public final class JavaEmitter {
         }
         String eofGuard = expr.node().selection().equals("predictive") && expr.node().alternatives().stream().allMatch(id -> !nullable(id))
             ? "if (s.cp(f.position()) < 0) return null; " : "";
-        return eofGuard + "return s.choice(f," + calls(expr.node().alternatives()) + "," + longest + "," + eligible + "," + (predict && (plan == null || plan.fallback().equals("fullChoice"))) + ");";
+        String guards = "null";
+        if (!predict && !longest && prediction.ordered(expr)) {
+            var plans = expr.node().alternatives().stream().map(prediction::guard).toList();
+            if (plans.stream().anyMatch(java.util.Objects::nonNull))
+                guards = constant("Guard[]", "new Guard[]{" + plans.stream().map(this::guard).collect(Collectors.joining(",")) + "}");
+        }
+        return eofGuard + "return s.choice(f," + calls(expr.node().alternatives()) + "," + longest + "," + eligible + "," + (predict && (plan == null || plan.fallback().equals("fullChoice"))) + (guards.equals("null") ? "" : "," + guards) + ");";
+    }
+    /** Static replay plan of one excluded alternative; see Prediction. */
+    private String guard(Prediction.Guard plan) {
+        if (plan == null) return "null";
+        var bounds = new ArrayList<Integer>();
+        for (int[] range : plan.allowed().items()) { bounds.add(range[0]); bounds.add(range[1]); }
+        String labels = "new Label[]{" + plan.labels().stream()
+            .map(text -> Prediction.TRIVIA_LABEL.equals(text) ? "null" : "Label.of(" + q(text) + ")").collect(Collectors.joining(",")) + "}";
+        String trivia = plan.triviaPolicyId() == null ? "null" : delimiters(plan.triviaPolicyId());
+        return constant("Guard", "new Guard(" + constant("int[]", ints(bounds)) + "," + constant("Label[]", labels) + ","
+            + trivia + "," + constant("int[]", ints(plan.suffix())) + "," + plan.maxRuleDepth() + ")");
+    }
+    private String delimiters(String policyId) {
+        TriviaPolicy policy = Validation.index(ir.semantics().trivia().policies(), TriviaPolicy::id).get(policyId);
+        return constant("Delimiters", "new Delimiters(" + policy.effectiveDelimiterSet().stream()
+            .map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + ")").collect(Collectors.joining(",")) + ")");
     }
     private void emitBuild(StringBuilder out) {
         if (recipes.values().stream().noneMatch(r -> r.resultTypeId() != null && !Set.of("transparent", "text", "skip").contains(r.kind()))) {

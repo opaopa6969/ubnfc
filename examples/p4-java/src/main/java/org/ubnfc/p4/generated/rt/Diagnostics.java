@@ -326,6 +326,38 @@ public final class Diagnostics {
         }
     }
 
+    /**
+     * 同じ位置へ複数の label をまとめて記録する（候補除外の静的再生）。{@code suffix} は「その候補が
+     * 入っていたはずの rule 列」（外側から内側）で、現在の stack の上に付け足して記録する。
+     * 観測は「候補を実際に評価して同じ位置で同じ順に記録した」場合と等しい: expected は記録順・
+     * 重複除去、rule 経路は最大長のうち最初のもの（{@code length > stackLength} でのみ更新）、
+     * consumed / matched は最遠位置を更新した記録のものだけが残る。
+     */
+    public void failBatch(int pos, int[] expectedIds, int[] suffix, int consumed, int matched) {
+        if (pos < 0) {
+            throw new IllegalArgumentException("Negative failure position");
+        }
+        if (suppressionDepth != 0 || expectedIds.length == 0) {
+            return;
+        }
+        boolean local = frameCount > 0;
+        if (pos < global.farthest && (!local || pos < frameFarthest[frameCount - 1])) {
+            return;
+        }
+        Node rebased = top;
+        for (int ruleId : suffix) rebased = new Node(ruleId, rebased);
+        int length = ruleCount + suffix.length;
+        for (int id : expectedIds) global.fail(pos, id, rebased, length, consumed, matched);
+        if (local) {
+            failTop(pos, expectedIds[0], rebased, ruleCount - frameBase[frameCount - 1] + suffix.length, consumed, matched);
+            int i = frameCount - 1;
+            if (frameFarthest[i] == pos) {
+                int start = frameExpectedStart[i];
+                for (int k = 1; k < expectedIds.length; k++) addExpected(start, expectedIds[k]);
+            }
+        }
+    }
+
     public void suppressBegin() {
         suppressionDepth = Math.incrementExact(suppressionDepth);
     }

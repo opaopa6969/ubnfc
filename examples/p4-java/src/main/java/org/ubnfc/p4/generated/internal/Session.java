@@ -153,6 +153,44 @@ public final class Session {
                 prefixGroups[i] = members.size() == 1 ? members.getFirst() : Label.group(members.toArray(new Label[0]));
             }
         }
+        /** 全ての区切りが失敗した周回が登録する 1 件（候補除外の再生が使う）。 */
+        Label fullGroup() { return prefixGroups[prefixGroups.length - 1]; }
+    }
+
+    /**
+     * 候補除外（emit/Prediction）の無効化スイッチ。既定は有効で、参照経路（全候補試行）との
+     * 差分検証と計測のためだけに false にする（system property {@code -Dubnfc.predict=false} でも切れる）。
+     * 観測結果は両経路で等しくなければならない。
+     */
+    public static boolean predict = !"false".equals(System.getProperty("ubnfc.predict"));
+    /**
+     * 除外した候補が記録したはずの観測の静的な再生計画（生成時に畳み込む。emit/Prediction 参照）。
+     * allowed は「候補が成功し得る先頭 code point」に trivia 区切りの先頭 code point を足した閉区間列で、
+     * 呼出し位置の文字がここに無ければ候補は最初の significant token で失敗し、trivia も 1 文字も進まない。
+     */
+    public static final class Guard {
+        private final int[] allowed; private final Label[] labels; private final Delimiters trivia;
+        final int[] suffix; final int maxRuleDepth;
+        private int[] ids;
+        public Guard(int[] allowed, Label[] labels, Delimiters trivia, int[] suffix, int maxRuleDepth) {
+            this.allowed = allowed; this.labels = labels; this.trivia = trivia; this.suffix = suffix; this.maxRuleDepth = maxRuleDepth;
+        }
+        /** 入力終端（-1）は allowed に入らないので除外できる。 */
+        boolean allows(int ch) {
+            if (ch < 0) return false;
+            for (int i = 0; i < allowed.length; i += 2) if (ch >= allowed[i] && ch <= allowed[i + 1]) return true;
+            return false;
+        }
+        /** label id は Label 登録簿の初期化順に依存しないよう遅延解決する（null は trivia の group label）。 */
+        int[] ids() {
+            int[] result = ids;
+            if (result == null) {
+                result = new int[labels.length];
+                for (int i = 0; i < labels.length; i++) result[i] = (labels[i] == null ? trivia.fullGroup() : labels[i]).id;
+                ids = result;
+            }
+            return result;
+        }
     }
     /** Trivia insertion plan of one sequence/repeat: null means no trivia at that boundary. */
     public static final class Trivia {
@@ -215,6 +253,7 @@ public final class Session {
     private void progress(Frame f) {
         int at = Math.max(f.c, f.m); reached = Math.max(reached, at); diagnostics.reach(at);
     }
+    private void progressAt(int at) { reached = Math.max(reached, at); diagnostics.reach(at); }
     private void fail(int at, String label) { fail(at, Label.of(label).id, at, at); }
     private void fail(int at, Label label) { fail(at, label.id, at, at); }
     private void fail(Frame frame, Label label) { fail(Math.max(frame.c, frame.m), label.id, frame.c, frame.m); }
@@ -481,11 +520,24 @@ public final class Session {
         f.reset = reset0; return combine(Arrays.asList(matches), start, f.c);
     }
     public Match choice(Frame f, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback) {
+        return choice(f, alternatives, longest, eligible, fallback, null);
+    }
+    public Match choice(Frame f, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback, Guard[] guards) {
         Match best = null; int bestC = 0, bestM = 0; List<TokenScanner.Effect> bestEffects = List.of();
         int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
+        // 候補除外は「記録位置 max(c,m) と読み取り位置 position() が一致し、否定先読みの中でない」ときだけ。
+        int probe = predict && guards != null && !f.invert && (reset0 || c0 == m0) ? c0 : -1;
+        int probed = probe < 0 ? -2 : cp(probe);
         for (int pass = 0; pass < (fallback ? 2 : 1); pass++) {
             for (int i = 0; i < alternatives.length; i++) {
                 if (pass == 0 && eligible != null && !eligible[i]) continue;
+                if (probe >= 0 && guards[i] != null && !guards[i].allows(probed)
+                    && depth + guards[i].maxRuleDepth < options.maxDepth()) {
+                    Guard guard = guards[i];
+                    progressAt(probe);
+                    diagnostics.failBatch(probe, guard.ids(), guard.suffix, probe, probe);
+                    continue;
+                }
                 long mark = mark(); f.c = c0; f.m = reset0 ? c0 : m0; f.reset = reset0;
                 Match result = alternatives[i].parse(this, f);
                 if (result != null && !longest) { f.reset = reset0; return result; }
