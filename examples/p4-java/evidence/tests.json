@@ -1,0 +1,23 @@
+[
+  {
+    "name": "org.ubnfc.p4.LegacySnapshotTest",
+    "tests": "2",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "org.ubnfc.p4.P4Test",
+    "tests": "21",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "org.ubnfc.p4.ScannerTest",
+    "tests": "4",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0"
+  }
+]

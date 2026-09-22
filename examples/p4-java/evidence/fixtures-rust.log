@@ -1,0 +1,4 @@
+invalid-syntax.tiny	ok=false	consumed=0/4	ast=null	ms=209.260	Diagnostic[kind=syntax, offset=4, farthestCp=4, expected=['$', '(', 'abs', 'call', 'ceil', 'cos', 'exp', 'external', 'floor', 'if', 'internal', 'len', 'length', 'log', 'match', 'max', 'min', 'pow', 'random', 'round', 'sin', 'sqrt', 'tan', 'toNum', NUMBER], deepestRule=SinFunction, ruleStack=[Formula, Expression, NumberExpression, NumberTerm, NumberFactor, MathFunction, SinFunction], farthestExpected=['$', '(', 'abs', 'call', 'ceil', 'cos', 'exp', 'external', 'floor', 'if', 'internal', 'len', 'length', 'log', 'match', 'max', 'min', 'pow', 'random', 'round', 'sin', 'sqrt', 'tan', 'toNum', NUMBER], severity=ERROR, length=0, origin=parser]
+valid-basic.tiny	ok=true	consumed=6/6	ast=FormulaExpr	ms=17.520
+valid-multiline.tiny	ok=true	consumed=40/40	ast=FormulaExpr	ms=23.752
+valid-unicode.tiny	ok=true	consumed=9/9	ast=FormulaExpr	ms=58.379

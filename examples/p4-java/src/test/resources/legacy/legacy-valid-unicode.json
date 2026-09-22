@@ -1,0 +1,1 @@
+{"type":"FormulaExpr","span":[0,10],"fields":{"imports":[],"declarations":[],"expression":{"type":"ExpressionExpr","span":[0,10],"fields":{"value":{"type":"StringConcatExpr","span":[0,10],"fields":{"left":"こんにちは\ud83d\ude00","op":[],"right":[]}}}},"methods":[]}}

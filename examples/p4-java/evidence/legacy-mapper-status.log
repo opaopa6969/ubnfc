@@ -1,0 +1,6 @@
+comparison-heavy exit=1
+complex-x4 exit=0
+complex-x16 exit=0
+complex-x64 exit=124
+flat-arithmetic exit=0
+large-match exit=0
