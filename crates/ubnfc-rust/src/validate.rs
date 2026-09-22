@@ -1,5 +1,5 @@
 use crate::EmitError;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use ubnfc_front::ir::*;
 
 pub(crate) fn unsupported(feature: &str, detail: impl Into<String>) -> EmitError {
@@ -117,11 +117,7 @@ pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
             ));
         }
     }
-    for a in &ir.analysis.rules {
-        if a.left_recursion != RuleAnalysisLeftRecursion::None {
-            return Err(unsupported("leftRecursionRewrite", &a.rule_id));
-        }
-    }
+    validate_left_recursion(ir)?;
     for e in &ir.plan.memo.entries {
         if !memo_ids.insert(&e.expr_id) {
             return Err(EmitError::InvalidIr(format!(
@@ -205,6 +201,97 @@ pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
                     "empty trivia delimiter: {}",
                     p.id
                 )));
+            }
+        }
+    }
+    Ok(())
+}
+
+// directRewritten describes the original grammar, not the executable rule body.
+// Start at current bodies so retained pre-lowering expressions are not rejected.
+fn validate_left_recursion(ir: &GrammarIr) -> Result<(), EmitError> {
+    let expressions: BTreeMap<_, _> = ir
+        .semantics
+        .expressions
+        .iter()
+        .map(|e| (&e.id, &e.node))
+        .collect();
+    let rules: BTreeMap<_, _> = ir
+        .semantics
+        .rules
+        .iter()
+        .map(|r| (&r.symbol_id, &r.body))
+        .collect();
+    let tokens: BTreeMap<_, _> = ir
+        .semantics
+        .tokens
+        .iter()
+        .map(|t| (&t.symbol_id, &t.spec))
+        .collect();
+    // Analysis may conservatively mark consuming expressions nullable. Recompute
+    // from semantics, also avoiding stale analysis on manually constructed IR.
+    let mut nullable = BTreeSet::new();
+    loop {
+        let before = nullable.len();
+        for (id, node) in &expressions {
+            let empty = match node {
+                ExprNode::Seq { items } => items.iter().all(|id| nullable.contains(id)),
+                ExprNode::Choice { alternatives, .. } => {
+                    alternatives.iter().any(|id| nullable.contains(id))
+                }
+                ExprNode::RuleRef { symbol_id } => nullable.contains(rules[symbol_id]),
+                ExprNode::Group { child } => nullable.contains(child),
+                ExprNode::Repeat { child, min, .. } => *min == 0 || nullable.contains(child),
+                ExprNode::Separated { element, min, .. } => *min == 0 || nullable.contains(element),
+                ExprNode::Literal { value, .. } => value.is_empty(),
+                ExprNode::TokenRef { symbol_id } => match tokens[symbol_id] {
+                    TokenSpec::Builtin { which, .. } => *which == BuiltinToken::EndOfSource,
+                    TokenSpec::CaseInsensitive { word, .. } => word.is_empty(),
+                    TokenSpec::Eof {}
+                    | TokenSpec::Empty {}
+                    | TokenSpec::Until { .. }
+                    | TokenSpec::Lookahead { .. }
+                    | TokenSpec::NegativeLookahead { .. }
+                    | TokenSpec::Extern { .. } => true,
+                    _ => false,
+                },
+                ExprNode::Optional { .. }
+                | ExprNode::Lookahead { .. }
+                | ExprNode::NegativeLookahead { .. }
+                | ExprNode::Eof {}
+                | ExprNode::Empty {} => true,
+                ExprNode::Any {} | ExprNode::Error { .. } => false,
+            };
+            if empty {
+                nullable.insert(*id);
+            }
+        }
+        if nullable.len() == before {
+            break;
+        }
+    }
+    for rule in &ir.semantics.rules {
+        let mut pending = vec![&rule.body];
+        let mut seen = BTreeSet::new();
+        while let Some(id) = pending.pop() {
+            if !seen.insert(id) {
+                continue;
+            }
+            let node = expressions[id];
+            if let ExprNode::RuleRef { symbol_id } = node {
+                if *symbol_id == rule.symbol_id {
+                    return Err(unsupported("unloweredLeftRecursion", symbol_id));
+                }
+                pending.push(rules[symbol_id]);
+            } else {
+                for child in node.children() {
+                    pending.push(child);
+                    if matches!(node, ExprNode::Seq { .. } | ExprNode::Separated { .. })
+                        && !nullable.contains(child)
+                    {
+                        break;
+                    }
+                }
             }
         }
     }

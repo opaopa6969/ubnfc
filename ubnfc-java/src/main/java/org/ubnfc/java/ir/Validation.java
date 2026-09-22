@@ -217,7 +217,9 @@ public final class Validation {
             if (memo.reason().equals("provedOmission")) require(memo.omissionProof() != null && !memo.omissionProof().kind().equals("none"), "Memo omission requires proof");
         }
         // The front supplies lowering; never attempt seed-growing on an unlowered cycle.
-        for (Rule rule : rules.values()) leftCycle(rule.symbolId(), rule.body(), expressions, rules, analyses, new HashSet<>());
+        // directRewritten is history; inspect current bodies, not retained originals.
+        var nullable = nullableExpressions(expressions, rules, tokens);
+        for (Rule rule : rules.values()) leftCycle(rule.symbolId(), rule.body(), expressions, rules, nullable, new HashSet<>());
     }
     private static void validateEval(Eval eval, AstType type) {
         var fields = index(type.fields(), AstField::name);
@@ -245,16 +247,50 @@ public final class Validation {
         if (value.element() != null) valueType(value.element(), types);
         for (var member : value.members()) valueType(member, types);
     }
-    private static void leftCycle(String target, String id, Map<String, Expr> expressions, Map<String, Rule> rules, Map<String, ExprAnalysis> analyses, Set<String> seen) {
+    private static Set<String> nullableExpressions(Map<String, Expr> expressions, Map<String, Rule> rules, Map<String, Token> tokens) {
+        // Analysis may be conservative or stale on hand-built IR. Derive zero
+        // consumption from semantics, including nullable rule-reference chains.
+        var nullable = new HashSet<String>();
+        boolean changed;
+        do {
+            changed = false;
+            for (Expr expr : expressions.values()) {
+                ExprNode n = expr.node();
+                boolean empty = switch (n.kind()) {
+                    case "seq" -> n.items().stream().allMatch(nullable::contains);
+                    case "choice" -> n.alternatives().stream().anyMatch(nullable::contains);
+                    case "ruleRef" -> nullable.contains(rules.get(n.symbolId()).body());
+                    case "group" -> nullable.contains(n.child());
+                    case "repeat" -> n.min() == 0 || nullable.contains(n.child());
+                    case "separated" -> n.min() == 0 || nullable.contains(n.element());
+                    case "literal" -> n.value().isEmpty();
+                    case "tokenRef" -> {
+                        TokenSpec spec = tokens.get(n.symbolId()).spec();
+                        yield switch (spec.kind()) {
+                            case "builtin" -> spec.which().equals("EndOfSource");
+                            case "caseInsensitive" -> spec.word().isEmpty();
+                            case "eof", "empty", "until", "lookahead", "negativeLookahead", "extern" -> true;
+                            default -> false;
+                        };
+                    }
+                    case "optional", "lookahead", "negativeLookahead", "eof", "empty" -> true;
+                    default -> false;
+                };
+                if (empty) changed |= nullable.add(expr.id());
+            }
+        } while (changed);
+        return nullable;
+    }
+    private static void leftCycle(String target, String id, Map<String, Expr> expressions, Map<String, Rule> rules, Set<String> nullable, Set<String> seen) {
         if (!seen.add(id)) return;
         ExprNode n = expressions.get(id).node();
         if (n.kind().equals("ruleRef")) {
             if (n.symbolId().equals(target)) unsupported("unloweredLeftRecursion:" + target);
-            leftCycle(target, rules.get(n.symbolId()).body(), expressions, rules, analyses, seen);
+            leftCycle(target, rules.get(n.symbolId()).body(), expressions, rules, nullable, seen);
         } else {
             for (String child : children(n)) {
-                leftCycle(target, child, expressions, rules, analyses, seen);
-                if (n.kind().equals("seq") && !analyses.get(child).nullable()) break;
+                leftCycle(target, child, expressions, rules, nullable, seen);
+                if ((n.kind().equals("seq") || n.kind().equals("separated")) && !nullable.contains(child)) break;
             }
         }
     }
