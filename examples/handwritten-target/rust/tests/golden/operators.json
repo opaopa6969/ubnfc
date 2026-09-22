@@ -1,0 +1,1264 @@
+[
+  {
+    "input": "1",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "1"
+                },
+                "span": [
+                  0,
+                  1
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              1
+            ],
+            "type": "Binary"
+          },
+          "op": [],
+          "right": []
+        },
+        "span": [
+          0,
+          1
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 1,
+      "matched_cp": 1,
+      "ok": true
+    }
+  },
+  {
+    "input": "10-3-2",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "10"
+                },
+                "span": [
+                  0,
+                  2
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              2
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "-",
+            "-"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "3"
+                  },
+                  "span": [
+                    3,
+                    4
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                3,
+                4
+              ],
+              "type": "Binary"
+            },
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "2"
+                  },
+                  "span": [
+                    5,
+                    6
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                5,
+                6
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          6
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 6,
+      "matched_cp": 6,
+      "ok": true
+    }
+  },
+  {
+    "input": "24/3/2",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "24"
+                },
+                "span": [
+                  0,
+                  2
+                ],
+                "type": "Number"
+              },
+              "op": [
+                "/",
+                "/"
+              ],
+              "right": [
+                {
+                  "fields": {
+                    "value": "3"
+                  },
+                  "span": [
+                    3,
+                    4
+                  ],
+                  "type": "Number"
+                },
+                {
+                  "fields": {
+                    "value": "2"
+                  },
+                  "span": [
+                    5,
+                    6
+                  ],
+                  "type": "Number"
+                }
+              ]
+            },
+            "span": [
+              0,
+              6
+            ],
+            "type": "Binary"
+          },
+          "op": [],
+          "right": []
+        },
+        "span": [
+          0,
+          6
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 6,
+      "matched_cp": 6,
+      "ok": true
+    }
+  },
+  {
+    "input": "2+3*4",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "2"
+                },
+                "span": [
+                  0,
+                  1
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              1
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "+"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "3"
+                  },
+                  "span": [
+                    2,
+                    3
+                  ],
+                  "type": "Number"
+                },
+                "op": [
+                  "*"
+                ],
+                "right": [
+                  {
+                    "fields": {
+                      "value": "4"
+                    },
+                    "span": [
+                      4,
+                      5
+                    ],
+                    "type": "Number"
+                  }
+                ]
+              },
+              "span": [
+                2,
+                5
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          5
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 5,
+      "matched_cp": 5,
+      "ok": true
+    }
+  },
+  {
+    "input": "(2+3)*4",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "left": {
+                    "fields": {
+                      "left": {
+                        "fields": {
+                          "value": "2"
+                        },
+                        "span": [
+                          1,
+                          2
+                        ],
+                        "type": "Number"
+                      },
+                      "op": [],
+                      "right": []
+                    },
+                    "span": [
+                      1,
+                      2
+                    ],
+                    "type": "Binary"
+                  },
+                  "op": [
+                    "+"
+                  ],
+                  "right": [
+                    {
+                      "fields": {
+                        "left": {
+                          "fields": {
+                            "value": "3"
+                          },
+                          "span": [
+                            3,
+                            4
+                          ],
+                          "type": "Number"
+                        },
+                        "op": [],
+                        "right": []
+                      },
+                      "span": [
+                        3,
+                        4
+                      ],
+                      "type": "Binary"
+                    }
+                  ]
+                },
+                "span": [
+                  1,
+                  4
+                ],
+                "type": "Binary"
+              },
+              "op": [
+                "*"
+              ],
+              "right": [
+                {
+                  "fields": {
+                    "value": "4"
+                  },
+                  "span": [
+                    6,
+                    7
+                  ],
+                  "type": "Number"
+                }
+              ]
+            },
+            "span": [
+              0,
+              7
+            ],
+            "type": "Binary"
+          },
+          "op": [],
+          "right": []
+        },
+        "span": [
+          0,
+          7
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 7,
+      "matched_cp": 7,
+      "ok": true
+    }
+  },
+  {
+    "input": "10-(3-2)",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "10"
+                },
+                "span": [
+                  0,
+                  2
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              2
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "-"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "left": {
+                      "fields": {
+                        "left": {
+                          "fields": {
+                            "value": "3"
+                          },
+                          "span": [
+                            4,
+                            5
+                          ],
+                          "type": "Number"
+                        },
+                        "op": [],
+                        "right": []
+                      },
+                      "span": [
+                        4,
+                        5
+                      ],
+                      "type": "Binary"
+                    },
+                    "op": [
+                      "-"
+                    ],
+                    "right": [
+                      {
+                        "fields": {
+                          "left": {
+                            "fields": {
+                              "value": "2"
+                            },
+                            "span": [
+                              6,
+                              7
+                            ],
+                            "type": "Number"
+                          },
+                          "op": [],
+                          "right": []
+                        },
+                        "span": [
+                          6,
+                          7
+                        ],
+                        "type": "Binary"
+                      }
+                    ]
+                  },
+                  "span": [
+                    4,
+                    7
+                  ],
+                  "type": "Binary"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                3,
+                8
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          8
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 8,
+      "matched_cp": 8,
+      "ok": true
+    }
+  },
+  {
+    "input": "24/(3/2)",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "24"
+                },
+                "span": [
+                  0,
+                  2
+                ],
+                "type": "Number"
+              },
+              "op": [
+                "/"
+              ],
+              "right": [
+                {
+                  "fields": {
+                    "left": {
+                      "fields": {
+                        "left": {
+                          "fields": {
+                            "value": "3"
+                          },
+                          "span": [
+                            4,
+                            5
+                          ],
+                          "type": "Number"
+                        },
+                        "op": [
+                          "/"
+                        ],
+                        "right": [
+                          {
+                            "fields": {
+                              "value": "2"
+                            },
+                            "span": [
+                              6,
+                              7
+                            ],
+                            "type": "Number"
+                          }
+                        ]
+                      },
+                      "span": [
+                        4,
+                        7
+                      ],
+                      "type": "Binary"
+                    },
+                    "op": [],
+                    "right": []
+                  },
+                  "span": [
+                    4,
+                    7
+                  ],
+                  "type": "Binary"
+                }
+              ]
+            },
+            "span": [
+              0,
+              8
+            ],
+            "type": "Binary"
+          },
+          "op": [],
+          "right": []
+        },
+        "span": [
+          0,
+          8
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 8,
+      "matched_cp": 8,
+      "ok": true
+    }
+  },
+  {
+    "input": "1+2*3-4/2+5",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "1"
+                },
+                "span": [
+                  0,
+                  1
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              1
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "+",
+            "-",
+            "+"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "2"
+                  },
+                  "span": [
+                    2,
+                    3
+                  ],
+                  "type": "Number"
+                },
+                "op": [
+                  "*"
+                ],
+                "right": [
+                  {
+                    "fields": {
+                      "value": "3"
+                    },
+                    "span": [
+                      4,
+                      5
+                    ],
+                    "type": "Number"
+                  }
+                ]
+              },
+              "span": [
+                2,
+                5
+              ],
+              "type": "Binary"
+            },
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "4"
+                  },
+                  "span": [
+                    6,
+                    7
+                  ],
+                  "type": "Number"
+                },
+                "op": [
+                  "/"
+                ],
+                "right": [
+                  {
+                    "fields": {
+                      "value": "2"
+                    },
+                    "span": [
+                      8,
+                      9
+                    ],
+                    "type": "Number"
+                  }
+                ]
+              },
+              "span": [
+                6,
+                9
+              ],
+              "type": "Binary"
+            },
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "5"
+                  },
+                  "span": [
+                    10,
+                    11
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                10,
+                11
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          11
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 11,
+      "matched_cp": 11,
+      "ok": true
+    }
+  },
+  {
+    "input": "((7))",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "left": {
+                    "fields": {
+                      "left": {
+                        "fields": {
+                          "left": {
+                            "fields": {
+                              "left": {
+                                "fields": {
+                                  "value": "7"
+                                },
+                                "span": [
+                                  2,
+                                  3
+                                ],
+                                "type": "Number"
+                              },
+                              "op": [],
+                              "right": []
+                            },
+                            "span": [
+                              2,
+                              3
+                            ],
+                            "type": "Binary"
+                          },
+                          "op": [],
+                          "right": []
+                        },
+                        "span": [
+                          2,
+                          3
+                        ],
+                        "type": "Binary"
+                      },
+                      "op": [],
+                      "right": []
+                    },
+                    "span": [
+                      1,
+                      4
+                    ],
+                    "type": "Binary"
+                  },
+                  "op": [],
+                  "right": []
+                },
+                "span": [
+                  1,
+                  4
+                ],
+                "type": "Binary"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              5
+            ],
+            "type": "Binary"
+          },
+          "op": [],
+          "right": []
+        },
+        "span": [
+          0,
+          5
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 5,
+      "matched_cp": 5,
+      "ok": true
+    }
+  },
+  {
+    "input": "-3+2",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "-3"
+                },
+                "span": [
+                  0,
+                  2
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              2
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "+"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "2"
+                  },
+                  "span": [
+                    3,
+                    4
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                3,
+                4
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          4
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 4,
+      "matched_cp": 4,
+      "ok": true
+    }
+  },
+  {
+    "input": "1e2/4-0.5",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "1e2"
+                },
+                "span": [
+                  0,
+                  3
+                ],
+                "type": "Number"
+              },
+              "op": [
+                "/"
+              ],
+              "right": [
+                {
+                  "fields": {
+                    "value": "4"
+                  },
+                  "span": [
+                    4,
+                    5
+                  ],
+                  "type": "Number"
+                }
+              ]
+            },
+            "span": [
+              0,
+              5
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "-"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "0.5"
+                  },
+                  "span": [
+                    6,
+                    9
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                6,
+                9
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          9
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 9,
+      "matched_cp": 9,
+      "ok": true
+    }
+  },
+  {
+    "input": " 10 - 3 - 2 ",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "10"
+                },
+                "span": [
+                  1,
+                  4
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              1,
+              4
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "-",
+            "-"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "3"
+                  },
+                  "span": [
+                    6,
+                    8
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                6,
+                8
+              ],
+              "type": "Binary"
+            },
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "2"
+                  },
+                  "span": [
+                    10,
+                    12
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                10,
+                12
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          12
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 12,
+      "matched_cp": 12,
+      "ok": true
+    }
+  },
+  {
+    "input": "2/*😀*/+3\n*4",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "2/*😀*/"
+                },
+                "span": [
+                  0,
+                  6
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              6
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "+"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "3"
+                  },
+                  "span": [
+                    7,
+                    9
+                  ],
+                  "type": "Number"
+                },
+                "op": [
+                  "*"
+                ],
+                "right": [
+                  {
+                    "fields": {
+                      "value": "4"
+                    },
+                    "span": [
+                      10,
+                      11
+                    ],
+                    "type": "Number"
+                  }
+                ]
+              },
+              "span": [
+                7,
+                11
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          11
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 11,
+      "matched_cp": 11,
+      "ok": true
+    }
+  },
+  {
+    "input": "1+2//😀\n-3",
+    "result": {
+      "ast": {
+        "fields": {
+          "left": {
+            "fields": {
+              "left": {
+                "fields": {
+                  "value": "1"
+                },
+                "span": [
+                  0,
+                  1
+                ],
+                "type": "Number"
+              },
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              1
+            ],
+            "type": "Binary"
+          },
+          "op": [
+            "+",
+            "-"
+          ],
+          "right": [
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "2//😀"
+                  },
+                  "span": [
+                    2,
+                    7
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                2,
+                7
+              ],
+              "type": "Binary"
+            },
+            {
+              "fields": {
+                "left": {
+                  "fields": {
+                    "value": "3"
+                  },
+                  "span": [
+                    8,
+                    9
+                  ],
+                  "type": "Number"
+                },
+                "op": [],
+                "right": []
+              },
+              "span": [
+                8,
+                9
+              ],
+              "type": "Binary"
+            }
+          ]
+        },
+        "span": [
+          0,
+          9
+        ],
+        "type": "Binary"
+      },
+      "consumed_cp": 9,
+      "matched_cp": 9,
+      "ok": true
+    }
+  },
+  {
+    "input": "",
+    "result": {
+      "ast": null,
+      "consumed_cp": 0,
+      "matched_cp": 0,
+      "ok": false
+    }
+  },
+  {
+    "input": "+",
+    "result": {
+      "ast": null,
+      "consumed_cp": 0,
+      "matched_cp": 0,
+      "ok": false
+    }
+  },
+  {
+    "input": "1+",
+    "result": {
+      "ast": null,
+      "consumed_cp": 1,
+      "matched_cp": 1,
+      "ok": false
+    }
+  },
+  {
+    "input": "1**2",
+    "result": {
+      "ast": null,
+      "consumed_cp": 1,
+      "matched_cp": 1,
+      "ok": false
+    }
+  },
+  {
+    "input": "(1+2",
+    "result": {
+      "ast": null,
+      "consumed_cp": 0,
+      "matched_cp": 0,
+      "ok": false
+    }
+  },
+  {
+    "input": "1+2)",
+    "result": {
+      "ast": null,
+      "consumed_cp": 3,
+      "matched_cp": 3,
+      "ok": false
+    }
+  },
+  {
+    "input": "1 2",
+    "result": {
+      "ast": null,
+      "consumed_cp": 2,
+      "matched_cp": 2,
+      "ok": false
+    }
+  },
+  {
+    "input": "😀+1",
+    "result": {
+      "ast": null,
+      "consumed_cp": 0,
+      "matched_cp": 0,
+      "ok": false
+    }
+  },
+  {
+    "input": "1/*unterminated",
+    "result": {
+      "ast": null,
+      "consumed_cp": 1,
+      "matched_cp": 1,
+      "ok": false
+    }
+  },
+  {
+    "input": "1e+",
+    "result": {
+      "ast": null,
+      "consumed_cp": 1,
+      "matched_cp": 1,
+      "ok": false
+    }
+  }
+]
