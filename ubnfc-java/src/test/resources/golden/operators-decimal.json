@@ -1,0 +1,69 @@
+{
+  "type": "Binary",
+  "span": [
+    0,
+    9
+  ],
+  "fields": {
+    "left": {
+      "type": "Binary",
+      "span": [
+        0,
+        5
+      ],
+      "fields": {
+        "left": {
+          "type": "Number",
+          "span": [
+            0,
+            3
+          ],
+          "fields": {
+            "value": "1e2"
+          }
+        },
+        "op": [
+          "/"
+        ],
+        "right": [
+          {
+            "type": "Number",
+            "span": [
+              4,
+              5
+            ],
+            "fields": {
+              "value": "4"
+            }
+          }
+        ]
+      }
+    },
+    "op": [
+      "-"
+    ],
+    "right": [
+      {
+        "type": "Binary",
+        "span": [
+          6,
+          9
+        ],
+        "fields": {
+          "left": {
+            "type": "Number",
+            "span": [
+              6,
+              9
+            ],
+            "fields": {
+              "value": "0.5"
+            }
+          },
+          "op": [],
+          "right": []
+        }
+      }
+    ]
+  }
+}

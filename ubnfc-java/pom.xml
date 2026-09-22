@@ -23,7 +23,22 @@
     </dependency>
   </dependencies>
   <build>
+    <resources>
+      <resource><directory>src/main/resources</directory></resource>
+      <resource><directory>runtime-template/src/main/java</directory><targetPath>runtime</targetPath></resource>
+      <resource><directory>../ir/schema</directory><targetPath>schema</targetPath></resource>
+    </resources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.3.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.13.0</version>
+        <configuration><compilerArgs><arg>-Xlint:all</arg><arg>-Werror</arg></compilerArgs></configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.4.1</version>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
