@@ -1,0 +1,3 @@
+/target/
+!src/main/java/target/
+!src/test/java/target/
