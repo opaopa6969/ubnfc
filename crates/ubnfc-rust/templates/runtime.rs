@@ -2,6 +2,7 @@ use super::api::*;
 use super::rt::{
     diag::{Diag, Diagnostics, DisplayDiagnostics, DisplaySnapshot},
     input::Input,
+    lexcache::{LexCache, SkipCache},
     memo::{Key, Memo},
     scope::{Checkpoint, ScopeStore},
 };
@@ -151,6 +152,8 @@ pub(crate) struct Buffers {
     display: DisplayDiagnostics,
     memo: Memo<Saved>,
     trivia_cache: Memo<(Step, DisplaySnapshot)>,
+    lex: LexCache,
+    trivia_skip: SkipCache,
     effects: Vec<Effect>,
     saved_effects: Vec<Effect>,
     stacks: Vec<Vec<(EventId, bool)>>,
@@ -163,6 +166,8 @@ pub(crate) struct Buffers {
     caps_pending: Vec<Cap>,
 }
 const POOL_RETAIN_BYTES: usize = 64 << 20;
+/// 位置ごとの字句 cache の上限（入力長に比例するため）。超える入力では cache を使わない。
+const LEX_CACHE_MAX_BYTES: usize = 256 << 20;
 thread_local! {
     static POOL: std::cell::RefCell<Option<Buffers>> = const { std::cell::RefCell::new(None) };
 }
@@ -173,6 +178,8 @@ impl Buffers {
             + self.display.capacity_bytes()
             + self.memo.capacity_bytes()
             + self.trivia_cache.capacity_bytes()
+            + self.lex.capacity_bytes()
+            + self.trivia_skip.capacity_bytes()
             + (self.effects.capacity() + self.saved_effects.capacity())
                 * std::mem::size_of::<Effect>()
             + (self.caps_flat.capacity() + self.caps_pending.capacity())
@@ -190,6 +197,12 @@ pub(crate) struct Session<'a> {
     pub memo: Memo<Saved>,
     pub scope: ScopeStore,
     pub trivia_cache: Memo<(Step, DisplaySnapshot)>,
+    /// 位置ごとの字句 cache（統合 DFA の結果）。key は位置だけ（rt/lexcache.rs の健全性議論）。
+    pub lex: LexCache,
+    /// trivia policy ごとの「次の非 trivia 位置」（診断を記録しない読み飛ばし）。
+    pub trivia_skip: SkipCache,
+    /// cache を引くか（`ParseOptions::lexical_cache` と、文法に cache 対象があるか）。
+    pub lex_enabled: bool,
     effects: Vec<Effect>,
     saved_effects: Vec<Effect>,
     pub statistics: Statistics,
@@ -238,6 +251,18 @@ impl<'a> Session<'a> {
         };
         // memo は rule 本体単位（P4 実測 約 2.3 entry / byte。候補除外で失敗 entry が減った）。
         let memo_capacity = text.len().saturating_mul(3).saturating_add(64).min(1 << 20);
+        // 字句 cache は位置で直接引く（位置は 0..=text.len()、EOF 位置を含む）。
+        // 文法に cache 対象の literal / trivia policy が無ければ 0 を渡して確保しない。
+        // 表は入力長に比例するので、割に合わない大きさになるときは cache を使わない。
+        let lex_bytes = (text.len() + 1)
+            .saturating_mul(LEX_WORDS * std::mem::size_of::<u64>() + std::mem::size_of::<u32>());
+        let lex_enabled = options.lexical_cache
+            && !rejected
+            && lex_bytes <= LEX_CACHE_MAX_BYTES
+            && (LEX_WORDS != 0 || TRIVIA_POLICIES != 0);
+        let lex_words = if lex_enabled { LEX_WORDS } else { 0 };
+        let skip_policies = if lex_enabled { TRIVIA_POLICIES } else { 0 };
+        let lex_positions = if lex_enabled { text.len() + 1 } else { 0 };
         let pooled = if options.reuse_buffers {
             POOL.with(|p| p.borrow_mut().take())
         } else {
@@ -252,6 +277,8 @@ impl<'a> Session<'a> {
                 // trivia cache は前回の entry 数を見積りにする（0 だと毎 parse 縮小と再拡張を繰り返す）。
                 let trivia_capacity = b.trivia_cache.len();
                 b.trivia_cache.reset(trivia_capacity);
+                b.lex.reset(lex_words, lex_positions);
+                b.trivia_skip.reset(skip_policies, lex_positions);
                 b.effects.clear();
                 b.saved_effects.clear();
                 b.text_spans.clear();
@@ -265,6 +292,16 @@ impl<'a> Session<'a> {
                 display: DisplayDiagnostics::new(options.limits.diagnostics),
                 memo: Memo::with_capacity(memo_capacity),
                 trivia_cache: Memo::default(),
+                lex: {
+                    let mut lex = LexCache::default();
+                    lex.reset(lex_words, lex_positions);
+                    lex
+                },
+                trivia_skip: {
+                    let mut cache = SkipCache::default();
+                    cache.reset(skip_policies, lex_positions);
+                    cache
+                },
                 effects: vec![],
                 saved_effects: vec![],
                 stacks: vec![],
@@ -299,6 +336,9 @@ impl<'a> Session<'a> {
             memo: buffers.memo,
             scope: ScopeStore::new(),
             trivia_cache: buffers.trivia_cache,
+            lex: buffers.lex,
+            trivia_skip: buffers.trivia_skip,
+            lex_enabled,
             effects: buffers.effects,
             saved_effects: buffers.saved_effects,
             statistics: Statistics::default(),
@@ -332,6 +372,8 @@ impl<'a> Session<'a> {
             display: std::mem::replace(&mut self.display, DisplayDiagnostics::new(0)),
             memo: std::mem::take(&mut self.memo),
             trivia_cache: std::mem::take(&mut self.trivia_cache),
+            lex: std::mem::take(&mut self.lex),
+            trivia_skip: std::mem::take(&mut self.trivia_skip),
             effects: std::mem::take(&mut self.effects),
             saved_effects: std::mem::take(&mut self.saved_effects),
             stacks: std::mem::take(&mut self.stacks),
@@ -641,14 +683,38 @@ impl<'a> Session<'a> {
             }
         }
     }
+    /// 統合 DFA の結果を位置ごとに引く。範囲外（起こらないはず）は None を返し、
+    /// 呼出し側は走査へ戻る。`lex_fill` は (入力, 位置) だけの関数なので、どの parser 状態
+    /// から引いても同じ答えになる。
+    #[inline]
+    pub fn lex_matches(&mut self, pos: usize, id: u32) -> Option<bool> {
+        if self.lex.need_fill(pos)? {
+            self.lex_run(pos);
+        }
+        Some(self.lex.test(pos, id))
+    }
+    /// この位置の統合 DFA を 1 回走らせて bitset を埋める（cache miss のときだけ）。
+    #[inline]
+    pub fn lex_run(&mut self, pos: usize) {
+        let bytes = self.text.as_bytes();
+        let out = self.lex.slot(pos);
+        lex_fill(bytes, pos, out);
+    }
     pub fn literal<const MATCH: bool>(
         &mut self,
         state: State,
         word: &'static str,
         sensitive: bool,
+        lit: u32,
         label: &'static str,
     ) -> Step {
         let start = state.position::<MATCH>();
+        if self.lex_enabled && lit != u32::MAX {
+            if let Some(hit) = self.lex_matches(start, lit) {
+                let length = hit.then_some(word.len());
+                return self.primitive::<MATCH>(state, length, label);
+            }
+        }
         let length = if sensitive {
             self.input.starts_with(start, word).then_some(word.len())
         } else {

@@ -1,0 +1,10 @@
+grammar Fuzz {
+  token T0 = UNTIL('#')
+  token T1 = NEGATIVE_LOOKAHEAD('#')
+  token T2 = LOOKAHEAD('a')
+  L0 ::= ;
+  @enum L1 ::= 'alpha' | 'beta';
+  L2 ::= '(';
+  M0 ::= { '+' } '('* @v2 '\n' @v3 | [ '('+ @v4 ] | L0{2,3} @v5 { ( L1 '😀'* % ':' @v6 '😀'? @v7 ) ( '(' @v8 L1 | L1 ){2} @v9 L1 };
+  @root Root ::= T0 @head L2? @head ( ',' @tail M0* )* @tail;
+}

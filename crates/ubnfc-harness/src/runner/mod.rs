@@ -3,7 +3,7 @@ mod comparison;
 mod report;
 pub(crate) mod rust;
 pub(crate) mod scanners;
-pub use comparison::{compare, unobserved};
+pub use comparison::{compare, project_numeric_lexemes, unobserved};
 pub use report::Report;
 
 use crate::{Case, CorpusFile, GrammarSource};

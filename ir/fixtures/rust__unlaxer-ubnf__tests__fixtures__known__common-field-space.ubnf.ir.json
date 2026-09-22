@@ -135,7 +135,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/common-field-space.ubnf:52:55:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。非再帰 SCC の単一所有パスで、巻戻して同一式を再実行する祖先がない。排他的 choice は fallback なし、反復を通る場合は各周回の consumed 前進を証明。",
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/known/common-field-space.ubnf:52:55:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/known/common-field-space.ubnf:52:55:body/0/literal"

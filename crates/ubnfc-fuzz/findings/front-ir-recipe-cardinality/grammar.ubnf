@@ -1,0 +1,4 @@
+grammar G {
+  @mapping(N) N ::= 'n';
+  @root @mapping(C, params=[v]) R ::= [ N? ] @v;
+}

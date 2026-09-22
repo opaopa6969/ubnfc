@@ -1,0 +1,12 @@
+grammar Fuzz {
+  token T0 = EOF
+  @mapping(Node.A, params=[w]) VA ::= 'p' @w;
+  @mapping(Node.B, params=[w]) VB ::= 'q' @w T0{1,};
+  @mapping(Node) Node ::= VA | VB;
+  @mapping(C0, params=[v2, v1]) @interleave(profile=javaStyle) M0 ::= ERROR('fuzz error') @typeof(v1) '(' @v2 | 'ab'{2,} T0{2} '('{1,} @v1;
+  @mapping(C1) @recovery(SKIP) M1 ::= '+';
+  @whitespace @interleave(profile=javaStyle) M2 ::= '*';
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= M1 @left { '+' @op M1 @right };
+  @mapping(Bin1, params=[left, op, right]) @leftAssoc @precedence(level=80) Op1 ::= Op0 @left { '-' @op Op0 @right };
+  @root Root ::= Op1 @head ',' @head;
+}

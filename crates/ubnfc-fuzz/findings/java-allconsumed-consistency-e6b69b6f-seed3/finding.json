@@ -1,0 +1,202 @@
+{
+  "slug": "java-allconsumed-consistency-e6b69b6f-seed3",
+  "signature": "java:allconsumed-consistency",
+  "seed": 3,
+  "grammar": "grammar Fuzz {\n  token T0 = NEGATIVE_LOOKAHEAD('#')\n  token T1 = org.unlaxer.parser.elementary.SingleQuotedParser\n  L1 ::= ERROR('fuzz error');\n  @mapping(C0, params=[v3, v5, v4]) @scopeTree(mode=dynamic) @declares(symbol=v3) @backref(name=v4) M0 ::= ( 'b' L1+ ) T0 T0 | T0 @v3 ( '😀'? 'ab'{0,} % ',' { '*' @v4 }+ @v5 | 'c'{1,2} )? % ')' ERROR('fuzz error');\n  @whitespace(none) @scopeTree(mode=dynamic) @declares(symbol=v6) @catalog(context='fuzz') M1 ::= ERROR('fuzz error') @v6 ';'? % ';';\n  @mapping(Bin0, params=[left, op, right]) @rightAssoc @precedence(level=90) Op0 ::= M1 @left { '-' @op Op0 @right };\n  @root @mapping(Top, params=[head, v7, v8, tail]) @eval(kind='binary', strategy='manual') Root ::= Op0 @head ( ':'+ T1 @v7 | 'ab'? M1 @v8 ){1,3} @head ( ',' @tail 'b' )* @tail;\n}\n",
+  "imported": null,
+  "input": "",
+  "input_code_points": 0,
+  "differences": [
+    {
+      "path": "/catalogs",
+      "expected": {
+        "<unobserved>": "catalogs"
+      },
+      "actual": [
+        {
+          "captures": [
+            "v6"
+          ],
+          "context": "fuzz",
+          "rule": "M1"
+        }
+      ]
+    },
+    {
+      "path": "/recoveries",
+      "expected": [],
+      "actual": {
+        "<unobserved>": "recoveries"
+      }
+    },
+    {
+      "path": "/scope/declarations",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/depth",
+      "expected": 0,
+      "actual": null
+    },
+    {
+      "path": "/scope/diagnostics",
+      "expected": [],
+      "actual": null
+    },
+    {
+      "path": "/scope/mode/0",
+      "expected": null,
+      "actual": "dynamic"
+    },
+    {
+      "path": "/scope/references",
+      "expected": [],
+      "actual": null
+    }
+  ],
+  "java_violations": [
+    {
+      "id": "allconsumed-consistency",
+      "detail": "allConsumed=false だが consumed=0 / 入力長=0"
+    }
+  ],
+  "rust_violations": [
+    {
+      "id": "allconsumed-consistency",
+      "detail": "allConsumed=false だが consumed=0 / 入力長=0"
+    }
+  ],
+  "java": {
+    "accepted": false,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "expected": [
+          "';'",
+          "Op0Parser",
+          "RootParser",
+          "__CaptureSite",
+          "fuzz error"
+        ],
+        "farthestExpected": [
+          "';'",
+          "Op0Parser",
+          "RootParser",
+          "__CaptureSite",
+          "fuzz error"
+        ],
+        "farthestOffset": 0,
+        "kind": "syntax",
+        "offset": 0,
+        "origin": "Mapper.diagnose"
+      }
+    ],
+    "id": 0,
+    "lexical": [],
+    "mappingError": null,
+    "matched": 0,
+    "nativeFailure": {
+      "consumed": 0,
+      "expected": [
+        "';'",
+        "Op0Parser",
+        "RootParser",
+        "__CaptureSite",
+        "fuzz error"
+      ],
+      "matched": 0,
+      "offset": 0
+    },
+    "parsedStatus": "failed",
+    "prefixCaptures": [],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "rust": {
+    "accepted": false,
+    "allConsumed": false,
+    "ast": null,
+    "captures": [],
+    "catalogs": [
+      {
+        "captures": [
+          "v6"
+        ],
+        "context": "fuzz",
+        "rule": "M1"
+      }
+    ],
+    "consumed": 0,
+    "declarations": [],
+    "diagnostics": [
+      {
+        "deepestRule": "Fuzz::M1",
+        "expected": [
+          "fuzz error"
+        ],
+        "farthestExpected": [
+          "';'",
+          "Op0Parser",
+          "RootParser",
+          "__CaptureSite",
+          "fuzz error"
+        ],
+        "farthestOffset": 0,
+        "kind": "syntax",
+        "offset": 0,
+        "origin": "Mapper.diagnose",
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::Op0",
+          "Fuzz::M1"
+        ]
+      }
+    ],
+    "hints": [
+      {
+        "deepestRule": "Fuzz::M1",
+        "expected": [
+          "fuzz error"
+        ],
+        "offset": 0,
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::Op0",
+          "Fuzz::M1"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [],
+    "mappingError": null,
+    "matched": 0,
+    "parsedStatus": "failed",
+    "prefixCaptures": [],
+    "recoveredRegions": [],
+    "references": [],
+    "scope": {
+      "events": [],
+      "mode": [
+        "dynamic"
+      ]
+    },
+    "scopeDepth": 0,
+    "value": null
+  },
+  "shrink_rounds": 6
+}

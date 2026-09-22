@@ -58,11 +58,26 @@ scanner は `Input` と `ScanState` だけに依存し、可変な外部状態�
 
 ## 計測条件
 
-`Benchmark` は同一プロセスで、入力・モードごとに2,000回の warmup と5 run を実行する。
+`Benchmark` は同一プロセスで、入力・モードごとに warmup と複数 run を実行し、中央値と
+1 parse あたりの割当 byte（`ThreadMXBean.getThreadAllocatedBytes`）を出す。
 1 run の回数は complex / comparison-heavy が2,000、x4 が500、x16 が125、x64 が50。
 x4/x16 は処理入力総量を概ね揃える設定。結果を volatile に保存し、I/O は計測外に置く。
 受理・全消費・AST の存在を事前に確認し、拒否入力を速度として記録しない。
-**x64 にも2,000回の warmup があるため、実行には長い時間がかかる。**
+**x64 にも既定 2,000 回の warmup があるため、実行には長い時間がかかる。**
+`BENCH_JVM_OPTS` で範囲を絞れる（システムプロパティ）:
+
+```bash
+# fixture / mode / warmup / run 回数 / 1 run の回数 / 入口を指定
+BENCH_JVM_OPTS='-Dbench.fixtures=complex,complex-x64 -Dbench.modes=ast -Dbench.warmup=500 -Dbench.runs=7' bash scripts/benchmark.sh
+# comparison-heavy 系は Formula 入口が拒否するので BooleanExpression 入口で測る
+BENCH_JVM_OPTS='-Dbench.fixtures=comparison-heavy,comparison-heavy-x64 -Dbench.entry=BooleanExpression' bash scripts/benchmark.sh
+# 候補除外（emit/Prediction）を切って参照経路と比べる
+BENCH_JVM_OPTS='-Dubnfc.predict=false' bash scripts/benchmark.sh
+# 旧生成物（tinyexpression の target/classes）を同じ計測法にかける任意ツール
+# root は JMH P4ParserBenchmark.parseFreshToken(true) と同じ経路（認識に対応）
+bash scripts/legacy-bench.sh /path/to/tinyexpression root complex
+bash scripts/legacy-bench.sh /path/to/tinyexpression mapper complex,complex-x4
+```
 
 `DepthProbe` の既定は括弧深度8/16/32/64/128。`scripts/depth.sh 256` で深度を指定できる。
 各 JVM は60秒を上限とし、時間切れは成功と扱わない。

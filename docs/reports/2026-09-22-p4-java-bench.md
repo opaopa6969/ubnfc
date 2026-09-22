@@ -150,7 +150,9 @@ run 間の分散があり、JIT/GC の影響を分離していない探索的な
 「AST 構築が認識より速い」といった解釈はしない。5 run の生値も保存する。
 
 <!-- BENCHMARK_TABLE -->
-計測中。完了後にここへ実測表とスケーリングを記録する。
+M5（第 1〜4 段）の実測表・スケーリング・profile・旧実装との比較は
+[`2026-09-22-p4-java-perf-m5.md`](2026-09-22-p4-java-perf-m5.md) に記録した。
+最終値は complex 認識 0.60 ms / AST 付き 0.64 ms、complex-x64 認識 37.1 ms / AST 付き 44.4 ms。
 <!-- END_BENCHMARK_TABLE -->
 
 旧 memo ON の公開 facade は complex で10秒の deadline に達した。
@@ -159,8 +161,11 @@ Mapper の直接呼び出しは一部動いたが、公開 facade と同一条�
 comparison-heavy の旧 facade 単発実行は成功したが、生成側 Formula が拒否するため、
 同じ入口での性能比較は成立しない。
 
-従って旧 Java の欄は `docs/design/02-facts-tokens-bench-corpus.md` §B の記録
-（complex 12.32 ms / complex-x64 958 ms）を参考として併記する。
+旧 facade の 10 秒 deadline は `-Dtinyexpression.p4.parse.timeout.millis=0` で無効化でき、
+M5 では `LegacyBenchmark` の `root` / `root-deferred` / `mapper` / `facade` の 4 経路を同じ
+ハーネスで測り直した（[`2026-09-22-p4-java-perf-m5.md`](2026-09-22-p4-java-perf-m5.md)「旧実装との比較」）。
+`docs/design/02-facts-tokens-bench-corpus.md` §B の記録
+（complex 12.32 ms / complex-x64 958 ms）は現在の checkout では再現できていない。
 この2値は AST 付き facade、別 revision・別ハーネスであり、認識のみの基準値ではない。
 旧 Rust complex 1.426 ms も別 revision の criterion 記録であり、参考値に限る。
 comparison-heavy / x64 の拒否処理時間は正常入力の性能値として出さない。
