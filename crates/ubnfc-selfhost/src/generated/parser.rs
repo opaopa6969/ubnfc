@@ -94,7 +94,7 @@ fn r0_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e0_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:0,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:0,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["UBNFFileParser"]);}
 self.depth-=1;out.diag=self.diag.rule(0,out.diag);out
@@ -103,7 +103,7 @@ fn r1_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e3_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:1,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:1,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@import'", "'from'"]);}
 self.depth-=1;out.diag=self.diag.rule(1,out.diag);out
@@ -112,7 +112,7 @@ fn r2_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e8_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:2,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:2,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'grammar'", "'{'", "'}'"]);}
 self.depth-=1;out.diag=self.diag.rule(2,out.diag);out
@@ -121,7 +121,7 @@ fn r3_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e21_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:3,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:3,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@'", "':'"]);}
 self.depth-=1;out.diag=self.diag.rule(3,out.diag);out
@@ -130,7 +130,7 @@ fn r4_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e26_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:4,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:4,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'{'", "'}'"]);}
 self.depth-=1;out.diag=self.diag.rule(4,out.diag);out
@@ -139,7 +139,7 @@ fn r5_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e29_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:5,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:5,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["StringSettingValueParser"]);}
 self.depth-=1;out.diag=self.diag.rule(5,out.diag);out
@@ -148,7 +148,7 @@ fn r6_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e31_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:6,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:6,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'{'", "'}'"]);}
 self.depth-=1;out.diag=self.diag.rule(6,out.diag);out
@@ -157,7 +157,7 @@ fn r7_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e36_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:7,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:7,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["':'"]);}
 self.depth-=1;out.diag=self.diag.rule(7,out.diag);out
@@ -166,7 +166,7 @@ fn r8_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e40_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:8,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:8,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'token'", "'='"]);}
 self.depth-=1;out.diag=self.diag.rule(8,out.diag);out
@@ -175,7 +175,7 @@ fn r9_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state)
 let mut out=self.e45_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:9,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:9,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'UNTIL'", "'('", "')'", "'NEGATION'", "'LOOKAHEAD'", "'NEGATIVE_LOOKAHEAD'", "'CHAR_RANGE'", "','", "'CI'", "'REGEX'", "'ANY'", "'EOF'", "'EMPTY'"]);}
 self.depth-=1;out.diag=self.diag.rule(9,out.diag);out
@@ -184,7 +184,7 @@ fn r10_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e57_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:10,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:10,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'UNTIL'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(10,out.diag);out
@@ -193,7 +193,7 @@ fn r11_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e62_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:11,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:11,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'NEGATION'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(11,out.diag);out
@@ -202,7 +202,7 @@ fn r12_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e67_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:12,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:12,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'LOOKAHEAD'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(12,out.diag);out
@@ -211,7 +211,7 @@ fn r13_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e72_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:13,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:13,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'NEGATIVE_LOOKAHEAD'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(13,out.diag);out
@@ -220,7 +220,7 @@ fn r14_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e77_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:14,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:14,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'CHAR_RANGE'", "'('", "','", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(14,out.diag);out
@@ -229,7 +229,7 @@ fn r15_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e84_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:15,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:15,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'CI'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(15,out.diag);out
@@ -238,7 +238,7 @@ fn r16_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e89_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:16,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:16,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'REGEX'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(16,out.diag);out
@@ -247,7 +247,7 @@ fn r17_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e94_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:17,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:17,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'ANY'"]);}
 self.depth-=1;out.diag=self.diag.rule(17,out.diag);out
@@ -256,7 +256,7 @@ fn r18_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e96_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:18,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:18,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'EOF'"]);}
 self.depth-=1;out.diag=self.diag.rule(18,out.diag);out
@@ -265,7 +265,7 @@ fn r19_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e98_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:19,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:19,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'EMPTY'"]);}
 self.depth-=1;out.diag=self.diag.rule(19,out.diag);out
@@ -274,7 +274,7 @@ fn r20_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e100_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:20,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:20,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'::='", "';'"]);}
 self.depth-=1;out.diag=self.diag.rule(20,out.diag);out
@@ -283,7 +283,7 @@ fn r21_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e107_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:21,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:21,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@root'", "'@mapping'", "'('", "')'", "'@eval'", "'@whitespace'", "'@interleave'", "'profile'", "'='", "'@backref'", "'name'", "'@scopeTree'", "'mode'", "'@declares'", "'symbol'", "'@catalog'", "'context'", "'@leftAssoc'", "'@rightAssoc'", "'@longestChoice'", "'@predictiveChoice'", "'@precedence'", "'level'", "'@doc'", "'@recovery'", "'@skip'", "'@commonField'", "'@enum'", "'@'"]);}
 self.depth-=1;out.diag=self.diag.rule(21,out.diag);out
@@ -292,7 +292,7 @@ fn r22_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e128_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:22,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:22,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@root'"]);}
 self.depth-=1;out.diag=self.diag.rule(22,out.diag);out
@@ -301,7 +301,7 @@ fn r23_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e130_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:23,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:23,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@mapping'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(23,out.diag);out
@@ -310,7 +310,7 @@ fn r24_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e147_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:24,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:24,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@eval'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(24,out.diag);out
@@ -319,7 +319,7 @@ fn r25_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e156_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:25,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:25,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@whitespace'"]);}
 self.depth-=1;out.diag=self.diag.rule(25,out.diag);out
@@ -328,7 +328,7 @@ fn r26_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e163_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:26,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:26,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@interleave'", "'('", "'profile'", "'='", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(26,out.diag);out
@@ -337,7 +337,7 @@ fn r27_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e170_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:27,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:27,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@backref'", "'('", "'name'", "'='", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(27,out.diag);out
@@ -346,7 +346,7 @@ fn r28_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e177_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:28,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:28,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@scopeTree'", "'('", "'mode'", "'='", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(28,out.diag);out
@@ -355,7 +355,7 @@ fn r29_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e184_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:29,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:29,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@declares'", "'('", "'symbol'", "'='", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(29,out.diag);out
@@ -364,7 +364,7 @@ fn r30_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e197_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:30,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:30,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@catalog'", "'('", "'context'", "'='", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(30,out.diag);out
@@ -373,7 +373,7 @@ fn r31_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e204_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:31,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:31,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@leftAssoc'"]);}
 self.depth-=1;out.diag=self.diag.rule(31,out.diag);out
@@ -382,7 +382,7 @@ fn r32_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e206_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:32,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:32,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@rightAssoc'"]);}
 self.depth-=1;out.diag=self.diag.rule(32,out.diag);out
@@ -391,7 +391,7 @@ fn r33_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e208_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:33,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:33,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@longestChoice'"]);}
 self.depth-=1;out.diag=self.diag.rule(33,out.diag);out
@@ -400,7 +400,7 @@ fn r34_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e210_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:34,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:34,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@predictiveChoice'"]);}
 self.depth-=1;out.diag=self.diag.rule(34,out.diag);out
@@ -409,7 +409,7 @@ fn r35_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e212_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:35,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:35,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@precedence'", "'('", "'level'", "'='", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(35,out.diag);out
@@ -418,7 +418,7 @@ fn r36_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e219_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:36,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:36,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@doc'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(36,out.diag);out
@@ -427,7 +427,7 @@ fn r37_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e224_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:37,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:37,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@recovery'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(37,out.diag);out
@@ -436,7 +436,7 @@ fn r38_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e235_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:38,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:38,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@skip'"]);}
 self.depth-=1;out.diag=self.diag.rule(38,out.diag);out
@@ -445,7 +445,7 @@ fn r39_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e237_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:39,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:39,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@commonField'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(39,out.diag);out
@@ -454,7 +454,7 @@ fn r40_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e246_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:40,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:40,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@enum'"]);}
 self.depth-=1;out.diag=self.diag.rule(40,out.diag);out
@@ -463,7 +463,7 @@ fn r41_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e248_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:41,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:41,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@'"]);}
 self.depth-=1;out.diag=self.diag.rule(41,out.diag);out
@@ -472,7 +472,7 @@ fn r42_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e251_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:42,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:42,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["ChoiceBodyParser"]);}
 self.depth-=1;out.diag=self.diag.rule(42,out.diag);out
@@ -481,7 +481,7 @@ fn r43_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e257_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:43,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:43,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["SequenceBodyParser"]);}
 self.depth-=1;out.diag=self.diag.rule(43,out.diag);out
@@ -490,7 +490,7 @@ fn r44_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e260_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:44,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:44,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["AnnotatedElementParser"]);}
 self.depth-=1;out.diag=self.diag.rule(44,out.diag);out
@@ -499,7 +499,7 @@ fn r45_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e274_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:45,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:45,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'+'", "'?'", "'*'"]);}
 self.depth-=1;out.diag=self.diag.rule(45,out.diag);out
@@ -508,7 +508,7 @@ fn r46_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e278_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:46,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:46,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'%'"]);}
 self.depth-=1;out.diag=self.diag.rule(46,out.diag);out
@@ -517,7 +517,7 @@ fn r47_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e281_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:47,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:47,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'{'", "'}'"]);}
 self.depth-=1;out.diag=self.diag.rule(47,out.diag);out
@@ -526,7 +526,7 @@ fn r48_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e290_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:48,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:48,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["DigitsParser"]);}
 self.depth-=1;out.diag=self.diag.rule(48,out.diag);out
@@ -535,7 +535,7 @@ fn r49_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e294_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:49,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:49,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'('", "')'", "'['", "']'", "'{'", "'}'", "'ERROR'"]);}
 self.depth-=1;out.diag=self.diag.rule(49,out.diag);out
@@ -544,7 +544,7 @@ fn r50_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e301_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:50,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:50,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(50,out.diag);out
@@ -553,7 +553,7 @@ fn r51_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e305_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:51,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:51,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'['", "']'"]);}
 self.depth-=1;out.diag=self.diag.rule(51,out.diag);out
@@ -562,7 +562,7 @@ fn r52_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e309_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:52,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:52,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'{'", "'}'"]);}
 self.depth-=1;out.diag=self.diag.rule(52,out.diag);out
@@ -571,7 +571,7 @@ fn r53_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e313_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:53,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:53,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'ERROR'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(53,out.diag);out
@@ -580,7 +580,7 @@ fn r54_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e318_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:54,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:54,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["TerminalElementParser"]);}
 self.depth-=1;out.diag=self.diag.rule(54,out.diag);out
@@ -593,7 +593,7 @@ if site==58 {let mut targets=self.take_scope();self.scope_captures(out.events,&[
 let _=(&name,offset_cp,len_cp); }
 self.give_scope(scope_sites);
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:55,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:55,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["QuantifiedRefParser"]);}
 self.depth-=1;out.diag=self.diag.rule(55,out.diag);out
@@ -602,7 +602,7 @@ fn r56_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e326_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:56,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:56,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["'@typeof'", "'('", "')'"]);}
 self.depth-=1;out.diag=self.diag.rule(56,out.diag);out
@@ -611,7 +611,7 @@ fn r57_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e331_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:57,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:57,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["DottedIdentifierParser"]);}
 self.depth-=1;out.diag=self.diag.rule(57,out.diag);out
@@ -620,7 +620,7 @@ fn r58_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state
 let mut out=self.e337_c(state);
 if out.ok {
 let end=out.state.consumed;
-out.events=self.event(Event::Rule {rule:58,span:[state.consumed,end],child:out.events});
+out.events=self.event(Event::Rule {rule:58,span:[state.consumed,end],child:out.events,caps:(0,0)});
 } else { self.restore(mark); }
 if !out.ok {self.display.failures(state.consumed.max(state.matched),&["RuleBodyParser"]);}
 self.depth-=1;out.diag=self.diag.rule(58,out.diag);out
