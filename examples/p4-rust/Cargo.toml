@@ -1,0 +1,25 @@
+[package]
+name = "ubnfc-p4-rust"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+build = "build.rs"
+
+[features]
+default = []
+# 生成 AST の canonical JSON（serde / serde_json は optional）。
+json = ["dep:serde", "dep:serde_json"]
+# build.rs が複製した parser/runtime に rule 呼出し・memo・arena の計数フックを挿入する。計時値は乱れる。
+counters = []
+
+[dependencies]
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+[dev-dependencies]
+ubnfc-p4-rust = { path = ".", features = ["json"] }
+ubnfc-front = { path = "../../crates/ubnfc-front" }
+ubnfc-rust = { path = "../../crates/ubnfc-rust" }
+serde_json.workspace = true
