@@ -13,7 +13,9 @@ mod follow;
 mod graph;
 mod operators;
 mod planning;
+mod reachability;
 mod regex;
+pub use reachability::ChoiceIssue;
 pub(crate) use regex::attach as attach_regex_plans;
 
 use crate::ir::*;
@@ -120,6 +122,14 @@ impl Context<'_> {
 /// lowering 済みの意味論を解析する。直接左再帰は lowering の正規化記録を参照し、
 /// 書換えが残っていれば拒否する。正規化前の保存式は出力するが実行グラフから除く。
 pub fn analyze(semantics: &Semantics) -> Result<(Analysis, Plan), Vec<AnalysisError>> {
+    analyze_with_choice_issues(semantics).map(|(analysis, plan, _)| (analysis, plan))
+}
+
+/// `analyze` に加えて、順序付き選択の到達不能候補（D-037）の警告を返す。
+/// 警告は IR に載らない。受理・AST・診断は変えない。
+pub fn analyze_with_choice_issues(
+    semantics: &Semantics,
+) -> Result<(Analysis, Plan, Vec<ChoiceIssue>), Vec<AnalysisError>> {
     checks::validate(semantics)?;
     let mut cx = Context {
         sem: semantics,
@@ -179,6 +189,8 @@ pub fn analyze(semantics: &Semantics) -> Result<(Analysis, Plan), Vec<AnalysisEr
         return Err(errors);
     }
     let (choices, prefix_tries) = choices::plans(&cx);
+    // 左再帰・cardinality・operator の検査を通った後でだけ到達性を論じる。
+    let choice_issues = reachability::check(&cx);
     let (memo, safety, effects, omitted) = planning::memo(&cx, &choices);
     let follow = follow::compute(&cx);
     let sccs: Vec<_> = cx
@@ -267,7 +279,7 @@ pub fn analyze(semantics: &Semantics) -> Result<(Analysis, Plan), Vec<AnalysisEr
             key: PlanTriviaCacheKey,
         },
     };
-    Ok((analysis, plan))
+    Ok((analysis, plan, choice_issues))
 }
 
 pub use planning::{scope_schedule, ScopeStep};
