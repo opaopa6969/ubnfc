@@ -52,12 +52,14 @@ Expr ::=
 PEG の順序付き選択は、候補順を誤ると黙って前の候補が勝つ。P4 の `comparison-heavy` が
 `Formula` 入口で拒否されるのはこれが原因だった。
 
-`crates/ubnfc-rust/src/predict.rs` の trivia 越し FIRST 集合と `analysis` の nullable/minConsume が
-既にあるので、検証器に警告を足せる:
+**実装済み（D-037、`crates/ubnfc-front/src/analysis/reachability.rs`）**。証明は設計 v1 §3.4、
+実測は `docs/reports/2026-09-23-choice-reachability.md`。
 
-- `W-CHOICE-UNREACHABLE`: 候補 B の言語が先行候補 A に完全に含まれる（証明できた場合のみ）
-- `W-CHOICE-PREFIX`: A が B の真の接頭辞（`'a' | 'ab'` 形）。PEG では A が勝ち B は事実上死ぬ
-- `W-CHOICE-NULLABLE-FIRST`: nullable な候補が末尾以外にある（以降が全て死ぬ）
+- `W-CHOICE-NULLABLE-NOT-LAST`: 無条件にゼロ幅成功する候補が末尾以外にある（以降が全て死ぬ）
+- `W-CHOICE-PREFIX`: A が B の必須先頭リテラルの接頭辞（`'a' | 'ab'` 形）。PEG では A が勝ち B は死ぬ
+- `W-CHOICE-UNREACHABLE`: B が A と構造同一、または B の成功が常に「同じ位置での A の成功」を含む
+- `W-CHOICE-SHADOWED-PATH`: B に「A を呼んでさらに消費する」導出経路がある（その経路だけが死ぬ）。
+  P4 の `Formula` 拒否はこれ。当初案の「B の言語が A に含まれる」一般形は証明できないので入れていない。
 
 **v1 でも出す**（警告のみで受理は変えない）。`--strict` でエラー化。
 
@@ -101,7 +103,7 @@ IR には既に組込み種別があるので、表層の語彙を足すだけ�
 
 ## 実施順
 
-1. §2 到達不能候補の検出（v1 で警告、低リスク）
+1. ~~§2 到達不能候補の検出（v1 で警告、低リスク）~~ **完了（D-037）**
 2. §1 左再帰（最大の価値）
 3. §3 単語境界（互換影響の実測 → v2 既定）
 4. §5 token 語彙、§4 パラメータ化ルール、§6 統廃合

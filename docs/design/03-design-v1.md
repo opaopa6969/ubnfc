@@ -83,6 +83,25 @@ IR に `analysisVersion` と対象機能集合を持たせ、未対応版は明�
   （`PredictiveChoiceInterface.java:34`）。診断は元の Choice と同値。
 - `@longestChoice`: 全候補を共通開始状態から試行、最大消費、同長は宣言順。
 - 生成器は通常の `|` にも予測を適用してよいが、**候補除外は保守的証明付き**で、除外後の失敗診断が元と同値であること。
+- **到達不能候補の検出（D-037）**。順序付き選択は継続の失敗で別候補へ戻らないので、候補順を誤ると
+  候補が黙って死ぬ。front は証明できた場合だけ警告を出す（受理・AST・診断は変えない。`--strict` でエラー化）。
+  対象は `selection = ordered` の Choice だけ（`longest` は全候補を試すので順序で死なない。
+  `predictive` は候補除外の証明側で扱う）。recovery 適用 site、Extern / regex など不明を含む経路は出さない。
+
+  | code | 証明 |
+  |---|---|
+  | `W-CHOICE-NULLABLE-NOT-LAST` | 末尾でない候補の `zeroConsumeCondition = always`（＝無条件にゼロ幅成功）。その候補は全位置で成功するので以降は必ず死ぬ |
+  | `W-CHOICE-PREFIX` | 先行候補が大文字小文字を区別するリテラル `L`、後続候補の**必須先頭リテラル**が `L` で始まる。後続が一致するなら先行も一致するので後続は死ぬ |
+  | `W-CHOICE-UNREACHABLE` | 後続候補が先行候補と構造同一、または先行候補 `RuleRef(R)` に対し後続候補の成功が常に「同じ位置での `R` の成功」を含む（左端呼出しが必須） |
+  | `W-CHOICE-SHADOWED-PATH` | 先行候補 `RuleRef(R)` に対し、後続候補に「同じ位置で `R` を呼び、その後さらに必ず消費する」導出経路がある。その経路だけが死ぬ（候補全体は死なない） |
+
+  `W-CHOICE-PREFIX` は D-002（語境界なし、`ExprNode.literal.wordBoundary` は IR v1 で固定値 `false`）に
+  依存する。`06-ubnf-v2.md` §3 が v2 で語境界を既定にするときは、境界付きリテラルを接頭辞の証明から
+  外す（境界があれば `'var'` は `variable` に一致しないので、後続候補は死なない）。
+
+  位置の同一性は trivia 挿入計画で確かめる。降下中に跨いだ policy が 1 つで、それが `R` 本体の
+  entry 境界と同じときだけ「同じ位置」と認める（trivia の読み飛ばしは最長一致で冪等なので、
+  二重に読み飛ばしても位置が変わらない）。異なる policy・複数 policy は不明として出さない。
 
 ### 3.5 trivia（空白/コメント）
 
@@ -325,3 +344,4 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | D-033 生成器 jar の鮮度をハーネスが検査する | 決定 | Java backend の driver template（`ubnfc-java/src/main/resources/templates/driver/Driver.java`）と emitter は **jar の resource** なので、`ubnfc-java` を直したあと `mvn -o -q -DskipTests package` を忘れると、harness / 差分 fuzzer は**古い観測契約の driver** を黙って生成する。これは「片方の backend が契約を破っている」と見分けが付かない形で現れ、実際に D-024 〜 D-029 の適用後に `diff:/catalogs`（Java が `catalogs` キーを出さない）と `diff:/diagnostics/*`（Java が成功解析にも合成 `syntax` 診断を足す）の**存在しない乖離**として誤報された（`docs/reports/2026-09-23-fuzz-fixes-catalogs-diagnostics.md`）。既定 jar を使う経路（`Runner::build`）では `ubnfc-java/src/main` と `pom.xml` の最新 mtime が jar より新しければ build を **エラーにする**（`runner/mod.rs check_java_generator_freshness`）。固定 seed campaign は `discarded == 0` を主張しているので、古い jar は差分ではなく discard として即座に赤くなる。`build_with_java_generator` で classpath を明示する経路（テストの `target/classes`）は maven が鮮度を保つので検査しない。mtime が読めない環境では検査を飛ばす（偽陽性で build を止めない） |
 | D-035 出現表と value span は opt-in | 決定 | `ParseOptions.occurrences` / `ParseOptions.value_spans`（どちらも既定 false）。§3.6 が「オプション出力」と書く `captures` / rule 出現 / token 出現と、`value_spans` を、要求されたときだけ集める。**既定で空になるもの**: AST だけを要求した parse の `captures`（`lexical` / `tokens` は従来から `lexical: true` のときだけ）と `value_spans`。AST・`node_spans`・診断・scope・recovery・統計・`recoveries[].capture_occurrence_ids` は一切変わらない。**走査は省けない**: M5 round 5 が出現収集と「AST が rule ごとに読む直下 capture 表」を 1 回の走査に統合したので、AST を作る parse では走査そのものは残る。省くのは公開する出現表の行を作る分と `ast.collect` による value span である。**再走査**: D-023 と違い結果からは要否が判定できないので自動の再解析は無い。要る利用者が要求する（`lexical: true` は出現表そのものが目的なので要求を含む）。self-host は `lexical: true` なので不変、driver は AST 経路で `value_spans: true` を要求し、出現は `lexical` のときだけ出す（corpus 観測は不変）。**費用**: complex AST −12 µs（−11.9%）・確保 681→509 回 / 113→77 KB、complex-x64 AST −410 µs（−6.5%）・確保 5.69→3.41 MB。要求した利用者は従来と同じ費用を払う。観測の同値は `examples/p4-rust/tests/fixtures.rs` の `occurrences_and_value_spans_are_opt_in_without_changing_anything_else` が固定する |
 | D-036 診断の配管は `const DIAG` で単相化 | 決定 | `Session<'a, const DIAG: bool>`。入口は `ParseOptions.diagnostics` を見て `Session::<false>`（fast mode）か `Session::<true>`（診断モード）を選び、D-023 の再解析も `Session::<true>` で走る。`Diagnostics` / `DisplayDiagnostics` への呼出しは Session 上の `diag_*` / `display_*` wrapper を通し、`DIAG == false` では定数分岐として消える。候補除外の失敗再生 `guard_e*` の早期 return と `finish_checked` の escalate 判定も同じ定数で分岐する。**理由**: 実行時の `enabled` 検査では「呼出し・引数の準備・`Step.diag` の合流」が残り、fast mode で 1 parse あたり主診断 `join` 3,429 回・`rule` 759 回・display frame 走査 3,226 回を払っていた。D-023 の注記「`const DIAG` は 8 µs なので作らない」は前提が古い。**費用**: 生成物の機械語が 2 部になり P4 の binary は 4.69 → 7.34 MB（+56%）。**fast path** は complex 認識 −17 µs（−20.5%）・complex AST −20 µs（−16.5%）・x64 認識 −954 µs（−17.4%）・x64 AST −1,060 µs（−14.5%）で、round 4 で警戒した i-cache の代償は出なかった。**診断モードは 0〜3% 遅くなる**（`docs/reports/2026-09-23-p4-rust-floor.md` §4。冷たい経路が単相化の裏返しを受ける）。**観測は不変**（fast mode は D-023 のとおり元から記録しない。fast/診断 同値テストと predict/factor/lexical_cache の参照経路比較が固定する） |
+| D-037 到達不能候補は警告 | 決定 | 順序付き選択（PEG）で死んだ候補を front が静的に検出し、`W-CHOICE-NULLABLE-NOT-LAST` / `W-CHOICE-PREFIX` / `W-CHOICE-UNREACHABLE` / `W-CHOICE-SHADOWED-PATH` の 4 コードで **警告**する（§3.4 に証明を書いた）。**エラーにしない理由**: (1) これは文法の意図の問題であって IR・生成物の契約違反ではない。死んだ候補があっても受理・AST・診断は完全に定義されており、既存の 24 fixture・P4・corpus 1,212 ケースはその挙動を固定している。エラーにすると v1 の文法が通らなくなり「v1 は凍結」（`06-ubnf-v2.md` §0）に反する。(2) 検出は**下界**である。証明できない形（`predict.rs` と同じく Extern / regex / 複数 trivia policy / recovery は不明）は黙って通すので、「警告が無い＝死んだ候補が無い」ではない。到達性の完全判定は PEG では決定不能なので、この非対称は原理的に残る。(3) `--strict` を使う側は既存の機械でエラーにできる。**証明できないので入れなかったもの**: 候補の言語包含一般（`'a'+` ⊇ `'a'`、正規言語同士の包含）、mayStart（FIRST）の包含による死の判定（FIRST は必要条件の上界にすぎず、A の FIRST が B を覆っても A が成功する保証にならない）、到達可能性を伴う「実際に入力が存在する」証明（`W-CHOICE-SHADOWED-PATH` は経路の死だけを主張し、その経路が他の理由で死んでいないことは主張しない）。**実測**: 24 fixture では tinycalc の 2 本（`( 'var' \| 'variable' )` で `'variable'` が死ぬ）だけ、`ubnf.ubnf` は 0 件、P4 は 9 件（`Expression ::= NumberExpression \| BooleanExpression \| ...` を含む。`docs/reports/2026-09-23-choice-reachability.md`）。生成器の乱択文法 1,000 件では 461 件が該当。corpus は Java Pass 1310 / Fail 0、Rust Pass 1292 / Fail 0 のまま |
