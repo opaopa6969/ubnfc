@@ -618,7 +618,11 @@ impl<'a> Converter<'a> {
                 } else {
                     self.span(j)?
                 };
-                Ok(Sequence { annotations: Vec::new(), elements, span })
+                Ok(Sequence {
+                    annotations: Vec::new(),
+                    elements,
+                    span,
+                })
             })
             .collect::<Result<Vec<_>>>()?;
         let first = alternatives

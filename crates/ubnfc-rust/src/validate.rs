@@ -8,7 +8,7 @@ pub(crate) fn unsupported(feature: &str, detail: impl Into<String>) -> EmitError
         detail: detail.into(),
     }
 }
-/// UBNF 表層言語のバージョン上限（D-037）。表層の新機能は front が v1 の正規形へ
+/// UBNF 表層言語のバージョン上限（D-038）。表層の新機能は front が v1 の正規形へ
 /// 脱糖するので backend の実装は変わらないが、**未知のバージョンは明示拒否する**。
 pub(crate) const MAX_LANGUAGE_VERSION: u64 = 2;
 

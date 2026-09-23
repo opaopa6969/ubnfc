@@ -150,7 +150,7 @@ class BackendTest {
         raw.put("requiredFeatures", List.of()); raw.put("analysisVersion", "future");
         assertTrue(assertThrows(IllegalArgumentException.class, () -> IrReader.read(Json.write(raw))).getMessage().contains("analysisVersion"));
     }
-    /** D-037: UBNF 表層言語のバージョン門。既知の 1/2 だけを受け、未知は明示拒否する。 */
+    /** D-038: UBNF 表層言語のバージョン門。既知の 1/2 だけを受け、未知は明示拒否する。 */
     @Test void rejectUnknownLanguageVersion() throws Exception {
         var raw = Json.object(Json.read(Files.readString(TINY)));
         assertEquals(java.math.BigDecimal.ONE, raw.get("languageVersion"));

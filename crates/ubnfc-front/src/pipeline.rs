@@ -298,7 +298,7 @@ pub(crate) fn sort_issues(issues: &mut [ValidationIssue]) {
 struct Prepared {
     grammar: ResolvedGrammar,
     sources: Vec<SourceInput>,
-    /// `@ubnf` の最大宣言値（D-037）。IR の `languageVersion` になる。
+    /// `@ubnf` の最大宣言値（D-038）。IR の `languageVersion` になる。
     language_version: u64,
     /// 脱糖・バージョン門の診断（resolve より前に出る）。
     issues: Vec<ValidationIssue>,

@@ -100,7 +100,7 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
     assert!(unknown.is_empty(), "未登録の差分: {unknown:#?}");
 }
 
-/// UBNF v2（`@ubnf: 2` の左再帰ルール、D-038）を両 backend で突き合わせる。
+/// UBNF v2（`@ubnf: 2` の左再帰ルール、D-039）を両 backend で突き合わせる。
 /// front の脱糖が v1 の正規形を作るので IR は両 backend で同じだが、
 /// 「脱糖した文法が実際に build でき、同じ入力で同じ観測を返す」ことは
 /// ここで初めて機械的に確かめられる。seed は `gen::V2_SEED_BASE` の帯（既存

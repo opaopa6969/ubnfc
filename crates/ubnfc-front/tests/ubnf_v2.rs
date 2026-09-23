@@ -1,4 +1,4 @@
-//! UBNF v2: バージョン門（D-037）と左再帰ルールの脱糖（D-038）。
+//! UBNF v2: バージョン門（D-038）と左再帰ルールの脱糖（D-039）。
 //!
 //! v1 の意味論が凍結されていることも、ここで押さえる（`@ubnf` が無い文法は
 //! 何も変わらず、候補先頭注釈も左再帰も v1 のままの扱いになる）。
@@ -10,7 +10,8 @@ use ubnfc_front::ir::{ExprNode, OperatorAssociativity, OperatorCanonicalForm, Re
 use ubnfc_front::pipeline::{compile, Compiled, PipelineError};
 
 fn source(text: &str) -> Result<Compiled, PipelineError> {
-    let files: BTreeMap<PathBuf, String> = BTreeMap::from([("/virtual/main.ubnf".into(), text.into())]);
+    let files: BTreeMap<PathBuf, String> =
+        BTreeMap::from([("/virtual/main.ubnf".into(), text.into())]);
     compile("/virtual/main.ubnf", &|path: &Path| Ok(files[path].clone()))
 }
 
@@ -80,7 +81,10 @@ fn unknown_or_duplicated_ubnf_versions_are_rejected() {
         .contains(&"E-UBNF-VERSION-UNSUPPORTED".to_owned()));
     assert!(codes(&grammar(Some(0), "  @root R ::= NUMBER;\n"))
         .contains(&"E-UBNF-VERSION-UNSUPPORTED".to_owned()));
-    let text = format!("{}  @root R ::= NUMBER;\n}}", header("  @ubnf: 2\n  @ubnf: 2\n"));
+    let text = format!(
+        "{}  @root R ::= NUMBER;\n}}",
+        header("  @ubnf: 2\n  @ubnf: 2\n")
+    );
     assert!(codes(&text).contains(&"E-UBNF-VERSION-DUPLICATE".to_owned()));
     let text = format!("{}  @root R ::= NUMBER;\n}}", header("  @ubnf: two\n"));
     assert!(codes(&text).contains(&"E-UBNF-VERSION-UNSUPPORTED".to_owned()));
@@ -111,7 +115,10 @@ fn a_left_recursive_rule_becomes_the_v1_precedence_tower() {
     for (name, level, base) in [("Expr", 10, "Expr__lr1"), ("Expr__lr1", 20, "Expr__lrBase")] {
         let operator = by_rule[name].operator.as_ref().expect("operator metadata");
         assert_eq!(operator.associativity, OperatorAssociativity::Left);
-        assert_eq!(operator.canonical_form, OperatorCanonicalForm::LeftOpRightLists);
+        assert_eq!(
+            operator.canonical_form,
+            OperatorCanonicalForm::LeftOpRightLists
+        );
         assert_eq!(operator.precedence, level);
         assert!(operator.base_rule_id.ends_with(base), "{name}");
     }
@@ -129,7 +136,14 @@ fn a_left_recursive_rule_becomes_the_v1_precedence_tower() {
             panic!("{name}: Seq ではない");
         };
         assert_eq!(items.len(), 2);
-        assert!(matches!(expressions[&items[1]], ExprNode::Repeat { min: 0, max: None, .. }));
+        assert!(matches!(
+            expressions[&items[1]],
+            ExprNode::Repeat {
+                min: 0,
+                max: None,
+                ..
+            }
+        ));
     }
     // 演算子の段だけが mapping を持ち、基底の段は持たない。
     let recipes: BTreeMap<_, _> = compiled
@@ -302,9 +316,7 @@ fn unsupported_annotations_on_a_left_recursive_rule_are_rejected() {
         "@precedence(level=10)",
         "@predictiveChoice",
     ] {
-        let body = format!(
-            "  @root {annotation}\n  Expr ::= Expr '+' Expr | NUMBER;\n"
-        );
+        let body = format!("  @root {annotation}\n  Expr ::= Expr '+' Expr | NUMBER;\n");
         assert!(
             codes(&grammar(Some(2), &body)).contains(&"E-LEFTREC-ANNOTATION".to_owned()),
             "{annotation}"
@@ -314,8 +326,10 @@ fn unsupported_annotations_on_a_left_recursive_rule_are_rejected() {
 
 #[test]
 fn a_left_recursive_rule_needs_a_base_alternative_and_free_names() {
-    assert!(codes(&grammar(Some(2), "  @root Expr ::= Expr '+' Expr;\n"))
-        .contains(&"E-LEFTREC-NO-BASE".to_owned()));
+    assert!(
+        codes(&grammar(Some(2), "  @root Expr ::= Expr '+' Expr;\n"))
+            .contains(&"E-LEFTREC-NO-BASE".to_owned())
+    );
     assert!(codes(&grammar(
         Some(2),
         "  @root Expr ::= Expr '+' Expr | NUMBER;\n  Expr__lrBase ::= NUMBER;\n"
@@ -343,5 +357,89 @@ fn a_base_alternative_ending_in_the_rule_itself_warns_about_its_binding() {
         Some(2),
         "  @root Expr ::= Expr '+' Expr | '-' Expr | NUMBER;\n",
     ));
-    assert!(issues.contains(&"W-LEFTREC-TRAILING-SELF-REF".to_owned()), "{issues:?}");
+    assert!(
+        issues.contains(&"W-LEFTREC-TRAILING-SELF-REF".to_owned()),
+        "{issues:?}"
+    );
+}
+
+// ── P4-v2（examples/p4-v2）が commit 済み P4 の IR と構造同値であること ──────
+
+/// `examples/p4-v2/tinyexpression-p4-v2.ubnf` は tinyexpression の P4 を
+/// v2 の左再帰ルールで書き直したもの（式の塔以外は 1 文字も同じ）。生成した parser の
+/// 観測比較は `examples/p4-v2/scripts/compare.sh`（報告
+/// `docs/reports/2026-09-23-ubnf-v2-left-recursion.md`）。ここでは codegen 無しで
+/// **AST 型と recipe が塔と完全に一致する**ことだけを固定する。
+#[test]
+fn p4_v2_produces_the_same_ast_types_and_recipes_as_the_committed_p4_ir() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let grammar = root.join("examples/p4-v2/tinyexpression-p4-v2.ubnf");
+    let declarations = ubnfc_front::ir::parse_extern_first_chars(
+        &std::fs::read_to_string(root.join("scanners/first-chars.json")).unwrap(),
+    )
+    .unwrap();
+    let mut compiled = compile(&grammar, &|path: &Path| std::fs::read_to_string(path)).unwrap();
+    let (_, missing) = ubnfc_front::ir::apply_extern_first_chars(&mut compiled.ir, &declarations);
+    assert!(missing.is_empty(), "{missing:?}");
+    assert_eq!(compiled.ir.language_version, 2);
+
+    let v1: ubnfc_front::ir::GrammarIr = ubnfc_front::ir::from_json(
+        &std::fs::read_to_string(root.join(
+            "ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json",
+        ))
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(v1.language_version, 1);
+    assert_eq!(v1.semantics.rules.len(), 124);
+    // 塔 8 本 -> 左再帰ルール 3 本。透過的な BooleanExpression__lrBase が 1 本増える。
+    assert_eq!(compiled.ir.semantics.rules.len(), 125);
+    assert_eq!(v1.semantics.ast_types, compiled.ir.semantics.ast_types);
+
+    let shape = |ir: &ubnfc_front::ir::GrammarIr, names: &[&str]| {
+        names
+            .iter()
+            .map(|name| {
+                let recipe = ir
+                    .semantics
+                    .recipes
+                    .iter()
+                    .find(|r| r.rule_id.ends_with(&format!("::{name}")))
+                    .unwrap_or_else(|| panic!("recipe がありません: {name}"));
+                (
+                    recipe.kind,
+                    recipe.result_type_id.clone(),
+                    recipe
+                        .fields
+                        .iter()
+                        .map(|f| (f.field.clone(), f.cardinality, f.conversion))
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(
+        shape(
+            &v1,
+            &[
+                "NumberExpression",
+                "NumberTerm",
+                "StringExpression",
+                "BooleanExpression",
+                "BooleanAndExpression",
+                "BooleanXorExpression",
+            ]
+        ),
+        shape(
+            &compiled.ir,
+            &[
+                "NumberExpression",
+                "NumberExpression__lr1",
+                "StringExpression",
+                "BooleanExpression",
+                "BooleanExpression__lr1",
+                "BooleanExpression__lr2",
+            ]
+        )
+    );
 }

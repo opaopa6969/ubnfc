@@ -74,6 +74,12 @@ memo に seed-growing は無く（`PackratMemoTable.java:72`）、実行時は S
 → 直接左再帰のループ化は**明示的な言語拡張**。D-016: 対象形を限定（nullable suffix、代替順、capture・trivia・scope・recovery の投影を定義）、
 未対応形は明示拒否。
 
+追記（2026-09-23、D-039）: UBNF v2（`@ubnf: 2`）では「候補順＝優先順位」の左再帰ルールが書ける。
+front が resolve より前に**優先順位塔へ脱糖**するので、実行・AST・診断は塔と同じで、
+この文書の契約はそのまま効く。名前が値に出る観測（`deepestRule` / `rulePath` と合成 helper の
+表示名）だけが段の機械生成名になる（D-020 / D-027 の「情報」「言語別 hints」の範囲）。
+実測は `docs/reports/2026-09-23-ubnf-v2-left-recursion.md`。
+
 ## 5. IR スキーマ（`ir/schema/grammar-ir.v1.schema.json`、`ir/examples/tinycalc.ir.json`）
 
 - `semantics` / `analysis` / `plan` を分離。trivia 挿入と左再帰 lowering の記録は意味論側。

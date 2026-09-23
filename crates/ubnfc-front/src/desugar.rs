@@ -6,7 +6,7 @@
 //!
 //! 脱糖は resolve より前（構文木の段階）で行う。したがって下流（resolve /
 //! validate / lower / analysis / backend）は v1 の正規形しか見ない。これが
-//! 「v1 の挙動が bit 単位で不変」を構造的に保証する方法である（D-037 / D-038）。
+//! 「v1 の挙動が bit 単位で不変」を構造的に保証する方法である（D-038 / D-039）。
 
 use std::collections::BTreeSet;
 
@@ -119,7 +119,11 @@ fn plain(element: &Element) -> bool {
 fn optional_quantifier(element: &Element) -> bool {
     matches!(
         element.quantifier,
-        Some(Quantifier::Question { .. } | Quantifier::Star { .. } | Quantifier::Bounded { min: 0, .. })
+        Some(
+            Quantifier::Question { .. }
+                | Quantifier::Star { .. }
+                | Quantifier::Bounded { min: 0, .. }
+        )
     )
 }
 
@@ -190,7 +194,11 @@ fn tiers(
     let operators: Vec<usize> = alternatives
         .iter()
         .enumerate()
-        .filter(|(_, a)| a.elements.first().is_some_and(|e| self_reference(e, &rule.name)))
+        .filter(|(_, a)| {
+            a.elements
+                .first()
+                .is_some_and(|e| self_reference(e, &rule.name))
+        })
         .map(|(i, _)| i)
         .collect();
     if version < LATEST_LANGUAGE_VERSION || operators.is_empty() {
@@ -203,7 +211,10 @@ fn tiers(
     };
     for annotation in &rule.annotations {
         if portable(annotation)
-            || matches!(annotation, Annotation::Root { .. } | Annotation::Mapping { .. })
+            || matches!(
+                annotation,
+                Annotation::Root { .. } | Annotation::Mapping { .. }
+            )
         {
             continue;
         }
@@ -262,9 +273,7 @@ fn tiers(
                 "前置・後置・三項の候補は第一段では未対応です。塔を手書きしてください。",
                 issues,
             );
-        } else if right == Some(true)
-            && matches!(alternative.elements[1].atom, Atom::Ref { .. })
-        {
+        } else if right == Some(true) && matches!(alternative.elements[1].atom, Atom::Ref { .. }) {
             // v1 の右結合正規形は二つの解析で食い違っている:
             // `lower/annotations.rs::operator_elements` は `Base @left { Op @op Self @right }`
             // を、`analysis/operators.rs::canonical` は `Base Op Self | Base` を右結合と見る。
@@ -492,7 +501,10 @@ fn respan(annotation: &Annotation, span: Span) -> Annotation {
         Interleave { profile },
         Backref { name },
         ScopeTree { mode },
-        Declares { symbol, description },
+        Declares {
+            symbol,
+            description
+        },
         Catalog { context },
         LeftAssoc {},
         RightAssoc {},

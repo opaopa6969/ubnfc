@@ -3488,7 +3488,7 @@
       "type": "array"
     },
     "languageVersion": {
-      "description": "UBNF 表層言語のバージョン（@ubnf、既定 1）。既存フィールドを変えない追加キーなので IR は再生成する。backend は未知バージョンを明示拒否する（D-037）。",
+      "description": "UBNF 表層言語のバージョン（@ubnf、既定 1）。既存フィールドを変えない追加キーなので IR は再生成する。backend は未知バージョンを明示拒否する（D-038）。",
       "enum": [
         1,
         2

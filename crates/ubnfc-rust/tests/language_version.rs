@@ -1,4 +1,4 @@
-//! D-037: UBNF 表層言語のバージョン門。v2 の表層機能は front が v1 の正規形へ
+//! D-038: UBNF 表層言語のバージョン門。v2 の表層機能は front が v1 の正規形へ
 //! 脱糖するので生成物は変わらないが、**未知のバージョンは明示拒否**する。
 use ubnfc_front::ir::{from_json, to_canonical_json, GrammarIr};
 use ubnfc_rust::{emit, EmitOptions};

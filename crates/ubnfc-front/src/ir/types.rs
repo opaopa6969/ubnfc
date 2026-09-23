@@ -577,7 +577,7 @@ pub struct GrammarIr {
     pub entry: Entry,
     /// UBNF 表層言語のバージョン（`@ubnf`、既定 1）。既存フィールドを変えない
     /// 追加キーだが**必須**で、IR は再生成する。backend は未知バージョンを
-    /// 明示拒否する（D-037）。
+    /// 明示拒否する（D-038）。
     pub language_version: u64,
     pub grammar_units: Vec<GrammarUnit>,
     pub import_edges: Vec<ImportEdge>,

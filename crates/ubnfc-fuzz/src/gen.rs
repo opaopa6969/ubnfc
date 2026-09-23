@@ -546,7 +546,7 @@ pub fn generate(seed: u64) -> Grammar {
         let index = builder.rng.below(builder.deeper.len());
         builder.deeper[index].clone()
     };
-    // v2: 同じ塔を「候補順＝優先順位」の左再帰ルール 1 本で書く（D-038）。
+    // v2: 同じ塔を「候補順＝優先順位」の左再帰ルール 1 本で書く（D-039）。
     // 段ごとの規則は脱糖が作るので、両 backend は塔と同じ IR を受け取る。
     if v2 && tower > 0 {
         builder.mark("leftRecursion");
