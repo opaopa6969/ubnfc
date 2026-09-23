@@ -20,6 +20,7 @@ pub mod pipeline;
 pub mod resolve;
 pub mod selfhost;
 pub mod syntax;
+pub mod templates;
 pub mod validate;
 pub mod vocabulary;
 

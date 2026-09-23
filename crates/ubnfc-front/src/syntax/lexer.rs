@@ -75,8 +75,11 @@ pub(super) fn lex(source: &str) -> Result<Vec<Token<'_>>, SyntaxError> {
                 offset += 3;
                 Kind::Define
             }
+            // '<' / '>' はパラメータ化ルール（D-043）専用。v1 ではこの 2 文字は
+            // どの位置でも構文エラーだったので、字句として認めても v1 の受理は
+            // 1 つも増えない（構文解析が必ず拒否する）。
             b'@' | b'|' | b';' | b'(' | b')' | b'[' | b']' | b'{' | b'}' | b',' | b'=' | b':'
-            | b'.' | b'+' | b'?' | b'*' | b'%' => {
+            | b'.' | b'+' | b'?' | b'*' | b'%' | b'<' | b'>' => {
                 offset += 1;
                 Kind::Punct(char::from(byte))
             }

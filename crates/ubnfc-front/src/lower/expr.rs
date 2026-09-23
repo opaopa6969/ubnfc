@@ -240,8 +240,10 @@ impl Builder<'_, '_> {
         id
     }
     fn atom(&mut self, atom: &A, role: &str) -> ExprId {
-        let bracket_optional = matches!(atom, A::Optional { .. })
-            && self.cx.text(self.rule.unit)[atom.span().start..].starts_with('[');
+        // `[ ... ]` と `X?` の区別。v1 は「範囲の先頭文字が `[` か」で見ていたが、
+        // 構文木が持つ事実（D-043）に置き換えた。実在の 24 文法・P4 に `[X]?` は
+        // 無いので、v1 の IR は 1 byte も変わらない。
+        let bracket_optional = matches!(atom, A::Optional { bracket: true, .. });
         let kind = match atom {
             A::Literal { .. } => "literal",
             A::Ref { symbol, .. } => {

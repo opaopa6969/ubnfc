@@ -37,6 +37,18 @@ pub struct Element {
     pub capture: Option<String>,
 }
 
+impl Rule {
+    /// 雛形の綴りを持たない通常の規則。
+    pub fn plain(annotations: Vec<String>, name: String, body: Body) -> Self {
+        Self {
+            annotations,
+            name,
+            body,
+            template: None,
+        }
+    }
+}
+
 impl Element {
     pub fn new(atom: Atom) -> Self {
         Self {
@@ -89,6 +101,11 @@ pub struct Rule {
     pub annotations: Vec<String>,
     pub name: String,
     pub body: Body,
+    /// パラメータ化ルール（D-043）の実体化を**原文として**書くときの本体
+    /// （例 `Tpl<Op0, ','>`）。`body` は常に展開後の形を持つので、モデル・導出・
+    /// 期待値はすべて展開後を見る。つまりこの欄は「同じ文法の別の綴り」であり、
+    /// front の展開がその綴りと一致することを両 backend が突き合わせる。
+    pub template: Option<String>,
 }
 
 /// `@import` で参照される 2 つ目のファイル。規則は最小限に保つ。
@@ -106,6 +123,8 @@ pub struct Grammar {
     pub name: String,
     /// `@package: ...` などのグローバル設定（描画済み 1 行）。
     pub settings: Vec<String>,
+    /// パラメータ化ルールの宣言（描画済み 1 行）。
+    pub templates: Vec<String>,
     pub tokens: Vec<Token>,
     pub rules: Vec<Rule>,
     pub import: Option<Import>,
@@ -206,6 +225,7 @@ fn render_unit(
     name: &str,
     imports: &[String],
     settings: &[String],
+    templates: &[String],
     tokens: &[Token],
     rules: &[Rule],
 ) -> String {
@@ -219,13 +239,26 @@ fn render_unit(
     for token in tokens {
         let _ = writeln!(out, "  token {} = {}", token.name, token.declaration);
     }
+    // 実体化されている雛形だけを宣言する（縮小で使われなくなったら消える）。
+    for declaration in templates {
+        let used = format!("{}<", declaration.split('<').next().unwrap_or(""));
+        if rules
+            .iter()
+            .any(|r| r.template.as_deref().is_some_and(|t| t.contains(&used)))
+        {
+            let _ = writeln!(out, "  {declaration}");
+        }
+    }
     for rule in rules {
         out.push_str("  ");
         for annotation in &rule.annotations {
             let _ = write!(out, "{annotation} ");
         }
         let _ = write!(out, "{} ::= ", rule.name);
-        render_body(&rule.body, &mut out);
+        match &rule.template {
+            Some(body) => out.push_str(body),
+            None => render_body(&rule.body, &mut out),
+        }
         out.push_str(";\n");
     }
     out.push_str("}\n");
@@ -247,6 +280,7 @@ impl Grammar {
             &self.name,
             &imports,
             &self.settings,
+            &self.templates,
             &self.tokens,
             &self.rules,
         )
@@ -257,7 +291,14 @@ impl Grammar {
         let import = self.import.as_ref()?;
         Some((
             import.file.clone(),
-            render_unit(&import.grammar, &[], &[], &import.tokens, &import.rules),
+            render_unit(
+                &import.grammar,
+                &[],
+                &[],
+                &[],
+                &import.tokens,
+                &import.rules,
+            ),
         ))
     }
 
@@ -426,6 +467,16 @@ pub fn shrink_candidates(grammar: &Grammar) -> Vec<Grammar> {
         candidate.settings.remove(index);
         out.push(candidate);
     }
+    // 「雛形の綴りをやめて展開後を直接書く」候補。乖離が雛形の展開に由来するか
+    // どうかを縮小の 1 手で切り分けられる。
+    if grammar.rules.iter().any(|r| r.template.is_some()) {
+        let mut candidate = grammar.clone();
+        candidate.templates.clear();
+        for rule in &mut candidate.rules {
+            rule.template = None;
+        }
+        out.push(candidate);
+    }
     for index in 0..grammar.rules.len() {
         if grammar.rules.len() > 1 {
             let mut candidate = grammar.clone();
@@ -435,6 +486,7 @@ pub fn shrink_candidates(grammar: &Grammar) -> Vec<Grammar> {
         for annotation in 0..grammar.rules[index].annotations.len() {
             let mut candidate = grammar.clone();
             candidate.rules[index].annotations.remove(annotation);
+            candidate.rules[index].template = None;
             out.push(candidate);
         }
         let alternatives = grammar.rules[index].body.alternatives.len();
@@ -442,6 +494,7 @@ pub fn shrink_candidates(grammar: &Grammar) -> Vec<Grammar> {
             for alternative in 0..alternatives {
                 let mut candidate = grammar.clone();
                 candidate.rules[index].body.alternatives.remove(alternative);
+                candidate.rules[index].template = None;
                 out.push(candidate);
             }
         }
@@ -450,12 +503,14 @@ pub fn shrink_candidates(grammar: &Grammar) -> Vec<Grammar> {
             for element in 0..elements {
                 let mut candidate = grammar.clone();
                 candidate.rules[index].body.alternatives[alternative].remove(element);
+                candidate.rules[index].template = None;
                 out.push(candidate);
                 for simpler in
                     simplify_element(&grammar.rules[index].body.alternatives[alternative][element])
                 {
                     let mut candidate = grammar.clone();
                     candidate.rules[index].body.alternatives[alternative][element] = simpler;
+                    candidate.rules[index].template = None;
                     out.push(candidate);
                 }
             }
@@ -536,6 +591,7 @@ mod tests {
         Grammar {
             name: "Fuzz".into(),
             settings: vec!["@whitespace: javaStyle".into()],
+            templates: Vec::new(),
             tokens: vec![Token {
                 name: "N".into(),
                 declaration: "NumberParser".into(),
@@ -543,6 +599,7 @@ mod tests {
                 feature: "token:number",
             }],
             rules: vec![Rule {
+                template: None,
                 annotations: vec!["@root".into()],
                 name: "Root".into(),
                 body: Body::single(vec![

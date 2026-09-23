@@ -168,6 +168,10 @@ pub enum ResolvedAtom {
     },
     Optional {
         body: ResolvedBody,
+        /// `[ ... ]` と書かれたか（`X?` は false）。v1 では lower が
+        /// 「span の先頭文字が `[` か」で判定していたが、雛形（D-043）を展開すると
+        /// 範囲が実体化の位置へ移るので、構文木の形そのものを持ち回る。
+        bracket: bool,
         span: Span,
     },
     Repeat {
