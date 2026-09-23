@@ -31,6 +31,10 @@ pub(super) fn parse(source: &str, tokens: Vec<Token<'_>>) -> ParseResult<UbnfFil
     })
 }
 
+/// `body()` と `template_args()` が共有する入れ子の上限。相互再帰なので
+/// 片方だけ数えると、もう片方の経路で stack overflow に到達する。
+const DEPTH_LIMIT: usize = 128;
+
 struct Parser<'a> {
     tokens: Vec<Token<'a>>,
     cursor: usize,
@@ -396,6 +400,19 @@ impl Parser<'_> {
     /// `<A, B>`。実引数は **atom**（規則参照・token・リテラル・`(...)` `[...]` `{...}`）。
     /// 量指定子や capture を付けたいときは `( X+ )` のように括る。
     fn template_args(&mut self) -> ParseResult<Vec<Atom>> {
+        // `atom()` ⇄ `template_args()` は相互再帰なので、`body()` と同じ深さ上限を
+        // 共有する。ここを数えないと `Q<Q<…>>` の深い入れ子が診断ではなく
+        // stack overflow（exit 134）でプロセスを落とす。
+        if self.depth == DEPTH_LIMIT {
+            return Err(SyntaxError {
+                message: format!(
+                    "パラメータ化ルールの実引数の入れ子が上限{DEPTH_LIMIT}を超えています"
+                ),
+                span: self.peek(0).span,
+                expected: vec!["shallower template arguments"],
+            });
+        }
+        self.depth += 1;
         self.require("<")?;
         let mut args = Vec::new();
         if !self.is_at(0, ">") {
@@ -407,6 +424,7 @@ impl Parser<'_> {
             }
         }
         self.require(">")?;
+        self.depth -= 1;
         Ok(args)
     }
 
@@ -570,9 +588,9 @@ impl Parser<'_> {
 
     fn body(&mut self) -> ParseResult<RuleBody> {
         // 異常な入れ子でもプロセスを stack overflow で落とさず位置付きエラーにする。
-        if self.depth == 128 {
+        if self.depth == DEPTH_LIMIT {
             return Err(SyntaxError {
-                message: "ルール本体の入れ子が上限128を超えています".into(),
+                message: format!("ルール本体の入れ子が上限{DEPTH_LIMIT}を超えています"),
                 span: self.peek(0).span,
                 expected: vec!["shallower rule body"],
             });

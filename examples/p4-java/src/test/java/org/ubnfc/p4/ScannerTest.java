@@ -13,12 +13,20 @@ class ScannerTest {
         return P4Scanners.ALL.get("TinyExpressionP4::" + token).scan(new Input(text), new ScanState(c, m, mode, invert, reset));
     }
     private void accepts(String token, String text, int length) {
+        accepts(token, text, length, value(text, length));
+    }
+    private void accepts(String token, String text, int length, ValueSpan value) {
         var result = scan(token, text, 0, 0, Mode.consumed, false, true);
         assertTrue(result.ok(), text);
         assertEquals(length, result.consumedEnd(), text);
         assertEquals(length, result.matchedEnd(), text);
-        assertEquals(new ValueSpan(0, length), result.valueSpan());
+        assertEquals(value, result.valueSpan(), text);
         assertTrue(result.effects().isEmpty());
+    }
+    /** 旧 Mapper の文字列変換は単引用符だけ value から除く（generators.md #132）。
+     *  共有 registry（scanners/{java,rust}）と Rust backend もこの規則。 */
+    private ValueSpan value(String text, int length) {
+        return text.startsWith("'") && length >= 2 ? new ValueSpan(1, length - 1) : new ValueSpan(0, length);
     }
     private void rejects(String token, String text) {
         var result = scan(token, text, 0, 0, Mode.consumed, false, true);
@@ -29,7 +37,10 @@ class ScannerTest {
     @Test void quotedAcceptance() {
         for (String text : List.of("''", "\"\"", "'こんにちは😀'", "'a\nb'", "\"a\rb\"", "'a\\qb'", "'a\\\nb'", "'a\\\'b'", "\"a\\\"b\"", "'a\\\\b'", "'\u0000'"))
             accepts("STRING", text, text.length());
-        accepts("STRING", "'a'tail", 3);
+        accepts("STRING", "'a'tail", 3, new ValueSpan(1, 2));
+        // 二重引用符は value に残る。`''` は空の value になる。
+        accepts("STRING", "\"'a'\"", 5, new ValueSpan(0, 5));
+        accepts("STRING", "''", 2, new ValueSpan(1, 1));
         for (String text : List.of("", "a", "'", "'a", "'a\\", "'a\\'", "'a\"")) rejects("STRING", text);
     }
     @Test void fences() {
@@ -49,7 +60,8 @@ class ScannerTest {
         String text = "x'😀'!";
         var matched = scan("STRING", text, 0, 1, Mode.matchOnly, false, false);
         assertTrue(matched.ok()); assertEquals(0, matched.consumedEnd()); assertEquals(5, matched.matchedEnd());
-        assertEquals(new ValueSpan(1, 5), matched.valueSpan());
+        // `'😀'` は UTF-16 で 4 単位。単引用符を除いた [2,4) が value。
+        assertEquals(new ValueSpan(2, 4), matched.valueSpan());
         assertFalse(scan("STRING", text, 0, 1, Mode.matchOnly, false, true).ok());
         assertEquals(scan("STRING", text, 1, 5, Mode.consumed, false, false),
             scan("STRING", text, 1, 5, Mode.consumed, false, false));

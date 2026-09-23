@@ -1,1 +1,1 @@
-{"type":"FormulaExpr","span":[0,9],"fields":{"imports":[],"declarations":[],"expression":{"type":"ExpressionExpr","span":[0,9],"fields":{"value":{"type":"StringConcatExpr","span":[0,9],"fields":{"left":"'こんにちは\ud83d\ude00'","op":[],"right":[]}}}},"methods":[]}}
+{"type":"FormulaExpr","span":[0,9],"fields":{"imports":[],"declarations":[],"expression":{"type":"ExpressionExpr","span":[0,9],"fields":{"value":{"type":"StringConcatExpr","span":[0,9],"fields":{"left":"こんにちは\ud83d\ude00","op":[],"right":[]}}}},"methods":[]}}
