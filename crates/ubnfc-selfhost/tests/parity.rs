@@ -140,6 +140,39 @@ fn fixture_acceptance_and_ast_parity() {
     assert_eq!(rejected.len(), KNOWN_REJECTIONS.len());
 }
 
+/// UBNF 自身のコメント構文は `//` だけである
+/// （`unlaxer-parser/unlaxer-dsl/specs/ubnf-syntax.md`「UBNF ファイル自体のコメント構文は
+/// `//` のみで、`/* ... */` は未対応です」）。`ubnf.ubnf` の `@whitespace: javaStyle` は
+/// javaStyle の既定区切りにブロックコメントを持ち込むので、**生成 frontend だけが**
+/// `/* */` を受理していた（2026-09-23 クロスチェック、既知乖離 6 件とは逆向き）。
+/// D-051 で self-host frontend 側に UBNF のコメント規則の門を置き、両 frontend の受理が
+/// 揃った。逆向き乖離（生成側が手書きより広い）の再発回帰。
+#[test]
+fn block_comments_are_rejected_by_both_frontends() {
+    for source in [
+        "grammar G { /* no */ R ::= 'x'; }",
+        "/* no */ grammar G { R ::= 'x'; }",
+        "grammar G { R ::= 'x'; } /* no */",
+        "grammar G { R ::= 'x' /* no */ 'y'; }",
+    ] {
+        let manual = syntax::parse_file(source).unwrap_err();
+        let generated = ubnfc_selfhost::parse_file(source).unwrap_err();
+        assert_eq!(generated.span(), Some(manual.span), "{source:?}");
+    }
+    // 文字列リテラルの中の `/*` は従来どおりコメントではない（受理される）。
+    same("grammar G { R ::= '/* not a comment */'; }");
+    same("grammar G { R ::= 'x'; } // /* 行コメントの中も */");
+    // `/*` より手前に別の構文エラーがあるときは、そちらの位置を返す。
+    for source in [
+        "grammar G { R ::= ( 'x' ; } /* y */",
+        "grammar G { R ::= 'unclosed /* y */",
+    ] {
+        let manual = syntax::parse_file(source).unwrap_err();
+        let generated = ubnfc_selfhost::parse_file(source).unwrap_err();
+        assert_eq!(generated.span(), Some(manual.span), "{source:?}");
+    }
+}
+
 #[test]
 fn syntax_error_positions() {
     for source in [

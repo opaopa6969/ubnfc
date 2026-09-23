@@ -1,7 +1,10 @@
 use crate::resolve::{ResolvedBody, ResolvedRule};
 use crate::syntax::ast::Annotation;
 
-use super::{captures, general::valid_whitespace, nested_body, trim, Context};
+use super::{captures, general::valid_whitespace, general::I32_MAX, nested_body, trim, Context};
+
+/// `@recovery(mode)` で受理する mode（design v1 §3.10）。大小は無視する。
+const RECOVERY_MODES: &[&str] = &["sync", "auto", "skip"];
 
 /// 表層で受理する規則注釈の名前（parser.rs の分岐と 1:1）。要素注釈 `@typeof` は
 /// ここに含めない（`Element::typeof_constraint` で別に構文化されている）。
@@ -101,6 +104,35 @@ pub(super) fn validate(rule: &ResolvedRule, scope: bool, v2: bool, cx: &mut Cont
             Annotation::ScopeTree { mode, .. } => scopes.push(mode),
             Annotation::Declares { .. } => declares += 1,
             Annotation::Catalog { .. } => catalog = true,
+            // design v1 §3.10 の mode は sync / auto / skip の 3 つ。未知の綴りは
+            // lower が黙って SYNC に落としていた（`lower/annotations.rs` の `_ =>`）。
+            // unlaxer-ubnf も Java bootstrap も拒否するので拒否に揃える。
+            Annotation::Recovery {
+                mode: Some(mode), ..
+            } if !RECOVERY_MODES
+                .iter()
+                .any(|known| trim(mode).eq_ignore_ascii_case(known)) =>
+            {
+                cx.rule(
+                    rule,
+                    "E-ANNOTATION-RECOVERY-MODE",
+                    format!(
+                        "rule {name} uses unsupported @recovery mode: {}",
+                        trim(mode)
+                    ),
+                    "Use @recovery(sync), @recovery(sync='...'), @recovery(auto) or @recovery(skip).",
+                );
+            }
+            // 旧実装は level を Java int で読む。i64 を超える値は lower の
+            // E-LOWER-PRECEDENCE-RANGE が拾うが、そこまで行く前に同じ範囲で拒否する。
+            Annotation::Precedence { level, .. } if *level > I32_MAX => {
+                cx.rule(
+                    rule,
+                    "E-PRECEDENCE-OVERFLOW",
+                    format!("rule {name} has @precedence(level={level}) outside the 32-bit range"),
+                    format!("Use a precedence level of at most {I32_MAX}."),
+                );
+            }
             _ => {}
         }
     }

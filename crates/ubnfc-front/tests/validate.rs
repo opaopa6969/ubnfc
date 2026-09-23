@@ -142,3 +142,89 @@ fn negative_precedence_is_rejected_by_syntax_before_validation() {
     // 手動構築できる負の level に E-PRECEDENCE-NEGATIVE を付ける API は未提供。
     assert!(parse_file("grammar G { @precedence(level=-1) Start ::= 'a'; }").is_err());
 }
+
+/// 2026-09-23 のクロスチェック（`docs/reports/2026-09-23-parser-feature-correctness-comparison.md`
+/// §3.1 ①）が見つけた「ubnfc だけが受理する不正宣言」7 件の回帰。unlaxer-ubnf と
+/// Java bootstrap はいずれも拒否する。正本は
+/// `unlaxer-parser/unlaxer-dsl/specs/ubnf-syntax.md`（CHAR_RANGE の境界）と
+/// `rust/unlaxer-ubnf/src/parser.rs`（整数は Java int の範囲、recovery mode は 3 種）。
+#[test]
+fn crosscheck_malformed_declarations_are_rejected() {
+    for (source, code) in [
+        // 以前はここで lower/tokens.rs が unwrap して panic していた。
+        (
+            "grammar G { token T=CHAR_RANGE('','a') R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-BOUNDARY",
+        ),
+        (
+            "grammar G { token T=CHAR_RANGE('a','') R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-BOUNDARY",
+        ),
+        // 先頭 1 文字を黙って採らない。
+        (
+            "grammar G { token T=CHAR_RANGE('ab','z') R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-BOUNDARY",
+        ),
+        (
+            "grammar G { token T=CHAR_RANGE('\u{1f600}','\u{1f607}') R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-SUPPLEMENTARY",
+        ),
+        (
+            "grammar G { token T=CHAR_RANGE('z','a') R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-ORDER",
+        ),
+        (
+            "grammar G { @root R ::= 'x'{2147483648}; }",
+            "E-BOUNDED-OVERFLOW",
+        ),
+        (
+            "grammar G { @root R ::= 'x'{2147483648,}; }",
+            "E-BOUNDED-OVERFLOW",
+        ),
+        (
+            "grammar G { @root @leftAssoc @precedence(level=2147483648) @mapping(N, params=[left,op,right]) R ::= 'a' @left { '+' @op 'b' @right }; }",
+            "E-PRECEDENCE-OVERFLOW",
+        ),
+        (
+            "grammar G { @root @recovery(magic) R ::= 'x'; }",
+            "E-ANNOTATION-RECOVERY-MODE",
+        ),
+    ] {
+        let issues = check(source);
+        let issue = issues
+            .iter()
+            .find(|i| i.code == code)
+            .unwrap_or_else(|| panic!("{code} が出ません: {source}\n{issues:?}"));
+        assert_eq!(issue.severity(), "ERROR", "{source}");
+        // ERROR がある限り lower へは進めない（pipeline と lower の両方が門を持つ）。
+        let ast = parse_file(source).unwrap();
+        let resolved = resolve(&[("test.ubnf", ast)], &|_| panic!("unexpected import")).unwrap();
+        let errors = ubnfc_front::lower::lower(&resolved, &[]).unwrap_err();
+        assert!(
+            errors.iter().any(|e| e.to_string().starts_with(code)),
+            "{source}: {errors:?}"
+        );
+    }
+}
+
+/// 境界が正しい CHAR_RANGE と、3 種の recovery mode、32 bit に収まる量指定子は通る。
+#[test]
+fn crosscheck_wellformed_declarations_stay_accepted() {
+    for source in [
+        "grammar G { token T=CHAR_RANGE('a','z') @root R ::= T; }",
+        "grammar G { token T=CHAR_RANGE('a','a') @root R ::= T; }",
+        // エスケープ展開後に 1 文字であればよい（`\t` < `\n` なので順序も正しい）。
+        "grammar G { token T=CHAR_RANGE('\\t','\\n') @root R ::= T; }",
+        "grammar G { @root R ::= 'x'{2147483647}; }",
+        "grammar G { @root @recovery(sync) R ::= 'x'; }",
+        "grammar G { @root @recovery(AUTO) R ::= 'x'; }",
+        "grammar G { @root @recovery(skip) R ::= 'x'; }",
+        "grammar G { @root @recovery(sync=';') R ::= 'x'; }",
+    ] {
+        assert!(
+            check(source).iter().all(|i| i.severity() != "ERROR"),
+            "{source}: {:?}",
+            check(source)
+        );
+    }
+}

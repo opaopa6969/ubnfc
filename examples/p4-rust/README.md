@@ -37,7 +37,9 @@ bash scripts/generate.sh --check   # または --write
   診断 DAG の node 追加、display frame の走査回数）。計測値は複製経路（`parse_entry`）だけに付く。
 - `tests/fixtures/` は tinyexpression の `benchmarks/fixtures/*.tiny` と
   `rust/tinyexpression-rs/tests/fixtures/*.tiny` を byte を変えずに収録した（16 件）。
-- `tests/golden/` は生成 Rust の canonical AST。Java golden（`../p4-java`）とは文字列値の単引用符だけが異なる
-  （Rust の scanner 集合は単引用符を value から除く。`tests/fixtures.rs` で個数まで固定）。
+- `tests/golden/` は生成 Rust の canonical AST。**Java golden（`../p4-java`）とは正規化なしで完全一致する**
+  （`tests/fixtures.rs` の `java_and_rust_goldens_are_identical_without_normalization`）。
+  2026-09-23 まではこの比較が「単引用符を除けば一致」の形で書かれており、実際の backend 間不一致 256 件を
+  期待値として固定していた（[クロスチェック報告](../../docs/reports/2026-09-23-crosscheck-fixes.md)）。
 - `examples/bench.rs` は std のみ。warmup 後 5 run の中央値、確保回数は GlobalAlloc の別 parse で数える。
 - `benchmarks/` に計測結果を保存する。

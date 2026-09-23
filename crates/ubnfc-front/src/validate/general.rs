@@ -136,6 +136,9 @@ pub(super) fn validate(cx: &mut Context<'_>) {
                 );
             }
         }
+        if let TokenValue::CharRange { min, max, .. } = &token.declaration {
+            char_range(&token.name, min, max, cx);
+        }
         if token.unresolved {
             if let TokenValue::ClassRef { dotted, .. } = &token.declaration {
                 cx.add(None, "W-TOKEN-UNRESOLVED", format!("token {} references unresolved parser class: {dotted}", token.name),
@@ -185,15 +188,89 @@ pub(super) fn validate(cx: &mut Context<'_>) {
     }
 }
 
+/// `CHAR_RANGE('min','max')` の境界検査。
+///
+/// 正本は `unlaxer-parser/unlaxer-dsl/specs/ubnf-syntax.md`
+/// 「各境界はエスケープ展開後に1個の非 surrogate BMP 文字で、`min <= max` でなければならない。
+/// 空文字・複数文字・surrogate・補助文字・逆順の範囲は明示的に拒否し、先頭文字へ切り捨てない」
+/// と `docs/design/02-facts-tokens-bench-corpus.md` §A（`char` 境界、両端含む）。
+/// 参照実装 `rust/unlaxer-ubnf/src/parser.rs`（`bmp()` と "minimum exceeds maximum"）と
+/// Java bootstrap も同じ 3 条件で拒否する。
+fn char_range(name: &str, min: &str, max: &str, cx: &mut Context<'_>) {
+    let boundary = |label: &str, value: &str, cx: &mut Context<'_>| -> Option<u32> {
+        let mut chars = value.chars();
+        match (chars.next(), chars.next()) {
+            (Some(c), None) if (c as u32) <= 0xffff => Some(c as u32),
+            (Some(c), None) => {
+                cx.add(
+                    None,
+                    "E-TOKEN-CHAR-RANGE-SUPPLEMENTARY",
+                    format!(
+                        "token {name} has a CHAR_RANGE {label} boundary outside the BMP: U+{:04X}",
+                        c as u32
+                    ),
+                    "CHAR_RANGE boundaries are Java char values; use a BMP character or a different token construct for supplementary code points.",
+                );
+                None
+            }
+            (None, _) => {
+                cx.add(
+                    None,
+                    "E-TOKEN-CHAR-RANGE-BOUNDARY",
+                    format!("token {name} has an empty CHAR_RANGE {label} boundary"),
+                    "Each CHAR_RANGE boundary must be exactly one non-surrogate BMP character after escape expansion.",
+                );
+                None
+            }
+            (Some(_), Some(_)) => {
+                cx.add(
+                    None,
+                    "E-TOKEN-CHAR-RANGE-BOUNDARY",
+                    format!(
+                        "token {name} has a CHAR_RANGE {label} boundary of {} characters: {value}",
+                        value.chars().count()
+                    ),
+                    "Each CHAR_RANGE boundary must be exactly one non-surrogate BMP character after escape expansion; the first character is not taken silently.",
+                );
+                None
+            }
+        }
+    };
+    // surrogate 単独は UTF-8 の Rust `char` として表現できないので、字句が
+    // 生成し得るのは「空 / 1 文字 / 複数文字 / 非 BMP」の 4 つだけ。
+    let min_value = boundary("minimum", min, cx);
+    let max_value = boundary("maximum", max, cx);
+    if let (Some(low), Some(high)) = (min_value, max_value) {
+        if low > high {
+            cx.add(
+                None,
+                "E-TOKEN-CHAR-RANGE-ORDER",
+                format!("token {name} has a CHAR_RANGE minimum U+{low:04X} greater than its maximum U+{high:04X}"),
+                "Write CHAR_RANGE('min','max') with min <= max; the range includes both bounds.",
+            );
+        }
+    }
+}
+
 fn bounded(rule: &ResolvedRule, body: &ResolvedBody, cx: &mut Context<'_>) {
     for element in body.alternatives.iter().flatten() {
-        if let ResolvedAtom::Bounded {
-            min,
-            max: Some(max),
-            ..
-        } = &element.atom
-        {
-            if min > max {
+        if let ResolvedAtom::Bounded { min, max, .. } = &element.atom {
+            if let Some(bound) = [Some(*min), *max]
+                .into_iter()
+                .flatten()
+                .find(|v| *v > I32_MAX)
+            {
+                cx.rule(
+                    rule,
+                    "E-BOUNDED-OVERFLOW",
+                    format!(
+                        "rule {} has a BoundedRepeatElement bound outside the 32-bit range: {bound}",
+                        rule.name
+                    ),
+                    format!("Use a {{min,max}} bound of at most {I32_MAX}."),
+                );
+            }
+            if let Some(max) = max.filter(|max| min > max) {
                 cx.rule(
                     rule,
                     "E-BOUNDED-INVALID",
@@ -209,6 +286,11 @@ fn bounded(rule: &ResolvedRule, body: &ResolvedBody, cx: &mut Context<'_>) {
         }
     }
 }
+
+/// 量指定子の上限と `@precedence(level=N)` が収まらなければならない範囲。
+/// 旧実装が Java `int` で読むため（`Integer.parseInt`、`rust/unlaxer-ubnf/src/parser.rs:102-108`
+/// の `parse::<i32>()` と "integer exceeds 2147483647"）、両者が拒否する値を ubnfc も拒否する。
+pub(super) const I32_MAX: u64 = i32::MAX as u64;
 
 /// `@ubnf: 2` 以上を宣言しているか（D-038）。
 pub(super) fn declares_v2(grammar: &crate::resolve::Grammar) -> bool {
