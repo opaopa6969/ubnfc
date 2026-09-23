@@ -280,6 +280,9 @@ AST の増分は 23 µs（89 − 66）。profile §3.2 の「AST 構築 22 µs�
   `ubnfc-java/target` が無いと Java driver の build が失敗して `build:java` で discard され、
   campaign も Java corpus も静かに値が変わる。`cd ubnfc-java && mvn -o -DskipTests package` が先に要る
   （本 round で 2 度踏んだ。1 度目は未 build、2 度目は master merge 後の再 build 忘れ）。
+- `crates/ubnfc-rust/tests/semantics.rs` の `cached_trivia`（P4 には無い `plan.trivia_cache` 経路）は、
+  単相化で `self.trivia_cache.insert(key,(out,self.display_snapshot()))` が二重借用になる。
+  snapshot を先に局所変数へ受けるよう `src/tokens.rs` を直した（P4 の生成物は byte 不変）。
 - `ubnfc-java` と `crates/ubnfc-front` は無変更（IR の意味も schema も変えていない）。
 
 ## 8. 次にやるなら
