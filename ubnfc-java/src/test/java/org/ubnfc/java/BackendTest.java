@@ -150,6 +150,19 @@ class BackendTest {
         raw.put("requiredFeatures", List.of()); raw.put("analysisVersion", "future");
         assertTrue(assertThrows(IllegalArgumentException.class, () -> IrReader.read(Json.write(raw))).getMessage().contains("analysisVersion"));
     }
+    /** D-038: UBNF 表層言語のバージョン門。既知の 1/2 だけを受け、未知は明示拒否する。 */
+    @Test void rejectUnknownLanguageVersion() throws Exception {
+        var raw = Json.object(Json.read(Files.readString(TINY)));
+        assertEquals(java.math.BigDecimal.ONE, raw.get("languageVersion"));
+        raw.put("languageVersion", java.math.BigDecimal.valueOf(2));
+        assertDoesNotThrow(() -> IrReader.read(Json.write(raw)));
+        for (int version : new int[]{0, 3, 99}) {
+            raw.put("languageVersion", java.math.BigDecimal.valueOf(version));
+            assertTrue(assertThrows(IllegalArgumentException.class, () -> IrReader.read(Json.write(raw))).getMessage().contains("languageVersion"));
+        }
+        raw.remove("languageVersion");
+        assertThrows(IllegalArgumentException.class, () -> IrReader.read(Json.write(raw)));
+    }
     @Test void memoOffAndStructuredOccurrenceReplay() throws Exception {
         var h = harnesses.get("power"); String input = "2 /*😀*/ ^3^2";
         Object on = h.parse(input, h.options(true, true, true, true, Map.of()));

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Typed v1 contract. Discriminated variants have nullable variant-specific components. */
-public record GrammarIr(Analysis analysis, String analysisVersion, GrammarIrEntry entry, List<GrammarUnit> grammarUnits, List<ImportEdge> importEdges, Plan plan, List<String> requiredFeatures, Semantics semantics, String serialization, List<Source> sources, Integer version) {
+public record GrammarIr(Analysis analysis, String analysisVersion, GrammarIrEntry entry, List<GrammarUnit> grammarUnits, List<ImportEdge> importEdges, Integer languageVersion, Plan plan, List<String> requiredFeatures, Semantics semantics, String serialization, List<Source> sources, Integer version) {
     public record Analysis(List<ExprAnalysis> expressions, List<PrefixTrie> prefixTries, List<RuleAnalysis> rules, List<Scc> sccs) {}
     public record Annotation(Map<String, Object> arguments, String name, Span source) {}
     public record AstField(String cardinality, String name, ValueType valueType) {}

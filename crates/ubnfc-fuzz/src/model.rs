@@ -27,6 +27,9 @@ pub enum Atom {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Element {
+    /// 候補の**先頭**に置く注釈（UBNF v2 の `@mapping` / `@leftAssoc` / `@rightAssoc`）。
+    /// 候補の 2 番目以降の要素に付けると構文エラーになるので、生成側が先頭にだけ置く。
+    pub lead: Vec<String>,
     pub typeof_capture: Option<String>,
     pub atom: Atom,
     pub quant: Option<Quant>,
@@ -37,6 +40,7 @@ pub struct Element {
 impl Element {
     pub fn new(atom: Atom) -> Self {
         Self {
+            lead: Vec::new(),
             typeof_capture: None,
             atom,
             quant: None,
@@ -165,6 +169,10 @@ fn render_atom(atom: &Atom, out: &mut String) {
 }
 
 fn render_element(element: &Element, out: &mut String) {
+    for annotation in &element.lead {
+        out.push_str(annotation);
+        out.push(' ');
+    }
     if let Some(target) = &element.typeof_capture {
         let _ = write!(out, "@typeof({target}) ");
     }
@@ -463,6 +471,12 @@ pub fn shrink_candidates(grammar: &Grammar) -> Vec<Grammar> {
 
 fn simplify_element(element: &Element) -> Vec<Element> {
     let mut out = Vec::new();
+    if !element.lead.is_empty() {
+        out.push(Element {
+            lead: Vec::new(),
+            ..element.clone()
+        });
+    }
     if element.typeof_capture.is_some() {
         out.push(Element {
             typeof_capture: None,

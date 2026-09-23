@@ -222,6 +222,10 @@ impl RuleBody {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Sequence {
+    /// UBNF v2 の候補先頭注釈（`@leftAssoc` / `@rightAssoc`）。v1 では常に空。
+    /// 候補の結合性は左再帰ルールの脱糖だけが読む（`desugar`）。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub annotations: Vec<Annotation>,
     pub elements: Vec<Element>,
     pub span: Span,
 }

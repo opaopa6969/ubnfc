@@ -2,21 +2,31 @@
 
 > 2026-09-23 開始。利用者が tinyexpression のみの段階で、互換のために抱えていた欠陥を解消する。
 
-## 0. バージョン門
+## 0. バージョン門 — **実装済み（D-038）**
 
-grammar 設定 `@ubnf: 1|2`（既定 **1**）。
+grammar 設定 `@ubnf: 1|2`（既定 **1**、grammar ごとに 1 回）。
 
 - **v1 は凍結**。既存の 24 fixture・P4・corpus 1,212 ケース・差分ファジング・self-host 固定点が
   永久にこれを守る。v1 の文法は 1 文字も変えずに通り続ける。
-- **v2 でのみ**新機能と挙動変更を有効にする。IR には `languageVersion` を載せ、backend は
-  未知バージョンを明示拒否する。
+- **v2 でのみ**新機能と挙動変更を有効にする。IR には必須キー `languageVersion` を載せ、
+  backend は未知バージョンを明示拒否する。
 - 純粋な追加（新しい書き方を足すだけで既存の意味を変えない）は v1 でも使えてよい。
   **既存の受理・AST・診断が変わるものだけ** v2 に閉じる。
 
-## 1. 左再帰（最優先）
+実装の要点:
+
+- 表層に足した構文は「v1 では構文エラーだった位置」にしか置かない
+  （設定値の数値 `@ubnf: 2`、候補**先頭**の `@leftAssoc` / `@rightAssoc` / `@mapping`）。
+  末尾に `@rightAssoc` を置く案は直前の要素の capture と区別が付かないので採らなかった。
+- `languageVersion` は IR の必須キー。既存フィールドを変えない追加なので IR を全部再生成した。
+- 未知バージョンの拒否は Rust `crates/ubnfc-rust/src/validate.rs`、Java
+  `ubnfc-java/.../ir/Validation.java`。
+- v2 の表層機能は front が v1 の正規形へ脱糖するので、**backend の実装は門しか増えない**。
+
+## 1. 左再帰 — **実装済み（D-039）**
 
 ### 問題
-P4 は数値・文字列・真偽値・オブジェクトで同じ優先順位塔を 4 回書いており、全体 124 ルール。
+P4 は数値・文字列・真偽で同じ優先順位塔を書いており（式の塔だけで 8 規則）、全体 124 規則。
 
 ```ubnf
 NumberExpression ::= NumberTerm @left { AddOp @op NumberTerm @right } ;
@@ -26,26 +36,33 @@ NumberFactor     ::= ... ;
 
 ANTLR4 なら 1 ルール。可読性・保守性の差は決定的で、UBNF の最大の弱点。
 
-### 方針（v2）
-ANTLR4 と同じ「候補順＝優先順位（先頭が最高）」の左再帰ルールを導入する。
+### 採った形（v2）
+ANTLR4 と同じ「候補順＝優先順位（先頭が最高）」の左再帰ルールを導入し、
+**front が優先順位塔へ脱糖する**（`crates/ubnfc-front/src/desugar.rs`）。
 
 ```ubnf
-@leftRec
+@mapping(Binary, params=[left, op, right])
 Expr ::=
-    Expr '^' @op Expr        @rightAssoc   // 最高優先、右結合
-  | Expr ('*'|'/') @op Expr                // 左結合
-  | Expr ('+'|'-') @op Expr
+    @rightAssoc Expr @left '^' @op Expr @right   // 最高優先、右結合
+  | Expr @left MulOp @op Expr @right
+  | Expr @left AddOp @op Expr @right
   | '(' Expr ')'
   | NUMBER ;
 ```
 
-- 直接左再帰（先頭が自分自身）と直接右再帰（末尾が自分自身）を優先順位上昇法へ lowering する。
-  ubnfc には既に D-004 の climbing 設計、D-031 の直接左再帰書き換え、`analysis/operators.rs` の
-  塔解析がある。
+- `@leftRec` は要らない。**先頭要素が自分自身**の候補があることが唯一の引き金
+  （v1 ではその形は `E-LOWER-D016` で落ちていたので曖昧にならない）。
+- 脱糖先は v1 の正規形。入口は元の名前のまま（最低優先の段）、中間段は `Name__lr{n}`、
+  基底段は `Name__lrBase`。
+- **AST は段ごとに 1 ノード**（v1 と同じ `left + op[] + right[]`）。段ごとに別クラスが要る
+  ときは候補先頭の `@mapping` で上書きする。
 - 間接左再帰は引き続き拒否（ANTLR4 も同じ）。
-- AST は演算子適用ごとの二項ノード（塔形式の `left + op[] + right[]` より自然）。
-  塔形式も v1 として残るので、移行は利用者の選択。
-- 未解決: trivia 境界（D-004 の注記）、`@mapping` の型付け、scope/recovery を含む塔の扱い。
+- **climbing にしなかった**理由と、第一段で拒否する形は D-039 と
+  `docs/reports/2026-09-23-ubnf-v2-left-recursion.md`。
+
+### 残っている宿題
+前置・後置・三項の候補、規則参照を演算子にした右結合、`@scopeTree` / `@recovery` を持つ
+左再帰ルール、そして「演算子適用ごとの二項ノード」という別の AST 形。
 
 ## 2. 到達不能な候補の検出（低リスク・即効）
 

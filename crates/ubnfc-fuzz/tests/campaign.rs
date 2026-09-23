@@ -100,6 +100,52 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
     assert!(unknown.is_empty(), "未登録の差分: {unknown:#?}");
 }
 
+/// UBNF v2（`@ubnf: 2` の左再帰ルール、D-039）を両 backend で突き合わせる。
+/// front の脱糖が v1 の正規形を作るので IR は両 backend で同じだが、
+/// 「脱糖した文法が実際に build でき、同じ入力で同じ観測を返す」ことは
+/// ここで初めて機械的に確かめられる。seed は `gen::V2_SEED_BASE` の帯（既存
+/// seed の生成物は 1 バイトも変わらない）。
+#[test]
+fn c_v2_left_recursive_grammars_agree_across_backends() {
+    ubnfc_fuzz::tune_generated_builds();
+    let scratch = scratch();
+    let start = ubnfc_fuzz::gen::V2_SEED_BASE + 1;
+    for seed in start..start + 3 {
+        let grammar = ubnfc_fuzz::gen::generate(seed);
+        assert!(grammar.features.contains("ubnf2"), "seed {seed}");
+    }
+    let summary = campaign::run(&Config {
+        start_seed: start,
+        seeds: 3,
+        inputs: 10,
+        jobs: 2,
+        budget: Some(Duration::from_secs(900)),
+        findings: None,
+        shrink_builds: 0,
+        driver_timeout: Duration::from_secs(120),
+        workdir: scratch.0.clone(),
+    });
+    assert_eq!(
+        summary.discarded, 0,
+        "front の discard: {:?}",
+        summary.discards
+    );
+    assert!(summary.compiled >= 2, "文法が build できていない");
+    assert!(
+        summary.comparisons >= 20 && summary.driver_errors == 0,
+        "driver が動いていない: 比較 {} / error {}",
+        summary.comparisons,
+        summary.driver_errors
+    );
+    let unknown: Vec<_> = summary
+        .findings
+        .iter()
+        .filter(|finding| !KNOWN.contains(&finding.signature.as_str()))
+        .map(|finding| format!("{} ({})", finding.signature, finding.slug))
+        .collect();
+    assert!(unknown.is_empty(), "未登録の差分: {unknown:#?}");
+}
+
 /// A-1 の回帰試験。seed 269 は `@recovery(AUTO)` の適用範囲が両 backend で食い違い、
 /// 同じ入力の受理・カーソル・capture・AST が変わっていた（13 差分クラス）。
 /// 契約は `docs/design/03-design-v1.md` §3.10 / D-024。

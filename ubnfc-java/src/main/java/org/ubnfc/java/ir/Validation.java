@@ -39,7 +39,11 @@ public final class Validation {
     }
     private static void require(boolean condition, String reason) { if (!condition) throw new IllegalArgumentException(reason); }
     private static void reference(Map<String, ?> map, String id) { require(id != null && map.containsKey(id), "Unresolved reference: " + id); }
+    /** UBNF 表層言語のバージョン（D-038）。追加フィールドなので欠落は 1 とみなす。 */
+    public static final int MAX_LANGUAGE_VERSION = 2;
     public static void validate(GrammarIr ir) {
+        int language = ir.languageVersion() == null ? 1 : ir.languageVersion();
+        if (language < 1 || language > MAX_LANGUAGE_VERSION) unsupported("languageVersion:" + language);
         var s = ir.semantics();
         var expressions = index(s.expressions(), Expr::id); var rules = index(s.rules(), Rule::symbolId);
         var tokens = index(s.tokens(), Token::symbolId); var captures = index(s.captures(), Capture::siteId);

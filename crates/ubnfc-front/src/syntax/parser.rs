@@ -223,7 +223,14 @@ impl Parser<'_> {
                 span: self.span_from(start),
             })
         } else {
-            let value = self.dotted()?;
+            // `@ubnf: 2` のような数値設定。v1 では構文エラーだったので純粋な追加。
+            let value = if let Kind::Digits(digits) = self.peek(0).kind {
+                let value = digits.to_owned();
+                self.cursor += 1;
+                value
+            } else {
+                self.dotted()?
+            };
             Ok(GlobalSetting::String {
                 key,
                 value,
@@ -487,6 +494,16 @@ impl Parser<'_> {
         let mut alternatives = Vec::new();
         loop {
             let start = self.start();
+            // UBNF v2: 候補先頭の結合性注釈。v1 では構文エラーだったので純粋な追加。
+            // 末尾に置くと直前の要素の capture と区別できないため先頭に固定する。
+            let mut annotations = Vec::new();
+            while self.is_at(0, "@")
+                && (self.is_at(1, "leftAssoc")
+                    || self.is_at(1, "rightAssoc")
+                    || self.is_at(1, "mapping"))
+            {
+                annotations.push(self.annotation()?);
+            }
             let mut elements = Vec::new();
             while matches!(
                 self.peek(0).kind,
@@ -496,6 +513,7 @@ impl Parser<'_> {
             }
             // SequenceBody ::= { AnnotatedElement } に従い epsilon も保持する。
             alternatives.push(Sequence {
+                annotations,
                 elements,
                 span: self.span_from(start),
             });
