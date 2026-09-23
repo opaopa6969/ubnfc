@@ -121,6 +121,24 @@ pub fn builtin_class(class_name: &str) -> Option<BuiltinKind> {
 pub(super) fn classify(value: &TokenValue) -> (ResolvedTokenValue, bool) {
     use ResolvedTokenValue as R;
     let value = match value {
+        // 中立名は「同じ FQN を書いたとき」と同じ分類器を通す。これで受理範囲が
+        // 02-facts §A の表と一致することが構成的に保証される（D-041）。
+        TokenValue::Builtin { name, .. } => {
+            let kind = crate::vocabulary::builtin_fqn(name)
+                .and_then(builtin_class)
+                .expect("語彙表の項目は組込みに分類される（vocabulary のテストが固定）");
+            return (R::Builtin { kind }, false);
+        }
+        // 明示された host 実装。未解決警告（W-TOKEN-UNRESOLVED）は綴り間違いを
+        // 拾うためのもので、明示宣言には出さない。registry の有無は ir/gen が見る。
+        TokenValue::Extern { name, .. } => {
+            return (
+                R::Extern {
+                    class_name: name.clone(),
+                },
+                false,
+            )
+        }
         TokenValue::ClassRef { dotted, .. } => {
             if let Some(kind) = builtin_class(dotted) {
                 return (R::Builtin { kind }, false);

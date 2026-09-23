@@ -152,15 +152,41 @@ Args ::= '(' [ List<Expr, ','> ] ')' ;
 memo・候補除外・字句キャッシュの健全性が全部乗っているため（D-013、`06` §3）。
 文脈依存が要る場面は `@backref`/`@typeof`/`@scopeTree` で宣言的に扱う。
 
-## 5. 言語中立な token 語彙（v2）
+## 5. 言語中立な token 語彙 — **実装済み（D-041 / D-042）**
+
+### 問題
+v1 の token 宣言は host 言語のクラス名を書く。Java と Rust の両方を出す言語中立な形式を
+名乗る以上これは層の破れで、IR は既に組込み種別へ正規化しているので**残っていたのは表層だけ**だった。
+
+### 採った形
 
 ```ubnf
-token NUMBER = org.unlaxer.parser.elementary.NumberParser   // v1
-token NUMBER = NUMBER                                        // v2（組込み語彙）
-token CODE   = extern 'CodeStartParser'                      // host 実装は extern と明示
+token NUMBER     = NUMBER                        // 言語中立な組込み語彙（36 名前）
+token STRING     = extern 'StringLiteralParser'  // host 実装は extern と明示
+token EOF        = END_OF_INPUT
 ```
 
-IR には既に組込み種別があるので、表層の語彙を足すだけ。
+- **裸の語**（SCREAMING_SNAKE_CASE）。token 宣言の値の位置には利用者の token 名も規則名も
+  現れないので衝突し得ず、`ANY` / `EOF` / `EMPTY` / `UNTIL(…)` は v1 から既にこの形である。
+  host クラス単純名（`UpperCamelCase`）とも字面が重ならず、重なっても `extern '<id>'` が逃げ道になる。
+  名前空間形も `builtin` キーワードも採らなかった（理由は報告 §1）。
+- 中立名は**旧実装の FQN を既存の分類器へ渡すだけ**なので、`02-facts` §A の受理範囲を
+  1 つも変えない（`crates/ubnfc-front/src/vocabulary.rs` がその表そのもの）。
+- **`extern '<id>'` の `'…'` は scanner registry の ID** で、クラス名でなくてよい
+  （`scanners/first-chars.json`・`scanners/{java,rust}`）。v1 では構文エラーだった位置なので純粋な追加。
+- `@ubnf: 2` の文法で `--extern-first-chars` を渡したとき、registry が提供しない extern は
+  **生成時に** `E-TOKEN-EXTERN-UNREGISTERED` で落ちる（exit 1）。
+
+### v1 / v2 の方針（D-042）
+中立語彙も `extern` も**純粋な追加なので v1 でも使える**。v2 でだけ変わるのは、
+旧綴りに `W-TOKEN-HOST-CLASS` が出ること（**拒否はしない**）と、上の registry の門である。
+拒否しない理由は「唯一の実利用者（tinyexpression の P4）の文法がこちらから直せない別 repo にあり、
+v2 を機能ごとに採れなくなる」「拒否しても `builtin_class` は v1 のために残るので何も減らない」
+「強制したい側は `--strict` でエラー化できる」。
+
+証拠と語彙の全表は `docs/reports/2026-09-23-ubnf-v2-token-vocabulary.md`。
+P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の registry ID の
+**4 キー 20 箇所だけ**（綴りの原文・説明文・extern の registry ID）になり、28 入力の driver 応答は完全に一致した。
 
 ## 6. アノテーションの統廃合（v2）
 
@@ -173,4 +199,5 @@ IR には既に組込み種別があるので、表層の語彙を足すだけ�
 1. ~~§2 到達不能候補の検出（v1 で警告、低リスク）~~ **完了（D-037）**
 2. ~~§1 左再帰（最大の価値）~~ **完了（D-039）**
 3. ~~§3 単語境界（互換影響の実測 → v2 既定）~~ **完了（D-040）**
-4. §5 token 語彙、§4 パラメータ化ルール、§6 統廃合
+4. ~~§5 token 語彙~~ **完了（D-041 / D-042）**
+5. §4 パラメータ化ルール、§6 統廃合

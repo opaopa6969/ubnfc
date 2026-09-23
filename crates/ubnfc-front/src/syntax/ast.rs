@@ -104,8 +104,21 @@ pub enum TokenValue {
     Empty {
         span: Span,
     },
+    /// v1 の綴り: host 言語のクラス名（FQN または既知パッケージの単純名）。
     ClassRef {
         dotted: String,
+        span: Span,
+    },
+    /// 言語中立な組込み語彙（`token NUMBER = NUMBER`）。名前は
+    /// [`crate::vocabulary::BUILTIN_VOCABULARY`] の中立名（D-041）。
+    Builtin {
+        name: String,
+        span: Span,
+    },
+    /// host 実装の明示宣言（`token CODE = extern 'CodeStartParser'`）。
+    /// 名前は scanner registry が解決する ID で、FQN でなくてよい（D-041）。
+    Extern {
+        name: String,
         span: Span,
     },
 }
@@ -309,7 +322,7 @@ macro_rules! impl_span {
 
 impl_span!(GlobalSetting: String, Block);
 impl_span!(TokenValue: Until, Negation, Lookahead, NegativeLookahead, CharRange,
-    CaseInsensitive, Regex, Any, Eof, Empty, ClassRef);
+    CaseInsensitive, Regex, Any, Eof, Empty, ClassRef, Builtin, Extern);
 impl_span!(Annotation: Root, Mapping, Eval, Whitespace, Interleave, Backref, ScopeTree,
     Declares, Catalog, LeftAssoc, RightAssoc, LongestChoice, PredictiveChoice,
     Precedence, Doc, Recovery, Skip, CommonField, Enum, Simple);

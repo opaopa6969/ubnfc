@@ -17,8 +17,11 @@ public final class Registry {
             Map.entry("SingleQuotedParser", scanner(Kind.SINGLE)),
             Map.entry("org.unlaxer.parser.elementary.SingleQuotedParser", scanner(Kind.SINGLE)),
             Map.entry("org.unlaxer.tinyexpression.parser.StringLiteralParser", scanner(Kind.STRING)),
+            Map.entry("StringLiteralParser", scanner(Kind.STRING)),
             Map.entry("org.unlaxer.tinyexpression.parser.javalang.CodeStartParser", scanner(Kind.START)),
+            Map.entry("CodeStartParser", scanner(Kind.START)),
             Map.entry("org.unlaxer.tinyexpression.parser.javalang.CodeEndParser", scanner(Kind.END)),
+            Map.entry("CodeEndParser", scanner(Kind.END)),
             Map.entry("oracle.ExternalCursorParser", scanner(Kind.EXTERNAL)));
     }
     private enum Kind { DOUBLE, SINGLE, STRING, START, END, EXTERNAL }

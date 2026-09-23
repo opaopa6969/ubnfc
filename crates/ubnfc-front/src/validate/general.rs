@@ -67,12 +67,21 @@ pub(super) fn validate(cx: &mut Context<'_>) {
                 format!("global @memoSafeToken references undefined token alias: {alias}"),
                 format!("Declare token {alias} or remove this @memoSafeToken setting."),
             ),
-            Some(t) if !matches!(t.declaration, TokenValue::ClassRef { .. }) => cx.add(
-                None,
-                "E-MEMO-SAFE-TOKEN-KIND",
-                format!("global @memoSafeToken alias must name a Simple token: {alias}"),
-                "Remove the setting; built-in token declarations are already proven safe.",
-            ),
+            Some(t)
+                if !matches!(
+                    t.declaration,
+                    TokenValue::ClassRef { .. }
+                        | TokenValue::Builtin { .. }
+                        | TokenValue::Extern { .. }
+                ) =>
+            {
+                cx.add(
+                    None,
+                    "E-MEMO-SAFE-TOKEN-KIND",
+                    format!("global @memoSafeToken alias must name a Simple token: {alias}"),
+                    "Remove the setting; built-in token declarations are already proven safe.",
+                )
+            }
             _ => {}
         }
     }
@@ -86,7 +95,29 @@ pub(super) fn validate(cx: &mut Context<'_>) {
             "Add @root to at least one entry rule.",
         );
     }
+    // v2 は「文法に host のクラス名を書かない」形式なので、旧綴りが残っていることを
+    // 知らせる。**警告どまりで拒否しない**理由は D-042（移行費用と `--strict`）。
+    // v1 では旧綴りが唯一の綴りなので何も言わない（v1 の出力は 1 バイトも変えない）。
+    let v2 = grammar.settings.iter().any(|s| match s {
+        GlobalSetting::String { key, value, .. } if key == "ubnf" => {
+            trim(value).parse::<u64>().is_ok_and(|version| version >= 2)
+        }
+        _ => false,
+    });
     for token in &grammar.tokens {
+        if v2 {
+            if let TokenValue::ClassRef { dotted, .. } = &token.declaration {
+                cx.add(
+                    None,
+                    "W-TOKEN-HOST-CLASS",
+                    format!(
+                        "token {} names a host-language class: {dotted}",
+                        token.name
+                    ),
+                    "Use the neutral builtin vocabulary (for example 'token NUMBER = NUMBER'), or declare the host implementation explicitly with extern '<id>'.",
+                );
+            }
+        }
         if token.unresolved {
             if let TokenValue::ClassRef { dotted, .. } = &token.declaration {
                 cx.add(None, "W-TOKEN-UNRESOLVED", format!("token {} references unresolved parser class: {dotted}", token.name),
@@ -94,9 +125,19 @@ pub(super) fn validate(cx: &mut Context<'_>) {
             }
         }
         let reference = match &token.declaration {
-            TokenValue::ClassRef { dotted, .. } if trim(dotted).is_empty() => continue,
-            TokenValue::ClassRef { dotted, .. } if !dotted.contains('.') => dotted.clone(),
+            TokenValue::ClassRef { dotted, .. } | TokenValue::Extern { name: dotted, .. }
+                if trim(dotted).is_empty() =>
+            {
+                continue
+            }
+            TokenValue::ClassRef { dotted, .. } | TokenValue::Extern { name: dotted, .. }
+                if !dotted.contains('.') =>
+            {
+                dotted.clone()
+            }
             TokenValue::ClassRef { .. }
+            | TokenValue::Extern { .. }
+            | TokenValue::Builtin { .. }
             | TokenValue::Until { .. }
             | TokenValue::Negation { .. }
             | TokenValue::CharRange { .. }

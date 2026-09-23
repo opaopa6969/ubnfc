@@ -275,6 +275,13 @@ unknown（宣言しないのと同じ）。front は `ubnfc ir|gen --extern-firs
 （`crates/ubnfc-front/tests/pipeline_golden.rs`）。harness の run-all は渡さない
 （corpus の verdict は宣言に依存しない）。
 
+**UBNF v2 では宣言が必須になる（D-042）。** v2 の token 宣言は host 実装を
+`token X = extern '<id>'` と明示し、`'<id>'` は**この registry が解決する ID** である
+（FQN でなくてよい。短い ID の別名を FQN と並べて登録する）。`@ubnf: 2` の文法に
+`--extern-first-chars` を渡したとき、宣言の無い Extern があれば `ubnfc ir|gen` は
+`E-TOKEN-EXTERN-UNREGISTERED` を出して **exit 1** で止まる。v1 は凍結なので従来どおり
+警告のみ。詳細は `docs/reports/2026-09-23-ubnf-v2-token-vocabulary.md` §3。
+
 宣言は必要条件で、健全性は scanner 実装の責任である: 集合外の先頭文字（Extern を呼ぶ位置の
 文字。同梱集合は `match_only && reset` の STRING を含め、消費 cursor の位置）では scanner が
 消費なしで失敗しなければならない。backend（Rust）はこの宣言を候補除外の判定にだけ使い、

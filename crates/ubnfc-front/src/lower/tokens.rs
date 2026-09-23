@@ -113,6 +113,9 @@ pub(super) fn lower(cx: &mut Context<'_>, grammar: &r::Grammar) {
             a::TokenValue::ClassRef { dotted, .. } if !external => {
                 format!("既知の {dotted} の専用スキャナ。受理と診断を組込み契約で再現する。")
             }
+            a::TokenValue::Builtin { name, .. } => {
+                format!("組込み語彙 {name} の専用スキャナ。受理と診断を組込み契約で再現する。")
+            }
             _ if external => "extern token: alias assertion required".into(),
             _ => "known deterministic builtin".into(),
         };
