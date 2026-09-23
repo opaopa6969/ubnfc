@@ -112,7 +112,7 @@ IR に `analysisVersion` と対象機能集合を持たせ、未対応版は明�
 
 ### 3.5 trivia（空白/コメント）
 
-rule-trivia 契約（`docs/rule-trivia.md`）。有効設定は rule `@whitespace` > rule `@interleave` > grammar。
+rule-trivia 契約（`unlaxer-parser/docs/rule-trivia.md`）。有効設定は rule `@whitespace` > rule `@interleave` > grammar。
 挿入位置は既存生成 chain と同じ（先頭・各要素後・helper 境界。`ParserGenerator.java:495`）。
 IR に **挿入計画**（どの ExprId 境界で、どの policy で）を持たせる。global `@comment` は
 D-018 `comment-trivia` に従い、`line` / `blockOpen`+`blockClose`（または `block: 'OPEN CLOSE'`）の
@@ -223,7 +223,7 @@ SYNC と同じく消費する。
 
 ## 4. IR 契約（v1 で追加した項目）
 
-`ir/schema/grammar-ir.v1.json`（JSON Schema）で固定。v0 §3 に加えて:
+`ir/schema/grammar-ir.v1.schema.json`（JSON Schema）で固定。v0 §3 に加えて:
 
 - **ExprId**: 全 Expr ノードに安定 ID（文法ソース位置由来）。capture site / trivia 挿入 / memo / 診断 が参照。
 - **Expr ごとの解析**: `mayStart`（文字クラス + EOF + ゼロ消費成功条件）、`minConsume`、接頭辞 trie、
@@ -310,7 +310,7 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | M2 | 完了 | `ubnfc ir` で 21 fixture + P4 の golden、self-host 経路（生成 Rust frontend → `compile_parsed`） |
 | M3 | **完了** | round7: Java Pass 1,306 / Fail 0、Rust Pass 1,292 / Fail 0（既知乖離 28 は D-017/D-018） |
 | M4 | 完了（既知差分あり） | ubnf.ubnf の IR byte 一致・再生成固定点。25 対象中 19 一致、6 は手書きの fixture 互換拡張（`05-selfhost.md`） |
-| M5 | **進行中** | P4 Java 17.3 ms / Rust 25 ms（目標 complex ≤0.2 ms、x64 ≤15 ms）。主因は診断 DAG（`docs/reports/2026-09-22-p4-rust-bench.md`） |
+| M5 | **進行中** | **2026-09-23 更新**: 目標は complex ≤0.2 ms（AST）/ x64 ≤15 ms。**Rust は達成**（complex 認識 0.066 / AST 0.089 ms、x64 認識 4.52 / AST 5.86 ms。`docs/reports/2026-09-23-p4-rust-floor.md`）。**Java は未達**（complex 認識 0.60 / AST 0.64 ms、x64 認識 37.1 / AST 44.4 ms。`docs/reports/2026-09-22-p4-java-perf-m5.md`）。旧実装ベースラインは `docs/reports/2026-09-23-legacy-baseline.md`（complex 認識 13.6 / AST 14.5 ms）。〈旧記載「P4 Java 17.3 ms / Rust 25 ms、主因は診断 DAG」は 2026-09-22 夜の値で、診断の二段構え（D-023）以降は当てはまらない〉 |
 
 ## 8. 争点の状態
 
@@ -347,7 +347,7 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | D-029 scope イベントの `name` と空の記号名 | 決定 | (a) `events[].name` は、`declare` / `reference` では対象シンボル名、`enter` / `leave` / `clear` では **その scope を持つ規則名**（IR の `scope.effects[].events[].name`）。Rust は enter/leave で `null` を返していたので埋める。(b) **trim（U+0000〜U+0020）後に空になった記号名の `declare` / `reference` は記録しない**。空文字は記号ではないので、参照イベントも未定義シンボル警告も出さない。Java は capture 由来の経路でだけこの規則を持っていた（`Session.java:223`）ので、両言語・全経路へ広げる |
 | D-016 左再帰書換えの対象形 | 決定（lowering 実装） | 対象は `E ::= E Op Base \| Base` で参照先にも capture/mapping/scope/recovery が無く演算子側から自身へ戻らない形。他は明示拒否 | M2 で定義（nullable suffix、代替順、capture/trivia/scope/recovery の投影）。未対応形は明示拒否 |
 | D-031 `@recovery` の適用規則 | 決定 | §3.10 に確定。mode / 同期集合 / `consumeSync` / `noSyncAction` は front が IR に載せ、backend は再推定しない（`JavaEmitter.recoveryCall` の legacy mode 補正を撤去、Rust `Session::recover` は mode 文字列で分岐しない）。**AUTO は同期文字列（FOLLOW）を消費しない**（D-017「AUTO の過剰消費」は再現しない）。FOLLOW が空のときの既定 `;` だけは SYNC と同じく消費する。SKIP も FOLLOW を同期集合に使い、同期文字列の手前で止まる。`@recovery(auto)` と `@recovery(AUTO)` は同じ注釈。根拠: 2026-09-23 差分 fuzzing A-1（`@recovery(AUTO)` の受理が backend で食い違った）。corpus の recovery 系観測は不変 |
-| D-032 量指定子つき capture の cardinality | 決定 | cardinality は**一度の成功解析で共存し得る値の個数**（`docs/nested-capture-migration.md` の表）。量指定子は上限が 2 以上のときだけ List で、`{1}` は Scalar・`{0}` / `{0,1}` / `X?` は Optional。capture site の量指定子は出現回数としてそのまま数え、site より内側の量指定子は**意味値**だけを増やす（text だけの領域は一致範囲全体で 1 つの値）。これで `validate` が通り `ir` が落ちる文法（2026-09-23 差分 fuzzing D、320 文法中 28 件）が無くなる。旧 Java 生成器は bounded を常に List と型付けしていた（`SemanticCardinality.java`）が、corpus に capture つき `{n<=1}` の fixture は無く観測は不変 |
+| D-032 量指定子つき capture の cardinality | 決定 | cardinality は**一度の成功解析で共存し得る値の個数**（`unlaxer-parser/docs/nested-capture-migration.md` の表）。量指定子は上限が 2 以上のときだけ List で、`{1}` は Scalar・`{0}` / `{0,1}` / `X?` は Optional。capture site の量指定子は出現回数としてそのまま数え、site より内側の量指定子は**意味値**だけを増やす（text だけの領域は一致範囲全体で 1 つの値）。これで `validate` が通り `ir` が落ちる文法（2026-09-23 差分 fuzzing D、320 文法中 28 件）が無くなる。旧 Java 生成器は bounded を常に List と型付けしていた（`SemanticCardinality.java`）が、corpus に capture つき `{n<=1}` の fixture は無く観測は不変 |
 | D-033 生成器 jar の鮮度をハーネスが検査する | 決定 | Java backend の driver template（`ubnfc-java/src/main/resources/templates/driver/Driver.java`）と emitter は **jar の resource** なので、`ubnfc-java` を直したあと `mvn -o -q -DskipTests package` を忘れると、harness / 差分 fuzzer は**古い観測契約の driver** を黙って生成する。これは「片方の backend が契約を破っている」と見分けが付かない形で現れ、実際に D-024 〜 D-029 の適用後に `diff:/catalogs`（Java が `catalogs` キーを出さない）と `diff:/diagnostics/*`（Java が成功解析にも合成 `syntax` 診断を足す）の**存在しない乖離**として誤報された（`docs/reports/2026-09-23-fuzz-fixes-catalogs-diagnostics.md`）。既定 jar を使う経路（`Runner::build`）では `ubnfc-java/src/main` と `pom.xml` の最新 mtime が jar より新しければ build を **エラーにする**（`runner/mod.rs check_java_generator_freshness`）。固定 seed campaign は `discarded == 0` を主張しているので、古い jar は差分ではなく discard として即座に赤くなる。`build_with_java_generator` で classpath を明示する経路（テストの `target/classes`）は maven が鮮度を保つので検査しない。mtime が読めない環境では検査を飛ばす（偽陽性で build を止めない） |
 | D-035 出現表と value span は opt-in | 決定 | `ParseOptions.occurrences` / `ParseOptions.value_spans`（どちらも既定 false）。§3.6 が「オプション出力」と書く `captures` / rule 出現 / token 出現と、`value_spans` を、要求されたときだけ集める。**既定で空になるもの**: AST だけを要求した parse の `captures`（`lexical` / `tokens` は従来から `lexical: true` のときだけ）と `value_spans`。AST・`node_spans`・診断・scope・recovery・統計・`recoveries[].capture_occurrence_ids` は一切変わらない。**走査は省けない**: M5 round 5 が出現収集と「AST が rule ごとに読む直下 capture 表」を 1 回の走査に統合したので、AST を作る parse では走査そのものは残る。省くのは公開する出現表の行を作る分と `ast.collect` による value span である。**再走査**: D-023 と違い結果からは要否が判定できないので自動の再解析は無い。要る利用者が要求する（`lexical: true` は出現表そのものが目的なので要求を含む）。self-host は `lexical: true` なので不変、driver は AST 経路で `value_spans: true` を要求し、出現は `lexical` のときだけ出す（corpus 観測は不変）。**費用**: complex AST −12 µs（−11.9%）・確保 681→509 回 / 113→77 KB、complex-x64 AST −410 µs（−6.5%）・確保 5.69→3.41 MB。要求した利用者は従来と同じ費用を払う。観測の同値は `examples/p4-rust/tests/fixtures.rs` の `occurrences_and_value_spans_are_opt_in_without_changing_anything_else` が固定する |
 | D-036 診断の配管は `const DIAG` で単相化 | 決定 | `Session<'a, const DIAG: bool>`。入口は `ParseOptions.diagnostics` を見て `Session::<false>`（fast mode）か `Session::<true>`（診断モード）を選び、D-023 の再解析も `Session::<true>` で走る。`Diagnostics` / `DisplayDiagnostics` への呼出しは Session 上の `diag_*` / `display_*` wrapper を通し、`DIAG == false` では定数分岐として消える。候補除外の失敗再生 `guard_e*` の早期 return と `finish_checked` の escalate 判定も同じ定数で分岐する。**理由**: 実行時の `enabled` 検査では「呼出し・引数の準備・`Step.diag` の合流」が残り、fast mode で 1 parse あたり主診断 `join` 3,429 回・`rule` 759 回・display frame 走査 3,226 回を払っていた。D-023 の注記「`const DIAG` は 8 µs なので作らない」は前提が古い。**費用**: 生成物の機械語が 2 部になり P4 の binary は 4.69 → 7.34 MB（+56%）。**fast path** は complex 認識 −17 µs（−20.5%）・complex AST −20 µs（−16.5%）・x64 認識 −954 µs（−17.4%）・x64 AST −1,060 µs（−14.5%）で、round 4 で警戒した i-cache の代償は出なかった。**診断モードは 0〜3% 遅くなる**（`docs/reports/2026-09-23-p4-rust-floor.md` §4。冷たい経路が単相化の裏返しを受ける）。**観測は不変**（fast mode は D-023 のとおり元から記録しない。fast/診断 同値テストと predict/factor/lexical_cache の参照経路比較が固定する） |
