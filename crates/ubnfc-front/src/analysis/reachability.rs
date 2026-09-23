@@ -60,8 +60,10 @@ struct Reach<'a, 'b> {
     recovery: Vec<bool>,
     lead: BTreeMap<usize, LeadMap>,
     prefix: BTreeMap<usize, (String, BTreeSet<String>)>,
-    stack: Vec<usize>,
-    prefix_stack: Vec<usize>,
+    /// `lead` の走査中スタックに載っている式（再帰版の `stack.contains`）。
+    on_lead_stack: Vec<bool>,
+    /// `literal_prefix` の走査中スタックに載っている式。
+    on_prefix_stack: Vec<bool>,
 }
 
 /// 必須リテラル接頭辞の打切り長。これ以上は判定に要らない。
@@ -81,14 +83,78 @@ impl Reach<'_, '_> {
     /// 左端呼出し関係。左再帰は `analyze` がこの前に拒否しているので循環しないが、
     /// 想定外の循環でも空を返して打ち切る。打ち切った値も memo する: 得られる集合は
     /// 常に下界（＝警告が減る方向）なので健全で、走査順は入力だけで決まるため決定的。
-    fn lead(&mut self, i: usize) -> LeadMap {
-        if let Some(cached) = self.lead.get(&i) {
+    ///
+    /// rule 参照をまたぐので深さは規則連鎖長に比例する。再帰では深い文法で
+    /// stack overflow したため明示スタックで書く。子を辿る順序・memo に書く時点・
+    /// 打切りの判定時点はいずれも再帰版と同じなので、結果は完全に一致する。
+    fn lead(&mut self, root: usize) -> LeadMap {
+        if let Some(cached) = self.lead.get(&root) {
             return cached.clone();
         }
-        if self.stack.contains(&i) || self.recovery[i] {
+        if self.on_lead_stack[root] || self.recovery[root] {
             return LeadMap::new();
         }
-        self.stack.push(i);
+        self.on_lead_stack[root] = true;
+        // (式, その式が lead を呼ぶ子の並び, 次に呼ぶ添字)
+        let mut frames: Vec<(usize, Vec<usize>, usize)> = vec![(root, self.lead_deps(root), 0)];
+        while !frames.is_empty() {
+            let top = frames.len() - 1;
+            let (v, k) = (frames[top].0, frames[top].2);
+            if k < frames[top].1.len() {
+                let child = frames[top].1[k];
+                frames[top].2 += 1;
+                // 再帰版が `lead(child)` の冒頭で即座に返す 3 条件。値は combine 時に読む。
+                if !self.lead.contains_key(&child)
+                    && !self.on_lead_stack[child]
+                    && !self.recovery[child]
+                {
+                    self.on_lead_stack[child] = true;
+                    let deps = self.lead_deps(child);
+                    frames.push((child, deps, 0));
+                }
+                continue;
+            }
+            frames.pop();
+            let out = self.lead_combine(v);
+            self.on_lead_stack[v] = false;
+            self.lead.insert(v, out);
+        }
+        self.lead[&root].clone()
+    }
+
+    /// `lead` が `lead` を呼ぶ子式の並び。再帰版の match の各腕と同じ順・同じ打切り。
+    fn lead_deps(&self, i: usize) -> Vec<usize> {
+        match self.node(i) {
+            ExprNode::RuleRef { symbol_id } => vec![self.body(symbol_id)],
+            ExprNode::Seq { items } => {
+                let mut deps = Vec::new();
+                for item in items {
+                    deps.push(self.at(item));
+                    if self.cx.fact(item).consumes {
+                        break;
+                    }
+                }
+                deps
+            }
+            ExprNode::Group { child }
+            | ExprNode::Lookahead { child }
+            | ExprNode::Optional { child }
+            | ExprNode::Repeat { child, .. } => vec![self.at(child)],
+            ExprNode::Choice { alternatives, .. } => {
+                alternatives.iter().map(|id| self.at(id)).collect()
+            }
+            ExprNode::Separated { element, .. } => vec![self.at(element)],
+            _ => Vec::new(),
+        }
+    }
+
+    /// 打切り済みの子は空集合（再帰版が返す値と同じ）。
+    fn lead_value(&self, i: usize) -> LeadMap {
+        self.lead.get(&i).cloned().unwrap_or_default()
+    }
+
+    /// 子の `lead` が確定した後の合成。再帰版の match の本体そのもの。
+    fn lead_combine(&mut self, i: usize) -> LeadMap {
         let outer = self.entry[i].clone();
         let mut out = LeadMap::new();
         match self.node(i).clone() {
@@ -102,7 +168,7 @@ impl Reach<'_, '_> {
                     },
                 );
                 let body = self.body(&symbol_id);
-                let map = self.lead(body);
+                let map = self.lead_value(body);
                 merge(&mut out, map, true, false, &outer);
             }
             ExprNode::Seq { items } => {
@@ -112,7 +178,7 @@ impl Reach<'_, '_> {
                         .map(|id| self.cx.fact(id).minimum())
                         .sum();
                     let at = self.at(item);
-                    let map = self.lead(at);
+                    let map = self.lead_value(at);
                     // Seq は全要素の成功が必要。先行要素が一切消費しない間は開始位置が動かない。
                     merge(&mut out, map, true, rest > 0, &outer);
                     if self.cx.fact(item).consumes {
@@ -122,19 +188,19 @@ impl Reach<'_, '_> {
             }
             ExprNode::Group { child } | ExprNode::Lookahead { child } => {
                 let at = self.at(&child);
-                let map = self.lead(at);
+                let map = self.lead_value(at);
                 merge(&mut out, map, true, false, &outer);
             }
             ExprNode::Optional { child } => {
                 let at = self.at(&child);
-                let map = self.lead(at);
+                let map = self.lead_value(at);
                 merge(&mut out, map, false, false, &outer);
             }
             ExprNode::Choice { alternatives, .. } => {
                 let mut common: Option<BTreeSet<String>> = None;
                 for id in &alternatives {
                     let at = self.at(id);
-                    let map = self.lead(at);
+                    let map = self.lead_value(at);
                     let musts: BTreeSet<String> = map
                         .iter()
                         .filter(|(_, lead)| lead.must)
@@ -160,7 +226,7 @@ impl Reach<'_, '_> {
                 ..
             } => {
                 let at = self.at(&child);
-                let map = self.lead(at);
+                let map = self.lead_value(at);
                 // terminator（UNTIL）付きは本体より先に終端判定が走るので必須にしない。
                 merge(
                     &mut out,
@@ -172,27 +238,99 @@ impl Reach<'_, '_> {
             }
             ExprNode::Separated { element, min, .. } => {
                 let at = self.at(&element);
-                let map = self.lead(at);
+                let map = self.lead_value(at);
                 merge(&mut out, map, min >= 1, false, &outer);
             }
             _ => {}
         }
-        self.stack.pop();
-        self.lead.insert(i, out.clone());
         out
     }
 
     /// 式が必ず先頭に持つ、大文字小文字を区別するリテラル文字列と、
     /// その途中で跨いだ trivia 挿入境界の policy。`PREFIX_CAP` で打ち切る。
-    fn literal_prefix(&mut self, i: usize) -> (String, BTreeSet<String>) {
-        if let Some(cached) = self.prefix.get(&i) {
+    ///
+    /// `lead` と同じ理由で明示スタック。Seq の打切りは「そこまでに積んだ値」に
+    /// 依存するので、子は添字を進めながら 1 つずつ確定させる。
+    fn literal_prefix(&mut self, root: usize) -> (String, BTreeSet<String>) {
+        if let Some(cached) = self.prefix.get(&root) {
             return cached.clone();
         }
-        let mut trivia = self.entry[i].clone();
-        if self.prefix_stack.contains(&i) || self.recovery[i] {
-            return (String::new(), trivia);
+        if self.on_prefix_stack[root] || self.recovery[root] {
+            return (String::new(), self.entry[root].clone());
         }
-        self.prefix_stack.push(i);
+        self.on_prefix_stack[root] = true;
+        // (式, 次に確定させる子の添字)
+        let mut frames: Vec<(usize, usize)> = vec![(root, 0)];
+        while !frames.is_empty() {
+            let top = frames.len() - 1;
+            let (v, k) = frames[top];
+            if let Some(child) = self.prefix_dep(v, k) {
+                frames[top].1 += 1;
+                if !self.prefix.contains_key(&child)
+                    && !self.on_prefix_stack[child]
+                    && !self.recovery[child]
+                {
+                    self.on_prefix_stack[child] = true;
+                    frames.push((child, 0));
+                }
+                continue;
+            }
+            frames.pop();
+            let out = self.prefix_combine(v);
+            self.on_prefix_stack[v] = false;
+            self.prefix.insert(v, out);
+        }
+        self.prefix[&root].clone()
+    }
+
+    /// 打切り済み・未計算の子が返す値。再帰版の早期 return と同じ。
+    fn prefix_value(&self, i: usize) -> (String, BTreeSet<String>) {
+        self.prefix
+            .get(&i)
+            .cloned()
+            .unwrap_or_else(|| (String::new(), self.entry[i].clone()))
+    }
+
+    /// `literal_prefix` が `k` 番目に降りる子式。無ければ `None`。
+    fn prefix_dep(&self, i: usize, k: usize) -> Option<usize> {
+        match self.node(i) {
+            ExprNode::Group { child } => (k == 0).then(|| self.at(child)),
+            ExprNode::RuleRef { symbol_id } => (k == 0).then(|| self.body(symbol_id)),
+            ExprNode::Seq { items } => {
+                let mut value = String::new();
+                for (index, item) in items.iter().enumerate() {
+                    let at = self.at(item);
+                    if index == k {
+                        return Some(at);
+                    }
+                    let (v, _) = self.prefix_value(at);
+                    value.push_str(&v);
+                    // 要素全体がリテラルのときだけ次の要素へ連結できる。
+                    let whole = matches!(
+                        self.node(at),
+                        ExprNode::Literal {
+                            case_sensitive: true,
+                            ..
+                        }
+                    );
+                    if !whole || value.chars().count() >= PREFIX_CAP {
+                        return None;
+                    }
+                }
+                None
+            }
+            ExprNode::Choice { alternatives, .. } => alternatives.get(k).map(|id| self.at(id)),
+            ExprNode::Repeat { child, min, .. } if *min >= 1 => (k == 0).then(|| self.at(child)),
+            ExprNode::Separated { element, min, .. } if *min >= 1 => {
+                (k == 0).then(|| self.at(element))
+            }
+            _ => None,
+        }
+    }
+
+    /// 子が確定した後の合成。再帰版の match の本体そのもの。
+    fn prefix_combine(&mut self, i: usize) -> (String, BTreeSet<String>) {
+        let mut trivia = self.entry[i].clone();
         let mut value = String::new();
         match self.node(i).clone() {
             ExprNode::Literal {
@@ -201,20 +339,20 @@ impl Reach<'_, '_> {
                 ..
             } => value.push_str(&literal),
             ExprNode::Group { child } => {
-                let (v, t) = self.literal_prefix(self.at(&child));
+                let (v, t) = self.prefix_value(self.at(&child));
                 value.push_str(&v);
                 trivia.extend(t);
             }
             ExprNode::RuleRef { symbol_id } => {
                 let body = self.body(&symbol_id);
-                let (v, t) = self.literal_prefix(body);
+                let (v, t) = self.prefix_value(body);
                 value.push_str(&v);
                 trivia.extend(t);
             }
             ExprNode::Seq { items } => {
                 for item in &items {
                     let at = self.at(item);
-                    let (v, t) = self.literal_prefix(at);
+                    let (v, t) = self.prefix_value(at);
                     value.push_str(&v);
                     trivia.extend(t);
                     // 要素全体がリテラルのときだけ次の要素へ連結できる。
@@ -234,7 +372,7 @@ impl Reach<'_, '_> {
                 let mut common: Option<String> = None;
                 for id in &alternatives {
                     let at = self.at(id);
-                    let (v, t) = self.literal_prefix(at);
+                    let (v, t) = self.prefix_value(at);
                     trivia.extend(t);
                     common = Some(match common {
                         None => v,
@@ -249,21 +387,18 @@ impl Reach<'_, '_> {
                 value = common.unwrap_or_default();
             }
             ExprNode::Repeat { child, min, .. } if min >= 1 => {
-                let (v, t) = self.literal_prefix(self.at(&child));
+                let (v, t) = self.prefix_value(self.at(&child));
                 value.push_str(&v);
                 trivia.extend(t);
             }
             ExprNode::Separated { element, min, .. } if min >= 1 => {
-                let (v, t) = self.literal_prefix(self.at(&element));
+                let (v, t) = self.prefix_value(self.at(&element));
                 value.push_str(&v);
                 trivia.extend(t);
             }
             _ => {}
         }
-        self.prefix_stack.pop();
-        let result = (value.chars().take(PREFIX_CAP).collect::<String>(), trivia);
-        self.prefix.insert(i, result.clone());
-        result
+        (value.chars().take(PREFIX_CAP).collect::<String>(), trivia)
     }
 
     /// 式木の構造同一性。rule 呼出しは symbol 名で比較して本体へは降りない
@@ -402,8 +537,8 @@ pub(super) fn check(cx: &Context<'_>) -> Vec<ChoiceIssue> {
         recovery,
         lead: BTreeMap::new(),
         prefix: BTreeMap::new(),
-        stack: Vec::new(),
-        prefix_stack: Vec::new(),
+        on_lead_stack: vec![false; count],
+        on_prefix_stack: vec![false; count],
     };
     let mut issues = Vec::new();
     for i in 0..count {
