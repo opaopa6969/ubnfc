@@ -9,28 +9,42 @@
 
 ## 1. 機能 × 観測面
 
-| 略号 | corpus ファイル | loader 件数 |
-|---|---|---:|
-| N | nested-captures/corpus.json | 10 |
-| Tt | rule-trivia/corpus.json | 33 |
-| S | scope-annotations/corpus.json | 14 |
-| P | primitives/corpus.json | 109 |
-| L | lexical/corpus.json | 78 |
-| SC | semantic-cardinality/corpus.json | 94 |
-| PA | semantic-cardinality/pure-alias.json | 69 |
-| F | tiny-code-fence/corpus.json | 73 |
-| Q | tiny-string-token/corpus.json | 39 |
-| M | mixed-values/corpus.json | 23 |
-| MD | mixed-values/delimited-corpus.json | 15 |
-| MS | mixed-values/shared-corpus.json | 11 |
-| E | evolution/conformance.json | 37 |
-| D | evolution/diagnostics.json | 8 |
-| A | associative/corpus.json | 24 |
-| RA | right-associative/corpus.json | 28 |
-| K | cardinality/corpus.json | 14 |
-| Nu | numeric-capture/conformance.json | 13 |
-| O | scope-store/corpus.json | 9 |
-| Cat | catalog/corpus.json | 2 |
+| 略号 | corpus ファイル | loader 件数 | 期待値の出所 |
+|---|---|---:|---|
+| N | nested-captures/corpus.json | 10 | 旧実装から採取 |
+| Tt | rule-trivia/corpus.json | 33 | 旧実装から採取 |
+| S | scope-annotations/corpus.json | 14 | 旧実装から採取 |
+| P | primitives/corpus.json | 109 | 旧実装から採取 |
+| L | lexical/corpus.json | 78 | 旧実装から採取 |
+| SC | semantic-cardinality/corpus.json | 94 | 旧実装から採取 |
+| PA | semantic-cardinality/pure-alias.json | 69 | 旧実装から採取 |
+| F | tiny-code-fence/corpus.json | 73 | 旧実装から採取 |
+| Q | tiny-string-token/corpus.json | 39 | 旧実装から採取 |
+| M | mixed-values/corpus.json | 23 | 旧実装から採取 |
+| MD | mixed-values/delimited-corpus.json | 15 | 旧実装から採取 |
+| MS | mixed-values/shared-corpus.json | 11 | 旧実装から採取 |
+| E | evolution/conformance.json | 37 | 旧実装から採取 |
+| D | evolution/diagnostics.json | 8 | 旧実装から採取 |
+| A | associative/corpus.json | 24 | 旧実装から採取 |
+| RA | right-associative/corpus.json | 28 | 旧実装から採取 |
+| K | cardinality/corpus.json | 14 | 旧実装から採取 |
+| Nu | numeric-capture/conformance.json | 13 | 旧実装から採取 |
+| O | scope-store/corpus.json | 9 | 旧実装から採取 |
+| Cat | catalog/corpus.json | 2 | 旧実装から採取 |
+| Or | `corpus/oracle/*.json`（107 ファイル） | 398 | 旧実装から採取 |
+| **Sp** | **`corpus/spec/ubnf/*.json`（10 ファイル）** | **129** | **仕様由来** |
+| **Sp4** | **`corpus/spec/p4/*.json`（4 ファイル）** | **32** | **仕様由来** |
+
+### 期待値の出所（provenance）
+
+| 値 | 意味 | 該当 |
+|---|---|---|
+| 旧実装から採取 | `unlaxer-parser` の実装を実行した観測値を固定したもの。疑わしい値も直していない（`corpus/oracle/README.md`） | N〜Cat の上流 fixture と `corpus/oracle/*.json` |
+| 仕様由来 | `unlaxer-dsl/specs/*.md` / tinyexpression の規範文だけから導いた期待値。どの実装の観測値も使わない（`corpus/spec/README.md`、issue #5） | `corpus/spec/**` |
+| 差分のみ | 2 実装の一致だけを見ており、どちらが正しいかの独立根拠が無い | `crates/ubnfc-fuzz` の差分 fuzzing、`crates/ubnfc-selfhost/tests/parity.rs` |
+
+`旧実装から採取` の行は「旧実装と同じ」までしか主張しない。仕様との一致は
+`corpus/spec/**` の判定（`docs/reports/2026-09-24-spec-derived-oracle.md`）で別に見る。
 
 `P[12]:3件` は JSON の fixture 添字12（0始まり）の全3ケース、`Nu/6` は平坦配列の添字6。`N[0]/inner-before-outer` の実 ID は `nested-text-completion/inner-before-outer`。
 fixture 添字から `name`、token 系は `添字:token` を引くと loader ID が復元できる（`H/corpus/mod.rs:174`）。`D/7` は `diagnostics/7`、`Nu/6` は `numeric/6`。件数は参照群の総数で、AST 列はその受理行に適用する。セルは代表群であり加算しない。
@@ -106,9 +120,10 @@ A:24件・RA:28件は評価値を使った結合性の oracle（例 `A/1` の5�
 Tt の javaStyle コメントは global `@comment` 設定の証拠にならない（`U/docs/rule-trivia.md:45`）。Cat は構文入力の解析ではなく静的 metadata の順序・重複除去・context 原文を検証する（`T/RustCatalogConformanceTest.java:48`）。
 `QuotedParser` 自体は quote parser 引数を要する基底実装（`C/parser/elementary/QuotedParser.java:41`）。DoubleQuotedParser の corpus だけで任意の quote 設定まで保証しない。
 
-## 2. 矛盾・言語差・仕様不足（15件）
+## 2. 矛盾・言語差・仕様不足（20件）
 
 「正」は既存 corpus がある範囲の互換判断。oracle のない事項は実装を暫定参照とし、拡張や不具合修正を既存互換と混同しない。C04/C05 は明示的な言語別契約、C14 の実行結果は未確認。
+**C16〜C20 は issue #5（仕様由来オラクル）で見つかったもので、根拠は `corpus/spec/ubnf/*.json` の仕様引用と `docs/reports/2026-09-24-spec-derived-oracle.md` の実測。**
 
 | ID | 仕様・設計の記述 | 実装／corpus の観測根拠 | ubnfc が正とするもの |
 |---|---|---|---|
@@ -128,6 +143,12 @@ Tt の javaStyle コメントは global `@comment` 設定の証拠にならな�
 | C14 | `U/docs/ubnf-guide.md:467` の alias 利用、`v1:169` の統合表から多段も完全解決済みとは断定できない | `U/unlaxer-dsl/src/main/java/org/unlaxer/dsl/bootstrap/UBNFMapper.java:159,175,211` は再帰読込後に未統合 GrammarDecl を保存し、直接 import の名前だけ prefix、body は据置き。多段実行 oracle なし | 推移的解決の完成は未確認。ubnfc の qualifiedSymbolId 方針は v1 を採るが、既存との一致は多段テスト追加後に判定 |
 
 | C15 | `v1:105` は位置をcp、`docs/design/02-facts-tokens-bench-corpus.md:23` は REGEX を lookingAt と規定 | `U/unlaxer-dsl/src/main/java/org/unlaxer/dsl/runtime/RegexTokenParser.java:38,45,50,54` はcpのconsumedをUTF-16 substringの添字に使い、matcherのUTF-16長をCodePointLengthに渡す。非BMPの前置/マッチで単位が混在。`corpus/oracle/regex-emoji.json`・`regex-prefix.json` に実測あり | 決定: D-017 に従い code point 意味論。既存の UTF-16 混在は再現しない。`regex-emoji/1`・`regex-prefix/1,2` の `parsedStatus` も `follow-spec` として台帳に登録（受理・AST/capture・cursor・診断は登録済み） |
+
+| C16 | `specs/validation.md:86,94,113` が挙げる `E-MAPPING-EXTRA-CAPTURE` / `E-ASSOC-WITHOUT-PRECEDENCE` / `E-PRECEDENCE-WITHOUT-ASSOC` | 実際に出るコードは `E-MAPPING-UNLISTED-CAPTURE` / `E-ASSOC-NO-PRECEDENCE` / `E-PRECEDENCE-NO-ASSOC`。**ubnfc と旧 Java `GrammarValidator` が同じ綴りを出す**（`corpus/spec/ubnf/annotations.json` の 3 ケース、`examples/ubnf-crosscheck/evidence/spec-report.md`） | 仕様書の表記のほうが誤り。検出そのものは両実装で一致しているのでコード名は変えない。上流の `validation.md` 修正を待つ |
+| C17 | `specs/ubnf-syntax.md:862,895` の `UBNFFile ::= { '//' LINE_COMMENT } GrammarDecl+` と `SequenceBody ::= AnnotatedElement+` | 空ファイル・`grammar G {}` 以外の空構文（`R ::= ;`、`'a' \| ;`、`()`、`[ ]`、`{ }`）を ubnfc は受理、unlaxer-ubnf と Java bootstrap は拒否 | **D-050**。自己記述文法 `ubnf.ubnf` が `{ AnnotatedElement }` を宣言しているので受理を維持し、仕様との差として記録する |
+| C18 | `specs/ubnf-syntax.md:897` の `AnnotatedElement ::= … AtomicElement [Quantifier \| '%' AtomicElement] …` | ubnfc は `V+{2,3}`（量指定子 2 つ）と `V+ % S`（量指定子と分離子の併記）を受理。他 3 実装は拒否 | **D-051**。v1 から受理してきた拡張なので狭めない。仕様の production が実態より狭いと記録する |
+| C19 | `specs/ubnf-syntax.md:863` の `GrammarDecl` は設定・token・rule をすべて 0 回にできる | `grammar G { }` を ubnfc は受理、unlaxer-ubnf は「grammar requires at least one rule」、Java bootstrap は `IllegalArgumentException` で拒否 | ubnfc が仕様どおり。他 2 実装の拒否は仕様に無い追加制約 |
+| C20 | `specs/annotations.md:97` は「`@leftAssoc` を使用するルールは `@precedence` も宣言する（MUST）」 | ところが `specs/ubnf-syntax.md:659` の完全版 MiniLang 文法自身が `@leftAssoc` を `@precedence` 無しで 3 箇所使う。仕様内の矛盾 | `undetermined`。MUST を優先して診断は出し続けるが、仕様の例が直るまで「正」とは書かない |
 
 ## 3. ケース群の分類と loader の読み方
 
