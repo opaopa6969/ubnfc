@@ -358,8 +358,9 @@ fn extern_scanners_are_reached() {
     let accepted = parse_formula(&text, options(true, true));
     assert!(accepted.ok);
     let json = accepted.ast.unwrap().canonical_json();
-    // scanners/rust の移植集合は単引用符だけ value から除く（QuotedParser 由来の規約）。
-    // Java 側の生成物は字句のまま `'jp'` を返すので、この点だけ golden が異なる。
+    // scanners/rust の移植集合は単引用符だけ value から除く（QuotedParser 由来の規約、
+    // `unlaxer-dsl/specs/generators.md` #132）。Java backend も同じ規則
+    // （共有 registry `scanners/java/Registry.java` と `examples/p4-java/P4Scanners.java`）。
     assert!(json.contains("\"jp\""), "{json}");
     assert!(!json.contains("'jp'"), "{json}");
     let double = parse_formula("var $c as string set \"jp\";\n1", options(true, true));
@@ -455,77 +456,54 @@ fn extern_first_chars_declaration_matches_bundled_scanners() {
     assert!(checked > 1000, "{checked}");
 }
 
-/// Java golden の単引用符付き文字列値 `'jp'` を `jp` に正規化し、正規化した個数を返す。
-fn strip_single_quotes(value: &mut serde_json::Value) -> usize {
-    match value {
-        serde_json::Value::String(s)
-            if s.len() >= 2 && s.starts_with('\'') && s.ends_with('\'') =>
-        {
-            *s = s[1..s.len() - 1].to_owned();
-            1
-        }
-        serde_json::Value::Array(items) => items.iter_mut().map(strip_single_quotes).sum(),
-        serde_json::Value::Object(fields) => fields.values_mut().map(strip_single_quotes).sum(),
-        _ => 0,
-    }
-}
-
+/// **両 backend の canonical AST は正規化なしで完全一致する。**
+///
+/// 2026-09-23 のクロスチェック（`docs/reports/2026-09-23-parser-feature-correctness-comparison.md`
+/// §3.2 結果(2)）まで、この比較は「単引用符を除けば一致する」形で書かれており、
+/// `strip_single_quotes` が Java golden の `'jp'` を `jp` に直してから比べ、
+/// 直した個数（complex 3 / x4 12 / x16 48 / x64 192 / valid-unicode 1 = **合計 256**）を
+/// 期待値として固定していた。つまり **backend 間の実際の不一致が、比較の側で
+/// 期待値に変換されていた**。corpus と差分 fuzzer が見つけられなかったのは、どちらも
+/// 共有 registry（`scanners/java/Registry.java` と `scanners/rust/scanners.rs`、
+/// `crates/ubnfc-harness/src/runner/scanners.rs` が両方に注入する）を使い、
+/// 共有 registry は両言語とも単引用符を value から除くため。差が出ていたのは
+/// `examples/p4-java` が同じ 3 つの Extern scanner を独自に書き直した
+/// `P4Scanners.java` だけで、そこは corpus も fuzzer も通らない。
+///
+/// `P4Scanners.valueSpan` を共有 registry と同じ規則
+/// （`unlaxer-dsl/specs/generators.md` #132「外側空白の strip と単引用符だけの除去」）に
+/// 直した今、正規化は一切しない。差がまた入れば、ここが落ちる。
 #[test]
-fn java_goldens_agree_except_single_quoted_string_values() {
-    // Java 側 golden（examples/p4-java）と serde_json::Value として比較する。key の順序は無視。
-    // 唯一の差は文字列値の単引用符（Rust scanner 集合は除く、Java は字句のまま）。
+fn java_and_rust_goldens_are_identical_without_normalization() {
+    // key の順序は serde_json::Value の比較で吸収される（Java は type/span/fields 順）。
     let java = root().join("../p4-java/src/test/resources/golden");
     if !java.is_dir() {
         eprintln!("Java golden がないため比較を省略: {}", java.display());
         return;
     }
-    let compare = |sub: &str, name: &str, quoted: usize| {
-        let rust: serde_json::Value = serde_json::from_str(
-            &std::fs::read_to_string(
-                root()
-                    .join("tests/golden")
-                    .join(sub)
-                    .join(format!("{name}.tiny.json")),
-            )
-            .unwrap(),
+    let read = |path: std::path::PathBuf| -> serde_json::Value {
+        serde_json::from_str(
+            &std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display())),
         )
-        .unwrap();
-        let mut java: serde_json::Value = serde_json::from_str(
-            &std::fs::read_to_string(java.join(sub).join(format!("{name}.tiny.json"))).unwrap(),
-        )
-        .unwrap();
-        if quoted == 0 {
-            assert_eq!(rust, java, "{sub}/{name}: Java golden と構造が異なる");
-        } else {
-            assert_ne!(rust, java, "{sub}/{name}: 生の golden は一致しないはず");
-        }
-        assert_eq!(
-            strip_single_quotes(&mut java),
-            quoted,
-            "{sub}/{name}: 単引用符の文字列値の数"
-        );
-        assert_eq!(
-            rust, java,
-            "{sub}/{name}: 単引用符を除いても Java golden と異なる"
-        );
+        .unwrap()
     };
-    // 単引用符付き文字列値の個数（complex 3、x4 12、x16 48、x64 192、valid-unicode 1）。
-    for (name, quoted) in [
-        ("complex", 3),
-        ("complex-x4", 12),
-        ("complex-x16", 48),
-        ("complex-x64", 192),
-        ("flat-arithmetic", 0),
-        ("large-match", 0),
-        ("valid-basic", 0),
-        ("valid-multiline", 0),
-        ("valid-unicode", 1),
-    ] {
-        compare("", name, quoted);
+    let mut compared = 0;
+    let mut compare = |sub: &str, name: &str| {
+        let file = format!("{name}.tiny.json");
+        assert_eq!(
+            read(root().join("tests/golden").join(sub).join(&file)),
+            read(java.join(sub).join(&file)),
+            "{sub}/{name}: Java backend と Rust backend の canonical AST が一致しません"
+        );
+        compared += 1;
+    };
+    for &(name, _) in ACCEPTED {
+        compare("", name);
     }
     for &(name, _) in BOOLEAN_ENTRY {
-        compare("boolean-entry", name, 0);
+        compare("boolean-entry", name);
     }
+    assert_eq!(compared, ACCEPTED.len() + BOOLEAN_ENTRY.len());
 }
 
 #[test]

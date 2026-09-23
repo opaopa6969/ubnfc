@@ -42,6 +42,7 @@ impl ValidationIssue {
             ("E-PRECEDENCE-", "PRECEDENCE"),
             ("E-ANNOTATION-", "ANNOTATION"),
             ("E-RULE-", "RULE"),
+            ("E-TOKEN-", "TOKEN"),
         ] {
             if self.code.starts_with(prefix) {
                 return category;

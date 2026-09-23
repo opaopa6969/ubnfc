@@ -445,3 +445,25 @@ fn excessive_nesting_reports_an_error_instead_of_overflowing_the_stack() {
     assert_eq!(error.expected, ["shallower rule body"]);
     assert!(source.get(error.span.start..error.span.end).is_some());
 }
+
+/// `atom()` ⇄ `template_args()` は相互再帰で、`body()` の深さ上限を共有していなかった。
+/// `Q<Q<…>>` を 2,000 段書くと診断ではなく stack overflow（exit 134）になっていた
+/// （2026-09-23 のクロスチェック後の panic 掃き出しで発見）。
+#[test]
+fn excessive_template_argument_nesting_reports_an_error_instead_of_overflowing_the_stack() {
+    let source = format!(
+        "grammar G {{ @root R ::= {}'x'{}; }}",
+        "Q<".repeat(200),
+        ">".repeat(200)
+    );
+    let error = parse_file(&source).unwrap_err();
+    assert_eq!(error.expected, ["shallower template arguments"]);
+    assert!(source.get(error.span.start..error.span.end).is_some());
+    // 上限の手前は従来どおり構文としては通る（未定義の雛形は resolve/templates が診断する）。
+    let shallow = format!(
+        "grammar G {{ @root R ::= {}'x'{}; }}",
+        "Q<".repeat(100),
+        ">".repeat(100)
+    );
+    parse_file(&shallow).unwrap();
+}
