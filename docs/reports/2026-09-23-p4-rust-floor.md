@@ -20,7 +20,7 @@
 
 | 項目 | 値 |
 |---|---|
-| 基準 | master `65c4a3f`。branch `perf/rust-floor`（master を merge 済み） |
+| 基準 | master `65c4a3f`。branch `perf/rust-floor` は仕上げに master `963b822` も取り込んでいるが、その差分は harness と Java 側だけで **Rust の生成物は byte 単位で変わらない**ので、計測はそのまま当てはまる |
 | rustc / cargo | `rustc 1.98.1` / `cargo 1.98.1`、`--release --offline` |
 | host | 32 core、WSL2。共有機で他エージェントが並走する |
 | 固定 | `taskset -c 27`。全 variant を**同一セッションで交互に 9 round**（1 round = 各 variant 1 回、bench は内部で warmup 後 5 sample の中央値） |
