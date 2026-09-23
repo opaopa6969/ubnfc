@@ -673,7 +673,7 @@ impl Fold<'_, '_> {
         if let Some((var, labels)) = self.early.take() {
             writeln!(
                 self.code,
-                "self.display.failures({var}.consumed.max({var}.matched),&{labels:?});"
+                "self.display_failures({var}.consumed.max({var}.matched),&{labels:?});"
             )
             .unwrap();
         }
@@ -744,7 +744,7 @@ impl Fold<'_, '_> {
                 let d = self.fresh("d");
                 writeln!(
                     self.code,
-                    "let {d}=self.diag.fail({var}.position::<{mode}>(),{label:?});"
+                    "let {d}=self.diag_fail({var}.position::<{mode}>(),{label:?});"
                 )
                 .unwrap();
                 let _ = value;
@@ -815,7 +815,7 @@ impl Fold<'_, '_> {
                         for alt in order {
                             let c = g.expr[alt.as_str()];
                             let child = self.walk(c, &b);
-                            writeln!(self.code, "{d}=self.diag.join({d},{child});").unwrap();
+                            writeln!(self.code, "{d}=self.diag_join({d},{child});").unwrap();
                         }
                         d
                     }
@@ -836,7 +836,7 @@ impl Fold<'_, '_> {
                             self.depth -= 1;
                             self.record(&var, g.display.rule(rule.symbol_id.as_str()));
                             let d = self.fresh("d");
-                            writeln!(self.code, "let {d}=self.diag.rule({r},{child});").unwrap();
+                            writeln!(self.code, "let {d}=self.diag_rule({r},{child});").unwrap();
                             d
                         } else {
                             // 本物の rule 関数（入口検査・memo・Rule node・rule label を自分で行う）。
@@ -883,25 +883,24 @@ pub(crate) fn guard_function(g: &Generator<'_>, i: usize, mode: bool) -> String 
     .unwrap();
     // 再生が作るのは失敗した候補の**観測**（display の reach / failures と主診断 DAG）だけで、
     // カーソル・memo・scope・event には触れない。fast mode（D-023、`ParseOptions::diagnostics == false`）は
-    // その観測をどちらも記録しないので、再生する中身が無く、丸ごと省ける。
+    // その観測をどちらも記録しないので、再生する中身が無く、丸ごと省ける。D-027 の単相化で、
+    // この分岐は fast の機械語では定数になり、guard 本体そのものが残らない。
     // 省かないと 1 parse あたり数百回、記録されない display 呼出しと本物の trivia 走査を行う
     // （P4 complex で guard 819 回 / parse、認識の 7.7%）。診断モードでは従来どおり再生する。
-    s.push_str(
-        "if !self.options.diagnostics {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}\n",
-    );
-    s.push_str("self.display.reach(state.consumed.max(state.matched));\n");
+    s.push_str("if !DIAG {return Step {ok:false,state,events:EventId(0),diag:Diag::NONE};}\n");
+    s.push_str("self.display_reach(state.consumed.max(state.matched));\n");
     s.push_str(&fold.code);
     if let Some(t) = &fold.t_var {
         if !fold.t_labels.is_empty() {
             writeln!(
                 s,
-                "self.display.failures({t}.consumed.max({t}.matched),&{:?});",
+                "self.display_failures({t}.consumed.max({t}.matched),&{:?});",
                 fold.t_labels
             )
             .unwrap();
         }
         for (var, labels) in &fold.late {
-            writeln!(s,"if {var}.consumed.max({var}.matched)=={t}.consumed.max({t}.matched) {{self.display.failures({t}.consumed.max({t}.matched),&{labels:?});}}").unwrap();
+            writeln!(s,"if {var}.consumed.max({var}.matched)=={t}.consumed.max({t}.matched) {{self.display_failures({t}.consumed.max({t}.matched),&{labels:?});}}").unwrap();
         }
     }
     writeln!(

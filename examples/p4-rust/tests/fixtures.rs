@@ -55,6 +55,15 @@ fn options(build_ast: bool, memo: bool) -> ParseOptions {
     options.limits.memo_entries = 1 << 30;
     options
 }
+/// 出現表と value span は opt-in（D-026）。差分テストはこれらも比較対象に残すため、
+/// 参照経路・最適化経路のどちらにも要求する。
+fn observed(options: ParseOptions) -> ParseOptions {
+    ParseOptions {
+        occurrences: true,
+        value_spans: true,
+        ..options
+    }
+}
 fn strip_statistics(mut result: ParseResult) -> ParseResult {
     // memo の hash は session ごとの RandomState なので memo_max_probe は実行ごとに変わる。
     result.statistics = Default::default();
@@ -120,6 +129,77 @@ fn formula_accepts_and_matches_golden() {
             assert_eq!(no_memo.statistics.memo_entries, 0);
         }
     }
+}
+
+/// D-026: 出現表（`captures` / `lexical` / `tokens`）と `value_spans` は opt-in。
+/// 既定では空になり、それ以外の観測（AST・node_spans・診断・scope・recovery・統計）は
+/// 要求したときと完全に一致する。要求すれば従来どおりの内容が返る。
+#[test]
+fn occurrences_and_value_spans_are_opt_in_without_changing_anything_else() {
+    let cases: Vec<(&str, Option<&str>)> = ACCEPTED
+        .iter()
+        .map(|(n, _)| (*n, None))
+        .chain(REJECTED.iter().map(|n| (*n, None)))
+        .chain([
+            ("comparison-heavy", Some("BooleanExpression")),
+            ("complex-x4", Some("Formula")),
+        ])
+        .collect();
+    let mut with_tables = 0usize;
+    for (name, entry) in cases {
+        let text = fixture(name);
+        for build_ast in [true, false] {
+            for lexical in [false, true] {
+                let base = ParseOptions {
+                    lexical,
+                    ..options(build_ast, true)
+                };
+                let run = |options: ParseOptions| {
+                    strip_statistics(match entry {
+                        None => parse_formula(&text, options),
+                        Some(entry) => parse_entry(Some(entry), &text, options).unwrap(),
+                    })
+                };
+                let default = run(base);
+                let requested = run(observed(base));
+                // 既定で空になるのは出現表と value span だけ。value span は常に opt-in。
+                assert!(
+                    default.value_spans.is_empty(),
+                    "{name}: value_spans 既定 off"
+                );
+                let mut stripped = requested.clone();
+                stripped.value_spans.clear();
+                if lexical {
+                    // lexical mode は出現表そのものが目的なので要求とみなす（D-026）。
+                    assert_eq!(default.captures, requested.captures, "{name}: lexical mode");
+                    assert_eq!(default.lexical, requested.lexical, "{name}: lexical mode");
+                    assert_eq!(default.tokens, requested.tokens, "{name}: lexical mode");
+                } else {
+                    assert!(default.captures.is_empty(), "{name}: captures 既定 off");
+                    assert!(
+                        default.lexical.is_empty() && default.tokens.is_empty(),
+                        "{name}"
+                    );
+                    stripped.captures.clear();
+                    stripped.lexical.clear();
+                    stripped.tokens.clear();
+                }
+                assert!(
+                    default == stripped,
+                    "{name}: 出現表と value span 以外が変わった (ast {build_ast} / lexical {lexical})"
+                );
+                if requested.ok && build_ast {
+                    assert!(!requested.captures.is_empty(), "{name}: 要求時は出現が出る");
+                    assert!(
+                        !requested.value_spans.is_empty(),
+                        "{name}: 要求時は value span が出る"
+                    );
+                    with_tables += 1;
+                }
+            }
+        }
+    }
+    assert!(with_tables >= 8, "{with_tables}");
 }
 
 #[test]
@@ -514,7 +594,7 @@ fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
                     continue;
                 }
                 let run = |predict: bool, factor: bool, lexical_cache: bool| {
-                    let mut options = options(true, memo);
+                    let mut options = observed(options(true, memo));
                     options.predict = predict;
                     options.factor = factor;
                     options.lexical_cache = lexical_cache;
@@ -528,7 +608,7 @@ fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
                 // hints まで完全一致し、完全成功では hints（投機的失敗）だけが fast mode で空になる。
                 let fast = run(true, true, false);
                 let diagnostic = {
-                    let mut options = options(true, memo);
+                    let mut options = observed(options(true, memo));
                     options.diagnostics = true;
                     strip_statistics(match entry {
                         None => parse_formula(input, options),

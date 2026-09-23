@@ -34,7 +34,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
                     .unwrap();
                 }
             }
-            writeln!(s,"_=>None,}};let Some(next)=next else {{break;}};current=next;p+=n;}}self.primitive::<MATCH>(state,end.map(|p|p-start),label)}};if !out.ok {{self.display.fail(state.consumed.max(state.matched),display);}}out\n}}").unwrap();
+            writeln!(s,"_=>None,}};let Some(next)=next else {{break;}};current=next;p+=n;}}self.primitive::<MATCH>(state,end.map(|p|p-start),label)}};if !out.ok {{self.display_fail(state.consumed.max(state.matched),display);}}out\n}}").unwrap();
             continue;
         }
         match &t.spec {
@@ -71,7 +71,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         if matches!(t.spec, TokenSpec::Extern { .. }) {
             s.push_str("};let _=display;out}\n");
         } else {
-            s.push_str("};if !out.ok {self.display.fail(state.consumed.max(state.matched),display);}out}\n");
+            s.push_str("};if !out.ok {self.display_fail(state.consumed.max(state.matched),display);}out}\n");
         }
     }
     for (i, p) in g.ir.semantics.trivia.policies.iter().enumerate() {
@@ -81,12 +81,12 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         )
         .unwrap();
         if g.ir.plan.trivia_cache.enabled {
-            writeln!(s,"let key=Key{{expression:{i},state,matched_mode:MATCH,version:0}};if let Some((hit,display))=self.trivia_cache.get(key) {{self.display.merge(display);return hit;}}").unwrap();
+            writeln!(s,"let key=Key{{expression:{i},state,matched_mode:MATCH,version:0}};if let Some((hit,display))=self.trivia_cache.get(key) {{self.display_merge(display);return hit;}}").unwrap();
         }
         s.push_str(if g.ir.plan.trivia_cache.enabled {
-            "self.display.enter(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n"
+            "self.display_enter(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n"
         } else {
-            "self.display.reach(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n"
+            "self.display_reach(state.consumed.max(state.matched));let mut out=Step::yes(state);loop {let before=out.state.position::<MATCH>();\n"
         });
         // 先頭 byte がどの区切りの先頭でもなければ、下の各 block は何も進めず候補 label を
         // 記録して終わる。その label 列を 1 回の failures で記録して抜ける（記録内容・位置は同じ）。
@@ -100,7 +100,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
                         labels.push(format!("'{open}'"));
                         if p.effective_delimiter_set.len() == 1 {
                             let label = format!("'{open}'");
-                            diag = format!("let d=self.diag.fail(out.state.consumed.max(out.state.matched),{label:?});out.diag=self.diag.join(out.diag,d);");
+                            diag = format!("let d=self.diag_fail(out.state.consumed.max(out.state.matched),{label:?});out.diag=self.diag_join(out.diag,d);");
                         }
                     }
                     Delimiter::BlockComment { open, close } => {
@@ -115,9 +115,9 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
                 .collect::<Vec<_>>()
                 .join("|");
             if pattern.is_empty() {
-                writeln!(s,"if true {{{diag}self.display.failures(out.state.consumed.max(out.state.matched),&{labels:?});break;}}").unwrap();
+                writeln!(s,"if true {{{diag}self.display_failures(out.state.consumed.max(out.state.matched),&{labels:?});break;}}").unwrap();
             } else {
-                writeln!(s,"if !matches!(self.text.as_bytes().get(before),Some({pattern})) {{{diag}self.display.failures(out.state.consumed.max(out.state.matched),&{labels:?});break;}}").unwrap();
+                writeln!(s,"if !matches!(self.text.as_bytes().get(before),Some({pattern})) {{{diag}self.display_failures(out.state.consumed.max(out.state.matched),&{labels:?});break;}}").unwrap();
             }
         }
         for d in &p.effective_delimiter_set {
@@ -128,26 +128,26 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
                     writeln!(s,"if self.input.starts_with(p,{open:?}) {{p+={};while let Some((c,n))=self.input.cp_at(p) {{if matches!(c,'\\n'|'\\r') {{break;}}p+=n;}}let end=if self.input.starts_with(p,\"\\r\\n\") {{p+2}} else {{self.input.cp_at(p).map_or(p,|(_,n)|p+n)}};out.state.advance::<MATCH>(p-start);if !MATCH {{out.state.matched=end;}}continue;}}",open.len()).unwrap();
                     if p.effective_delimiter_set.len()==1 {
                         let label=format!("'{open}'");
-                        writeln!(s,"let d=self.diag.fail(out.state.consumed.max(out.state.matched),{label:?});out.diag=self.diag.join(out.diag,d);").unwrap();
+                        writeln!(s,"let d=self.diag_fail(out.state.consumed.max(out.state.matched),{label:?});out.diag=self.diag_join(out.diag,d);").unwrap();
                     }
                 },
                 Delimiter::BlockComment{open,close}=>writeln!(s,"if self.input.starts_with(p,{open:?}) {{let body=p+{};if let Some(n)=self.text[body..].find({close:?}) {{p=body+n+{};out.state.advance::<MATCH>(p-start);continue;}}}}",open.len(),close.len()).unwrap(),
             }
             match d {
-                Delimiter::Characters { .. } => s.push_str("self.display.fail(out.state.consumed.max(out.state.matched),\"' '\");\n"),
-                Delimiter::LineComment { open, .. } => writeln!(s,"self.display.fail(out.state.consumed.max(out.state.matched),{:?});",format!("'{open}'")).unwrap(),
-                Delimiter::BlockComment { open, close } => writeln!(s,"if self.input.starts_with(start,{open:?}) {{self.display.fail(self.text.len(),{:?});self.display.fail(self.text.len(),\"WildCardStringParser\");}} else {{self.display.fail(out.state.consumed.max(out.state.matched),{:?});self.display.fail(out.state.consumed.max(out.state.matched),{:?});}}",format!("'{close}'"),format!("'{open}'"),format!("'{close}'")).unwrap(),
+                Delimiter::Characters { .. } => s.push_str("self.display_fail(out.state.consumed.max(out.state.matched),\"' '\");\n"),
+                Delimiter::LineComment { open, .. } => writeln!(s,"self.display_fail(out.state.consumed.max(out.state.matched),{:?});",format!("'{open}'")).unwrap(),
+                Delimiter::BlockComment { open, close } => writeln!(s,"if self.input.starts_with(start,{open:?}) {{self.display_fail(self.text.len(),{:?});self.display_fail(self.text.len(),\"WildCardStringParser\");}} else {{self.display_fail(out.state.consumed.max(out.state.matched),{:?});self.display_fail(out.state.consumed.max(out.state.matched),{:?});}}",format!("'{close}'"),format!("'{open}'"),format!("'{close}'")).unwrap(),
             }
             s.push_str("}\n");
         }
         s.push_str("if out.state.position::<MATCH>()==before {break;}}\n");
         if g.ir.plan.trivia_cache.enabled {
-            s.push_str("if self.trivia_cache.len()<self.options.limits.memo_entries {self.trivia_cache.insert(key,(out,self.display.snapshot()));}else {self.resource_failure.get_or_insert((state.consumed,\"trivia memo budget exceeded\"));}\n");
+            s.push_str("if self.trivia_cache.len()<self.options.limits.memo_entries {self.trivia_cache.insert(key,(out,self.display_snapshot()));}else {self.resource_failure.get_or_insert((state.consumed,\"trivia memo budget exceeded\"));}\n");
         }
         s.push_str(if g.ir.plan.trivia_cache.enabled {
-            "self.display.reach(out.state.consumed.max(out.state.matched));self.display.leave();out}\n"
+            "self.display_reach(out.state.consumed.max(out.state.matched));self.display_leave();out}\n"
         } else {
-            "self.display.reach(out.state.consumed.max(out.state.matched));out}\n"
+            "self.display_reach(out.state.consumed.max(out.state.matched));out}\n"
         });
         // 診断を記録しない読み飛ばし。候補除外の判定位置（predict.rs）にだけ使う。
         if p.effective_delimiter_set.is_empty() {

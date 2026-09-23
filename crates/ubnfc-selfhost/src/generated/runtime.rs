@@ -178,7 +178,10 @@ impl Buffers {
                 * std::mem::size_of::<Effect>()
     }
 }
-pub(crate) struct Session<'a> {
+/// 生成 parser の session。`DIAG` は診断を記録するかの単相化 flag で、`ParseOptions::diagnostics`
+/// と 1 対 1 に対応する（D-027）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
+/// 機械語から消える。
+pub(crate) struct Session<'a, const DIAG: bool> {
     pub text: &'a str,
     pub input: Input<'a>,
     pub options: ParseOptions,
@@ -218,7 +221,99 @@ pub(crate) struct Session<'a> {
     mapping_depth: usize,
     mapping_anchor: Option<usize>,
 }
-impl<'a> Session<'a> {
+impl<'a, const DIAG: bool> Session<'a, DIAG> {
+    // 診断の配管は `const DIAG` で単相化する（D-027）。fast mode（`ParseOptions::diagnostics ==
+    // false`）は `Session::<false>` で走り、以下の wrapper が定数 false の分岐になるので、主診断
+    // DAG（`Diagnostics`）と公開 farthest（`DisplayDiagnostics`）への呼出しが機械語から消える。
+    // 実行時の `enabled` 検査だけでは、呼出し・引数の準備・`Step.diag` の合流が残っていた。
+    // 診断モードは `Session::<true>` で従来どおり記録する。観測は両者で変わらない。
+    #[inline(always)]
+    pub fn diag_fail(&mut self, pos: usize, label: &'static str) -> Diag {
+        if DIAG {
+            self.diag.fail(pos, label)
+        } else {
+            Diag::NONE
+        }
+    }
+    #[inline(always)]
+    pub fn diag_join(&mut self, a: Diag, b: Diag) -> Diag {
+        if DIAG {
+            self.diag.join(a, b)
+        } else {
+            Diag::NONE
+        }
+    }
+    #[inline(always)]
+    pub fn diag_rule(&mut self, rule: usize, child: Diag) -> Diag {
+        if DIAG {
+            self.diag.rule(rule, child)
+        } else {
+            Diag::NONE
+        }
+    }
+    #[inline(always)]
+    pub fn display_reach(&mut self, reached: usize) {
+        if DIAG {
+            self.display.reach(reached);
+        }
+    }
+    #[inline(always)]
+    pub fn display_failures(&mut self, pos: usize, labels: &'static [&'static str]) {
+        if DIAG {
+            self.display.failures(pos, labels);
+        }
+    }
+    #[inline(always)]
+    pub fn display_fail(&mut self, pos: usize, label: &'static str) {
+        if DIAG {
+            self.display.fail(pos, label);
+        }
+    }
+    #[inline(always)]
+    pub fn display_enter(&mut self, reached: usize) {
+        if DIAG {
+            self.display.enter(reached);
+        }
+    }
+    #[inline(always)]
+    pub fn display_leave(&mut self) {
+        if DIAG {
+            self.display.leave();
+        }
+    }
+    #[inline(always)]
+    pub fn display_enter_guard(&mut self, reached: usize) {
+        if DIAG {
+            self.display.enter_guard(reached);
+        }
+    }
+    #[inline(always)]
+    pub fn display_leave_guard(&mut self) {
+        if DIAG {
+            self.display.leave_guard();
+        }
+    }
+    #[inline(always)]
+    pub fn display_discard(&mut self) {
+        if DIAG {
+            self.display.discard();
+        }
+    }
+    #[inline(always)]
+    pub fn display_snapshot(&mut self) -> DisplaySnapshot {
+        if DIAG {
+            self.display.snapshot()
+        } else {
+            DisplaySnapshot::default()
+        }
+    }
+    #[inline(always)]
+    pub fn display_merge(&mut self, snapshot: DisplaySnapshot) {
+        if DIAG {
+            self.display.merge(snapshot);
+        }
+    }
+
     pub fn new(text: &'a str, options: ParseOptions, scanner: &'a mut dyn TokenScanner) -> Self {
         let rejected = text.len() > options.limits.input_bytes.min(u32::MAX as usize);
         let text = if rejected { "" } else { text };
@@ -230,7 +325,8 @@ impl<'a> Session<'a> {
         };
         // fast mode（`ParseOptions::diagnostics == false`）は主診断 DAG も公開 farthest も
         // 記録しない。arena は確保せず、予算（limit 0）も消費しない。
-        let diag_on = options.diagnostics;
+        // 単相化（D-027）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
+        let diag_on = DIAG;
         let diag_limit = if diag_on { options.limits.diagnostics } else { 0 };
         let diag_capacity = if diag_on {
             text.len().saturating_mul(24).saturating_add(64).min(1 << 20)
@@ -557,7 +653,7 @@ impl<'a> Session<'a> {
         }
         let saved = self.memo.get(key)?;
         self.statistics.memo_hits += 1;
-        self.display.merge(saved.display);
+        self.display_merge(saved.display);
         self.replay_effects(saved.effects.map(|p| p as usize));
         Some(saved.step())
     }
@@ -575,7 +671,8 @@ impl<'a> Session<'a> {
         } else {
             [0, 0]
         };
-        self.memo.insert(key, Saved::new(step, effects, self.display.snapshot()));
+        let snapshot = self.display_snapshot();
+        self.memo.insert(key, Saved::new(step, effects, snapshot));
     }
     pub fn event(&mut self, event: Event) -> EventId {
         if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE && !HAS_RECOVERY {
@@ -608,7 +705,7 @@ impl<'a> Session<'a> {
             } else {
                 EventId(0)
             },
-            diag: self.diag.join(a.diag, b.diag),
+            diag: self.diag_join(a.diag, b.diag),
         }
     }
     pub fn fail(&mut self, state: State, offset: usize, label: &'static str) -> Step {
@@ -616,7 +713,7 @@ impl<'a> Session<'a> {
             ok: false,
             state,
             events: EventId(0),
-            diag: self.diag.fail(offset, label),
+            diag: self.diag_fail(offset, label),
         }
     }
     pub fn primitive<const MATCH: bool>(
@@ -722,7 +819,7 @@ impl<'a> Session<'a> {
     }
     pub fn eof<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
         if state.begin().position::<MATCH>() == self.text.len() {
-            self.display.fail(state.consumed.max(state.begin().matched),"WildCardCharacterParser");
+            self.display_fail(state.consumed.max(state.begin().matched),"WildCardCharacterParser");
             Step::yes(state)
         } else {
             self.fail(state, state.position::<MATCH>(), label)
@@ -735,40 +832,40 @@ impl<'a> Session<'a> {
         let bytes = self.text.as_bytes();
         let mut p = start;
         if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
-        else { self.display.fail(p, "SignParser"); }
+        else { self.display_fail(p, "SignParser"); }
         let digits = p;
         while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
-        self.display.fail(p, "DigitParser");
+        self.display_fail(p, "DigitParser");
         let mut count = p - digits;
-        if count == 0 { self.display.fail(p, "OneOrMore"); }
+        if count == 0 { self.display_fail(p, "OneOrMore"); }
         if bytes.get(p) == Some(&b'.') {
             p += 1;
             let fraction = p;
             while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
-            self.display.fail(p, "DigitParser");
-            if p == fraction { self.display.fail(p, "OneOrMore"); }
+            self.display_fail(p, "DigitParser");
+            if p == fraction { self.display_fail(p, "OneOrMore"); }
             count += p - fraction;
-            if count == 0 { self.display.fail(start,"Chain"); self.display.fail(start,"'.'"); }
+            if count == 0 { self.display_fail(start,"Chain"); self.display_fail(start,"'.'"); }
         } else {
-            self.display.fail(p, "'.'");
-            if count == 0 { self.display.fail(digits,"Chain"); }
+            self.display_fail(p, "'.'");
+            if count == 0 { self.display_fail(digits,"Chain"); }
         }
         if count == 0 {
-            self.display.fail(start,"NumberParser");
+            self.display_fail(start,"NumberParser");
             let mut out = self.primitive::<MATCH>(state, None, label);
-            if !out.ok { out.diag = self.diag.fail(p,label); }
+            if !out.ok { out.diag = self.diag_fail(p,label); }
             return out;
         }
         if matches!(bytes.get(p), Some(b'e' | b'E')) {
             let exponent = p;
             p += 1;
             if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
-            else { self.display.fail(p,"SignParser"); }
+            else { self.display_fail(p,"SignParser"); }
             let digits = p;
             while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
-            self.display.fail(p,"DigitParser");
-            if digits == p { self.display.fail(p,"OneOrMore"); p = exponent; }
-        } else { self.display.fail(p,"EParser"); self.display.fail(p,"ExponentParser"); }
+            self.display_fail(p,"DigitParser");
+            if digits == p { self.display_fail(p,"OneOrMore"); p = exponent; }
+        } else { self.display_fail(p,"EParser"); self.display_fail(p,"ExponentParser"); }
         self.primitive::<MATCH>(state, Some(p - start), label)
     }
     pub fn identifier<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
@@ -787,8 +884,8 @@ impl<'a> Session<'a> {
                 p += 1;
             }
         }
-        if p == start { self.display.fail(start,"AlphabetUnderScoreParser"); self.display.fail(start,"IdentifierParser"); }
-        else { self.display.fail(p,"AlphabetNumericUnderScoreParser"); }
+        if p == start { self.display_fail(start,"AlphabetUnderScoreParser"); self.display_fail(start,"IdentifierParser"); }
+        else { self.display_fail(p,"AlphabetNumericUnderScoreParser"); }
         self.primitive::<MATCH>(state, (p > start).then_some(p - start), label)
     }
     pub fn quoted<const MATCH: bool>(
@@ -821,7 +918,7 @@ impl<'a> Session<'a> {
                 }
             }
         }
-        self.display.fail(p, if quote == '\'' {"SingleQuoted"} else {"Quoted"});
+        self.display_fail(p, if quote == '\'' {"SingleQuoted"} else {"Quoted"});
         self.fail(state, start, label)
     }
     pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str, display: &'static str) -> Step {
@@ -833,9 +930,9 @@ impl<'a> Session<'a> {
                 }
                 return Step::yes(state.commit(out));
             }
-            if !terminator.is_empty() { self.display.fail(out.consumed.max(out.matched),display); }
+            if !terminator.is_empty() { self.display_fail(out.consumed.max(out.matched),display); }
             let Some((_, n)) = self.input.cp_at(out.position::<MATCH>()) else {
-                self.display.fail(out.consumed.max(out.matched),"ANY");
+                self.display_fail(out.consumed.max(out.matched),"ANY");
                 return Step::yes(state.commit(out));
             };
             out.advance::<MATCH>(n);
@@ -877,9 +974,9 @@ impl<'a> Session<'a> {
         });
         step.ok = result.ok;
         for d in result.diagnostics {
-            self.display.fail(d.offset, d.expected);
-            let diag = self.diag.fail(d.offset, d.expected);
-            step.diag = self.diag.join(step.diag, diag);
+            self.display_fail(d.offset, d.expected);
+            let diag = self.diag_fail(d.offset, d.expected);
+            step.diag = self.diag_join(step.diag, diag);
         }
         if step.ok {
             for effect in result.effects {
@@ -895,7 +992,7 @@ impl<'a> Session<'a> {
         } else {
             self.restore(mark);
             if step.diag.id == 0 {
-                step.diag = self.diag.fail(state.position::<MATCH>(), label);
+                step.diag = self.diag_fail(state.position::<MATCH>(), label);
             }
         }
         step
@@ -1209,7 +1306,7 @@ impl<'a> Session<'a> {
         }
         let mut child = state.begin();
         child.advance::<MATCH>(end - start);
-        let diag = self.diag.rule(rule, failed.diag);
+        let diag = self.diag_rule(rule, failed.diag);
         let events = self.event(Event::Recovery {
             rule,
             mode,
@@ -2429,7 +2526,7 @@ const RULES:&[&str]=&["UBNF::UBNFFile", "UBNF::ImportDecl", "UBNF::GrammarDecl",
 const EXPRESSIONS:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1155:1166:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1335:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1354:1360:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1507:1685:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1507:1516:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1517:1527:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1539:1542:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1550:1564:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1552:1562:body/3/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1584:1601:body/4/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1586:1599:body/4/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1619:1632:body/5/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1621:1630:body/5/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1652:1664:body/6/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1654:1662:body/6/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1682:1685:body/7/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1788:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1805:1808:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1878:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1886:1903:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2087:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2090:2102:body/1/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2114:2117:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2215:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2199:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2205:2208:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2209:2215:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2364:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2382:2385:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2470:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2478:2496:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2504:2523:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2531:2558:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2566:2585:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2593:2605:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2613:2628:body/6/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2636:2649:body/7/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2657:2670:body/8/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2678:2693:body/9/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2701:2717:body/10/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2828:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2829:2832:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2852:2855:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2968:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2969:2972:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2987:2990:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3111:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3112:3115:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3132:3135:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3290:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3291:3294:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3311:3314:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3436:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3437:3440:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3453:3456:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3469:3472:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3562:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3563:3566:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3580:3583:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3688:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3689:3692:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3709:3712:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4129:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4117:4127:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4170:4175:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4176:4184:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4196:4199:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4764:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4269:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4277:4294:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4302:4316:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4324:4344:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4352:4372:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4380:4397:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4405:4424:body/6/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4432:4450:body/7/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4458:4475:body/8/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4483:4502:body/9/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4510:4530:body/10/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4537:4560:body/11/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4567:4593:body/12/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4600:4620:body/13/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4628:4641:body/14/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4649:4667:body/15/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4675:4689:body/16/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4697:4718:body/17/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4726:4740:body/18/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4748:4764:body/19/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4819:4826:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4819:4826:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4924:5066:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4924:4934:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4935:4938:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4946:4956:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4975:5057:body/3/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4977:5055:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4977:4980:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4981:4989:body/3/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4990:4993:body/3/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4994:4997:body/3/0/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4998:5008:body/3/0/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5021:5051:body/3/0/5/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5023:5037:body/3/0/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5023:5026:body/3/0/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5027:5037:body/3/0/5/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5052:5055:body/3/0/6/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5063:5066:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5139:5206:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5139:5146:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5147:5150:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5151:5163:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5173:5202:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5175:5191:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5175:5178:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5179:5191:body/3/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5203:5206:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5289:5332:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5289:5302:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5303:5332:body/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5305:5330:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5305:5308:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5309:5319:body/1/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5327:5330:body/1/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5417:5472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5417:5430:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5431:5434:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5435:5444:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5445:5448:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5449:5459:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5469:5472:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5548:5594:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5548:5558:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5559:5562:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5563:5569:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5570:5573:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5574:5584:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5591:5594:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5674:5722:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5674:5686:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5687:5690:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5691:5697:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5698:5701:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5702:5712:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5719:5722:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5815:5912:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5815:5826:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5827:5830:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5831:5839:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5840:5843:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5844:5854:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5863:5908:body/5/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5865:5893:body/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5865:5868:body/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5869:5882:body/5/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5883:5886:body/5/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5887:5893:body/5/0/3/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5909:5912:body/6/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5991:6039:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5991:6001:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6002:6005:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6006:6015:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6016:6019:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6020:6026:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6036:6039:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6104:6116:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6104:6116:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6182:6195:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6182:6195:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6265:6281:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6265:6281:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6357:6376:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6357:6376:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6458:6515:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6458:6471:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6472:6475:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6476:6483:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6484:6487:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6488:6504:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6512:6515:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6583:6610:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6583:6589:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6590:6593:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6607:6610:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6700:6772:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6700:6711:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6712:6715:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6716:6768:body/2/group", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6718:6760:body/2/0/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6718:6735:body/2/0/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6718:6724:body/2/0/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6725:6728:body/2/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6750:6760:body/2/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6769:6772:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6827:6834:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6827:6834:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6997:7073:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6997:7011:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7012:7015:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7016:7026:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7039:7069:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7041:7055:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7041:7044:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7045:7055:body/3/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7070:7073:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7181:7188:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7181:7188:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7262:7276:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7262:7265:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7266:7276:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7457:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7408:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7423:7457:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7425:7441:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7425:7428:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7429:7441:body/1/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7545:7561:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7727:7912:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7727:7762:body/0/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7729:7742:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7770:7783:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7800:7821:body/2/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7802:7819:body/2/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7829:7850:body/3/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7831:7848:body/3/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7858:7873:body/4/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7860:7871:body/4/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7881:7912:body/5/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7883:7897:body/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7883:7886:body/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7887:7897:body/5/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7961:7976:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7961:7964:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7967:7970:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7973:7976:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8025:8042:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8025:8028:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8029:8042:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8100:8133:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8100:8103:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8104:8110:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8111:8129:body/2/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8113:8127:body/2/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8113:8116:body/2/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8117:8127:body/2/0/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8119:8125:body/2/0/1/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8130:8133:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8152:8167:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8152:8157:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8158:8167:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8160:8165:body/1/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8314:8434:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8314:8326:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8334:8349:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8357:8370:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8378:8390:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8398:8413:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8421:8434:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8524:8546:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8524:8527:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8528:8536:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8543:8546:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8636:8658:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8636:8639:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8640:8648:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8655:8658:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8749:8771:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8749:8752:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8753:8761:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8768:8771:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8871:8902:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8871:8878:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8879:8882:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8883:8889:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8899:8902:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9214:9254:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9214:9243:body/0/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9216:9241:body/0/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9216:9226:body/0/0/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9238:9241:body/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9244:9254:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9422:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9390:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9391:9394:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9395:9405:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9419:9422:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9569:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9536:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9544:9569:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9546:9560:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9546:9549:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9550:9560:body/1/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9627:9637:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9627:9637:body/0/ruleRef"];
 const BODIES:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1507:1685:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2215:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4764:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4819:4826:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4924:5066:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5139:5206:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5289:5332:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5417:5472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5548:5594:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5674:5722:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5815:5912:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5991:6039:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6104:6116:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6182:6195:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6265:6281:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6357:6376:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6458:6515:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6583:6610:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6700:6772:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6827:6834:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6997:7073:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7181:7188:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7262:7276:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7457:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7727:7912:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7961:7976:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8025:8042:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8100:8133:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8152:8167:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8314:8434:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8524:8546:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8636:8658:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8749:8771:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8871:8902:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9214:9254:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9422:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9569:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9627:9637:body/seq"];
 const SITES:&[(&str,&str)]=&[("expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/0/repeat/capture/0", "grammars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef/capture/0", "alias"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef/capture/0", "path"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1517:1527:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1550:1564:body/3/repeat/capture/0", "imports"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1584:1601:body/4/repeat/capture/0", "settings"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1619:1632:body/5/repeat/capture/0", "tokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1652:1664:body/6/repeat/capture/0", "rules"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2199:body/0/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2209:2215:body/2/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef/capture/0", "terminator"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef/capture/0", "chars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef/capture/0", "min"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef/capture/0", "max"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef/capture/0", "word"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4129:body/0/repeat/capture/0", "annotations"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4176:4184:body/3/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4946:4956:body/2/tokenRef/capture/0", "className"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4998:5008:body/3/0/4/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5027:5037:body/3/0/5/0/1/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5151:5163:body/2/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5179:5191:body/3/0/1/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5309:5319:body/1/0/1/tokenRef/capture/0", "style"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5449:5459:body/4/tokenRef/capture/0", "profile"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5574:5584:body/4/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5702:5712:body/4/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5844:5854:body/4/tokenRef/capture/0", "symbol"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5887:5893:body/5/0/3/tokenRef/capture/0", "description"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6020:6026:body/4/tokenRef/capture/0", "context"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6488:6504:body/4/tokenRef/capture/0", "level"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/2/tokenRef/capture/0", "text"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/2/tokenRef/capture/0", "syncTokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6750:6760:body/2/0/1/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7016:7026:body/2/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7045:7055:body/3/0/1/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7266:7276:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7408:body/0/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7429:7441:body/1/0/1/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/0/repeat/capture/0", "elements"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7729:7742:body/0/0/ruleRef/capture/0", "typeofConstraint"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7770:7783:body/1/ruleRef/capture/0", "element"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7887:7897:body/5/0/1/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8528:8536:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8640:8648:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8753:8761:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8883:8889:body/2/tokenRef/capture/0", "message"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/0/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9216:9226:body/0/0/0/tokenRef/capture/0", "namespace"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9244:9254:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9395:9405:body/2/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9536:body/0/tokenRef/capture/0", "parts"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9550:9560:body/1/0/1/tokenRef/capture/0", "parts")];
-impl Session<'_> {
+impl<const DIAG: bool> Session<'_, DIAG> {
 fn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut out=Vec::new();self.build_values_into(root,&mut out)?;Ok(out)}
 #[inline(never)] fn build_values_into(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err("maximum mapping depth exceeded".into());}self.mapping_depth+=1;let result=self.build_values_inner(root,out);self.mapping_depth-=1;result}
 fn build_values_inner(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child}=>self.build_rule(rule,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
@@ -2910,18 +3007,16 @@ fn occurrences(
                 site, span, child, ..
             } => {
                 if done {
-                    if self.options.build_ast || self.options.lexical {
-                        capture_owners.push(parent_index);
-                        let order = captures.len();
-                        captures.push(Capture {
-                            rule_completion_order: 0,
-                            occurrence_id: order,
-                            site_id: SITES[site].0,
-                            name: SITES[site].1,
-                            span: self.span(span),
-                            completion_order: order,
-                        });
-                    }
+                    capture_owners.push(parent_index);
+                    let order = captures.len();
+                    captures.push(Capture {
+                        rule_completion_order: 0,
+                        occurrence_id: order,
+                        site_id: SITES[site].0,
+                        name: SITES[site].1,
+                        span: self.span(span),
+                        completion_order: order,
+                    });
                 } else {
                     stack.push((id, parent, true, NONE));
                     stack.push((child, parent, false, NONE));
@@ -2955,23 +3050,18 @@ if self.options.lexical && expr != usize::MAX => {
                         lexical_order += 1;
                     }
                 } else {
-                    let index = if self.options.lexical || self.options.build_ast {
-                        let index = rule_orders.len();
-                        rule_orders.push(0);
-                        if self.options.lexical {
-                            lexical.push(LexicalOccurrence {
-                                occurrence_id: index,
-                                parent_occurrence_id: parent_index,
-                                rule_id: RULES[rule],
-                                expr_id: BODIES[rule],
-                                span: self.span(span),
-                                completion_order: 0,
-                            });
-                        }
-                        index
-                    } else {
-                        parent
-                    };
+                    let index = rule_orders.len();
+                    rule_orders.push(0);
+                    if self.options.lexical {
+                        lexical.push(LexicalOccurrence {
+                            occurrence_id: index,
+                            parent_occurrence_id: parent_index,
+                            rule_id: RULES[rule],
+                            expr_id: BODIES[rule],
+                            span: self.span(span),
+                            completion_order: 0,
+                        });
+                    }
                     stack.push((id, parent, true, index));
                     stack.push((child, index, false, NONE));
                 }
@@ -3159,9 +3249,10 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         (vec![], vec![])
     };
     diagnostics.splice(0..0, recovery_diagnostics);
-    // capture / rule / token の出現は AST か lexical のときだけ保持する（認識だけなら走査を省く）。
+    // capture / rule / token の出現は要求されたときだけ保持する（D-026）。
+    // lexical mode は出現表そのものが目的なので要求とみなす。
     let (captures, lexical, tokens) =
-        if step.ok && (self.options.build_ast || self.options.lexical) {
+        if step.ok && (self.options.occurrences || self.options.lexical) {
             self.occurrences(step.events)
         } else {
             (vec![], vec![], vec![])
@@ -3208,14 +3299,18 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     self.statistics.lexical_probes = self.lex.probes;
     self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
     self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
-    let mut value_spans = Vec::with_capacity(if ast.is_some() {
+    // value span は要求されたときだけ集める（D-026）。AST 自体は先に完成している。
+    let want_value_spans = self.options.value_spans && ast.is_some();
+    let mut value_spans = Vec::with_capacity(if want_value_spans {
         self.node_spans.len() + self.text_spans.len()
     } else {
         0
     });
-    if let Some(ast) = &ast {
-        let mut path = String::with_capacity(128);
-        ast.collect(&mut path, &self.text_spans, &mut value_spans);
+    if want_value_spans {
+        if let Some(ast) = &ast {
+            let mut path = String::with_capacity(128);
+            ast.collect(&mut path, &self.text_spans, &mut value_spans);
+        }
     }
     let result = ParseResult {
         value_spans,
@@ -3291,7 +3386,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     // 診断を要する結果（失敗・入力の残り・recovery / mapping / resource 診断）は fast mode では
     // 観測を持たないので、入口が診断モードで解析し直す。scope の意味診断（`scope_diagnostics`）は
     // 診断機構ではなく scope store の効果なので、fast mode でも同じものが得られる（再解析しない）。
-    let escalate = !self.options.diagnostics
+    let escalate = !DIAG
         && (!result.ok
             || incomplete
             || !result.diagnostics.is_empty()

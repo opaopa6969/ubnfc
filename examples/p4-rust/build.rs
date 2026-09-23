@@ -55,7 +55,10 @@ fn entry_with_scanner(parser: &str) -> String {
     let start = parser
         .find("pub fn parse_entry_with_options(")
         .expect("entry API");
-    let end = start + parser[start..].find("\nimpl Session").expect("entry 終端");
+    let end = start
+        + parser[start..]
+            .find("\nimpl<const DIAG: bool> Session")
+            .expect("entry 終端");
     parser[start..end]
         .replacen("parse_entry_with_options(", "parse_entry_with_scanner(", 1)
         .replacen(
@@ -106,10 +109,10 @@ fn instrument_parser(parser: &mut String) {
             }
         }
         for (call, key) in [
-            ("self.display.enter(", "DISPLAY_ENTER"),
-            ("self.display.failures(", "DISPLAY_FAILURES"),
-            ("self.display.reach(", "DISPLAY_REACH"),
-            ("self.display.leave(", "DISPLAY_LEAVE"),
+            ("self.display_enter(", "DISPLAY_ENTER"),
+            ("self.display_failures(", "DISPLAY_FAILURES"),
+            ("self.display_reach(", "DISPLAY_REACH"),
+            ("self.display_leave(", "DISPLAY_LEAVE"),
         ] {
             line = statement_hook(&line, call, key);
         }

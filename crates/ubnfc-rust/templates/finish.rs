@@ -27,18 +27,16 @@ fn occurrences(
                 site, span, child, ..
             } => {
                 if done {
-                    if self.options.build_ast || self.options.lexical {
-                        capture_owners.push(parent_index);
-                        let order = captures.len();
-                        captures.push(Capture {
-                            rule_completion_order: 0,
-                            occurrence_id: order,
-                            site_id: SITES[site].0,
-                            name: SITES[site].1,
-                            span: self.span(span),
-                            completion_order: order,
-                        });
-                    }
+                    capture_owners.push(parent_index);
+                    let order = captures.len();
+                    captures.push(Capture {
+                        rule_completion_order: 0,
+                        occurrence_id: order,
+                        site_id: SITES[site].0,
+                        name: SITES[site].1,
+                        span: self.span(span),
+                        completion_order: order,
+                    });
                 } else {
                     stack.push((id, parent, true, NONE));
                     stack.push((child, parent, false, NONE));
@@ -71,23 +69,18 @@ fn occurrences(
                         lexical_order += 1;
                     }
                 } else {
-                    let index = if self.options.lexical || self.options.build_ast {
-                        let index = rule_orders.len();
-                        rule_orders.push(0);
-                        if self.options.lexical {
-                            lexical.push(LexicalOccurrence {
-                                occurrence_id: index,
-                                parent_occurrence_id: parent_index,
-                                rule_id: RULES[rule],
-                                expr_id: BODIES[rule],
-                                span: self.span(span),
-                                completion_order: 0,
-                            });
-                        }
-                        index
-                    } else {
-                        parent
-                    };
+                    let index = rule_orders.len();
+                    rule_orders.push(0);
+                    if self.options.lexical {
+                        lexical.push(LexicalOccurrence {
+                            occurrence_id: index,
+                            parent_occurrence_id: parent_index,
+                            rule_id: RULES[rule],
+                            expr_id: BODIES[rule],
+                            span: self.span(span),
+                            completion_order: 0,
+                        });
+                    }
                     stack.push((id, parent, true, index));
                     stack.push((child, index, false, NONE));
                 }
@@ -275,9 +268,10 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         (vec![], vec![])
     };
     diagnostics.splice(0..0, recovery_diagnostics);
-    // capture / rule / token の出現は AST か lexical のときだけ保持する（認識だけなら走査を省く）。
+    // capture / rule / token の出現は要求されたときだけ保持する（D-026）。
+    // lexical mode は出現表そのものが目的なので要求とみなす。
     let (captures, lexical, tokens) =
-        if step.ok && (self.options.build_ast || self.options.lexical) {
+        if step.ok && (self.options.occurrences || self.options.lexical) {
             self.occurrences(step.events)
         } else {
             (vec![], vec![], vec![])
@@ -324,14 +318,18 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     self.statistics.lexical_probes = self.lex.probes;
     self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
     self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
-    let mut value_spans = Vec::with_capacity(if ast.is_some() {
+    // value span は要求されたときだけ集める（D-026）。AST 自体は先に完成している。
+    let want_value_spans = self.options.value_spans && ast.is_some();
+    let mut value_spans = Vec::with_capacity(if want_value_spans {
         self.node_spans.len() + self.text_spans.len()
     } else {
         0
     });
-    if let Some(ast) = &ast {
-        let mut path = String::with_capacity(128);
-        ast.collect(&mut path, &self.text_spans, &mut value_spans);
+    if want_value_spans {
+        if let Some(ast) = &ast {
+            let mut path = String::with_capacity(128);
+            ast.collect(&mut path, &self.text_spans, &mut value_spans);
+        }
     }
     let result = ParseResult {
         value_spans,
@@ -407,7 +405,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     // 診断を要する結果（失敗・入力の残り・recovery / mapping / resource 診断）は fast mode では
     // 観測を持たないので、入口が診断モードで解析し直す。scope の意味診断（`scope_diagnostics`）は
     // 診断機構ではなく scope store の効果なので、fast mode でも同じものが得られる（再解析しない）。
-    let escalate = !self.options.diagnostics
+    let escalate = !DIAG
         && (!result.ok
             || incomplete
             || !result.diagnostics.is_empty()

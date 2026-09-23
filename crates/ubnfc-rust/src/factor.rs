@@ -240,7 +240,7 @@ fn merged_failures(records: Vec<(String, Vec<String>)>) -> String {
         if !labels.is_empty() {
             writeln!(
                 s,
-                "self.display.failures({pos}.consumed.max({pos}.matched),&{labels:?});"
+                "self.display_failures({pos}.consumed.max({pos}.matched),&{labels:?});"
             )
             .unwrap();
         }
@@ -287,7 +287,7 @@ impl Emit<'_, '_> {
         let labels = g.display.expression(seq.id.as_str());
         self.code
             .push_str(&merged_failures(vec![("entry".to_owned(), labels)]));
-        writeln!(self.code, "diagnostic=self.diag.join(diagnostic,cur.diag);").unwrap();
+        writeln!(self.code, "diagnostic=self.diag_join(diagnostic,cur.diag);").unwrap();
     }
     /// 候補 `k` の成功: 出口 trivia、transaction、Values、capture、共有要素の付け替え。
     fn success(&mut self, k: usize, shared: &[(String, usize)]) {
@@ -334,7 +334,7 @@ impl Emit<'_, '_> {
             }
         }
         self.code
-            .push_str("diagnostic=self.diag.join(diagnostic,cur.diag);break 'factored cur;\n");
+            .push_str("diagnostic=self.diag_join(diagnostic,cur.diag);break 'factored cur;\n");
     }
     /// 候補 `group`（`order` 内 index の区間）は `depth` 個の要素を共有済み。
     /// `shared` は共有要素の event 変数と評価に使った候補。
@@ -406,7 +406,7 @@ impl Emit<'_, '_> {
                 }
                 self.code.push_str(&merged_failures(records));
                 self.code
-                    .push_str("diagnostic=self.diag.join(diagnostic,cur.diag);\n} else {\n");
+                    .push_str("diagnostic=self.diag_join(diagnostic,cur.diag);\n} else {\n");
                 self.trivia(&seq.id, BoundaryAt::AfterChild, Some(depth as u64));
                 shared.push((ev, i));
                 self.level((i, j), depth + 1, shared);
@@ -488,7 +488,7 @@ pub(crate) fn emit(
                 ));
             }
             s.push_str(&merged_failures(records));
-            s.push_str("diagnostic=self.diag.join(diagnostic,cur.diag);\n} else {\n");
+            s.push_str("diagnostic=self.diag_join(diagnostic,cur.diag);\n} else {\n");
             s.push_str(&g.trivia_with(&seq.id, BoundaryAt::AfterChild, Some(0), mode, "cur"));
             let mut shared = vec![("ev0".to_owned(), start)];
             e.level((start, end), 1, &mut shared);

@@ -51,9 +51,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             "self.scope.state_version()".to_owned()
         };
         writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:{version}}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
-        writeln!(s, "self.display.enter(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
+        writeln!(s, "self.display_enter(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display_reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
     } else if leaf {
-        writeln!(s, "let mut out=self.b{i}_{suf}(state);self.display.reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
+        writeln!(s, "let mut out=self.b{i}_{suf}(state);self.display_reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
     } else {
         writeln!(s, "let mut out=self.b{i}_{suf}(state);\nif out.ok {{").unwrap();
     }
@@ -87,7 +87,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     }
     writeln!(
         s,
-        "}} else {{{}self.display.failures(state.consumed.max(state.matched),&{:?});}}",
+        "}} else {{{}self.display_failures(state.consumed.max(state.matched),&{:?});}}",
         if memoized { "self.restore(mark);" } else { "" },
         g.display.expression(expr.id.as_str())
     )
@@ -95,7 +95,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     if memoized {
         writeln!(
             s,
-            "if (out.ok && {success}) || (!out.ok && {failure}) {{self.store(key,out,mark);}}self.display.leave();"
+            "if (out.ok && {success}) || (!out.ok && {failure}) {{self.store(key,out,mark);}}self.display_leave();"
         )
         .unwrap();
     }
@@ -156,9 +156,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             let candidate = |index: usize| -> String {
                 let alt = &order[index];
                 if let Some(x) = guarded.iter().find(|x| x.index == index) {
-                    format!("self.restore(mark);let mut child=if {} {{self.guard_e{}_{}(out.state.begin())}} else {{{}}};diagnostic=self.diag.join(diagnostic,child.diag);\n",crate::predict::skip_condition(&x.known),x.expr,suffix(child_mode),g.call(alt,child_mode,"out.state.begin()"))
+                    format!("self.restore(mark);let mut child=if {} {{self.guard_e{}_{}(out.state.begin())}} else {{{}}};diagnostic=self.diag_join(diagnostic,child.diag);\n",crate::predict::skip_condition(&x.known),x.expr,suffix(child_mode),g.call(alt,child_mode,"out.state.begin()"))
                 } else {
-                    format!("self.restore(mark);let mut child={};diagnostic=self.diag.join(diagnostic,child.diag);\n",g.call(alt,child_mode,"out.state.begin()"))
+                    format!("self.restore(mark);let mut child={};diagnostic=self.diag_join(diagnostic,child.diag);\n",g.call(alt,child_mode,"out.state.begin()"))
                 }
             };
             // 共通接頭辞を持つ連続候補は共有要素を 1 回だけ評価する（factor.rs）。参照経路は
@@ -194,7 +194,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             if let Some(t) = terminator {
                 writeln!(
                     s,
-                    "let end={};out.diag=self.diag.join(out.diag,end.diag);if end.ok {{",
+                    "let end={};out.diag=self.diag_join(out.diag,end.diag);if end.ok {{",
                     g.call(t, false, "out.state.begin()")
                 )
                 .unwrap();
@@ -205,7 +205,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
                 }
                 s.push_str("break;}self.restore(mark);\n");
             }
-            writeln!(s,"let mut child={};out.diag=self.diag.join(out.diag,child.diag);out.state=child.state;if !child.ok {{self.restore(mark);break;}}",g.call(child,child_mode,"out.state")).unwrap();
+            writeln!(s,"let mut child={};out.diag=self.diag_join(out.diag,child.diag);out.state=child.state;if !child.ok {{self.restore(mark);break;}}",g.call(child,child_mode,"out.state")).unwrap();
             s.push_str(&capture_events(g, expr, "before", "child"));
             writeln!(s,"out.events=self.join(out.events,child.events);count+=1;\nif before.position::<{mode}>()==out.state.position::<{mode}>() {{break;}}").unwrap();
             if let Some(max) = max {
@@ -219,7 +219,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
                 (min, None) => format!("count<{min}"),
                 (min, Some(max)) => format!("!({min}..={max}).contains(&count)"),
             };
-            writeln!(s,"if {bound} {{out.ok=false;out.state=state;let d=self.diag.fail(state.position::<{mode}>(),{label:?});out.diag=self.diag.join(out.diag,d);}}").unwrap();
+            writeln!(s,"if {bound} {{out.ok=false;out.state=state;let d=self.diag_fail(state.position::<{mode}>(),{label:?});out.diag=self.diag_join(out.diag,d);}}").unwrap();
         }
         ExprNode::Separated {
             element,
@@ -228,8 +228,8 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             ..
         } => {
             s.push_str("let mark=self.mark();\n");
-            writeln!(s,"let first={};out.diag=self.diag.join(out.diag,first.diag);let mut count=0usize;if first.ok {{out=self.combine(out,first);count+=1;loop {{let pair=self.mark();let before=out;",g.call(element,child_mode,"out.state.begin()")).unwrap();
-            writeln!(s,"let sep={};out.diag=self.diag.join(out.diag,sep.diag);if !sep.ok {{self.restore(pair);break;}}let item={};out.diag=self.diag.join(out.diag,item.diag);if !item.ok {{self.restore(pair);break;}}let joined=self.combine(sep,item);out=self.combine(out,joined);count+=1;if before.state.position::<{mode}>()==out.state.position::<{mode}>() {{break;}}}}}} else {{self.restore(mark);}}",g.call(separator,child_mode,"out.state.begin()"),g.call(element,child_mode,"sep.state")).unwrap();
+            writeln!(s,"let first={};out.diag=self.diag_join(out.diag,first.diag);let mut count=0usize;if first.ok {{out=self.combine(out,first);count+=1;loop {{let pair=self.mark();let before=out;",g.call(element,child_mode,"out.state.begin()")).unwrap();
+            writeln!(s,"let sep={};out.diag=self.diag_join(out.diag,sep.diag);if !sep.ok {{self.restore(pair);break;}}let item={};out.diag=self.diag_join(out.diag,item.diag);if !item.ok {{self.restore(pair);break;}}let joined=self.combine(sep,item);out=self.combine(out,joined);count+=1;if before.state.position::<{mode}>()==out.state.position::<{mode}>() {{break;}}}}}} else {{self.restore(mark);}}",g.call(separator,child_mode,"out.state.begin()"),g.call(element,child_mode,"sep.state")).unwrap();
             if *min > 0 {
                 writeln!(s, "if count<{min} {{out.ok=false;out.state=state;}}").unwrap();
             } else {
@@ -298,9 +298,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             )
             .unwrap();
             if matches!(expr.node, ExprNode::NegativeLookahead { .. }) {
-                writeln!(s,"out=if child.ok {{self.display.leave_guard();let mut failed=self.fail(state,state.position::<{mode}>(),{label:?});failed.diag=self.diag.join(child.diag,failed.diag);failed}} else {{self.display.discard();Step::yes(state.commit(out.state))}};").unwrap();
+                writeln!(s,"out=if child.ok {{self.display_leave_guard();let mut failed=self.fail(state,state.position::<{mode}>(),{label:?});failed.diag=self.diag_join(child.diag,failed.diag);failed}} else {{self.display_discard();Step::yes(state.commit(out.state))}};").unwrap();
             } else {
-                s.push_str("self.display.leave();out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
+                s.push_str("self.display_leave();out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
             }
         }
     }
@@ -311,7 +311,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         let display = g.display.token_label(expr.id.as_str());
         writeln!(
             s,
-            "if !out.ok {{self.display.fail(state.consumed.max(state.matched),{display:?});}}"
+            "if !out.ok {{self.display_fail(state.consumed.max(state.matched),{display:?});}}"
         )
         .unwrap();
     }
@@ -562,9 +562,9 @@ fn predict_literals(g: &Generator<'_>, order: &[ExprId], mode: bool) -> String {
     }
     s.push_str("_=>None,};if let Some(mut child)=candidate {if child.ok {\n");
     for (i, (_, _, label)) in literals.iter().enumerate() {
-        writeln!(s,"if predicted>{i} {{let d=self.diag.fail(out.state.begin().position::<{mode}>(),{label:?});diagnostic=self.diag.join(diagnostic,d);}}").unwrap();
+        writeln!(s,"if predicted>{i} {{let d=self.diag_fail(out.state.begin().position::<{mode}>(),{label:?});diagnostic=self.diag_join(diagnostic,d);}}").unwrap();
     }
-    s.push_str("child.state=out.state.commit(child.state);child.diag=self.diag.join(diagnostic,child.diag);break 'choice child;}}self.restore(mark); }\n");
+    s.push_str("child.state=out.state.commit(child.state);child.diag=self.diag_join(diagnostic,child.diag);break 'choice child;}}self.restore(mark); }\n");
     s
 }
 

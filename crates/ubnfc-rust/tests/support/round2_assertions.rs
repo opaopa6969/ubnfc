@@ -197,7 +197,13 @@ mod contracts {
         assert!(r.ok);
         assert_eq!((r.consumed_cp, r.matched_cp), (7, 7));
         assert_eq!(r.recoveries[0].span, [0, 4]);
-        let r = recovery_root::parse("bad;");
+        let r = recovery_root::parse_with_options(
+            "bad;",
+            recovery_root::ParseOptions {
+                occurrences: true,
+                ..Default::default()
+            },
+        );
         assert!(r.ok);
         assert!(r.ast.is_none());
         assert!(r.captures.is_empty());
@@ -205,7 +211,15 @@ mod contracts {
         assert_eq!(r.diagnostics.len(), 1);
         assert!(!recovery_sync::parse("bad").ok);
         assert!(!recovery_root::parse("").ok);
-        let r = recovery_sync::parse("😀;x");
+        // 出現表は opt-in（D-026）。既定では空、要求すれば従来どおり。
+        assert!(recovery_sync::parse("😀;x").captures.is_empty());
+        let r = recovery_sync::parse_with_options(
+            "😀;x",
+            recovery_sync::ParseOptions {
+                occurrences: true,
+                ..Default::default()
+            },
+        );
         assert!(!r.ok);
         assert_eq!((r.consumed_cp, r.matched_cp), (2, 2));
         assert_eq!(r.captures.len(), 1);

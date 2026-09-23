@@ -178,7 +178,10 @@ impl Buffers {
                 * std::mem::size_of::<Effect>()
     }
 }
-pub(crate) struct Session<'a> {
+/// 生成 parser の session。`DIAG` は診断を記録するかの単相化 flag で、`ParseOptions::diagnostics`
+/// と 1 対 1 に対応する（D-027）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
+/// 機械語から消える。
+pub(crate) struct Session<'a, const DIAG: bool> {
     pub text: &'a str,
     pub input: Input<'a>,
     pub options: ParseOptions,
@@ -218,7 +221,99 @@ pub(crate) struct Session<'a> {
     mapping_depth: usize,
     mapping_anchor: Option<usize>,
 }
-impl<'a> Session<'a> {
+impl<'a, const DIAG: bool> Session<'a, DIAG> {
+    // 診断の配管は `const DIAG` で単相化する（D-027）。fast mode（`ParseOptions::diagnostics ==
+    // false`）は `Session::<false>` で走り、以下の wrapper が定数 false の分岐になるので、主診断
+    // DAG（`Diagnostics`）と公開 farthest（`DisplayDiagnostics`）への呼出しが機械語から消える。
+    // 実行時の `enabled` 検査だけでは、呼出し・引数の準備・`Step.diag` の合流が残っていた。
+    // 診断モードは `Session::<true>` で従来どおり記録する。観測は両者で変わらない。
+    #[inline(always)]
+    pub fn diag_fail(&mut self, pos: usize, label: &'static str) -> Diag {
+        if DIAG {
+            self.diag.fail(pos, label)
+        } else {
+            Diag::NONE
+        }
+    }
+    #[inline(always)]
+    pub fn diag_join(&mut self, a: Diag, b: Diag) -> Diag {
+        if DIAG {
+            self.diag.join(a, b)
+        } else {
+            Diag::NONE
+        }
+    }
+    #[inline(always)]
+    pub fn diag_rule(&mut self, rule: usize, child: Diag) -> Diag {
+        if DIAG {
+            self.diag.rule(rule, child)
+        } else {
+            Diag::NONE
+        }
+    }
+    #[inline(always)]
+    pub fn display_reach(&mut self, reached: usize) {
+        if DIAG {
+            self.display.reach(reached);
+        }
+    }
+    #[inline(always)]
+    pub fn display_failures(&mut self, pos: usize, labels: &'static [&'static str]) {
+        if DIAG {
+            self.display.failures(pos, labels);
+        }
+    }
+    #[inline(always)]
+    pub fn display_fail(&mut self, pos: usize, label: &'static str) {
+        if DIAG {
+            self.display.fail(pos, label);
+        }
+    }
+    #[inline(always)]
+    pub fn display_enter(&mut self, reached: usize) {
+        if DIAG {
+            self.display.enter(reached);
+        }
+    }
+    #[inline(always)]
+    pub fn display_leave(&mut self) {
+        if DIAG {
+            self.display.leave();
+        }
+    }
+    #[inline(always)]
+    pub fn display_enter_guard(&mut self, reached: usize) {
+        if DIAG {
+            self.display.enter_guard(reached);
+        }
+    }
+    #[inline(always)]
+    pub fn display_leave_guard(&mut self) {
+        if DIAG {
+            self.display.leave_guard();
+        }
+    }
+    #[inline(always)]
+    pub fn display_discard(&mut self) {
+        if DIAG {
+            self.display.discard();
+        }
+    }
+    #[inline(always)]
+    pub fn display_snapshot(&mut self) -> DisplaySnapshot {
+        if DIAG {
+            self.display.snapshot()
+        } else {
+            DisplaySnapshot::default()
+        }
+    }
+    #[inline(always)]
+    pub fn display_merge(&mut self, snapshot: DisplaySnapshot) {
+        if DIAG {
+            self.display.merge(snapshot);
+        }
+    }
+
     pub fn new(text: &'a str, options: ParseOptions, scanner: &'a mut dyn TokenScanner) -> Self {
         let rejected = text.len() > options.limits.input_bytes.min(u32::MAX as usize);
         let text = if rejected { "" } else { text };
@@ -230,7 +325,8 @@ impl<'a> Session<'a> {
         };
         // fast mode（`ParseOptions::diagnostics == false`）は主診断 DAG も公開 farthest も
         // 記録しない。arena は確保せず、予算（limit 0）も消費しない。
-        let diag_on = options.diagnostics;
+        // 単相化（D-027）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
+        let diag_on = DIAG;
         let diag_limit = if diag_on { options.limits.diagnostics } else { 0 };
         let diag_capacity = if diag_on {
             text.len().saturating_mul(24).saturating_add(64).min(1 << 20)
@@ -557,7 +653,7 @@ impl<'a> Session<'a> {
         }
         let saved = self.memo.get(key)?;
         self.statistics.memo_hits += 1;
-        self.display.merge(saved.display);
+        self.display_merge(saved.display);
         self.replay_effects(saved.effects.map(|p| p as usize));
         Some(saved.step())
     }
@@ -575,7 +671,8 @@ impl<'a> Session<'a> {
         } else {
             [0, 0]
         };
-        self.memo.insert(key, Saved::new(step, effects, self.display.snapshot()));
+        let snapshot = self.display_snapshot();
+        self.memo.insert(key, Saved::new(step, effects, snapshot));
     }
     pub fn event(&mut self, event: Event) -> EventId {
         if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE && !HAS_RECOVERY {
@@ -608,7 +705,7 @@ impl<'a> Session<'a> {
             } else {
                 EventId(0)
             },
-            diag: self.diag.join(a.diag, b.diag),
+            diag: self.diag_join(a.diag, b.diag),
         }
     }
     pub fn fail(&mut self, state: State, offset: usize, label: &'static str) -> Step {
@@ -616,7 +713,7 @@ impl<'a> Session<'a> {
             ok: false,
             state,
             events: EventId(0),
-            diag: self.diag.fail(offset, label),
+            diag: self.diag_fail(offset, label),
         }
     }
     pub fn primitive<const MATCH: bool>(
@@ -722,7 +819,7 @@ impl<'a> Session<'a> {
     }
     pub fn eof<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
         if state.begin().position::<MATCH>() == self.text.len() {
-            self.display.fail(state.consumed.max(state.begin().matched),"WildCardCharacterParser");
+            self.display_fail(state.consumed.max(state.begin().matched),"WildCardCharacterParser");
             Step::yes(state)
         } else {
             self.fail(state, state.position::<MATCH>(), label)
@@ -735,40 +832,40 @@ impl<'a> Session<'a> {
         let bytes = self.text.as_bytes();
         let mut p = start;
         if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
-        else { self.display.fail(p, "SignParser"); }
+        else { self.display_fail(p, "SignParser"); }
         let digits = p;
         while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
-        self.display.fail(p, "DigitParser");
+        self.display_fail(p, "DigitParser");
         let mut count = p - digits;
-        if count == 0 { self.display.fail(p, "OneOrMore"); }
+        if count == 0 { self.display_fail(p, "OneOrMore"); }
         if bytes.get(p) == Some(&b'.') {
             p += 1;
             let fraction = p;
             while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
-            self.display.fail(p, "DigitParser");
-            if p == fraction { self.display.fail(p, "OneOrMore"); }
+            self.display_fail(p, "DigitParser");
+            if p == fraction { self.display_fail(p, "OneOrMore"); }
             count += p - fraction;
-            if count == 0 { self.display.fail(start,"Chain"); self.display.fail(start,"'.'"); }
+            if count == 0 { self.display_fail(start,"Chain"); self.display_fail(start,"'.'"); }
         } else {
-            self.display.fail(p, "'.'");
-            if count == 0 { self.display.fail(digits,"Chain"); }
+            self.display_fail(p, "'.'");
+            if count == 0 { self.display_fail(digits,"Chain"); }
         }
         if count == 0 {
-            self.display.fail(start,"NumberParser");
+            self.display_fail(start,"NumberParser");
             let mut out = self.primitive::<MATCH>(state, None, label);
-            if !out.ok { out.diag = self.diag.fail(p,label); }
+            if !out.ok { out.diag = self.diag_fail(p,label); }
             return out;
         }
         if matches!(bytes.get(p), Some(b'e' | b'E')) {
             let exponent = p;
             p += 1;
             if matches!(bytes.get(p), Some(b'+' | b'-')) { p += 1; }
-            else { self.display.fail(p,"SignParser"); }
+            else { self.display_fail(p,"SignParser"); }
             let digits = p;
             while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
-            self.display.fail(p,"DigitParser");
-            if digits == p { self.display.fail(p,"OneOrMore"); p = exponent; }
-        } else { self.display.fail(p,"EParser"); self.display.fail(p,"ExponentParser"); }
+            self.display_fail(p,"DigitParser");
+            if digits == p { self.display_fail(p,"OneOrMore"); p = exponent; }
+        } else { self.display_fail(p,"EParser"); self.display_fail(p,"ExponentParser"); }
         self.primitive::<MATCH>(state, Some(p - start), label)
     }
     pub fn identifier<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
@@ -787,8 +884,8 @@ impl<'a> Session<'a> {
                 p += 1;
             }
         }
-        if p == start { self.display.fail(start,"AlphabetUnderScoreParser"); self.display.fail(start,"IdentifierParser"); }
-        else { self.display.fail(p,"AlphabetNumericUnderScoreParser"); }
+        if p == start { self.display_fail(start,"AlphabetUnderScoreParser"); self.display_fail(start,"IdentifierParser"); }
+        else { self.display_fail(p,"AlphabetNumericUnderScoreParser"); }
         self.primitive::<MATCH>(state, (p > start).then_some(p - start), label)
     }
     pub fn quoted<const MATCH: bool>(
@@ -821,7 +918,7 @@ impl<'a> Session<'a> {
                 }
             }
         }
-        self.display.fail(p, if quote == '\'' {"SingleQuoted"} else {"Quoted"});
+        self.display_fail(p, if quote == '\'' {"SingleQuoted"} else {"Quoted"});
         self.fail(state, start, label)
     }
     pub fn until<const MATCH: bool>(&mut self, state: State, terminator: &'static str, display: &'static str) -> Step {
@@ -833,9 +930,9 @@ impl<'a> Session<'a> {
                 }
                 return Step::yes(state.commit(out));
             }
-            if !terminator.is_empty() { self.display.fail(out.consumed.max(out.matched),display); }
+            if !terminator.is_empty() { self.display_fail(out.consumed.max(out.matched),display); }
             let Some((_, n)) = self.input.cp_at(out.position::<MATCH>()) else {
-                self.display.fail(out.consumed.max(out.matched),"ANY");
+                self.display_fail(out.consumed.max(out.matched),"ANY");
                 return Step::yes(state.commit(out));
             };
             out.advance::<MATCH>(n);
@@ -877,9 +974,9 @@ impl<'a> Session<'a> {
         });
         step.ok = result.ok;
         for d in result.diagnostics {
-            self.display.fail(d.offset, d.expected);
-            let diag = self.diag.fail(d.offset, d.expected);
-            step.diag = self.diag.join(step.diag, diag);
+            self.display_fail(d.offset, d.expected);
+            let diag = self.diag_fail(d.offset, d.expected);
+            step.diag = self.diag_join(step.diag, diag);
         }
         if step.ok {
             for effect in result.effects {
@@ -895,7 +992,7 @@ impl<'a> Session<'a> {
         } else {
             self.restore(mark);
             if step.diag.id == 0 {
-                step.diag = self.diag.fail(state.position::<MATCH>(), label);
+                step.diag = self.diag_fail(state.position::<MATCH>(), label);
             }
         }
         step
@@ -1209,7 +1306,7 @@ impl<'a> Session<'a> {
         }
         let mut child = state.begin();
         child.advance::<MATCH>(end - start);
-        let diag = self.diag.rule(rule, failed.diag);
+        let diag = self.diag_rule(rule, failed.diag);
         let events = self.event(Event::Recovery {
             rule,
             mode,

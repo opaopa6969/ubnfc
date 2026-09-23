@@ -48,6 +48,25 @@ pub struct ParseOptions {
     /// `limits.diagnostics` bounds the recording, so in fast mode it is never
     /// consumed and never fails the parse.
     pub diagnostics: bool,
+    /// Retain the occurrence tables (`ParseResult::captures`, `lexical`, `tokens`;
+    /// design v1 §3.6 calls them optional outputs) (D-026).
+    ///
+    /// `false` (the default) skips the extra event-arena walk that builds them, so a
+    /// consumer that only wants the AST does not pay for tables it never reads. The
+    /// AST itself is built from the arena and never from these tables, so nothing
+    /// else in the result changes. `lexical: true` implies this flag, because the
+    /// rule / token occurrence tables are the entire point of lexical mode.
+    ///
+    /// Set it to `true` for occurrence-consuming frontends (LSP-style projection,
+    /// the self-host bootstrap, the harness driver).
+    pub occurrences: bool,
+    /// Retain `ParseResult::value_spans` (the source span of every mapped AST value,
+    /// addressed by canonical AST JSON pointer) (D-026).
+    ///
+    /// `false` (the default) skips the third walk over the built AST. The AST,
+    /// `node_spans` and every diagnostic are unaffected; only `value_spans` is empty.
+    /// Requires `build_ast` — without an AST there is nothing to address.
+    pub value_spans: bool,
     pub limits: ResourceLimits,
 }
 /// Per-session hard limits, checked before indexing input or retaining data.
@@ -87,6 +106,8 @@ impl Default for ParseOptions {
             reuse_buffers: true,
             lexical_cache: false,
             diagnostics: false,
+            occurrences: false,
+            value_spans: false,
             limits: ResourceLimits::default(),
         }
     }
