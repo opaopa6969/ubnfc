@@ -66,62 +66,97 @@ pub(super) fn unsafe_token(t: &Token) -> bool {
             }))
 }
 
+/// `effects` の明示スタック 1 段。`Exit` は再帰版で子の走査から戻った後の処理に当たる。
+enum Step {
+    Enter(usize),
+    Exit(usize),
+}
+
+/// rule 本体へ降りるので、深さは規則参照の連鎖長に比例する。再帰では
+/// `A ::= B; B ::= C; …` の 16,000 段で stack overflow したため明示スタックにした。
+/// 訪問順・`result` への push 順は再帰版と同じ。
 fn effects(cx: &Context<'_>, root: usize) -> Vec<String> {
-    fn visit(cx: &Context<'_>, i: usize, visiting: &mut BTreeSet<usize>, result: &mut Vec<String>) {
-        if !visiting.insert(i) {
-            return;
-        }
+    let own = |i: usize| -> Vec<(usize, &ScopeEvent)> {
         let e = &cx.sem.expressions[i];
         let body = cx.body(&e.rule_id) == i;
-        let own: Vec<_> = cx
-            .sem
+        cx.sem
             .scope
             .effects
             .iter()
             .filter(|s| body && s.rule_id == e.rule_id)
             .flat_map(|s| s.events.iter().enumerate())
-            .collect();
-        for (n, event) in &own {
-            if event.when == ScopeEffectEventsWhen::Entry {
-                result.push(format!("scope:{}:{n}", e.rule_id));
-            }
-        }
-        match &e.node {
-            ExprNode::Lookahead { .. } | ExprNode::NegativeLookahead { .. } => {}
-            ExprNode::TokenRef { symbol_id }
-                if matches!(
-                    cx.sem.tokens[cx.tokens[symbol_id]].spec,
-                    TokenSpec::Extern { .. }
-                ) =>
-            {
-                result.push(format!("extern:{symbol_id}"));
-            }
-            _ => {
-                for &j in &cx.deps[i] {
-                    visit(cx, j, visiting, result);
+            .collect()
+    };
+    let mut visiting = BTreeSet::new();
+    let mut result: Vec<String> = Vec::new();
+    let mut work = vec![Step::Enter(root)];
+    while let Some(step) = work.pop() {
+        match step {
+            Step::Enter(i) => {
+                if !visiting.insert(i) {
+                    continue;
+                }
+                let e = &cx.sem.expressions[i];
+                for (n, event) in &own(i) {
+                    if event.when == ScopeEffectEventsWhen::Entry {
+                        result.push(format!("scope:{}:{n}", e.rule_id));
+                    }
+                }
+                work.push(Step::Exit(i));
+                match &e.node {
+                    ExprNode::Lookahead { .. } | ExprNode::NegativeLookahead { .. } => {}
+                    ExprNode::TokenRef { symbol_id }
+                        if matches!(
+                            cx.sem.tokens[cx.tokens[symbol_id]].spec,
+                            TokenSpec::Extern { .. }
+                        ) =>
+                    {
+                        result.push(format!("extern:{symbol_id}"));
+                    }
+                    _ => {
+                        // LIFO なので逆順に積むと、再帰版と同じ順で子を訪れる。
+                        for &j in cx.deps[i].iter().rev() {
+                            work.push(Step::Enter(j));
+                        }
+                    }
                 }
             }
-        }
-        for phase in 1..4 {
-            for (n, event) in &own {
-                if event_phase(event.when) == phase {
-                    result.push(format!("scope:{}:{n}", e.rule_id));
+            Step::Exit(i) => {
+                let e = &cx.sem.expressions[i];
+                for phase in 1..4 {
+                    for (n, event) in &own(i) {
+                        if event_phase(event.when) == phase {
+                            result.push(format!("scope:{}:{n}", e.rule_id));
+                        }
+                    }
                 }
-            }
-        }
-        for r in &cx.sem.recovery {
-            if r.application_sites.contains(&e.id) {
-                result.push(format!("recovery:{}", r.rule_id));
+                for r in &cx.sem.recovery {
+                    if r.application_sites.contains(&e.id) {
+                        result.push(format!("recovery:{}", r.rule_id));
+                    }
+                }
             }
         }
         // 同一 root の要約では共有部分グラフを一度だけ訪問する。
         // effects は出現列ではなく、最初の出現順を保つ unique な要約。
     }
-    let mut result = Vec::new();
-    visit(cx, root, &mut BTreeSet::new(), &mut result);
     let mut seen = BTreeSet::new();
     result.retain(|s| seen.insert(s.clone()));
     result
+}
+
+/// 文法に scope 効果・recovery・Extern token が 1 つも無ければ、どの式の
+/// `effects` も空になる。`effects` は式ごとに部分グラフ全体を辿るので
+/// （式数 × 到達式数）になり、規則が数千を超える文法では時間で潰れる。
+/// 空と分かっている場合だけ走査そのものを省く（結果は同じ）。
+fn effectless(cx: &Context<'_>) -> bool {
+    cx.sem.scope.effects.is_empty()
+        && cx.sem.recovery.is_empty()
+        && !cx
+            .sem
+            .tokens
+            .iter()
+            .any(|t| matches!(t.spec, TokenSpec::Extern { .. }))
 }
 
 type MemoResult = (MemoPlan, Vec<MemoSafety>, Vec<Vec<String>>, BTreeSet<usize>);
@@ -142,7 +177,11 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
             break;
         }
     }
-    let summaries: Vec<_> = (0..cx.facts.len()).map(|i| effects(cx, i)).collect();
+    let summaries: Vec<Vec<String>> = if effectless(cx) {
+        vec![Vec::new(); cx.facts.len()]
+    } else {
+        (0..cx.facts.len()).map(|i| effects(cx, i)).collect()
+    };
     let safety: Vec<_> = cx.sem.expressions.iter().enumerate().map(|(i,e)| {
         if let ExprNode::TokenRef { symbol_id } = &e.node {
             let token = &cx.sem.tokens[cx.tokens[symbol_id]];
