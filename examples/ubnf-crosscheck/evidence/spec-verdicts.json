@@ -700,14 +700,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-TOKEN-CHAR-RANGE-BOUNDARY",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }
@@ -720,14 +720,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-TOKEN-CHAR-RANGE-BOUNDARY",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }
@@ -740,14 +740,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-TOKEN-CHAR-RANGE-BOUNDARY",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }
@@ -760,14 +760,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-TOKEN-CHAR-RANGE-BOUNDARY",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }
@@ -780,14 +780,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-TOKEN-CHAR-RANGE-SUPPLEMENTARY,E-TOKEN-CHAR-RANGE-SUPPLEMENTARY",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }
@@ -800,14 +800,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-TOKEN-CHAR-RANGE-ORDER",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }
@@ -840,14 +840,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-TOKEN-CHAR-RANGE-ORDER",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }
@@ -922,13 +922,13 @@
     },
     "verdicts": {
       "A": "一致",
-      "B": "違反",
+      "B": "一致",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
       "A": "拒否",
-      "B": "受理",
+      "B": "拒否",
       "C": "拒否",
       "D": "拒否"
     }
@@ -942,13 +942,13 @@
     },
     "verdicts": {
       "A": "一致",
-      "B": "違反",
+      "B": "一致",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
       "A": "拒否",
-      "B": "受理",
+      "B": "拒否",
       "C": "拒否",
       "D": "拒否"
     }
@@ -1402,14 +1402,14 @@
       "verdict": "reject"
     },
     "verdicts": {
-      "A": "違反",
-      "B": "違反",
+      "A": "一致(validate)",
+      "B": "駆動不能",
       "C": "一致",
       "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
+      "A": "構文では受理、validate が拒否: E-RULE-UNDEFINED",
+      "B": "validate は手書き front 経由でしか駆動できない",
       "C": "拒否",
       "D": "拒否"
     }

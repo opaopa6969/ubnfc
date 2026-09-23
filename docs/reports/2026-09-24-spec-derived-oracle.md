@@ -57,65 +57,73 @@ UBNF 文法族には規範文書 `unlaxer-parser/unlaxer-dsl/specs/{ubnf-syntax,
 
 ## 2. 判定（129 ケース × 4 実装）
 
-| 実装 | 一致 | 違反 | 別コード | 未定 | 駆動不能 |
-|---|---:|---:|---:|---:|---:|
-| A ubnfc 手書き frontend | 94 | **18** | 3 | 11 | 3 |
-| B ubnfc 自己ホスト生成 | 81 | **20** | 0 | 11 | 17 |
-| C unlaxer-ubnf（手書き Rust） | 100 | **1** | 0 | 11 | 17 |
-| D Java bootstrap | 109 | **3** | 3 | 11 | 3 |
+計測は **issue #1 の修正（D-050 / D-051）を取り込んだ後**の `origin/master` + 本 branch。
 
+| 実装 | 一致 | 一致(validate) | 違反 | 別コード | 未定 | 駆動不能 |
+|---|---:|---:|---:|---:|---:|---:|
+| A ubnfc 手書き frontend | 94 | 8 | **10** | 3 | 11 | 3 |
+| B ubnfc 自己ホスト生成 | 83 | 0 | **10** | 0 | 11 | 25 |
+| C unlaxer-ubnf（手書き Rust） | 100 | 0 | **1** | 0 | 11 | 17 |
+| D Java bootstrap | 109 | 0 | **3** | 3 | 11 | 3 |
+
+- **`一致(validate)`** = 構文解析では受理するが、同じ道具の `validate` 段が ERROR で拒否する場合。
+  仕様は「拒否する」としか書いておらず、**どの層で拒否するか**は定めていないので違反と混ぜない。
+  8 件はすべて A（CHAR_RANGE 7 件 + `ERROR();`）で、単一パスの C / D は同じ入力を構文段で拒否する。
 - 「別コード」= 同じ違反を検出しているが `validation.md` と違うコード名を出した場合（§4）。
-- B と C の「駆動不能」が 17 なのは、独立した validator を持たないため `validate` scope の
-  14 件を駆動できないから（+ `runtime` 3 件）。
+- B と C の「駆動不能」が多いのは、独立した validator を持たないため `validate` scope の
+  14 件（+ `runtime` 3 件）を駆動できないから。B はさらに、A が validate 段で拒否した 8 件を
+  自己ホスト front 経由で駆動する入口が無いので推測で埋めていない。
 - 「未定」列が 11 なのは、`undetermined` 14 件のうち 3 件が `runtime` scope で
   「駆動不能」に入るため。
-- `旧実装と同じ` を目標にしてきた ubnfc が **18 件、旧実装（D）が 3 件**。
-  この領域では **旧実装のほうが仕様に近い**。旧実装を基準にしている限り、
+- 残る違反は **ubnfc 10 件、旧実装（D）3 件**。旧実装を基準にしている限り、
   ubnfc が広すぎるのか旧実装が狭すぎるのかは判定できず、既知乖離として並ぶだけになる。
 
 節ごとの違反数:
 
 | 節 | ケース | A | B | C | D |
 |---|---:|---:|---:|---:|---:|
-| CHAR_RANGE | 11 | 7 | 7 | 0 | 0 |
-| 形式的な文法定義 | 23 | 9 | 9 | 1 | 2 |
+| 形式的な文法定義 | 23 | 8 | 8 | 1 | 2 |
 | 量指定子とセパレータ | 16 | 2 | 2 | 0 | 0 |
-| コメント | 5 | 0 | 2 | 0 | 1 |
-| 他 6 節 | 74 | 0 | 0 | 0 | 0 |
+| コメント | 5 | 0 | 0 | 0 | 1 |
+| 他 7 節（CHAR_RANGE 含む） | 85 | 0 | 0 | 0 | 0 |
 
 ## 3. 実装別の違反一覧（最小入力つき）
 
-### A ubnfc 手書き frontend — 18 件
+### A ubnfc 手書き frontend — 違反 10 件（+ `一致(validate)` 8 件）
 
-**(a) CHAR_RANGE の境界検査が無い — 7 件**（引用: `ubnf-syntax.md` 「`CHAR_RANGE('min','max')` — 文字の範囲」。
-「各境界はエスケープ展開後に1個の非surrogate BMP文字で、`min <= max` でなければならない。
-空文字・複数文字・surrogate・補助文字（例 `😀`）・逆順の範囲は `IllegalArgumentException` で
-明示的に拒否し、先頭文字へ切り捨てない。」）
+**(a) CHAR_RANGE の境界検査 — 7 件、issue #1 の D-050 で解決済み**
+（引用: `ubnf-syntax.md`「`CHAR_RANGE('min','max')` — 文字の範囲」。「各境界はエスケープ展開後に
+1個の非surrogate BMP文字で、`min <= max` でなければならない。空文字・複数文字・surrogate・
+補助文字（例 `😀`）・逆順の範囲は `IllegalArgumentException` で明示的に拒否し、
+先頭文字へ切り捨てない。」）
 
-| ケース | 入力 | A の実測 | `ubnfc validate` |
+このケース集を作った時点（`origin/master` = 9afb8cd）では 7 件すべてが
+**構文でも validate でも通り、`CHAR_RANGE('','a')` は `ubnfc validate` が panic（exit 101）**
+していた。issue #1 の D-050 を取り込んだ後の実測:
+
+| ケース | 入力 | A の構文 | `ubnfc validate` |
 |---|---|---|---|
-| `char-range/empty-min` | `grammar G { token L=CHAR_RANGE('','a') R ::= L; }` | 受理 | **panic exit 101** |
-| `char-range/empty-max` | `… CHAR_RANGE('a','') …` | 受理 | **panic exit 101** |
-| `char-range/multi-char-min` | `… CHAR_RANGE('ab','z') …` | 受理 | exit 0（先頭 1 文字へ黙って切り捨て） |
-| `char-range/multi-char-max` | `… CHAR_RANGE('a','yz') …` | 受理 | exit 0 |
-| `char-range/supplementary` | `… CHAR_RANGE('😀','😇') …` | 受理 | exit 0 |
-| `char-range/reversed` | `… CHAR_RANGE('z','a') …` | 受理 | exit 0 |
-| `char-range/escaped-bounds-reversed` | `… CHAR_RANGE('\n','\t') …` | 受理 | exit 0 |
+| `char-range/empty-min` / `-max` | `token L=CHAR_RANGE('','a')` | 受理 | `E-TOKEN-CHAR-RANGE-BOUNDARY` |
+| `char-range/multi-char-min` / `-max` | `CHAR_RANGE('ab','z')` | 受理 | `E-TOKEN-CHAR-RANGE-BOUNDARY` |
+| `char-range/supplementary` | `CHAR_RANGE('😀','😇')` | 受理 | `E-TOKEN-CHAR-RANGE-SUPPLEMENTARY` |
+| `char-range/reversed` | `CHAR_RANGE('z','a')` | 受理 | `E-TOKEN-CHAR-RANGE-ORDER` |
+| `char-range/escaped-bounds-reversed` | `CHAR_RANGE('\n','\t')` | 受理 | `E-TOKEN-CHAR-RANGE-ORDER` |
 
-C と D は 7 件すべてを拒否する。**この 7 件は issue #1（malformed-declaration diagnostics）が
-扱う範囲なので、本作業では front を触っていない**（同じファイルを同時に書き換えないため）。
-`corpus/spec/ubnf/char-range.json` が受け入れ条件としてそのまま使える。
-`CHAR_RANGE('\t','\n')`（展開後 0x09 <= 0x0A）は仕様どおり受理されるので、
-「エスケープ展開後に判定する」側の期待も同じファイルに入れてある。
+仕様は「拒否する」としか書いていないので、**構文段で拒否する C / D と validate 段で拒否する
+ubnfc はどちらも規範文を満たす**。`一致(validate)` として違反とは別に数える。
+`CHAR_RANGE('\t','\n')`（展開後 0x09 <= 0x0A）と `CHAR_RANGE('a','a')` は仕様どおり通るので、
+「エスケープ展開後に判定する」「両端を含む」側の期待も同じファイルに入れてある。
+`ERROR();` も同様に `E-RULE-UNDEFINED` で validate が拒否する（`ERROR` が規則参照に落ちるため）。
 
-**(b) 空構文 — 9 件**（引用: `UBNFFile ::= { '//' LINE_COMMENT } GrammarDecl+`、
+**(b) 空構文 — 8 件**（引用: `UBNFFile ::= { '//' LINE_COMMENT } GrammarDecl+`、
 `SequenceBody ::= AnnotatedElement+`）
 
 `(空ファイル)` / `// just a comment` / `R ::= ;` / `R ::= 'a' | ;` / `R ::= | 'a';` /
-`R ::= ();` / `R ::= [ ];` / `R ::= { };` / `ERROR();` の 9 件。C と D は 9 件とも拒否。
-→ **意図的。D-050 として記録した**（自己記述文法 `ubnf.ubnf` の `SequenceBody` が
-`{ AnnotatedElement }` で、`crates/ubnfc-selfhost/tests/parity.rs:56-63` が受理入力として
-明示列挙している。狭めると self-host の乖離方向が 9 件増え、実在文法の受理は 1 つも変わらない）。
+`R ::= ();` / `R ::= [ ];` / `R ::= { };` の 8 件。C と D は 8 件とも拒否し、
+`ubnfc validate` も ERROR を出さない。
+→ **意図的。D-052 として記録した**（自己記述文法 `ubnf.ubnf` の `SequenceBody` が
+`{ AnnotatedElement }` で、`crates/ubnfc-selfhost/tests/parity.rs` が受理入力として
+明示列挙している。狭めると self-host の乖離方向が 8 件増え、実在文法の受理は 1 つも変わらない）。
 
 **(c) 量指定子の併記 — 2 件**（引用: `AnnotatedElement ::= … AtomicElement [Quantifier | '%' AtomicElement] …`）
 
@@ -124,22 +132,15 @@ C と D は 7 件すべてを拒否する。**この 7 件は issue #1（malform
 | `quantifier/two-quantifiers` | `grammar G { token V=ANY R ::= V+{2,3}; }` | 受理 | 拒否 |
 | `quantifier/quantifier-and-separator` | `grammar G { token V=ANY token S=ANY R ::= V+ % S; }` | 受理 | 拒否 |
 
-→ **意図的な拡張。D-051 として記録した**。
+→ **意図的な拡張。D-053 として記録した**。
 
-### B ubnfc 自己ホスト生成 — 20 件
+### B ubnfc 自己ホスト生成 — 10 件
 
-A の 18 件に**ブロックコメント 2 件**が加わる。
-
-| ケース | 入力 | A | B | C | D |
-|---|---|---|---|---|---|
-| `comment/block-rejected` | `grammar G { /* no */ R ::= 'x'; }` | 拒否 | **受理** | 拒否 | 拒否 |
-| `comment/block-in-body-rejected` | `grammar G { R ::= /* no */ 'x'; }` | 拒否 | **受理** | 拒否 | 拒否 |
-
-`ubnf-syntax.md`「ルール宣言」の「UBNF ファイル自体のコメント構文は `//` のみで、
-`/* ... */` は未対応です。」に反する。2026-09-23 の比較報告が見つけた
-**7 件目の self-host 乖離**（`ubnf.ubnf:18` の `@whitespace: javaStyle` が
-`lower/trivia.rs` で block comment を delimiter に入れる）を、今回は**仕様の側から**
-独立に再現した。B は A の 9 件の空構文と 7 件の CHAR_RANGE も同じく受理する。
+A と同じ 8 + 2 件。**ブロックコメントの乖離は解消している**。
+このケース集を作った時点では B だけが `grammar G { /* no */ R ::= 'x'; }` と
+`grammar G { R ::= /* no */ 'x'; }` を受理していた（2026-09-23 の比較報告が見つけた
+7 件目の self-host 乖離）。`comments.json` の 2 ケースは仕様の側から独立にそれを検出し、
+issue #1 の D-051 の修正後は A と同じく拒否する。
 
 ### C unlaxer-ubnf（手書き Rust） — 1 件
 
@@ -188,10 +189,10 @@ A の 18 件に**ブロックコメント 2 件**が加わる。
 | ケース | 何が決まらないか |
 |---|---|
 | `rule/lowercase-name` | 本文は「左辺はルール名（大文字始まりの識別子）」、形式文法は `IDENTIFIER` で大小を制約しない。`r ::= 'x';` を拒否すべきか警告か許容か。4 実装とも受理 |
-| `rule/dotted-reference-three-segments` | `a.b.Value` の namespace が `a.b` か `a` か。「ドットは外側の文法が処理する」としか書かれていない。A/C/D は受理、B は拒否 |
+| `rule/dotted-reference-three-segments` | `a.b.Value` の namespace が `a.b` か `a` か。「ドットは外側の文法が処理する」としか書かれていない。A/C/D は受理、B（自己ホスト）は拒否 — 既知の self-host 乖離の 1 つを仕様側から拾った |
 | `escape/unknown-sequence` | 表は `\n \t \r \\ \'` の 5 つだけ。`'\q'` を拒否するのか、バックスラッシュごと残すのか、`q` にするのか。4 実装とも受理 |
 | `quantifier/reversed-bounds` | `V{9,2}`。`Quantifier` の production は n <= m を要求していない。CHAR_RANGE と違い逆順反復の規範文が無い。4 実装とも構文としては受理 |
-| `quantifier/huge-bound` | `'x'{2147483648}`。INTEGER の表現範囲が書かれていない。A/B 受理、C/D 拒否 |
+| `quantifier/huge-bound` | `'x'{2147483648}`。INTEGER の表現範囲が書かれていない。C/D は構文で拒否、ubnfc は構文で受理し validate が `E-BOUNDED-OVERFLOW`（issue #1 の D-050 で追加）。仕様が範囲を決めていないので、どちらも「違反」とは言えない |
 | `error/element-needs-string` | `ERROR(msg)` は `ErrorElement` にならないが、同じ形式文法の `RuleRefElement` + `GroupElement` で導出できる。予約語 `ERROR` を規則参照位置で使えるかが未規定。4 実装とも受理 |
 | `annotation/root-two-rules` | 「最大1つのルールに付与すべき（SHOULD）」。違反時に受理か警告かエラーかが定まらない |
 | `spec-contradiction/minilang-leftassoc` | `annotations.md:97` は `@leftAssoc` に `@precedence` を MUST とするが、`ubnf-syntax.md:659` の完全版 MiniLang 文法自身が 3 箇所で違反している。**仕様内の矛盾** |
@@ -246,24 +247,30 @@ HAND-ONLY 30 / UBNF-ONLY 16 / PARTIAL 14）は仕様ではなく実装差分の�
 
 | 分類 | 件数 | 対応 |
 |---|---:|---|
-| 意図的（仕様より広い受理を維持） | 11 | **D-050**（空構文 9 件）、**D-051**（量指定子併記 2 件）。どちらも受理・AST・IR・corpus 不変の追認 |
-| issue #1 が扱う範囲 | 7 | CHAR_RANGE の境界検査。`corpus/spec/ubnf/char-range.json` を受け入れ条件として使える。本作業では front を変更していない |
+| issue #1 が独立に修正した | 9 | CHAR_RANGE の境界検査 7 件（D-050）と self-host のブロックコメント 2 件（D-051）。**本ケース集は同じ 9 件を仕様の側から独立に指し、修正後の受け入れ条件としてそのまま回る** |
+| 意図的（仕様より広い受理を維持） | 10 | **D-052**（空構文 8 件）、**D-053**（量指定子併記 2 件）。どちらも受理・AST・IR・corpus 不変の追認 |
 | 仕様書の誤り | 3 | 診断コード名（compat-matrix C16）。実装は変えない |
 | 他実装の違反 | 4 | C 1 件・D 3 件。ubnfc 側の作業ではない（記録のみ） |
 
-**ubnfc のコードは 1 行も変えていない。** 見つかった 18 件はすべて
-「意図的（11）」「issue #1 の担当（7）」のどちらかで、本作業で直すべき残りは無い。
-決定 2 件と compat-matrix の 5 行（C16〜C20）が成果物である。
+**ubnfc のコードは本 branch で 1 行も変えていない。** ケース集を作った時点で ubnfc にあった
+18 件のうち 9 件は issue #1 が並行して直し（`crates/ubnfc-front/**` を同時に書き換えないため
+こちらでは触らなかった）、残る 10 件は意図的な差として D-052 / D-053 に落ちた。
+本 branch の成果物は**仕様由来のケース集 161 件と、それを回すドライバ、決定 2 件、
+compat-matrix の 5 行（C16〜C20）**である。
 
 ## 8. この作業が示したこと
 
-- **「旧実装と同じ」では仕様との距離が測れない。** 今回 ubnfc は 18 件、旧実装は 3 件
-  違反した。この 18 件は「旧実装と食い違っている」ことは以前から見えていた
+- **「旧実装と同じ」では仕様との距離が測れない。** ケース集を作った時点で ubnfc は 18 件、
+  旧実装は 3 件違反した。この 18 件が「旧実装と食い違っている」ことは以前から見えていた
   （2026-09-23 の比較報告の受理不一致 21 件に含まれる）が、**どちらが仕様に沿っているかは
   問われていなかった**。仕様を当てて初めて「ubnfc が広すぎる 18 件」「旧実装が狭すぎる /
-  緩すぎる 3 件」と向きが決まり、11 件を意図的な拡張として決定に落とせた。
+  緩すぎる 3 件」と向きが決まり、9 件が修正に、10 件が意図的な拡張の決定に落ちた。
   逆に `grammar G { }` のように **ubnfc が正しく他 2 実装が誤っている**ことも、
   旧実装を基準にしている限り出てこない。
+- **層の違いを違反と混ぜないと決められた。** CHAR_RANGE の 7 件を ubnfc は validate 段で、
+  C / D は構文段で拒否する。仕様は「拒否する」としか書いていないのでどちらも適合であり、
+  `一致(validate)` として別に数えた。「同じ入力を拒否するか」だけを見る差分比較では、
+  この区別は立てられない。
 - **仕様の側にも欠陥がある。** 存在しない診断コード 3 つ、自分の例が自分の MUST を破る
   箇所 1 つ、production が実態より狭い箇所 2 つ。仕様由来オラクルは仕様のレビューにもなる。
 - **「仕様が決めていない」を件数で持てるようになった。** 129 件中 14 件（10.9%）は

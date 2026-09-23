@@ -3,33 +3,35 @@
 期待値は `unlaxer-dsl/specs/*.md` の規範文から導いたもので、
 どの実装の観測値も使っていない（`corpus/spec/ubnf/README.md`）。
 
-ケース 129 件。判定は 一致 / 違反 / 別コード / 未定（仕様が沈黙）/ 駆動不能。
+ケース 129 件。判定は 一致 / 一致(validate) / 違反 / 別コード / 未定（仕様が沈黙）/ 駆動不能。
 
 ## 1. 節ごとの件数と違反数
 
 | 節 | ケース | ubnfc-front(手書き) 違反 | ubnfc-selfhost(生成) 違反 | unlaxer-ubnf(Rust) 違反 | Java bootstrap 違反 |
 |---|---:|---:|---:|---:|---:|
 | `annotations` (アノテーション) | 32 | 0 | 0 | 0 | 0 |
-| `char-range` (CHAR_RANGE('min','max')) | 11 | 7 | 7 | 0 | 0 |
-| `comments` (コメント) | 5 | 0 | 2 | 0 | 1 |
-| `formal-grammar` (形式的な文法定義) | 23 | 9 | 9 | 1 | 2 |
+| `char-range` (CHAR_RANGE('min','max')) | 11 | 0 | 0 | 0 | 0 |
+| `comments` (コメント) | 5 | 0 | 0 | 0 | 1 |
+| `formal-grammar` (形式的な文法定義) | 23 | 8 | 8 | 1 | 2 |
 | `global-settings` (グローバル設定) | 10 | 0 | 0 | 0 | 0 |
 | `literals-escapes` (ルール本体の書き方 / リテラル) | 9 | 0 | 0 | 0 | 0 |
 | `quantifiers` (量指定子とセパレータ) | 16 | 2 | 2 | 0 | 0 |
 | `reserved-words` (予約語) | 3 | 0 | 0 | 0 | 0 |
 | `rule-declaration` (ルール宣言) | 10 | 0 | 0 | 0 | 0 |
 | `token-declarations` (トークン宣言（token）) | 10 | 0 | 0 | 0 | 0 |
-| **合計** | **129** | **18** | **20** | **1** | **3** |
+| **合計** | **129** | **10** | **10** | **1** | **3** |
 
 ## 2. 判定の内訳
 
-| 実装 | 一致 | 違反 | 別コード | 未定 | 駆動不能 |
-|---|---:|---:|---:|---:|---:|
-| ubnfc-front(手書き) | 94 | 18 | 3 | 11 | 3 |
-| ubnfc-selfhost(生成) | 81 | 20 | 0 | 11 | 17 |
-| unlaxer-ubnf(Rust) | 100 | 1 | 0 | 11 | 17 |
-| Java bootstrap | 109 | 3 | 3 | 11 | 3 |
+| 実装 | 一致 | 一致(validate) | 違反 | 別コード | 未定 | 駆動不能 |
+|---|---:|---:|---:|---:|---:|---:|
+| ubnfc-front(手書き) | 94 | 8 | 10 | 3 | 11 | 3 |
+| ubnfc-selfhost(生成) | 83 | 0 | 10 | 0 | 11 | 25 |
+| unlaxer-ubnf(Rust) | 100 | 0 | 1 | 0 | 11 | 17 |
+| Java bootstrap | 109 | 0 | 3 | 3 | 11 | 3 |
 
+`一致(validate)` は構文解析では受理するが同じ道具の validate 段が ERROR で拒否する場合。
+仕様は「拒否する」としか書いておらず、どの層で拒否するかは定めていない。
 `別コード` は validation.md のコード名と違う名前で同じ違反を検出した場合。
 
 ## 3. ケース × 実装
@@ -70,19 +72,19 @@
 | `spec-contradiction/minilang-leftassoc` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
 | `char-range/valid` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `char-range/equal-bounds` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `char-range/empty-min` | parse | reject | 違反 | 違反 | 一致 | 一致 |
-| `char-range/empty-max` | parse | reject | 違反 | 違反 | 一致 | 一致 |
-| `char-range/multi-char-min` | parse | reject | 違反 | 違反 | 一致 | 一致 |
-| `char-range/multi-char-max` | parse | reject | 違反 | 違反 | 一致 | 一致 |
-| `char-range/supplementary` | parse | reject | 違反 | 違反 | 一致 | 一致 |
-| `char-range/reversed` | parse | reject | 違反 | 違反 | 一致 | 一致 |
+| `char-range/empty-min` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
+| `char-range/empty-max` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
+| `char-range/multi-char-min` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
+| `char-range/multi-char-max` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
+| `char-range/supplementary` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
+| `char-range/reversed` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
 | `char-range/escaped-bounds` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `char-range/escaped-bounds-reversed` | parse | reject | 違反 | 違反 | 一致 | 一致 |
+| `char-range/escaped-bounds-reversed` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
 | `char-range/inclusive-bounds` | runtime | undetermined | 駆動不能 | 駆動不能 | 駆動不能 | 駆動不能 |
 | `comment/line-accepted` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `comment/line-inside-body` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `comment/block-rejected` | parse | reject | 一致 | 違反 | 一致 | 一致 |
-| `comment/block-in-body-rejected` | parse | reject | 一致 | 違反 | 一致 | 一致 |
+| `comment/block-rejected` | parse | reject | 一致 | 一致 | 一致 | 一致 |
+| `comment/block-in-body-rejected` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `comment/block-unclosed-rejected` | parse | reject | 一致 | 一致 | 一致 | 違反 |
 | `file/empty-rejected` | parse | reject | 違反 | 違反 | 一致 | 一致 |
 | `file/only-comments-rejected` | parse | reject | 違反 | 違反 | 一致 | 一致 |
@@ -105,7 +107,7 @@
 | `element/typeof-prefix` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `error/element` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `error/element-needs-string` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
-| `error/element-needs-argument` | parse | reject | 違反 | 違反 | 一致 | 一致 |
+| `error/element-needs-argument` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
 | `error/hint-is-last-alternative` | runtime | undetermined | 駆動不能 | 駆動不能 | 駆動不能 | 駆動不能 |
 | `setting/package` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `setting/colon-required` | parse | reject | 一致 | 一致 | 一致 | 一致 |
@@ -168,17 +170,10 @@
 
 ## 4. 実装別の違反一覧（最小入力つき）
 
-### ubnfc-front(手書き) — 18 件
+### ubnfc-front(手書き) — 10 件
 
 | ケース | 入力 | 期待 | 実測 | 引用 |
 |---|---|---|---|---|
-| `char-range/empty-min` | `grammar G { token L=CHAR_RANGE('','a') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/empty-max` | `grammar G { token L=CHAR_RANGE('a','') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/multi-char-min` | `grammar G { token L=CHAR_RANGE('ab','z') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/multi-char-max` | `grammar G { token L=CHAR_RANGE('a','yz') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/supplementary` | `grammar G { token L=CHAR_RANGE('😀','😇') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/reversed` | `grammar G { token L=CHAR_RANGE('z','a') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/escaped-bounds-reversed` | `grammar G { token L=CHAR_RANGE('\n','\t') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
 | `file/empty-rejected` | `(空ファイル)` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `file/only-comments-rejected` | `// just a comment\n` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `body/empty-sequence-rejected` | `grammar G { R ::= ; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
@@ -187,23 +182,13 @@
 | `body/empty-group-rejected` | `grammar G { R ::= (); }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `body/empty-optional-rejected` | `grammar G { R ::= [ ]; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `body/empty-repeat-rejected` | `grammar G { R ::= { }; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
-| `error/element-needs-argument` | `grammar G { R ::= 'a' \| ERROR(); }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `quantifier/two-quantifiers` | `grammar G { token V=ANY R ::= V+{2,3}; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `quantifier/quantifier-and-separator` | `grammar G { token V=ANY token S=ANY R ::= V+ % S; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 
-### ubnfc-selfhost(生成) — 20 件
+### ubnfc-selfhost(生成) — 10 件
 
 | ケース | 入力 | 期待 | 実測 | 引用 |
 |---|---|---|---|---|
-| `char-range/empty-min` | `grammar G { token L=CHAR_RANGE('','a') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/empty-max` | `grammar G { token L=CHAR_RANGE('a','') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/multi-char-min` | `grammar G { token L=CHAR_RANGE('ab','z') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/multi-char-max` | `grammar G { token L=CHAR_RANGE('a','yz') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/supplementary` | `grammar G { token L=CHAR_RANGE('😀','😇') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/reversed` | `grammar G { token L=CHAR_RANGE('z','a') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `char-range/escaped-bounds-reversed` | `grammar G { token L=CHAR_RANGE('\n','\t') R ::= L; }` | reject | 受理 | ubnf-syntax.md #### `CHAR_RANGE('min','max')` — 文字の範囲 |
-| `comment/block-rejected` | `grammar G { /* no */ R ::= 'x'; }` | reject | 受理 | ubnf-syntax.md ## ルール宣言 |
-| `comment/block-in-body-rejected` | `grammar G { R ::= /* no */ 'x'; }` | reject | 受理 | ubnf-syntax.md ## ルール宣言 |
 | `file/empty-rejected` | `(空ファイル)` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `file/only-comments-rejected` | `// just a comment\n` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `body/empty-sequence-rejected` | `grammar G { R ::= ; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
@@ -212,7 +197,6 @@
 | `body/empty-group-rejected` | `grammar G { R ::= (); }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `body/empty-optional-rejected` | `grammar G { R ::= [ ]; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `body/empty-repeat-rejected` | `grammar G { R ::= { }; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
-| `error/element-needs-argument` | `grammar G { R ::= 'a' \| ERROR(); }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `quantifier/two-quantifiers` | `grammar G { token V=ANY R ::= V+{2,3}; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `quantifier/quantifier-and-separator` | `grammar G { token V=ANY token S=ANY R ::= V+ % S; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 
