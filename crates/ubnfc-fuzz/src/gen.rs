@@ -531,12 +531,23 @@ pub fn generate(seed: u64) -> Grammar {
             });
         }
         if builder.rng.chance(20) {
-            builder.mark("interleave");
-            annotations.push(if builder.rng.chance(50) {
-                "@interleave(profile=javaStyle)".to_owned()
+            // D-046: v2 で `@interleave` は非推奨なので、同じ位置に `@whitespace` を置く
+            // （同一規則に `@whitespace` が既にあるときは書かない＝重複エラーを避ける）。
+            // 乱数は v1 と同じ回数だけ引く。
+            let comments = builder.rng.chance(50);
+            if builder.v2 {
+                if !annotations.iter().any(|a| a.starts_with("@whitespace")) {
+                    builder.mark("whitespace");
+                    annotations.push("@whitespace(javaStyle)".to_owned());
+                }
             } else {
-                "@interleave(profile=commentsAndSpaces)".to_owned()
-            });
+                builder.mark("interleave");
+                annotations.push(if comments {
+                    "@interleave(profile=javaStyle)".to_owned()
+                } else {
+                    "@interleave(profile=commentsAndSpaces)".to_owned()
+                });
+            }
         }
         if builder.rng.chance(20) {
             builder.mark("recovery");
@@ -551,7 +562,9 @@ pub fn generate(seed: u64) -> Grammar {
             if builder.rng.chance(50) {
                 builder.mark("longestChoice");
                 annotations.push("@longestChoice".to_owned());
-            } else {
+            } else if !builder.v2 {
+                // D-047: v2 で `@predictiveChoice` は非推奨（front が自力で predict を選ぶ）。
+                // `@longestChoice` は導出できない意味論の選択なので残す。
                 builder.mark("predictiveChoice");
                 annotations.push("@predictiveChoice".to_owned());
             }
@@ -569,8 +582,11 @@ pub fn generate(seed: u64) -> Grammar {
                 annotations.push(format!("@declares(symbol={})", names[0]));
             }
             if builder.rng.chance(50) {
-                builder.mark("backref");
-                annotations.push(format!("@backref(name={})", names[names.len() - 1]));
+                // D-046: v2 は意味ごとの綴りを使う。生成側は必ず `@scopeTree` と同居させて
+                // いるので scope 検索側（`@symbolRef`）になる。
+                builder.mark(if builder.v2 { "symbolRef" } else { "backref" });
+                let spelling = if builder.v2 { "symbolRef" } else { "backref" };
+                annotations.push(format!("@{spelling}(name={})", names[names.len() - 1]));
             }
         }
         if !names.is_empty() && builder.rng.chance(12) {

@@ -33,6 +33,7 @@ impl ValidationIssue {
     pub fn category(&self) -> &'static str {
         for (prefix, category) in [
             ("W-CHOICE-", "CHOICE"),
+            ("W-ANNOTATION-", "ANNOTATION"),
             ("E-MAPPING-", "MAPPING"),
             ("E-ASSOC-", "ASSOCIATIVITY"),
             ("E-RIGHTASSOC-", "ASSOCIATIVITY"),
@@ -70,6 +71,7 @@ pub fn validate(resolved: &ResolvedGrammar) -> Vec<ValidationIssue> {
             grammar,
             issues: &mut issues,
         };
+        let v2 = general::declares_v2(grammar);
         general::validate(&mut context);
         mapping::validate_shapes(&mut context);
         let scope = grammar.rules.iter().any(|r| {
@@ -80,7 +82,7 @@ pub fn validate(resolved: &ResolvedGrammar) -> Vec<ValidationIssue> {
         for rule in &grammar.rules {
             mapping::validate_mapping(rule, &mut context);
             operators::validate_rule(rule, &mut context);
-            annotations::validate(rule, scope, &mut context);
+            annotations::validate(rule, scope, v2, &mut context);
         }
         operators::validate_topology(&mut context);
         operators::left_recursion(&mut context);

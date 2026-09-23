@@ -480,9 +480,22 @@ impl Parser<'_> {
                 let profile = self.identifier_argument("profile")?;
                 finish!(Interleave, profile)
             }
+            // `@backref` は文法中に `@scopeTree` があるかで意味が変わる（非局所）。
+            // v2 では意味ごとの綴りを使う（D-046）。旧綴りは mode=None のまま残す。
             "backref" => {
                 let name = self.identifier_argument("name")?;
-                finish!(Backref, name)
+                let mode = None;
+                finish!(Backref, name, mode)
+            }
+            "symbolRef" => {
+                let name = self.identifier_argument("name")?;
+                let mode = Some(BackrefMode::Symbol);
+                finish!(Backref, name, mode)
+            }
+            "sameText" => {
+                let name = self.identifier_argument("name")?;
+                let mode = Some(BackrefMode::SameText);
+                finish!(Backref, name, mode)
             }
             "scopeTree" => {
                 let mode = self.identifier_argument("mode")?;

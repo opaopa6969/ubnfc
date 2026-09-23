@@ -147,6 +147,15 @@ pub struct RuleDecl {
     pub span: Span,
 }
 
+/// `@backref` を意味ごとに割った v2 の綴り（D-046）。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum BackrefMode {
+    /// `@symbolRef(name=X)`: scope store の検索。未定義は WARNING。
+    Symbol,
+    /// `@sameText(name=X)`: 同一 rule 内のテキスト一致。不一致は ERROR。
+    SameText,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum Annotation {
     Root {
@@ -171,6 +180,8 @@ pub enum Annotation {
     },
     Backref {
         name: String,
+        /// v2 の明示綴り。`None` は旧 `@backref`（文法中に `@scopeTree` があるかで意味が決まる）。
+        mode: Option<BackrefMode>,
         span: Span,
     },
     ScopeTree {
