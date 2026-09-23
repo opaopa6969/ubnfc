@@ -82,7 +82,6 @@ fixed_value!(DiagnosticsSuccessfulRuleFailures, "retain");
 fixed_value!(DiagnosticsTrailingInputOffset, "acceptedConsumedEnd");
 fixed_value!(ExprNodeChoiceTieBreak, "declarationOrder");
 fixed_value!(ExprNodeSeparatedPairRollback, true);
-fixed_value!(ExprNodeLiteralWordBoundary, false);
 fixed_value!(MemoPlanReferenceMode, "allEligible");
 fixed_value!(
     MemoPlanReplay,

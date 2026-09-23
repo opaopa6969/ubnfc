@@ -81,8 +81,8 @@ fn element_shape(g: &Generator<'_>, i: usize) -> Option<Shape> {
         ExprNode::Literal {
             value,
             case_sensitive,
-            ..
-        } => format!("literal {case_sensitive} {value:?}"),
+            word_boundary,
+        } => format!("literal {case_sensitive} {word_boundary} {value:?}"),
         _ => return None,
     };
     if expr.capture_site_ids.len() > 1 {

@@ -122,7 +122,7 @@ fn lit(s: &mut Semantics, r: &str, text: &str) -> ExprId {
         ExprNode::Literal {
             value: text.into(),
             case_sensitive: true,
-            word_boundary: ExprNodeLiteralWordBoundary,
+            word_boundary: false,
         },
     )
 }

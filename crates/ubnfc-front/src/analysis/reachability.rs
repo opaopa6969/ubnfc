@@ -449,8 +449,10 @@ pub(super) fn check(cx: &Context<'_>) -> Vec<ChoiceIssue> {
                 ExprNode::Literal {
                     value,
                     case_sensitive: true,
-                    ..
-                } if !value.is_empty() && reach.entry[a].is_empty() => Some(value.clone()),
+                    word_boundary,
+                } if !value.is_empty() && reach.entry[a].is_empty() => {
+                    Some((value.clone(), *word_boundary))
+                }
                 _ => None,
             };
             let rule_ref = match reach.node(a) {
@@ -475,9 +477,23 @@ pub(super) fn check(cx: &Context<'_>) -> Vec<ChoiceIssue> {
                     ));
                     continue;
                 }
-                if let Some(value) = &literal {
+                if let Some((value, boundary)) = &literal {
                     let (prefix, trivia) = reach.literal_prefix(b);
-                    if trivia.is_empty() && prefix.starts_with(value.as_str()) {
+                    // D-040: 語境界つきの `L` は、直後が識別子構成文字なら一致しない。
+                    // 「B が一致する位置では A も必ず一致する」と言えるのは、B の必須接頭辞が
+                    // `L` の直後に**識別子構成文字でない文字**を持つと分かるときだけ。
+                    // `P == L`（続きが不明）や続きが識別子構成文字のときは B が生き残りうる。
+                    let covers = |rest: &str| {
+                        !*boundary
+                            || rest
+                                .chars()
+                                .next()
+                                .is_some_and(|c| !crate::boundary::is_identifier_char(c))
+                    };
+                    if trivia.is_empty()
+                        && prefix.starts_with(value.as_str())
+                        && covers(&prefix[value.len()..])
+                    {
                         found.push((
                             "W-CHOICE-PREFIX".into(),
                             format!(

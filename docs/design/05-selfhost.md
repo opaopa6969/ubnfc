@@ -64,7 +64,7 @@ cargo test -p ubnfc-front --offline --test selfhost_conversion --test selfhost_p
 |---|---:|---|
 | `positive/annotations.ubnf` | 43 | dotted mapping class (`Node.Item`) |
 | `known/eval-default.ubnf` | 32 | `@eval` entry の `=` 区切り |
-| `known/keyword-boundary.ubnf` | 24 | annotation keyword の識別子境界 (`@rooted`) |
+| `known/keyword-boundary.ubnf` | 24 | annotation keyword の識別子境界 (`@rooted`)。**D-040 の語境界そのもの**で、`ubnf.ubnf` を `@ubnf: 2`（または `@literalBoundary: word`）にすると解消する（実測: 受理 19 → 20、他の 5 件の位置は不変。`docs/reports/2026-09-23-ubnf-v2-word-boundary.md` §1.3）。self-description を v2 にするかは別の判断なので、この表は v1 のままの実測値 |
 | `known/namespace.ubnf` | 28 | 3成分以上の rule namespace (`a.b.Value`) |
 | `unlaxer-dsl/examples/tinycalc.ubnf` | 276 | setting block 内の二重引用符 |
 | `tinyexpression-p4.ubnf` | 2595 | `@declares` description の capture 名（非 STRING） |

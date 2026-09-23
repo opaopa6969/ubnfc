@@ -10,6 +10,7 @@
 //! - `pipeline` : ソース読込から参照検証済み Grammar IR までの結線
 
 pub mod analysis;
+pub mod boundary;
 pub mod cli;
 pub mod desugar;
 pub mod ir;

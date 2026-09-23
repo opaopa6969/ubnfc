@@ -49,6 +49,17 @@ fn generated_semantic_contracts() {
         "prefix",
         choice(vec![literal("var"), literal("variable")], "predictive"),
     );
+    // D-040: 語境界。同じ文法を境界あり／なしで並べ、差が境界だけであることを固定する。
+    add("boundary_off", literal("let"));
+    add("boundary_on", bounded_literal("let"));
+    add("boundary_symbol", bounded_literal("let+"));
+    add(
+        "boundary_prefix_choice",
+        choice(
+            vec![bounded_literal("var"), bounded_literal("variable")],
+            "ordered",
+        ),
+    );
     add(
         "separated",
         json!({"kind":"separated","element":literal("a"),"separator":literal(","),"min":1,"pairRollback":true}),
@@ -322,7 +333,16 @@ fn generated_semantic_contracts() {
         grammar(
             vec![("Root", token())],
             Some(
-                json!({"kind":"caseInsensitive","word":"kiss","comparison":"javaEqualsIgnoreCase"}),
+                json!({"kind":"caseInsensitive","word":"kiss","comparison":"javaEqualsIgnoreCase","wordBoundary":false}),
+            ),
+        ),
+    ));
+    grammars.push((
+        "case_insensitive_boundary",
+        grammar(
+            vec![("Root", token())],
+            Some(
+                json!({"kind":"caseInsensitive","word":"kiss","comparison":"javaEqualsIgnoreCase","wordBoundary":true}),
             ),
         ),
     ));

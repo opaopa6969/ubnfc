@@ -92,7 +92,9 @@ fn java_review_regressions_in_generated_rust() {
     grammars.push(("not_replay", replay));
     let mut ci = grammar(
         vec![("Root", token())],
-        Some(json!({"kind":"caseInsensitive","word":"let","comparison":"javaEqualsIgnoreCase"})),
+        Some(
+            json!({"kind":"caseInsensitive","word":"let","comparison":"javaEqualsIgnoreCase","wordBoundary":false}),
+        ),
     );
     display(&mut ci, 0, "CUSTOM_CI");
     grammars.push(("ci", ci));

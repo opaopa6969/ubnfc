@@ -260,11 +260,11 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         ExprNode::Literal {
             value,
             case_sensitive,
-            ..
+            word_boundary,
         } => {
             writeln!(
                 s,
-                "out=self.literal::<{mode}>(out.state,{value:?},{case_sensitive},{},{label:?});",
+                "out=self.literal::<{mode}>(out.state,{value:?},{case_sensitive},{},{word_boundary},{label:?});",
                 g.lexicon.id(value, *case_sensitive)
             )
             .unwrap();

@@ -34,9 +34,22 @@ fn issue(
 
 /// `@ubnf` 設定の値。宣言が無ければ 1。不正値は issue を積んで 1 を返す。
 pub fn language_version(decl: &GrammarDecl, issues: &mut Vec<ValidationIssue>) -> u64 {
+    language_version_with(&decl.name, &decl.settings, issues)
+}
+
+/// resolve 後の `Grammar.settings` からも同じ値を得るための形。
+pub fn language_version_of(settings: &[GlobalSetting], issues: &mut Vec<ValidationIssue>) -> u64 {
+    language_version_with("", settings, issues)
+}
+
+fn language_version_with(
+    decl_name: &str,
+    settings: &[GlobalSetting],
+    issues: &mut Vec<ValidationIssue>,
+) -> u64 {
     let mut version = DEFAULT_LANGUAGE_VERSION;
     let mut seen = false;
-    for setting in &decl.settings {
+    for setting in settings {
         let (GlobalSetting::String { key, .. } | GlobalSetting::Block { key, .. }) = setting;
         if key != "ubnf" {
             continue;
@@ -47,7 +60,7 @@ pub fn language_version(decl: &GrammarDecl, issues: &mut Vec<ValidationIssue>) -
                 "@ubnf は grammar ごとに一度だけ宣言できます".into(),
                 "余分な @ubnf 設定を削除してください。",
                 None,
-                &decl.name,
+                decl_name,
             ));
             continue;
         }
@@ -69,7 +82,7 @@ pub fn language_version(decl: &GrammarDecl, issues: &mut Vec<ValidationIssue>) -
                 ),
                 "'@ubnf: 1' か '@ubnf: 2' を宣言してください。",
                 None,
-                &decl.name,
+                decl_name,
             )),
         }
     }
@@ -81,6 +94,7 @@ pub fn file(ast: &mut UbnfFile, issues: &mut Vec<ValidationIssue>) -> u64 {
     let mut max = DEFAULT_LANGUAGE_VERSION;
     for decl in &mut ast.grammars {
         let version = language_version(decl, issues);
+        crate::boundary::validate(decl, version, issues);
         max = max.max(version);
         grammar(decl, version, issues);
     }

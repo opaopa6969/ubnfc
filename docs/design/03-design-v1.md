@@ -65,7 +65,13 @@ IR に `analysisVersion` と対象機能集合を持たせ、未対応版は明�
 
 ### 3.2 リテラル・token
 
-- リテラル `'x'` = code point 列の接頭辞一致（境界なし、`CI` は ignoreCase）。
+- リテラル `'x'` = code point 列の接頭辞一致（`CI` は ignoreCase）。
+- **語境界（D-040）**: `ExprNode.literal.wordBoundary` / `TokenSpec.caseInsensitive.wordBoundary` が
+  `true` のリテラルは、**一致の直後の code point が ASCII `[A-Za-z0-9_]` なら不一致**になる。
+  不一致の記録はリテラル不一致とまったく同じ（同じ位置・同じ expected label・`consume(0)`）。
+  front は `@literalBoundary: word|none`（既定は `@ubnf: 1` で `none`、`@ubnf: 2` で `word`）
+  と「リテラルの末尾が識別子構成文字か」から flag を決め、backend は flag だけを見る。
+  v1 の flag は常に `false` なので v1 の挙動は 1 bit も変わらない。
 - 組込み token の受理範囲は `02-facts` §A の表。**`Extern` token** は D-008 の API。
 - `REGEX`: Java 側は正則部分集合を DFA、それ以外は `java.util.regex.Pattern` の `lookingAt` に委譲
   （依存ゼロを保てる）。Rust 側は正則部分集合のみ、非正則は生成時エラー（明示）。ゼロ幅一致は失敗。
@@ -95,9 +101,10 @@ IR に `analysisVersion` と対象機能集合を持たせ、未対応版は明�
   | `W-CHOICE-UNREACHABLE` | 後続候補が先行候補と構造同一、または先行候補 `RuleRef(R)` に対し後続候補の成功が常に「同じ位置での `R` の成功」を含む（左端呼出しが必須） |
   | `W-CHOICE-SHADOWED-PATH` | 先行候補 `RuleRef(R)` に対し、後続候補に「同じ位置で `R` を呼び、その後さらに必ず消費する」導出経路がある。その経路だけが死ぬ（候補全体は死なない） |
 
-  `W-CHOICE-PREFIX` は D-002（語境界なし、`ExprNode.literal.wordBoundary` は IR v1 で固定値 `false`）に
-  依存する。`06-ubnf-v2.md` §3 が v2 で語境界を既定にするときは、境界付きリテラルを接頭辞の証明から
-  外す（境界があれば `'var'` は `variable` に一致しないので、後続候補は死なない）。
+  `W-CHOICE-PREFIX` は D-002（語境界なし）に依存していた。D-040 で語境界が入ったので、
+  **先行候補 `L` に `wordBoundary` があるときは、後続候補の必須接頭辞 `P` が `L` の直後に
+  「識別子構成文字でない文字」を持つと分かるときだけ**警告する（`'x' | 'x+y'` は残り、
+  `'var' | 'variable'` は v2 では出ない。`P == L` で続きが不明な場合も出さない）。
 
   位置の同一性は trivia 挿入計画で確かめる。降下中に跨いだ policy が 1 つで、それが `R` 本体の
   entry 境界と同じときだけ「同じ位置」と認める（trivia の読み飛ばしは最長一致で冪等なので、
@@ -310,7 +317,7 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | ID | 状態 | 決定 |
 |---|---|---|
 | D-001 FIRST 表現 | 決定 | 文字クラス + EOF + ゼロ消費条件 + 接頭辞 trie。Extern は不明。recovery の FOLLOW は文字列集合で別持ち |
-| D-002 キーワード境界 | 決定 | 境界なし（接頭辞一致）。仕様ガイドの記述は実装と矛盾しており実装を正とする |
+| D-002 キーワード境界 | 決定（v1 のみ。v2 は D-040） | 境界なし（接頭辞一致）。仕様ガイドの記述は実装と矛盾しており実装を正とする |
 | D-003 CST | 決定 | 標準出力から外す。capture/lexical 出現表 + scope + 診断を結果に含める |
 | D-004 climbing | 決定 | M5 で条件付き採用（trivia 境界計画、差分比較） |
 | D-005 memo 判定 | 決定 | 既定 memo あり、省略は証明ベース、SCC 単位 |
@@ -347,3 +354,4 @@ Rust `trait TokenScanner`。`ScanState { consumed, matched, mode, invertMatch, r
 | D-037 到達不能候補は警告 | 決定 | 順序付き選択（PEG）で死んだ候補を front が静的に検出し、`W-CHOICE-NULLABLE-NOT-LAST` / `W-CHOICE-PREFIX` / `W-CHOICE-UNREACHABLE` / `W-CHOICE-SHADOWED-PATH` の 4 コードで **警告**する（§3.4 に証明を書いた）。**エラーにしない理由**: (1) これは文法の意図の問題であって IR・生成物の契約違反ではない。死んだ候補があっても受理・AST・診断は完全に定義されており、既存の 24 fixture・P4・corpus 1,212 ケースはその挙動を固定している。エラーにすると v1 の文法が通らなくなり「v1 は凍結」（`06-ubnf-v2.md` §0）に反する。(2) 検出は**下界**である。証明できない形（`predict.rs` と同じく Extern / regex / 複数 trivia policy / recovery は不明）は黙って通すので、「警告が無い＝死んだ候補が無い」ではない。到達性の完全判定は PEG では決定不能なので、この非対称は原理的に残る。(3) `--strict` を使う側は既存の機械でエラーにできる。**証明できないので入れなかったもの**: 候補の言語包含一般（`'a'+` ⊇ `'a'`、正規言語同士の包含）、mayStart（FIRST）の包含による死の判定（FIRST は必要条件の上界にすぎず、A の FIRST が B を覆っても A が成功する保証にならない）、到達可能性を伴う「実際に入力が存在する」証明（`W-CHOICE-SHADOWED-PATH` は経路の死だけを主張し、その経路が他の理由で死んでいないことは主張しない）。**実測**: 24 fixture では tinycalc の 2 本（`( 'var' \| 'variable' )` で `'variable'` が死ぬ）だけ、`ubnf.ubnf` は 0 件、P4 は 9 件（`Expression ::= NumberExpression \| BooleanExpression \| ...` を含む。`docs/reports/2026-09-23-choice-reachability.md`）。生成器の乱択文法 1,000 件では 461 件が該当。corpus は Java Pass 1310 / Fail 0、Rust Pass 1292 / Fail 0 のまま |
 | D-038 UBNF 表層言語のバージョン門 | 決定 | grammar 設定 `@ubnf: 1|2`（既定 **1**、grammar ごとに 1 回）。IR に必須キー **`languageVersion`** を足し（既存フィールドは変えない追加キーなので IR は再生成する）、**両 backend が未知バージョンを明示拒否**する（Rust `validate.rs` の `EmitError::Unsupported{feature:"languageVersion"}`、Java `Validation.unsupported("languageVersion:N")`）。**v1 は凍結**: 表層に足した構文は「v1 では構文エラーだった位置」にしか置かない（設定値の数値 `@ubnf: 2`、候補**先頭**の `@leftAssoc` / `@rightAssoc` / `@mapping`）ので、既存の文法は 1 文字も意味が変わらない。`@ubnf: 2` を宣言しても v2 の機能を使わなければ `semantics` / `analysis` / `plan` は 1 バイトも変わらない（`crates/ubnfc-front/tests/ubnf_v2.rs`）。v2 の表層機能は front が v1 の正規形へ脱糖するので **backend の実装は増えない**（門だけ） |
 | D-039 v2 の左再帰ルールは「候補順＝優先順位」で塔へ脱糖する | 決定 | `@ubnf: 2` の下で、**先頭要素が自分自身**の候補を演算子候補とみなし、ANTLR4 と同じく**候補の並び順が優先順位**（先頭が最高）になる。lowering は **resolve より前の構文木変換**（`crates/ubnfc-front/src/desugar.rs`）で、v1 の正規形 `T_i ::= T_{i+1} @left { Op @op T_{i+1} @right }`（右結合は右辺が `T_i`）＋基底段 `T__lrBase` の塔を作る。**入口は元の名前のまま**（最低優先の段）、中間段は `Name__lr{n}`、基底段は `Name__lrBase`。**climbing にしない理由**: D-004 の `climb`/`lift` は塔のノードを復元するためのもので、`analysis/operators.rs` は P4 の 6 塔すべてを「trivia・scope・recovery がある」として climbing 不適格と判定している（`docs/reports/2026-09-22-p4-rust-perf-m5-round2.md` §手順1）。表層の弱点は「塔を手で書かされること」なので、**塔を機械が書く**ことで消える。この形なら v1 の実行・AST・診断機械をそのまま使え、等価性が構成的に保証される。**AST**: 段ごとに 1 ノード（v1 の `left + op[] + right[]`）。段ごとに別クラスが要る場合は**候補先頭の `@mapping`** が rule の `@mapping` を上書きする。**第一段で拒否するもの**（黙って別物を作らない）: `Self <演算子> Self` の 3 要素でない演算子候補（`E-LEFTREC-ALT-SHAPE`。前置・後置・三項）、基底候補なし（`E-LEFTREC-NO-BASE`）、空一致し得る演算子（`E-LEFTREC-NULLABLE-OP`）、規則参照を演算子にした右結合（`E-LEFTREC-RIGHTASSOC-OP-REF`。v1 の右結合正規形が `annotations::operator_elements` と `analysis::operators::canonical` で食い違っている既存の穴）、`@scopeTree` / `@declares` / `@backref` / `@recovery` / `@catalog` / `@skip` / `@enum` / `@eval` / `@typeof` / `@leftAssoc` / `@precedence` / `@longestChoice` / `@predictiveChoice` を付けた左再帰ルール（`E-LEFTREC-ANNOTATION`）、脱糖名の衝突（`E-LEFTREC-NAME-COLLISION`）、候補先頭に置けない注釈（`E-LEFTREC-ALT-ANNOTATION`）、v1 での候補先頭注釈（`E-ALT-ASSOC-UNSUPPORTED`）。**間接左再帰は従来どおりエラー**（`E-LOWER-INDIRECT-LEFT-RECURSION`、D-010）。演算子候補でない候補の末尾に自分自身が来る形（`'-' Expr`）は「式全体＝最低優先」を指すと定義し、`W-LEFTREC-TRAILING-SELF-REF` で知らせる。**診断**（D-011 / D-014 / D-020）: 塔と同じ木を実行するので `kind` / 主 `offset` / `farthestOffset` / `expected` / `farthestExpected` は保たれ、規則名そのものを値に持つ `deepestRule` / `rulePath` と合成 helper 名だけが段の名前ぶん変わる。証拠は `docs/reports/2026-09-23-ubnf-v2-left-recursion.md` |
+| D-040 v2 のリテラルは単語境界を持つ | 決定 | **末尾が識別子構成文字のリテラルは、一致の直後の code point も識別子構成文字なら一致しない**。識別子構成文字は **ASCII `[A-Za-z0-9_]`**（組込み `IdentifierParser` の継続文字集合と厳密に同じ。生成物は依存ゼロ契約なので Unicode 表を持ち込まない）。**開始側の境界は課さない**（PEG は直前の要素が終わった位置からしかリテラルを試さないので構造的に不要で、`10px` のような接尾キーワードを壊す。実測では corpus 1,425 ケースの応答が末尾側だけの場合と 1 byte も違わず、得るものが 0 だった）。記号で終わるリテラル（`'+='` `'('` `'.in('`）は形の条件で自動的に対象外。`CI('select')` には同じ規則を適用し（`TokenSpec.caseInsensitive.wordBoundary`）、`LOOKAHEAD` / `UNTIL` / `@recovery` の同期文字列は対象外（語ではなく述語・区切り）。**リテラルの長さによる例外は作らない**（`'if'` `'in'` は 2 文字の実在キーワード、`'e'` `'L'` は 1 文字でも境界が邪魔。長さはキーワードと抽象 token を分離しない）。設定は `@literalBoundary: word|none`（grammar ごと 1 回。既定は `@ubnf: 1` で `none`、`@ubnf: 2` で `word`）で、適用範囲は**そのリテラルを書いた文法**。IR は `ExprNode.literal.wordBoundary` を固定値 `false` から真の bool へ（JSON の形は同じなので v1 golden は byte 一致）、`TokenSpec.caseInsensitive.wordBoundary` は追加キー。**backend は flag しか見ない**。**診断は不一致と完全に同じ**（同じ位置・同じ expected label・`consume(0)`）。**実測**（`docs/reports/2026-09-23-ubnf-v2-word-boundary.md`）: 24 fixture のうち IR まで通る 21 件（`ubnf.ubnf` を含む）と P4 の literal 627 本中 209 本が対象で `wordBoundary` 以外の IR は 1 byte も変わらない。全文法に `word` を強制すると corpus は Java 1310 → 1213 / Rust 1292 → 1197（**両 backend で完全に同じ 98 件**）だが、**98 件すべてが「英数字リテラルを空白なしで連結する合成試験文法」の帰結**（影響した 41 build の境界対象 115 本中 114 本が 1 文字リテラル）。**実在の 3 文法は退行ゼロ**で、P4 は Rust 12/12・Java 28 中 27（落ちるのは「commit 済み v1 IR から再生成した source と一致するか」の meta 試験だけ）、`ubnf.ubnf` は **self-host の既知差分が 6 → 5 に減る**（`known/keyword-boundary.ubnf` の `@rooted`）。`W-CHOICE-PREFIX` は §3.4 のとおり条件付きになる |

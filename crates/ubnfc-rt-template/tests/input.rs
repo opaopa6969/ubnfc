@@ -74,6 +74,21 @@ fn literals_match_prefixes_without_word_boundaries() {
     assert!(!input.starts_with(usize::MAX, ""));
 }
 
+/// D-040: 語境界は「一致の直後の byte が ASCII [A-Za-z0-9_] か」だけで決まる。
+/// 非 ASCII は先頭 byte が 0x80 以上なので識別子構成文字にならない。
+#[test]
+fn identifier_bytes_are_ascii_alphanumerics_and_underscore_only() {
+    let input = Input::new("let_x9 😀あ");
+    for byte in [0, 1, 2, 3, 4, 5] {
+        assert!(input.identifier_byte_at(byte), "{byte}");
+    }
+    assert!(!input.identifier_byte_at(6), "空白");
+    assert!(!input.identifier_byte_at(7), "😀 の先頭 byte");
+    assert!(!input.identifier_byte_at(11), "あ の先頭 byte");
+    assert!(!input.identifier_byte_at(input.bytes().len()), "終端");
+    assert!(!input.identifier_byte_at(usize::MAX));
+}
+
 #[test]
 fn ignore_case_handles_java_style_scalar_comparisons() {
     for (left, right) in [

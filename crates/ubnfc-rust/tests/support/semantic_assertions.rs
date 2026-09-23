@@ -238,6 +238,47 @@ mod tests {
         assert!(negation::parse("😀").ok);
         assert!(!negation::parse("a").ok);
     }
+    /// D-040: 語境界。境界あり／なしの差が「直後が識別子構成文字か」だけであること、
+    /// 境界違反の失敗記録がリテラル不一致と同じ（同じ位置・同じ候補）であることを固定する。
+    #[test]
+    fn literal_word_boundary() {
+        // 境界なし（v1）は従来どおり接頭辞一致。
+        assert!(prefix!(boundary_off, "letter").ok);
+        assert!(prefix!(boundary_off, "let_").ok);
+        assert!(prefix!(boundary_off, "let9").ok);
+        // 境界あり（v2 既定）は直後が ASCII [A-Za-z0-9_] なら不一致。
+        assert!(!prefix!(boundary_on, "letter").ok);
+        assert!(!prefix!(boundary_on, "let_").ok);
+        assert!(!prefix!(boundary_on, "let9").ok);
+        assert!(boundary_on::parse("let").ok);
+        assert!(prefix!(boundary_on, "let+x").ok);
+        assert!(prefix!(boundary_on, "let あ").ok);
+        assert!(prefix!(boundary_on, "let😀").ok, "非 ASCII は識別子構成文字でない");
+        // 境界違反の観測は「一致しなかった」と同じ: 同じ位置、同じ expected。
+        let violated = boundary_on::parse("letter");
+        let mismatched = boundary_on::parse("lex");
+        assert!(!violated.ok && !mismatched.ok);
+        assert_eq!(violated.consumed_cp, mismatched.consumed_cp);
+        let shape = |r: &boundary_on::ParseResult| {
+            r.diagnostics
+                .iter()
+                .map(|d| (d.kind, d.offset_cp, d.expected.clone(), d.farthest_cp))
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(shape(&violated), shape(&mismatched));
+        // backend は flag をそのまま実行する（どのリテラルに立てるかは front の責務）。
+        // 境界は「リテラル全体の直後」を見るので、記号を含む `'let+'` でも位置は末尾の次。
+        assert!(boundary_symbol::parse("let+").ok);
+        assert!(!prefix!(boundary_symbol, "let+x").ok);
+        // 語境界があると `'var' | 'variable'` の後続候補が生きる（D-037 / W-CHOICE-PREFIX）。
+        assert_eq!(prefix!(boundary_prefix_choice, "variable").consumed_cp, 8);
+        assert_eq!(prefix!(boundary_prefix_choice, "var;").consumed_cp, 3);
+        // CI token も同じ規則。
+        assert!(prefix!(case_insensitive, "KISSx").ok);
+        assert!(!prefix!(case_insensitive_boundary, "KISSx").ok);
+        assert!(case_insensitive_boundary::parse("KISS").ok);
+    }
+
     #[test]
     fn local_backreference() {
         assert!(backref::parse("aa").scope_diagnostics.is_empty());

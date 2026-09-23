@@ -1131,7 +1131,7 @@
               "type": "string"
             },
             "wordBoundary": {
-              "const": false
+              "type": "boolean"
             }
           },
           "required": [
@@ -2973,12 +2973,16 @@
             },
             "word": {
               "type": "string"
+            },
+            "wordBoundary": {
+              "type": "boolean"
             }
           },
           "required": [
             "kind",
             "word",
-            "comparison"
+            "comparison",
+            "wordBoundary"
           ],
           "type": "object"
         },
