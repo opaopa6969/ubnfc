@@ -1,0 +1,224 @@
+{
+  "family": "ubnf",
+  "section": "量指定子とセパレータ",
+  "summary": "量指定子の綴りと、仕様が等価と述べている組。",
+  "cases": [
+    {
+      "id": "quantifier/plus",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { R ::= 'x'+; }",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "quantifier/bracket-optional",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "### `?` — 0回か1回（`[ ... ]` の別記法）",
+        "sentence": "`element?` は `[ element ]` と同じ意味です："
+      },
+      "input": "grammar G { R ::= [ 'x' ]; }",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "quantifier/question-equals-bracket",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "### `?` — 0回か1回（`[ ... ]` の別記法）",
+        "sentence": "`element?` は `[ element ]` と同じ意味です："
+      },
+      "input": "grammar G { R ::= 'x'?; }",
+      "expectation": {
+        "verdict": "accept",
+        "sameCanonicalAs": "quantifier/bracket-optional"
+      },
+      "note": "仕様が「同じ意味」と述べているので構文木も一致すべき。"
+    },
+    {
+      "id": "quantifier/brace-repeat",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "### `*` — 0回以上（`{ ... }` の別記法）",
+        "sentence": "`element*` は `{ element }` と同じ意味です："
+      },
+      "input": "grammar G { R ::= { 'x' }; }",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "quantifier/star-equals-brace",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "### `*` — 0回以上（`{ ... }` の別記法）",
+        "sentence": "`element*` は `{ element }` と同じ意味です："
+      },
+      "input": "grammar G { R ::= 'x'*; }",
+      "expectation": {
+        "verdict": "accept",
+        "sameCanonicalAs": "quantifier/brace-repeat"
+      }
+    },
+    {
+      "id": "quantifier/exact",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { token HEX=CHAR_RANGE('0','9') R ::= '#' HEX{6}; }",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "quantifier/bounded",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { token V=ANY R ::= V{8,32}; }",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "quantifier/open-ended",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { token V=ANY R ::= V{1,}; }",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "quantifier/missing-lower-bound",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { token V=ANY R ::= V{,2}; }",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "note": "Quantifier の選択肢に `{ ',' INTEGER '}' ` は無い。"
+    },
+    {
+      "id": "quantifier/three-bounds",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { token V=ANY R ::= V{1,2,3}; }",
+      "expectation": {
+        "verdict": "reject"
+      }
+    },
+    {
+      "id": "quantifier/two-quantifiers",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "AnnotatedElement ::= ['@typeof' '(' IDENTIFIER ')'] AtomicElement [Quantifier | '%' AtomicElement] ['@' IDENTIFIER]"
+      },
+      "input": "grammar G { token V=ANY R ::= V+{2,3}; }",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "note": "AnnotatedElement は Quantifier を高々 1 つしか許さない。"
+    },
+    {
+      "id": "quantifier/quantifier-and-separator",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "AnnotatedElement ::= ['@typeof' '(' IDENTIFIER ')'] AtomicElement [Quantifier | '%' AtomicElement] ['@' IDENTIFIER]"
+      },
+      "input": "grammar G { token V=ANY token S=ANY R ::= V+ % S; }",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "note": "`[Quantifier | '%' AtomicElement]` は選択であり併記できない。"
+    },
+    {
+      "id": "quantifier/reversed-bounds",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { token V=ANY R ::= V{9,2}; }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "`Quantifier ::= … '{' INTEGER ',' [INTEGER] '}'` は n <= m を要求していない。CHAR_RANGE と違って逆順の反復に関する規範文が無い。"
+      }
+    },
+    {
+      "id": "quantifier/huge-bound",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+      },
+      "input": "grammar G { R ::= 'x'{2147483648}; }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "INTEGER の表現範囲（32bit か否か）を仕様が定めていない。"
+      }
+    },
+    {
+      "id": "separator/rule-reference",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "### `elem % sep` — セパレータ区切りリスト（1個以上）",
+        "sentence": "`elem % sep` は「`elem` が `sep` 区切りで1個以上並ぶ」という意味です。"
+      },
+      "input": "grammar G { token C=ANY Expr ::= 'e'; ExprList ::= Expr % C; }",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "separator/expansion",
+      "scope": "runtime",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "### `elem % sep` — セパレータ区切りリスト（1個以上）",
+        "sentence": "`elem (sep elem)*` と展開されます："
+      },
+      "input": "grammar G { token C=ANY Expr ::= 'e'; ExprList ::= Expr % C; }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "`elem (sep elem)*` への展開は生成パーサの構造であり、構文木の比較では観測できない。"
+      }
+    }
+  ]
+}

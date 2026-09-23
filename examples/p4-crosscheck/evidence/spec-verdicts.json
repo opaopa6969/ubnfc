@@ -1,0 +1,489 @@
+[
+  {
+    "id": "p4/if-else",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/if-without-else",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "拒否",
+      "R2": "拒否"
+    }
+  },
+  {
+    "id": "p4/if-space-before-paren",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/if-block-comment-head",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/if-block-comment-inside",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/block-comment-anywhere",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/line-comment-not-in-body",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "拒否",
+      "R2": "拒否"
+    }
+  },
+  {
+    "id": "p4/match-order",
+    "scope": "runtime",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "評価順は実行時の契約で、構文解析では観測できない。また match の具体構文を仕様本文が BNF で与えていない。"
+    },
+    "verdicts": {
+      "R1": "駆動不能",
+      "R2": "駆動不能"
+    },
+    "observed": {
+      "R1": "駆動していない",
+      "R2": "駆動していない"
+    }
+  },
+  {
+    "id": "p4/number-integer",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/number-decimal",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/number-negative",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/number-positive",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/number-exponent-lower",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/number-exponent-upper",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/number-long-suffix",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "§2.1.1 の表は `42L` を数値リテラルとして挙げるが、§2.17 は数値具体型のサフィックスを HAND-ONLY（レガシーのみ）に分類している。P4 が受理すべきかが同じ文書の中で決まらない。"
+    },
+    "verdicts": {
+      "R1": "未定",
+      "R2": "未定"
+    },
+    "observed": {
+      "R1": "拒否",
+      "R2": "拒否"
+    }
+  },
+  {
+    "id": "p4/number-float-suffix",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "`42L` と同じ理由（§2.1.1 の表と §2.17 の分類が食い違う）。"
+    },
+    "verdicts": {
+      "R1": "未定",
+      "R2": "未定"
+    },
+    "observed": {
+      "R1": "拒否",
+      "R2": "拒否"
+    }
+  },
+  {
+    "id": "p4/string-single-quote",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/string-double-quote",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/string-escape-newline",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/boolean-true",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/boolean-false",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/arithmetic",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/comparison",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/comparison-at-top-level",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "仕様は式全体（Formula）の production を与えておらず、比較式単独が完結した式として成立するかを述べていない。"
+    },
+    "verdicts": {
+      "R1": "未定",
+      "R2": "未定"
+    },
+    "observed": {
+      "R1": "拒否",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/logical-and",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/logical-not",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/precedence-mul-over-add",
+    "scope": "runtime",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "優先順位は AST の形に現れるが、この比較ドライバは受理のみを記録する。"
+    },
+    "verdicts": {
+      "R1": "駆動不能",
+      "R2": "駆動不能"
+    },
+    "observed": {
+      "R1": "駆動していない",
+      "R2": "駆動していない"
+    }
+  },
+  {
+    "id": "p4/precedence-xor-and-or-conflict",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "spec/SPEC.md §2.6 と docs/language-guide.md は `^` > `&` > `|`、specs/language.md は `&` > `^` > `|` と書いており、同じ repo 内で矛盾している。文法ファイルの `@precedence` は前者と一致するが、規範文だけでは決まらない。"
+    },
+    "verdicts": {
+      "R1": "未定",
+      "R2": "未定"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/variable-dollar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/variable-without-dollar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "拒否",
+      "R2": "拒否"
+    }
+  },
+  {
+    "id": "p4/variable-case-sensitive",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "R1": "一致",
+      "R2": "一致"
+    },
+    "observed": {
+      "R1": "受理",
+      "R2": "受理"
+    }
+  },
+  {
+    "id": "p4/variable-missing-is-null",
+    "scope": "runtime",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "未定義変数が null を返すのは評価時の契約で、構文解析では観測できない。"
+    },
+    "verdicts": {
+      "R1": "駆動不能",
+      "R2": "駆動不能"
+    },
+    "observed": {
+      "R1": "駆動していない",
+      "R2": "駆動していない"
+    }
+  }
+]
