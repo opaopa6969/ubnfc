@@ -1,0 +1,15 @@
+# 親 workspace の member にはしない（比較用の使い捨てドライバであり、
+# ubnfc 本体の test/clippy/fmt 対象を増やさない）。空の [workspace] で切り離す。
+[workspace]
+
+[package]
+name = "ubnf-crosscheck"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+publish = false
+
+[dependencies]
+ubnfc-front = { path = "../../crates/ubnfc-front" }
+ubnfc-selfhost = { path = "../../crates/ubnfc-selfhost" }

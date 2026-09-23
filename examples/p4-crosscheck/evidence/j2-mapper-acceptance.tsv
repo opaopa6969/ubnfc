@@ -1,0 +1,16 @@
+comparison-heavy-x16.tiny	reject
+comparison-heavy-x4.tiny	reject
+comparison-heavy-x64.tiny	reject
+comparison-heavy.tiny	reject
+complex-half.tiny	reject
+complex-tail.tiny	reject
+complex-x16.tiny	ok
+complex-x4.tiny	ok
+complex-x64.tiny	reject
+complex.tiny	ok
+flat-arithmetic.tiny	ok
+invalid-syntax.tiny	reject
+large-match.tiny	ok
+valid-basic.tiny	ok
+valid-multiline.tiny	ok
+valid-unicode.tiny	ok
