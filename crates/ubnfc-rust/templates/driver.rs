@@ -64,6 +64,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             max_depth,
             // driver は成功時も hints（投機的失敗）を出すので、診断を明示的に要求する。
             diagnostics: true,
+            // prefix parse の出現は `lexical` のときだけ観測に出る。`lexical: true` が
+            // 出現表の要求を含むので（D-035）、ここで別に要求する必要はない。value span は使わない。
             ..Default::default()
         },
     )?;
@@ -78,6 +80,9 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             lexical_cache,
             max_depth,
             diagnostics: true,
+            // AST が出たときは必ず texts / nodes / valueSpans を出すので value span を要求する。
+            // 出現表は `lexical` のときだけ観測に出る（D-035。`lexical: true` が要求を含む）。
+            value_spans: true,
             ..Default::default()
         },
     )?;

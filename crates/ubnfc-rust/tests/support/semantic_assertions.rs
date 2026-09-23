@@ -45,17 +45,31 @@ mod tests {
         assert!(r.ok);
         assert!(r.diagnostics.is_empty());
         assert!(!prefix!(negative, "a").ok);
-        let r = nested::parse("");
+        // 出現表は opt-in（D-035）。既定は空で、AST はそのまま作られる。
+        let plain = nested::parse("");
+        assert!(plain.captures.is_empty() && plain.ast.is_some());
+        macro_rules! occ {
+            ($m:ident,$text:expr) => {
+                $m::parse_with_options(
+                    $text,
+                    $m::ParseOptions {
+                        occurrences: true,
+                        ..Default::default()
+                    },
+                )
+            };
+        }
+        let r = occ!(nested, "");
         assert_eq!(
             r.captures.iter().map(|c| c.name).collect::<Vec<_>>(),
             vec!["inner", "outer"]
         );
         assert_eq!(r.captures[0].span, [0, 0]);
-        let r = longest::parse("ab");
+        let r = occ!(longest, "ab");
         assert!(r.ok);
         assert_eq!(r.captures.len(), 1);
         assert_eq!(r.captures[0].name, "long");
-        let r = longest_tie::parse("a");
+        let r = occ!(longest_tie, "a");
         assert!(r.ok);
         assert_eq!(r.captures[0].name, "first");
         assert!(predict::parse("😀").ok);

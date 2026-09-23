@@ -23,17 +23,22 @@ fn occurrences(
     let mut tokens = Vec::new();
     let build_ast = self.options.build_ast;
     let want_lexical = self.options.lexical;
-    let want_occurrences = build_ast || want_lexical;
+    // 公開する出現表は opt-in（D-035）。AST の直下 capture 表（`pending` / `caps_flat`）は
+    // `build_ast` のままで、こちらの flag には依らない。走査の骨組み（rule ごとの開始位置）は
+    // どちらかが要るときに積む。
+    let want_occurrences = self.options.occurrences || want_lexical;
+    let want_intervals = build_ast || want_occurrences;
     // 未完了の rule に属する capture の番号（完了順）。rule の完了時にその rule の
     // 完了順を直接書き込むので、所属表と後段の付け直しの走査は要らない。
     let mut pending_ids: Vec<u32> = Vec::with_capacity(if want_occurrences { estimate } else { 0 });
-    let mut rule_starts: Vec<u32> = Vec::new();
+    // rule ごとの開始位置。`.0` は直下 capture 表（AST 用）、`.1` は公開出現の番号（出現表用）。
+    let mut rule_starts: Vec<(u32, u32)> = Vec::new();
     let mut rule_occurrences: u32 = 0;
     let mut rule_order: u32 = 0;
     // 直下 capture 表（AST を作るときだけ）。event id で索く表は伸長だけする（本文の注記参照）。
     let mut caps_flat = std::mem::take(&mut self.caps_flat);
     let mut pending = std::mem::take(&mut self.caps_pending);
-    if want_occurrences {
+    if want_intervals {
         rule_starts.reserve(64);
     }
     if build_ast {
@@ -105,9 +110,10 @@ fn occurrences(
                 rule, span, child, ..
             } => {
                 if done {
-                    if want_occurrences {
-                        let start = rule_starts.pop().unwrap_or(0) as usize;
+                    if want_intervals {
+                        let (cap_start, id_start) = rule_starts.pop().unwrap_or((0, 0));
                         if build_ast {
+                            let start = cap_start as usize;
                             let offset = caps_flat.len();
                             caps_flat.extend_from_slice(&pending[start..]);
                             pending.truncate(start);
@@ -115,11 +121,15 @@ fn occurrences(
                                 *caps = (offset as u32, (caps_flat.len() - offset) as u32);
                             }
                         }
-                        // この rule の直下 capture に rule 完了順を書く（後段の走査の代わり）。
-                        for &order in &pending_ids[start..] {
-                            captures[order as usize].rule_completion_order = rule_order as usize;
+                        if want_occurrences {
+                            let start = id_start as usize;
+                            // この rule の直下 capture に rule 完了順を書く（後段の走査の代わり）。
+                            for &order in &pending_ids[start..] {
+                                captures[order as usize].rule_completion_order =
+                                    rule_order as usize;
+                            }
+                            pending_ids.truncate(start);
                         }
-                        pending_ids.truncate(start);
                     }
                     if current != NONE {
                         let index = current as usize;
@@ -132,8 +142,8 @@ fn occurrences(
                         lexical_order += 1;
                     }
                 } else {
-                    if want_occurrences {
-                        rule_starts.push(pending_ids.len() as u32);
+                    if want_intervals {
+                        rule_starts.push((pending.len() as u32, pending_ids.len() as u32));
                     }
                     let index = if want_occurrences {
                         let index = rule_occurrences;
@@ -180,6 +190,8 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
             Event::Rule { child, .. } | Event::Values { child, .. } => stack.push((child, None)),
             Event::Capture { child, .. } => {
                 if let Some(start) = done {
+                    // `capture_occurrence_ids` は出現表を返すかに依らない観測なので、
+                    // 番号付けは AST / lexical のときそのまま数える（D-035 の対象外）。
                     if self.options.build_ast || self.options.lexical {
                         for r in &mut recoveries[start..] {
                             r.capture_occurrence_ids.push(capture_order);
@@ -338,9 +350,12 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         (vec![], vec![])
     };
     diagnostics.splice(0..0, recovery_diagnostics);
-    // capture / rule / token の出現は AST か lexical のときだけ保持する（認識だけなら走査を省く）。
+    // 走査は AST の直下 capture 表のために `build_ast` でも要る。公開する出現表を作るかは
+    // `occurrences` / `lexical` が決める（D-035）。認識だけで要求も無ければ走査ごと省く。
     let (captures, lexical, tokens) =
-        if step.ok && (self.options.build_ast || self.options.lexical) {
+        if step.ok
+            && (self.options.build_ast || self.options.occurrences || self.options.lexical)
+        {
             self.occurrences(step.events)
         } else {
             (vec![], vec![], vec![])
@@ -388,14 +403,18 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     self.statistics.lexical_probes = self.lex.probes;
     self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
     self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
-    let mut value_spans = Vec::with_capacity(if ast.is_some() {
+    // value span は要求されたときだけ集める（D-035）。AST 自体は先に完成している。
+    let want_value_spans = self.options.value_spans && ast.is_some();
+    let mut value_spans = Vec::with_capacity(if want_value_spans {
         self.node_spans.len() + self.text_spans.len()
     } else {
         0
     });
-    if let Some(ast) = &ast {
-        let mut path = String::with_capacity(128);
-        ast.collect(&mut path, &self.text_spans, &mut value_spans);
+    if want_value_spans {
+        if let Some(ast) = &ast {
+            let mut path = String::with_capacity(128);
+            ast.collect(&mut path, &self.text_spans, &mut value_spans);
+        }
     }
     let result = ParseResult {
         value_spans,
@@ -473,7 +492,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     // 診断を要する結果（失敗・入力の残り・recovery / mapping / resource 診断）は fast mode では
     // 観測を持たないので、入口が診断モードで解析し直す。scope の意味診断（`scope_diagnostics`）は
     // 診断機構ではなく scope store の効果なので、fast mode でも同じものが得られる（再解析しない）。
-    let escalate = !self.options.diagnostics
+    let escalate = !DIAG
         && (!result.ok
             || incomplete
             || !result.diagnostics.is_empty()

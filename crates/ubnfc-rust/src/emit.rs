@@ -265,11 +265,11 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
     // fast mode（診断を記録しない）で解析し、診断が要る結果なら同じ入力を診断モードで解析し直す。
     writeln!(
         p,
-        "let mut parser=Session::new(text,options,&mut *scanner);\nlet step=parser.r{entry}_c(State::default());\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {{return result;}}\nlet options=ParseOptions{{diagnostics:true,..options}};\nlet mut parser=Session::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nparser.finish(step)\n}}",
+        "// 診断は const DIAG で単相化する（D-036）。要求されていれば診断 session で 1 度だけ走り、\n// そうでなければ fast session で走って、診断が要る結果のときだけ診断 session で解析し直す（D-023）。\nif options.diagnostics {{let mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nreturn parser.finish(step);}}\nlet mut parser=Session::<false>::new(text,options,&mut *scanner);\nlet step=parser.r{entry}_c(State::default());\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {{return result;}}\nlet options=ParseOptions{{diagnostics:true,..options}};\nlet mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nparser.finish(step)\n}}",
         entry = g.rules[ir.entry.rule_id.as_str()]
     )
     .unwrap();
-    p.push_str("fn entry_step(parser:&mut Session<'_>,grammar:&str,entry:Option<&str>)->Result<Step,&'static str> {\nOk(match (grammar,entry) {\n");
+    p.push_str("fn entry_step<const DIAG: bool>(parser:&mut Session<'_,DIAG>,grammar:&str,entry:Option<&str>)->Result<Step,&'static str> {\nOk(match (grammar,entry) {\n");
     for unit in &ir.grammar_units {
         let roots = ir
             .semantics
@@ -317,7 +317,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         )
         .unwrap();
     }
-    p.push_str("_=>return Err(\"unsupported grammar or entry\"),})}\npub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\nlet mut scanner=RejectExtern;\nlet mut parser=Session::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {return Ok(result);}\nlet options=ParseOptions{diagnostics:true,..options};\nlet mut parser=Session::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nOk(parser.finish(step))}\nimpl Session<'_> {\n");
+    p.push_str("_=>return Err(\"unsupported grammar or entry\"),})}\npub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\nlet mut scanner=RejectExtern;\nif options.diagnostics {let mut parser=Session::<true>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nreturn Ok(parser.finish(step));}\nlet mut parser=Session::<false>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {return Ok(result);}\nlet options=ParseOptions{diagnostics:true,..options};\nlet mut parser=Session::<true>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nOk(parser.finish(step))}\nimpl<const DIAG: bool> Session<'_, DIAG> {\n");
     for (i, rule) in ir.semantics.rules.iter().enumerate() {
         for mode in [false, true] {
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {
@@ -363,7 +363,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
             writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,end],child:out.events,caps:(0,0)}});\n}} else {{ self.restore(mark); }}").unwrap();
             writeln!(
                 p,
-                "if !out.ok {{self.display.failures(state.consumed.max(state.matched),&{:?});}}",
+                "if !out.ok {{self.display_failures(state.consumed.max(state.matched),&{:?});}}",
                 g.display.rule(rule.symbol_id.as_str())
             )
             .unwrap();
@@ -387,14 +387,14 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
                 };
                 writeln!(
                     p,
-                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?},{},{no_sync:?});}}self.display.reach(out.state.consumed.max(out.state.matched));",
+                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?},{},{no_sync:?});}}self.display_reach(out.state.consumed.max(out.state.matched));",
                     recovery.resolved_sync_patterns, recovery.consume_sync
                 )
                 .unwrap();
             }
             writeln!(
                 p,
-                "self.depth-=1;out.diag=self.diag.rule({i},out.diag);out\n}}"
+                "self.depth-=1;out.diag=self.diag_rule({i},out.diag);out\n}}"
             )
             .unwrap();
         }

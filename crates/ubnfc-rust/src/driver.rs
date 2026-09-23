@@ -118,7 +118,10 @@ fn scanner_hook(ir: &GrammarIr, out: &mut String) {
     let start = parser
         .find("pub fn parse_entry_with_options(")
         .expect("entry API");
-    let end = start + parser[start..].find("\nimpl Session").expect("entry 終端");
+    let end = start
+        + parser[start..]
+            .find("\nimpl<const DIAG: bool> Session")
+            .expect("entry 終端");
     let entry = parser[start..end]
         .replacen("parse_entry_with_options(", "parse_entry_with_scanner(", 1)
         .replacen(
