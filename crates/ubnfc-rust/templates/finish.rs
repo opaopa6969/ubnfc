@@ -23,7 +23,7 @@ fn occurrences(
     let mut tokens = Vec::new();
     let build_ast = self.options.build_ast;
     let want_lexical = self.options.lexical;
-    // 公開する出現表は opt-in（D-033）。AST の直下 capture 表（`pending` / `caps_flat`）は
+    // 公開する出現表は opt-in（D-035）。AST の直下 capture 表（`pending` / `caps_flat`）は
     // `build_ast` のままで、こちらの flag には依らない。走査の骨組み（rule ごとの開始位置）は
     // どちらかが要るときに積む。
     let want_occurrences = self.options.occurrences || want_lexical;
@@ -191,7 +191,7 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
             Event::Capture { child, .. } => {
                 if let Some(start) = done {
                     // `capture_occurrence_ids` は出現表を返すかに依らない観測なので、
-                    // 番号付けは AST / lexical のときそのまま数える（D-033 の対象外）。
+                    // 番号付けは AST / lexical のときそのまま数える（D-035 の対象外）。
                     if self.options.build_ast || self.options.lexical {
                         for r in &mut recoveries[start..] {
                             r.capture_occurrence_ids.push(capture_order);
@@ -351,7 +351,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     };
     diagnostics.splice(0..0, recovery_diagnostics);
     // 走査は AST の直下 capture 表のために `build_ast` でも要る。公開する出現表を作るかは
-    // `occurrences` / `lexical` が決める（D-033）。認識だけで要求も無ければ走査ごと省く。
+    // `occurrences` / `lexical` が決める（D-035）。認識だけで要求も無ければ走査ごと省く。
     let (captures, lexical, tokens) =
         if step.ok
             && (self.options.build_ast || self.options.occurrences || self.options.lexical)
@@ -403,7 +403,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     self.statistics.lexical_probes = self.lex.probes;
     self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
     self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
-    // value span は要求されたときだけ集める（D-033）。AST 自体は先に完成している。
+    // value span は要求されたときだけ集める（D-035）。AST 自体は先に完成している。
     let want_value_spans = self.options.value_spans && ast.is_some();
     let mut value_spans = Vec::with_capacity(if want_value_spans {
         self.node_spans.len() + self.text_spans.len()

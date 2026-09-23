@@ -3,7 +3,7 @@
 [`2026-09-23-p4-rust-profile.md`](2026-09-23-p4-rust-profile.md) が順位を付けた残りの候補を、安い順・安全な順に実装した報告。
 基準は **master `65c4a3f`**（M5 round 5 の finish 走査統合と観測契約の統一を取り込んだ後）。結論を先に書く:
 
-- **採用 2 件**（候補4 出現表と value span の opt-in = D-033、候補2 `const DIAG` 単相化 = D-034）で
+- **採用 2 件**（候補4 出現表と value span の opt-in = D-035、候補2 `const DIAG` 単相化 = D-036）で
   **complex 認識 −20.5%（0.083→0.066 ms）／complex AST −26.4%（0.121→0.089 ms）／
   x64 認識 −17.4%（5.48→4.52 ms）／x64 AST −20.0%（7.33→5.86 ms）**。
   確保は complex AST が **680 回 113 KB → 509 回 77 KB**、x64 AST が **40,759 回 5.69 MB → 30,130 回 3.41 MB**。
@@ -41,7 +41,7 @@ variant:
 | `noevent` | `final` + 認識で event を一切置かない。**受理は同じだが scope 結果が壊れる上限**（profile §2.2 と同じ性質） |
 | `drvold` / `drvnew` | driver と同じ設定（`diagnostics: true`）。old = master、new = `final` + `value_spans` |
 
-## 1. 候補4（採用）: 出現表と value span を opt-in にする — D-033
+## 1. 候補4（採用）: 出現表と value span を opt-in にする — D-035
 
 `ParseOptions` に `occurrences` と `value_spans`（どちらも既定 false）を足した。
 
@@ -90,7 +90,7 @@ AST の得は complex −12 µs / x64 −410 µs。**profile の見積り（18 �
 
 **規模**: `templates/api.rs` / `templates/finish.rs` / `templates/driver.rs` で 70 行ほど。
 
-## 2. 候補2（採用）: `const DIAG` による診断配管の単相化 — D-034
+## 2. 候補2（採用）: `const DIAG` による診断配管の単相化 — D-036
 
 `Session<'a, const DIAG: bool>` にし、入口が `ParseOptions::diagnostics` を見て `Session::<false>`（fast mode）か
 `Session::<true>`（診断モード）を選ぶ。D-023 の再解析も `Session::<true>` で走る。
@@ -193,7 +193,7 @@ profile §4.3 は「event arena で 12 µs」と書いたが、その根拠は `
 ## 4. driver 経路（診断モード）
 
 driver は corpus 観測のために `diagnostics: true` で 2 回解析する（prefix は `build_ast: false`、
-本体は `build_ast: true`）。D-033 で要求側になったので、**AST 解析だけが `value_spans: true` を出し、
+本体は `build_ast: true`）。D-035 で要求側になったので、**AST 解析だけが `value_spans: true` を出し、
 出現は `lexical: true` が含意する分だけ**にした（prefix 解析は `lexical` のときしか出現を出さないので要求しない）。
 
 | 入力 / mode | `drvold`（master、`diag=1`） 中央値 / **最小** | `drvnew`（`final`、`diag=1,vspan=1`） 中央値 / **最小** | Δ（最小） |
@@ -246,7 +246,7 @@ complex 認識 66 µs の内訳（本 round の実測で更新）:
 | scope 効果（`scope_captures` の走査 + 宣言・参照の `String` + `ScopeStore`） | 約 9 | §3.2（`noevent` から push 分を引いた残り） |
 
 AST の増分は 23 µs（89 − 66）。profile §3.2 の「AST 構築 22 µs」とそのまま一致する
-（出現収集と value span は D-033 で既定から外れた）。
+（出現収集と value span は D-035 で既定から外れた）。
 
 **候補5（AST の arena / SoA 化）の価値は、この 23 µs のうち確保に由来する分だけ**である。
 本 round 後の complex AST は 509 回 / 77,181 byte 確保していて、認識分（324 回 / 31,829 byte）を引くと

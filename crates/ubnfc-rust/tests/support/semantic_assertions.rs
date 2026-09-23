@@ -45,7 +45,7 @@ mod tests {
         assert!(r.ok);
         assert!(r.diagnostics.is_empty());
         assert!(!prefix!(negative, "a").ok);
-        // 出現表は opt-in（D-033）。既定は空で、AST はそのまま作られる。
+        // 出現表は opt-in（D-035）。既定は空で、AST はそのまま作られる。
         let plain = nested::parse("");
         assert!(plain.captures.is_empty() && plain.ast.is_some());
         macro_rules! occ {

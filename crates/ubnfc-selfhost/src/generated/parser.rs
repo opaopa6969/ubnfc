@@ -7,7 +7,7 @@ use super::rt::{diag::Diag,memo::Key};
 pub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::default())}
 pub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {parse_with_scanner(text,options,&mut RejectExtern)}
 pub fn parse_with_scanner(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner)->ParseResult {
-// 診断は const DIAG で単相化する（D-034）。要求されていれば診断 session で 1 度だけ走り、
+// 診断は const DIAG で単相化する（D-036）。要求されていれば診断 session で 1 度だけ走り、
 // そうでなければ fast session で走って、診断が要る結果のときだけ診断 session で解析し直す（D-023）。
 if options.diagnostics {let mut parser=Session::<true>::new(text,options,scanner);
 let step=parser.r0_c(State::default());

@@ -265,7 +265,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
     // fast mode（診断を記録しない）で解析し、診断が要る結果なら同じ入力を診断モードで解析し直す。
     writeln!(
         p,
-        "// 診断は const DIAG で単相化する（D-034）。要求されていれば診断 session で 1 度だけ走り、\n// そうでなければ fast session で走って、診断が要る結果のときだけ診断 session で解析し直す（D-023）。\nif options.diagnostics {{let mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nreturn parser.finish(step);}}\nlet mut parser=Session::<false>::new(text,options,&mut *scanner);\nlet step=parser.r{entry}_c(State::default());\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {{return result;}}\nlet options=ParseOptions{{diagnostics:true,..options}};\nlet mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nparser.finish(step)\n}}",
+        "// 診断は const DIAG で単相化する（D-036）。要求されていれば診断 session で 1 度だけ走り、\n// そうでなければ fast session で走って、診断が要る結果のときだけ診断 session で解析し直す（D-023）。\nif options.diagnostics {{let mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nreturn parser.finish(step);}}\nlet mut parser=Session::<false>::new(text,options,&mut *scanner);\nlet step=parser.r{entry}_c(State::default());\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {{return result;}}\nlet options=ParseOptions{{diagnostics:true,..options}};\nlet mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nparser.finish(step)\n}}",
         entry = g.rules[ir.entry.rule_id.as_str()]
     )
     .unwrap();

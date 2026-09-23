@@ -189,7 +189,7 @@ impl Buffers {
     }
 }
 /// 生成 parser の session。`DIAG` は診断を記録するかの単相化 flag で、`ParseOptions::diagnostics`
-/// と 1 対 1 に対応する（D-034）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
+/// と 1 対 1 に対応する（D-036）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
 /// 機械語から消える。
 pub(crate) struct Session<'a, const DIAG: bool> {
     pub text: &'a str,
@@ -236,7 +236,7 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     mapping_anchor: Option<usize>,
 }
 impl<'a, const DIAG: bool> Session<'a, DIAG> {
-    // 診断の配管は `const DIAG` で単相化する（D-034）。fast mode（`ParseOptions::diagnostics ==
+    // 診断の配管は `const DIAG` で単相化する（D-036）。fast mode（`ParseOptions::diagnostics ==
     // false`）は `Session::<false>` で走り、以下の wrapper が定数 false の分岐になるので、主診断
     // DAG（`Diagnostics`）と公開 farthest（`DisplayDiagnostics`）への呼出しが機械語から消える。
     // 実行時の `enabled` 検査だけでは、呼出し・引数の準備・`Step.diag` の合流が残っていた。
@@ -339,7 +339,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         };
         // fast mode（`ParseOptions::diagnostics == false`）は主診断 DAG も公開 farthest も
         // 記録しない。arena は確保せず、予算（limit 0）も消費しない。
-        // 単相化（D-034）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
+        // 単相化（D-036）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
         let diag_on = DIAG;
         let diag_limit = if diag_on { options.limits.diagnostics } else { 0 };
         let diag_capacity = if diag_on {
@@ -4184,7 +4184,7 @@ fn occurrences(
     let mut tokens = Vec::new();
     let build_ast = self.options.build_ast;
     let want_lexical = self.options.lexical;
-    // 公開する出現表は opt-in（D-033）。AST の直下 capture 表（`pending` / `caps_flat`）は
+    // 公開する出現表は opt-in（D-035）。AST の直下 capture 表（`pending` / `caps_flat`）は
     // `build_ast` のままで、こちらの flag には依らない。走査の骨組み（rule ごとの開始位置）は
     // どちらかが要るときに積む。
     let want_occurrences = self.options.occurrences || want_lexical;
@@ -4353,7 +4353,7 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
             Event::Capture { child, .. } => {
                 if let Some(start) = done {
                     // `capture_occurrence_ids` は出現表を返すかに依らない観測なので、
-                    // 番号付けは AST / lexical のときそのまま数える（D-033 の対象外）。
+                    // 番号付けは AST / lexical のときそのまま数える（D-035 の対象外）。
                     if self.options.build_ast || self.options.lexical {
                         for r in &mut recoveries[start..] {
                             r.capture_occurrence_ids.push(capture_order);
@@ -4513,7 +4513,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     };
     diagnostics.splice(0..0, recovery_diagnostics);
     // 走査は AST の直下 capture 表のために `build_ast` でも要る。公開する出現表を作るかは
-    // `occurrences` / `lexical` が決める（D-033）。認識だけで要求も無ければ走査ごと省く。
+    // `occurrences` / `lexical` が決める（D-035）。認識だけで要求も無ければ走査ごと省く。
     let (captures, lexical, tokens) =
         if step.ok
             && (self.options.build_ast || self.options.occurrences || self.options.lexical)
@@ -4565,7 +4565,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     self.statistics.lexical_probes = self.lex.probes;
     self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
     self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
-    // value span は要求されたときだけ集める（D-033）。AST 自体は先に完成している。
+    // value span は要求されたときだけ集める（D-035）。AST 自体は先に完成している。
     let want_value_spans = self.options.value_spans && ast.is_some();
     let mut value_spans = Vec::with_capacity(if want_value_spans {
         self.node_spans.len() + self.text_spans.len()

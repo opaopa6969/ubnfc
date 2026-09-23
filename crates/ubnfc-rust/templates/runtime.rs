@@ -189,7 +189,7 @@ impl Buffers {
     }
 }
 /// 生成 parser の session。`DIAG` は診断を記録するかの単相化 flag で、`ParseOptions::diagnostics`
-/// と 1 対 1 に対応する（D-034）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
+/// と 1 対 1 に対応する（D-036）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
 /// 機械語から消える。
 pub(crate) struct Session<'a, const DIAG: bool> {
     pub text: &'a str,
@@ -236,7 +236,7 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     mapping_anchor: Option<usize>,
 }
 impl<'a, const DIAG: bool> Session<'a, DIAG> {
-    // 診断の配管は `const DIAG` で単相化する（D-034）。fast mode（`ParseOptions::diagnostics ==
+    // 診断の配管は `const DIAG` で単相化する（D-036）。fast mode（`ParseOptions::diagnostics ==
     // false`）は `Session::<false>` で走り、以下の wrapper が定数 false の分岐になるので、主診断
     // DAG（`Diagnostics`）と公開 farthest（`DisplayDiagnostics`）への呼出しが機械語から消える。
     // 実行時の `enabled` 検査だけでは、呼出し・引数の準備・`Step.diag` の合流が残っていた。
@@ -339,7 +339,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         };
         // fast mode（`ParseOptions::diagnostics == false`）は主診断 DAG も公開 farthest も
         // 記録しない。arena は確保せず、予算（limit 0）も消費しない。
-        // 単相化（D-034）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
+        // 単相化（D-036）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
         let diag_on = DIAG;
         let diag_limit = if diag_on { options.limits.diagnostics } else { 0 };
         let diag_capacity = if diag_on {
