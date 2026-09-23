@@ -193,8 +193,13 @@ fn compile_parsed_with_strict(
     if strict && !warnings.is_empty() {
         return Err(PipelineError::Strict(warnings));
     }
-    let (analysis, plan) =
-        analysis::analyze(&lowered.semantics).map_err(PipelineError::Analysis)?;
+    let (analysis, plan, choice_issues) = analysis::analyze_with_choice_issues(&lowered.semantics)
+        .map_err(PipelineError::Analysis)?;
+    warnings.extend(choice_issues.into_iter().map(choice_warning));
+    sort_issues(&mut warnings);
+    if strict && !warnings.is_empty() {
+        return Err(PipelineError::Strict(warnings));
+    }
     analysis::attach_regex_plans(&mut lowered.semantics, &plan);
     for recovery in &mut lowered.semantics.recovery {
         if matches!(recovery.mode, RecoveryMode::Auto | RecoveryMode::Skip) {
@@ -240,7 +245,19 @@ fn compile_parsed_with_strict(
     Ok(Compiled { ir, warnings })
 }
 
+/// 順序付き選択の到達不能候補（D-037）を既存の診断機械へ載せる。
+pub(crate) fn choice_warning(issue: analysis::ChoiceIssue) -> ValidationIssue {
+    ValidationIssue {
+        code: issue.code,
+        message: issue.message,
+        hint: issue.hint,
+        rule: issue.rule,
+        grammar: issue.grammar,
+    }
+}
+
 /// 既存 validate 契約。lower / analysis による生成可否とは別に診断を返す。
+/// エラーが無いときに限り lower / analysis まで進め、到達不能候補の警告も足す。
 pub fn validate_file(
     main_path: impl AsRef<Path>,
     loader: &dyn Fn(&Path) -> io::Result<String>,
@@ -257,6 +274,16 @@ pub fn validate_file(
     })?;
     let mut issues = prepared.issues.clone();
     issues.extend(validate::validate(&prepared.grammar));
+    if issues.iter().all(|i| i.severity() != "ERROR") {
+        // lower / analysis の失敗は ir / gen が報告する。ここでは警告を足せないだけ。
+        if let Ok(lowered) = lower::lower(&prepared.grammar, &prepared.sources) {
+            if let Ok((_, _, choice_issues)) =
+                analysis::analyze_with_choice_issues(&lowered.semantics)
+            {
+                issues.extend(choice_issues.into_iter().map(choice_warning));
+            }
+        }
+    }
     sort_issues(&mut issues);
     Ok(issues)
 }

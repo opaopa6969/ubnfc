@@ -32,6 +32,7 @@ impl ValidationIssue {
 
     pub fn category(&self) -> &'static str {
         for (prefix, category) in [
+            ("W-CHOICE-", "CHOICE"),
             ("E-MAPPING-", "MAPPING"),
             ("E-ASSOC-", "ASSOCIATIVITY"),
             ("E-RIGHTASSOC-", "ASSOCIATIVITY"),
