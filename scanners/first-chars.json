@@ -1,13 +1,16 @@
 {
-  "$comment": "Extern scanner の先頭文字宣言。key は IR の originalClassName（scanners/rust/scanners.rs・scanners/java の registry が解決する完全クラス名または alias）。値は成功し得る先頭 code point の集合（1 code point の文字列、整数、または {start,end} の閉区間）。集合外の先頭文字で scanner が消費なしに失敗することを scanner 実装が保証する必要条件で、backend は候補除外（設計 v1 §3.4）にだけ使う。null は unknown。front には ubnfc ir/gen --extern-first-chars で渡す。docs/harness-driver-protocol.md「Extern scanner の先頭文字宣言」参照。",
+  "$comment": "Extern scanner の先頭文字宣言。key は IR の originalClassName（scanners/rust/scanners.rs・scanners/java の registry が解決する完全クラス名または alias）。値は成功し得る先頭 code point の集合（1 code point の文字列、整数、または {start,end} の閉区間）。集合外の先頭文字で scanner が消費なしに失敗することを scanner 実装が保証する必要条件で、backend は候補除外（設計 v1 §3.4）にだけ使う。null は unknown。front には ubnfc ir/gen --extern-first-chars で渡す。docs/harness-driver-protocol.md「Extern scanner の先頭文字宣言」参照。 UBNF v2 の extern 宣言（token X = extern 'Name'）は registry の ID をそのまま書くので、 FQN と並べて短い ID の別名も登録する（D-041）。v2 の文法では、ここに無い extern は ubnfc ir/gen が E-TOKEN-EXTERN-UNREGISTERED で落とす（D-042）。",
   "scanners": {
     "org.unlaxer.parser.elementary.DoubleQuotedParser": ["\""],
     "DoubleQuotedParser": ["\""],
     "org.unlaxer.parser.elementary.SingleQuotedParser": ["'"],
     "SingleQuotedParser": ["'"],
     "org.unlaxer.tinyexpression.parser.StringLiteralParser": ["'", "\""],
+    "StringLiteralParser": ["'", "\""],
     "org.unlaxer.tinyexpression.parser.javalang.CodeStartParser": ["`"],
+    "CodeStartParser": ["`"],
     "org.unlaxer.tinyexpression.parser.javalang.CodeEndParser": ["`"],
+    "CodeEndParser": ["`"],
     "oracle.ExternalCursorParser": ["😀"]
   }
 }

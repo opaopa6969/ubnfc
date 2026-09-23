@@ -255,6 +255,15 @@ impl Parser<'_> {
     fn token_value(&mut self) -> ParseResult<TokenValue> {
         let start = self.start();
         let dotted = self.dotted()?;
+        // `extern '<id>'`（D-041）。v1 では `extern` の次に文字列が来る位置は
+        // 構文エラーだったので純粋な追加であり、v1 の文法は 1 文字も変わらない。
+        if dotted == "extern" && matches!(self.peek(0).kind, Kind::String { .. }) {
+            let name = self.string()?;
+            return Ok(TokenValue::Extern {
+                name,
+                span: self.span_from(start),
+            });
+        }
         let constructor = matches!(
             dotted.as_str(),
             "UNTIL"
@@ -312,6 +321,11 @@ impl Parser<'_> {
                 "ANY" => TokenValue::Any { span },
                 "EOF" => TokenValue::Eof { span },
                 "EMPTY" => TokenValue::Empty { span },
+                // 言語中立な組込み語彙（D-041）。SCREAMING_SNAKE_CASE なので
+                // host のクラス単純名（UpperCamelCase）と綴りが重ならない。
+                _ if crate::vocabulary::builtin_fqn(&dotted).is_some() => {
+                    TokenValue::Builtin { name: dotted, span }
+                }
                 _ => TokenValue::ClassRef { dotted, span },
             })
         }

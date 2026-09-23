@@ -443,3 +443,122 @@ fn p4_v2_produces_the_same_ast_types_and_recipes_as_the_committed_p4_ir() {
         )
     );
 }
+
+// ── §5 言語中立な token 語彙（D-041 / D-042） ──────────────────────────────
+
+/// token 宣言だけが違う最小の文法。
+fn with_token(version: Option<u64>, declaration: &str) -> String {
+    let settings = version.map_or(String::new(), |v| format!("  @ubnf: {v}\n"));
+    format!(
+        "grammar G {{\n  @package: org.example\n{settings}  @whitespace: none\n  \
+         token T = {declaration}\n  @root\n  S ::= T ;\n}}"
+    )
+}
+
+fn token_spec(compiled: &Compiled) -> String {
+    let token = &compiled.ir.semantics.tokens[0];
+    // spec / 診断プロファイル / memo 安全性の「意味のある部分」だけを比べる。
+    // 綴りそのものが写る originalDeclaration と reason は外す。
+    format!(
+        "{:?}|{:?}|{}/{}",
+        token.spec, token.diagnostic_profiles, token.memo_safety.success, token.memo_safety.failure
+    )
+}
+
+/// 中立名は「同じ FQN を書いたとき」と**同じ述語・同じ IR** を指す（D-041）。
+/// これが語彙の契約そのもの（02-facts §A の受理範囲を 1 つも変えない）。
+#[test]
+fn every_neutral_name_produces_the_same_token_spec_as_its_host_class_spelling() {
+    for (neutral, class) in ubnfc_front::vocabulary::BUILTIN_VOCABULARY {
+        let by_class = source(&with_token(Some(2), class)).unwrap();
+        let by_name = source(&with_token(Some(2), neutral)).unwrap();
+        assert_eq!(
+            token_spec(&by_class),
+            token_spec(&by_name),
+            "{neutral} と {class} の IR が違う"
+        );
+    }
+}
+
+/// 中立語彙は**純粋な追加**なので v1 でも書ける（06 §0 の規則）。
+/// v1 の既存文法は 1 文字も変わらないし、v1 で中立名を書いても v2 と同じ IR になる。
+#[test]
+fn the_neutral_vocabulary_is_additive_and_also_works_under_v1() {
+    for version in [None, Some(1), Some(2)] {
+        let compiled = source(&with_token(version, "NUMBER")).unwrap();
+        assert_eq!(
+            token_spec(&compiled),
+            token_spec(&source(&with_token(version, "NumberParser")).unwrap())
+        );
+    }
+    // v1 で中立名を書いても警告は出ない。
+    assert!(codes(&with_token(Some(1), "IDENTIFIER")).is_empty());
+}
+
+/// `extern '<id>'` は host 実装の明示宣言。名前は registry の ID なので FQN でなくてよく、
+/// 綴り間違いを拾うための W-TOKEN-UNRESOLVED は出さない（registry の有無は ir/gen が見る）。
+#[test]
+fn extern_declares_a_host_implementation_without_a_java_package() {
+    let compiled = source(&with_token(Some(2), "extern 'StringLiteralParser'")).unwrap();
+    let spec = format!("{:?}", compiled.ir.semantics.tokens[0].spec);
+    assert!(spec.contains("StringLiteralParser"), "{spec}");
+    assert!(!spec.contains("org.unlaxer"), "{spec}");
+    assert!(codes(&with_token(Some(2), "extern 'StringLiteralParser'")).is_empty());
+    // 単純名の ClassRef は「未知のクラス」として警告が出る形。extern はそれを消す。
+    assert_eq!(
+        codes(&with_token(Some(2), "StringLiteralParser")),
+        ["W-TOKEN-HOST-CLASS", "W-TOKEN-UNRESOLVED"]
+    );
+    // extern は綴りをそのまま残すので、中立語彙と綴りが重なる host クラスも書ける。
+    let escaped = source(&with_token(Some(2), "extern 'NUMBER'")).unwrap();
+    assert!(format!("{:?}", escaped.ir.semantics.tokens[0].spec).contains("Extern"));
+}
+
+/// v2 は旧綴りを**警告する**（拒否しない、D-042）。v1 では旧綴りが唯一の綴りなので黙る。
+#[test]
+fn v2_warns_about_host_class_token_declarations_but_still_accepts_them() {
+    let fqn = "org.unlaxer.parser.elementary.NumberParser";
+    assert_eq!(codes(&with_token(Some(2), fqn)), ["W-TOKEN-HOST-CLASS"]);
+    assert!(codes(&with_token(None, fqn)).is_empty());
+    assert!(codes(&with_token(Some(1), fqn)).is_empty());
+    // 警告どまりなので IR は作られ、中立名の IR と一致する。
+    assert_eq!(
+        token_spec(&source(&with_token(Some(2), fqn)).unwrap()),
+        token_spec(&source(&with_token(Some(2), "NUMBER")).unwrap())
+    );
+}
+
+/// v2 では registry が提供しない extern を **生成時に** 落とす（D-042）。
+/// v1 は凍結なので従来どおり stderr の注意だけで IR を出す。
+#[test]
+fn v2_rejects_an_extern_that_no_scanner_registry_provides() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let first_chars = root.join("scanners/first-chars.json");
+    let dir = std::env::temp_dir().join(format!("ubnfc-extern-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let run = |version: Option<u64>, declaration: &str| {
+        let path = dir.join("g.ubnf");
+        std::fs::write(&path, with_token(version, declaration)).unwrap();
+        std::process::Command::new(env!("CARGO_BIN_EXE_ubnfc"))
+            .args(["ir", "--grammar"])
+            .arg(&path)
+            .args(["--out", "-", "--extern-first-chars"])
+            .arg(&first_chars)
+            .output()
+            .unwrap()
+    };
+
+    let missing = run(Some(2), "extern 'NoSuchScanner'");
+    assert_eq!(missing.status.code(), Some(1));
+    let stderr = String::from_utf8(missing.stderr).unwrap();
+    assert!(stderr.contains("E-TOKEN-EXTERN-UNREGISTERED"), "{stderr}");
+    assert!(stderr.contains("NoSuchScanner"), "{stderr}");
+
+    let registered = run(Some(2), "extern 'StringLiteralParser'");
+    assert_eq!(registered.status.code(), Some(0));
+
+    // v1 は凍結: 同じ形が従来どおり注意だけで通る。
+    let v1 = run(None, "NoSuchScanner");
+    assert_eq!(v1.status.code(), Some(0));
+    std::fs::remove_dir_all(&dir).unwrap();
+}

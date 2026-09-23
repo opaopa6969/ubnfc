@@ -10,13 +10,17 @@ grammar TinyExpressionP4 {
   @memoSafeToken: CODE_END
   @memoSafeToken: EOF
 
-  token NUMBER     = org.unlaxer.parser.elementary.NumberParser
-  token IDENTIFIER = org.unlaxer.parser.clang.IdentifierParser
-  token STRING     = org.unlaxer.tinyexpression.parser.StringLiteralParser
-  token CODE_START = org.unlaxer.tinyexpression.parser.javalang.CodeStartParser
+  // 言語中立な組込み語彙（D-041）。受理範囲は 02-facts §A の表そのままで、
+  // v1 の FQN 綴りと 1 述語ずつ対応する。host 実装が要る 3 つは extern と明示する
+  // （組込みでは書けない理由は報告 2026-09-23-ubnf-v2-token-vocabulary.md §4。
+  //  名前は scanner registry の ID: scanners/first-chars.json・scanners/{java,rust}）。
+  token NUMBER     = NUMBER
+  token IDENTIFIER = IDENTIFIER
+  token STRING     = extern 'StringLiteralParser'
+  token CODE_START = extern 'CodeStartParser'
   token CODE_BODY  = UNTIL('```')
-  token CODE_END   = org.unlaxer.tinyexpression.parser.javalang.CodeEndParser
-  token EOF        = org.unlaxer.parser.elementary.EndOfSourceParser
+  token CODE_END   = extern 'CodeEndParser'
+  token EOF        = END_OF_INPUT
 
   @root
   @interleave(profile=javaStyle)

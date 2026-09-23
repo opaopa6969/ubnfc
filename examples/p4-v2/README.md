@@ -2,7 +2,12 @@
 
 `tinyexpression-p4-v2.ubnf` は、tinyexpression の P4 文法
 （`tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf`、**読み取り専用**）を
-`@ubnf: 2` の左再帰ルールで書き直したもの。**式の塔以外は 1 文字も変えていない**。
+UBNF v2（`@ubnf: 2`）で書き直したもの。変えたのは次の 2 つだけである。
+
+1. **式の塔 → 左再帰ルール**（D-039、下の表）
+2. **token 宣言 → 言語中立な語彙と明示 `extern`**（D-041、`docs/reports/2026-09-23-ubnf-v2-token-vocabulary.md`）
+
+それ以外は 1 文字も変えていない。
 
 | | v1（手書きの塔） | v2（左再帰ルール） |
 |---|---:|---:|
@@ -19,6 +24,17 @@
 
 真偽の塔は段ごとに AST クラスが違う（`BooleanOrExpr` / `BooleanAndExpr` / `BooleanXorExpr`）ので、
 **候補先頭の `@mapping`** で段ごとに指定している。
+
+token 宣言は host 言語のクラス名を書かない形になった:
+
+| token | v1 | v2 |
+|---|---|---|
+| `NUMBER` / `IDENTIFIER` / `EOF` | `org.unlaxer.parser.…Parser` | `NUMBER` / `IDENTIFIER` / `END_OF_INPUT` |
+| `STRING` / `CODE_START` / `CODE_END` | `org.unlaxer.tinyexpression.parser.…` | `extern 'StringLiteralParser'` 等（scanner registry の ID） |
+| `CODE_BODY` | `UNTIL('```')` | 同じ（元から中立） |
+
+この差で IR が変わるのは `memoSafety.originalDeclaration` / `memoSafety.reason` /
+extern の `originalClassName`・`javaBinding` の 4 キー 20 箇所だけで、`spec` も解析も計画も一致する。
 
 ## 比較の走らせ方
 

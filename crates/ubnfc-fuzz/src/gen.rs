@@ -60,6 +60,8 @@ pub const FEATURES: &[&str] = &[
     "ubnf2",
     "leftRecursion",
     "wordBoundary",
+    "token:neutral",
+    "token:extern",
 ];
 
 /// UBNF v2（`@ubnf: 2`）を生成する seed の帯。
@@ -68,6 +70,25 @@ pub const FEATURES: &[&str] = &[
 /// 4001..4004 は CI の固定 campaign）。したがって v2 は乱数を引かず、
 /// **seed の値だけ**で決める。
 pub const V2_SEED_BASE: u64 = 100_000;
+
+/// UBNF v2 の token 綴り（D-041）。v2 の seed だけ、同じ述語を**言語中立な語彙**か
+/// **明示 extern** で綴り直す。トークン数も乱数の消費も変えないので、既存 seed の
+/// 生成物は 1 バイトも変わらない（v2 帯そのものは `V2_SEED_BASE` 以降）。
+///
+/// `extern 'SingleQuotedParser'` は scanner registry（`scanners/{java,rust}`）が
+/// 両言語で提供している ID なので、**extern の表層も両 backend で突き合わせられる**。
+/// seed の偶奇で切り替えるので、どちらの綴りも固定 seed campaign に現れる。
+fn v2_spelling(seed: u64, declaration: &str) -> Option<(&'static str, &'static str)> {
+    Some(match declaration {
+        "NumberParser" => ("NUMBER", "token:neutral"),
+        "org.unlaxer.parser.clang.IdentifierParser" => ("IDENTIFIER", "token:neutral"),
+        "org.unlaxer.parser.elementary.SingleQuotedParser" if seed % 2 == 1 => {
+            ("extern 'SingleQuotedParser'", "token:extern")
+        }
+        "org.unlaxer.parser.elementary.SingleQuotedParser" => ("SINGLE_QUOTED", "token:neutral"),
+        _ => return None,
+    })
+}
 
 /// `@enum` の選択肢。variant 名が Java / Rust の識別子になるため、
 /// 記号や非 ASCII は使えない（Java 生成器の `Validation.identifier`）。
@@ -345,6 +366,14 @@ pub fn generate(seed: u64) -> Grammar {
         let spec = builder.rng.pick(TOKEN_PALETTE);
         let (declaration, samples, feature) = (spec.declaration, spec.samples, spec.feature);
         builder.mark(feature);
+        // 綴りだけ v2 の語彙へ差し替える（述語・サンプル・乱数は同じ）。
+        let declaration = match v2.then(|| v2_spelling(seed, declaration)).flatten() {
+            Some((spelling, marker)) => {
+                builder.mark(marker);
+                spelling
+            }
+            None => declaration,
+        };
         builder.tokens.push(Token {
             name: format!("T{index}"),
             declaration: declaration.to_owned(),
@@ -777,6 +806,63 @@ mod tests {
             .filter(|s| generate(*s).features.contains("wordBoundary"))
             .count();
         assert!(v2 >= 50, "v2 帯の被覆が足りない: {v2}/60");
+    }
+
+    /// v1 の seed は host クラス名の綴りのまま（v1 は凍結、D-041）。
+    #[test]
+    fn v1_seeds_keep_the_host_class_spelling() {
+        for seed in 0..400u64 {
+            let source = generate(seed).render();
+            for line in source
+                .lines()
+                .filter(|l| l.trim_start().starts_with("token "))
+            {
+                assert!(
+                    !line.contains("extern ")
+                        && !line.contains("= NUMBER")
+                        && !line.contains("= IDENTIFIER")
+                        && !line.contains("= SINGLE_QUOTED"),
+                    "seed {seed}: {line}"
+                );
+            }
+        }
+    }
+
+    /// v2 の seed は中立語彙か明示 extern で綴る。どちらも固定 seed campaign
+    /// （`tests/campaign.rs` の c）で両 backend に渡る。
+    #[test]
+    fn v2_seeds_spell_tokens_with_the_neutral_vocabulary_or_explicit_extern() {
+        let (mut neutral, mut external) = (0, 0);
+        for seed in V2_SEED_BASE..V2_SEED_BASE + 400 {
+            let source = generate(seed).render();
+            for line in source
+                .lines()
+                .filter(|l| l.trim_start().starts_with("token "))
+            {
+                assert!(
+                    !line.contains("org.unlaxer"),
+                    "seed {seed} に host クラス名が残っている: {line}"
+                );
+                neutral += usize::from(
+                    line.contains("= NUMBER")
+                        || line.contains("= IDENTIFIER")
+                        || line.contains("= SINGLE_QUOTED"),
+                );
+                external += usize::from(line.contains("extern 'SingleQuotedParser'"));
+            }
+        }
+        assert!(neutral > 0 && external > 0, "{neutral} / {external}");
+    }
+
+    /// `tests/campaign.rs` の c が回す固定 seed 帯が、**両方の綴り**を含むこと。
+    /// これが崩れると「両 backend で突き合わせた」と言えなくなる。
+    #[test]
+    fn the_fixed_v2_campaign_band_covers_both_spellings() {
+        let features: BTreeSet<&str> = (V2_SEED_BASE + 1..V2_SEED_BASE + 4)
+            .flat_map(|seed| generate(seed).features)
+            .collect();
+        assert!(features.contains("token:neutral"), "{features:?}");
+        assert!(features.contains("token:extern"), "{features:?}");
     }
 
     #[test]

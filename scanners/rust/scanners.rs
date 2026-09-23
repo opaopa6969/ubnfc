@@ -15,9 +15,13 @@ fn kind(class: &str) -> Option<Kind> {
     Some(match class {
         "DoubleQuotedParser" | "org.unlaxer.parser.elementary.DoubleQuotedParser" => Kind::Double,
         "SingleQuotedParser" | "org.unlaxer.parser.elementary.SingleQuotedParser" => Kind::Single,
-        "org.unlaxer.tinyexpression.parser.StringLiteralParser" => Kind::String,
-        "org.unlaxer.tinyexpression.parser.javalang.CodeStartParser" => Kind::Start,
-        "org.unlaxer.tinyexpression.parser.javalang.CodeEndParser" => Kind::End,
+        "StringLiteralParser" | "org.unlaxer.tinyexpression.parser.StringLiteralParser" => {
+            Kind::String
+        }
+        "CodeStartParser" | "org.unlaxer.tinyexpression.parser.javalang.CodeStartParser" => {
+            Kind::Start
+        }
+        "CodeEndParser" | "org.unlaxer.tinyexpression.parser.javalang.CodeEndParser" => Kind::End,
         "oracle.ExternalCursorParser" => Kind::External,
         _ => return None,
     })

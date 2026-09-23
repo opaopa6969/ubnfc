@@ -8,6 +8,7 @@
 //! - `analysis` : nullable / FIRST / 左再帰 / 優先順位 / choice 戦略 / capture cardinality
 //! - `cli`      : `ubnfc` コマンド
 //! - `pipeline` : ソース読込から参照検証済み Grammar IR までの結線
+//! - `vocabulary`: UBNF v2 の言語中立な組込み token 語彙（D-040）
 
 pub mod analysis;
 pub mod boundary;
@@ -20,5 +21,6 @@ pub mod resolve;
 pub mod selfhost;
 pub mod syntax;
 pub mod validate;
+pub mod vocabulary;
 
 pub const IR_VERSION: u32 = 1;

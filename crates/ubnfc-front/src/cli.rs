@@ -66,6 +66,19 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         let declarations =
             ir::parse_extern_first_chars(&text).map_err(|e| format!("{path}: {e}"))?;
         let (_, missing) = ir::apply_extern_first_chars(&mut compiled.ir, &declarations);
+        // v2 は host 実装を明示する形式（D-041）なので、registry が提供しない extern を
+        // **生成時に**落とす。v1 は凍結なので従来どおり stderr の注意だけ（D-042）。
+        if compiled.ir.language_version >= 2 && !missing.is_empty() {
+            for class in &missing {
+                eprintln!(
+                    "ubnfc: E-TOKEN-EXTERN-UNREGISTERED: extern token implementation \
+                     {class} is not provided by {path} \
+                     [hint: add {class} to the scanner registry (scanners/first-chars.json and \
+                     scanners/{{java,rust}}), or fix the name in the extern declaration]"
+                );
+            }
+            return Ok(1);
+        }
         for class in missing {
             eprintln!(
                 "ubnfc: {path}: Extern class {class} has no firstChars declaration (kept unknown)"
