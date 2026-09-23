@@ -1,0 +1,18 @@
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex,recognize,Formula,2000,2000,0.667215,0.712366,0.547356,0.581813,0.558695,0.623841,503544
+complex,ast,Formula,2000,2000,0.637224,0.502771,0.503351,0.624737,0.761668,0.624737,535720
+complex-x4,recognize,Formula,2000,500,2.290102,2.072889,2.661003,3.417923,1.952280,2.290102,1917864
+complex-x4,ast,Formula,2000,500,2.117750,1.847568,1.917612,2.302046,2.318552,1.960470,2047672
+complex-x16,recognize,Formula,2000,125,6.233740,6.517219,10.051561,11.070786,8.640670,6.840892,7681064
+complex-x16,ast,Formula,2000,125,6.938128,6.860965,7.076886,6.831529,6.951098,6.951098,8200376
+complex-x64,recognize,Formula,2000,50,39.064884,34.462082,33.577864,32.601762,30.375611,32.896835,32999472
+complex-x64,ast,Formula,2000,50,44.860653,46.083007,36.694274,35.171062,35.417506,35.417506,35076928
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=comparison-heavy,comparison-heavy-x64, -Dbench.entry=BooleanExpression]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+comparison-heavy,recognize,BooleanExpression,2000,2000,0.318963,0.303345,0.305469,0.289864,0.302434,0.302434,440272
+comparison-heavy,ast,BooleanExpression,2000,2000,0.321185,0.314689,0.319606,0.314164,0.315629,0.314689,510000
+comparison-heavy-x64,recognize,BooleanExpression,2000,50,23.734419,22.769732,26.448544,23.647375,23.158548,23.299123,32304512
+comparison-heavy-x64,ast,BooleanExpression,2000,50,32.217160,30.404365,31.170322,32.832308,34.847284,32.832308,36776896

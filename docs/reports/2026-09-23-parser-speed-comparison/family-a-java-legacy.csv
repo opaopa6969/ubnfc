@@ -1,0 +1,228 @@
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=200, -Dbench.iterations=200, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex,legacy-root,Formula,200,200,13.773323,13.330795,17.654974,14.533848,15.938199,13.773323,27425864
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=60, -Dbench.iterations=40, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x4,legacy-root,Formula,60,40,64.071988,61.523390,80.068316,118.166848,67.993766,67.993766,107386304
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=20, -Dbench.iterations=8, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x16,legacy-root,Formula,20,8,302.604636,328.250662,326.590913,326.124540,352.627784,328.250662,419737512
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=5, -Dbench.iterations=3, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x64,legacy-root,Formula,5,3,1614.058591,1621.217469,1704.110666,1469.052278,1842.952172,1614.058591,1670764864
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=200, -Dbench.iterations=200, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex,legacy-mapper,Formula,200,200,14.402454,13.258528,14.104166,13.622176,13.202027,13.782564,27559241
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=60, -Dbench.iterations=40, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x4,legacy-mapper,Formula,60,40,147.691685,132.185889,65.952926,60.840342,57.538504,60.840342,106421672
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=20, -Dbench.iterations=8, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x16,legacy-mapper,Formula,20,8,336.953689,324.407280,370.145238,345.679383,360.084889,345.679383,421588424
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=5, -Dbench.iterations=3, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x64,legacy-mapper,Formula,5,3,1569.806379,1455.266301,1438.828855,1419.333955,1432.303808,1438.828855,1684423437
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=200, -Dbench.iterations=200, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex,legacy-facade,Formula,200,200,11.354354,9.560418,10.123130,11.376161,10.033636,10.033636,23621013
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=60, -Dbench.iterations=40, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x4,legacy-facade,Formula,60,40,48.725724,44.117221,45.882532,45.955017,69.048538,45.882532,92624157
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=20, -Dbench.iterations=8, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x16,legacy-facade,Formula,20,8,251.842843,252.170572,249.313587,233.946295,241.944921,241.944921,363084168
+# org.unlaxer.parser.AbstractParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.Parser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.ParentHolderParser <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.parser.combinator.Chain <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Choice <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.parser.combinator.Occurs <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.ParseContext <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.PackratMemoTable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.Memoization <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeFailureMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.context.SafeSuccessMemoizable <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/m2/org/unlaxer/unlaxer-common/3.0.15/unlaxer-common-3.0.15.jar
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Mapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# org.unlaxer.tinyexpression.p4.P4PreferredAstMapper <- file:/tmp/claude-1000/-home-opa-work-unlaxer-workspace-unlaxer-parser/b12038a6-6260-4045-90a0-9b3410555ee6/scratchpad/speedcmp/tinyexpression/target/classes/
+# root=org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4Parsers$FormulaParser safeSuccess=false safeFailure=true
+# java=21.0.9 memoize=true
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dtinyexpression.p4.memoize=true, -Dtinyexpression.p4.parse.timeout.millis=0, -Dbench.runs=7, -Dbench.warmup=5, -Dbench.iterations=3, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,alloc_bytes_per_parse
+complex-x64,legacy-facade,Formula,5,3,1310.315444,1335.971613,1246.515518,1227.269104,1272.111682,1272.111682,1450446032

@@ -1,0 +1,9 @@
+# java=21.0.9 memo=SAFE_FAILURES
+# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.warmup=100, -Dbench.runs=7, -Dbench.iterations=20, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED]
+# root=org.unlaxer.dsl.bootstrap.UBNFParsers$UBNFFileParser <- file:/home/opa/work/unlaxer-workspace/unlaxer-parser/unlaxer-dsl/target/classes/
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+C,unlaxer-dsl UBNFParsers(旧 Java/combinator),ubnf.ubnf,10650,CST(認識相当),20,7,66.248994,61.878688,77.522070,6.2206,,98644072
+C,unlaxer-dsl UBNFParsers(旧 Java/combinator),elements,276,CST(認識相当),20,7,1.698814,1.646096,1.861916,6.1551,,4768456
+C,unlaxer-dsl UBNFParsers(旧 Java/combinator),boundaries,334,CST(認識相当),20,7,2.014739,1.933794,2.145261,6.0322,,5739448
+C,unlaxer-dsl UBNFParsers(旧 Java/combinator),all-tokens,559,CST(認識相当),20,7,2.056982,1.887343,4.176368,3.6798,,5692520
+C,unlaxer-dsl UBNFParsers(旧 Java/combinator),annotations,653,CST(認識相当),20,7,2.665745,2.115753,3.454376,4.0823,,6256952

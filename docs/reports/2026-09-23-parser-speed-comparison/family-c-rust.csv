@@ -1,0 +1,23 @@
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+C,ubnfc-selfhost,ubnf.ubnf,10650,認識,518,7,0.442788,0.436197,0.467073,0.0416,258,808572
+C,ubnfc-selfhost,ubnf.ubnf,10650,AST(生成),689,7,0.562175,0.551100,0.581000,0.0528,1473,1368940
+C,ubnfc-selfhost,ubnf.ubnf,10650,AST(UbnfFile 射影),94,7,5.237972,5.071292,5.926369,0.4918,7073,2673447
+C,ubnfc-front(手書き),ubnf.ubnf,10650,AST(UbnfFile),2463,7,0.091663,0.073754,0.121080,0.0086,1215,470005
+C,unlaxer-ubnf(手書き),ubnf.ubnf,10650,AST(UbnfFile),3506,7,0.078093,0.074220,0.082257,0.0073,1567,433015
+C,ubnfc-selfhost,elements,276,認識,16757,7,0.023136,0.022583,0.025521,0.0838,37,69996
+C,ubnfc-selfhost,elements,276,AST(生成),7413,7,0.029885,0.028679,0.032572,0.1083,124,93941
+C,ubnfc-selfhost,elements,276,AST(UbnfFile 射影),2823,7,0.083470,0.082293,0.086178,0.3024,514,167656
+C,ubnfc-front(手書き),elements,276,AST(UbnfFile),30879,7,0.003697,0.003668,0.003864,0.0134,86,31452
+C,unlaxer-ubnf(手書き),elements,276,AST(UbnfFile),22428,7,0.004776,0.004393,0.005788,0.0173,138,28677
+C,ubnfc-selfhost,boundaries,334,認識,17989,7,0.021364,0.021141,0.027389,0.0640,34,56928
+C,ubnfc-selfhost,boundaries,334,AST(生成),8617,7,0.026548,0.026291,0.034142,0.0795,98,81220
+C,ubnfc-selfhost,boundaries,334,AST(UbnfFile 射影),4110,7,0.068119,0.067250,0.071191,0.2039,428,150272
+C,ubnfc-front(手書き),boundaries,334,AST(UbnfFile),34630,7,0.002261,0.002241,0.002420,0.0068,58,20773
+C,unlaxer-ubnf(手書き),boundaries,334,AST(UbnfFile),27449,7,0.002430,0.002415,0.004212,0.0073,69,16961
+C,ubnfc-selfhost,all-tokens,559,認識,12961,7,0.024626,0.023808,0.027458,0.0441,47,91348
+C,ubnfc-selfhost,all-tokens,559,AST(生成),6658,7,0.032249,0.031439,0.036631,0.0577,151,126198
+C,ubnfc-selfhost,all-tokens,559,AST(UbnfFile 射影),3242,7,0.099452,0.098393,0.110092,0.1779,595,210755
+C,ubnfc-front(手書き),all-tokens,559,AST(UbnfFile),25396,7,0.004782,0.004744,0.004819,0.0086,116,44286
+C,unlaxer-ubnf(手書き),all-tokens,559,AST(UbnfFile),16324,7,0.006142,0.006060,0.006292,0.0110,183,44745
+C,ubnfc-front(手書き),annotations,653,AST(UbnfFile),37464,7,0.004691,0.004621,0.004740,0.0072,119,40496
+C,unlaxer-ubnf(手書き),annotations,653,AST(UbnfFile),17937,7,0.005806,0.005786,0.005901,0.0089,179,43388
