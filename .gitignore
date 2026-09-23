@@ -3,3 +3,5 @@ target/
 .idea/
 *.iml
 /scratch/
+examples/*/out/
+examples/*/out-spec/

@@ -1,0 +1,102 @@
+{
+  "family": "p4",
+  "section": "2.3-2.6 演算子",
+  "summary": "演算子の綴りと優先順位。",
+  "cases": [
+    {
+      "id": "p4/arithmetic",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.3 算術演算子",
+        "sentence": "| `+` | 加算（文字列の場合は連結） | `1 + 2`, `$a + 'x'` |"
+      },
+      "input": "$a + $b",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/comparison",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.4 比較演算子",
+        "sentence": "| `>=` | 以上 | `$age >= 18` |"
+      },
+      "input": "if($age >= 18){1}else{2}",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "note": "仕様が比較式を置く位置（条件）で確かめる。"
+    },
+    {
+      "id": "p4/comparison-at-top-level",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.4 比較演算子",
+        "sentence": "| `>=` | 以上 | `$age >= 18` |"
+      },
+      "input": "$age >= 18",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "仕様は式全体（Formula）の production を与えておらず、比較式単独が完結した式として成立するかを述べていない。"
+      }
+    },
+    {
+      "id": "p4/logical-and",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.5 論理演算子",
+        "sentence": "| `&` | 論理 AND | `$a & $b` |"
+      },
+      "input": "if($a & $b){1}else{2}",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/logical-not",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.5 論理演算子",
+        "sentence": "| `not()` | 論理否定 | `not($flag)` |"
+      },
+      "input": "not($flag)",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/precedence-mul-over-add",
+      "scope": "runtime",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.6 演算子の優先順位（高い順）",
+        "sentence": "1. `()` — 括弧 2. `not()` — 否定 3. `*`, `/` — 乗除算 4. `+`, `-` — 加減算"
+      },
+      "input": "1 + 2 * 3",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "優先順位は AST の形に現れるが、この比較ドライバは受理のみを記録する。"
+      }
+    },
+    {
+      "id": "p4/precedence-xor-and-or-conflict",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.6 演算子の優先順位（高い順）",
+        "sentence": "7. `^` — XOR 8. `&` — AND 9. `|` — OR（最低）"
+      },
+      "input": "if($a | $b & $c ^ $d){1}else{2}",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "spec/SPEC.md §2.6 と docs/language-guide.md は `^` > `&` > `|`、specs/language.md は `&` > `^` > `|` と書いており、同じ repo 内で矛盾している。文法ファイルの `@precedence` は前者と一致するが、規範文だけでは決まらない。"
+      }
+    }
+  ]
+}

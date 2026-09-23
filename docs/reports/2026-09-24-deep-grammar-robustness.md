@@ -126,7 +126,7 @@ Java bootstrap から採った `crates/ubnfc-front/tests/fixtures/validation-jav
 
 つまり **Java 参照実装と観測が一致する範囲は完全に保ったまま、参照実装も一緒に病的だった
 領域（同じ成分に基本巡回が複数ある場合）でだけ出力を 1 規則 1 件に畳んだ**。
-契約の選択なので [`../design/03-design-v1.md`](../design/03-design-v1.md) §8 に **D-052** として記録した。
+契約の選択なので [`../design/03-design-v1.md`](../design/03-design-v1.md) §8 に **D-054** として記録した。
 
 ---
 

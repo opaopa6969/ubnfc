@@ -1,0 +1,114 @@
+{
+  "family": "p4",
+  "section": "2.7 条件式",
+  "summary": "if / else と match の形。",
+  "cases": [
+    {
+      "id": "p4/if-else",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.7.1 if / else",
+        "sentence": "- `else` 節は必須（MUST）"
+      },
+      "input": "if(true){1}else{2}",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/if-without-else",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.7.1 if / else",
+        "sentence": "- `else` 節は必須（MUST）"
+      },
+      "input": "if(true){1}",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "note": "`else` 節は必須（MUST）。"
+    },
+    {
+      "id": "p4/if-space-before-paren",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.7.1 if / else",
+        "sentence": "if   (true){1}else{2}"
+      },
+      "input": "if   (true){1}else{2}",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/if-block-comment-head",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.15 コメント",
+        "sentence": "/*head*/if(true){1}else{2}"
+      },
+      "input": "/*head*/if(true){1}else{2}",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/if-block-comment-inside",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.15 コメント",
+        "sentence": "if/*c*/(true){1}else{2}"
+      },
+      "input": "if/*c*/(true){1}else{2}",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/block-comment-anywhere",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.15 コメント",
+        "sentence": "| ブロックコメント | `/* comment */` | 式本文内の任意の位置（制御構造の前後も含む） |"
+      },
+      "input": "1 /* mid */ + 2",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/line-comment-not-in-body",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.15 コメント",
+        "sentence": "| 行コメント | `# comment` | FormulaInfo メタデータ行（`#` 始まり） |"
+      },
+      "input": "1 # comment",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "note": "`#` 行コメントの文脈は FormulaInfo メタデータ行だけ、と表が限定している。"
+    },
+    {
+      "id": "p4/match-order",
+      "scope": "runtime",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.7.3 match 式",
+        "sentence": "- 上から順に条件を評価し、最初に真となった条件の値を返す"
+      },
+      "input": "match { $a > 1 => 1, default => 0 }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "評価順は実行時の契約で、構文解析では観測できない。また match の具体構文を仕様本文が BNF で与えていない。"
+      }
+    }
+  ]
+}

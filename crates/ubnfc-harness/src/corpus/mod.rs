@@ -4,6 +4,7 @@ pub mod external;
 pub mod operations;
 pub mod oracle;
 pub mod rule;
+pub mod spec;
 pub mod token;
 
 use serde::{de::DeserializeOwned, Deserialize, Deserializer, Serialize};
