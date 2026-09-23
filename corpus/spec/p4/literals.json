@@ -1,0 +1,180 @@
+{
+  "family": "p4",
+  "section": "2.1 リテラル",
+  "summary": "数値・文字列・真偽値リテラルの綴り。",
+  "cases": [
+    {
+      "id": "p4/number-integer",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.1 数値リテラル",
+        "sentence": "| `123` | 整数 |"
+      },
+      "input": "123",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/number-decimal",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.1 数値リテラル",
+        "sentence": "| `3.14` | 小数 |"
+      },
+      "input": "3.14",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/number-negative",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.1 数値リテラル",
+        "sentence": "- 符号（`+`, `-`）プレフィックスをサポート"
+      },
+      "input": "-42",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/number-positive",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.1 数値リテラル",
+        "sentence": "- 符号（`+`, `-`）プレフィックスをサポート"
+      },
+      "input": "+100",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/number-exponent-lower",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.1 数値リテラル",
+        "sentence": "| `1.5e3` | 指数表記（= 1500.0）、`e` / `E` どちらも有効 |"
+      },
+      "input": "1.5e3",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/number-exponent-upper",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.1 数値リテラル",
+        "sentence": "| `1.5e3` | 指数表記（= 1500.0）、`e` / `E` どちらも有効 |"
+      },
+      "input": "1.5E3",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "note": "`e` / `E` どちらも有効、と表に書かれている。"
+    },
+    {
+      "id": "p4/number-long-suffix",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.17 機能パリティマトリクス（レガシー vs P4 UBNF）",
+        "sentence": "4. 数値具体型（int/long/float/double/BigDecimal キャスト、プレフィックス、サフィックス）— 6+ パーサーファミリ"
+      },
+      "input": "42L",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "§2.1.1 の表は `42L` を数値リテラルとして挙げるが、§2.17 は数値具体型のサフィックスを HAND-ONLY（レガシーのみ）に分類している。P4 が受理すべきかが同じ文書の中で決まらない。"
+      }
+    },
+    {
+      "id": "p4/number-float-suffix",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.17 機能パリティマトリクス（レガシー vs P4 UBNF）",
+        "sentence": "4. 数値具体型（int/long/float/double/BigDecimal キャスト、プレフィックス、サフィックス）— 6+ パーサーファミリ"
+      },
+      "input": "3.14f",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "`42L` と同じ理由（§2.1.1 の表と §2.17 の分類が食い違う）。"
+      }
+    },
+    {
+      "id": "p4/string-single-quote",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.2 文字列リテラル",
+        "sentence": "- シングルクォート・ダブルクォートは互換"
+      },
+      "input": "'hello'",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/string-double-quote",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.2 文字列リテラル",
+        "sentence": "- シングルクォート・ダブルクォートは互換"
+      },
+      "input": "\"hello\"",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "note": "両クォートは互換と明記されている。"
+    },
+    {
+      "id": "p4/string-escape-newline",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.2 文字列リテラル",
+        "sentence": "- 基本 Java エスケープシーケンス（`\\n`, `\\t`, `\\\\`, `\\\"`, `\\'` 等）に準拠"
+      },
+      "input": "'a\\nb'",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/boolean-true",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.3 真偽値リテラル",
+        "sentence": "#### 2.1.3 真偽値リテラル"
+      },
+      "input": "true",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/boolean-false",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "#### 2.1.3 真偽値リテラル",
+        "sentence": "#### 2.1.3 真偽値リテラル"
+      },
+      "input": "false",
+      "expectation": {
+        "verdict": "accept"
+      }
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "family": "ubnf",
+  "section": "ルール本体の書き方 / リテラル",
+  "summary": "リテラルの綴りとエスケープ展開。",
+  "cases": [
+    {
+      "id": "literal/single-quoted",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## ルール本体の書き方",
+        "sentence": "シングルクォートで囲んだ文字列はそのまま照合します："
+      },
+      "input": "grammar G { LetKeyword ::= 'let' ; }",
+      "expectation": {
+        "verdict": "accept",
+        "canonicalContains": [
+          "[\"TerminalElement\",\"let\"]"
+        ]
+      }
+    },
+    {
+      "id": "literal/double-quoted-rejected",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "TerminalElement ::= \"'\" chars \"'\""
+      },
+      "input": "grammar G { R ::= \"x\"; }",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "note": "終端要素はシングルクォートでのみ綴られる。"
+    },
+    {
+      "id": "escape/newline",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## ルール本体の書き方",
+        "sentence": "| `'\\n'` | 改行 |"
+      },
+      "input": "grammar G { R ::= '\\n'; }",
+      "expectation": {
+        "verdict": "accept",
+        "canonicalContains": [
+          "[\"TerminalElement\",\"\\n\"]"
+        ]
+      }
+    },
+    {
+      "id": "escape/tab",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## ルール本体の書き方",
+        "sentence": "| `'\\t'` | タブ |"
+      },
+      "input": "grammar G { R ::= '\\t'; }",
+      "expectation": {
+        "verdict": "accept",
+        "canonicalContains": [
+          "[\"TerminalElement\",\"\\t\"]"
+        ]
+      }
+    },
+    {
+      "id": "escape/carriage-return",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## ルール本体の書き方",
+        "sentence": "| `'\\r'` | 復帰 |"
+      },
+      "input": "grammar G { R ::= '\\r'; }",
+      "expectation": {
+        "verdict": "accept",
+        "canonicalContains": [
+          "[\"TerminalElement\",\"\\r\"]"
+        ]
+      }
+    },
+    {
+      "id": "escape/backslash",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## ルール本体の書き方",
+        "sentence": "| `'\\\\'` | バックスラッシュ |"
+      },
+      "input": "grammar G { R ::= '\\\\'; }",
+      "expectation": {
+        "verdict": "accept",
+        "canonicalContains": [
+          "[\"TerminalElement\",\"\\\\\"]"
+        ]
+      }
+    },
+    {
+      "id": "escape/single-quote",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## ルール本体の書き方",
+        "sentence": "| `'\\''` | シングルクォート |"
+      },
+      "input": "grammar G { R ::= '\\''; }",
+      "expectation": {
+        "verdict": "accept",
+        "canonicalContains": [
+          "[\"TerminalElement\",\"'\"]"
+        ]
+      }
+    },
+    {
+      "id": "escape/unknown-sequence",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## ルール本体の書き方",
+        "sentence": "**エスケープシーケンス** も使えます："
+      },
+      "input": "grammar G { R ::= '\\q'; }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "表は `\\n` `\\t` `\\r` `\\\\` `\\'` の 5 つだけを挙げ、表に無いエスケープ （例 `\\q`）を拒否するのか、バックスラッシュごと残すのか、`q` にするのかを述べていない。"
+      }
+    },
+    {
+      "id": "escape/unterminated-literal",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 形式的な文法定義",
+        "sentence": "TerminalElement ::= \"'\" chars \"'\""
+      },
+      "input": "grammar G { R ::= 'x; }",
+      "expectation": {
+        "verdict": "reject"
+      }
+    }
+  ]
+}

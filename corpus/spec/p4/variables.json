@@ -1,0 +1,62 @@
+{
+  "family": "p4",
+  "section": "2.2 変数",
+  "summary": "変数参照の綴り。",
+  "cases": [
+    {
+      "id": "p4/variable-dollar",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.2 変数",
+        "sentence": "変数名は `$` プレフィックスで始まる（MUST）。"
+      },
+      "input": "$age",
+      "expectation": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "p4/variable-without-dollar",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.2 変数",
+        "sentence": "変数名は `$` プレフィックスで始まる（MUST）。"
+      },
+      "input": "age",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "note": "`$` プレフィックスで始まる（MUST）なので、裸の識別子は変数参照にならない。"
+    },
+    {
+      "id": "p4/variable-case-sensitive",
+      "scope": "parse",
+      "citation": {
+        "file": "spec/SPEC.md",
+        "heading": "### 2.2 変数",
+        "sentence": "- 変数名は大文字小文字を区別する"
+      },
+      "input": "$Age",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "note": "大文字小文字を区別するので `$Age` も正当な別名。"
+    },
+    {
+      "id": "p4/variable-missing-is-null",
+      "scope": "runtime",
+      "citation": {
+        "file": "specs/language.md",
+        "heading": "## 変数",
+        "sentence": "- 存在しない変数の参照は `null` を返す"
+      },
+      "input": "$nosuchvariable",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "未定義変数が null を返すのは評価時の契約で、構文解析では観測できない。"
+      }
+    }
+  ]
+}

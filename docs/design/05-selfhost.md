@@ -69,6 +69,38 @@ cargo test -p ubnfc-front --offline --test selfhost_conversion --test selfhost_p
 | `unlaxer-dsl/examples/tinycalc.ubnf` | 276 | setting block 内の二重引用符 |
 | `tinyexpression-p4.ubnf` | 2595 | `@declares` description の capture 名（非 STRING） |
 
+### 7 件目 — 唯一の逆向き乖離（生成側が広い）とその閉じ方
+
+上の 6 件はすべて「**手書き frontend だけが受理する**」向きで、self-host を通すための加工を
+していないことの記録だった。2026-09-23 のクロスチェック
+（[`../reports/2026-09-23-parser-feature-correctness-comparison.md`](../reports/2026-09-23-parser-feature-correctness-comparison.md) §3.1 (4)）で、
+**逆向きが 1 件だけ**見つかった。
+
+| source | 手書き | 生成 | 根本原因 |
+|---|---|---|---|
+| `grammar G { /* no */ R ::= 'x'; }` | 拒否 @12「UBNF のコメントは // 行コメントのみです」 | **受理**（`/* no */` が無いときと同じ AST） | `ubnf.ubnf:18` の `@whitespace: javaStyle` → `lower/trivia.rs:90-99` が javaStyle の区切り集合へ `BlockComment{/*, */}` を無条件に入れる |
+
+UBNF 自身のコメント構文は `//` 行コメントだけで `/* ... */` は未対応
+（`unlaxer-parser/unlaxer-dsl/specs/ubnf-syntax.md`。unlaxer-ubnf と Java bootstrap も拒否する）。
+**正しいのは手書き側**で、自己記述文法 `ubnf.ubnf` が UBNF より広い言語を記述している。
+
+`ubnf.ubnf` は読み取り専用の別 repo にあり、javaStyle の中身は corpus
+（`corpus/oracle/comment-whitespace.json` の `expected` が `'/*'` / `'*/'` を含む）が固定している。
+そこで **D-051** に従い、`ubnfc_selfhost::parse_file` が生成パーサの外でブロックコメントを
+拒否する（`crates/ubnfc-selfhost/src/lib.rs` の `block_comment_start`）。手書き lexer と同じ
+走査規則を使い、文字列リテラルと `//` の中は見ない。`/*` より手前に別の字句エラーがある入力は
+生成パーサに任せるので、失敗位置も手書きと一致する。**再解析ではなく字句の門**なので、
+「この経路は `syntax::parse_file` へフォールバックしない」という上の契約は保たれる。
+IR・生成物・固定点は 1 byte も変わらない。
+
+回帰は `crates/ubnfc-selfhost/tests/parity.rs` の
+`block_comments_are_rejected_by_both_frontends`（拒否位置の一致・文字列リテラル中の `/*`・
+先行する字句エラーの優先を固定する）。
+
+**本来の直し方**は `ubnf.ubnf` が UBNF の実際の trivia を宣言すること
+（`@whitespace: none` + `@comment: { line: '//' }`、または javaStyle からブロックコメントだけを
+外せる表層を足すこと）だが、どちらもこの repo からは行えない。上流で直れば、この門は外せる。
+
 独立した構文エラー3例は、Unicode を含む場合も手書き/生成変換後の byte span が一致する。
 validation error golden 3件では `all-tokens.ubnf` の AST が一致し、`annotations.ubnf` と
 `namespace.ubnf` は上記の文法差分として位置を固定している。
