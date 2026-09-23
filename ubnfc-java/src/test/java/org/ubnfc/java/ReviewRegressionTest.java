@@ -117,7 +117,7 @@ class ReviewRegressionTest {
 
     @Test void expectedDisplayAndPrimaryTrailingExpectedAreIndependent() throws Exception {
         for (String label : List.of("'let'", "CUSTOM_CI")) {
-            var f = new IrFixture(); String ci = f.token("Root", "CI", obj("kind", "caseInsensitive", "word", "let", "comparison", "javaEqualsIgnoreCase"));
+            var f = new IrFixture(); String ci = f.token("Root", "CI", obj("kind", "caseInsensitive", "word", "let", "comparison", "javaEqualsIgnoreCase", "wordBoundary", false));
             display(f, ci, label); f.rule("Root", ci);
             try (var h = f.compile()) {
                 diagnostic(h.parse("le"), "syntax", 0, List.of(label));

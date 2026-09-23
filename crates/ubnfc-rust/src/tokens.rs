@@ -57,11 +57,11 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             TokenSpec::Eof{}=>writeln!(s,"self.eof::<MATCH>(state,label)").unwrap(),
             TokenSpec::Empty{}=>s.push_str("self.empty(state)\n"),
             TokenSpec::Until{terminator,..}=>writeln!(s,"self.until::<MATCH>(state,{terminator:?},{:?})",format!("'{terminator}'")).unwrap(),
-            TokenSpec::CaseInsensitive{word,..}=>writeln!(s,"self.literal::<MATCH>(state,{word:?},false,u32::MAX,label)").unwrap(),
+            TokenSpec::CaseInsensitive{word,word_boundary,..}=>writeln!(s,"self.literal::<MATCH>(state,{word:?},false,u32::MAX,{word_boundary},label)").unwrap(),
             TokenSpec::CharRange{min,max}=>writeln!(s,"let length=self.input.cp_at(state.position::<MATCH>()).filter(|(c,_)|({min}..={max}).contains(&(*c as u64))).map(|(_,n)|n);self.primitive::<MATCH>(state,length,label)").unwrap(),
             TokenSpec::Negation{excluded}=>writeln!(s,"let length=self.input.cp_at(state.position::<MATCH>()).filter(|(c,_)|!{excluded:?}.contains(*c)).map(|(_,n)|n);self.primitive::<MATCH>(state,length,label)").unwrap(),
             TokenSpec::Lookahead{pattern}|TokenSpec::NegativeLookahead{pattern}=>{
-                if pattern.is_empty() { s.push_str("let child=self.fail(state.begin(),state.begin().matched,label);\n"); } else { writeln!(s,"let child=self.literal::<true>(state.begin(),{pattern:?},true,{},label);",g.lexicon.id(pattern,true)).unwrap(); }
+                if pattern.is_empty() { s.push_str("let child=self.fail(state.begin(),state.begin().matched,label);\n"); } else { writeln!(s,"let child=self.literal::<true>(state.begin(),{pattern:?},true,{},false,label);",g.lexicon.id(pattern,true)).unwrap(); }
                 if matches!(t.spec,TokenSpec::NegativeLookahead{..}) {writeln!(s,"if child.ok {{self.fail(state,state.matched,label)}} else {{Step::yes(state.commit(state.begin()))}}").unwrap();}
                 else {s.push_str("Step {state:if child.ok {state.commit(child.state)} else {state},events:EventId(0),..child}\n");}
             },

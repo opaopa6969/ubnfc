@@ -146,6 +146,56 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
     assert!(unknown.is_empty(), "未登録の差分: {unknown:#?}");
 }
 
+/// UBNF v2 のリテラル語境界（D-040）を両 backend で突き合わせる。
+/// v2 の seed 帯は `V2_LITERALS` から `let` / `letter` / `in` / `int` のような
+/// **末尾が識別子構成文字の語**を引くので、`@literalBoundary: word`（v2 の既定）が
+/// 受理を変える位置を必ず踏む。Java は UTF-16 単位、Rust は UTF-8 byte 単位で
+/// 「一致直後の文字」を見るので、非 BMP・非 ASCII が続く入力で食い違わないことも
+/// ここで押さえる。
+#[test]
+fn d_v2_word_boundary_literals_agree_across_backends() {
+    ubnfc_fuzz::tune_generated_builds();
+    let scratch = scratch();
+    let start = ubnfc_fuzz::gen::V2_SEED_BASE + 40;
+    for seed in start..start + 3 {
+        let grammar = ubnfc_fuzz::gen::generate(seed);
+        assert!(
+            grammar.features.contains("wordBoundary"),
+            "seed {seed} が語境界つきリテラルを含んでいない"
+        );
+    }
+    let summary = campaign::run(&Config {
+        start_seed: start,
+        seeds: 3,
+        inputs: 12,
+        jobs: 2,
+        budget: Some(Duration::from_secs(900)),
+        findings: None,
+        shrink_builds: 0,
+        driver_timeout: Duration::from_secs(120),
+        workdir: scratch.0.clone(),
+    });
+    assert_eq!(
+        summary.discarded, 0,
+        "front の discard: {:?}",
+        summary.discards
+    );
+    assert!(summary.compiled >= 2, "文法が build できていない");
+    assert!(
+        summary.comparisons >= 20 && summary.driver_errors == 0,
+        "driver が動いていない: 比較 {} / error {}",
+        summary.comparisons,
+        summary.driver_errors
+    );
+    let unknown: Vec<_> = summary
+        .findings
+        .iter()
+        .filter(|finding| !KNOWN.contains(&finding.signature.as_str()))
+        .map(|finding| format!("{} ({})", finding.signature, finding.slug))
+        .collect();
+    assert!(unknown.is_empty(), "未登録の差分: {unknown:#?}");
+}
+
 /// A-1 の回帰試験。seed 269 は `@recovery(AUTO)` の適用範囲が両 backend で食い違い、
 /// 同じ入力の受理・カーソル・capture・AST が変わっていた（13 差分クラス）。
 /// 契約は `docs/design/03-design-v1.md` §3.10 / D-024。

@@ -82,6 +82,7 @@ pub(super) fn lower(cx: &mut Context<'_>, grammar: &r::Grammar) {
                 max: max.chars().next().unwrap() as u64,
             },
             T::CaseInsensitive { word } => TokenSpec::CaseInsensitive {
+                word_boundary: crate::boundary::applies_to(word, cx.boundary_mode(token.id)),
                 word: word.clone(),
                 comparison: TokenSpecCaseInsensitiveComparison,
             },

@@ -827,38 +827,46 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         let out = self.lex.slot(pos);
         lex_fill(bytes, pos, out);
     }
+    /// `boundary` は D-040 の語境界。末尾が識別子構成文字のリテラルにだけ front が
+    /// 立てる。境界違反は「一致しなかった」と同じ失敗記録（同じ位置・同じ label）になる。
     pub fn literal<const MATCH: bool>(
         &mut self,
         state: State,
         word: &'static str,
         sensitive: bool,
         lit: u32,
+        boundary: bool,
         label: &'static str,
     ) -> Step {
         let start = state.position::<MATCH>();
-        if self.lex_enabled && lit != u32::MAX {
-            if let Some(hit) = self.lex_matches(start, lit) {
-                let length = hit.then_some(word.len());
-                return self.primitive::<MATCH>(state, length, label);
-            }
-        }
-        let length = if sensitive {
-            self.input.starts_with(start, word).then_some(word.len())
-        } else {
-            let mut p = start;
-            let mut ok = true;
-            for expected in word.chars() {
-                let Some((actual, n)) = self.input.cp_at(p) else {
-                    ok = false;
-                    break;
-                };
-                if !super::rt::input::equal_ignore_case(actual, expected) {
-                    ok = false;
-                    break;
+        let length = 'length: {
+            if self.lex_enabled && lit != u32::MAX {
+                if let Some(hit) = self.lex_matches(start, lit) {
+                    break 'length hit.then_some(word.len());
                 }
-                p += n;
             }
-            ok.then_some(p - start)
+            if sensitive {
+                self.input.starts_with(start, word).then_some(word.len())
+            } else {
+                let mut p = start;
+                let mut ok = true;
+                for expected in word.chars() {
+                    let Some((actual, n)) = self.input.cp_at(p) else {
+                        ok = false;
+                        break;
+                    };
+                    if !super::rt::input::equal_ignore_case(actual, expected) {
+                        ok = false;
+                        break;
+                    }
+                    p += n;
+                }
+                ok.then_some(p - start)
+            }
+        };
+        let length = match length {
+            Some(n) if boundary && self.input.identifier_byte_at(start + n) => None,
+            other => other,
         };
         self.primitive::<MATCH>(state, length, label)
     }

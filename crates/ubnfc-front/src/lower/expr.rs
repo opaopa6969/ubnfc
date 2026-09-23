@@ -268,9 +268,12 @@ impl Builder<'_, '_> {
         let i = self.reserve(atom.span(), &lowered_role);
         let node = match atom {
             A::Literal { value, .. } => ExprNode::Literal {
+                word_boundary: crate::boundary::applies_to(
+                    value,
+                    self.cx.boundary_mode(self.rule.id),
+                ),
                 value: value.clone(),
                 case_sensitive: true,
-                word_boundary: ExprNodeLiteralWordBoundary,
             },
             A::Ref { symbol, .. } => {
                 if self.cx.grammar.symbol(*symbol).kind == r::SymbolKind::Rule {

@@ -15,7 +15,7 @@ class TokenTest {
         return Stream.of(
             new Case(obj("kind", "builtin", "which", "Number", "codePoints", List.of()), List.of("+1", "-0", ".5", "1.", "1.e2", "-.5e-2"), List.of(".", "+", "1e+", "１２")),
             new Case(obj("kind", "builtin", "which", "Identifier", "codePoints", List.of()), List.of("_", "aZ_09"), List.of("é", "9a", "😀")),
-            new Case(obj("kind", "caseInsensitive", "word", "AbC", "comparison", "javaEqualsIgnoreCase"), List.of("abc", "ABC"), List.of("ab", "abcd")),
+            new Case(obj("kind", "caseInsensitive", "word", "AbC", "comparison", "javaEqualsIgnoreCase", "wordBoundary", false), List.of("abc", "ABC"), List.of("ab", "abcd")),
             new Case(obj("kind", "charRange", "min", 97, "max", 99), List.of("a", "c"), List.of("d", "ab", "😀")),
             new Case(obj("kind", "negation", "excluded", "x😀"), List.of("a", "😁"), List.of("x", "😀", "")),
             new Case(obj("kind", "regex", "pattern", "(?:😀|[a-z])+", "regularSubset", false, "matching", "lookingAt", "zeroWidth", "fail", "javaFallback", "java.util.regex.Pattern", "rustFallback", "generationError"), List.of("😀ab", "abc"), List.of("", "1abc")),

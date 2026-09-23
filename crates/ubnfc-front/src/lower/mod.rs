@@ -99,6 +99,16 @@ pub fn lower(
     let mut grammar = grammar.clone();
     let warnings = normalize::normalize(&mut grammar);
     let source_table = source::Sources::new(&grammar, sources)?;
+    // D-040: リテラルの語境界は文法ごとの設定。`@ubnf` 版で既定が決まる。
+    let literal_boundary: Vec<crate::boundary::Mode> = grammar
+        .grammars
+        .iter()
+        .map(|g| {
+            let mut ignored = Vec::new();
+            let version = crate::desugar::language_version_of(&g.settings, &mut ignored);
+            crate::boundary::mode_of(&g.settings, version)
+        })
+        .collect();
     let mut cx = Context {
         grammar: &grammar,
         sources: source_table,
@@ -117,6 +127,7 @@ pub fn lower(
         unit_ids: BTreeMap::new(),
         types: BTreeMap::new(),
         fields: BTreeMap::new(),
+        literal_boundary,
     };
     cx.metadata();
     schema::prepare(&mut cx);
@@ -159,8 +170,14 @@ struct Context<'a> {
     unit_ids: BTreeMap<r::UnitId, String>,
     types: BTreeMap<r::SymbolId, String>,
     fields: BTreeMap<r::SymbolId, BTreeMap<String, captures::Shape>>,
+    /// GrammarId 順のリテラル語境界モード（D-040）。
+    literal_boundary: Vec<crate::boundary::Mode>,
 }
 impl Context<'_> {
+    /// その symbol を宣言した文法のリテラル語境界モード。
+    fn boundary_mode(&self, id: r::SymbolId) -> crate::boundary::Mode {
+        self.literal_boundary[self.grammar.symbol(id).grammar.0]
+    }
     fn sid(&self, id: r::SymbolId) -> String {
         self.symbol_ids[&id].clone()
     }

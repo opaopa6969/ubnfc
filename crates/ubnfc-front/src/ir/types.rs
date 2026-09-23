@@ -901,7 +901,9 @@ pub enum ExprNode {
     Literal {
         case_sensitive: bool,
         value: String,
-        word_boundary: ExprNodeLiteralWordBoundary,
+        /// D-040: 末尾が識別子構成文字のリテラルに語境界を課す（v2 の既定）。
+        /// v1 は常に `false`。
+        word_boundary: bool,
     },
     RuleRef {
         symbol_id: String,
@@ -1423,6 +1425,8 @@ pub enum TokenSpec {
     CaseInsensitive {
         comparison: TokenSpecCaseInsensitiveComparison,
         word: String,
+        /// D-040。`ExprNode::Literal.word_boundary` と同じ規則。
+        word_boundary: bool,
     },
     Regex {
         #[serde(

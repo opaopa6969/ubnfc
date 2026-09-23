@@ -407,7 +407,7 @@ public final class JavaEmitter {
             case "repeat" -> "return s.repeat(f, " + call(n.child()) + ", " + n.min() + ", " + (n.max() == null ? "Integer.MAX_VALUE" : n.max()) + ", " + (n.terminator() == null ? "null" : call(n.terminator())) + ", " + boundary + (Integer.valueOf(0).equals(n.max()) && repeatedLiteral(n.child()) != null ? "," + label("'" + repeatedLiteral(n.child()) + "'") : "") + ");";
             case "separated" -> "return s.separated(f, " + call(n.element()) + ", " + call(n.separator()) + ", " + n.min() + ", " + boundary + ");";
             case "choice" -> choice(expr);
-            case "literal" -> "return s.literal(f, " + q(n.value()) + ", " + n.caseSensitive() + ", " + label(label) + ");";
+            case "literal" -> "return s.literal(f, " + q(n.value()) + ", " + n.caseSensitive() + ", " + Boolean.TRUE.equals(n.wordBoundary()) + ", " + label(label) + ");";
             case "ruleRef" -> {
                 String call = parser + "::" + ruleMethod(n.symbolId());
                 var recovery = ir.semantics().recovery().stream().filter(r -> r.applicationSites().contains(expr.id())).findFirst().orElse(null);
@@ -450,7 +450,7 @@ public final class JavaEmitter {
             case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + label(label) + ")," + spec.kind().equals("negativeLookahead") + "," + label(label) + ")";
             case "negation" -> "s.range(f,0,1114111," + q(spec.excluded()) + "," + label(label) + ")";
             case "charRange" -> "s.range(f," + spec.min() + "," + spec.max() + ",null," + label(label) + ")";
-            case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + label(label) + ")";
+            case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + Boolean.TRUE.equals(spec.wordBoundary()) + "," + label(label) + ")";
             case "regex" -> regex(spec, label);
             case "extern" -> "s.external(f," + q(spec.logicalId()) + "," + externIndex(spec.logicalId()) + ")";
             // D-027: 失敗候補の表示名は旧実装のクラス単純名（`WildCardCharacterParser`）。

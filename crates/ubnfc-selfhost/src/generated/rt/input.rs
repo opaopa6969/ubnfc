@@ -84,6 +84,14 @@ impl<'a> Input<'a> {
         Some((ch, len))
     }
 
+    /// D-040: その byte 位置が識別子構成文字（ASCII `[A-Za-z0-9_]`）か。
+    /// 非 ASCII は先頭 byte が 0x80 以上なので自然に false になる。
+    pub fn identifier_byte_at(&self, byte: usize) -> bool {
+        self.bytes
+            .get(byte)
+            .is_some_and(|b| b.is_ascii_alphanumeric() || *b == b'_')
+    }
+
     /// 単語境界を要求しない接頭辞一致。空 literal は EOF でも一致する。
     pub fn starts_with(&self, byte: usize, lit: &str) -> bool {
         self.is_boundary(byte)

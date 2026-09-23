@@ -52,7 +52,9 @@ final class IrFixture {
             "prefixTrieId", null, "memoSafety", safety, "effects", List.of()));
         return id;
     }
-    String literal(String rule, String value) { return expression(rule, "literal", "value", value, "caseSensitive", true, "wordBoundary", false); }
+    String literal(String rule, String value) { return literal(rule, value, false); }
+    /** D-040: wordBoundary を明示する literal。 */
+    String literal(String rule, String value, boolean wordBoundary) { return expression(rule, "literal", "value", value, "caseSensitive", true, "wordBoundary", wordBoundary); }
     String seq(String rule, String... items) { return expression(rule, "seq", "items", List.of(items)); }
     String ref(String rule, String callee) { return expression(rule, "ruleRef", "symbolId", callee); }
     String choice(String rule, String strategy, String... alternatives) {

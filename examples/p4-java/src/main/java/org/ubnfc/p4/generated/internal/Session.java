@@ -657,12 +657,20 @@ public final class Session {
         if (result == null) { f.c = c0; f.m = m0; return null; }
         return Match.empty(f.c, f.c);
     }
-    public Match literal(Frame f, String word, boolean sensitive, String label) { return literal(f, word, sensitive, Label.of(label)); }
-    public Match literal(Frame f, String word, boolean sensitive, Label label) {
+    public Match literal(Frame f, String word, boolean sensitive, String label) { return literal(f, word, sensitive, false, Label.of(label)); }
+    public Match literal(Frame f, String word, boolean sensitive, Label label) { return literal(f, word, sensitive, false, label); }
+    public Match literal(Frame f, String word, boolean sensitive, boolean boundary, String label) { return literal(f, word, sensitive, boundary, Label.of(label)); }
+    /** boundary は D-040 の語境界。境界違反はリテラル不一致と同じ失敗記録になる。 */
+    public Match literal(Frame f, String word, boolean sensitive, boolean boundary, Label label) {
         int at = f.position();
         boolean ok = !word.isEmpty() && (sensitive ? input.startsWith(at, word) : input.startsWithIgnoreCase(at, word));
+        if (ok && boundary && identifierChar(cp(at + word.length()))) ok = false;
         if (!ok) { fail(f, label); f.advance(0); return null; }
         f.advance(word.length()); return Match.empty(at, at + word.length());
+    }
+    /** ASCII [A-Za-z0-9_]。組込み IdentifierParser の継続文字集合（D-040）。 */
+    private static boolean identifierChar(int c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
     }
     public Match any(Frame f, String label) { return any(f, Label.of(label)); }
     public Match any(Frame f, Label label) {

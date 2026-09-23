@@ -59,6 +59,7 @@ pub const FEATURES: &[&str] = &[
     "doc",
     "ubnf2",
     "leftRecursion",
+    "wordBoundary",
 ];
 
 /// UBNF v2（`@ubnf: 2`）を生成する seed の帯。
@@ -74,6 +75,14 @@ const ENUM_LITERALS: &[&str] = &["alpha", "beta", "gamma", "delta"];
 
 const LITERALS: &[&str] = &[
     "a", "b", "c", "ab", "x", "(", ")", ",", ";", "+", "-", "*", ":", "=", "😀", "あ", "\n",
+];
+
+/// v2 だけで使うリテラル。**末尾が識別子構成文字**の語（D-040 の語境界が効く形）と、
+/// 互いに接頭辞になる組（`let`/`letter`、`in`/`int`）を足して、境界が受理を変える
+/// 位置を両 backend に踏ませる。v1 の seed は `LITERALS` のままなので生成物は不変。
+const V2_LITERALS: &[&str] = &[
+    "a", "b", "c", "ab", "x", "(", ")", ",", ";", "+", "-", "*", ":", "=", "😀", "あ", "\n", "let",
+    "letter", "in", "int", "if", "x1", "_",
 ];
 
 struct TokenSpec {
@@ -148,6 +157,8 @@ const TOKEN_PALETTE: &[TokenSpec] = &[
 struct Builder<'a> {
     rng: &'a mut Rng,
     features: BTreeSet<&'static str>,
+    /// `@ubnf: 2`（D-038）。語境界つきリテラル（D-040）を引くかどうかを決める。
+    v2: bool,
     /// 参照できる、より深い層の名前（ルール名または token 名）。
     deeper: Vec<String>,
     tokens: Vec<Token>,
@@ -161,7 +172,18 @@ impl Builder<'_> {
 
     fn literal(&mut self) -> Atom {
         self.mark("literal");
-        Atom::Literal((*self.rng.pick(LITERALS)).to_owned())
+        let pool = if self.v2 { V2_LITERALS } else { LITERALS };
+        let value = (*self.rng.pick(pool)).to_owned();
+        // 末尾が識別子構成文字なら、v2 の既定でこのリテラルに語境界が付く。
+        if self.v2
+            && value
+                .chars()
+                .next_back()
+                .is_some_and(|c| c.is_ascii_alphanumeric() || c == '_')
+        {
+            self.mark("wordBoundary");
+        }
+        Atom::Literal(value)
     }
 
     fn reference(&mut self) -> Atom {
@@ -282,16 +304,17 @@ impl Builder<'_> {
 /// 同じ seed からは必ず同じ文法を作る。
 pub fn generate(seed: u64) -> Grammar {
     let mut rng = Rng::new(seed);
+    // v2 は乱数を消費せずに seed だけで決める（既存 seed の生成物を保つため）。
+    let v2 = seed >= V2_SEED_BASE;
     let mut builder = Builder {
         rng: &mut rng,
         features: BTreeSet::new(),
+        v2,
         deeper: Vec::new(),
         tokens: Vec::new(),
         captures: 0,
     };
 
-    // v2 は乱数を消費せずに seed だけで決める（既存 seed の生成物を保つため）。
-    let v2 = seed >= V2_SEED_BASE;
     let mut settings = Vec::new();
     if v2 {
         builder.mark("ubnf2");
@@ -743,6 +766,17 @@ mod tests {
                 ubnfc_front::syntax::parse_file(&imported).unwrap();
             }
         }
+    }
+
+    /// D-040: v2 の seed 帯は語境界つきリテラルをほぼ必ず含み、v1 の帯は 1 つも含まない。
+    #[test]
+    fn word_boundary_literals_only_appear_in_the_v2_seed_band() {
+        let v1 = (0..200u64).filter(|s| generate(*s).features.contains("wordBoundary"));
+        assert_eq!(v1.count(), 0);
+        let v2 = (V2_SEED_BASE..V2_SEED_BASE + 60)
+            .filter(|s| generate(*s).features.contains("wordBoundary"))
+            .count();
+        assert!(v2 >= 50, "v2 帯の被覆が足りない: {v2}/60");
     }
 
     #[test]

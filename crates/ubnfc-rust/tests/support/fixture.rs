@@ -4,6 +4,10 @@ use ubnfc_front::ir::{from_json, GrammarIr};
 pub fn literal(value: &str) -> Value {
     json!({"kind":"literal","value":value,"caseSensitive":true,"wordBoundary":false})
 }
+/// D-040 の語境界つきリテラル。
+pub fn bounded_literal(value: &str) -> Value {
+    json!({"kind":"literal","value":value,"caseSensitive":true,"wordBoundary":true})
+}
 pub fn seq(items: Vec<Value>) -> Value {
     json!({"kind":"seq","items":items})
 }
