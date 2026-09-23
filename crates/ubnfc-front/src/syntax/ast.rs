@@ -24,7 +24,23 @@ pub struct GrammarDecl {
     pub imports: Vec<ImportDecl>,
     pub settings: Vec<GlobalSetting>,
     pub tokens: Vec<TokenDecl>,
+    /// パラメータ化ルール（D-043）。`desugar` が展開して**空にする**ので、
+    /// resolve 以降は常に空である。
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub templates: Vec<TemplateDecl>,
     pub rules: Vec<RuleDecl>,
+    pub span: Span,
+}
+
+/// `Name<P1, P2> ::= body ;`。規則ではなく**規則本体の雛形**であり、
+/// 展開後は何も残らない（新しい規則も新しい名前も作らない）。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct TemplateDecl {
+    /// 雛形に注釈は置けない（`desugar` が `E-TEMPLATE-ANNOTATION` で拒否する）。
+    pub annotations: Vec<Annotation>,
+    pub name: String,
+    pub params: Vec<String>,
+    pub body: RuleBody,
     pub span: Span,
 }
 
@@ -237,7 +253,7 @@ impl RuleBody {
 pub struct Sequence {
     /// UBNF v2 の候補先頭注釈（`@leftAssoc` / `@rightAssoc`）。v1 では常に空。
     /// 候補の結合性は左再帰ルールの脱糖だけが読む（`desugar`）。
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub annotations: Vec<Annotation>,
     pub elements: Vec<Element>,
     pub span: Span,
@@ -305,6 +321,12 @@ pub enum Atom {
         name: String,
         span: Span,
     },
+    /// `Name<A, B>`。`desugar::templates` が展開して消すので resolve 以降は現れない。
+    Instantiate {
+        name: String,
+        args: Vec<Atom>,
+        span: Span,
+    },
 }
 
 // enum の利用側でも共通の範囲取得を行えるようにする。
@@ -327,4 +349,4 @@ impl_span!(Annotation: Root, Mapping, Eval, Whitespace, Interleave, Backref, Sco
     Declares, Catalog, LeftAssoc, RightAssoc, LongestChoice, PredictiveChoice,
     Precedence, Doc, Recovery, Skip, CommonField, Enum, Simple);
 impl_span!(Quantifier: Plus, Question, Star, Bounded);
-impl_span!(Atom: Group, Optional, Repeat, Error, Literal, Ref);
+impl_span!(Atom: Group, Optional, Repeat, Error, Literal, Ref, Instantiate);

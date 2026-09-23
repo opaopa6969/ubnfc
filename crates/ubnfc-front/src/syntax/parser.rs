@@ -4,6 +4,12 @@ use super::ast::*;
 use super::lexer::{Kind, Token};
 use super::SyntaxError;
 
+/// grammar 本体の宣言。`Name<...> ::=` だけが雛形（D-043）。
+enum Declaration {
+    Rule(RuleDecl),
+    Template(TemplateDecl),
+}
+
 type ParseResult<T> = Result<T, SyntaxError>;
 
 pub(super) fn parse(source: &str, tokens: Vec<Token<'_>>) -> ParseResult<UbnfFile> {
@@ -174,11 +180,15 @@ impl Parser<'_> {
             tokens.push(self.token_decl()?);
         }
         let mut rules = Vec::new();
+        let mut templates = Vec::new();
         while !self.is_at(0, "}") {
             if matches!(self.peek(0).kind, Kind::Eof) {
                 return Err(self.error(&["}"]));
             }
-            rules.push(self.rule()?);
+            match self.rule_or_template()? {
+                Declaration::Rule(rule) => rules.push(rule),
+                Declaration::Template(template) => templates.push(template),
+            }
         }
         self.require("}")?;
         Ok(GrammarDecl {
@@ -186,6 +196,7 @@ impl Parser<'_> {
             imports,
             settings,
             tokens,
+            templates,
             rules,
             span: self.span_from(start),
         })
@@ -331,22 +342,72 @@ impl Parser<'_> {
         }
     }
 
-    fn rule(&mut self) -> ParseResult<RuleDecl> {
+    /// 規則宣言か、パラメータ化ルールの宣言（D-043）。
+    ///
+    /// 引き金は名前の直後の `<` だけ。v1 では規則名の次は `::=` しか来られない
+    /// （`<` は構文エラー）ので、v1 の文法は 1 文字も意味が変わらない。
+    fn rule_or_template(&mut self) -> ParseResult<Declaration> {
         let start = self.start();
         let mut annotations = Vec::new();
         while self.is_at(0, "@") {
             annotations.push(self.annotation()?);
         }
         let name = self.identifier()?;
+        if self.is_at(0, "<") {
+            let params = self.template_params()?;
+            self.require("::=")?;
+            let body = self.body()?;
+            self.require(";")?;
+            return Ok(Declaration::Template(TemplateDecl {
+                annotations,
+                name,
+                params,
+                body,
+                span: self.span_from(start),
+            }));
+        }
         self.require("::=")?;
         let body = self.body()?;
         self.require(";")?;
-        Ok(RuleDecl {
+        Ok(Declaration::Rule(RuleDecl {
             annotations,
             name,
             body,
             span: self.span_from(start),
-        })
+        }))
+    }
+
+    /// `<P1, P2>`。パラメータは識別子のみ（`desugar` が規則名との衝突を検査する）。
+    fn template_params(&mut self) -> ParseResult<Vec<String>> {
+        self.require("<")?;
+        let mut params = Vec::new();
+        if !self.is_at(0, ">") {
+            loop {
+                params.push(self.identifier()?);
+                if !self.consume(",") {
+                    break;
+                }
+            }
+        }
+        self.require(">")?;
+        Ok(params)
+    }
+
+    /// `<A, B>`。実引数は **atom**（規則参照・token・リテラル・`(...)` `[...]` `{...}`）。
+    /// 量指定子や capture を付けたいときは `( X+ )` のように括る。
+    fn template_args(&mut self) -> ParseResult<Vec<Atom>> {
+        self.require("<")?;
+        let mut args = Vec::new();
+        if !self.is_at(0, ">") {
+            loop {
+                args.push(self.atom()?);
+                if !self.consume(",") {
+                    break;
+                }
+            }
+        }
+        self.require(">")?;
+        Ok(args)
     }
 
     fn annotation(&mut self) -> ParseResult<Annotation> {
@@ -663,6 +724,15 @@ impl Parser<'_> {
             return Err(self.error(&["identifier", "single-quoted string", "(", "[", "{"]));
         }
         let dotted = self.dotted()?;
+        // パラメータ化ルールの実体化（D-043）。v1 では参照の直後に `<` は来られない。
+        if self.is_at(0, "<") && !dotted.contains('.') {
+            let args = self.template_args()?;
+            return Ok(Atom::Instantiate {
+                name: dotted,
+                args,
+                span: self.span_from(start),
+            });
+        }
         // known/namespace.ubnf は a.b.Value。最後の成分以外を namespace とする。
         let (namespace, name) = if let Some((namespace, name)) = dotted.rsplit_once('.') {
             (Some(namespace.to_owned()), name.to_owned())

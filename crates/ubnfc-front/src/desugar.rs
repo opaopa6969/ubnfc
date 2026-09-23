@@ -95,6 +95,9 @@ pub fn file(ast: &mut UbnfFile, issues: &mut Vec<ValidationIssue>) -> u64 {
     for decl in &mut ast.grammars {
         let version = language_version(decl, issues);
         crate::boundary::validate(decl, version, issues);
+        // パラメータ化ルール（D-043）を先に展開する。雛形が左再帰ルールの演算子や
+        // 基底候補を供給できるよう、左再帰の脱糖より前に置く。
+        crate::templates::expand(decl, version, issues);
         max = max.max(version);
         grammar(decl, version, issues);
     }

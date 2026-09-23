@@ -139,14 +139,46 @@ D-037 の証明は「`L` が一致するなら先行候補も一致する」に�
 ない文字を持つと分かるときだけ**警告する（`03-design-v1.md` §3.4）。実測では tinycalc の 2 本が
 v2 で消え（`'variable'` が本当に到達可能になる）、P4 の 9 件（`W-CHOICE-SHADOWED-PATH`）は不変。
 
-## 4. パラメータ化ルール（v2）
+## 4. パラメータ化ルール — **実装済み（D-043 / D-044）**
 
-Menhir 風の高階ルールで文法量を減らす。`%` 分離が組込みなのはこの不在の代償。
+### 採った形（v2）
+
+`Name<P1, ..., Pn> ::= body ;` は**規則ではなく規則本体の雛形**で、`Name<A1, ..., An>` の
+位置へ **resolve より前にその場で展開**される（`crates/ubnfc-front/src/templates.rs`）。
 
 ```ubnf
-List<X, Sep> ::= X { Sep X } ;
-Args ::= '(' [ List<Expr, ','> ] ')' ;
+VarDecl<Hint, Value> ::=
+  ( 'variable' | 'var' ) '$' IDENTIFIER @varName
+  [ Hint ]
+  [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] Value @value ]
+  ';' ;
+
+@declares(symbol=varName, description=desc)
+@mapping(NumberVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
+NumberVariableDeclaration ::= VarDecl<NumberTypeHint, NumberExpression> ;
 ```
+
+- **新しい規則も新しい名前も作らない**。規則数・AST クラス・capture・`rulePath` /
+  `deepestRule` / expected ラベルは一つも変わらず、**名前のマングリングが要らない**。
+- Menhir の `separated_list(sep, X)`（新しい非終端）**ではなく `%inline` 側**を採った。
+  `@mapping` が規則ごとに AST クラスを決める UBNF では、非終端版は**必ず AST を変える**ので
+  既存文法へ後付けできない（P4 のカンマ区切り 15 箇所のうち 12 箇所が該当）。
+- 実引数は **atom**（規則参照・token・リテラル・`( )` `[ ]` `{ }`）。capture は雛形の中に書き、
+  **実体化した規則のフィールド**になる。注釈は雛形に置けず、実体化する規則に書く。
+- **再帰は一切禁止**（`E-TEMPLATE-RECURSION`）。その場での置換なのでどんな循環も無限展開になる。
+  依存グラフが有限なので判定は**完全**（下界ではない）。再帰が要る形は通常の規則で書ける。
+
+### 実測（`docs/reports/2026-09-23-ubnf-v2-parameterized-rules.md`）
+
+P4-v2 は **規則数 119 のまま、646 → 607 行**、11 雛形・32 実体化。v1 parser との応答は
+28/28 一致で、IR は「文法ソース上の範囲」以外 117,940 行が 1 行も違わない。
+
+正直な評価: **`%`（分離リスト）の穴埋めとしての価値はほとんど無い**（カンマ区切りは実在の
+25 文法中 P4 に 15・`ubnf.ubnf` に 5・残り 23 文法に 0 で、capture 名がばらばらなので
+1 つの `SepList` では括れない）。価値があったのは**型ごとの多重化**のほうで、
+`VariableDeclaration` 4 本・`MethodDeclaration` 4 本・8 候補のスライス構文 2 本といった
+「AST クラスが違うので規則としては減らせないが、本体は同じ」形が 1 箇所に集まる。
+効能は「規則数が減る」ではなく「**同じ形が 1 箇所に書かれる**」である。
 
 **意味述語（ANTLR の `{...}?`）は入れない。** 終端が「(入力, 位置) の純粋述語」である性質に
 memo・候補除外・字句キャッシュの健全性が全部乗っているため（D-013、`06` §3）。
@@ -200,4 +232,5 @@ P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の
 2. ~~§1 左再帰（最大の価値）~~ **完了（D-039）**
 3. ~~§3 単語境界（互換影響の実測 → v2 既定）~~ **完了（D-040）**
 4. ~~§5 token 語彙~~ **完了（D-041 / D-042）**
-5. §4 パラメータ化ルール、§6 統廃合
+5. ~~§4 パラメータ化ルール~~ **完了（D-043 / D-044）**
+6. §6 統廃合
