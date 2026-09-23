@@ -551,6 +551,8 @@ impl<'a> Converter<'a> {
             },
             "BackrefAnnotation" => Annotation::Backref {
                 name: self.value(i, "name")?,
+                // ubnf.ubnf は v1 のメタ文法で旧綴りしか持たない（D-044）。
+                mode: None,
                 span,
             },
             "ScopeTreeAnnotation" => Annotation::ScopeTree {

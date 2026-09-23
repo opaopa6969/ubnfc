@@ -357,10 +357,22 @@ public final class JavaEmitter {
         out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(exprIds.size() + ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
             .append(", ").append(constant("Field[]", "new Field[]{" + fields + "}")).append(", ").append(constant("Effect[]", "new Effect[]{" + effects + "}")).append(", ").append(rule.skip()).append(", ")
-            .append(kLabels(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().map(hint -> "'" + hint + "'").toList())).append(", ").append(rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"))).append(", ").append(kLabels(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
+            .append(kLabels(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().map(hint -> "'" + hint + "'").toList())).append(", ").append(rightAssociativeSpan(rule)).append(", ").append(kLabels(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
         Recovery recovery = entryRecovery(rule.symbolId());
         if (recovery != null) out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("$entry(Session s, Frame f) {\n        ")
             .append(recoveryCall(recovery, parser + "::" + ruleMethod(rule.symbolId()))).append("\n    }\n");
+    }
+    // `@rightAssoc` の span 補正は「rule 固有の trivia 方針がある」ときだけ掛ける。
+    // 規則に同居する trivia 注釈が無い（＝ grammar 既定の trivia しかない）場合、旧実装の
+    // 右再帰ノードは末尾 trivia を含む消費範囲をそのまま持つ
+    // （unlaxer-dsl RightAssociativeMappingRuntimeTest: " 2 ^ 3 ^ 2 " で [5,11] / [9,11]）。
+    // 規則局所の trivia があるときだけ significant end に切り替える
+    // （rule-trivia/corpus.json:14 RightScoped: [11,12]）。Rust emit.rs と同一条件。
+    private static boolean rightAssociativeSpan(Rule rule) {
+        boolean rightAssoc = rule.annotations().stream().anyMatch(a -> a.name().equals("rightAssoc"));
+        boolean localTrivia = rule.annotations().stream().anyMatch(a ->
+            a.name().equals("interleave") || a.name().equals("whitespace") || a.name().equals("comment"));
+        return rightAssoc && localTrivia;
     }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;

@@ -3,7 +3,82 @@ use crate::syntax::ast::Annotation;
 
 use super::{captures, general::valid_whitespace, nested_body, trim, Context};
 
-pub(super) fn validate(rule: &ResolvedRule, scope: bool, cx: &mut Context<'_>) {
+/// 表層で受理する規則注釈の名前（parser.rs の分岐と 1:1）。要素注釈 `@typeof` は
+/// ここに含めない（`Element::typeof_constraint` で別に構文化されている）。
+const KNOWN_ANNOTATIONS: &[&str] = &[
+    "root",
+    "mapping",
+    "eval",
+    "whitespace",
+    "interleave",
+    "backref",
+    "symbolRef",
+    "sameText",
+    "scopeTree",
+    "declares",
+    "catalog",
+    "leftAssoc",
+    "rightAssoc",
+    "longestChoice",
+    "predictiveChoice",
+    "precedence",
+    "doc",
+    "recovery",
+    "skip",
+    "commonField",
+    "enum",
+];
+
+/// v2 で非推奨になった綴りの警告（D-044 / D-046 / D-047）。v1 では旧綴りが唯一の綴り
+/// なので出さない（凍結した fixture・P4・corpus に無意味な警告を足さない。D-042 と同じ扱い）。
+fn deprecations(rule: &ResolvedRule, cx: &mut Context<'_>) {
+    let name = &rule.name;
+    for annotation in &rule.annotations {
+        match annotation {
+            Annotation::Backref { mode: None, .. } => cx.rule(
+                rule,
+                "W-ANNOTATION-BACKREF-AMBIGUOUS",
+                format!("rule {name} uses @backref, whose meaning depends on whether any rule in the grammar has @scopeTree"),
+                "Use @symbolRef(name=...) for a scope lookup, or @sameText(name=...) for a same-rule text match.",
+            ),
+            Annotation::Interleave { profile, .. } => cx.rule(
+                rule,
+                "W-ANNOTATION-INTERLEAVE-DEPRECATED",
+                format!(
+                    "rule {name} uses @interleave(profile={}), which resolves to the same delimiter set as @whitespace",
+                    trim(profile)
+                ),
+                "Use @whitespace (or @whitespace(javaStyle)) instead; @interleave is removed in a later version.",
+            ),
+            Annotation::PredictiveChoice { .. } => cx.rule(
+                rule,
+                "W-ANNOTATION-PREDICTIVE-REDUNDANT",
+                format!("rule {name} uses @predictiveChoice, which the choice analysis already decides on its own"),
+                "Remove @predictiveChoice; the front picks strategy=predict with proof=exclusiveCandidates where it is provable. @longestChoice is a different (semantic) choice and stays.",
+            ),
+            _ => {}
+        }
+    }
+}
+
+pub(super) fn validate(rule: &ResolvedRule, scope: bool, v2: bool, cx: &mut Context<'_>) {
+    // D-043: catch-all `@<任意の識別子>` は綴り間違いを黙って metadata にする。
+    // 版に関係なく警告する（受理・AST・生成コードは変えない純粋な診断の追加）。
+    for annotation in &rule.annotations {
+        if let Annotation::Simple { name: unknown, .. } = annotation {
+            if !KNOWN_ANNOTATIONS.contains(&unknown.as_str()) {
+                cx.rule(
+                    rule,
+                    "W-ANNOTATION-UNKNOWN",
+                    format!("rule {} has an unknown annotation: @{unknown}", rule.name),
+                    format!("Remove @{unknown} or fix the spelling; unknown annotations are carried as metadata and never reach code generation."),
+                );
+            }
+        }
+    }
+    if v2 {
+        deprecations(rule, cx);
+    }
     let name = &rule.name;
     let mut whitespace = 0;
     let mut interleave = Vec::new();
@@ -96,7 +171,11 @@ pub(super) fn validate(rule: &ResolvedRule, scope: bool, cx: &mut Context<'_>) {
     for annotation in &rule.annotations {
         let (target, code) = match annotation {
             Annotation::Declares { symbol, .. } => (symbol, "E-ANNOTATION-DECLARES-CAPTURE"),
-            Annotation::Backref { name, .. } if scope => (name, "E-ANNOTATION-BACKREF-CAPTURE"),
+            // 旧 `@backref` は scope モードのときだけ検査する（v1 の診断を変えない）。
+            // 明示綴り（D-044）はどちらのモードでも capture 名を検査する。
+            Annotation::Backref { name, mode, .. } if scope || mode.is_some() => {
+                (name, "E-ANNOTATION-BACKREF-CAPTURE")
+            }
             _ => continue,
         };
         if !captures.contains(&target.as_str()) {

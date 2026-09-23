@@ -156,7 +156,11 @@ fn annotation_name(annotation: &Annotation) -> &str {
         Annotation::Eval { .. } => "@eval",
         Annotation::Whitespace { .. } => "@whitespace",
         Annotation::Interleave { .. } => "@interleave",
-        Annotation::Backref { .. } => "@backref",
+        Annotation::Backref { mode, .. } => match mode {
+            None => "@backref",
+            Some(BackrefMode::Symbol) => "@symbolRef",
+            Some(BackrefMode::SameText) => "@sameText",
+        },
         Annotation::ScopeTree { .. } => "@scopeTree",
         Annotation::Declares { .. } => "@declares",
         Annotation::Catalog { .. } => "@catalog",
@@ -513,7 +517,7 @@ fn respan(annotation: &Annotation, span: Span) -> Annotation {
         Eval { entries },
         Whitespace { style },
         Interleave { profile },
-        Backref { name },
+        Backref { name, mode },
         ScopeTree { mode },
         Declares {
             symbol,

@@ -214,7 +214,6 @@ public final class Session {
     private final String[] ruleNames; private final Label[] ruleParserLabels;
     private int depth;
     private int[] activeRules = new int[64]; private int activeDepth;
-    private final int[] activeCounts;
     private int reached;
     private ParseResult<?> syntax;
     private long nextCaptureCompletion;
@@ -222,7 +221,6 @@ public final class Session {
     private final IdentityHashMap<Recipe, Object> built = new IdentityHashMap<>();
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) {
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
-        this.activeCounts = new int[ruleNames.length];
         diagnostics = new Diagnostics(Label.count(), 1024);
         ruleParserLabels = new Label[ruleNames.length];
         // 観測: P4 で 1 文字あたり約 5 entry。成長の再ハッシュを避けつつ上限は固定する。
@@ -298,7 +296,9 @@ public final class Session {
         progress(f);
         if (depth >= options.maxDepth()) throw new DepthLimit();
         depth++;
-        boolean recursive = activeCounts[id]++ > 0;
+        // @rightAssoc の span 補正は「外側の rule が末尾 trivia を消費する」
+        // 入れ子呼出しだけに掛ける（Rust emit.rs と同一条件）。entry 規則は補正しない。
+        boolean nested = depth > 1;
         if (activeDepth == activeRules.length) activeRules = Arrays.copyOf(activeRules, activeDepth * 2);
         activeRules[activeDepth++] = id;
         long mark = mark(); diagnostics.enterRule(id); progress(f);
@@ -332,7 +332,7 @@ public final class Session {
                     names[fi] = field.name(); lists[fi] = List.copyOf(captures);
                 }
                 int nodeEnd = f.c;
-                if (rightAssociative && recursive) {
+                if (rightAssociative && nested) {
                     int max = Integer.MIN_VALUE;
                     for (List<Value> list : lists) for (int k = 0; k < list.size(); k++) max = Math.max(max, list.get(k).end());
                     if (max != Integer.MIN_VALUE) nodeEnd = max;
@@ -353,7 +353,7 @@ public final class Session {
             for (Label hint : failureHints) fail(Math.max(c, m), hint);
             restore(mark); f.c = c; f.m = m;
         }
-        depth--; activeCounts[id]--; activeDepth--;
+        depth--; activeDepth--;
         boolean store = cache && (result != null ? successMemo : failureMemo);
         var diagnostic = diagnostics.leaveRule(store);
         if (store) {

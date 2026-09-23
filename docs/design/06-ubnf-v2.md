@@ -188,9 +188,11 @@ v2 を機能ごとに採れなくなる」「拒否しても `builtin_class` は
 P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の registry ID の
 **4 キー 20 箇所だけ**（綴りの原文・説明文・extern の registry ID）になり、28 入力の driver 応答は完全に一致した。
 
-## 6. アノテーションの統廃合（v2）
+## 6. アノテーションの統廃合（v2）— **P1 / P2 / P3 / P5 と P7-1 / P7-3 は実装済み**
 
 **棚卸しと提案は `07-annotation-inventory.md`**（全表・グループ分け・順位付き統廃合案・影響範囲）。
+実装の結果は `docs/reports/2026-09-23-annotation-consolidation.md`（D-043 〜 D-047）。
+残りは **P4**（`@precedence` 省略可能）・**P6**（型注釈系）・**P7-4**（TriviaPolicy 重複）。
 要点だけ:
 
 - 名前の付いた表層は **26**（rule/element 注釈 20 + grammar 設定 5 + directive 1）＋ 未知注釈の catch-all。
@@ -205,7 +207,10 @@ P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の
   `@longestChoice` は最長一致が導出不能な意味論なので**残す**。
 - 統廃合の前に出すべき不具合が 4 件（`@rightAssoc` の span 補正が両 backend で非対称、
   Java に `languageVersion` 上限検査が無い、`@rightAssoc` + `@precedence` が `operator` を作らない、
-  同一内容の TriviaPolicy が重複）。
+  同一内容の TriviaPolicy が重複）。**実装時に 2 件が棚卸しの誤りと判明**した:
+  `languageVersion` 上限検査は Java にもあり（`ir/Validation.java:43`）、`operator` を作らない
+  分かれ目は結合性ではなく演算子 atom の種類（`@leftAssoc` + リテラル演算子も `None`）だった。
+  本当の不具合は `@rightAssoc` + 規則参照演算子が `InvalidOperator` で文法ごと落ちること（D-045）。
 - P1〜P3・P5 は**警告を足すだけ**で IR も backend も動かないので 1 本にまとめられる。
 
 ## 実施順
@@ -214,4 +219,5 @@ P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の
 2. ~~§1 左再帰（最大の価値）~~ **完了（D-039）**
 3. ~~§3 単語境界（互換影響の実測 → v2 既定）~~ **完了（D-040）**
 4. ~~§5 token 語彙~~ **完了（D-041 / D-042）**
-5. §4 パラメータ化ルール、§6 統廃合
+5. §6 統廃合の P1 / P2 / P3 / P5 と P7-1 / P7-3 **完了（D-043 〜 D-047）**
+6. §4 パラメータ化ルール、§6 の残り（P4 / P6 / P7-4）

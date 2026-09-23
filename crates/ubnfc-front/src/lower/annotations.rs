@@ -25,7 +25,16 @@ pub(super) fn annotation(cx: &Context<'_>, unit: r::UnitId, a: &A) -> Annotation
             vec![("style", json(style.as_deref().unwrap_or("javaStyle")))],
         ),
         A::Interleave { profile, .. } => ("interleave", vec![("profile", json(profile))]),
-        A::Backref { name, .. } => ("backref", vec![("name", json(name))]),
+        // 表層の綴りをそのまま metadata に残す（D-044）。意味は `scope.effects[].mode`
+        // が正本で、旧綴り `@backref` と新綴りは同じ field へ落ちる。
+        A::Backref { name, mode, .. } => (
+            match mode {
+                None => "backref",
+                Some(a::BackrefMode::Symbol) => "symbolRef",
+                Some(a::BackrefMode::SameText) => "sameText",
+            },
+            vec![("name", json(name))],
+        ),
         A::ScopeTree { mode, .. } => ("scopeTree", vec![("mode", json(mode))]),
         A::Declares {
             symbol,
@@ -184,6 +193,15 @@ pub(super) fn operator(cx: &mut Context<'_>, rule: &r::ResolvedRule) -> Option<O
         ));
         return None;
     };
+    // 右結合の `operator` metadata は作らない（D-045）。v1 の右結合正規形は表層の
+    // `Base @left { Op @op Self @right }` のままで IR に載るが、`analysis::operators::canonical`
+    // が右結合の段として認めるのは正規化後の `Base Op Self | Base` の形だけなので、
+    // metadata を作ると `AnalysisError::InvalidOperator` で文法ごと落ちる（演算子が
+    // 規則参照のときだけ発火していた。演算子がリテラルなら下の `else` で None になり、
+    // 同じ形の `@leftAssoc` は通るという結合性の非対称になっていた）。
+    if associativity == OperatorAssociativity::Right {
+        return None;
+    }
     let (r::ResolvedAtom::Ref { symbol: base, .. }, r::ResolvedAtom::Ref { symbol: oper, .. }) =
         (&left.atom, &op.atom)
     else {
@@ -316,14 +334,24 @@ fn scope(cx: &mut Context<'_>, grammar: &r::Grammar, rule: &r::ResolvedRule) {
         }
     }
     if !events.is_empty() {
+        // D-044: v2 の明示綴りは「文法のどこかに `@scopeTree` があるか」という非局所な
+        // 判断より優先する。旧 `@backref`（mode=None）だけが従来の非局所規則で決まる。
+        let explicit = rule.annotations.iter().find_map(|a| match a {
+            A::Backref { mode, .. } => mode.as_ref(),
+            _ => None,
+        });
+        let symbol_mode = if scope == Some("dynamic") {
+            ScopeEffectMode::Dynamic
+        } else {
+            ScopeEffectMode::Lexical
+        };
         cx.out.semantics.scope.effects.push(ScopeEffect {
             events,
-            mode: if !any_scope {
-                ScopeEffectMode::SameRuleText
-            } else if scope == Some("dynamic") {
-                ScopeEffectMode::Dynamic
-            } else {
-                ScopeEffectMode::Lexical
+            mode: match explicit {
+                Some(a::BackrefMode::SameText) => ScopeEffectMode::SameRuleText,
+                Some(a::BackrefMode::Symbol) => symbol_mode,
+                None if !any_scope => ScopeEffectMode::SameRuleText,
+                None => symbol_mode,
             },
             rule_id: cx.sid(rule.id),
         });

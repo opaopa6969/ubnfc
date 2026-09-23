@@ -10,3 +10,4 @@ rule Root uses unsupported @interleave profile: comments [code: E-ANNOTATION-INT
 rule Root uses @leftAssoc but @mapping(Node.Item) params does not contain 'op' [code: E-ASSOC-MAPPING-PARAM] [hint: Include left/op/right in @mapping params.]
 rule Root uses @leftAssoc but capture @op is missing [code: E-ASSOC-MISSING-CAPTURE] [hint: Add @op capture in the rule body.]
 rule Root uses @leftAssoc but has no repeat segment [code: E-ASSOC-NO-REPEAT] [hint: Use canonical operator pattern: Base { Op Right }.]
+rule Root has an unknown annotation: @custom [code: W-ANNOTATION-UNKNOWN] [hint: Remove @custom or fix the spelling; unknown annotations are carried as metadata and never reach code generation.]

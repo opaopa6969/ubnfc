@@ -136,18 +136,26 @@ fn p4_matches_cli_golden_and_typed_round_trip() {
 #[test]
 fn three_invalid_fixtures_match_validation_text_goldens_and_json_counts() {
     let root = fixture_root("UNLAXER_PARSER_DIR", "../../../unlaxer-parser");
+    // (ファイル, ERROR 件数, WARNING 件数)。annotations.ubnf の 1 件は D-043 の
+    // `@custom`（未知注釈）で、12 件の ERROR は Java 実装と同じまま。
     let cases = [
         (
             "rust/unlaxer-ubnf/tests/fixtures/positive/all-tokens.ubnf",
             1,
+            0,
         ),
-        ("rust/unlaxer-ubnf/tests/fixtures/known/namespace.ubnf", 1),
+        (
+            "rust/unlaxer-ubnf/tests/fixtures/known/namespace.ubnf",
+            1,
+            0,
+        ),
         (
             "rust/unlaxer-ubnf/tests/fixtures/positive/annotations.ubnf",
             12,
+            1,
         ),
     ];
-    for (file, errors) in cases {
+    for (file, errors, warnings) in cases {
         let out = run(&root, "validate", file);
         assert_eq!(out.status.code(), Some(1));
         assert!(out.stderr.is_empty());
@@ -174,7 +182,10 @@ fn three_invalid_fixtures_match_validation_text_goldens_and_json_counts() {
         assert_eq!(json.status.code(), Some(1));
         let value: serde_json::Value = serde_json::from_slice(&json.stdout).unwrap();
         assert_eq!(value["severityCounts"]["ERROR"], errors);
-        assert_eq!(value["severityCounts"]["WARNING"], 0);
-        assert_eq!(value["issues"].as_array().unwrap().len(), errors as usize);
+        assert_eq!(value["severityCounts"]["WARNING"], warnings);
+        assert_eq!(
+            value["issues"].as_array().unwrap().len(),
+            (errors + warnings) as usize
+        );
     }
 }

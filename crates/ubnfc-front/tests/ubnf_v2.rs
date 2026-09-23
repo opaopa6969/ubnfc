@@ -562,3 +562,148 @@ fn v2_rejects_an_extern_that_no_scanner_registry_provides() {
     assert_eq!(v1.status.code(), Some(0));
     std::fs::remove_dir_all(&dir).unwrap();
 }
+
+// ── §6 注釈の統廃合（D-043 〜 D-047）─────────────────────────────────────
+
+/// `@symbolRef` / `@sameText` は `scope.effects[].mode` を明示するだけで、
+/// IR の他の部分は旧 `@backref` と同じ（D-044）。
+#[test]
+fn symbol_ref_and_same_text_only_pin_the_scope_mode() {
+    let body = |annotation: &str| {
+        format!(
+            "  @root @scopeTree(mode=lexical) @mapping(Root, params=[decl, ref])\n  \
+             Root ::= Decl @decl Ref @ref;\n  \
+             @declares(symbol=name) @mapping(Decl, params=[name]) Decl ::= NUMBER @name ';';\n  \
+             {annotation} @mapping(Ref, params=[name]) Ref ::= '->' NUMBER @name;\n"
+        )
+    };
+    let modes = |text: &str| {
+        let compiled = source(text).unwrap();
+        compiled
+            .ir
+            .semantics
+            .scope
+            .effects
+            .iter()
+            .map(|e| {
+                (
+                    e.rule_id.rsplit("::").next().unwrap().to_owned(),
+                    serde_json::to_value(e.mode)
+                        .unwrap()
+                        .as_str()
+                        .unwrap()
+                        .to_owned(),
+                )
+            })
+            .collect::<Vec<_>>()
+    };
+    // 文法に `@scopeTree` があるので旧 `@backref` は scope 検索になる。
+    let legacy = grammar(None, &body("@backref(name=name)"));
+    let explicit = grammar(None, &body("@symbolRef(name=name)"));
+    assert_eq!(modes(&legacy), modes(&explicit));
+    assert!(modes(&explicit).iter().all(|(_, mode)| mode == "lexical"));
+    // `@sameText` は `@scopeTree` があってもテキスト一致に固定する（非局所判定より優先）。
+    let same_text = source(&grammar(None, &body("@sameText(name=name)"))).unwrap();
+    let ref_mode = same_text
+        .ir
+        .semantics
+        .scope
+        .effects
+        .iter()
+        .find(|e| e.rule_id.ends_with("::Ref"))
+        .map(|e| serde_json::to_value(e.mode).unwrap());
+    assert_eq!(ref_mode.unwrap(), serde_json::json!("sameRuleText"));
+    // 旧綴りは v2 でだけ非推奨警告が出る（v1 は 1 件も増やさない）。
+    assert!(!codes(&legacy).contains(&"W-ANNOTATION-BACKREF-AMBIGUOUS".to_owned()));
+    let v2 = grammar(Some(2), &body("@backref(name=name)"));
+    assert!(codes(&v2).contains(&"W-ANNOTATION-BACKREF-AMBIGUOUS".to_owned()));
+    assert!(!codes(&grammar(Some(2), &body("@symbolRef(name=name)")))
+        .contains(&"W-ANNOTATION-BACKREF-AMBIGUOUS".to_owned()));
+}
+
+/// 未知注釈は版に関係なく警告する（D-043）。未知の grammar 設定は v2 だけ。
+#[test]
+fn unknown_annotations_warn_in_every_version_and_unknown_settings_only_in_v2() {
+    for version in [None, Some(1), Some(2)] {
+        let text = grammar(version, "  @root @rooted R ::= NUMBER;\n");
+        assert!(
+            codes(&text).contains(&"W-ANNOTATION-UNKNOWN".to_owned()),
+            "{version:?}"
+        );
+        assert!(!codes(&grammar(version, "  @root R ::= NUMBER;\n"))
+            .contains(&"W-ANNOTATION-UNKNOWN".to_owned()));
+    }
+    // 未知設定は旧 Java 検証器と揃えた前方互換契約があるので v1 では黙る。
+    let setting = |version: Option<u64>| {
+        let settings = version.map_or(String::new(), |v| format!("  @ubnf: {v}\n"));
+        format!(
+            "grammar G {{\n  @package: org.example\n{settings}  @futureSetting: value\n  \
+             @whitespace: javaStyle\n  token NUMBER = NumberParser\n  @root R ::= NUMBER;\n}}"
+        )
+    };
+    assert!(!codes(&setting(None)).contains(&"W-ANNOTATION-UNKNOWN".to_owned()));
+    assert!(!codes(&setting(Some(1))).contains(&"W-ANNOTATION-UNKNOWN".to_owned()));
+    assert!(codes(&setting(Some(2))).contains(&"W-ANNOTATION-UNKNOWN".to_owned()));
+}
+
+/// `@interleave` と `@predictiveChoice` は v2 でだけ非推奨（D-046 / D-047）。
+/// `@longestChoice` は意味論の選択なのでどの版でも黙る。
+#[test]
+fn interleave_and_predictive_choice_are_deprecated_only_under_v2() {
+    let interleave = "  @root @interleave(profile=javaStyle) R ::= NUMBER;\n";
+    let predictive = "  @root @predictiveChoice R ::= NUMBER | '-' NUMBER;\n";
+    let longest = "  @root @longestChoice R ::= NUMBER | '-' NUMBER;\n";
+    for (body, code) in [
+        (interleave, "W-ANNOTATION-INTERLEAVE-DEPRECATED"),
+        (predictive, "W-ANNOTATION-PREDICTIVE-REDUNDANT"),
+    ] {
+        assert!(
+            !codes(&grammar(None, body)).contains(&code.to_owned()),
+            "{code} v1"
+        );
+        assert!(
+            codes(&grammar(Some(2), body)).contains(&code.to_owned()),
+            "{code} v2"
+        );
+    }
+    for version in [None, Some(2)] {
+        assert!(!codes(&grammar(version, longest))
+            .iter()
+            .any(|c| c.starts_with("W-ANNOTATION-")));
+    }
+}
+
+/// D-045: `@rightAssoc` + 規則参照演算子は `InvalidOperator` で落ちていた。
+/// リテラル演算子と同じく通り、`operator` metadata は作らない。
+#[test]
+fn right_associative_rules_with_a_rule_reference_operator_compile() {
+    let body =
+        "  @root @mapping(Bin, params=[left, op, right]) @rightAssoc @precedence(level=20)\n  \
+                R ::= Atom @left { PowOp @op R @right };\n  \
+                PowOp ::= '^';\n  Atom ::= NUMBER;\n";
+    let compiled = source(&grammar(None, body)).unwrap();
+    let rule = compiled
+        .ir
+        .semantics
+        .rules
+        .iter()
+        .find(|r| r.symbol_id.ends_with("::R"))
+        .unwrap();
+    assert!(rule.operator.is_none(), "{:?}", rule.operator);
+    // リテラル演算子の右結合（Power.ubnf と同形）も同じく operator を作らない。
+    let literal = source(&grammar(
+        None,
+        "  @root @mapping(Bin, params=[left, op, right]) @rightAssoc @precedence(level=20)\n  \
+         R ::= Atom @left { '^' @op R @right };\n  Atom ::= NUMBER;\n",
+    ))
+    .unwrap();
+    assert!(literal
+        .ir
+        .semantics
+        .rules
+        .iter()
+        .find(|r| r.symbol_id.ends_with("::R"))
+        .unwrap()
+        .operator
+        .is_none());
+}

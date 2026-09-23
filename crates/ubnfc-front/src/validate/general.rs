@@ -98,12 +98,30 @@ pub(super) fn validate(cx: &mut Context<'_>) {
     // v2 は「文法に host のクラス名を書かない」形式なので、旧綴りが残っていることを
     // 知らせる。**警告どまりで拒否しない**理由は D-042（移行費用と `--strict`）。
     // v1 では旧綴りが唯一の綴りなので何も言わない（v1 の出力は 1 バイトも変えない）。
-    let v2 = grammar.settings.iter().any(|s| match s {
-        GlobalSetting::String { key, value, .. } if key == "ubnf" => {
-            trim(value).parse::<u64>().is_ok_and(|version| version >= 2)
+    let v2 = declares_v2(grammar);
+    // D-043: 未知の grammar 設定は `grammarUnits[].annotations` へ素通りする。
+    // 綴り間違いを黙って metadata にしないよう警告する（拒否はしない）。
+    // **設定だけは v2 に閉じる**: 未知設定の黙認は旧 Java 検証器と揃えた明示の
+    // 前方互換契約（`tests/fixtures/validation-java.json` の
+    // `testUnknownGlobalSettingCompatibilityIsUnchanged`）で、v1 ではこれを崩さない。
+    // 未知**注釈**のほうは同じ契約を持たず、実際に綴り間違い（`@rooted`）を隠していたので
+    // 版に関係なく警告する。
+    if v2 {
+        for setting in &grammar.settings {
+            let key = key(setting);
+            if !KNOWN_SETTINGS.contains(&key) {
+                cx.add(
+                    None,
+                    "W-ANNOTATION-UNKNOWN",
+                    format!("grammar {} has an unknown setting: @{key}", grammar.name),
+                    format!(
+                        "Remove @{key} or use a known setting ({}).",
+                        KNOWN_SETTINGS.join(", ")
+                    ),
+                );
+            }
         }
-        _ => false,
-    });
+    }
     for token in &grammar.tokens {
         if v2 {
             if let TokenValue::ClassRef { dotted, .. } = &token.declaration {
@@ -191,6 +209,27 @@ fn bounded(rule: &ResolvedRule, body: &ResolvedBody, cx: &mut Context<'_>) {
         }
     }
 }
+
+/// `@ubnf: 2` 以上を宣言しているか（D-038）。
+pub(super) fn declares_v2(grammar: &crate::resolve::Grammar) -> bool {
+    grammar.settings.iter().any(|s| match s {
+        GlobalSetting::String { key, value, .. } if key == "ubnf" => {
+            trim(value).parse::<u64>().is_ok_and(|version| version >= 2)
+        }
+        _ => false,
+    })
+}
+
+/// front が意味を与える grammar 設定。ここに無いキーは黙って metadata になる（D-043）。
+pub(super) const KNOWN_SETTINGS: &[&str] = &[
+    "package",
+    "whitespace",
+    "interleave",
+    "comment",
+    "memoSafeToken",
+    "ubnf",
+    "literalBoundary",
+];
 
 fn key(setting: &GlobalSetting) -> &str {
     match setting {
