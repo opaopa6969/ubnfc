@@ -329,6 +329,13 @@ impl Runner {
                         generator.display()
                     )));
                 }
+                // D-033: 既定 jar は手で build する成果物なので、driver template や emitter を
+                // 直したまま package し忘れると「古い契約の driver」が黙って動き、
+                // 差分 fuzzing に存在しない乖離が出る（2026-09-23 の `diff:/catalogs` /
+                // `diff:/diagnostics/*` の誤報）。ソースより古い jar は使わず、ここで落とす。
+                if java_generator.is_none() {
+                    check_java_generator_freshness(generator)?;
+                }
                 let sources = Scratch::create(Some(&build_dir))?;
                 let output = Command::new("java")
                     .arg("-cp")
@@ -519,6 +526,45 @@ fn check_build(name: &str, output: &std::process::Output) -> Result<()> {
         String::from_utf8_lossy(&output.stdout)
     )))
 }
+/// 既定 jar が `ubnfc-java` のソースより古くないかを見る（D-033）。
+/// driver template は jar の resource なので、package し忘れた jar は
+/// 「古い観測契約の driver」を生成する。それを黙って使わない。
+fn check_java_generator_freshness(jar: &Path) -> Result<()> {
+    let Ok(built) = fs::metadata(jar).and_then(|meta| meta.modified()) else {
+        return Ok(()); // mtime が読めない環境では検査しない
+    };
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../ubnfc-java");
+    let mut newest: Option<(std::time::SystemTime, PathBuf)> = None;
+    let mut stack = vec![root.join("src/main"), root.join("pom.xml")];
+    while let Some(path) = stack.pop() {
+        let Ok(meta) = fs::metadata(&path) else {
+            continue;
+        };
+        if meta.is_dir() {
+            let Ok(entries) = fs::read_dir(&path) else {
+                continue;
+            };
+            stack.extend(entries.flatten().map(|entry| entry.path()));
+            continue;
+        }
+        let Ok(modified) = meta.modified() else {
+            continue;
+        };
+        if newest.as_ref().is_none_or(|(at, _)| modified > *at) {
+            newest = Some((modified, path));
+        }
+    }
+    match newest {
+        Some((modified, path)) if modified > built => Err(Error(format!(
+            "Java 生成器 jar がソースより古い: {} より {} が新しい \
+             (cd ubnfc-java && mvn -o -q -DskipTests package を先に実行)",
+            jar.display(),
+            path.display()
+        ))),
+        _ => Ok(()),
+    }
+}
+
 fn exchange(
     program: &Path,
     args: &[OsString],
