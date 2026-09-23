@@ -62,6 +62,7 @@ pub const FEATURES: &[&str] = &[
     "wordBoundary",
     "token:neutral",
     "token:extern",
+    "template",
 ];
 
 /// UBNF v2（`@ubnf: 2`）を生成する seed の帯。
@@ -390,16 +391,16 @@ pub fn generate(seed: u64) -> Grammar {
             file: "imported.ubnf".into(),
             grammar: "Imported".into(),
             tokens: Vec::new(),
-            rules: vec![Rule {
-                annotations: Vec::new(),
-                name: "Piece".into(),
-                body: Body {
+            rules: vec![Rule::plain(
+                Vec::new(),
+                "Piece".into(),
+                Body {
                     alternatives: vec![
                         vec![Element::new(Atom::Literal("i".into()))],
                         vec![Element::new(Atom::Literal("j".into()))],
                     ],
                 },
-            }],
+            )],
         })
     } else {
         None
@@ -437,11 +438,7 @@ pub fn generate(seed: u64) -> Grammar {
             builder.mark("skip");
             annotations.push("@skip".to_owned());
         }
-        rules.push(Rule {
-            annotations,
-            name: name.clone(),
-            body,
-        });
+        rules.push(Rule::plain(annotations, name.clone(), body));
         builder.deeper.push(name);
     }
 
@@ -466,27 +463,27 @@ pub fn generate(seed: u64) -> Grammar {
                 "w",
             )];
             elements.push(normalize(tail));
-            rules.push(Rule {
-                annotations: vec![format!("@mapping(Node.{variant}, params=[w])")],
-                name: format!("V{variant}"),
-                body: Body::single(elements),
-            });
+            rules.push(Rule::plain(
+                vec![format!("@mapping(Node.{variant}, params=[w])")],
+                format!("V{variant}"),
+                Body::single(elements),
+            ));
         }
         let mut annotations = vec!["@mapping(Node)".to_owned()];
         if common {
             builder.mark("commonField");
             annotations.push("@commonField(w)".to_owned());
         }
-        rules.push(Rule {
+        rules.push(Rule::plain(
             annotations,
-            name: "Node".into(),
-            body: Body {
+            "Node".into(),
+            Body {
                 alternatives: vec![
                     vec![Element::new(Atom::Ref("VA".into()))],
                     vec![Element::new(Atom::Ref("VB".into()))],
                 ],
             },
-        });
+        ));
         builder.deeper.push("Node".into());
     }
 
@@ -585,7 +582,7 @@ pub fn generate(seed: u64) -> Grammar {
                 annotations.push(format!("@declares(symbol={})", names[0]));
             }
             if builder.rng.chance(50) {
-                // D-044: v2 は意味ごとの綴りを使う。生成側は必ず `@scopeTree` と同居させて
+                // D-046: v2 は意味ごとの綴りを使う。生成側は必ず `@scopeTree` と同居させて
                 // いるので scope 検索側（`@symbolRef`）になる。
                 builder.mark(if builder.v2 { "symbolRef" } else { "backref" });
                 let spelling = if builder.v2 { "symbolRef" } else { "backref" };
@@ -600,11 +597,7 @@ pub fn generate(seed: u64) -> Grammar {
             builder.mark("doc");
             annotations.push("@doc('fuzz 😀')".to_owned());
         }
-        rules.push(Rule {
-            annotations,
-            name: name.clone(),
-            body,
-        });
+        rules.push(Rule::plain(annotations, name.clone(), body));
         builder.deeper.push(name);
     }
 
@@ -635,11 +628,7 @@ pub fn generate(seed: u64) -> Grammar {
             ]);
         }
         alternatives.push(vec![Element::new(Atom::Ref(operand.clone()))]);
-        rules.push(Rule {
-            annotations: Vec::new(),
-            name: name.clone(),
-            body: Body { alternatives },
-        });
+        rules.push(Rule::plain(Vec::new(), name.clone(), Body { alternatives }));
         operand = name.clone();
         builder.deeper.push(name);
     }
@@ -668,15 +657,50 @@ pub fn generate(seed: u64) -> Grammar {
             ])
         };
         builder.mark("precedence");
-        rules.push(Rule {
-            annotations: vec![
+        rules.push(Rule::plain(
+            vec![
                 format!("@mapping(Bin{step}, params=[left, op, right])"),
                 if right { "@rightAssoc" } else { "@leftAssoc" }.to_owned(),
                 format!("@precedence(level={level})"),
             ],
-            name: name.clone(),
+            name.clone(),
             body,
-        });
+        ));
+        operand = name.clone();
+        builder.deeper.push(name);
+    }
+
+    // v2: パラメータ化ルール（D-043）。雛形は規則を作らず実体化の位置へ展開されるので、
+    // **モデルは展開後の形をそのまま持ち**、原文だけ `Tpl<...>` と綴る。front の展開が
+    // その綴りと一致していなければ、両 backend が同時にモデルと食い違って赤くなる。
+    // 乱数は 1 つも引かないので、既存 seed の生成物は 1 バイトも変わらない。
+    let mut templates: Vec<String> = Vec::new();
+    if v2 {
+        builder.mark("template");
+        templates.push("Tpl<A, S> ::= A @head { S A @tail } ;".to_owned());
+        let expansion = |separator: &str| -> Seq {
+            vec![
+                Element::captured(Atom::Ref(operand.clone()), "head"),
+                Element::new(Atom::Repeat(Body::single(vec![
+                    Element::new(Atom::Literal(separator.to_owned())),
+                    Element::captured(Atom::Ref(operand.clone()), "tail"),
+                ]))),
+            ]
+        };
+        // 実体化は 2 箇所: 列の途中（括弧の中）と、候補まるごと。
+        let mut first = vec![Element::new(Atom::Literal("(".into()))];
+        first.extend(expansion(","));
+        first.push(Element::new(Atom::Literal(")".into())));
+        let name = "TplWrap".to_owned();
+        let mut rule = Rule::plain(
+            vec!["@mapping(TplExpr, params=[head, tail])".to_owned()],
+            name.clone(),
+            Body {
+                alternatives: vec![first, expansion(";")],
+            },
+        );
+        rule.template = Some(format!("'(' Tpl<{operand}, ','> ')' | Tpl<{operand}, ';'>"));
+        rules.push(rule);
         operand = name.clone();
         builder.deeper.push(name);
     }
@@ -724,17 +748,18 @@ pub fn generate(seed: u64) -> Grammar {
         builder.mark("eval");
         root_annotations.push("@eval(kind='binary', strategy='manual')".to_owned());
     }
-    rules.push(Rule {
-        annotations: root_annotations,
-        name: "Root".into(),
-        body: Body::single(root_elements),
-    });
+    rules.push(Rule::plain(
+        root_annotations,
+        "Root".into(),
+        Body::single(root_elements),
+    ));
 
     let features = builder.features.clone();
     let tokens = builder.tokens.clone();
     Grammar {
         name: "Fuzz".into(),
         settings,
+        templates,
         tokens,
         rules,
         import,
@@ -798,6 +823,38 @@ pub fn trivia_for(grammar: &Grammar) -> Vec<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// D-043: 雛形は v2 の帯にだけ現れ、v1 の帯には 1 つも現れない。
+    /// 実体化は 2 箇所あり、展開後の形をモデルが持っている。
+    #[test]
+    fn parameterized_rules_only_appear_in_the_v2_seed_band() {
+        for seed in 0..60u64 {
+            let text = generate(seed).render();
+            assert!(!text.contains("Tpl<"), "seed {seed} に雛形がある");
+            assert!(
+                !text.contains("::= A @head"),
+                "seed {seed} に雛形宣言がある"
+            );
+        }
+        for seed in V2_SEED_BASE..V2_SEED_BASE + 60 {
+            let grammar = generate(seed);
+            let text = grammar.render();
+            assert_eq!(
+                text.matches("Tpl<").count(),
+                3,
+                "seed {seed}: 宣言 1 + 実体化 2 のはず\n{text}"
+            );
+            assert!(grammar.features.contains("template"), "seed {seed}");
+            // モデルは展開後の形を持つ（原文だけが雛形の綴り）。
+            let wrap = grammar
+                .rules
+                .iter()
+                .find(|r| r.name == "TplWrap")
+                .expect("TplWrap");
+            assert_eq!(wrap.body.alternatives.len(), 2);
+            assert!(wrap.template.is_some());
+        }
+    }
 
     #[test]
     fn generation_is_deterministic_and_always_parses_as_ubnf() {

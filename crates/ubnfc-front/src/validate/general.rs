@@ -99,7 +99,7 @@ pub(super) fn validate(cx: &mut Context<'_>) {
     // 知らせる。**警告どまりで拒否しない**理由は D-042（移行費用と `--strict`）。
     // v1 では旧綴りが唯一の綴りなので何も言わない（v1 の出力は 1 バイトも変えない）。
     let v2 = declares_v2(grammar);
-    // D-043: 未知の grammar 設定は `grammarUnits[].annotations` へ素通りする。
+    // D-045: 未知の grammar 設定は `grammarUnits[].annotations` へ素通りする。
     // 綴り間違いを黙って metadata にしないよう警告する（拒否はしない）。
     // **設定だけは v2 に閉じる**: 未知設定の黙認は旧 Java 検証器と揃えた明示の
     // 前方互換契約（`tests/fixtures/validation-java.json` の
@@ -220,7 +220,7 @@ pub(super) fn declares_v2(grammar: &crate::resolve::Grammar) -> bool {
     })
 }
 
-/// front が意味を与える grammar 設定。ここに無いキーは黙って metadata になる（D-043）。
+/// front が意味を与える grammar 設定。ここに無いキーは黙って metadata になる（D-045）。
 pub(super) const KNOWN_SETTINGS: &[&str] = &[
     "package",
     "whitespace",

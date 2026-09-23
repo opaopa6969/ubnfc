@@ -407,6 +407,8 @@ impl<'a> Converter<'a> {
         Ok(GrammarDecl {
             name: self.value(i, "name")?,
             span: self.span(i)?,
+            // 自己記述文法（v1）はパラメータ化ルールを綴れない（D-043）。
+            templates: Vec::new(),
             imports: self
                 .children(i, "ImportDecl")
                 .into_iter()
@@ -551,7 +553,7 @@ impl<'a> Converter<'a> {
             },
             "BackrefAnnotation" => Annotation::Backref {
                 name: self.value(i, "name")?,
-                // ubnf.ubnf は v1 のメタ文法で旧綴りしか持たない（D-044）。
+                // ubnf.ubnf は v1 のメタ文法で旧綴りしか持たない（D-046）。
                 mode: None,
                 span,
             },

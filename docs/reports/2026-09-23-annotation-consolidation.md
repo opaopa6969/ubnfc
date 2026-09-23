@@ -1,7 +1,8 @@
 # UBNF アノテーション統廃合 — P7-1 / P7-3 の不具合と P1 / P2 / P3 / P5
 
 > 2026-09-23。`docs/design/07-annotation-inventory.md` が推奨した束をまとめて入れた。
-> 決定行は `03-design-v1.md` §8 の **D-043 〜 D-047**。
+> 決定行は `03-design-v1.md` §8 の **D-045 〜 D-049**
+> （並行して入った §4 パラメータ化ルールが D-043 / D-044 を取ったので、merge 時に 2 つ繰り下げた）。
 > IR は 1 バイトも変えていない（goldens 無変更）。v1 の受理・AST も変えていない。
 
 ## 0. 何をしたか
@@ -120,7 +121,7 @@ R ::= Atom @left { PowOp @op R @right };
 PowOp ::= '^';
 ```
 
-### 直したこと（D-045）
+### 直したこと（D-047）
 
 `lower/annotations.rs::operator` は右結合では `operator` を作らない。
 これで `@rightAssoc` はリテラル演算子でも規則参照演算子でも同じ扱い（`noncanonical` →
@@ -141,7 +142,7 @@ PowOp ::= '^';
 self-host の byte 一致に出るため、IR 不変を前提にしたこの束では入れない。
 P3 の移行が進んで `@interleave` が消えれば自然に解消する（棚卸しの指摘どおり）。
 
-## 5. P1 — `W-ANNOTATION-UNKNOWN`（D-043）
+## 5. P1 — `W-ANNOTATION-UNKNOWN`（D-045）
 
 UBNF の `@<任意の識別子>` catch-all（`Annotation::Simple`）が綴り間違いを黙って metadata にしていた。
 
@@ -184,7 +185,7 @@ D-042（旧綴りは v2 だけ警告）ではなく **D-037（`W-CHOICE-*` は v
 
 corpus / oracle の期待値は一切変えていない。
 
-## 6. P2 — `@symbolRef` / `@sameText`（D-044）
+## 6. P2 — `@symbolRef` / `@sameText`（D-046）
 
 `@backref` の意味は「文法中のどこか 1 つの規則に `@scopeTree` があるか」という**非局所**な判定で
 決まっていた（`validate/mod.rs`、`lower/annotations.rs`）。どこか 1 規則に `@scopeTree` を足すと
@@ -222,7 +223,7 @@ rule <Rule> uses @backref, whose meaning depends on whether any rule in the gram
 実在の `@backref` は全件が `@scopeTree` を持つ文法にあるので、全件 `@symbolRef` へ機械置換できる。
 `@sameText` の実使用は世界にゼロ。
 
-## 7. P3 — `@interleave` の非推奨（D-046、v2 のみ）
+## 7. P3 — `@interleave` の非推奨（D-048、v2 のみ）
 
 **警告文**:
 
@@ -244,7 +245,7 @@ byte 一致に効くので、採番規則も重複排除キーも触っていな
 
 `@interleave` の corpus oracle は rule-trivia の 2 件（Tt[5,6] と Tt[14]）で、いずれも v1 のまま無影響。
 
-## 8. P5 — `@predictiveChoice` の非推奨 / `@longestChoice` の維持（D-047、v2 のみ）
+## 8. P5 — `@predictiveChoice` の非推奨 / `@longestChoice` の維持（D-049、v2 のみ）
 
 **警告文**:
 
@@ -281,7 +282,7 @@ v1 帯の既存 seed の生成物は 1 バイトも変わらない（D-041 / D-0
 
 | 項目 | 結果 |
 |---|---|
-| `cargo test --workspace --offline` | **緑**（79 target、exit 0）。`ubnf_v2` は 18 → **22** テスト（D-043 〜 D-045 の 4 本を追加） |
+| `cargo test --workspace --offline` | **緑**（`master` を merge したあと 80 target、exit 0）。`ubnf_v2` は 18 → **22** テスト（D-045 〜 D-047 の 4 本を追加） |
 | `cargo clippy --workspace --all-targets --offline -- -D warnings` | **緑** |
 | `cargo fmt --all -- --check` | **緑** |
 | `cd ubnfc-java && mvn -o -q test` | **緑** |

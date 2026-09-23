@@ -29,7 +29,7 @@ const KNOWN_ANNOTATIONS: &[&str] = &[
     "enum",
 ];
 
-/// v2 で非推奨になった綴りの警告（D-044 / D-046 / D-047）。v1 では旧綴りが唯一の綴り
+/// v2 で非推奨になった綴りの警告（D-046 / D-048 / D-049）。v1 では旧綴りが唯一の綴り
 /// なので出さない（凍結した fixture・P4・corpus に無意味な警告を足さない。D-042 と同じ扱い）。
 fn deprecations(rule: &ResolvedRule, cx: &mut Context<'_>) {
     let name = &rule.name;
@@ -62,7 +62,7 @@ fn deprecations(rule: &ResolvedRule, cx: &mut Context<'_>) {
 }
 
 pub(super) fn validate(rule: &ResolvedRule, scope: bool, v2: bool, cx: &mut Context<'_>) {
-    // D-043: catch-all `@<任意の識別子>` は綴り間違いを黙って metadata にする。
+    // D-045: catch-all `@<任意の識別子>` は綴り間違いを黙って metadata にする。
     // 版に関係なく警告する（受理・AST・生成コードは変えない純粋な診断の追加）。
     for annotation in &rule.annotations {
         if let Annotation::Simple { name: unknown, .. } = annotation {
@@ -172,7 +172,7 @@ pub(super) fn validate(rule: &ResolvedRule, scope: bool, v2: bool, cx: &mut Cont
         let (target, code) = match annotation {
             Annotation::Declares { symbol, .. } => (symbol, "E-ANNOTATION-DECLARES-CAPTURE"),
             // 旧 `@backref` は scope モードのときだけ検査する（v1 の診断を変えない）。
-            // 明示綴り（D-044）はどちらのモードでも capture 名を検査する。
+            // 明示綴り（D-046）はどちらのモードでも capture 名を検査する。
             Annotation::Backref { name, mode, .. } if scope || mode.is_some() => {
                 (name, "E-ANNOTATION-BACKREF-CAPTURE")
             }

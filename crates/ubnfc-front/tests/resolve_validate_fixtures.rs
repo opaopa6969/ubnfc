@@ -97,7 +97,7 @@ fn external_fixture_diagnostics() {
                 let expected = if name == "story/code/calc-leftrec.ubnf" {
                     BTreeMap::from([("W-LEFT-RECURSION", 2)])
                 } else if name.ends_with("/keyword-boundary.ubnf") {
-                    // `@rooted` は `@root` の綴り間違い（D-043 で初めて診断が付いた）。
+                    // `@rooted` は `@root` の綴り間違い（D-045 で初めて診断が付いた）。
                     // entry が `lower/mod.rs` の「最初の規則」fallback に落ちて動いていた。
                     BTreeMap::from([("W-GENERAL-NO-ROOT", 1), ("W-ANNOTATION-UNKNOWN", 1)])
                 } else if ["/eval-default.ubnf", "/common-field-space.ubnf"]
@@ -106,7 +106,7 @@ fn external_fixture_diagnostics() {
                 {
                     BTreeMap::from([("W-GENERAL-NO-ROOT", 1)])
                 } else if name.ends_with("/positive/annotations.ubnf") {
-                    // 合成 fixture の `@custom`（D-043）。
+                    // 合成 fixture の `@custom`（D-045）。
                     BTreeMap::from([("W-ANNOTATION-UNKNOWN", 1)])
                 } else {
                     BTreeMap::new()
@@ -156,7 +156,7 @@ fn external_fixture_diagnostics() {
         BTreeMap::from([
             ("W-LEFT-RECURSION".into(), 2),
             ("W-GENERAL-NO-ROOT".into(), 3),
-            // D-043: `@rooted`（keyword-boundary.ubnf）と `@custom`（annotations.ubnf）。
+            // D-045: `@rooted`（keyword-boundary.ubnf）と `@custom`（annotations.ubnf）。
             // 24 fixture + `ubnf.ubnf` + P4 でこの 2 件だけが未知注釈である。
             ("W-ANNOTATION-UNKNOWN".into(), 2)
         ])

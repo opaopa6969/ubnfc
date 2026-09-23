@@ -563,10 +563,10 @@ fn v2_rejects_an_extern_that_no_scanner_registry_provides() {
     std::fs::remove_dir_all(&dir).unwrap();
 }
 
-// ── §6 注釈の統廃合（D-043 〜 D-047）─────────────────────────────────────
+// ── §6 注釈の統廃合（D-045 〜 D-049）─────────────────────────────────────
 
 /// `@symbolRef` / `@sameText` は `scope.effects[].mode` を明示するだけで、
-/// IR の他の部分は旧 `@backref` と同じ（D-044）。
+/// IR の他の部分は旧 `@backref` と同じ（D-046）。
 #[test]
 fn symbol_ref_and_same_text_only_pin_the_scope_mode() {
     let body = |annotation: &str| {
@@ -621,7 +621,7 @@ fn symbol_ref_and_same_text_only_pin_the_scope_mode() {
         .contains(&"W-ANNOTATION-BACKREF-AMBIGUOUS".to_owned()));
 }
 
-/// 未知注釈は版に関係なく警告する（D-043）。未知の grammar 設定は v2 だけ。
+/// 未知注釈は版に関係なく警告する（D-045）。未知の grammar 設定は v2 だけ。
 #[test]
 fn unknown_annotations_warn_in_every_version_and_unknown_settings_only_in_v2() {
     for version in [None, Some(1), Some(2)] {
@@ -646,7 +646,7 @@ fn unknown_annotations_warn_in_every_version_and_unknown_settings_only_in_v2() {
     assert!(codes(&setting(Some(2))).contains(&"W-ANNOTATION-UNKNOWN".to_owned()));
 }
 
-/// `@interleave` と `@predictiveChoice` は v2 でだけ非推奨（D-046 / D-047）。
+/// `@interleave` と `@predictiveChoice` は v2 でだけ非推奨（D-048 / D-049）。
 /// `@longestChoice` は意味論の選択なのでどの版でも黙る。
 #[test]
 fn interleave_and_predictive_choice_are_deprecated_only_under_v2() {
@@ -673,7 +673,7 @@ fn interleave_and_predictive_choice_are_deprecated_only_under_v2() {
     }
 }
 
-/// D-045: `@rightAssoc` + 規則参照演算子は `InvalidOperator` で落ちていた。
+/// D-047: `@rightAssoc` + 規則参照演算子は `InvalidOperator` で落ちていた。
 /// リテラル演算子と同じく通り、`operator` metadata は作らない。
 #[test]
 fn right_associative_rules_with_a_rule_reference_operator_compile() {

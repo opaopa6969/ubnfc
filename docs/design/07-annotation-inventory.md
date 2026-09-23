@@ -4,7 +4,7 @@
 > 数字はすべて再現可能な grep/JSON 走査で採った（§1 に採り方）。
 >
 > **実装状況（2026-09-23 追記）**: P1 / P2 / P3 / P5 と P7 の 1・3 は
-> `docs/reports/2026-09-23-annotation-consolidation.md` で実装済み（D-043 〜 D-047）。
+> `docs/reports/2026-09-23-annotation-consolidation.md` で実装済み（D-045 〜 D-049）。
 > P7-2 は**誤りだった**（Java にも上限検査はある）。P7-4 と P4 / P6 は未着手。
 > 各節の先頭に **[済]** / **[誤]** / **[未]** を付けた。
 
@@ -188,13 +188,13 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
 各案に **採否・置き換える対象・移行・影響範囲**を付ける。
 すべて **`@ubnf: 2` 限定**で、v1 は 1 bit も変えない前提（D-038）。
 
-### P1（**[済]** D-043）未知注釈の警告 — `W-ANNOTATION-UNKNOWN`
+### P1（**[済]** D-045）未知注釈の警告 — `W-ANNOTATION-UNKNOWN`
 
 - **形**: `@ubnf: 2` で、既知でない注釈名に警告を出す。`--strict` でエラー化（D-037 と同じ扱い）。
 - **置き換える対象**: `Annotation::Simple` の「黙って受理」。受理自体は残す（拒否しない）。
 - **移行**: 無い。既存文法は警告が出るだけ。`@rooted`（keyword-boundary.ubnf）と `@custom`
   （annotations.ubnf）の 2 件が v2 に移行したときだけ光る。
-- **影響範囲**: 決定行の追加 1 行（D-043 相当）。IR 変更なし。backend 変更なし。
+- **影響範囲**: 決定行の追加 1 行（D-045 相当）。IR 変更なし。backend 変更なし。
   fuzzer は `@ubnf: 2` 文法で未知注釈を生成していないので変更不要。corpus は v1 のまま無影響。
 - **なぜ 1 位か**: 実際に綴り間違いを 1 件見つけている（`@rooted`。しかも entry の暗黙 fallback で
   隠れていた）、コストが最小、他のどの案よりも先に入れておくと
@@ -203,7 +203,7 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
   `package` / `comment` / `whitespace` / `interleave` 以外を無検査で `grammarUnits[].annotations` へ
   流している。
 
-### P2（**[済]** D-044）`@backref` を意味ごとに 2 つへ割る
+### P2（**[済]** D-046）`@backref` を意味ごとに 2 つへ割る
 
 - **形**: `@symbolRef(name=X)`（scope 検索・未定義は WARNING）と `@sameText(name=X)`
   （同一 rule 内テキスト一致・不一致は ERROR）。v2 では `@backref` に
@@ -221,7 +221,7 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
   - fuzzer: `gen.rs:576` の `@backref` 生成を v2 では `@symbolRef` にする。
 - **コスト**: front の parser に 2 つの注釈を足し、既存の `Backref` を残す。小。
 
-### P3（**[済]** D-046）`@interleave` を `@whitespace` に畳む
+### P3（**[済]** D-048）`@interleave` を `@whitespace` に畳む
 
 - **形**: v2 では `@interleave(profile=…)` に `W-ANNOTATION-INTERLEAVE-DEPRECATED` を出し、
   `@whitespace(javaStyle)` へ誘導する。v3 で削除。**v2 でも拒否はしない**（D-042 と同じ理屈で、
@@ -269,7 +269,7 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
 - **合わせて直すべき非対称**: `@rightAssoc` + `@precedence` が `operator` を作らない件
   （`Power.ubnf` の IR が `operator=None`）。これは案というより不具合に近い。
 
-### P5（**[済]** D-047）`@predictiveChoice` を非推奨にする / `@longestChoice` は残す
+### P5（**[済]** D-049）`@predictiveChoice` を非推奨にする / `@longestChoice` は残す
 
 - **`@predictiveChoice`**: v2 で `W-ANNOTATION-PREDICTIVE-REDUNDANT`。
   **根拠**: front は注釈と無関係に `plan.choices[].strategy=predict` を 16 箇所で選んでおり
@@ -321,7 +321,7 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
    分かれ目は結合性ではなく**演算子 atom の種類**で、`@leftAssoc` + リテラル演算子も
    `operator=None` になる（`lower/annotations.rs` が演算子を規則参照に限っている。実測で確認）。
    本当の非対称は `@rightAssoc` + **規則参照**演算子が `AnalysisError::InvalidOperator` で
-   **文法ごと落ちる**ことだった（同じ形の `@leftAssoc` は通る）。D-045 で lowering 側を揃えて
+   **文法ごと落ちる**ことだった（同じ形の `@leftAssoc` は通る）。D-047 で lowering 側を揃えて
    落ちないようにした。`@rightAssoc` にも `operator` を作る完全対称化は `plan.operators` と
    Power.ubnf の IR が変わるので別作業（IR 不変の枠を出る）。
 4. **[未]** **同一内容の TriviaPolicy が重複する**（§3.1-1）。`rawSettings` 差だけで policy が分裂し、

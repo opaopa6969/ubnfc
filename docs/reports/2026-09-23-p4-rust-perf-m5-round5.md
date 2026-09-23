@@ -1,5 +1,14 @@
 # P4 Rust 生成 parser の性能改善 M5 round 5（2026-09-23）— finish の走査統合
 
+> **訂正（本報告の commit 直後に確定）**: 本文の「旧実装比」列が使っている
+> **complex 12.32 ms / complex-x64 958 ms は旧実装の公開 facade（`publicFacade`）の値**で、
+> AST 経路の対比には使えない。確定したベースラインは
+> [`2026-09-23-legacy-baseline.md`](2026-09-23-legacy-baseline.md) の
+> **complex 認識 13.6 ms / AST 14.5 ms、complex-x64 認識 1,603 ms / AST 1,693 ms** であり、
+> 対比は認識 ↔ 認識、AST ↔ AST で採る。本報告の ubnfc 側の絶対値と A/B は有効なまま。
+> なお ubnfc Rust のその後の到達点は [`2026-09-23-p4-rust-floor.md`](2026-09-23-p4-rust-floor.md)
+> （complex 認識 0.066 / AST 0.089 ms、x64 認識 4.52 / AST 5.86 ms）。
+
 [`2026-09-23-p4-rust-perf-m5-round4.md`](2026-09-23-p4-rust-perf-m5-round4.md) の「残り 2」:
 
 > x64 AST: finish の出現収集（1.4 ms）と AST 構築（1.6 ms）が 2 回の全木走査。`occurrences` を

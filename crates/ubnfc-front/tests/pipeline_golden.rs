@@ -136,7 +136,7 @@ fn p4_matches_cli_golden_and_typed_round_trip() {
 #[test]
 fn three_invalid_fixtures_match_validation_text_goldens_and_json_counts() {
     let root = fixture_root("UNLAXER_PARSER_DIR", "../../../unlaxer-parser");
-    // (ファイル, ERROR 件数, WARNING 件数)。annotations.ubnf の 1 件は D-043 の
+    // (ファイル, ERROR 件数, WARNING 件数)。annotations.ubnf の 1 件は D-045 の
     // `@custom`（未知注釈）で、12 件の ERROR は Java 実装と同じまま。
     let cases = [
         (

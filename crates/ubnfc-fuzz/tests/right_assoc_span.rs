@@ -36,11 +36,11 @@ fn scratch() -> Scratch {
 }
 
 fn rule(annotations: &[&str], name: &str, body: Body) -> Rule {
-    Rule {
-        annotations: annotations.iter().map(|a| (*a).to_owned()).collect(),
-        name: name.to_owned(),
+    Rule::plain(
+        annotations.iter().map(|a| (*a).to_owned()).collect(),
+        name.to_owned(),
         body,
-    }
+    )
 }
 
 /// `Base @left { Op @op Self @right }`（v1 の右結合正規形）。
@@ -58,6 +58,7 @@ fn grammar(name: &str, settings: &[&str], rules: Vec<Rule>) -> Grammar {
     Grammar {
         name: name.to_owned(),
         settings: settings.iter().map(|s| (*s).to_owned()).collect(),
+        templates: Vec::new(),
         tokens: Vec::new(),
         rules,
         import: None,

@@ -7,9 +7,16 @@
 **性能・互換性の検証例であり、P4 の完全互換を達成したものではない。**
 16 fixture 中、Formula 入口で 9 件を全消費、意図的な不正入力 3 件と comparison-heavy 系 4 件を拒否する
 （Java 側と同じ）。BooleanExpression 入口なら comparison-heavy 系 4 件も全消費する。
-ただし **既定の診断予算（`limits.diagnostics` = 200 万 node）では complex-x4 以上・large-match・
-comparison-heavy-x4 以上が `diagnostic budget exceeded` で失敗する**。テストとベンチは予算を広げて受理を確認している。
 詳細と計測は [計測報告](../../docs/reports/2026-09-22-p4-rust-bench.md)。
+
+> **診断予算について（2026-09-23 訂正）**: 本 README は以前「既定の診断予算（`limits.diagnostics`
+> = 200 万 node）では complex-x4 以上・large-match・comparison-heavy-x4 以上が
+> `diagnostic budget exceeded` で失敗する」と書いていたが、**現在は当てはまらない**。
+> 失敗記録が O(1) 件になり、さらに既定が fast mode（`ParseOptions::diagnostics = false`）に
+> なって予算を消費しなくなったため、既定 2,000,000 で全 fixture が通る（D-023、
+> [`2026-09-23-p4-rust-diag-two-mode.md`](../../docs/reports/2026-09-23-p4-rust-diag-two-mode.md)）。
+> 契約は `tests/fixtures.rs` の
+> `default_diagnostic_budget_accepts_every_fixture_and_small_budget_fails_as_resource` が固定する。
 
 ## 再現
 

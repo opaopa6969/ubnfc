@@ -515,12 +515,17 @@ impl Resolver<'_> {
         use ResolvedAtom as R;
         let span = atom.span();
         Some(match atom {
-            Atom::Ref {
-                namespace, name, ..
-            } => {
-                let local = namespace
-                    .as_ref()
-                    .map_or_else(|| name.clone(), |ns| format!("{ns}.{name}"));
+            // `Atom::Instantiate` は `desugar::templates` が展開して消す（D-043）。
+            // 展開できなかったときも desugar が `Atom::Ref` へ落としているので
+            // ここには来ないが、resolve を直接呼ぶ経路のために未定義参照として扱う。
+            Atom::Instantiate { name, .. } | Atom::Ref { name, .. } => {
+                let local = match atom {
+                    Atom::Ref {
+                        namespace: Some(ns),
+                        ..
+                    } => format!("{ns}.{name}"),
+                    _ => name.clone(),
+                };
                 let qualified = qualify(prefix, &local);
                 let Some(symbol) = self.result.lookup(pending.id, &qualified) else {
                     let known = self
@@ -561,6 +566,7 @@ impl Resolver<'_> {
                 span,
             },
             Atom::Optional { body, .. } => R::Optional {
+                bracket: true,
                 body: self.body(pending, unit, prefix, rule, body),
                 span,
             },
@@ -625,7 +631,11 @@ fn quantify(atom: ResolvedAtom, quantifier: &Quantifier) -> ResolvedAtom {
                 span: inner_span,
             };
             if matches!(quantifier, Quantifier::Question { .. }) {
-                ResolvedAtom::Optional { body, span }
+                ResolvedAtom::Optional {
+                    body,
+                    bracket: false,
+                    span,
+                }
             } else {
                 ResolvedAtom::Repeat { body, span }
             }

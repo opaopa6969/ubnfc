@@ -22,6 +22,65 @@ grammar TinyExpressionP4 {
   token CODE_END   = extern 'CodeEndParser'
   token EOF        = END_OF_INPUT
 
+  // ── パラメータ化ルール（D-043） ────────────────────────────────────────────
+  // 雛形は規則ではない。実体化した位置へその場で展開され、新しい規則も新しい
+  // 名前も作らないので、AST（@mapping のクラスと params）も rulePath も
+  // expected ラベルも手書きしたときと 1 文字も変わらない。
+
+  // 型ごとに 4 本ずつ書いていた宣言・メソッド・外部呼び出し。
+  VarDecl<Hint, Value> ::=
+    ( 'variable' | 'var' )
+    '$' IDENTIFIER @varName
+    [ Hint ]
+    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] Value @value ]
+    [ Description @desc ]
+    ';' ;
+
+  MethodDecl<Ret, Body> ::=
+    Ret IDENTIFIER @methodName
+    '('
+      [ MethodParameters @parameters ]
+    ')'
+    '{'
+      Body @expression
+    '}' ;
+
+  ExternalInvocation<Ret> ::=
+    'external' [ 'returning' [ 'as' ] ] Ret
+    [ ':' ]
+    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
+    '(' [ Arguments @args ] ')' ;
+
+  // 8 候補のスライス構文。受け手だけが違う 2 本を 1 箇所で書く。
+  Slice<Recv> ::=
+      Recv @value '[' SliceStartIndex @start ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
+    | Recv @value '[' SliceStartIndex @start ':' SliceEndIndex @end ']'
+    | Recv @value '[' SliceStartIndex @start ':' ':' SliceStepIndex @step ']'
+    | Recv @value '[' SliceStartIndex @start ':' ']'
+    | Recv @value '[' ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
+    | Recv @value '[' ':' SliceEndIndex @end ']'
+    | Recv @value '[' ':' ':' SliceStepIndex @step ']'
+    | Recv @value '[' ':' ']' ;
+
+  // match 式とその case。
+  MatchBody<Case, Default> ::=
+    'match' '{'
+      Case @firstCase { ',' Case @moreCases }
+      ',' Default @defaultCase
+    '}' ;
+  CaseRule<Value> ::= BooleanExpression @condition '->' Value @value ;
+  DefaultCaseRule<Value> ::= 'default' '->' Value @value ;
+
+  // カンマ区切りリストと、可変長引数の組込み関数・文字列述語。
+  ValuesList<X> ::= X @values { ',' X @values } ;
+  NAryNumberFn<Kw> ::= Kw '(' ArgumentExpression @first { ',' ArgumentExpression @rest } ')' ;
+  StringPredFn<Kw> ::=
+    Kw '(' StringExpression @value ',' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+  StringPredDot<Kw> ::=
+    StringPredicateReceiver @value Kw '(' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+
   @root
   @interleave(profile=javaStyle)
   @scopeTree(mode=lexical)
@@ -60,43 +119,19 @@ grammar TinyExpressionP4 {
 
   @declares(symbol=varName, description=desc)
   @mapping(NumberVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
-  NumberVariableDeclaration ::=
-    ( 'variable' | 'var' )
-    '$' IDENTIFIER @varName
-    [ NumberTypeHint ]
-    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] NumberExpression @value ]
-    [ Description @desc ]
-    ';' ;
+  NumberVariableDeclaration ::= VarDecl<NumberTypeHint, NumberExpression> ;
 
   @declares(symbol=varName, description=desc)
   @mapping(StringVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
-  StringVariableDeclaration ::=
-    ( 'variable' | 'var' )
-    '$' IDENTIFIER @varName
-    [ StringTypeHint ]
-    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] StringExpression @value ]
-    [ Description @desc ]
-    ';' ;
+  StringVariableDeclaration ::= VarDecl<StringTypeHint, StringExpression> ;
 
   @declares(symbol=varName, description=desc)
   @mapping(BooleanVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
-  BooleanVariableDeclaration ::=
-    ( 'variable' | 'var' )
-    '$' IDENTIFIER @varName
-    [ BooleanTypeHint ]
-    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] BooleanExpression @value ]
-    [ Description @desc ]
-    ';' ;
+  BooleanVariableDeclaration ::= VarDecl<BooleanTypeHint, BooleanExpression> ;
 
   @declares(symbol=varName, description=desc)
   @mapping(ObjectVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
-  ObjectVariableDeclaration ::=
-    ( 'variable' | 'var' )
-    '$' IDENTIFIER @varName
-    [ ObjectTypeHint ]
-    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] ObjectExpression @value ]
-    [ Description @desc ]
-    ';' ;
+  ObjectVariableDeclaration ::= VarDecl<ObjectTypeHint, ObjectExpression> ;
 
   TypeHint ::= [ 'as' ] ( 'number' | 'Number' | 'string' | 'String'
     | 'boolean' | 'Boolean' | 'object' | 'Object' ) ;
@@ -124,53 +159,25 @@ grammar TinyExpressionP4 {
   @scopeTree(mode=lexical)
   @declares(symbol=methodName)
   @mapping(NumberMethodDeclarationExpr, params=[methodName, parameters, expression])
-  NumberMethodDeclaration ::=
-    NumberReturnType IDENTIFIER @methodName
-    '('
-      [ MethodParameters @parameters ]
-    ')'
-    '{'
-      NumberExpression @expression
-    '}' ;
+  NumberMethodDeclaration ::= MethodDecl<NumberReturnType, NumberExpression> ;
 
   @scopeTree(mode=lexical)
   @declares(symbol=methodName)
   @mapping(StringMethodDeclarationExpr, params=[methodName, parameters, expression])
-  StringMethodDeclaration ::=
-    StringReturnType IDENTIFIER @methodName
-    '('
-      [ MethodParameters @parameters ]
-    ')'
-    '{'
-      StringExpression @expression
-    '}' ;
+  StringMethodDeclaration ::= MethodDecl<StringReturnType, StringExpression> ;
 
   @scopeTree(mode=lexical)
   @declares(symbol=methodName)
   @mapping(BooleanMethodDeclarationExpr, params=[methodName, parameters, expression])
-  BooleanMethodDeclaration ::=
-    BooleanReturnType IDENTIFIER @methodName
-    '('
-      [ MethodParameters @parameters ]
-    ')'
-    '{'
-      BooleanExpression @expression
-    '}' ;
+  BooleanMethodDeclaration ::= MethodDecl<BooleanReturnType, BooleanExpression> ;
 
   @scopeTree(mode=lexical)
   @declares(symbol=methodName)
   @mapping(ObjectMethodDeclarationExpr, params=[methodName, parameters, expression])
-  ObjectMethodDeclaration ::=
-    ObjectReturnType IDENTIFIER @methodName
-    '('
-      [ MethodParameters @parameters ]
-    ')'
-    '{'
-      ObjectExpression @expression
-    '}' ;
+  ObjectMethodDeclaration ::= MethodDecl<ObjectReturnType, ObjectExpression> ;
 
   @mapping(MethodParametersExpr, params=[values])
-  MethodParameters ::= MethodParameter @values { ',' MethodParameter @values } ;
+  MethodParameters ::= ValuesList<MethodParameter> ;
 
   @declares(symbol=paramName)
   @mapping(MethodParameterExpr, params=[paramName, type])
@@ -187,11 +194,7 @@ grammar TinyExpressionP4 {
   // Example: external returning as boolean checkAlphabets($inputName)
 
   @mapping(ExternalBooleanInvocationExpr, params=[className, name, args])
-  ExternalBooleanInvocation ::=
-    'external' [ 'returning' [ 'as' ] ] BooleanReturnType
-    [ ':' ]
-    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
-    '(' [ Arguments @args ] ')' ;
+  ExternalBooleanInvocation ::= ExternalInvocation<BooleanReturnType> ;
 
   @mapping(ExternalNumberInvocationExpr, params=[className, name, args])
   ExternalNumberInvocation ::=
@@ -201,18 +204,10 @@ grammar TinyExpressionP4 {
     '(' [ Arguments @args ] ')' ;
 
   @mapping(ExternalStringInvocationExpr, params=[className, name, args])
-  ExternalStringInvocation ::=
-    'external' [ 'returning' [ 'as' ] ] StringReturnType
-    [ ':' ]
-    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
-    '(' [ Arguments @args ] ')' ;
+  ExternalStringInvocation ::= ExternalInvocation<StringReturnType> ;
 
   @mapping(ExternalObjectInvocationExpr, params=[className, name, args])
-  ExternalObjectInvocation ::=
-    'external' [ 'returning' [ 'as' ] ] ObjectReturnType
-    [ ':' ]
-    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
-    '(' [ Arguments @args ] ')' ;
+  ExternalObjectInvocation ::= ExternalInvocation<ObjectReturnType> ;
 
   // ── Built-in method invocation (call / call internal / internal) ──────────
 
@@ -235,7 +230,7 @@ grammar TinyExpressionP4 {
     | Expression @value ;
 
   @mapping(ArgumentsExpr, params=[values])
-  Arguments ::= ArgumentExpression @values { ',' ArgumentExpression @values } ;
+  Arguments ::= ValuesList<ArgumentExpression> ;
 
   // ── Numeric expressions ────────────────────────────────────────────────────
 
@@ -292,10 +287,10 @@ grammar TinyExpressionP4 {
   SqrtFunction ::= 'sqrt' '(' ArgumentExpression @arg ')' ;
 
   @mapping(MinExpr, params=[first, rest])
-  MinFunction ::= 'min' '(' ArgumentExpression @first { ',' ArgumentExpression @rest } ')' ;
+  MinFunction ::= NAryNumberFn<'min'> ;
 
   @mapping(MaxExpr, params=[first, rest])
-  MaxFunction ::= 'max' '(' ArgumentExpression @first { ',' ArgumentExpression @rest } ')' ;
+  MaxFunction ::= NAryNumberFn<'max'> ;
 
   @mapping(RandomExpr)
   RandomFunction ::= 'random' '(' ')' ;
@@ -363,16 +358,13 @@ grammar TinyExpressionP4 {
   // These return boolean: startsWith, endsWith, contains
 
   @mapping(StartsWithExpr, params=[value, patterns])
-  StartsWithFunction ::= 'startsWith' '(' StringExpression @value ',' StringExpression @patterns
-    { ',' StringExpression @patterns } ')' ;
+  StartsWithFunction ::= StringPredFn<'startsWith'> ;
 
   @mapping(EndsWithExpr, params=[value, patterns])
-  EndsWithFunction ::= 'endsWith' '(' StringExpression @value ',' StringExpression @patterns
-    { ',' StringExpression @patterns } ')' ;
+  EndsWithFunction ::= StringPredFn<'endsWith'> ;
 
   @mapping(ContainsExpr, params=[value, patterns])
-  ContainsFunction ::= 'contains' '(' StringExpression @value ',' StringExpression @patterns
-    { ',' StringExpression @patterns } ')' ;
+  ContainsFunction ::= StringPredFn<'contains'> ;
 
   @mapping(InExpr, params=[value, candidates])
   InMethod ::= StringExpression @value '.in' '(' StringExpression @candidates { ',' StringExpression @candidates } ')' ;
@@ -380,16 +372,13 @@ grammar TinyExpressionP4 {
   // ── String predicates (boolean-returning, dot form) ─────────────────────
 
   @mapping(StartsWithDotExpr, params=[value, patterns])
-  StartsWithDotMethod ::= StringPredicateReceiver @value '.startsWith' '(' StringExpression @patterns
-    { ',' StringExpression @patterns } ')' ;
+  StartsWithDotMethod ::= StringPredDot<'.startsWith'> ;
 
   @mapping(EndsWithDotExpr, params=[value, patterns])
-  EndsWithDotMethod ::= StringPredicateReceiver @value '.endsWith' '(' StringExpression @patterns
-    { ',' StringExpression @patterns } ')' ;
+  EndsWithDotMethod ::= StringPredDot<'.endsWith'> ;
 
   @mapping(ContainsDotExpr, params=[value, patterns])
-  ContainsDotMethod ::= StringPredicateReceiver @value '.contains' '(' StringExpression @patterns
-    { ',' StringExpression @patterns } ')' ;
+  ContainsDotMethod ::= StringPredDot<'.contains'> ;
 
   StringPredicateReceiver ::= ToLowerCaseFunction | ToUpperCaseFunction | TrimFunction | VariableRef ;
 
@@ -431,26 +420,10 @@ grammar TinyExpressionP4 {
   SliceStepIndex  ::= NumberExpression ;
 
   @mapping(SliceExpr, params=[value, start, end, step])
-  SliceBaseExpression ::=
-      SliceBaseReceiver @value '[' SliceStartIndex @start ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
-    | SliceBaseReceiver @value '[' SliceStartIndex @start ':' SliceEndIndex @end ']'
-    | SliceBaseReceiver @value '[' SliceStartIndex @start ':' ':' SliceStepIndex @step ']'
-    | SliceBaseReceiver @value '[' SliceStartIndex @start ':' ']'
-    | SliceBaseReceiver @value '[' ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
-    | SliceBaseReceiver @value '[' ':' SliceEndIndex @end ']'
-    | SliceBaseReceiver @value '[' ':' ':' SliceStepIndex @step ']'
-    | SliceBaseReceiver @value '[' ':' ']' ;
+  SliceBaseExpression ::= Slice<SliceBaseReceiver> ;
 
   @mapping(SliceExpr, params=[value, start, end, step])
-  SliceNestedExpression ::=
-      SliceBaseExpression @value '[' SliceStartIndex @start ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
-    | SliceBaseExpression @value '[' SliceStartIndex @start ':' SliceEndIndex @end ']'
-    | SliceBaseExpression @value '[' SliceStartIndex @start ':' ':' SliceStepIndex @step ']'
-    | SliceBaseExpression @value '[' SliceStartIndex @start ':' ']'
-    | SliceBaseExpression @value '[' ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
-    | SliceBaseExpression @value '[' ':' SliceEndIndex @end ']'
-    | SliceBaseExpression @value '[' ':' ':' SliceStepIndex @step ']'
-    | SliceBaseExpression @value '[' ':' ']' ;
+  SliceNestedExpression ::= Slice<SliceBaseExpression> ;
 
   SliceExpression ::= SliceNestedExpression | SliceBaseExpression ;
 
@@ -580,44 +553,32 @@ grammar TinyExpressionP4 {
   // ── Match expressions ──────────────────────────────────────────────────────
 
   @mapping(NumberMatchExpr, params=[firstCase, moreCases, defaultCase])
-  NumberMatchExpression ::=
-    'match' '{'
-      NumberCase @firstCase { ',' NumberCase @moreCases }
-      ',' NumberDefaultCase @defaultCase
-    '}' ;
+  NumberMatchExpression ::= MatchBody<NumberCase, NumberDefaultCase> ;
 
   @mapping(NumberCaseExpr, params=[condition, value])
-  NumberCase ::= BooleanExpression @condition '->' NumberCaseValue @value ;
+  NumberCase ::= CaseRule<NumberCaseValue> ;
   @mapping(NumberDefaultCaseExpr, params=[value])
-  NumberDefaultCase ::= 'default' '->' NumberCaseValue @value ;
+  NumberDefaultCase ::= DefaultCaseRule<NumberCaseValue> ;
   @mapping(NumberCaseValueExpr, params=[value])
   NumberCaseValue ::= NumberExpression @value ;
 
   @mapping(StringMatchExpr, params=[firstCase, moreCases, defaultCase])
-  StringMatchExpression ::=
-    'match' '{'
-      StringCase @firstCase { ',' StringCase @moreCases }
-      ',' StringDefaultCase @defaultCase
-    '}' ;
+  StringMatchExpression ::= MatchBody<StringCase, StringDefaultCase> ;
 
   @mapping(StringCaseExpr, params=[condition, value])
-  StringCase ::= BooleanExpression @condition '->' StringCaseValue @value ;
+  StringCase ::= CaseRule<StringCaseValue> ;
   @mapping(StringDefaultCaseExpr, params=[value])
-  StringDefaultCase ::= 'default' '->' StringCaseValue @value ;
+  StringDefaultCase ::= DefaultCaseRule<StringCaseValue> ;
   @mapping(StringCaseValueExpr, params=[value])
   StringCaseValue ::= StringExpression @value ;
 
   @mapping(BooleanMatchExpr, params=[firstCase, moreCases, defaultCase])
-  BooleanMatchExpression ::=
-    'match' '{'
-      BooleanCase @firstCase { ',' BooleanCase @moreCases }
-      ',' BooleanDefaultCase @defaultCase
-    '}' ;
+  BooleanMatchExpression ::= MatchBody<BooleanCase, BooleanDefaultCase> ;
 
   @mapping(BooleanCaseExpr, params=[condition, value])
-  BooleanCase ::= BooleanExpression @condition '->' BooleanCaseValue @value ;
+  BooleanCase ::= CaseRule<BooleanCaseValue> ;
   @mapping(BooleanDefaultCaseExpr, params=[value])
-  BooleanDefaultCase ::= 'default' '->' BooleanCaseValue @value ;
+  BooleanDefaultCase ::= DefaultCaseRule<BooleanCaseValue> ;
   @mapping(BooleanCaseValueExpr, params=[value])
   BooleanCaseValue ::= BooleanExpression @value ;
 
