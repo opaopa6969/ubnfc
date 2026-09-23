@@ -57,7 +57,16 @@ pub const FEATURES: &[&str] = &[
     "eval",
     "catalog",
     "doc",
+    "ubnf2",
+    "leftRecursion",
 ];
+
+/// UBNF v2（`@ubnf: 2`）を生成する seed の帯。
+///
+/// 既存 seed の生成物は 1 バイトも変えない（seed 269 は A-1 の回帰試験、
+/// 4001..4004 は CI の固定 campaign）。したがって v2 は乱数を引かず、
+/// **seed の値だけ**で決める。
+pub const V2_SEED_BASE: u64 = 100_000;
 
 /// `@enum` の選択肢。variant 名が Java / Rust の識別子になるため、
 /// 記号や非 ASCII は使えない（Java 生成器の `Validation.identifier`）。
@@ -242,6 +251,7 @@ impl Builder<'_> {
             None
         };
         normalize(Element {
+            lead: Vec::new(),
             typeof_capture: None,
             atom,
             quant,
@@ -280,7 +290,13 @@ pub fn generate(seed: u64) -> Grammar {
         captures: 0,
     };
 
+    // v2 は乱数を消費せずに seed だけで決める（既存 seed の生成物を保つため）。
+    let v2 = seed >= V2_SEED_BASE;
     let mut settings = Vec::new();
+    if v2 {
+        builder.mark("ubnf2");
+        settings.push("@ubnf: 2".to_owned());
+    }
     let whitespace = builder.rng.weighted(&[35, 45, 20]);
     match whitespace {
         0 => {}
@@ -444,6 +460,7 @@ pub fn generate(seed: u64) -> Grammar {
             let extra = builder.capture_name();
             let atom = builder.literal();
             body.alternatives[0].push(Element {
+                lead: Vec::new(),
                 typeof_capture: Some(target),
                 atom,
                 quant: None,
@@ -529,7 +546,36 @@ pub fn generate(seed: u64) -> Grammar {
         let index = builder.rng.below(builder.deeper.len());
         builder.deeper[index].clone()
     };
-    for step in 0..tower {
+    // v2: 同じ塔を「候補順＝優先順位」の左再帰ルール 1 本で書く（D-038）。
+    // 段ごとの規則は脱糖が作るので、両 backend は塔と同じ IR を受け取る。
+    if v2 && tower > 0 {
+        builder.mark("leftRecursion");
+        builder.mark("precedence");
+        builder.mark("leftAssoc");
+        let name = "OpLr".to_owned();
+        let mut alternatives = Vec::new();
+        for step in 0..tower {
+            let operator = Atom::Literal((*builder.rng.pick(&["+", "-", "*"])).to_owned());
+            // 段ごとに別の AST クラスを使う（v1 の塔の Bin{step} と同じ形）。
+            // 候補先頭の @mapping はその段だけに効く。
+            let mut left = Element::captured(Atom::Ref(name.clone()), "left");
+            left.lead = vec![format!("@mapping(BinLr{step}, params=[left, op, right])")];
+            alternatives.push(vec![
+                left,
+                Element::captured(operator, "op"),
+                Element::captured(Atom::Ref(name.clone()), "right"),
+            ]);
+        }
+        alternatives.push(vec![Element::new(Atom::Ref(operand.clone()))]);
+        rules.push(Rule {
+            annotations: Vec::new(),
+            name: name.clone(),
+            body: Body { alternatives },
+        });
+        operand = name.clone();
+        builder.deeper.push(name);
+    }
+    for step in 0..if v2 { 0 } else { tower } {
         let name = format!("Op{step}");
         let level = 90 - 10 * step as u64;
         let right = builder.rng.chance(40);
@@ -574,6 +620,7 @@ pub fn generate(seed: u64) -> Grammar {
         let atom = builder.atom(1);
         let quant = builder.quantifier();
         root_elements.push(normalize(Element {
+            lead: Vec::new(),
             typeof_capture: None,
             atom,
             quant,
@@ -585,6 +632,7 @@ pub fn generate(seed: u64) -> Grammar {
         builder.mark("capture:nested");
         let inner = builder.element(1, false);
         root_elements.push(Element {
+            lead: Vec::new(),
             typeof_capture: None,
             atom: Atom::Group(Body::single(vec![
                 Element::captured(Atom::Literal(",".into()), "tail"),
@@ -685,7 +733,7 @@ mod tests {
 
     #[test]
     fn generation_is_deterministic_and_always_parses_as_ubnf() {
-        for seed in 0..200u64 {
+        for seed in (0..200u64).chain(V2_SEED_BASE..V2_SEED_BASE + 200) {
             let grammar = generate(seed);
             assert_eq!(grammar, generate(seed));
             let source = grammar.render();
@@ -700,7 +748,7 @@ mod tests {
     #[test]
     fn every_declared_feature_name_is_reachable_from_some_seed() {
         let mut seen = BTreeSet::new();
-        for seed in 0..800u64 {
+        for seed in (0..800u64).chain(V2_SEED_BASE..V2_SEED_BASE + 800) {
             seen.extend(generate(seed).features);
         }
         let missing: Vec<_> = FEATURES

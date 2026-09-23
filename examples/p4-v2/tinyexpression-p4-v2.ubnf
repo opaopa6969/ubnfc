@@ -1,0 +1,642 @@
+grammar TinyExpressionP4 {
+
+  @ubnf: 2
+  @package: org.unlaxer.tinyexpression.generated.p4
+  @whitespace: javaStyle
+  @memoSafeToken: NUMBER
+  @memoSafeToken: IDENTIFIER
+  @memoSafeToken: STRING
+  @memoSafeToken: CODE_START
+  @memoSafeToken: CODE_END
+  @memoSafeToken: EOF
+
+  token NUMBER     = org.unlaxer.parser.elementary.NumberParser
+  token IDENTIFIER = org.unlaxer.parser.clang.IdentifierParser
+  token STRING     = org.unlaxer.tinyexpression.parser.StringLiteralParser
+  token CODE_START = org.unlaxer.tinyexpression.parser.javalang.CodeStartParser
+  token CODE_BODY  = UNTIL('```')
+  token CODE_END   = org.unlaxer.tinyexpression.parser.javalang.CodeEndParser
+  token EOF        = org.unlaxer.parser.elementary.EndOfSourceParser
+
+  @root
+  @interleave(profile=javaStyle)
+  @scopeTree(mode=lexical)
+  @mapping(FormulaExpr, params=[imports, declarations, expression, methods])
+  Formula ::= { CodeBlock } { ImportDeclaration @imports } { VariableDeclaration @declarations }
+    { Annotation } Expression @expression { MethodDeclaration @methods } EOF ;
+
+  // ── Fenced Java code block ─────────────────────────────────────────────────
+  // Syntax: ```scheme:JavaClassName\n...\n```
+  // Example: ```java:sample.v1.CheckAlphabets\npublic class ...\n```
+
+  @mapping(CodeBlockExpr)
+  CodeBlock ::= CODE_START CODE_BODY CODE_END ;
+
+  // ── Import declaration ─────────────────────────────────────────────────────
+  // Syntax: import fully.qualified.ClassName [#methodName] as alias;
+  // Examples:
+  //   import sample.v1.CheckAlphabets#check as checkAlphabets;  (with method)
+  //   import sample.v1.CheckAlphabets as checkAlphabets;        (bare)
+
+  @interleave(profile=javaStyle)
+  @mapping(ImportDeclarationExpr, params=[className, method, alias])
+  ImportDeclaration ::= 'import' ClassName @className [ '#' IDENTIFIER @method ] 'as' IDENTIFIER @alias ';' ;
+
+  @mapping(QualifiedNameExpr, params=[head, tail])
+  ClassName ::= IDENTIFIER @head { '.' IDENTIFIER @tail } ;
+
+  // ── Variable declarations ──────────────────────────────────────────────────
+
+  @interleave(profile=javaStyle)
+  VariableDeclaration ::=
+      NumberVariableDeclaration
+    | StringVariableDeclaration
+    | BooleanVariableDeclaration
+    | ObjectVariableDeclaration ;
+
+  @declares(symbol=varName, description=desc)
+  @mapping(NumberVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
+  NumberVariableDeclaration ::=
+    ( 'variable' | 'var' )
+    '$' IDENTIFIER @varName
+    [ NumberTypeHint ]
+    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] NumberExpression @value ]
+    [ Description @desc ]
+    ';' ;
+
+  @declares(symbol=varName, description=desc)
+  @mapping(StringVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
+  StringVariableDeclaration ::=
+    ( 'variable' | 'var' )
+    '$' IDENTIFIER @varName
+    [ StringTypeHint ]
+    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] StringExpression @value ]
+    [ Description @desc ]
+    ';' ;
+
+  @declares(symbol=varName, description=desc)
+  @mapping(BooleanVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
+  BooleanVariableDeclaration ::=
+    ( 'variable' | 'var' )
+    '$' IDENTIFIER @varName
+    [ BooleanTypeHint ]
+    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] BooleanExpression @value ]
+    [ Description @desc ]
+    ';' ;
+
+  @declares(symbol=varName, description=desc)
+  @mapping(ObjectVariableDeclarationExpr, params=[varName, onlyIfAbsent, value, desc])
+  ObjectVariableDeclaration ::=
+    ( 'variable' | 'var' )
+    '$' IDENTIFIER @varName
+    [ ObjectTypeHint ]
+    [ 'set' [ OnlyIfAbsent @onlyIfAbsent ] ObjectExpression @value ]
+    [ Description @desc ]
+    ';' ;
+
+  TypeHint ::= [ 'as' ] ( 'number' | 'Number' | 'string' | 'String'
+    | 'boolean' | 'Boolean' | 'object' | 'Object' ) ;
+
+  NumberTypeHint ::= [ 'as' ] ( 'number' | 'Number' | 'float' | 'Float' ) ;
+  StringTypeHint ::= [ 'as' ] ( 'string' | 'String' ) ;
+  BooleanTypeHint ::= [ 'as' ] ( 'boolean' | 'Boolean' ) ;
+  ObjectTypeHint ::= [ 'as' ] ( 'object' | 'Object' ) ;
+
+  @mapping(OnlyIfAbsentExpr)
+  OnlyIfAbsent ::= 'if' 'not' 'exists' ;
+
+  Description ::= 'description' '=' STRING ;
+
+  Annotation ::= '@' IDENTIFIER '(' [ AnnotationParameters ] ')' ;
+  AnnotationParameters ::= AnnotationParameter { ',' AnnotationParameter } ;
+  AnnotationParameter ::= IDENTIFIER '=' Expression ;
+
+  MethodDeclaration ::=
+      NumberMethodDeclaration
+    | StringMethodDeclaration
+    | BooleanMethodDeclaration
+    | ObjectMethodDeclaration ;
+
+  @scopeTree(mode=lexical)
+  @declares(symbol=methodName)
+  @mapping(NumberMethodDeclarationExpr, params=[methodName, parameters, expression])
+  NumberMethodDeclaration ::=
+    NumberReturnType IDENTIFIER @methodName
+    '('
+      [ MethodParameters @parameters ]
+    ')'
+    '{'
+      NumberExpression @expression
+    '}' ;
+
+  @scopeTree(mode=lexical)
+  @declares(symbol=methodName)
+  @mapping(StringMethodDeclarationExpr, params=[methodName, parameters, expression])
+  StringMethodDeclaration ::=
+    StringReturnType IDENTIFIER @methodName
+    '('
+      [ MethodParameters @parameters ]
+    ')'
+    '{'
+      StringExpression @expression
+    '}' ;
+
+  @scopeTree(mode=lexical)
+  @declares(symbol=methodName)
+  @mapping(BooleanMethodDeclarationExpr, params=[methodName, parameters, expression])
+  BooleanMethodDeclaration ::=
+    BooleanReturnType IDENTIFIER @methodName
+    '('
+      [ MethodParameters @parameters ]
+    ')'
+    '{'
+      BooleanExpression @expression
+    '}' ;
+
+  @scopeTree(mode=lexical)
+  @declares(symbol=methodName)
+  @mapping(ObjectMethodDeclarationExpr, params=[methodName, parameters, expression])
+  ObjectMethodDeclaration ::=
+    ObjectReturnType IDENTIFIER @methodName
+    '('
+      [ MethodParameters @parameters ]
+    ')'
+    '{'
+      ObjectExpression @expression
+    '}' ;
+
+  @mapping(MethodParametersExpr, params=[values])
+  MethodParameters ::= MethodParameter @values { ',' MethodParameter @values } ;
+
+  @declares(symbol=paramName)
+  @mapping(MethodParameterExpr, params=[paramName, type])
+  MethodParameter ::= '$' IDENTIFIER @paramName [ 'as' ReturnType @type ] ;
+
+  NumberReturnType ::= 'number' | 'float' ;
+  StringReturnType ::= 'string' ;
+  BooleanReturnType ::= 'boolean' ;
+  ObjectReturnType ::= 'object' ;
+  ReturnType ::= NumberReturnType | StringReturnType | BooleanReturnType | ObjectReturnType ;
+
+  // ── External invocations ───────────────────────────────────────────────────
+  // Syntax: external returning as <type> methodName(args)
+  // Example: external returning as boolean checkAlphabets($inputName)
+
+  @mapping(ExternalBooleanInvocationExpr, params=[className, name, args])
+  ExternalBooleanInvocation ::=
+    'external' [ 'returning' [ 'as' ] ] BooleanReturnType
+    [ ':' ]
+    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
+    '(' [ Arguments @args ] ')' ;
+
+  @mapping(ExternalNumberInvocationExpr, params=[className, name, args])
+  ExternalNumberInvocation ::=
+    'external'
+    ( [ 'returning' [ 'as' ] ] NumberReturnType [ ':' ] | [ ':' ] )
+    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
+    '(' [ Arguments @args ] ')' ;
+
+  @mapping(ExternalStringInvocationExpr, params=[className, name, args])
+  ExternalStringInvocation ::=
+    'external' [ 'returning' [ 'as' ] ] StringReturnType
+    [ ':' ]
+    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
+    '(' [ Arguments @args ] ')' ;
+
+  @mapping(ExternalObjectInvocationExpr, params=[className, name, args])
+  ExternalObjectInvocation ::=
+    'external' [ 'returning' [ 'as' ] ] ObjectReturnType
+    [ ':' ]
+    ( ClassName @className '#' IDENTIFIER @name | IDENTIFIER @name )
+    '(' [ Arguments @args ] ')' ;
+
+  // ── Built-in method invocation (call / call internal / internal) ──────────
+
+  // Matches: "call internal", "call", or "internal" (actual MethodInvocationHeaderParser)
+  MethodInvocationHeader ::= 'call' [ 'internal' ] | 'internal' ;
+
+  @backref(name=name)
+  @mapping(MethodInvocationExpr, params=[name, args])
+  MethodInvocation ::= MethodInvocationHeader IDENTIFIER @name '(' [ Arguments @args ] ')' ;
+
+  // ── Argument expression (allows bare ternary inside function parens) ───
+  @mapping(TernaryExpr, params=[condition, thenExpr, elseExpr])
+  ArgumentTernary ::= BooleanExpression @condition '?' BranchExpression @thenExpr ':' BranchExpression @elseExpr ;
+
+  @mapping(ArgumentExpressionExpr, params=[value])
+  ArgumentExpression ::=
+      ArgumentTernary @value
+    | ComparisonExpression @value
+    | StringComparisonExpression @value
+    | Expression @value ;
+
+  @mapping(ArgumentsExpr, params=[values])
+  Arguments ::= ArgumentExpression @values { ',' ArgumentExpression @values } ;
+
+  // ── Numeric expressions ────────────────────────────────────────────────────
+
+  // v2: 候補順が優先順位（先頭が最高）。塔は脱糖が作る。
+  @mapping(BinaryExpr, params=[left, op, right])
+  NumberExpression ::=
+      NumberExpression @left MulOp @op NumberExpression @right
+    | NumberExpression @left AddOp @op NumberExpression @right
+    | TernaryExpression
+    | NumberMatchExpression
+    | IfExpression
+    | MathFunction
+    | ToNumFunction
+    | LengthDotMethod
+    | LenFunction
+    | LengthFunction
+    | ExternalNumberInvocation
+    | NUMBER
+    | VariableRef
+    | MethodInvocation
+    | '(' NumberExpression ')' ;
+
+  AddOp ::= '+' | '-' ;
+  MulOp ::= '*' | '/' ;
+
+  // ── Math functions ──────────────────────────────────────────────────────
+
+  MathFunction ::=
+      SinFunction
+    | CosFunction
+    | TanFunction
+    | SqrtFunction
+    | MinFunction
+    | MaxFunction
+    | RandomFunction
+    | AbsFunction
+    | RoundFunction
+    | CeilFunction
+    | FloorFunction
+    | PowFunction
+    | LogFunction
+    | ExpFunction ;
+
+  @mapping(SinExpr, params=[arg])
+  SinFunction ::= 'sin' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(CosExpr, params=[arg])
+  CosFunction ::= 'cos' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(TanExpr, params=[arg])
+  TanFunction ::= 'tan' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(SqrtExpr, params=[arg])
+  SqrtFunction ::= 'sqrt' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(MinExpr, params=[first, rest])
+  MinFunction ::= 'min' '(' ArgumentExpression @first { ',' ArgumentExpression @rest } ')' ;
+
+  @mapping(MaxExpr, params=[first, rest])
+  MaxFunction ::= 'max' '(' ArgumentExpression @first { ',' ArgumentExpression @rest } ')' ;
+
+  @mapping(RandomExpr)
+  RandomFunction ::= 'random' '(' ')' ;
+
+  @mapping(AbsExpr, params=[arg])
+  AbsFunction ::= 'abs' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(RoundExpr, params=[arg])
+  RoundFunction ::= 'round' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(CeilExpr, params=[arg])
+  CeilFunction ::= 'ceil' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(FloorExpr, params=[arg])
+  FloorFunction ::= 'floor' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(PowExpr, params=[base, exponent])
+  PowFunction ::= 'pow' '(' ArgumentExpression @base ',' ArgumentExpression @exponent ')' ;
+
+  @mapping(LogExpr, params=[arg])
+  LogFunction ::= 'log' '(' ArgumentExpression @arg ')' ;
+
+  @mapping(ExpExpr, params=[arg])
+  ExpFunction ::= 'exp' '(' ArgumentExpression @arg ')' ;
+
+  // ── Type conversion ────────────────────────────────────────────────────
+
+  @mapping(ToNumExpr, params=[value, defaultValue])
+  ToNumFunction ::= 'toNum' '(' StringExpression @value ',' ArgumentExpression @defaultValue ')' ;
+
+  // ── String functions (function form) ────────────────────────────────────
+
+  @mapping(ToUpperCaseExpr, params=[value])
+  ToUpperCaseFunction ::= 'toUpperCase' '(' StringExpression @value ')' ;
+
+  @mapping(ToLowerCaseExpr, params=[value])
+  ToLowerCaseFunction ::= 'toLowerCase' '(' StringExpression @value ')' ;
+
+  @mapping(TrimExpr, params=[value])
+  TrimFunction ::= 'trim' '(' StringExpression @value ')' ;
+
+  @mapping(LengthExpr, params=[value])
+  LengthFunction ::= 'length' '(' StringExpression @value ')' ;
+
+  @mapping(LengthExpr, params=[value])
+  LenFunction ::= 'len' '(' StringExpression @value ')' ;
+
+  // ── String dot methods (backward compatible addition) ──────────────────
+  // Dot form uses own AST types; evaluator delegates to same logic as function form.
+  // Receiver is VariableRef only (avoids left recursion). Phase 2: full chaining.
+
+  @mapping(ToUpperCaseDotExpr, params=[value])
+  ToUpperCaseDotMethod ::= VariableRef @value '.toUpperCase' '(' ')' ;
+
+  @mapping(ToLowerCaseDotExpr, params=[value])
+  ToLowerCaseDotMethod ::= VariableRef @value '.toLowerCase' '(' ')' ;
+
+  @mapping(TrimDotExpr, params=[value])
+  TrimDotMethod ::= VariableRef @value '.trim' '(' ')' ;
+
+  @mapping(LengthDotExpr, params=[value])
+  LengthDotMethod ::= VariableRef @value '.length' '(' ')' ;
+
+  // ── String predicates (boolean-returning, function form) ─────────────────
+  // These return boolean: startsWith, endsWith, contains
+
+  @mapping(StartsWithExpr, params=[value, patterns])
+  StartsWithFunction ::= 'startsWith' '(' StringExpression @value ',' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+
+  @mapping(EndsWithExpr, params=[value, patterns])
+  EndsWithFunction ::= 'endsWith' '(' StringExpression @value ',' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+
+  @mapping(ContainsExpr, params=[value, patterns])
+  ContainsFunction ::= 'contains' '(' StringExpression @value ',' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+
+  @mapping(InExpr, params=[value, candidates])
+  InMethod ::= StringExpression @value '.in' '(' StringExpression @candidates { ',' StringExpression @candidates } ')' ;
+
+  // ── String predicates (boolean-returning, dot form) ─────────────────────
+
+  @mapping(StartsWithDotExpr, params=[value, patterns])
+  StartsWithDotMethod ::= StringPredicateReceiver @value '.startsWith' '(' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+
+  @mapping(EndsWithDotExpr, params=[value, patterns])
+  EndsWithDotMethod ::= StringPredicateReceiver @value '.endsWith' '(' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+
+  @mapping(ContainsDotExpr, params=[value, patterns])
+  ContainsDotMethod ::= StringPredicateReceiver @value '.contains' '(' StringExpression @patterns
+    { ',' StringExpression @patterns } ')' ;
+
+  StringPredicateReceiver ::= ToLowerCaseFunction | ToUpperCaseFunction | TrimFunction | VariableRef ;
+
+  // ── isPresent (boolean-returning) ───────────────────────────────────────
+
+  @mapping(IsPresentExpr, params=[value])
+  IsPresentFunction ::= 'isPresent' '(' VariableRef @value ')' ;
+
+  // ── Time range functions (boolean-returning) ──────────────────────────
+
+  @mapping(InTimeRangeExpr, params=[startHour, endHour])
+  InTimeRangeFunction ::= 'inTimeRange' '(' NumberExpression @startHour ',' NumberExpression @endHour ')' ;
+
+  @mapping(InDayTimeRangeExpr, params=[startDay, startHour, endDay, endHour])
+  InDayTimeRangeFunction ::= 'inDayTimeRange' '(' DayOfWeek @startDay ',' NumberExpression @startHour ',' DayOfWeek @endDay ',' NumberExpression @endHour ')' ;
+
+  DayOfWeek ::= 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY' ;
+
+  // ── String slice (Python-style) ─────────────────────────────────────────
+  // Syntax: $s[0:3], $s[1:], $s[:3], $s[::2], $s[::-1]
+  SliceBaseReceiver ::=
+      ExternalStringInvocation
+    | '(' VariableRef ')'
+    | ParenthesizedStringExpression
+    | ToUpperCaseFunction | ToLowerCaseFunction | TrimFunction
+    | ToUpperCaseDotMethod | ToLowerCaseDotMethod | TrimDotMethod
+    | STRING
+    | VariableRef
+    | MethodInvocation ;
+
+  // Distinct wrapper rules per slice component so the generated mapper can tell
+  // start/end/step apart. Without these, all three are NumberExpression and the
+  // mapper assigns them by a cross-variant global descendant index (start:0-3,
+  // end:4-7, step:8-11), which is nonsense for partial slices — e.g. `[::-1]`
+  // captured -1 as `start` and `[4:6]` left `end` null. Each wrapper type occurs
+  // at most once per slice, so findDescendantByIndex(...,0) is unambiguous. (#35/#32)
+  SliceStartIndex ::= NumberExpression ;
+  SliceEndIndex   ::= NumberExpression ;
+  SliceStepIndex  ::= NumberExpression ;
+
+  @mapping(SliceExpr, params=[value, start, end, step])
+  SliceBaseExpression ::=
+      SliceBaseReceiver @value '[' SliceStartIndex @start ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
+    | SliceBaseReceiver @value '[' SliceStartIndex @start ':' SliceEndIndex @end ']'
+    | SliceBaseReceiver @value '[' SliceStartIndex @start ':' ':' SliceStepIndex @step ']'
+    | SliceBaseReceiver @value '[' SliceStartIndex @start ':' ']'
+    | SliceBaseReceiver @value '[' ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
+    | SliceBaseReceiver @value '[' ':' SliceEndIndex @end ']'
+    | SliceBaseReceiver @value '[' ':' ':' SliceStepIndex @step ']'
+    | SliceBaseReceiver @value '[' ':' ']' ;
+
+  @mapping(SliceExpr, params=[value, start, end, step])
+  SliceNestedExpression ::=
+      SliceBaseExpression @value '[' SliceStartIndex @start ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
+    | SliceBaseExpression @value '[' SliceStartIndex @start ':' SliceEndIndex @end ']'
+    | SliceBaseExpression @value '[' SliceStartIndex @start ':' ':' SliceStepIndex @step ']'
+    | SliceBaseExpression @value '[' SliceStartIndex @start ':' ']'
+    | SliceBaseExpression @value '[' ':' SliceEndIndex @end ':' SliceStepIndex @step ']'
+    | SliceBaseExpression @value '[' ':' SliceEndIndex @end ']'
+    | SliceBaseExpression @value '[' ':' ':' SliceStepIndex @step ']'
+    | SliceBaseExpression @value '[' ':' ']' ;
+
+  SliceExpression ::= SliceNestedExpression | SliceBaseExpression ;
+
+  // ── String expressions ─────────────────────────────────────────────────────
+
+  @mapping(StringConcatExpr, params=[left, op, right])
+  StringExpression ::=
+      StringExpression @left '+' @op StringExpression @right
+    | StringMatchExpression
+    | IfExpression
+    | StringCastVariable
+    | StringTypedVariable
+    | SliceExpression
+    | ParenthesizedStringExpression
+    | ExternalStringInvocation
+    | ToUpperCaseFunction | ToLowerCaseFunction | TrimFunction
+    | ToUpperCaseDotMethod | ToLowerCaseDotMethod | TrimDotMethod
+    | STRING
+    | VariableRef
+    | MethodInvocation ;
+
+  ParenthesizedStringExpression ::= '(' StringExpression ')' ;
+
+  // Slice precedes the bare parenthesized form under PEG first-match
+  // semantics. Otherwise `($name)[0:6]` commits after `($name)` and leaves
+  // the slice suffix unconsumed.
+  @mapping(StringCastVariableRefExpr, params=[name])
+  StringCastVariable ::= '(' ( 'string' | 'String' ) ')' '$' IDENTIFIER @name ;
+
+  @mapping(StringTypedVariableRefExpr, params=[name])
+  StringTypedVariable ::= '$' IDENTIFIER @name 'as' ( 'string' | 'String' ) ;
+
+  // ── Boolean expressions (3-level precedence: OR < AND < XOR) ──────────
+
+  // OR < AND < XOR。候補順が優先順位で、段ごとの AST クラスは候補先頭の @mapping。
+  BooleanExpression ::=
+      @mapping(BooleanXorExpr, params=[left, op, right])
+      BooleanExpression @left '^' @op BooleanExpression @right
+    | @mapping(BooleanAndExpr, params=[left, op, right])
+      BooleanExpression @left '&' @op BooleanExpression @right
+    | @mapping(BooleanOrExpr, params=[left, op, right])
+      BooleanExpression @left '|' @op BooleanExpression @right
+    | BooleanFactor ;
+
+  // ── Not operator ───────────────────────────────────────────────────────
+
+  @mapping(NotExpr, params=[value])
+  NotExpression ::= 'not' '(' BooleanExpression @value ')' ;
+
+  BooleanComparable ::=
+      NotExpression
+    | IfExpression
+    | BooleanMatchExpression
+    | ExternalBooleanInvocation
+    | InMethod
+    | StartsWithDotMethod
+    | EndsWithDotMethod
+    | ContainsDotMethod
+    | StartsWithFunction
+    | EndsWithFunction
+    | ContainsFunction
+    | IsPresentFunction
+    | InTimeRangeFunction
+    | InDayTimeRangeFunction
+    | 'true'
+    | 'false'
+    | VariableRef
+    | MethodInvocation
+    | '(' BooleanExpression ')' ;
+
+  @mapping(BooleanEqualityExpr, params=[left, op, right])
+  BooleanEqualityExpression ::= BooleanComparable @left EqualityOp @op BooleanComparable @right ;
+
+  @mapping(BooleanFactorExpr, params=[value])
+  BooleanFactor ::=
+      BooleanEqualityExpression @value
+    | ComparisonExpression @value
+    | StringComparisonExpression @value
+    | BooleanComparable @value
+    ;
+
+  // String equality: $var == 'text', 'a' != 'b', etc.
+  // Must appear before number ComparisonExpression (actual BooleanExpressionOfStringParser ordering)
+  @mapping(StringComparisonExpr, params=[left, op, right])
+  StringComparisonExpression ::= StringExpression @left EqualityOp @op StringExpression @right ;
+  EqualityOp ::= '==' | '!=' ;
+
+  @mapping(ComparisonExpr, params=[left, op, right])
+  ComparisonExpression ::= NumberExpression @left CompareOp @op NumberExpression @right ;
+  CompareOp ::= '==' | '!=' | '<=' | '>=' | '<' | '>' ;
+
+  // ── Object expressions ─────────────────────────────────────────────────────
+
+  @mapping(ObjectExpr, params=[value])
+  ObjectExpression ::=
+      NumberExpression @value
+    | StringExpression @value
+    | BooleanExpression @value
+    | ExternalObjectInvocation @value
+    | VariableRef @value
+    | MethodInvocation @value ;
+
+  // ── Control flow ───────────────────────────────────────────────────────────
+
+  @mapping(IfExpr, params=[condition, thenExpr, elseExpr])
+  IfExpression ::=
+    'if' '(' BooleanExpression @condition ')'
+    '{' BranchExpression @thenExpr '}'
+    'else'
+    '{' BranchExpression @elseExpr '}' ;
+
+  @mapping(BranchExpressionExpr, params=[value])
+  BranchExpression ::=
+      ComparisonExpression @value
+    | StringComparisonExpression @value
+    | BooleanEqualityExpression @value
+    | NumberExpression @value
+    | BooleanExpression @value
+    | StringExpression @value
+    | ObjectExpression @value
+    | MethodInvocation @value ;
+
+  // ── Ternary expression (mandatory outer parentheses) ──────────────────
+  @mapping(TernaryExpr, params=[condition, thenExpr, elseExpr])
+  TernaryExpression ::= '(' BooleanExpression @condition '?' BranchExpression @thenExpr ':' BranchExpression @elseExpr ')' ;
+
+  // ── Match expressions ──────────────────────────────────────────────────────
+
+  @mapping(NumberMatchExpr, params=[firstCase, moreCases, defaultCase])
+  NumberMatchExpression ::=
+    'match' '{'
+      NumberCase @firstCase { ',' NumberCase @moreCases }
+      ',' NumberDefaultCase @defaultCase
+    '}' ;
+
+  @mapping(NumberCaseExpr, params=[condition, value])
+  NumberCase ::= BooleanExpression @condition '->' NumberCaseValue @value ;
+  @mapping(NumberDefaultCaseExpr, params=[value])
+  NumberDefaultCase ::= 'default' '->' NumberCaseValue @value ;
+  @mapping(NumberCaseValueExpr, params=[value])
+  NumberCaseValue ::= NumberExpression @value ;
+
+  @mapping(StringMatchExpr, params=[firstCase, moreCases, defaultCase])
+  StringMatchExpression ::=
+    'match' '{'
+      StringCase @firstCase { ',' StringCase @moreCases }
+      ',' StringDefaultCase @defaultCase
+    '}' ;
+
+  @mapping(StringCaseExpr, params=[condition, value])
+  StringCase ::= BooleanExpression @condition '->' StringCaseValue @value ;
+  @mapping(StringDefaultCaseExpr, params=[value])
+  StringDefaultCase ::= 'default' '->' StringCaseValue @value ;
+  @mapping(StringCaseValueExpr, params=[value])
+  StringCaseValue ::= StringExpression @value ;
+
+  @mapping(BooleanMatchExpr, params=[firstCase, moreCases, defaultCase])
+  BooleanMatchExpression ::=
+    'match' '{'
+      BooleanCase @firstCase { ',' BooleanCase @moreCases }
+      ',' BooleanDefaultCase @defaultCase
+    '}' ;
+
+  @mapping(BooleanCaseExpr, params=[condition, value])
+  BooleanCase ::= BooleanExpression @condition '->' BooleanCaseValue @value ;
+  @mapping(BooleanDefaultCaseExpr, params=[value])
+  BooleanDefaultCase ::= 'default' '->' BooleanCaseValue @value ;
+  @mapping(BooleanCaseValueExpr, params=[value])
+  BooleanCaseValue ::= BooleanExpression @value ;
+
+  // ── Variable references ────────────────────────────────────────────────────
+
+  @catalog(context='variable')
+  @backref(name=name)
+  @mapping(VariableRefExpr, params=[name, type])
+  VariableRef ::= '$' IDENTIFIER @name [ [ 'as' ] TypeKeyword @type ] ;
+
+  TypeKeyword ::= 'number' | 'Number' | 'float' | 'Float'
+    | 'string' | 'String' | 'boolean' | 'Boolean' | 'object' | 'Object' ;
+
+  // ── Top-level expression ───────────────────────────────────────────────────
+
+  // NumberExpression first: matches hand-written ExpressionsParser ordering.
+  // NumberExpression consumes "$a+$b" fully; BooleanExpression would only consume "$a".
+  @mapping(ExpressionExpr, params=[value])
+  Expression ::=
+      NumberExpression @value
+    | BooleanExpression @value
+    | StringExpression @value
+    | ObjectExpression @value
+    | MethodInvocation @value
+    | '(' Expression @value ')' ;
+}

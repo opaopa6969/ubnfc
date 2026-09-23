@@ -11,6 +11,7 @@
 
 pub mod analysis;
 pub mod cli;
+pub mod desugar;
 pub mod ir;
 pub mod lower;
 pub mod pipeline;

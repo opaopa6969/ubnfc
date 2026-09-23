@@ -8,7 +8,17 @@ pub(crate) fn unsupported(feature: &str, detail: impl Into<String>) -> EmitError
         detail: detail.into(),
     }
 }
+/// UBNF 表層言語のバージョン上限（D-037）。表層の新機能は front が v1 の正規形へ
+/// 脱糖するので backend の実装は変わらないが、**未知のバージョンは明示拒否する**。
+pub(crate) const MAX_LANGUAGE_VERSION: u64 = 2;
+
 pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
+    if ir.language_version < 1 || ir.language_version > MAX_LANGUAGE_VERSION {
+        return Err(unsupported(
+            "languageVersion",
+            format!("unknown UBNF language version {}", ir.language_version),
+        ));
+    }
     for feature in &ir.required_features {
         if matches!(feature, RequiredFeature::LeftRecursionRewrite) {
             return Err(unsupported(

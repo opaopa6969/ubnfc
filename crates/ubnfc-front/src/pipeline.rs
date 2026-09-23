@@ -166,7 +166,8 @@ fn compile_parsed_with_strict(
     strict: bool,
 ) -> Result<Compiled, PipelineError> {
     let prepared = prepare_parsed(main_path, main, loader)?;
-    let mut warnings = validate::validate(&prepared.grammar);
+    let mut warnings = prepared.issues.clone();
+    warnings.extend(validate::validate(&prepared.grammar));
     if warnings.iter().any(|i| i.severity() == "ERROR") {
         return Err(PipelineError::Validation(warnings));
     }
@@ -222,6 +223,7 @@ fn compile_parsed_with_strict(
         }])
     })?;
     let ir = GrammarIr {
+        language_version: prepared.language_version,
         required_features: required_features(&lowered.semantics, &plan, &lowered.import_edges),
         analysis,
         plan,
@@ -253,7 +255,10 @@ pub fn validate_file(
         let ast = syntax::parse_file(&text).map_err(ParsedLoadError::Syntax)?;
         Ok(ParsedSource::new(text, ast))
     })?;
-    Ok(validate::validate(&prepared.grammar))
+    let mut issues = prepared.issues.clone();
+    issues.extend(validate::validate(&prepared.grammar));
+    sort_issues(&mut issues);
+    Ok(issues)
 }
 
 pub(crate) fn sort_issues(issues: &mut [ValidationIssue]) {
@@ -266,6 +271,10 @@ pub(crate) fn sort_issues(issues: &mut [ValidationIssue]) {
 struct Prepared {
     grammar: ResolvedGrammar,
     sources: Vec<SourceInput>,
+    /// `@ubnf` の最大宣言値（D-037）。IR の `languageVersion` になる。
+    language_version: u64,
+    /// 脱糖・バージョン門の診断（resolve より前に出る）。
+    issues: Vec<ValidationIssue>,
 }
 
 fn parse_source(
@@ -292,12 +301,25 @@ fn prepare_parsed(
         path: main_path.into(),
         error,
     })?;
+    // v2 の表層構文はここで v1 の正規形へ脱糖する。resolve 以降は v1 しか見ない。
+    // sources にも脱糖後の AST を入れる（lower の E-LOWER-SOURCE-STALE 検査と一致させる）。
+    let issues = RefCell::new(Vec::new());
+    let language_version = RefCell::new(crate::desugar::DEFAULT_LANGUAGE_VERSION);
+    let mut main = main;
+    {
+        let mut issues = issues.borrow_mut();
+        let version = crate::desugar::file(&mut main.ast, &mut issues);
+        *language_version.borrow_mut() = version;
+    }
     let inputs = RefCell::new(BTreeMap::from([(path.clone(), main.clone())]));
     let grammar = resolve::resolve_with(&[(path.clone(), main.ast)], &|import| {
-        let parsed = loader(import).map_err(|error| match error {
+        let mut parsed = loader(import).map_err(|error| match error {
             ParsedLoadError::Io(error) => resolve::LoadError::Io(error),
             ParsedLoadError::Syntax(error) => resolve::LoadError::Syntax(error),
         })?;
+        let version = crate::desugar::file(&mut parsed.ast, &mut issues.borrow_mut());
+        let mut current = language_version.borrow_mut();
+        *current = (*current).max(version);
         let ast = parsed.ast.clone();
         inputs.borrow_mut().insert(import.to_path_buf(), parsed);
         Ok(ast)
@@ -332,7 +354,12 @@ fn prepare_parsed(
             Ok(SourceInput::parsed(path, logical, parsed.text, parsed.ast))
         })
         .collect::<Result<_, PipelineError>>()?;
-    Ok(Prepared { grammar, sources })
+    Ok(Prepared {
+        grammar,
+        sources,
+        language_version: language_version.into_inner(),
+        issues: issues.into_inner(),
+    })
 }
 
 pub(crate) fn absolute_path(path: &Path) -> io::Result<PathBuf> {
