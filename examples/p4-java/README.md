@@ -7,7 +7,8 @@ JDK 21、Maven を使用し、依存は JUnit 5.10.2 の test scope のみ。
 **既知の不足を含む検証例であり、P4 の完全互換を達成したものではない。**
 16 fixture 中、Formula 入口で9件を全消費、意図的な不正入力3件を拒否。
 comparison-heavy 系4件は Formula 入口が拒否する。BooleanExpression 入口での成功と
-AST golden は別に保存した。文字列の引用符除去と旧生成物の Unicode span にも差がある。
+AST golden は別に保存した。旧生成物との差は **非 BMP 1 文字あたり 1 多い UTF-16 span だけ**で、
+文字列値は旧実装と同じく単引用符を除いた形になる（2026-09-23 に修正。`evidence/ast-differences.json`）。
 テストの緑はこれらを含む観測結果の固定を意味する。
 詳細は [計測報告](../../docs/reports/2026-09-22-p4-java-bench.md) を参照。
 
@@ -53,8 +54,13 @@ if (result.ok()) {
 `P4Scanners.ALL` のキーは `TinyExpressionP4::STRING` / `CODE_START` / `CODE_END`。
 scanner は `Input` と `ScanState` だけに依存し、可変な外部状態や旧 ParseContext を持たない。
 純粋性と成功・失敗 memo の宣言は、入力 IR の各 token の `memoSafety` に既にある。
-`valueSpan` は引用符も含む token 全体。引用符の除去は旧 Mapper の意味変換であり、
-今回の scanner では入力文字列を改変しない。
+`valueSpan` は **単引用符だけを除いた**範囲（二重引用符は value に残す）。これは旧実装の
+文字列変換（`unlaxer-dsl/specs/generators.md` #132「外側空白の strip と単引用符だけの除去」、
+`unlaxer-common` の `elementary/QuotedParser.java:55-71`）と、共有 registry
+`scanners/java/Registry.java` / `scanners/rust/scanners.rs` の規則に合わせたもの。
+scanner は入力文字列を改変せず、span を 1 単位内側へ寄せるだけ。
+2026-09-23 まではここだけ寄せておらず、同じ入力で Rust backend が `jp`、Java backend が `'jp'` を
+返していた（[クロスチェック報告](../../docs/reports/2026-09-23-crosscheck-fixes.md)）。
 
 ## 計測条件
 
@@ -97,4 +103,4 @@ python3 scripts/compare-ast.py /path/to/result.json src/test/resources/golden/va
 `MAVEN_REPO` と `UNLAXER_VERSION` で jar の探索先を変更できる。既定版は3.0.15。
 `mapper` は旧 Formula root の直接比較、`facade` は memo ON の公開入口。
 旧 snapshot は `src/test/resources/legacy/`、機械可読の差分は `evidence/*differences.json`。
-span の単位や引用符を正規化して差分を消す処理は行わない。
+span の単位を正規化して差分を消す処理は行わない。

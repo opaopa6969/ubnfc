@@ -11,14 +11,14 @@ import org.ubnfc.p4.generated.rt.Input;
 public final class P4Scanners {
     private P4Scanners() {}
     public static final Map<String, TokenScanner> ALL = Map.of(
-        "TinyExpressionP4::STRING", scanner(P4Scanners::string, "STRING"),
-        "TinyExpressionP4::CODE_START", scanner(P4Scanners::codeStart, "CODE_START"),
-        "TinyExpressionP4::CODE_END", scanner(P4Scanners::codeEnd, "CODE_END"));
+        "TinyExpressionP4::STRING", scanner(P4Scanners::string, "STRING", true),
+        "TinyExpressionP4::CODE_START", scanner(P4Scanners::codeStart, "CODE_START", false),
+        "TinyExpressionP4::CODE_END", scanner(P4Scanners::codeEnd, "CODE_END", false));
     public static ParseOptions options(boolean ast) {
         return new ParseOptions(ast, true, false, true, ALL);
     }
     @FunctionalInterface private interface Scan { int end(Input in, int at, boolean invert); }
-    private static TokenScanner scanner(Scan scan, String label) {
+    private static TokenScanner scanner(Scan scan, String label, boolean unquote) {
         return (in, state) -> {
             // 旧 LazyChain/LazyChoice の begin は reset 時に matched を consumed に戻す。
             int start = state.mode() == TokenScanner.Mode.consumed || state.resetMatchedWithConsumed()
@@ -28,8 +28,19 @@ public final class P4Scanners {
                 null, List.of(new TokenScanner.ScanDiagnostic(start, label)), List.of());
             int consumed = state.mode() == TokenScanner.Mode.consumed ? end : state.consumed();
             return new TokenScanner.ScanResult(true, consumed, end,
-                new TokenScanner.ValueSpan(start, end), List.of(), List.of());
+                valueSpan(in, start, end, unquote), List.of(), List.of());
         };
+    }
+    // 旧 Mapper の文字列変換は「外側空白の strip と**単引用符だけ**の除去」
+    // （unlaxer-dsl/specs/generators.md #132、unlaxer-common elementary/QuotedParser.java:55-71）。
+    // 共有 registry の scanners/rust/scanners.rs:143-144 と scanners/java/Registry.java:70-71 も
+    // 単引用符のときだけ value span を 1 単位内側へ寄せる。ここだけ寄せていなかったため、
+    // 同じ入力で Java backend の value が 'jp'、Rust backend が jp になっていた
+    // （docs/reports/2026-09-23-parser-feature-correctness-comparison.md §3.2 結果(2) の 256 件）。
+    private static TokenScanner.ValueSpan valueSpan(Input in, int start, int end, boolean unquote) {
+        return unquote && end - start >= 2 && in.startsWith(start, "'")
+            ? new TokenScanner.ValueSpan(start + 1, end - 1)
+            : new TokenScanner.ValueSpan(start, end);
     }
     // tinyexpression: parser/StringLiteralParser.java:19-25。
     // unlaxer-common: elementary/QuotedParser.java:55-71、EscapeInQuotedParser.java:22-26。

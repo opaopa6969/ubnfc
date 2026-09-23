@@ -77,10 +77,27 @@ pub(super) fn lower(cx: &mut Context<'_>, grammar: &r::Grammar) {
             T::NegativeLookahead { pattern } => TokenSpec::NegativeLookahead {
                 pattern: pattern.clone(),
             },
-            T::CharRange { min, max } => TokenSpec::CharRange {
-                min: min.chars().next().unwrap() as u64,
-                max: max.chars().next().unwrap() as u64,
-            },
+            // 境界の妥当性は validate の E-TOKEN-CHAR-RANGE-* が拒否済み
+            // （`lower()` 冒頭で ERROR があれば lower に入らない）。それでも
+            // 利用者入力で unwrap しない: 空境界は panic ではなく lower の
+            // エラーにして、直接 lower を呼ぶ経路でも診断で終わらせる。
+            T::CharRange { min, max } => {
+                let boundary = |cx: &mut Context<'_>, label: &str, value: &String| {
+                    value.chars().next().map_or_else(
+                        || {
+                            cx.errors.push(error(
+                                "E-LOWER-CHAR-RANGE",
+                                format!("{}: CHAR_RANGE の {label} 境界が空です", token.name),
+                            ));
+                            0
+                        },
+                        |c| c as u64,
+                    )
+                };
+                let min = boundary(&mut *cx, "minimum", min);
+                let max = boundary(&mut *cx, "maximum", max);
+                TokenSpec::CharRange { min, max }
+            }
             T::CaseInsensitive { word } => TokenSpec::CaseInsensitive {
                 word_boundary: crate::boundary::applies_to(word, cx.boundary_mode(token.id)),
                 word: word.clone(),
