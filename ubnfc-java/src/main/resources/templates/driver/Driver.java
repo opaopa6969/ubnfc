@@ -20,6 +20,10 @@ public final class Driver {
     private Driver() {}
     private static final Set<Class<?>> OPERATOR_TYPES = Set.of(__OPERATOR_TYPES__);
     private static final Map<String, String> BINDINGS = __BINDINGS__;
+    /** D-025: `@catalog` の静的表。入力に依存しない grammar metadata。 */
+    private static final List<Object> CATALOGS = __CATALOGS__;
+    /** D-025: 文法が宣言した scope mode（観測されたイベントの mode ではない）。 */
+    private static final List<String> SCOPE_MODES = __SCOPE_MODES__;
     private static final Pattern NUMBER = Pattern.compile("[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?");
 
     private static final Map<String, String> EXTERN_CLASSES = __EXTERN_CLASSES__;
@@ -121,17 +125,24 @@ public final class Driver {
                 "farthestOffset", d.farthestCp(), "farthestExpected", d.farthestExpected()));
         }
         Diagnostic diagnostic = result.diagnostics();
-        if ((!diagnostic.kind().equals("none") || result.recoveries().isEmpty() && !diagnostic.expected().isEmpty())
+        String primaryKind = diagnostic.kind().equals("none") ? "syntax" : diagnostic.kind();
+        // D-026: 全入力解析が成功したなら、成功経路内の投機的失敗は診断ではない（hints の領分）。
+        boolean speculative = result.ok() && (primaryKind.equals("syntax") || primaryKind.equals("trailing_input"));
+        if (!speculative
+            && (!diagnostic.kind().equals("none") || result.recoveries().isEmpty() && !diagnostic.expected().isEmpty())
             && (diagnostic.farthestCp() >= 0 || !diagnostic.expected().isEmpty()))
-            diagnostics.add(object("kind", diagnostic.kind().equals("none") ? "syntax" : diagnostic.kind(),
+            diagnostics.add(object("kind", primaryKind,
                 "offset", diagnostic.offset() < 0 ? diagnostic.farthestCp() : diagnostic.offset(),
                 "expected", diagnostic.expected(), "farthestOffset", diagnostic.farthestCp(), "farthestExpected", diagnostic.farthestExpected(), "origin", "Mapper.diagnose"));
         for (var diagnosticEvent : result.scope().diagnostics())
             diagnostics.add(object("kind", diagnosticEvent.severity().name(), "offset", diagnosticEvent.offset(), "expected", List.of(),
                 "message", diagnosticEvent.msg(), "length", diagnosticEvent.len(), "severity", diagnosticEvent.severity().name(), "origin", "ScopeStore"));
         var response = object("id", request.get("id"), "accepted", prefix.ok(), "allConsumed", result.ok(),
-            "consumed", prefix.consumedCp(), "matched", prefix.matchedCp(), "ast", ast,
-            "diagnostics", diagnostics, "mappingError", mapping, "parsedStatus", prefix.ok() ? "succeeded" : "failed");
+            "consumed", prefix.consumedCp(), "matched", prefix.matchedCp(),
+            // D-024: allConsumed は全入力解析の成否。prefix 側の consumed からは導けない。
+            "fullConsumed", result.consumedCp(), "fullMatched", result.matchedCp(), "ast", ast,
+            "diagnostics", diagnostics, "mappingError", mapping, "parsedStatus", prefix.ok() ? "succeeded" : "failed",
+            "catalogs", CATALOGS);
         if (value != UNOBSERVED) response.put("value", value);
         if (evaluationError) response.put("evaluationError", true);
         if (mappingKind != null) { response.put("mappingErrorKind", mappingKind); response.put("mappingMessage", mappingMessage); }
@@ -197,7 +208,7 @@ public final class Driver {
     }
     private static Map<String, Object> scope(ParseResult<?> result, Map<String, Object> observations) {
         var scope = result.scope();
-        var state = object("depth", scope.depth(), "mode", scope.events().stream().map(ParseResult.ScopeEvent::mode).distinct().toList(),
+        var state = object("depth", scope.depth(), "mode", SCOPE_MODES,
             "events", scope.events().stream().filter(e -> Set.of("enter", "leave", "declare", "use").contains(e.action()))
                 .map(e -> object("order", e.order(), "action", e.action().equals("use") ? "reference" : e.action(), "mode", e.mode(),
                     "name", e.name(), "offset", e.offsetCp(), "length", e.lengthCp())).toList(),

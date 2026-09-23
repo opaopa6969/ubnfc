@@ -4,7 +4,7 @@ Java corpus run-all
 
 集計単位は case × variant（文法なし操作列は各1件）。段階失敗後は比較しない。比較に差分がある場合は Fail / Known、差分がなく欠落観測がある場合は未観測、それ以外は Pass。Known/Fail に併存する未観測は JSON の missing と未観測項目表に残す。
 
-Java generator SHA-256: `83e98b12314eb0437913eeb0bff19bac43edb796bf9c45a5e765cc4f67cdc24e`
+Java generator SHA-256: `3f64321fce7d11f25bc85246ddd4e3218a0dba0ee0e478b1469e4e261d0d98ec`
 
 front SHA-256: `181255f858517d32d5ba582f3b4a9ba72c98e23470d8cb5f244e9cafa97e3e90`
 
@@ -14,13 +14,13 @@ front SHA-256: `181255f858517d32d5ba582f3b4a9ba72c98e23470d8cb5f244e9cafa97e3e90
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | associative | 0 | 0 | 0 | 0 | 24 | 24 | 0 | 0 | 0 |
 | cardinality | 0 | 0 | 0 | 0 | 70 | 0 | 0 | 0 | 0 |
-| catalog | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
+| catalog | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 |
 | evolution | 0 | 0 | 0 | 0 | 140 | 0 | 0 | 0 | 16 |
 | lexical | 0 | 0 | 0 | 0 | 78 | 0 | 0 | 0 | 0 |
 | mixed-values | 0 | 0 | 0 | 0 | 98 | 0 | 0 | 0 | 0 |
 | nested-captures | 0 | 0 | 0 | 0 | 10 | 0 | 0 | 0 | 0 |
 | numeric-capture | 0 | 0 | 0 | 0 | 13 | 0 | 0 | 0 | 0 |
-| oracle | 0 | 0 | 0 | 0 | 330 | 4 | 28 | 0 | 36 |
+| oracle | 0 | 0 | 0 | 0 | 332 | 4 | 28 | 0 | 34 |
 | primitives | 0 | 0 | 0 | 0 | 109 | 0 | 0 | 0 | 0 |
 | right-associative | 0 | 0 | 0 | 0 | 112 | 0 | 0 | 0 | 0 |
 | rule-trivia | 0 | 0 | 0 | 0 | 33 | 0 | 0 | 0 | 0 |
@@ -29,7 +29,7 @@ front SHA-256: `181255f858517d32d5ba582f3b4a9ba72c98e23470d8cb5f244e9cafa97e3e90
 | semantic-cardinality | 0 | 0 | 0 | 0 | 163 | 0 | 0 | 0 | 0 |
 | tiny-code-fence | 0 | 0 | 0 | 0 | 73 | 0 | 0 | 0 | 0 |
 | tiny-string-token | 0 | 0 | 0 | 0 | 39 | 0 | 0 | 0 | 0 |
-| 合計 | 0 | 0 | 0 | 0 | 1306 | 28 | 28 | 0 | 63 |
+| 合計 | 0 | 0 | 0 | 0 | 1310 | 28 | 28 | 0 | 59 |
 
 6 系統別（case × variant 単位）
 
@@ -37,11 +37,11 @@ front SHA-256: `181255f858517d32d5ba582f3b4a9ba72c98e23470d8cb5f244e9cafa97e3e90
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | external-grammar | 0 | 0 | 0 | 0 | 359 | 24 | 0 | 0 | 16 |
 | inline-ast | 0 | 0 | 0 | 0 | 57 | 0 | 0 | 0 | 0 |
-| operations | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 11 |
-| oracle | 0 | 0 | 0 | 0 | 330 | 4 | 28 | 0 | 36 |
+| operations | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 9 |
+| oracle | 0 | 0 | 0 | 0 | 332 | 4 | 28 | 0 | 34 |
 | rule | 0 | 0 | 0 | 0 | 373 | 0 | 0 | 0 | 0 |
 | token | 0 | 0 | 0 | 0 | 187 | 0 | 0 | 0 | 0 |
-| 合計 | 0 | 0 | 0 | 0 | 1306 | 28 | 28 | 0 | 63 |
+| 合計 | 0 | 0 | 0 | 0 | 1310 | 28 | 28 | 0 | 59 |
 
 文法別（case × variant 単位。文法なしは操作列）
 
@@ -54,8 +54,8 @@ front SHA-256: `181255f858517d32d5ba582f3b4a9ba72c98e23470d8cb5f244e9cafa97e3e90
 | cardinality/corpus.json:2[bounded] | 0 | 0 | 0 | 0 | 14 | 0 | 0 | 0 | 0 |
 | cardinality/corpus.json:3[unbounded] | 0 | 0 | 0 | 0 | 14 | 0 | 0 | 0 | 0 |
 | cardinality/corpus.json:4[separated] | 0 | 0 | 0 | 0 | 14 | 0 | 0 | 0 | 0 |
-| catalog/corpus.json:0[deduplicated-sorted-captures] | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
-| catalog/corpus.json:1[rule-order-locality-quantifiers-and-escaped-context] | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
+| catalog/corpus.json:0[deduplicated-sorted-captures] | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
+| catalog/corpus.json:1[rule-order-locality-quantifiers-and-escaped-context] | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
 | evolution/conformance.json:0[0] | 0 | 0 | 0 | 0 | 33 | 0 | 0 | 0 | 4 |
 | evolution/conformance.json:1[1] | 0 | 0 | 0 | 0 | 33 | 0 | 0 | 0 | 4 |
 | evolution/conformance.json:2[2] | 0 | 0 | 0 | 0 | 33 | 0 | 0 | 0 | 4 |
@@ -114,8 +114,8 @@ front SHA-256: `181255f858517d32d5ba582f3b4a9ba72c98e23470d8cb5f244e9cafa97e3e90
 | oracle/conformance-cardinality-separated.json:0[cardinality] | 0 | 0 | 0 | 0 | 5 | 0 | 0 | 0 | 0 |
 | oracle/conformance-cardinality-unbounded.json:0[cardinality] | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 |
 | oracle/conformance-cardinality-zero.json:0[cardinality] | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 |
-| oracle/conformance-catalog-deduplicated-sorted-captures.json:0[catalog] | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
-| oracle/conformance-catalog-rule-order-locality-quantifiers-and-escaped-context.json:0[catalog] | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
+| oracle/conformance-catalog-deduplicated-sorted-captures.json:0[catalog] | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
+| oracle/conformance-catalog-rule-order-locality-quantifiers-and-escaped-context.json:0[catalog] | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
 | oracle/conformance-mixed-values-one.json:0[mixed-values] | 0 | 0 | 0 | 0 | 5 | 0 | 0 | 0 | 0 |
 | oracle/conformance-nested-captures-nested-text-completion.json:0[nested-captures] | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
 | oracle/conformance-nested-captures-same-wrapper-and-parser-class.json:0[nested-captures] | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
@@ -328,7 +328,7 @@ front SHA-256: `181255f858517d32d5ba582f3b4a9ba72c98e23470d8cb5f244e9cafa97e3e90
 | tiny-string-token/corpus.json:4[optional] | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 |
 | tiny-string-token/corpus.json:5[repeat] | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 |
 | tiny-string-token/corpus.json:6[mapped-node] | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 |
-| 合計 | 0 | 0 | 0 | 0 | 1306 | 28 | 28 | 0 | 63 |
+| 合計 | 0 | 0 | 0 | 0 | 1310 | 28 | 28 | 0 | 59 |
 
 拒否理由（M3 作業リスト）
 
@@ -347,7 +347,6 @@ Fail 詳細（各実行の差分先頭3行。実測応答・全差分・期待�
 
 | 観測 | 件数 |
 |---|---:|
-| /catalogs | 4 |
 | /diagnosticError | 1 |
 | /enumError | 2 |
 | /enumValue | 3 |

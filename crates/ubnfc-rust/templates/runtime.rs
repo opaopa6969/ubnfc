@@ -35,6 +35,10 @@ pub(crate) enum Event {
         rule: usize,
         span: Span,
         child: EventId,
+        /// この rule の直下 capture が `caps_flat` のどこにあるか（開始, 個数）。
+        /// 出現収集が書き、AST 構築が読む。event を読むときに同じ cache line に載るので、
+        /// event id で索く別表（x64 で 640 KB の疎な書き込み）を持たない。
+        caps: (u32, u32),
     },
     Token {
         text_span: Option<Span>,
@@ -138,6 +142,8 @@ struct Effect {
     mode: &'static str,
     offset_cp: usize,
     length_cp: usize,
+    /// D-029: enter / leave が属する規則名。declare / use は効果自身が名前を持つ。
+    name: Option<&'static str>,
 }
 /// parse をまたいで再利用する大きな buffer（`ParseOptions::reuse_buffers`）。
 /// 内容は parse ごとに捨て、確保だけを thread ごとに 1 組保持する。大きな入力を扱った後は
@@ -158,6 +164,8 @@ pub(crate) struct Buffers {
     texts_pool: Vec<Vec<String>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
     text_spans: TextSpans,
+    caps_flat: Vec<Cap>,
+    caps_pending: Vec<Cap>,
 }
 const POOL_RETAIN_BYTES: usize = 64 << 20;
 /// 位置ごとの字句 cache の上限（入力長に比例するため）。超える入力では cache を使わない。
@@ -176,10 +184,12 @@ impl Buffers {
             + self.trivia_skip.capacity_bytes()
             + (self.effects.capacity() + self.saved_effects.capacity())
                 * std::mem::size_of::<Effect>()
+            + (self.caps_flat.capacity() + self.caps_pending.capacity())
+                * std::mem::size_of::<Cap>()
     }
 }
 /// 生成 parser の session。`DIAG` は診断を記録するかの単相化 flag で、`ParseOptions::diagnostics`
-/// と 1 対 1 に対応する（D-027）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
+/// と 1 対 1 に対応する（D-034）。`false` は fast mode で、主診断 DAG と公開 farthest の配管が
 /// 機械語から消える。
 pub(crate) struct Session<'a, const DIAG: bool> {
     pub text: &'a str,
@@ -212,6 +222,10 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     values_pool: Vec<Vec<Ast>>,
     texts_pool: Vec<Vec<String>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
+    /// 出現収集で組み立てる「rule ごとの直下 capture」の並び。どの区間がどの rule のものかは
+    /// `Event::Rule::caps`（開始, 個数）が持つ。AST 構築はその区間を写すだけで木を再走査しない。
+    caps_flat: Vec<Cap>,
+    caps_pending: Vec<Cap>,
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
@@ -222,7 +236,7 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     mapping_anchor: Option<usize>,
 }
 impl<'a, const DIAG: bool> Session<'a, DIAG> {
-    // 診断の配管は `const DIAG` で単相化する（D-027）。fast mode（`ParseOptions::diagnostics ==
+    // 診断の配管は `const DIAG` で単相化する（D-034）。fast mode（`ParseOptions::diagnostics ==
     // false`）は `Session::<false>` で走り、以下の wrapper が定数 false の分岐になるので、主診断
     // DAG（`Diagnostics`）と公開 farthest（`DisplayDiagnostics`）への呼出しが機械語から消える。
     // 実行時の `enabled` 検査だけでは、呼出し・引数の準備・`Step.diag` の合流が残っていた。
@@ -325,7 +339,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         };
         // fast mode（`ParseOptions::diagnostics == false`）は主診断 DAG も公開 farthest も
         // 記録しない。arena は確保せず、予算（limit 0）も消費しない。
-        // 単相化（D-027）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
+        // 単相化（D-034）と `ParseOptions::diagnostics` は入口で 1 対 1 に対応する。
         let diag_on = DIAG;
         let diag_limit = if diag_on { options.limits.diagnostics } else { 0 };
         let diag_capacity = if diag_on {
@@ -394,6 +408,8 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
                 texts_pool: vec![],
                 scope_pool: vec![],
                 text_spans: Default::default(),
+                caps_flat: vec![],
+                caps_pending: vec![],
             },
         };
         buffers.diag.enable(diag_on);
@@ -431,6 +447,8 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             values_pool: buffers.values_pool,
             texts_pool: buffers.texts_pool,
             scope_pool: buffers.scope_pool,
+            caps_flat: buffers.caps_flat,
+            caps_pending: buffers.caps_pending,
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
@@ -462,6 +480,8 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             texts_pool: std::mem::take(&mut self.texts_pool),
             scope_pool: std::mem::take(&mut self.scope_pool),
             text_spans: std::mem::take(&mut self.text_spans),
+            caps_flat: std::mem::take(&mut self.caps_flat),
+            caps_pending: std::mem::take(&mut self.caps_pending),
         };
         if buffers.bytes() <= POOL_RETAIN_BYTES {
             POOL.with(|p| *p.borrow_mut() = Some(buffers));
@@ -512,15 +532,26 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     pub fn cp(&self, byte: usize) -> usize {
         self.input.byte_to_cp(byte).expect("parser UTF-8 boundary")
     }
+    /// `remember_text` へ渡す複製は識別用の 1 byte を最初から確保する
+    /// （`to_owned` は丁度 len で確保するので、直後の `reserve(1)` が必ず再確保になる）。
+    fn owned_text(text: &str) -> String {
+        let mut owned = String::with_capacity(text.len() + 1);
+        owned.push_str(text);
+        owned
+    }
+    fn text_for_identity(&self, span: Span) -> String {
+        Self::owned_text(self.trimmed(span))
+    }
     pub fn span(&self, span: Span) -> Span {
         [self.cp(span[0]), self.cp(span[1])]
     }
+    fn trimmed(&self, span: Span) -> &str {
+        self.text[span[0]..span[1]].trim_matches(|c: char| {
+            c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
+        })
+    }
     pub fn text(&self, span: Span) -> String {
-        self.text[span[0]..span[1]]
-            .trim_matches(|c: char| {
-                c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
-            })
-            .to_owned()
+        self.trimmed(span).to_owned()
     }
     pub fn mark(&self) -> Mark {
         Mark {
@@ -559,6 +590,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
                 effect.mode,
                 effect.offset_cp,
                 effect.length_cp,
+                effect.name,
             );
         }
     }
@@ -579,7 +611,24 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         offset_cp: usize,
         length_cp: usize,
     ) {
-        self.effect_shared(std::rc::Rc::new(effect), mode, offset_cp, length_cp);
+        self.effect_shared(std::rc::Rc::new(effect), mode, offset_cp, length_cp, None);
+    }
+    /// D-029: scope を開閉する効果は、その scope を持つ規則名を伴う。
+    pub fn effect_scope_at(
+        &mut self,
+        effect: ScanEffect,
+        mode: &'static str,
+        offset_cp: usize,
+        length_cp: usize,
+        name: &'static str,
+    ) {
+        self.effect_shared(
+            std::rc::Rc::new(effect),
+            mode,
+            offset_cp,
+            length_cp,
+            Some(name),
+        );
     }
     fn effect_shared(
         &mut self,
@@ -587,7 +636,16 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         mode: &'static str,
         offset_cp: usize,
         length_cp: usize,
+        name: Option<&'static str>,
     ) {
+        // D-029: trim 後に空になった記号名は記号ではない。宣言も参照も記録しない
+        // （Java の `Session.applyEffects` と同じ規則）。
+        if matches!(
+            &*effect,
+            ScanEffect::Declare { name, .. } | ScanEffect::Use { name, .. } if name.is_empty()
+        ) {
+            return;
+        }
         if self.effect_work
             >= self
                 .options
@@ -645,6 +703,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             mode,
             offset_cp,
             length_cp,
+            name,
         });
     }
     pub fn lookup(&mut self, key: Key) -> Option<Step> {
@@ -1030,43 +1089,12 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     pub fn give_stack(&mut self, stack: Vec<(EventId, bool)>) {
         self.stacks.push(stack);
     }
-    /// rule の局所 event（Join / Values / Capture）を 1 回だけ走査し、全 capture site の出現を
-    /// 完了順に集める。AST 構築は field ごとにここから site で選ぶ（field ごとの再走査をしない）。
-    pub fn collect_captures(&mut self, root: EventId, out: &mut Vec<Cap>) {
-        let mut stack = self.take_stack();
-        stack.push((root, false));
-        while let Some((id, done)) = stack.pop() {
-            match self.arena[id.0] {
-                Event::Join(a, b) => {
-                    stack.push((b, false));
-                    stack.push((a, false));
-                }
-                Event::Values { child, .. } => stack.push((child, false)),
-                Event::Capture {
-                    site,
-                    span,
-                    child,
-                    token_extent,
-                } => {
-                    if done {
-                        out.push((
-                            site,
-                            if token_extent {
-                                self.selected_extent(child, span)
-                            } else {
-                                span
-                            },
-                            child,
-                        ));
-                    } else {
-                        stack.push((id, true));
-                        stack.push((child, false));
-                    }
-                }
-                _ => {}
-            }
-        }
-        self.give_stack(stack);
+    /// rule の直下 capture 出現（完了順）を出現収集が並べた区間から写す。
+    /// 以前は rule ごとに局所 event を再走査していた（`collect_captures`）。同じ木を 2 度
+    /// 下るのをやめ、出現収集の 1 回の走査で rule ごとに切り出しておく。
+    pub fn rule_captures(&mut self, caps: (u32, u32), out: &mut Vec<Cap>) {
+        let (offset, len) = (caps.0 as usize, caps.1 as usize);
+        out.extend_from_slice(&self.caps_flat[offset..offset + len]);
     }
     pub fn take_captures(&mut self) -> Vec<Cap> {
         let mut v = self.captures_pool.pop().unwrap_or_default();
@@ -1345,7 +1373,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         found
     }
     pub fn mapped_text(&mut self, span: Span) -> String {
-        self.remember_text(self.text(span), span)
+        self.remember_text(self.text_for_identity(span), span)
     }
     fn remember_text(&mut self, mut text: String, span: Span) -> String {
         // Empty strings also need distinct identities until paths are resolved.
@@ -1404,7 +1432,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             Some((None, content)) => (span, content.unwrap_or(span), false),
             None => (span, span, false),
         };
-        let value = if token_text { self.text[content[0]..content[1]].to_owned() } else { self.text(content) };
+        let value = if token_text { Self::owned_text(&self.text[content[0]..content[1]]) } else { self.text_for_identity(content) };
         self.remember_text(value, extent)
     }
     pub fn take_scope(&mut self) -> Vec<(usize, Span)> {

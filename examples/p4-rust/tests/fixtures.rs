@@ -55,7 +55,7 @@ fn options(build_ast: bool, memo: bool) -> ParseOptions {
     options.limits.memo_entries = 1 << 30;
     options
 }
-/// 出現表と value span は opt-in（D-026）。差分テストはこれらも比較対象に残すため、
+/// 出現表と value span は opt-in（D-033）。差分テストはこれらも比較対象に残すため、
 /// 参照経路・最適化経路のどちらにも要求する。
 fn observed(options: ParseOptions) -> ParseOptions {
     ParseOptions {
@@ -131,7 +131,7 @@ fn formula_accepts_and_matches_golden() {
     }
 }
 
-/// D-026: 出現表（`captures` / `lexical` / `tokens`）と `value_spans` は opt-in。
+/// D-033: 出現表（`captures` / `lexical` / `tokens`）と `value_spans` は opt-in。
 /// 既定では空になり、それ以外の観測（AST・node_spans・診断・scope・recovery・統計）は
 /// 要求したときと完全に一致する。要求すれば従来どおりの内容が返る。
 #[test]
@@ -170,7 +170,7 @@ fn occurrences_and_value_spans_are_opt_in_without_changing_anything_else() {
                 let mut stripped = requested.clone();
                 stripped.value_spans.clear();
                 if lexical {
-                    // lexical mode は出現表そのものが目的なので要求とみなす（D-026）。
+                    // lexical mode は出現表そのものが目的なので要求とみなす（D-033）。
                     assert_eq!(default.captures, requested.captures, "{name}: lexical mode");
                     assert_eq!(default.lexical, requested.lexical, "{name}: lexical mode");
                     assert_eq!(default.tokens, requested.tokens, "{name}: lexical mode");

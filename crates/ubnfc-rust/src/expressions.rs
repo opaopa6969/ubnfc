@@ -287,7 +287,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             let not = matches!(expr.node, ExprNode::NegativeLookahead { .. });
             writeln!(
                 s,
-                "let mark=self.mark();self.display.{}(state.consumed.max(state.matched));",
+                "let mark=self.mark();self.display_{}(state.consumed.max(state.matched));",
                 if not { "enter_guard" } else { "enter" }
             )
             .unwrap();
@@ -445,7 +445,7 @@ pub(crate) fn scope_events(
             } else {
                 "name:name.clone()"
             };
-            writeln!(s, "let mut scope_sites=self.take_scope();self.scope_captures({events},&{sites:?},&mut scope_sites);for &(site,span) in &scope_sites {{ let name=self.text(span);let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;").unwrap();
+            writeln!(s, "let mut scope_sites=self.take_scope();self.scope_captures({events},&{sites:?},&mut scope_sites);for &(site,span) in &scope_sites {{ let name=self.text(span);if name.is_empty() {{continue;}}let offset_cp=self.cp(span[0]);let len_cp=self.cp(span[1])-offset_cp;").unwrap();
             for event in selected.iter().filter(|e| e.capture_site_id.is_some()) {
                 let site = g.sites[event.capture_site_id.as_ref().unwrap().as_str()];
                 if effect.mode != ScopeEffectMode::SameRuleText {
@@ -501,11 +501,24 @@ pub(crate) fn scope_events(
                 ScopeEffectEventsAction::Declare => format!("ScanEffect::Declare{{name:{:?}.into(),offset_cp:self.cp({state}.consumed)}}",event.name.as_deref().unwrap_or("")),
                 ScopeEffectEventsAction::Use => format!("ScanEffect::Use{{name:{:?}.into(),offset_cp:self.cp({state}.consumed),len_cp:0}}",event.name.as_deref().unwrap_or("")),
             };
-            writeln!(
-                s,
-                "self.effect_at({action},{mode:?},self.cp({state}.consumed),0);"
-            )
-            .unwrap();
+            // D-029: enter / leave / clear は scope を持つ規則名を伴う。
+            match (event.action, event.name.as_deref()) {
+                (
+                    ScopeEffectEventsAction::Enter
+                    | ScopeEffectEventsAction::Leave
+                    | ScopeEffectEventsAction::Clear,
+                    Some(name),
+                ) => writeln!(
+                    s,
+                    "self.effect_scope_at({action},{mode:?},self.cp({state}.consumed),0,{name:?});"
+                )
+                .unwrap(),
+                _ => writeln!(
+                    s,
+                    "self.effect_at({action},{mode:?},self.cp({state}.consumed),0);"
+                )
+                .unwrap(),
+            }
         }
     }
     s

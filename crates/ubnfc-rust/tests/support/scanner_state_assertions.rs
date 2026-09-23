@@ -44,7 +44,7 @@ mod scanner_state_regression {
                         mode,
                         calls: 0,
                     };
-                    // 診断は const DIAG で単相化されている（D-027）。fast 側で確かめる。
+                    // 診断は const DIAG で単相化されている（D-034）。fast 側で確かめる。
                     let mut session =
                         Session::<false>::new("abc", Default::default(), &mut scanner);
                     let out = if mode {

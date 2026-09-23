@@ -49,19 +49,21 @@ pub struct ParseOptions {
     /// consumed and never fails the parse.
     pub diagnostics: bool,
     /// Retain the occurrence tables (`ParseResult::captures`, `lexical`, `tokens`;
-    /// design v1 §3.6 calls them optional outputs) (D-026).
+    /// design v1 §3.6 calls them optional outputs) (D-033).
     ///
-    /// `false` (the default) skips the extra event-arena walk that builds them, so a
-    /// consumer that only wants the AST does not pay for tables it never reads. The
-    /// AST itself is built from the arena and never from these tables, so nothing
-    /// else in the result changes. `lexical: true` implies this flag, because the
-    /// rule / token occurrence tables are the entire point of lexical mode.
+    /// `false` (the default) does not build the tables, so a consumer that only wants
+    /// the AST does not pay for rows it never reads. Building an AST still walks the
+    /// event arena once (it needs each rule's immediate captures), but that walk is
+    /// independent of these tables and nothing else in the result changes. With
+    /// neither an AST nor a request the walk is skipped entirely. `lexical: true`
+    /// implies this flag, because the rule / token occurrence tables are the entire
+    /// point of lexical mode.
     ///
     /// Set it to `true` for occurrence-consuming frontends (LSP-style projection,
     /// the self-host bootstrap, the harness driver).
     pub occurrences: bool,
     /// Retain `ParseResult::value_spans` (the source span of every mapped AST value,
-    /// addressed by canonical AST JSON pointer) (D-026).
+    /// addressed by canonical AST JSON pointer) (D-033).
     ///
     /// `false` (the default) skips the third walk over the built AST. The AST,
     /// `node_spans` and every diagnostic are unaffected; only `value_spans` is empty.

@@ -9,7 +9,10 @@ use std::process::Command;
 use std::time::Duration;
 use ubnfc_fuzz::campaign::{self, Config};
 
-/// `docs/reports/2026-09-23-differential-fuzzing.md` で triage 済みの所見。
+/// `docs/reports/2026-09-23-differential-fuzzing.md` で triage 済みの所見のうち、まだ残っているもの。
+/// 契約・観測側（B-1 / C-1 / A-5 / A-8 / A-9 と A-6 の一部）は
+/// `docs/reports/2026-09-23-observation-contract.md` の D-024 〜 D-029 で閉じたので一覧から外した。
+/// A-1 / A-2 / A-3 / A-4 はこの固定 seed では出ないので登録しない（出たら赤になる）。
 /// 新しい signature が出たらこのテストが落ち、report に追記するまで通らない。
 /// 受理そのものが食い違う差分クラス。A-1（`@recovery(AUTO)` の適用）を直した後は
 /// 1 件も出てはならないので、既知 signature には決して入れない。
@@ -25,22 +28,11 @@ const ACCEPTANCE: &[&str] = &[
 ];
 
 const KNOWN: &[&str] = &[
-    // B. driver の wire 形式（`docs/reports/2026-09-23-differential-fuzzing.md` §4.B）
-    "diff:/catalogs",
-    "diff:/recoveries",
-    "diff:/scope/declarations",
-    "diff:/scope/depth",
-    "diff:/scope/diagnostics",
-    "diff:/scope/references",
-    // A-3: 成功した解析に Java だけが投機的 syntax 診断を残す
-    "diff:/diagnostics/*",
-    // A-6: Java の farthestExpected に合成 parser の表示名が混じる
-    "diff:/diagnostics/*/farthestExpected/*",
-    // A-4: 全入力解析が失敗したのに Rust が capture を返す
+    // A-7: 全入力解析が失敗したのに Rust が prefix 側の capture を返す
     "diff:/captures/*",
-    // C: allConsumed は consumed からは導けない（両 backend 共通、契約の不足）
-    "java:allconsumed-consistency",
-    "rust:allconsumed-consistency",
+    // A-6 の残り: 最遠位置に載る候補の差（`@leftAssoc` の静的失敗ヒント計画、Extern token の表示名）。
+    // 蓄積規則そのものは共有契約のまま（D-027）。
+    "diff:/diagnostics/*/farthestExpected/*",
 ];
 
 struct Scratch(PathBuf);

@@ -65,7 +65,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             // driver は成功時も hints（投機的失敗）を出すので、診断を明示的に要求する。
             diagnostics: true,
             // prefix parse の出現は `lexical` のときだけ観測に出る。`lexical: true` が
-            // 出現表の要求を含むので（D-026）、ここで別に要求する必要はない。value span は使わない。
+            // 出現表の要求を含むので（D-033）、ここで別に要求する必要はない。value span は使わない。
             ..Default::default()
         },
     )?;
@@ -81,7 +81,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             max_depth,
             diagnostics: true,
             // AST が出たときは必ず texts / nodes / valueSpans を出すので value span を要求する。
-            // 出現表は `lexical` のときだけ観測に出る（D-026。`lexical: true` が要求を含む）。
+            // 出現表は `lexical` のときだけ観測に出る（D-033。`lexical: true` が要求を含む）。
             value_spans: true,
             ..Default::default()
         },
@@ -102,7 +102,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             DiagnosticKind::Recovery => "recovery",
             DiagnosticKind::TrailingInput => "trailing_input",
             DiagnosticKind::Mapping => {
-                mapping = d.message.as_ref().map(|message| format!("java.lang.IllegalArgumentException: {message}")).to_json();
+                // D-028: メッセージは生成側が組み立てたものをそのまま返す（driver は他言語の例外名を足さない）。
+                mapping = d.message.as_deref().to_json();
                 continue;
             }
         };
@@ -128,12 +129,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         diagnostics.push(row);
     }
     for d in &result.scope_diagnostics {
-        let severity = match d.severity {
-            Severity::Error => "ERROR",
-            Severity::Warning => "WARNING",
-            Severity::Info => "INFO",
-            Severity::Hint => "HINT",
-        };
+        let severity = severity_name(d.severity);
         diagnostics.push(Json::object([
             ("kind", severity.to_json()),
             ("origin", "ScopeStore".to_json()),
@@ -144,28 +140,44 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             ("severity", severity.to_json()),
         ]));
     }
+    let mapping_failed = mapping != Json::Null;
     let mut response = Json::object([
         ("id", id),
         ("accepted", Json::Bool(prefix.ok)),
         ("allConsumed", Json::Bool(result.ok)),
         ("consumed", prefix.consumed_cp.to_json()),
         ("matched", prefix.matched_cp.to_json()),
+        // D-024: allConsumed は全入力解析の成否。prefix 側の consumed からは導けないので、
+        // 全入力解析のカーソルも別キーで公開する。
+        ("fullConsumed", result.consumed_cp.to_json()),
+        ("fullMatched", result.matched_cp.to_json()),
         ("ast", ast.clone()),
         ("diagnostics", Json::Array(diagnostics)),
         ("mappingError", mapping),
         (
-            "recoveredRegions",
+            // D-025: wire のキーと要素は両 driver で同一。skippedSpan / syncPattern は
+            // span・syncSpan・mode から導ける（Session.java:630-632 と同じ定義）。
+            "recoveries",
             Json::Array(
                 result
                     .recoveries
                     .iter()
                     .map(|r| {
+                        let skipped = match r.sync_span {
+                            Some(sync) if r.mode != "SKIP" => [r.span[0], r.span[1].min(sync[0])],
+                            _ => r.span,
+                        };
                         Json::object([
                             ("ruleId", r.rule_id.to_json()),
                             ("mode", r.mode.to_json()),
                             ("span", r.span.to_json()),
+                            (
+                                "syncPattern",
+                                r.sync_span.map(|s| slice(input, s)).to_json(),
+                            ),
+                            ("skippedSpan", skipped.to_json()),
                             ("syncSpan", r.sync_span.map_or(Json::Null, |s| s.to_json())),
-                            ("captureOccurrenceIds", r.capture_occurrence_ids.to_json()),
+                            ("captureOccurrences", r.capture_occurrence_ids.to_json()),
                         ])
                     })
                     .collect(),
@@ -211,8 +223,13 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     let Json::Object(fields) = &mut response else {
         unreachable!()
     };
+    // D-028: entry が AST 値を作らないことは mapping 失敗ではない。評価器も値を持たないので
+    // `value` はキーごと出さない（Driver.java:115 と同じ規則。観測済み null と区別する）。
+    let unevaluated = ast == Json::Null && result.ok && !mapping_failed;
     if let Some(value) = value {
-        fields.insert("value".into(), value);
+        if !unevaluated {
+            fields.insert("value".into(), value);
+        }
     }
     if evaluation_error {
         fields.insert("evaluationError".into(), Json::Bool(true));
@@ -326,9 +343,50 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     }
     if scope {
         fields.insert("scopeDepth".into(), result.scope.depth.to_json());
+        let scope_declarations = Json::Array(
+            result
+                .declarations
+                .iter()
+                .map(|d| {
+                    Json::object([
+                        ("name", d.name.to_json()),
+                        ("sourceOffset", d.offset_cp.to_json()),
+                    ])
+                })
+                .collect(),
+        );
+        let scope_references = Json::Array(
+            result
+                .references
+                .iter()
+                .map(|r| {
+                    Json::object([
+                        ("name", r.name.to_json()),
+                        ("offset", r.offset.to_json()),
+                        ("length", r.len.to_json()),
+                    ])
+                })
+                .collect(),
+        );
+        let scope_diagnostics = Json::Array(
+            result
+                .scope_diagnostics
+                .iter()
+                .map(|d| {
+                    Json::object([
+                        ("message", d.msg.to_json()),
+                        ("offset", d.offset.to_json()),
+                        ("length", d.len.to_json()),
+                        ("severity", severity_name(d.severity).to_json()),
+                    ])
+                })
+                .collect(),
+        );
         fields.insert(
             "scope".into(),
             Json::object([
+                ("depth", result.scope.depth.to_json()),
+                // D-025: mode は文法が宣言した scope mode の集合（入力に依存しない静的な値）。
                 ("mode", result.scope.mode.to_json()),
                 (
                     "events",
@@ -358,41 +416,31 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
                             .collect(),
                     ),
                 ),
+                ("declarations", scope_declarations.clone()),
+                ("references", scope_references.clone()),
+                ("diagnostics", scope_diagnostics),
             ]),
         );
-        fields.insert(
-            "declarations".into(),
-            Json::Array(
-                result
-                    .declarations
-                    .iter()
-                    .map(|d| {
-                        Json::object([
-                            ("name", d.name.to_json()),
-                            ("sourceOffset", d.offset_cp.to_json()),
-                        ])
-                    })
-                    .collect(),
-            ),
-        );
-        fields.insert(
-            "references".into(),
-            Json::Array(
-                result
-                    .references
-                    .iter()
-                    .map(|r| {
-                        Json::object([
-                            ("name", r.name.to_json()),
-                            ("offset", r.offset.to_json()),
-                            ("length", r.len.to_json()),
-                        ])
-                    })
-                    .collect(),
-            ),
-        );
+        fields.insert("declarations".into(), scope_declarations);
+        fields.insert("references".into(), scope_references);
     }
     Ok(response)
+}
+fn severity_name(severity: Severity) -> &'static str {
+    match severity {
+        Severity::Error => "ERROR",
+        Severity::Warning => "WARNING",
+        Severity::Info => "INFO",
+        Severity::Hint => "HINT",
+    }
+}
+/// code point の半開区間を入力から切り出す。
+fn slice(input: &str, span: [usize; 2]) -> String {
+    input
+        .chars()
+        .skip(span[0])
+        .take(span[1] - span[0])
+        .collect()
 }
 fn at_path<'a>(mut value: &'a Json, path: &str) -> Option<&'a Json> {
     for part in path.split('/').skip(1) {

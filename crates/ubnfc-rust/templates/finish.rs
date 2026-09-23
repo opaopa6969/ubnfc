@@ -1,50 +1,101 @@
+/// 出現（capture / rule / token）の収集と、AST 構築が rule ごとに読む直下 capture 表を
+/// 1 回の走査で作る。以前は出現収集の後に AST 構築が rule ごとに `collect_captures` で
+/// 同じ木をもう一度下っていた。
+///
+/// 直下 capture 表の作り方: capture は完了順に `pending` へ積む。走査は深さ優先なので
+/// rule R に入った時点の `pending` の長さ `start` を覚えておけば、R が完了した時点の
+/// `pending[start..]` はちょうど「R の直下 capture（間に別の rule を挟まないもの）を完了順に
+/// 並べたもの」になる（内側の rule は自分の完了時に自分の分を抜き取って `pending` を
+/// `start` まで戻すため、R の分だけが連続して残る）。これを `caps_flat` へ移して
+/// `(開始, 個数)` を rule の event id に記録する。公開する出現（`captures` / `lexical` /
+/// `tokens`）の並びと番号付けは従来どおり。
 fn occurrences(
-    &self,
+    &mut self,
     root: EventId,
 ) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
     // 出現数は event 数で上から見積もる（capture / rule は event の一部）。伸長の複製を避ける。
-    let estimate = self.arena.len() / 4;
+    // P4 実測は capture も rule も event の 1/8 前後（complex 155+177 / 1,308、
+    // complex-x64 9,731+10,824 / 80,246）。1/4 は 2 倍以上の過大確保で、x64 では
+    // `Capture` 72 byte × 20,061 を確保して半分しか使っていなかった。
+    let estimate = self.arena.len() / 6 + 8;
     let mut captures = Vec::with_capacity(estimate);
-    let mut capture_owners = Vec::with_capacity(estimate);
-    let mut rule_orders = Vec::with_capacity(estimate);
-    let mut rule_order = 0;
     let mut lexical = Vec::new();
     let mut tokens = Vec::new();
-    // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは usize::MAX。
-    const NONE: usize = usize::MAX;
-    let mut stack: Vec<(EventId, usize, bool, usize)> = Vec::with_capacity(64);
-    stack.push((root, NONE, false, NONE));
+    let build_ast = self.options.build_ast;
+    let want_lexical = self.options.lexical;
+    // 公開する出現表は opt-in（D-033）。AST の直下 capture 表（`pending` / `caps_flat`）は
+    // `build_ast` のままで、こちらの flag には依らない。走査の骨組み（rule ごとの開始位置）は
+    // どちらかが要るときに積む。
+    let want_occurrences = self.options.occurrences || want_lexical;
+    let want_intervals = build_ast || want_occurrences;
+    // 未完了の rule に属する capture の番号（完了順）。rule の完了時にその rule の
+    // 完了順を直接書き込むので、所属表と後段の付け直しの走査は要らない。
+    let mut pending_ids: Vec<u32> = Vec::with_capacity(if want_occurrences { estimate } else { 0 });
+    // rule ごとの開始位置。`.0` は直下 capture 表（AST 用）、`.1` は公開出現の番号（出現表用）。
+    let mut rule_starts: Vec<(u32, u32)> = Vec::new();
+    let mut rule_occurrences: u32 = 0;
+    let mut rule_order: u32 = 0;
+    // 直下 capture 表（AST を作るときだけ）。event id で索く表は伸長だけする（本文の注記参照）。
+    let mut caps_flat = std::mem::take(&mut self.caps_flat);
+    let mut pending = std::mem::take(&mut self.caps_pending);
+    if want_intervals {
+        rule_starts.reserve(64);
+    }
+    if build_ast {
+        caps_flat.clear();
+        caps_flat.reserve(estimate);
+        pending.clear();
+    }
+    // stack の要素は (event, 親 rule 出現, 出口か, 自身の rule 出現)。無しは u32::MAX。
+    // event id も出現番号も入力 byte 数（u32 上限）で抑えられるので u32 に詰める（1 要素 16 byte）。
+    const NONE: u32 = u32::MAX;
+    let mut stack: Vec<(u32, u32, bool, u32)> = Vec::with_capacity(64);
+    stack.push((root.0 as u32, NONE, false, NONE));
     let mut lexical_order = 0;
     while let Some((id, parent, done, current)) = stack.pop() {
-        let parent_index = (parent != NONE).then_some(parent);
+        let parent_index = (parent != NONE).then_some(parent as usize);
+        let id = EventId(id as usize);
         match self.arena[id.0] {
             Event::Join(a, b) => {
-                stack.push((b, parent, false, NONE));
-                stack.push((a, parent, false, NONE));
+                stack.push((b.0 as u32, parent, false, NONE));
+                stack.push((a.0 as u32, parent, false, NONE));
             }
-            Event::Values { child, .. } => stack.push((child, parent, false, NONE)),
+            Event::Values { child, .. } => stack.push((child.0 as u32, parent, false, NONE)),
             Event::Capture {
-                site, span, child, ..
+                site,
+                span,
+                child,
+                token_extent,
             } => {
                 if done {
-                    capture_owners.push(parent_index);
-                    let order = captures.len();
-                    captures.push(Capture {
-                        rule_completion_order: 0,
-                        occurrence_id: order,
-                        site_id: SITES[site].0,
-                        name: SITES[site].1,
-                        span: self.span(span),
-                        completion_order: order,
-                    });
+                    if build_ast {
+                        let extent = if token_extent {
+                            self.selected_extent(child, span)
+                        } else {
+                            span
+                        };
+                        pending.push((site, extent, child));
+                    }
+                    if want_occurrences {
+                        let order = captures.len();
+                        pending_ids.push(order as u32);
+                        captures.push(Capture {
+                            rule_completion_order: 0,
+                            occurrence_id: order,
+                            site_id: SITES[site].0,
+                            name: SITES[site].1,
+                            span: self.span(span),
+                            completion_order: order,
+                        });
+                    }
                 } else {
-                    stack.push((id, parent, true, NONE));
-                    stack.push((child, parent, false, NONE));
+                    stack.push((id.0 as u32, parent, true, NONE));
+                    stack.push((child.0 as u32, parent, false, NONE));
                 }
             }
             Event::Token {
                 expr, rule, span, ..
-            } if self.options.lexical && expr != usize::MAX => {
+            } if want_lexical && expr != usize::MAX => {
                 tokens.push(LexicalOccurrence {
                     occurrence_id: tokens.len(),
                     parent_occurrence_id: parent_index,
@@ -55,45 +106,74 @@ fn occurrences(
                 });
                 lexical_order += 1;
             }
-            Event::Rule { rule, span, child } => {
+            Event::Rule {
+                rule, span, child, ..
+            } => {
                 if done {
+                    if want_intervals {
+                        let (cap_start, id_start) = rule_starts.pop().unwrap_or((0, 0));
+                        if build_ast {
+                            let start = cap_start as usize;
+                            let offset = caps_flat.len();
+                            caps_flat.extend_from_slice(&pending[start..]);
+                            pending.truncate(start);
+                            if let Event::Rule { caps, .. } = &mut self.arena[id.0] {
+                                *caps = (offset as u32, (caps_flat.len() - offset) as u32);
+                            }
+                        }
+                        if want_occurrences {
+                            let start = id_start as usize;
+                            // この rule の直下 capture に rule 完了順を書く（後段の走査の代わり）。
+                            for &order in &pending_ids[start..] {
+                                captures[order as usize].rule_completion_order =
+                                    rule_order as usize;
+                            }
+                            pending_ids.truncate(start);
+                        }
+                    }
                     if current != NONE {
-                        let index = current;
-                        rule_orders[index] = rule_order;
+                        let index = current as usize;
                         rule_order += 1;
                         // rule 出現は lexical のときだけ保持する（AST だけなら完了順だけ要る）。
-                        if self.options.lexical {
+                        if want_lexical {
                             let node: &mut LexicalOccurrence = &mut lexical[index];
                             node.completion_order = lexical_order;
                         }
                         lexical_order += 1;
                     }
                 } else {
-                    let index = rule_orders.len();
-                    rule_orders.push(0);
-                    if self.options.lexical {
-                        lexical.push(LexicalOccurrence {
-                            occurrence_id: index,
-                            parent_occurrence_id: parent_index,
-                            rule_id: RULES[rule],
-                            expr_id: BODIES[rule],
-                            span: self.span(span),
-                            completion_order: 0,
-                        });
+                    if want_intervals {
+                        rule_starts.push((pending.len() as u32, pending_ids.len() as u32));
                     }
-                    stack.push((id, parent, true, index));
-                    stack.push((child, index, false, NONE));
+                    let index = if want_occurrences {
+                        let index = rule_occurrences;
+                        rule_occurrences += 1;
+                        if want_lexical {
+                            lexical.push(LexicalOccurrence {
+                                occurrence_id: index as usize,
+                                parent_occurrence_id: parent_index,
+                                rule_id: RULES[rule],
+                                expr_id: BODIES[rule],
+                                span: self.span(span),
+                                completion_order: 0,
+                            });
+                        }
+                        index
+                    } else {
+                        parent
+                    };
+                    stack.push((id.0 as u32, parent, true, index));
+                    stack.push((child.0 as u32, index, false, NONE));
                 }
             }
             _ => {}
         }
     }
-    for (capture, owner) in captures.iter_mut().zip(capture_owners) {
-        capture.rule_completion_order = owner.map_or(0, |i| rule_orders[i]);
-    }
     for token in &mut tokens {
         token.occurrence_id += lexical.len();
     }
+    self.caps_flat = caps_flat;
+    self.caps_pending = pending;
     (captures, lexical, tokens)
 }
 fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>) {
@@ -110,6 +190,8 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
             Event::Rule { child, .. } | Event::Values { child, .. } => stack.push((child, None)),
             Event::Capture { child, .. } => {
                 if let Some(start) = done {
+                    // `capture_occurrence_ids` は出現表を返すかに依らない観測なので、
+                    // 番号付けは AST / lexical のときそのまま数える（D-033 の対象外）。
                     if self.options.build_ast || self.options.lexical {
                         for r in &mut recoveries[start..] {
                             r.capture_occurrence_ids.push(capture_order);
@@ -268,10 +350,12 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         (vec![], vec![])
     };
     diagnostics.splice(0..0, recovery_diagnostics);
-    // capture / rule / token の出現は要求されたときだけ保持する（D-026）。
-    // lexical mode は出現表そのものが目的なので要求とみなす。
+    // 走査は AST の直下 capture 表のために `build_ast` でも要る。公開する出現表を作るかは
+    // `occurrences` / `lexical` が決める（D-033）。認識だけで要求も無ければ走査ごと省く。
     let (captures, lexical, tokens) =
-        if step.ok && (self.options.occurrences || self.options.lexical) {
+        if step.ok
+            && (self.options.build_ast || self.options.occurrences || self.options.lexical)
+        {
             self.occurrences(step.events)
         } else {
             (vec![], vec![], vec![])
@@ -280,10 +364,11 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
         match self.build_values(step.events).and_then(|mut nodes| {
             if nodes.len() == 1 {
                 Ok(Some(nodes.remove(0)))
-            } else if nodes.is_empty() && self.has_recovery(step.events) {
+            } else if nodes.is_empty() {
+                // D-028: entry が AST 値を作らないのは mapping 失敗ではない（ast=null / mappingError=null）。
                 Ok(None)
             } else {
-                Err("entry must produce one AST value".into())
+                Err("entry produced more than one AST value".into())
             }
         }) {
             Ok(ast) => ast,
@@ -318,7 +403,7 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     self.statistics.lexical_probes = self.lex.probes;
     self.statistics.trivia_skip_hits = self.trivia_skip.hits.get();
     self.statistics.trivia_skip_misses = self.trivia_skip.misses.get();
-    // value span は要求されたときだけ集める（D-026）。AST 自体は先に完成している。
+    // value span は要求されたときだけ集める（D-033）。AST 自体は先に完成している。
     let want_value_spans = self.options.value_spans && ast.is_some();
     let mut value_spans = Vec::with_capacity(if want_value_spans {
         self.node_spans.len() + self.text_spans.len()
@@ -368,10 +453,12 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
                     .iter()
                     .enumerate()
                     .map(|(order, effect)| {
+                        // D-029: enter / leave / clear の name は scope を持つ規則名。
+                        let owner = || effect.name.map(str::to_owned);
                         let (action, name, offset_cp, length_cp) = match &*effect.value {
-                            ScanEffect::Enter => ("enter", None, effect.offset_cp, 0),
-                            ScanEffect::Leave => ("leave", None, effect.offset_cp, 0),
-                            ScanEffect::Clear => ("clear", None, effect.offset_cp, 0),
+                            ScanEffect::Enter => ("enter", owner(), effect.offset_cp, 0),
+                            ScanEffect::Leave => ("leave", owner(), effect.offset_cp, 0),
+                            ScanEffect::Clear => ("clear", owner(), effect.offset_cp, 0),
                             ScanEffect::Declare { name, offset_cp } => {
                                 ("declare", Some(name.clone()), *offset_cp, effect.length_cp)
                             }

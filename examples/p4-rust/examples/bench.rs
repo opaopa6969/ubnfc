@@ -131,7 +131,7 @@ fn options(build_ast: bool) -> ParseOptions {
                 "reuse" => options.reuse_buffers = on,
                 "memo" => options.memo = on,
                 "lexcache" => options.lexical_cache = on,
-                // D-026: 出現表 / value span の opt-in（driver 経路を測るときに立てる）。
+                // D-033: 出現表 / value span の opt-in（driver 経路を測るときに立てる）。
                 "occ" => options.occurrences = on,
                 "vspan" => options.value_spans = on,
                 "diag" => options.diagnostics = on,

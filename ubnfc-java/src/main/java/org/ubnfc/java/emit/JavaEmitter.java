@@ -301,7 +301,33 @@ public final class JavaEmitter {
             .map(r -> typeName(recipes.get(r.symbolId()).resultTypeId()) + ".class")
             .distinct().collect(Collectors.joining(", "));
         return resource("/templates/driver/Driver.java").replace("generated.", pkg + ".")
-            .replace("__PARSER__", parser).replace("__AST__", ast).replace("__OPERATOR_TYPES__", operatorTypes).replace("__BINDINGS__", bindings()).replace("__EXTERN_CLASSES__", externClasses());
+            .replace("__PARSER__", parser).replace("__AST__", ast).replace("__OPERATOR_TYPES__", operatorTypes).replace("__BINDINGS__", bindings()).replace("__EXTERN_CLASSES__", externClasses())
+            .replace("__CATALOGS__", catalogMetadata()).replace("__SCOPE_MODES__", scopeModes());
+    }
+    /** D-025: `@catalog` の静的表。規則宣言順、context は初出順、capture 名は重複除去・ソート。 */
+    private String catalogMetadata() {
+        var rows = new java.util.ArrayList<String>();
+        for (Rule rule : rules.values()) {
+            var contexts = new java.util.LinkedHashSet<String>();
+            for (var catalog : ir.semantics().catalogs())
+                if (catalog.ruleId().equals(rule.symbolId())) contexts.add(catalog.context());
+            for (String context : contexts) {
+                var sites = ir.semantics().catalogs().stream()
+                    .filter(c -> c.ruleId().equals(rule.symbolId()) && c.context().equals(context))
+                    .map(GrammarIr.Catalog::captureSiteId).toList();
+                var names = ir.semantics().captures().stream().filter(c -> sites.contains(c.siteId()))
+                    .map(GrammarIr.Capture::name).distinct().sorted().map(JavaEmitter::q).collect(Collectors.joining(", "));
+                String name = ir.semantics().symbols().stream().filter(symbol -> symbol.id().equals(rule.symbolId()))
+                    .findFirst().orElseThrow().name();
+                rows.add("object(\"rule\", " + q(name) + ", \"context\", " + q(context) + ", \"captures\", List.of(" + names + "))");
+            }
+        }
+        return "List.of(" + String.join(", ", rows) + ")";
+    }
+    /** D-025: 文法が宣言した scope mode（宣言順・重複除去）。 */
+    private String scopeModes() {
+        return "List.of(" + ir.semantics().scope().effects().stream().map(GrammarIr.ScopeEffect::mode)
+            .distinct().map(JavaEmitter::q).collect(Collectors.joining(", ")) + ")";
     }
     private String externClasses() {
         return "Map.ofEntries(" + tokens.values().stream().map(Token::spec)
@@ -427,7 +453,9 @@ public final class JavaEmitter {
             case "caseInsensitive" -> "s.literal(f," + q(spec.word()) + ",false," + label(label) + ")";
             case "regex" -> regex(spec, label);
             case "extern" -> "s.external(f," + q(spec.logicalId()) + "," + externIndex(spec.logicalId()) + ")";
-            case "any" -> "s.any(f,\"ANY\")"; case "eof" -> "s.eof(f)"; case "empty" -> "s.empty(f)";
+            // D-027: 失敗候補の表示名は旧実装のクラス単純名（`WildCardCharacterParser`）。
+            // UBNF の綴り `ANY` は表示名ではないので、診断 plan が出す label を使う。
+            case "any" -> "s.any(f," + q(label) + ")"; case "eof" -> "s.eof(f)"; case "empty" -> "s.empty(f)";
             default -> throw new IllegalArgumentException(spec.kind());
         };
     }

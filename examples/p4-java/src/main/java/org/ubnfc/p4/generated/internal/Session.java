@@ -393,6 +393,9 @@ public final class Session {
         for (Effect definition : definitions) {
             if (!definition.when().equals(when)) continue;
             if (definition.site() == null) {
+                // D-029: 名前を持たない declare / use は記号を指さないので記録しない。
+                if ((definition.action().equals("declare") || definition.action().equals("use"))
+                    && (definition.name() == null || definition.name().isEmpty())) continue;
                 effect(new TokenScanner.Effect(definition.action(), definition.name(), result == null ? 0 : input.cpIndex(result.end()), 0, definition.mode())); continue;
             }
             if (result == null) continue;

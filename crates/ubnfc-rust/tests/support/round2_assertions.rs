@@ -211,7 +211,7 @@ mod contracts {
         assert_eq!(r.diagnostics.len(), 1);
         assert!(!recovery_sync::parse("bad").ok);
         assert!(!recovery_root::parse("").ok);
-        // 出現表は opt-in（D-026）。既定では空、要求すれば従来どおり。
+        // 出現表は opt-in（D-033）。既定では空、要求すれば従来どおり。
         assert!(recovery_sync::parse("😀;x").captures.is_empty());
         let r = recovery_sync::parse_with_options(
             "😀;x",
