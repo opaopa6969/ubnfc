@@ -250,3 +250,17 @@ pub(crate) const CAPTURE_RULES: &[(&str, &str)] = &[
         "UBNF::DottedIdentifier",
     ),
 ];
+
+/// `CAPTURE_RULES` を site_id で引く。parse のたび 1,000 件超の capture を
+/// 62 件の線形探索で照合していたため、プロセス寿命で 1 回だけ構築する
+/// `HashMap` に置き換える。中身・順序は `CAPTURE_RULES` を単に索引するだけで、
+/// `tests::capture_site_metadata_matches_unmodified_golden` が検査する配列自体は変えない。
+pub(crate) fn rule_for(site_id: &str) -> Option<&'static str> {
+    use std::collections::HashMap;
+    use std::sync::OnceLock;
+    static INDEX: OnceLock<HashMap<&'static str, &'static str>> = OnceLock::new();
+    INDEX
+        .get_or_init(|| CAPTURE_RULES.iter().copied().collect())
+        .get(site_id)
+        .copied()
+}
