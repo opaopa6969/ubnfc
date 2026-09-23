@@ -38,7 +38,8 @@ public final class Recipe {
     /** elements retains transparent helper values separately from the enclosing capture extent. */
     public record Value(int start, int end, List<Recipe> nodes, String text, List<Value> elements) {
         public Value(int start, int end, List<Recipe> nodes, String text) { this(start, end, nodes, text, null); }
-        public Value { nodes = List.copyOf(nodes); elements = elements == null ? null : List.copyOf(elements); }
+        // nodes / elements は Session の中だけで組み立てられ、構築後は変更しない（Match の list と
+        // 同じ約束）。防御的複製は 1 parse あたり数千回の全複写になるので行わない。
         public Value(int start, int end, List<Recipe> nodes) { this(start, end, nodes, null); }
     }
 }

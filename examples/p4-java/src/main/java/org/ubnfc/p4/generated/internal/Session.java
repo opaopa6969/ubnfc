@@ -317,19 +317,25 @@ public final class Session {
                 var names = new String[fields.length]; List<Value>[] lists = Recipe.lists(fields.length);
                 for (int fi = 0; fi < fields.length; fi++) {
                     Field field = fields[fi];
-                    var captures = new ArrayList<Value>();
+                    // 値の付かない field が多数派なので、集める要素が出るまで list を確保しない。
+                    ArrayList<Value> captures = null;
                     boolean nodeLike = "node".equals(field.conversion()) || "mixed".equals(field.conversion());
                     boolean list = field.cardinality().equals("list"), scalar = field.cardinality().equals("scalar");
                     List<Occurrence> local = result.local();
                     for (int k = 0, n = local.size(); k < n; k++) { Occurrence occurrence = local.get(k); if (!contains(field.sites(), occurrence.site())) continue;
                         Value v = occurrence.value();
-                        if (nodeLike && !scalar && v.elements() != null)
-                            captures.addAll(v.elements());
-                        else if (nodeLike && list && !v.nodes().isEmpty())
+                        if (nodeLike && !scalar && v.elements() != null) {
+                            List<Value> elements = v.elements();
+                            if (!elements.isEmpty()) { if (captures == null) captures = new ArrayList<>(); captures.addAll(elements); }
+                        } else if (nodeLike && list && !v.nodes().isEmpty()) {
+                            if (captures == null) captures = new ArrayList<>();
                             for (Recipe node : v.nodes()) captures.add(new Value(node.start(), node.end(), List.of(node)));
-                        else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) captures.add(v);
+                        } else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) {
+                            if (captures == null) captures = new ArrayList<>();
+                            captures.add(v);
+                        }
                     }
-                    names[fi] = field.name(); lists[fi] = List.copyOf(captures);
+                    names[fi] = field.name(); lists[fi] = captures == null ? List.of() : List.copyOf(captures);
                 }
                 int nodeEnd = f.c;
                 if (rightAssociative && nested) {
@@ -485,25 +491,48 @@ public final class Session {
             Match only = items.getFirst();
             return new Match(only.nodes(), only.local(), only.captures(), only.traces(), start, end, only.mappingFailure(), only.recoveries(), items, only.text(), only.values());
         }
-        List<Recipe> nodes = List.of(); List<Occurrence> local = List.of(), captures = List.of(); List<Trace> traces = List.of();
-        List<RecoveryEvent> recoveries = List.of(); List<Value> values = null; boolean failure = false;
+        // 1 回目の走査で各列の合計要素数だけを数え、2 回目で合計長の list を 1 個だけ確保する。
+        // 逐次 concat は k 番目までの合計を毎回複製するので、要素数 T・項目数 n に対して O(T*n)
+        // （512 atom の Operators で 1 parse あたり 8.9 MB）になっていた。合計を先に数えれば O(T)。
+        int nodesN = 0, localN = 0, capturesN = 0, tracesN = 0, recoveriesN = 0, valuesN = 0;
+        boolean anyValues = false, failure = false;
         for (int k = 0, n = items.size(); k < n; k++) {
             Match item = items.get(k);
-            if (!item.nodes().isEmpty()) nodes = concat(nodes, item.nodes());
-            if (!item.local().isEmpty()) local = concat(local, item.local());
-            if (!item.captures().isEmpty()) captures = concat(captures, item.captures());
-            if (!item.traces().isEmpty()) traces = concat(traces, item.traces());
-            if (!item.recoveries().isEmpty()) recoveries = concat(recoveries, item.recoveries());
-            if (item.values() != null) values = values == null ? item.values() : concat(values, item.values());
+            nodesN += item.nodes().size(); localN += item.local().size(); capturesN += item.captures().size();
+            tracesN += item.traces().size(); recoveriesN += item.recoveries().size();
+            List<Value> itemValues = item.values();
+            if (itemValues != null) { anyValues = true; valuesN += itemValues.size(); }
             failure |= item.mappingFailure();
         }
+        List<Recipe> nodes = join(items, NODES, nodesN);
+        List<Occurrence> local = join(items, LOCAL, localN), captures = join(items, CAPTURES, capturesN);
+        List<Trace> traces = join(items, TRACES, tracesN);
+        List<RecoveryEvent> recoveries = join(items, RECOVERIES, recoveriesN);
+        List<Value> values = anyValues ? join(items, VALUES, valuesN) : null;
         return new Match(nodes, local, captures, traces, start, end, failure, recoveries, items, null, values);
     }
-    /** Immutable concatenation; both inputs are already immutable lists. */
-    private static <T> List<T> concat(List<T> head, List<T> tail) {
-        if (head.isEmpty()) return tail;
-        if (tail.isEmpty()) return head;
-        var merged = new ArrayList<T>(head.size() + tail.size()); merged.addAll(head); merged.addAll(tail); return merged;
+    private static final int NODES = 0, LOCAL = 1, CAPTURES = 2, TRACES = 3, RECOVERIES = 4, VALUES = 5;
+    private static List<?> column(Match item, int column) {
+        return switch (column) {
+            case NODES -> item.nodes(); case LOCAL -> item.local(); case CAPTURES -> item.captures();
+            case TRACES -> item.traces(); case RECOVERIES -> item.recoveries(); default -> item.values();
+        };
+    }
+    /**
+     * 1 列ぶんの多項連結。合計 {@code total} は呼出し側が数えてあるので確保は最大 1 回で、
+     * 寄与する項目が 1 つだけなら（従来の 2 項 concat と同じく）その list をそのまま返す。
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> List<T> join(List<Match> items, int column, int total) {
+        if (total == 0) return List.of();
+        ArrayList<T> merged = null;
+        for (int k = 0, n = items.size(); k < n; k++) {
+            List<T> part = (List<T>) column(items.get(k), column);
+            if (part == null || part.isEmpty()) continue;
+            if (merged == null) { if (part.size() == total) return part; merged = new ArrayList<>(total); }
+            merged.addAll(part);
+        }
+        return merged;
     }
     // Transactions run on the caller's frame in place: begin saves (c, m, reset) and applies
     // "m := c when reset"; failure restores c/m; either outcome restores reset (a commit never
