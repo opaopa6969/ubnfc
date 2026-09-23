@@ -190,9 +190,23 @@ P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の
 
 ## 6. アノテーションの統廃合（v2）
 
-- `@interleave(profile=)` は `@whitespace` にほぼ吸収できる（rule-trivia 契約で優先順位が既に決まっている）
-- `@backref` がスコープの有無で意味が変わるのを 2 つの注釈に分ける
-- `@mapping` / `@enum` / `@commonField` の関係を 1 つの型注釈系に整理
+**棚卸しと提案は `07-annotation-inventory.md`**（全表・グループ分け・順位付き統廃合案・影響範囲）。
+要点だけ:
+
+- 名前の付いた表層は **26**（rule/element 注釈 20 + grammar 設定 5 + directive 1）＋ 未知注釈の catch-all。
+  実言語 18 文法で使われていないものが **11**、どの文法にも 1 度も現れないものが **3**
+  （`@longestChoice` / `@predictiveChoice` / `@literalBoundary`）。
+- 採用した案は 6 つ。順に **P1** 未知注釈の警告（`@rooted` のような綴り間違いが今は素通り）、
+  **P2** `@backref` を `@symbolRef` / `@sameText` に割る（今は文法内の遠い `@scopeTree` の有無で意味が変わる）、
+  **P3** `@interleave` を `@whitespace` に畳む（2 profile とも同じ区切り集合に落ちる。実在 7 箇所）、
+  **P5** `@predictiveChoice` を非推奨（front が自力で `strategy=predict` を 16 箇所選んでいる）、
+  **P4** `@precedence(level=N)` を省略可能に（両 backend が値を読んでいない）、
+  **P6** `@enum` / `@commonField` を `@mapping` の下位形へ。
+  `@longestChoice` は最長一致が導出不能な意味論なので**残す**。
+- 統廃合の前に出すべき不具合が 4 件（`@rightAssoc` の span 補正が両 backend で非対称、
+  Java に `languageVersion` 上限検査が無い、`@rightAssoc` + `@precedence` が `operator` を作らない、
+  同一内容の TriviaPolicy が重複）。
+- P1〜P3・P5 は**警告を足すだけ**で IR も backend も動かないので 1 本にまとめられる。
 
 ## 実施順
 
