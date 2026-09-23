@@ -11,16 +11,23 @@ import java.util.Map;
 import java.util.Optional;
 import org.unlaxer.dsl.bootstrap.UBNFAST;
 import org.unlaxer.dsl.bootstrap.UBNFMapper;
+import org.unlaxer.dsl.codegen.GrammarValidator;
 
 public final class UbnfProbe {
     public static void main(String[] arguments) throws Exception {
+        boolean validate = arguments.length > 0 && arguments[0].equals("--validate");
         for (String path : arguments) {
+            if (path.equals("--validate")) continue;
             String source = Files.readString(Path.of(path));
             StringBuilder out = new StringBuilder();
             out.append("{\"input\":").append(quote(path));
             try {
                 UBNFAST.UBNFFile file = UBNFMapper.parse(source);
-                out.append(",\"ok\":true,\"ast\":").append(canonical(file));
+                if (validate) {
+                    out.append(",\"ok\":true,\"codes\":").append(codes(file));
+                } else {
+                    out.append(",\"ok\":true,\"ast\":").append(canonical(file));
+                }
             } catch (Throwable error) {
                 Throwable cause = error;
                 out.append(",\"ok\":false,\"error\":")
@@ -29,6 +36,29 @@ public final class UbnfProbe {
             out.append("}");
             System.out.println(out);
         }
+    }
+
+    /// 既存 GrammarValidator の診断コードだけを並べる（validation.md のコード表と突き合わせるため）。
+    static String codes(UBNFAST.UBNFFile file) {
+        StringBuilder out = new StringBuilder("[");
+        boolean first = true;
+        for (UBNFAST.GrammarDecl grammar : file.grammars()) {
+            List<GrammarValidator.ValidationIssue> issues;
+            try {
+                issues = GrammarValidator.validate(grammar);
+            } catch (Throwable error) {
+                if (!first) out.append(',');
+                first = false;
+                out.append(quote("THREW: " + error.getClass().getName()));
+                continue;
+            }
+            for (GrammarValidator.ValidationIssue issue : issues) {
+                if (!first) out.append(',');
+                first = false;
+                out.append(quote(issue.code()));
+            }
+        }
+        return out.append(']').toString();
     }
 
     static String canonical(Object value) throws Exception {

@@ -39,3 +39,20 @@ bash scripts/run.sh [OUT_DIR]      # 既定 OUT_DIR は ./out
 
 `evidence/report.md`（2026-09-23 実行）。要点は
 `docs/reports/2026-09-23-parser-feature-correctness-comparison.md` の Part 3.2。
+
+## 仕様由来ケース（issue #5）
+
+`corpus/spec/p4/*.json` の 32 ケースは tinyexpression の `spec/SPEC.md` /
+`specs/language.md` の規範文から期待値を導いたもので、実装の観測値を使っていない。
+
+```bash
+bash scripts/run-spec.sh [OUT_DIR]      # 既定 OUT_DIR は ./out-spec
+```
+
+駆動するのは R1（`examples/p4-rust` の `--example spec-probe`）と
+R2（`tinyexpression-rs` の `parse` CLI）だけ。J1 / J2 は 1 入力あたり JVM 起動が要るので
+上の 16 fixture 比較に任せている。
+
+実行済みの結果は `evidence/spec-report.md`。仕様側の留保（自己申告で実装由来、
+文書間の優先順位の矛盾、Formula の production が無い）は
+`docs/reports/2026-09-24-spec-derived-oracle.md` §6。

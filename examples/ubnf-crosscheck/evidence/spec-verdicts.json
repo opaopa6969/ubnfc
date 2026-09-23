@@ -1,0 +1,2654 @@
+[
+  {
+    "id": "annotation/root",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/root-two-rules",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "SHOULD なので違反時に受理するか警告するかエラーにするかが定まらない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/mapping-class-only",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/mapping-params",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/mapping-empty-params",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "annotation/mapping-missing-capture",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-MAPPING-MISSING-CAPTURE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-MAPPING-MISSING-CAPTURE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-MAPPING-MISSING-CAPTURE"
+    }
+  },
+  {
+    "id": "annotation/mapping-extra-capture",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-MAPPING-EXTRA-CAPTURE"
+    },
+    "verdicts": {
+      "A": "別コード",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "別コード"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-MAPPING-UNLISTED-CAPTURE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-MAPPING-UNLISTED-CAPTURE"
+    }
+  },
+  {
+    "id": "annotation/mapping-duplicate-param",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-MAPPING-DUPLICATE-PARAM"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-MAPPING-DUPLICATE-PARAM",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-MAPPING-DUPLICATE-PARAM"
+    }
+  },
+  {
+    "id": "annotation/whitespace-bare",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/whitespace-none",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/whitespace-uppercase",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/whitespace-bad-style",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-WHITESPACE-RULE-STYLE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-WHITESPACE-RULE-STYLE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-WHITESPACE-RULE-STYLE"
+    }
+  },
+  {
+    "id": "annotation/whitespace-rule-duplicate",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-WHITESPACE-RULE-DUPLICATE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-WHITESPACE-RULE-DUPLICATE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-WHITESPACE-RULE-DUPLICATE"
+    }
+  },
+  {
+    "id": "annotation/precedence-level",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/precedence-missing-level-keyword",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "annotation/precedence-negative",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "annotation/precedence-duplicate",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-PRECEDENCE-DUPLICATE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-NO-MAPPING,E-ASSOC-NO-REPEAT,E-PRECEDENCE-DUPLICATE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-ASSOC-NO-MAPPING,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-NO-REPEAT,E-PRECEDENCE-DUPLICATE"
+    }
+  },
+  {
+    "id": "annotation/precedence-without-assoc",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-PRECEDENCE-WITHOUT-ASSOC"
+    },
+    "verdicts": {
+      "A": "別コード",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "別コード"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-PRECEDENCE-NO-ASSOC",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-PRECEDENCE-NO-ASSOC"
+    }
+  },
+  {
+    "id": "annotation/assoc-without-precedence",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-ASSOC-WITHOUT-PRECEDENCE"
+    },
+    "verdicts": {
+      "A": "別コード",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "別コード"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-NO-MAPPING,E-ASSOC-NO-PRECEDENCE,E-ASSOC-NO-REPEAT",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-ASSOC-NO-MAPPING,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-NO-REPEAT,E-ASSOC-NO-PRECEDENCE"
+    }
+  },
+  {
+    "id": "annotation/assoc-both",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-ASSOC-BOTH"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-ASSOC-BOTH",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-ASSOC-BOTH"
+    }
+  },
+  {
+    "id": "annotation/interleave-profile",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/interleave-missing-keyword",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "annotation/interleave-bad-profile",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-ANNOTATION-INTERLEAVE-PROFILE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-ANNOTATION-INTERLEAVE-PROFILE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-ANNOTATION-INTERLEAVE-PROFILE"
+    }
+  },
+  {
+    "id": "annotation/backref-name",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/scopetree-mode",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/scopetree-bad-mode",
+    "section": "annotations",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-ANNOTATION-SCOPETREE-MODE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "W-GENERAL-NO-ROOT,E-ANNOTATION-SCOPETREE-MODE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-ANNOTATION-SCOPETREE-MODE"
+    }
+  },
+  {
+    "id": "annotation/doc-string",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/doc-identifier-rejected",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "annotation/skip",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/simple-catch-all",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "annotation/simple-with-arguments-rejected",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "spec-contradiction/minilang-leftassoc",
+    "section": "annotations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "ubnf-syntax.md の完全版 MiniLang 文法は `@leftAssoc` を `@precedence` 無しで使うが、annotations.md は「`@leftAssoc` を使用するルールは `@precedence` も宣言する（MUST）」、validation.md は E-ASSOC-WITHOUT-PRECEDENCE と書く。仕様内で矛盾している。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "char-range/valid",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "char-range/equal-bounds",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "char-range/empty-min",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "char-range/empty-max",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "char-range/multi-char-min",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "char-range/multi-char-max",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "char-range/supplementary",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "char-range/reversed",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "char-range/escaped-bounds",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "char-range/escaped-bounds-reversed",
+    "section": "char-range",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "char-range/inclusive-bounds",
+    "section": "char-range",
+    "scope": "runtime",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "両端を含むことは生成パーサの実行時挙動であり、UBNF を読む 4 実装では観測できない。"
+    },
+    "verdicts": {
+      "A": "駆動不能",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "駆動不能"
+    },
+    "observed": {
+      "A": "生成パーサの実行時挙動",
+      "B": "生成パーサの実行時挙動",
+      "C": "生成パーサの実行時挙動",
+      "D": "生成パーサの実行時挙動"
+    }
+  },
+  {
+    "id": "comment/line-accepted",
+    "section": "comments",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "comment/line-inside-body",
+    "section": "comments",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "comment/block-rejected",
+    "section": "comments",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "comment/block-in-body-rejected",
+    "section": "comments",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "comment/block-unclosed-rejected",
+    "section": "comments",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "違反"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "file/empty-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "file/only-comments-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "file/two-grammars",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "file/leading-comment-then-grammar",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "file/trailing-garbage-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "違反"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "grammar/empty-block",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "違反",
+      "D": "違反"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否: grammar requires at least one rule",
+      "D": "拒否: java.lang.IllegalArgumentException: UBNF パース失敗: grammar G { }"
+    }
+  },
+  {
+    "id": "grammar/keyword-required",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "grammar/name-required",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "grammar/unclosed",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "order/token-after-rule",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "order/setting-after-token",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "body/empty-sequence-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "body/empty-alternative-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "body/leading-bar-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "body/empty-group-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "body/empty-optional-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "body/empty-repeat-rejected",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "body/choice-and-group",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "element/typeof-prefix",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "error/element",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "error/element-needs-string",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "`ErrorElement ::= 'ERROR' '(' STRING ')'` は満たさないが、同じ形式文法の `RuleRefElement ::= IDENTIFIER` と `GroupElement ::= '(' RuleBody ')'` で `ERROR` + `(msg)` として導出できてしまう。予約語 `ERROR` を規則参照位置で 使えるかを仕様が決めていない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "error/element-needs-argument",
+    "section": "formal-grammar",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "error/hint-is-last-alternative",
+    "section": "formal-grammar",
+    "scope": "runtime",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "ヒントが診断に現れることは生成パーサの実行時挙動で、構文木の比較では観測できない。"
+    },
+    "verdicts": {
+      "A": "駆動不能",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "駆動不能"
+    },
+    "observed": {
+      "A": "生成パーサの実行時挙動",
+      "B": "生成パーサの実行時挙動",
+      "C": "生成パーサの実行時挙動",
+      "D": "生成パーサの実行時挙動"
+    }
+  },
+  {
+    "id": "setting/package",
+    "section": "global-settings",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "setting/colon-required",
+    "section": "global-settings",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "setting/quoted-scalar-rejected",
+    "section": "global-settings",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "setting/block-value",
+    "section": "global-settings",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "setting/whitespace-javastyle",
+    "section": "global-settings",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "setting/whitespace-none",
+    "section": "global-settings",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "setting/whitespace-bad-style",
+    "section": "global-settings",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-WHITESPACE-GLOBAL-STYLE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "E-WHITESPACE-GLOBAL-STYLE,W-GENERAL-NO-ROOT",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "E-WHITESPACE-GLOBAL-STYLE,W-GENERAL-NO-ROOT"
+    }
+  },
+  {
+    "id": "setting/whitespace-duplicate",
+    "section": "global-settings",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-WHITESPACE-GLOBAL-DUPLICATE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "E-WHITESPACE-GLOBAL-DUPLICATE,W-GENERAL-NO-ROOT",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "E-WHITESPACE-GLOBAL-DUPLICATE,W-GENERAL-NO-ROOT"
+    }
+  },
+  {
+    "id": "setting/whitespace-block-value",
+    "section": "global-settings",
+    "scope": "validate",
+    "expectation": {
+      "verdict": "diagnostic",
+      "code": "E-WHITESPACE-GLOBAL-STYLE"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "E-WHITESPACE-GLOBAL-STYLE,W-GENERAL-NO-ROOT",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "E-WHITESPACE-GLOBAL-STYLE,W-GENERAL-NO-ROOT"
+    }
+  },
+  {
+    "id": "setting/unknown-key",
+    "section": "global-settings",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "literal/single-quoted",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"TerminalElement\",\"let\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "literal/double-quoted-rejected",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "escape/newline",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"TerminalElement\",\"\\n\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "escape/tab",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"TerminalElement\",\"\\t\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "escape/carriage-return",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"TerminalElement\",\"\\r\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "escape/backslash",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"TerminalElement\",\"\\\\\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "escape/single-quote",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"TerminalElement\",\"'\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "escape/unknown-sequence",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "表は `\\n` `\\t` `\\r` `\\\\` `\\'` の 5 つだけを挙げ、表に無いエスケープ （例 `\\q`）を拒否するのか、バックスラッシュごと残すのか、`q` にするのかを述べていない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "escape/unterminated-literal",
+    "section": "literals-escapes",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "quantifier/plus",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/bracket-optional",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/question-equals-bracket",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "sameCanonicalAs": "quantifier/bracket-optional"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/brace-repeat",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/star-equals-brace",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "sameCanonicalAs": "quantifier/brace-repeat"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/exact",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/bounded",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/open-ended",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/missing-lower-bound",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "quantifier/three-bounds",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "quantifier/two-quantifiers",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "quantifier/quantifier-and-separator",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "違反",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "quantifier/reversed-bounds",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "`Quantifier ::= … '{' INTEGER ',' [INTEGER] '}'` は n <= m を要求していない。CHAR_RANGE と違って逆順の反復に関する規範文が無い。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "quantifier/huge-bound",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "INTEGER の表現範囲（32bit か否か）を仕様が定めていない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "separator/rule-reference",
+    "section": "quantifiers",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "separator/expansion",
+    "section": "quantifiers",
+    "scope": "runtime",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "`elem (sep elem)*` への展開は生成パーサの構造であり、構文木の比較では観測できない。"
+    },
+    "verdicts": {
+      "A": "駆動不能",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "駆動不能"
+    },
+    "observed": {
+      "A": "生成パーサの実行時挙動",
+      "B": "生成パーサの実行時挙動",
+      "C": "生成パーサの実行時挙動",
+      "D": "生成パーサの実行時挙動"
+    }
+  },
+  {
+    "id": "reserved/rule-named-token",
+    "section": "reserved-words",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "予約語一覧は「特別な意味を持つ単語」と述べるだけで、それらをルール名・トークン名に使えないとは書いていない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "reserved/rule-named-error",
+    "section": "reserved-words",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "`ERROR` は予約語だが、`ERROR('...')` 以外の位置での参照が禁じられているとは書かれていない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "reserved/token-named-any",
+    "section": "reserved-words",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "トークンキーワードと同名のトークン宣言に関する規範文が無い。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "rule/semicolon-required",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "rule/semicolon-present",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "rule/assign-token-required",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "rule/lowercase-name",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "本文は「大文字始まりの識別子」と書くが、形式的な文法定義の `RuleDecl ::= { Annotation } IDENTIFIER '::=' RuleBody ';'` は大小を制約しない。小文字始まりのルール名を拒否すべきか、警告すべきか、許すかが仕様から決まらない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "rule/two-refs-are-two-elements",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"RuleRefElement\",null,\"T\"]",
+        "[\"RuleRefElement\",null,\"Root\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "rule/comment-is-identifier-boundary",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"RuleRefElement\",null,\"T\"]",
+        "[\"RuleRefElement\",null,\"Root\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "rule/captures-kept-separately",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"RuleRefElement\",null,\"T\"],\"x\"",
+        "[\"RuleRefElement\",null,\"Root\"],\"value\""
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "rule/space-inside-identifier",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "rule/dotted-reference",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "rule/dotted-reference-three-segments",
+    "section": "rule-declaration",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "undetermined",
+      "question": "ドットを外側の文法が処理するとしか書かれておらず、namespace が何段まで許されるか、`a.b.Value` の namespace が `a.b` か `a` かが仕様から決まらない。"
+    },
+    "verdicts": {
+      "A": "未定",
+      "B": "未定",
+      "C": "未定",
+      "D": "未定"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "拒否",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/class-reference",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/equals-required",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "token/unknown-keyword-with-arguments",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  },
+  {
+    "id": "token/any-eof-empty",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/until",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"Until\",\"T\",\"\\n\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/ci",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"CaseInsensitive\",\"K\",\"select\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/regex",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"Regex\",\"I\",\"[0-9]+\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/negation-empty-set",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/negation-codepoint-set",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "accept",
+      "canonicalContains": [
+        "[\"Negation\",\"N\",\"x😀\"]"
+      ]
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "受理",
+      "B": "受理",
+      "C": "受理",
+      "D": "受理"
+    }
+  },
+  {
+    "id": "token/declaration-needs-no-semicolon",
+    "section": "token-declarations",
+    "scope": "parse",
+    "expectation": {
+      "verdict": "reject"
+    },
+    "verdicts": {
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
+    },
+    "observed": {
+      "A": "拒否",
+      "B": "拒否",
+      "C": "拒否",
+      "D": "拒否"
+    }
+  }
+]
