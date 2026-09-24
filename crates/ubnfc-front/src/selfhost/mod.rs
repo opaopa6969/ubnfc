@@ -690,6 +690,16 @@ impl<'a> Converter<'a> {
     fn string(&self, i: usize, field: &str) -> Result<String> {
         decode_string(self.raw_scalar(i, field)?, self.span(i)?)
     }
+    /// STRING capture の原文から引用符を落としたもの。v2 の `\uXXXX` 展開（D-063）が
+    /// 使う。手書き parser の `string_with_raw` と同じ文字列になる。
+    fn inner_raw(&self, i: usize, field: &str) -> Result<String> {
+        let raw = self.raw_scalar(i, field)?;
+        let trimmed = raw
+            .strip_prefix(['\'', '"'])
+            .and_then(|rest| rest.strip_suffix(['\'', '"']))
+            .unwrap_or(raw);
+        Ok(trimmed.to_owned())
+    }
     fn optional_string(&self, i: usize, field: &str) -> Result<Option<String>> {
         let raw = match count_and_first(self.capture_values(i, field, true))? {
             (0, _) => None,
@@ -821,6 +831,7 @@ impl<'a> Converter<'a> {
             },
             "NegationExpression" => TokenValue::Negation {
                 chars: self.string(i, "chars")?,
+                chars_raw: self.inner_raw(i, "chars")?,
                 span,
             },
             "LookaheadExpression" => TokenValue::Lookahead {
@@ -834,6 +845,8 @@ impl<'a> Converter<'a> {
             "CharRangeExpression" => TokenValue::CharRange {
                 min: self.string(i, "min")?,
                 max: self.string(i, "max")?,
+                min_raw: self.inner_raw(i, "min")?,
+                max_raw: self.inner_raw(i, "max")?,
                 span,
             },
             "CIExpression" => TokenValue::CaseInsensitive {

@@ -14,6 +14,7 @@ pub mod analysis;
 pub mod boundary;
 pub mod cli;
 pub mod desugar;
+pub mod escape;
 pub mod ir;
 pub mod lower;
 pub mod pipeline;

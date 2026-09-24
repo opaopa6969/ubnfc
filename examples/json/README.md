@@ -21,7 +21,7 @@
 | **語境界（`@literalBoundary` の v2 既定 `word`）** | `'true'` / `'false'` / `'null'` | `truex` を `true` + 余りではなく**リテラル不一致**として落とす。v1 既定の `none` では語境界が無い |
 | `@whitespace: none`（暗黙 trivia を切る） | 冒頭 | RFC 8259 の ws はちょうど 4 文字。`javaStyle` は `//` `/* */` を必ず区切りに入れてしまい、JSON でコメントが通る（`crates/ubnfc-front/src/lower/trivia.rs:85-99`）。さらに `javaStyle` は 0x0B / 0x0C も空白扱いする |
 | `CHAR_RANGE(...)` token | `ZERO` `ONENINE` `E_LOWER` `ESC_U` ほか | **語境界は rule 本体のリテラルにだけ効き、token には効かない**。`'0'` `'e'` `'u'` をリテラルで書くと `0e1` や `é` が語境界で失敗する。英数 1 文字は token にして避けている |
-| `NEGATION('"\\')` token | `SAFE` | 文字列の中に生で置ける 1 文字 |
+| **code point クラス（D-063）** — `CHAR_RANGE` の境界の `\uXXXX` / `\u{X…}` と BMP 外 | `SAFE_SP` `SAFE_MID` `SAFE_BMP` `SAFE_SUPP` | 文字列の中に生で置ける 1 文字（`"` `\` と U+0000..U+001F を除く全 code point）。v1 では書けない |
 | `XDIGIT` / `DIGIT`（v2 の言語中立な組込み語彙、D-041） | `HEX` / `DIGIT` | host クラス名（`org.unlaxer...`）を書かずに済む |
 | 有界反復 `HEX{4}` | `Escape` | `\uXXXX` の 4 桁 |
 | `@mapping(...)` と、**全候補が mapped rule への参照だけの選択**（`Value`） | 各規則 | `JsonAST` が sealed interface + record の和型として自動で出る |
@@ -31,25 +31,30 @@
 
 ## 3 記法で揃えられなかった点
 
-### 1. 文字列の中の制御文字（U+0000..U+001F）— **UBNF 版だけ受理してしまう**
+### 1. 文字列の中の制御文字（U+0000..U+001F）— **D-063 で解消**
 
 RFC 8259 §7 は「引用符・逆ソリダス・制御文字 (U+0000〜U+001F) 以外の Unicode 文字は
 そのまま置ける」と定める。ANTLR は `~["\\\u0000-\u001F]`、tree-sitter は
-`/[^"\\\x00-\x1f]/` でそのまま書けるが、**UBNF にはこの集合を書く手立てが無い**。
+`/[^"\\\x00-\x1f]/` で書く。UBNF はかつてこの集合を書けず（issue #34）、
+`token SAFE = NEGATION('"\\')` で**制御文字が通ることを受け入れていた**——
+JSONTestSuite の `n_string_unescaped_{ctrl_char,newline,tab}` 3 件で他の 2 記法と判定が割れていた。
 
-- `NEGATION('…')` の除外集合はリテラルなので、綴れる制御文字は `\t` `\n` `\r` の 3 つだけ
-  （UBNF のリテラルのエスケープは `\n \t \r \\ \'` の 5 つ。`\uXXXX` は無い）。
-- 正の範囲で書く（`CHAR_RANGE(' ','!')` `CHAR_RANGE('#','[')` `CHAR_RANGE(']', U+FFFF)`）と、
-  `CHAR_RANGE` の境界が **Java char = BMP 限定**（`E-TOKEN-CHAR-RANGE-SUPPLEMENTARY`）なので
-  補助面の生文字が落ちる。JSONTestSuite の `y_string_utf8` など**受理必須の 3 件**を
-  拒否してしまうので採れない。
-- `REGEX('[^"\\\x00-\x1F]')` は front の正則部分集合パーサが `\x` を受け付けず、Rust backend が
-  生成時エラーになる。
+**v2 の code point クラス（D-063）で書けるようになった。**正の範囲を 4 本並べる:
 
-そこで `token SAFE = NEGATION('"\\')` を採り、**制御文字が通ることを受け入れた**。
-JSONTestSuite ではちょうど 3 件（`n_string_unescaped_ctrl_char` / `n_string_unescaped_newline` /
-`n_string_unescaped_tab`）で他の 2 記法と判定が割れる。これは UBNF v2 の表現力の穴であって、
-文法の書き方の問題ではない。
+```ubnf
+token SAFE_SP   = CHAR_RANGE('\u0020','\u0021')        // U+0020..U+0021
+token SAFE_MID  = CHAR_RANGE('\u0023','\u005B')        // U+0023..U+005B
+token SAFE_BMP  = CHAR_RANGE('\u005D','\u{D7FF}')      // U+005D..U+D7FF
+token SAFE_SUPP = CHAR_RANGE('\u{E000}','\u{10FFFF}')  // U+E000..U+10FFFF
+```
+
+- `\uXXXX` / `\u{X…}` は `CHAR_RANGE` の境界と `NEGATION` の除外集合でだけ使える（v2 限定）。
+- `CHAR_RANGE` の境界の BMP 制限は v2 で外れたので、補助面（絵文字など）も範囲に入る。
+- surrogate 区画（U+D800..U+DFFF）を含む範囲は引き続き拒否されるので、上側が 2 本に割れる。
+
+**両 backend とも `n_` 188/188 拒否・`y_` 95/95 受理**になり、この項目の不一致は 0 件。
+負の書き方（`NEGATION` にエスケープを書いて 34 文字を除外する）でも同じ集合を綴れるが、
+正の範囲のほうが短いのでこちらを採った。
 
 ### 2. サロゲート対の妥当性 — 3 記法とも検査しない
 

@@ -228,3 +228,81 @@ fn crosscheck_wellformed_declarations_stay_accepted() {
         );
     }
 }
+
+/// D-063: v2 の code point クラス。`\uXXXX` / `\u{X…}` は v2 でのみエスケープで、
+/// v1 では `E-TOKEN-ESCAPE-V2-ONLY` として拒否する（v1 で黙って別の意味に読まない）。
+/// 補助面の境界は v2 でのみ許す（`E-TOKEN-CHAR-RANGE-SUPPLEMENTARY` は v1 専用になった）。
+#[test]
+fn v2_code_point_classes_are_gated_and_validated() {
+    for (source, code) in [
+        // v1 の門。CHAR_RANGE も NEGATION も同じ理由で止める。
+        (
+            "grammar G { token T=CHAR_RANGE('\\u0041','\\u005A') @root R ::= T; }",
+            "E-TOKEN-ESCAPE-V2-ONLY",
+        ),
+        (
+            "grammar G { token T=NEGATION('\\u0041') @root R ::= T; }",
+            "E-TOKEN-ESCAPE-V2-ONLY",
+        ),
+        // v2 でも綴りの誤りは拒否する。
+        (
+            "grammar G { @ubnf: 2 token T=CHAR_RANGE('\\u00','z') @root R ::= T; }",
+            "E-TOKEN-ESCAPE-UNICODE",
+        ),
+        (
+            "grammar G { @ubnf: 2 token T=CHAR_RANGE('a','\\u{110000}') @root R ::= T; }",
+            "E-TOKEN-ESCAPE-UNICODE",
+        ),
+        (
+            "grammar G { @ubnf: 2 token T=NEGATION('\\u{}') @root R ::= T; }",
+            "E-TOKEN-ESCAPE-UNICODE",
+        ),
+        // 単独 surrogate は code point ではない。
+        (
+            "grammar G { @ubnf: 2 token T=CHAR_RANGE('\\uD800','\\uDFFF') @root R ::= T; }",
+            "E-TOKEN-ESCAPE-SURROGATE",
+        ),
+        // D-050 の 3 条件は v2 でもそのまま。
+        (
+            "grammar G { @ubnf: 2 token T=CHAR_RANGE('\\u{1F607}','\\u{1F600}') @root R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-ORDER",
+        ),
+        (
+            "grammar G { @ubnf: 2 token T=CHAR_RANGE('\\u0041\\u0042','z') @root R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-BOUNDARY",
+        ),
+        // 補助面は v1 では従来どおり拒否。
+        (
+            "grammar G { token T=CHAR_RANGE('\u{1f600}','\u{1f607}') @root R ::= T; }",
+            "E-TOKEN-CHAR-RANGE-SUPPLEMENTARY",
+        ),
+    ] {
+        let issues = check(source);
+        let issue = issues
+            .iter()
+            .find(|i| i.code == code)
+            .unwrap_or_else(|| panic!("{code} が出ません: {source}\n{issues:?}"));
+        assert_eq!(issue.severity(), "ERROR", "{source}");
+        assert_eq!(issue.category(), "TOKEN", "{source}");
+    }
+}
+
+/// v2 で受理される新しい書き方。生の補助面文字も、エスケープも通る。
+#[test]
+fn v2_code_point_classes_accept_escapes_and_supplementary_boundaries() {
+    for source in [
+        "grammar G { @ubnf: 2 token T=CHAR_RANGE('\\u0020','\\u0021') @root R ::= T; }",
+        "grammar G { @ubnf: 2 token T=CHAR_RANGE('\\u{5D}','\\u{D7FF}') @root R ::= T; }",
+        "grammar G { @ubnf: 2 token T=CHAR_RANGE('\\u{E000}','\\u{10FFFF}') @root R ::= T; }",
+        "grammar G { @ubnf: 2 token T=CHAR_RANGE('\u{1f600}','\u{1f607}') @root R ::= T; }",
+        "grammar G { @ubnf: 2 token T=NEGATION('\"\\u0000\\u{1F600}') @root R ::= T; }",
+        // `\u` を書かない v2 文法は v1 と同じ扱い（未知のエスケープも v1 のまま）。
+        "grammar G { @ubnf: 2 token T=NEGATION('a\\qb') @root R ::= T; }",
+    ] {
+        assert!(
+            check(source).iter().all(|i| i.severity() != "ERROR"),
+            "{source}: {:?}",
+            check(source)
+        );
+    }
+}

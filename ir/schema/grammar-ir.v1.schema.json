@@ -2945,12 +2945,12 @@
               "const": "charRange"
             },
             "max": {
-              "maximum": 65535,
+              "maximum": 1114111,
               "minimum": 0,
               "type": "integer"
             },
             "min": {
-              "maximum": 65535,
+              "maximum": 1114111,
               "minimum": 0,
               "type": "integer"
             }

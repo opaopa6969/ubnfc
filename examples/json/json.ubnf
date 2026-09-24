@@ -33,13 +33,16 @@ grammar Json {
   token ESC_U   = CHAR_RANGE('u','u')
 
   // 文字列の「生のまま置ける 1 文字」。RFC 8259 §7 は `"` `\` と **U+0000..U+001F** を
-  // 除くと定めるが、UBNF には「制御文字を除く code point 集合」を書く手立てが無い:
-  //   - NEGATION の除外集合はリテラルなので、綴れる制御文字は \t \n \r の 3 つだけ
-  //   - CHAR_RANGE は Java char 境界（BMP 限定、E-TOKEN-CHAR-RANGE-SUPPLEMENTARY）なので
-  //     正の範囲で書くと補助面（U+10000 以上）の生文字を落とす
-  //     ＝ JSONTestSuite の y_string_utf8 等 3 件を**拒否**してしまう
-  // ここは前者を採り、「制御文字も通る」ことを README と報告に明記する。
-  token SAFE = NEGATION('"\\')
+  // 除く任意の Unicode 文字、と定める。v2 の code point クラス（D-063）で正の範囲として
+  // 素直に書ける:
+  //   - CHAR_RANGE の境界に `\uXXXX` / `\u{X…}` を書ける（v2 のみ）
+  //   - CHAR_RANGE の境界が BMP に限られない（v2 のみ。U+10FFFF まで）
+  // surrogate 区画（U+D800..U+DFFF）は単独では文字ではないので範囲に含めない
+  // （含む範囲は E-TOKEN-CHAR-RANGE-* が拒否する）。そのため上側は 2 つに割れる。
+  token SAFE_SP   = CHAR_RANGE('\u0020','\u0021')        // U+0020..U+0021 ( `"` の手前まで )
+  token SAFE_MID  = CHAR_RANGE('\u0023','\u005B')        // U+0023..U+005B ( `\` の手前まで )
+  token SAFE_BMP  = CHAR_RANGE('\u005D','\u{D7FF}')      // U+005D..U+D7FF
+  token SAFE_SUPP = CHAR_RANGE('\u{E000}','\u{10FFFF}')  // U+E000..U+10FFFF（補助面を含む）
 
   @root
   @mapping(JsonDocument, params=[value])
@@ -62,7 +65,7 @@ grammar Json {
   @mapping(StringNode, params=[text])
   String ::= '"' ( { Char } ) @text '"' ;
 
-  Char ::= Escape | SAFE ;
+  Char ::= Escape | SAFE_SP | SAFE_MID | SAFE_BMP | SAFE_SUPP ;
 
   // RFC 8259 §7 escape。\uXXXX はサロゲートの対を検査しない（3 記法とも同じ）。
   Escape ::= '\\' ( '"' | '\\' | '/' | ESC_B | ESC_F | ESC_N | ESC_R | ESC_T | ESC_U HEX{4} ) ;
