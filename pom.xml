@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ubnfc の Maven 集約 pom。既定では ubnfc-java（生成器）だけを組む。
+  LSP/DAP は opt-in の feature なので、`-Plsp` を付けたときだけ ubnfc-lsp を reactor に入れる
+  （D-059）。プロファイル無しのビルドは lsp4j を一切引かない。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.ubnfc</groupId>
+  <artifactId>ubnfc-aggregator</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>ubnfc-aggregator</name>
+  <description>ubnfc の Java 側モジュール集約（既定は生成器のみ）</description>
+  <modules>
+    <module>ubnfc-java</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>lsp</id>
+      <modules>
+        <module>ubnfc-lsp</module>
+      </modules>
+    </profile>
+  </profiles>
+</project>

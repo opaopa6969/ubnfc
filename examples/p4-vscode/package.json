@@ -1,0 +1,73 @@
+{
+  "name": "ubnfc-tinyexpression-p4",
+  "displayName": "TinyExpression P4 (ubnfc)",
+  "description": "ubnfc が生成した TinyExpression P4 パーサを LSP で使う（段階 2: 診断のみ）",
+  "version": "0.1.0",
+  "publisher": "ubnfc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opaopa6969/ubnfc.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onLanguage:tinyexpression-p4"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "tinyexpression-p4",
+        "aliases": [
+          "TinyExpression P4 (ubnfc)"
+        ],
+        "extensions": [
+          ".tiny"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configuration": {
+      "title": "TinyExpression P4 (ubnfc)",
+      "properties": {
+        "ubnfcP4.java.path": {
+          "type": "string",
+          "default": "java",
+          "description": "サーバ jar を起動する java 実行ファイル"
+        },
+        "ubnfcP4.server.jarPath": {
+          "type": "string",
+          "default": "",
+          "description": "サーバ jar のパス（空なら拡張同梱の server-dist/ubnfc-p4-lsp-server.jar）"
+        },
+        "ubnfcP4.server.jvmArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "サーバ JVM への追加引数"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "3.9.2",
+    "typescript": "5.4.5"
+  }
+}

@@ -1,0 +1,1181 @@
+{
+  "comparison-heavy-x16.tiny": {
+    "diagnostics": [
+      {
+        "code": "NumberFactor",
+        "message": "構文エラー: ' ' | '(' | ')' | '*' | '*/' | '+' | '-' | '.' ほか 17 件 を期待しました",
+        "range": [
+          0,
+          5,
+          0,
+          5
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "comparison-heavy-x4.tiny": {
+    "diagnostics": [
+      {
+        "code": "NumberFactor",
+        "message": "構文エラー: ' ' | '(' | ')' | '*' | '*/' | '+' | '-' | '.' ほか 17 件 を期待しました",
+        "range": [
+          0,
+          5,
+          0,
+          5
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "comparison-heavy-x64.tiny": {
+    "diagnostics": [
+      {
+        "code": "NumberFactor",
+        "message": "構文エラー: ' ' | '(' | ')' | '*' | '*/' | '+' | '-' | '.' ほか 17 件 を期待しました",
+        "range": [
+          0,
+          5,
+          0,
+          5
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "comparison-heavy.tiny": {
+    "diagnostics": [
+      {
+        "code": "NumberFactor",
+        "message": "構文エラー: ' ' | '(' | ')' | '*' | '*/' | '+' | '-' | '.' ほか 17 件 を期待しました",
+        "range": [
+          0,
+          5,
+          0,
+          5
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "complex-half.tiny": {
+    "diagnostics": [
+      {
+        "code": "NumberFactor",
+        "message": "構文エラー: '.' | Chain | DigitParser | OneOrMore を期待しました",
+        "range": [
+          4,
+          27,
+          4,
+          27
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "complex-tail.tiny": {
+    "diagnostics": [
+      {
+        "code": "NumberReturnType",
+        "message": "構文エラー: ' ' | '(' | ')' | '*/' | '/*' | '//' | 'boolean' | 'float' ほか 7 件 を期待しました",
+        "range": [
+          14,
+          1,
+          14,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "complex-x16.tiny": {
+    "diagnostics": [
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus1'",
+        "range": [
+          34,
+          39,
+          34,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus2'",
+        "range": [
+          43,
+          39,
+          43,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus3'",
+        "range": [
+          52,
+          39,
+          52,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus4'",
+        "range": [
+          61,
+          39,
+          61,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus5'",
+        "range": [
+          70,
+          39,
+          70,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus6'",
+        "range": [
+          79,
+          39,
+          79,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus7'",
+        "range": [
+          88,
+          39,
+          88,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus8'",
+        "range": [
+          97,
+          39,
+          97,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus9'",
+        "range": [
+          106,
+          39,
+          106,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus10'",
+        "range": [
+          115,
+          40,
+          115,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus11'",
+        "range": [
+          124,
+          40,
+          124,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus12'",
+        "range": [
+          133,
+          40,
+          133,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus13'",
+        "range": [
+          142,
+          40,
+          142,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus14'",
+        "range": [
+          151,
+          40,
+          151,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus15'",
+        "range": [
+          160,
+          40,
+          160,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus16'",
+        "range": [
+          169,
+          40,
+          169,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "complex-x4.tiny": {
+    "diagnostics": [
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus1'",
+        "range": [
+          10,
+          39,
+          10,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus2'",
+        "range": [
+          19,
+          39,
+          19,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus3'",
+        "range": [
+          28,
+          39,
+          28,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus4'",
+        "range": [
+          37,
+          39,
+          37,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "complex-x64.tiny": {
+    "diagnostics": [
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus1'",
+        "range": [
+          130,
+          39,
+          130,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus2'",
+        "range": [
+          139,
+          39,
+          139,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus3'",
+        "range": [
+          148,
+          39,
+          148,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus4'",
+        "range": [
+          157,
+          39,
+          157,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus5'",
+        "range": [
+          166,
+          39,
+          166,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus6'",
+        "range": [
+          175,
+          39,
+          175,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus7'",
+        "range": [
+          184,
+          39,
+          184,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus8'",
+        "range": [
+          193,
+          39,
+          193,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus9'",
+        "range": [
+          202,
+          39,
+          202,
+          45
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus10'",
+        "range": [
+          211,
+          40,
+          211,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus11'",
+        "range": [
+          220,
+          40,
+          220,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus12'",
+        "range": [
+          229,
+          40,
+          229,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus13'",
+        "range": [
+          238,
+          40,
+          238,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus14'",
+        "range": [
+          247,
+          40,
+          247,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus15'",
+        "range": [
+          256,
+          40,
+          256,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus16'",
+        "range": [
+          265,
+          40,
+          265,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus17'",
+        "range": [
+          274,
+          40,
+          274,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus18'",
+        "range": [
+          283,
+          40,
+          283,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus19'",
+        "range": [
+          292,
+          40,
+          292,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus20'",
+        "range": [
+          301,
+          40,
+          301,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus21'",
+        "range": [
+          310,
+          40,
+          310,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus22'",
+        "range": [
+          319,
+          40,
+          319,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus23'",
+        "range": [
+          328,
+          40,
+          328,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus24'",
+        "range": [
+          337,
+          40,
+          337,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus25'",
+        "range": [
+          346,
+          40,
+          346,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus26'",
+        "range": [
+          355,
+          40,
+          355,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus27'",
+        "range": [
+          364,
+          40,
+          364,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus28'",
+        "range": [
+          373,
+          40,
+          373,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus29'",
+        "range": [
+          382,
+          40,
+          382,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus30'",
+        "range": [
+          391,
+          40,
+          391,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus31'",
+        "range": [
+          400,
+          40,
+          400,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus32'",
+        "range": [
+          409,
+          40,
+          409,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus33'",
+        "range": [
+          418,
+          40,
+          418,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus34'",
+        "range": [
+          427,
+          40,
+          427,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus35'",
+        "range": [
+          436,
+          40,
+          436,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus36'",
+        "range": [
+          445,
+          40,
+          445,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus37'",
+        "range": [
+          454,
+          40,
+          454,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus38'",
+        "range": [
+          463,
+          40,
+          463,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus39'",
+        "range": [
+          472,
+          40,
+          472,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus40'",
+        "range": [
+          481,
+          40,
+          481,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus41'",
+        "range": [
+          490,
+          40,
+          490,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus42'",
+        "range": [
+          499,
+          40,
+          499,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus43'",
+        "range": [
+          508,
+          40,
+          508,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus44'",
+        "range": [
+          517,
+          40,
+          517,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus45'",
+        "range": [
+          526,
+          40,
+          526,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus46'",
+        "range": [
+          535,
+          40,
+          535,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus47'",
+        "range": [
+          544,
+          40,
+          544,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus48'",
+        "range": [
+          553,
+          40,
+          553,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus49'",
+        "range": [
+          562,
+          40,
+          562,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus50'",
+        "range": [
+          571,
+          40,
+          571,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus51'",
+        "range": [
+          580,
+          40,
+          580,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus52'",
+        "range": [
+          589,
+          40,
+          589,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus53'",
+        "range": [
+          598,
+          40,
+          598,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus54'",
+        "range": [
+          607,
+          40,
+          607,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus55'",
+        "range": [
+          616,
+          40,
+          616,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus56'",
+        "range": [
+          625,
+          40,
+          625,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus57'",
+        "range": [
+          634,
+          40,
+          634,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus58'",
+        "range": [
+          643,
+          40,
+          643,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus59'",
+        "range": [
+          652,
+          40,
+          652,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus60'",
+        "range": [
+          661,
+          40,
+          661,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus61'",
+        "range": [
+          670,
+          40,
+          670,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus62'",
+        "range": [
+          679,
+          40,
+          679,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus63'",
+        "range": [
+          688,
+          40,
+          688,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      },
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus64'",
+        "range": [
+          697,
+          40,
+          697,
+          47
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "complex.tiny": {
+    "diagnostics": [
+      {
+        "code": "scope",
+        "message": "未定義のシンボル: 'bonus'",
+        "range": [
+          4,
+          38,
+          4,
+          43
+        ],
+        "severity": 2,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "flat-arithmetic.tiny": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "invalid-syntax.tiny": {
+    "diagnostics": [
+      {
+        "code": "SinFunction",
+        "message": "構文エラー: ' ' | '$' | '(' | ')' | '*/' | ',' | '.' | '.length' ほか 36 件 を期待しました",
+        "range": [
+          1,
+          0,
+          1,
+          0
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "large-match.tiny": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "valid-basic.tiny": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "valid-multiline.tiny": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "valid-unicode.tiny": {
+    "diagnostics": [],
+    "timedOut": false
+  }
+}

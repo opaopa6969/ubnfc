@@ -289,8 +289,14 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   先に書かれた規範ではない）、文書間で優先順位の矛盾もある。判定可能な 32 件のうち
   25 件は R1（ubnfc p4-rust）・R2（tinyexpression-rs）とも仕様と一致、残り 4 件は文書間の
   矛盾で未定、3 件は駆動不能（[`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md) §6）。
-- **インクリメンタル解析・LSP は無い**。生成物は毎回全文を読み直す 1 回きりの解析器で、
-  差分再解析・エディタ向けプロトコル・部分木の再利用は設計にも実装にも無い。
+- **インクリメンタル解析は無い**。生成物は毎回全文を読み直す 1 回きりの解析器で、
+  差分再解析・部分木の再利用は設計にも実装にも無い。
+- **LSP は opt-in の feature**（D-059、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
+  有効にすると `ubnfc-lsp --emit-lsp` が生成パーサを包む LSP サーバを**別パッケージへ追加**する。
+  生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**段階 2 の capability は診断のみ**
+  （構文エラーと未定義参照。completion / hover / definition / references は未実装）。
+  打鍵ごとに全文を再解析する（[`docs/reports/2026-09-24-lsp-vsix-stage1.md`](docs/reports/2026-09-24-lsp-vsix-stage1.md)
+  §6 に実測。P4 の 325 code point で 0.45 ms、20,923 code point で 15.6 ms）。DAP は未実装。
 - `@doc`、`@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
 
@@ -396,6 +402,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `crates/ubnfc-rust` | IR → Rust ソース。`ubnfc-rust` CLI |
 | `ubnfc-java` | IR → Java ソース。Maven モジュール。runtime テンプレートと driver テンプレートを resource に持つ |
 | `crates/ubnfc-harness` | corpus loader、生成 → build → 実行 → 比較の runner、canonical 差分 |
+| `ubnfc-lsp` | IR → 生成パーサを包む LSP サーバのソース。**opt-in**（root `pom.xml` の Maven profile `lsp`）。`--emit-lsp` を明示したときだけ出す（D-059） |
 | `crates/ubnfc-fuzz` | 2 backend の差分ファジング。`findings/` に最小再現 |
 | `crates/ubnfc-selfhost` | 生成 Rust frontend による self-host 経路と固定点テスト。`src/generated/` は生成物を commit |
 | `crates/ubnfc-rt-template` | 両 backend が写す runtime の原本（input / cursor / scope / memo / diag） |
@@ -405,6 +412,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `scanners/` | Extern token の scanner registry（`first-chars.json` と Java / Rust 実装） |
 | `examples/handwritten-target` | 生成物の**目標形**を手書きで固定した Operators / Power（Java・Rust） |
 | `examples/p4-java`, `examples/p4-rust` | tinyexpression P4（124 規則）の生成物を commit した実行例とベンチ |
+| `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + VSIX）。`scripts/build-vsix.sh` で組む |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
 | `docs/` | 設計・決定・報告。下記 |
 
