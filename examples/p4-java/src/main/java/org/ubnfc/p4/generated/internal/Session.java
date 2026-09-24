@@ -219,7 +219,17 @@ public final class Session {
     private long nextCaptureCompletion;
     public final IdentityHashMap<Object, Span> spans = new IdentityHashMap<>();
     private final IdentityHashMap<Recipe, Object> built = new IdentityHashMap<>();
-    public Session(CharSequence source, ParseOptions options, String[] ruleNames) {
+    /**
+     * D-056 の二段構え。{@code tree} が false の認識経路は Match 木・capture 出現・Recipe を作らず、
+     * {@code diag} が false の経路は診断観測を記録しない（主位置 {@code reached} だけ残す）。
+     * {@code twoMode} は生成側が決める文法ごとの可否（@recover を持つ文法や scope 効果が
+     * 反復下の capture site を読む文法は完全経路だけ）。
+     */
+    public final boolean tree, diag;
+    public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false); }
+    public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode) {
+        this.tree = !twoMode || options.buildAst() || options.lexical() || options.occurrences();
+        this.diag = !twoMode || options.diagnostics();
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         diagnostics = new Diagnostics(Label.count(), 1024);
         ruleParserLabels = new Label[ruleNames.length];
@@ -249,14 +259,15 @@ public final class Session {
     public int cp(int at) { return at < input.length() ? input.codePointAt(at) : -1; }
     public Span span(int start, int end) { return new Span(input.cpIndex(start), input.cpIndex(end)); }
     private void progress(Frame f) {
-        int at = Math.max(f.c, f.m); reached = Math.max(reached, at); diagnostics.reach(at);
+        int at = Math.max(f.c, f.m); if (at > reached) reached = at; if (diag) diagnostics.reach(at);
     }
-    private void progressAt(int at) { reached = Math.max(reached, at); diagnostics.reach(at); }
-    private void fail(int at, String label) { fail(at, Label.of(label).id, at, at); }
+    private void progressAt(int at) { if (at > reached) reached = at; if (diag) diagnostics.reach(at); }
+    private void fail(int at, String label) { if (!diag) { if (at > reached) reached = at; return; } fail(at, Label.of(label).id, at, at); }
     private void fail(int at, Label label) { fail(at, label.id, at, at); }
     private void fail(Frame frame, Label label) { fail(Math.max(frame.c, frame.m), label.id, frame.c, frame.m); }
     private void fail(int at, int id, int consumed, int matched) {
-        diagnostics.failAt(at, id, consumed, matched); if (at > reached) reached = at;
+        if (diag) diagnostics.failAt(at, id, consumed, matched);
+        if (at > reached) reached = at;
     }
     private long mark() { return ((long) scope.checkpoint() << 32) | effects.size(); }
     private void restore(long mark) {
@@ -288,7 +299,9 @@ public final class Session {
         if (cache) {
             int slot = memo.get(memoId, c, m, mode, state);
             if (slot >= 0) {
-                Memo value = payloads.get(memo.payload(slot)); diagnostics.merge(value.diagnostics()); replay(value.effects());
+                Memo value = payloads.get(memo.payload(slot));
+                if (diag) diagnostics.merge(value.diagnostics());
+                replay(value.effects());
                 f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = value.reset();
                 return value.match();
             }
@@ -301,7 +314,7 @@ public final class Session {
         boolean nested = depth > 1;
         if (activeDepth == activeRules.length) activeRules = Arrays.copyOf(activeRules, activeDepth * 2);
         activeRules[activeDepth++] = id;
-        long mark = mark(); diagnostics.enterRule(id); progress(f);
+        long mark = mark(); if (diag) diagnostics.enterRule(id); progress(f);
         if (scopeEffects.length > 0) applyEffects(scopeEffects, "entry", Match.empty(c, c));
         Match result = body.parse(this, f);
         if (result != null) {
@@ -312,7 +325,8 @@ public final class Session {
             }
             List<Recipe> nodes = result.nodes();
             boolean skipped = skip || "skip".equals(recipeKind);
-            if (skipped) nodes = List.of();
+            if (!tree) nodes = List.of();
+            else if (skipped) nodes = List.of();
             else if (recipe != null && !"transparent".equals(recipeKind) && !"text".equals(recipeKind)) {
                 var names = new String[fields.length]; List<Value>[] lists = Recipe.lists(fields.length);
                 for (int fi = 0; fi < fields.length; fi++) {
@@ -347,21 +361,26 @@ public final class Session {
             }
             List<Occurrence> completed = result.local();
             for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
-            List<Value> values = result.values();
-            if (skipped || nodes != result.nodes()) {
-                values = nodes.isEmpty() ? List.of() : List.of(new Value(nodes.getFirst().start(), nodes.getFirst().end(), nodes));
+            if (!tree) result = Match.empty(c, f.c);
+            else {
+                List<Value> values = result.values();
+                if (skipped || nodes != result.nodes()) {
+                    values = nodes.isEmpty() ? List.of() : List.of(new Value(nodes.getFirst().start(), nodes.getFirst().end(), nodes));
+                }
+                result = new Match(nodes, List.of(), result.captures(), result.traces(), c, f.c,
+                    result.mappingFailure(), result.recoveries(), List.of(), result.text(), values);
             }
-            result = new Match(nodes, List.of(), result.captures(), result.traces(), c, f.c,
-                result.mappingFailure(), result.recoveries(), List.of(), result.text(), values);
         } else {
-            int localFarthest = diagnostics.localFarthest();
-            if (localFarthest == Math.max(c, m)) for (Label hint : recoveryHints) fail(localFarthest, hint);
-            for (Label hint : failureHints) fail(Math.max(c, m), hint);
+            if (diag) {
+                int localFarthest = diagnostics.localFarthest();
+                if (localFarthest == Math.max(c, m)) for (Label hint : recoveryHints) fail(localFarthest, hint);
+                for (Label hint : failureHints) fail(Math.max(c, m), hint);
+            }
             restore(mark); f.c = c; f.m = m;
         }
         depth--; activeDepth--;
         boolean store = cache && (result != null ? successMemo : failureMemo);
-        var diagnostic = diagnostics.leaveRule(store);
+        var diagnostic = diag ? diagnostics.leaveRule(store) : null;
         if (store) {
             int payload = payloads.size();
             payloads.add(new Memo(result, f.reset, effectsSince(mark), diagnostic));
@@ -379,14 +398,16 @@ public final class Session {
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
         int slot = memo.get(id, c, m, mode, state);
         if (slot >= 0) {
-            Memo value = payloads.get(memo.payload(slot)); diagnostics.merge(value.diagnostics()); replay(value.effects());
+            Memo value = payloads.get(memo.payload(slot));
+            if (diag) diagnostics.merge(value.diagnostics());
+            replay(value.effects());
             f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = value.reset();
             return value.match();
         }
-        long mark = mark(); diagnostics.enterExpression(); progress(f);
+        long mark = mark(); if (diag) diagnostics.enterExpression(); progress(f);
         Match result = body.parse(this, f);
         boolean store = result != null ? successMemo : failureMemo;
-        var diagnostic = diagnostics.leaveRule(store);
+        var diagnostic = diag ? diagnostics.leaveRule(store) : null;
         if (store) {
             int payload = payloads.size();
             payloads.add(new Memo(result, f.reset, effectsSince(mark), diagnostic));
@@ -427,15 +448,22 @@ public final class Session {
             }
         }
     }
-    public Match capture(Frame f, Call call, String[] sites, String[] names, String[] spanRules, boolean[] skips,
+    public Match capture(Frame f, Call call, String[] sites, String[] names, String[] spanRules, boolean[] skips, boolean[] scoped,
                          String rule, String expr, boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints) {
         int c = f.c, m = f.m; Match result = call.parse(this, f);
         progress(f);
         if (result == null) {
-            for (Label hint : failureHints) fail(Math.max(c, m), hint);
+            if (diag) for (Label hint : failureHints) fail(Math.max(c, m), hint);
             return null;
         }
-        result = project(result, semanticKind, semanticMany);
+        if (!tree) {
+            // 認識経路は出現表を公開しない（D-035 の Java 版）。scope 効果が site を読む
+            // capture だけ局所出現として残す（生成側の scoped がその集合）。
+            boolean needed = false;
+            for (int i = 0; i < scoped.length; i++) if (scoped[i] && !skips[i]) { needed = true; break; }
+            if (!needed) return result;
+        }
+        if (tree) result = project(result, semanticKind, semanticMany);
         if (quantified && sites.length > 0) {
             var items = new ArrayList<Match>();
             for (Match item : result.items()) {
@@ -444,7 +472,10 @@ public final class Session {
                 String text = selected.text() == null ? source.substring(selected.start(), selected.end()).strip() : selected.text();
                 var value = new Match(item.nodes(), item.local(), item.captures(), item.traces(), item.start(), item.end(),
                     item.mappingFailure(), item.recoveries(), item.items(), text, item.values());
-                for (int i = 0; i < sites.length; i++) value = captured(value, item.start(), item.end(), sites[i], names[i], skips[i]);
+                for (int i = 0; i < sites.length; i++) {
+                    if (!tree && !scoped[i]) continue;
+                    value = captured(value, item.start(), item.end(), sites[i], names[i], skips[i]);
+                }
                 items.add(value);
             }
             Match joined = combine(items, result.start(), result.end());
@@ -453,6 +484,7 @@ public final class Session {
         }
         Match captured = result;
         for (int i = 0; i < sites.length; i++) {
+            if (!tree && !scoped[i]) continue;
             int start = spanRules[i].equals("matchedExtent") ? m : spanRules[i].equals("selectedChildExtent") ? result.start() : c;
             int end = spanRules[i].equals("matchedExtent") ? f.m : spanRules[i].equals("selectedChildExtent") ? result.end() : f.c;
             captured = captured(captured, start, Math.max(start, end), sites[i], names[i], skips[i]);
@@ -465,7 +497,8 @@ public final class Session {
     private Match captured(Match result, int start, int end, String site, String name, boolean skip) {
         if (skip) return result;
         var occurrence = new Occurrence(site, name, new Value(start, end, result.nodes(), result.text(), result.values()));
-        return new Match(result.nodes(), appended(result.local(), occurrence), appended(result.captures(), occurrence), result.traces(), result.start(), result.end(),
+        return new Match(result.nodes(), appended(result.local(), occurrence),
+            tree ? appended(result.captures(), occurrence) : result.captures(), result.traces(), result.start(), result.end(),
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), result.values());
     }
     private static List<Occurrence> appended(List<Occurrence> list, Occurrence occurrence) {
@@ -486,7 +519,24 @@ public final class Session {
         for (int k = 0, n = values.size(); k < n; k++) if (!values.get(k).nodes().isEmpty()) return false;
         return true;
     }
-    private static Match combine(List<Match> items, int start, int end) {
+    /** 認識経路の局所出現だけを足し込む（列の畳み込みをしない）。 */
+    private static ArrayList<Occurrence> keep(ArrayList<Occurrence> accumulator, Match item) {
+        List<Occurrence> local = item.local();
+        if (local.isEmpty()) return accumulator;
+        if (accumulator == null) accumulator = new ArrayList<>(local.size() + 2);
+        accumulator.addAll(local); return accumulator;
+    }
+    private Match fast(ArrayList<Occurrence> local, int start, int end) {
+        return local == null ? Match.empty(start, end)
+            : new Match(List.of(), local, List.of(), List.of(), start, end);
+    }
+    private Match combine(List<Match> items, int start, int end) {
+        if (!tree) {
+            int localN = 0;
+            for (int k = 0, n = items.size(); k < n; k++) localN += items.get(k).local().size();
+            return localN == 0 ? Match.empty(start, end)
+                : new Match(List.of(), join(items, LOCAL, localN), List.of(), List.of(), start, end);
+        }
         if (items.size() == 1) {
             Match only = items.getFirst();
             return new Match(only.nodes(), only.local(), only.captures(), only.traces(), start, end, only.mappingFailure(), only.recoveries(), items, only.text(), only.values());
@@ -542,6 +592,17 @@ public final class Session {
         if (reset0) f.m = f.c;
         int start = f.c;
         if (trivia.entry != null) trivia(f, trivia.entry); if (trivia.helperEntry != null) trivia(f, trivia.helperEntry);
+        if (!tree) {
+            ArrayList<Occurrence> local = null;
+            for (int i = 0; i < children.length; i++) {
+                Match result = children[i].parse(this, f);
+                if (result == null) { restore(mark); f.c = c0; f.m = m0; f.reset = reset0; return null; }
+                local = keep(local, result);
+                if (trivia.afterChild != null && trivia.afterChild[i] != null) trivia(f, trivia.afterChild[i]);
+            }
+            if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
+            f.reset = reset0; return fast(local, start, f.c);
+        }
         var matches = new Match[children.length];
         for (int i = 0; i < children.length; i++) {
             Match result = children[i].parse(this, f);
@@ -567,7 +628,7 @@ public final class Session {
                     && depth + guards[i].maxRuleDepth < options.maxDepth()) {
                     Guard guard = guards[i];
                     progressAt(probe);
-                    diagnostics.failBatch(probe, guard.ids(), guard.suffix, probe, probe);
+                    if (diag) diagnostics.failBatch(probe, guard.ids(), guard.suffix, probe, probe);
                     continue;
                 }
                 long mark = mark(); f.c = c0; f.m = reset0 ? c0 : m0; f.reset = reset0;
@@ -598,7 +659,8 @@ public final class Session {
         if (reset0) f.m = f.c;
         int start = f.c, count = 0;
         if (trivia.entry != null) trivia(f, trivia.entry); if (trivia.helperEntry != null) trivia(f, trivia.helperEntry);
-        var matches = new ArrayList<Match>();
+        ArrayList<Match> matches = tree ? new ArrayList<>() : null;
+        ArrayList<Occurrence> local = null;
         while (true) {
             int before = f.position();
             if (terminator != null) {
@@ -609,7 +671,7 @@ public final class Session {
                 Match done = terminator.parse(this, f);
                 f.matched = matched0; f.reset = reset1;
                 if (done != null) {
-                    if (!matched0) matches.add(done);
+                    if (!matched0) { if (tree) matches.add(done); else local = keep(local, done); }
                     else { restore(mark); f.c = c1; f.m = m1; }
                     break;
                 }
@@ -617,23 +679,28 @@ public final class Session {
             }
             long mark = mark(); Match result = child.parse(this, f);
             if (result == null) { restore(mark); break; }
-            matches.add(result); count++;
+            if (tree) matches.add(result); else local = keep(local, result);
+            count++;
             if (before == f.position() || count >= max) break;
         }
         if (count < min || count > max) {
             int at = Math.max(c0, m0), fc = f.c, fm = f.m;
             f.c = c0; f.m = m0; f.reset = reset0;
-            fail(at, label.id, c0, m0);
-            if (label.text.startsWith("'") && activeDepth > 0) {
-                int rule = activeRules[activeDepth - 1];
-                if (ruleParserLabels[rule] == null) ruleParserLabels[rule] = Label.of(ruleNames[rule] + "Parser");
-                fail(at, ruleParserLabels[rule]);
-            }
-            diagnostics.failureCursor(at, fc, fm);
+            if (diag) {
+                fail(at, label.id, c0, m0);
+                if (label.text.startsWith("'") && activeDepth > 0) {
+                    int rule = activeRules[activeDepth - 1];
+                    if (ruleParserLabels[rule] == null) ruleParserLabels[rule] = Label.of(ruleNames[rule] + "Parser");
+                    fail(at, ruleParserLabels[rule]);
+                }
+                diagnostics.failureCursor(at, fc, fm);
+            } else if (at > reached) reached = at;
             restore(whole); return null;
         }
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
-        f.reset = reset0; Match combined = combine(matches, start, f.c);
+        f.reset = reset0;
+        if (!tree) return fast(local, start, f.c);
+        Match combined = combine(matches, start, f.c);
         return new Match(combined.nodes(), combined.local(), combined.captures(), combined.traces(), start, f.c, combined.mappingFailure(), combined.recoveries(), matches, combined.text(),
             matches.isEmpty() ? List.of() : combined.values());
     }
@@ -642,14 +709,16 @@ public final class Session {
         if (reset0) f.m = f.c;
         int start = f.c;
         if (trivia.entry != null) trivia(f, trivia.entry); if (trivia.helperEntry != null) trivia(f, trivia.helperEntry);
-        var matches = new ArrayList<Match>(); var elements = new ArrayList<Match>(); long first = mark();
+        ArrayList<Match> matches = tree ? new ArrayList<>() : null, elements = tree ? new ArrayList<>() : null;
+        ArrayList<Occurrence> local = null; int parts = 0; long first = mark();
         Match initial = element.parse(this, f);
         if (initial == null) {
             restore(first);
             if (min > 0) { restore(whole); f.c = c0; f.m = m0; f.reset = reset0; return null; }
             f.c = c0; f.m = reset0 ? c0 : m0; f.reset = reset0;
         } else {
-            matches.add(initial); elements.add(initial);
+            if (tree) { matches.add(initial); elements.add(initial); } else local = keep(local, initial);
+            parts = 1;
             while (true) {
                 long mark = mark(); int c1 = f.c, m1 = f.m; boolean reset1 = f.reset;
                 if (reset1) f.m = f.c;
@@ -657,13 +726,17 @@ public final class Session {
                 Match sep = separator.parse(this, f); Match next = sep == null ? null : element.parse(this, f);
                 f.reset = reset1;
                 if (next == null) { restore(mark); f.c = c1; f.m = m1; break; }
-                matches.add(sep); matches.add(next); elements.add(next);
+                if (tree) { matches.add(sep); matches.add(next); elements.add(next); }
+                else { local = keep(local, sep); local = keep(local, next); }
+                parts += 2;
                 if (before == f.position()) break;
             }
         }
-        if (initial != null && (matches.size() + 1) / 2 < min) { restore(whole); f.c = c0; f.m = m0; f.reset = reset0; return null; }
+        if (initial != null && (parts + 1) / 2 < min) { restore(whole); f.c = c0; f.m = m0; f.reset = reset0; return null; }
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
-        f.reset = reset0; Match result = combine(matches, start, f.c);
+        f.reset = reset0;
+        if (!tree) return fast(local, start, f.c);
+        Match result = combine(matches, start, f.c);
         return new Match(result.nodes(), result.local(), result.captures(), result.traces(), start, f.c,
             result.mappingFailure(), result.recoveries(), elements, result.text(), elements.isEmpty() ? List.of() : result.values());
     }
@@ -672,7 +745,7 @@ public final class Session {
         long mark = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset, matched0 = f.matched;
         if (reset0) f.m = f.c;
         f.matched = true;
-        var diagnosticMark = negative ? diagnostics.checkpoint() : null;
+        var diagnosticMark = negative && diag ? diagnostics.checkpoint() : null;
         int priorReached = reached;
         Match result;
         try { result = child.parse(this, f); }
@@ -680,7 +753,8 @@ public final class Session {
         if (negative) {
             f.c = c0; f.m = m0;
             if (result != null) { fail(f, label); return null; }
-            diagnostics.restore(diagnosticMark); reached = priorReached;
+            if (diagnosticMark != null) diagnostics.restore(diagnosticMark);
+            reached = priorReached;
             f.m = reset0 ? c0 : m0; return Match.empty(c0, c0);
         }
         if (result == null) { f.c = c0; f.m = m0; return null; }
@@ -872,6 +946,7 @@ public final class Session {
     public Match recover(Frame f, Call child, String rule, String mode, String[] patterns, boolean consumeSync,
                          String noSync, String projection, String recipe) {
         long mark = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
+        // @recover を持つ文法は二段構えの対象外（生成側が twoMode=false を渡す）ので diag は常に真。
         diagnostics.enterExpression();
         Match result = child.parse(this, f);
         var failure = diagnostics.leaveRule();

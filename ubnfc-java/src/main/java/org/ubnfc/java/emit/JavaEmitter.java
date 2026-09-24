@@ -279,10 +279,12 @@ public final class JavaEmitter {
             out.append("                default -> throw new IllegalArgumentException(\"Unsupported entry: \" + entry);\n            };\n");
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
-            .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(");\n")
+            .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(", ").append(twoMode()).append(");\n")
             .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
             .append("        if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }\n")
             .append("        ParseResult<").append(ast).append("> syntax = s.result(f, match, ").append(catalogs()).append(");\n")
+            .append("        // D-023: 認識専用の fast path は観測を記録しない。診断を要する結果だけ決定的に再解析する。\n")
+            .append("        if (!syntax.ok() && !s.diag) return parseEntryInternal(grammar, entry, source, options.withDiagnostics(), rollback);\n")
             .append("        if (!syntax.ok() || !options.buildAst()) return syntax;\n")
             .append("        if (match.mappingFailure()) throw s.mapping(match.start(), match.end(), \"Recovered input cannot be mapped\", null);\n")
             .append("        if (match.nodes().isEmpty()) return syntax;\n")
@@ -374,6 +376,27 @@ public final class JavaEmitter {
             a.name().equals("interleave") || a.name().equals("whitespace") || a.name().equals("comment"));
         return rightAssoc && localTrivia;
     }
+    private Set<String> scopeSiteIds;
+    /** scope 効果が読む capture site（site が null の効果は出現表を読まない）。 */
+    private Set<String> scopeSites() {
+        if (scopeSiteIds == null) scopeSiteIds = ir.semantics().scope().effects().stream()
+            .flatMap(e -> e.events().stream()).map(GrammarIr.ScopeEffectEventsItem::captureSiteId)
+            .filter(java.util.Objects::nonNull).collect(Collectors.toSet());
+        return scopeSiteIds;
+    }
+    /**
+     * D-056: 認識専用の二段構えを許す文法か。@recover は RecoveryEvent と Recipe marker を
+     * 認識結果にも載せるので対象外。scope 効果が反復下（quantified）の capture site を読む
+     * 文法も、出現表を落とすと scope 観測が変わるので対象外にする。
+     */
+    private boolean twoMode() {
+        if (!ir.semantics().recovery().isEmpty()) return false;
+        var scoped = scopeSites();
+        if (scoped.isEmpty()) return true;
+        return expressions.values().stream().noneMatch(e ->
+            Set.of("repeat", "optional", "separated").contains(e.node().kind())
+                && e.captureSiteIds().stream().anyMatch(scoped::contains));
+    }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;
         Expr expr = expressions.get(id);
@@ -396,7 +419,8 @@ public final class JavaEmitter {
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(kStrings(expr.captureSiteIds())).append(", ").append(kStrings(sites.stream().map(Capture::name).toList())).append(", ").append(kStrings(sites.stream().map(Capture::spanRule).toList()))
-            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}")).append(", ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(kLabels(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
+            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}"))
+            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> Boolean.toString(scopeSites().contains(c.siteId()))).collect(Collectors.joining(",")) + "}")).append(", ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(kLabels(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
         String body = expression(expr);
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
     }

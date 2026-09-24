@@ -17,6 +17,10 @@ public final class P4Scanners {
     public static ParseOptions options(boolean ast) {
         return new ParseOptions(ast, true, false, true, ALL);
     }
+    /** 認識専用（D-023 / D-035 の二段構え）: 出現表も診断観測も要求しない。 */
+    public static ParseOptions recognize() {
+        return new ParseOptions(false, true, false, true, ALL, ParseOptions.DEFAULT_MAX_DEPTH, false, false);
+    }
     @FunctionalInterface private interface Scan { int end(Input in, int at, boolean invert); }
     private static TokenScanner scanner(Scan scan, String label, boolean unquote) {
         return (in, state) -> {

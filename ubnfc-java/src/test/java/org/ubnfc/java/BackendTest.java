@@ -44,11 +44,22 @@ class BackendTest {
                 var row = Json.object(rows.get(i)); var expected = Json.object(golden.get(i));
                 String input = (String) row.get("input"); boolean accepted = row.containsKey("value") && !row.containsKey("modes");
                 tests.add(DynamicTest.dynamicTest(grammar + ": " + input, () -> {
-                    Object result = h.parse(input), recognition = h.parse(input, h.options.getField("RECOGNIZE").get(null));
+                    Object fastOptions = h.options.getField("RECOGNIZE").get(null);
+                    Object diagOptions = h.options.getMethod("withDiagnostics").invoke(fastOptions);
+                    Object result = h.parse(input), recognition = h.parse(input, fastOptions),
+                        diagnosed = h.parse(input, diagOptions);
                     assertEquals(accepted, ok(result), "full-input acceptance"); assertEquals(accepted, ok(recognition));
+                    assertEquals(accepted, ok(diagnosed));
                     assertEquals(get(recognition, "consumedCp"), get(result, "consumedCp"));
                     assertEquals(get(recognition, "matchedCp"), get(result, "matchedCp"));
-                    assertEquals(get(recognition, "diagnostics"), get(result, "diagnostics"));
+                    // D-023: 診断を要求した認識解析は AST 経路と同じ観測を返す。
+                    assertEquals(get(diagnosed, "diagnostics"), get(result, "diagnostics"));
+                    // 認識専用（要求なし）は、失敗なら再解析で同じ観測、成功なら hints が空（D-023 の副作用 (a)）。
+                    assertEquals(accepted ? get(diagnosed, "diagnostics") : get(result, "diagnostics"),
+                        accepted ? get(diagnosed, "diagnostics") : get(recognition, "diagnostics"));
+                    if (accepted) assertTrue(((List<?>) get(get(recognition, "diagnostics"), "expected")).isEmpty());
+                    // D-035: 出現表は要求したときだけ出る。
+                    assertTrue(((List<?>) get(recognition, "captures")).isEmpty(), "認識専用では capture 出現を作らない");
                     assertTrue(((java.util.Optional<?>) get(recognition, "ast")).isEmpty());
                     if (accepted) {
                         assertEquals(input.codePointCount(0, input.length()), get(result, "consumedCp"));
