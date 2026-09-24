@@ -72,6 +72,28 @@ impl CharSet {
         result
     }
 
+    pub fn intersect(&self, other: &Self) -> Self {
+        let mut unicode = Vec::new();
+        for &(lo, hi) in &self.unicode {
+            for &(lo2, hi2) in &other.unicode {
+                let start = lo.max(lo2);
+                let end = hi.min(hi2);
+                if start <= end {
+                    unicode.push((start, end));
+                }
+            }
+        }
+        unicode.sort_unstable();
+        Self {
+            ascii: self.ascii & other.ascii,
+            unicode,
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.ascii == 0 && self.unicode.is_empty()
+    }
+
     pub fn disjoint(&self, other: &Self) -> bool {
         self.ascii & other.ascii == 0
             && !self

@@ -24,9 +24,10 @@ fn read(path: &str) -> Result<String, String> {
 
 /// `UBNFC_ARENA_ENTRIES` で `ResourceLimits.arena_entries` を上書きする。
 ///
-/// 既定は 2,000,000 で、1 MB の JSON を typed AST で解析するとこれを超えて
-/// Resource 診断（"arena budget exceeded"）で失敗する。速度比較では入力サイズごとに
-/// 設定を変えたくないので、全サイズで同じ値へ上げて測り、上げたことを報告に書く。
+/// issue #35 / D-071: 既定値（2,000,000）は `Session::new` が入力長に応じて自動的に
+/// 引き上げる（未設定のときだけ）ので、1 MB の JSON も既定のままで通るようになった。
+/// この env var は速度比較で入力サイズごとに設定を変えず**固定値**で揃えたいときの
+/// 明示的な上書き用に残してある（明示すると自動スケーリングの対象外になる）。
 /// 認識のみの経路はこの上限に触れない。
 macro_rules! limits {
     ($ns:ident) => {{
@@ -40,6 +41,11 @@ macro_rules! limits {
     }};
 }
 
+/// `UBNFC_SCAN=0` で D-067 の一括走査を切る（参照経路）。issue #48 の A/B に使う。
+fn scan_enabled() -> bool {
+    std::env::var("UBNFC_SCAN").map_or(true, |value| value != "0")
+}
+
 /// 文法ごとの入口を 1 つの型に揃える。
 struct Entry {
     recognize: fn(&str) -> (bool, usize),
@@ -50,14 +56,14 @@ fn json_entry() -> Entry {
     fn recognize(text: &str) -> (bool, usize) {
         let r = gen_json::parse_with_options(
             text,
-            gen_json::ParseOptions { build_ast: false, limits: limits!(gen_json), ..Default::default() },
+            gen_json::ParseOptions { build_ast: false, scan: scan_enabled(), limits: limits!(gen_json), ..Default::default() },
         );
         (r.ok, r.consumed_cp)
     }
     fn ast(text: &str) -> (bool, usize) {
         let r = gen_json::parse_with_options(
             text,
-            gen_json::ParseOptions { limits: limits!(gen_json), ..Default::default() },
+            gen_json::ParseOptions { scan: scan_enabled(), limits: limits!(gen_json), ..Default::default() },
         );
         (r.ok && r.ast.is_some(), r.consumed_cp)
     }
@@ -68,14 +74,14 @@ fn operators_entry() -> Entry {
     fn recognize(text: &str) -> (bool, usize) {
         let r = gen_operators::parse_with_options(
             text,
-            gen_operators::ParseOptions { build_ast: false, limits: limits!(gen_operators), ..Default::default() },
+            gen_operators::ParseOptions { build_ast: false, scan: scan_enabled(), limits: limits!(gen_operators), ..Default::default() },
         );
         (r.ok, r.consumed_cp)
     }
     fn ast(text: &str) -> (bool, usize) {
         let r = gen_operators::parse_with_options(
             text,
-            gen_operators::ParseOptions { limits: limits!(gen_operators), ..Default::default() },
+            gen_operators::ParseOptions { scan: scan_enabled(), limits: limits!(gen_operators), ..Default::default() },
         );
         (r.ok && r.ast.is_some(), r.consumed_cp)
     }
@@ -86,14 +92,14 @@ fn power_entry() -> Entry {
     fn recognize(text: &str) -> (bool, usize) {
         let r = gen_power::parse_with_options(
             text,
-            gen_power::ParseOptions { build_ast: false, limits: limits!(gen_power), ..Default::default() },
+            gen_power::ParseOptions { build_ast: false, scan: scan_enabled(), limits: limits!(gen_power), ..Default::default() },
         );
         (r.ok, r.consumed_cp)
     }
     fn ast(text: &str) -> (bool, usize) {
         let r = gen_power::parse_with_options(
             text,
-            gen_power::ParseOptions { limits: limits!(gen_power), ..Default::default() },
+            gen_power::ParseOptions { scan: scan_enabled(), limits: limits!(gen_power), ..Default::default() },
         );
         (r.ok && r.ast.is_some(), r.consumed_cp)
     }

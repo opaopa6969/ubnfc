@@ -1852,6 +1852,14 @@
             "optimized"
           ]
         },
+        "scans": {
+          "description": "D-072 の一括走査。既存キーを変えない追加で、空のときはキーごと出力しない。",
+          "items": {
+            "$ref": "#/$defs/ScanPlan"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
         "triviaCache": {
           "additionalProperties": false,
           "properties": {
@@ -1991,6 +1999,7 @@
             "noTriviaEffectsRecovery",
             "leftRecursionNormalization",
             "unprofitableTerminalScan",
+            "terminalOnlyScan",
             "none"
           ]
         }
@@ -2366,6 +2375,84 @@
         "leftRecursion",
         "sccId",
         "progressProven"
+      ],
+      "type": "object"
+    },
+    "ScanClass": {
+      "additionalProperties": false,
+      "description": "単一 code point クラスの compact 表。asciiLow は U+0000..U+003F、asciiHigh は U+0040..U+007F の bitset（bit n = 先頭 code point + n）。ranges は U+0080 以上の昇順・互いに素な閉区間。",
+      "properties": {
+        "asciiHigh": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "asciiLow": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "ranges": {
+          "items": {
+            "$ref": "#/$defs/CharRange"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "asciiLow",
+        "asciiHigh",
+        "complete",
+        "ranges"
+      ],
+      "type": "object"
+    },
+    "ScanPlan": {
+      "additionalProperties": false,
+      "description": "観測（capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点）を 1 つも要求しない終端領域。backend は root の式を 1 本の走査へ畳んでよい。受理・消費長・カーソルは元の評価と同じで、失敗した解析は D-023 により診断 session が非最適化経路で作り直すため観測は変わらない。charClassRepetition は反復本体の順序付き選択のうち「1 文字で確定して 1 code point だけ消費する」部分集合を class に載せる。root=false の行はその表だけを載せる（走査関数の起点ではない）。",
+      "properties": {
+        "class": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScanClass"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exprId": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "kind": {
+          "enum": [
+            "charClassRepetition",
+            "terminalSequence"
+          ]
+        },
+        "proof": {
+          "$ref": "#/$defs/Proof"
+        },
+        "root": {
+          "type": "boolean"
+        },
+        "ruleIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "exprId",
+        "kind",
+        "root",
+        "class",
+        "ruleIds",
+        "proof"
       ],
       "type": "object"
     },

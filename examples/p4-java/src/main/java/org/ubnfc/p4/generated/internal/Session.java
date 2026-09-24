@@ -271,6 +271,13 @@ public final class Session {
      */
     public final boolean tree, diag, occ;
     /**
+     * issue #35 / D-070: {@link #parse} が {@code DepthLimit} ではなく {@code StackOverflowError}
+     * を捕まえたか（＝ {@code options.maxDepth()} にはまだ達していない、JVM stack がこの呼出しの
+     * 上では小さいだけの失敗）。呼出し側はこれを見て、{@code maxDepth} から見積もった十分な
+     * stack を持つ専用 {@link Thread} で 1 度だけ解析し直すかを決める。
+     */
+    public boolean stackOverflowTripped;
+    /**
      * capture の包み（{@link #capture}）が何もしないことが確定する経路。生成側はこの旗が立つとき
      * 包みを飛ばして中身を直に呼ぶ（site を 1 つも公開せず、失敗 hint も記録しないので観測は同じ）。
      */
@@ -361,6 +368,17 @@ public final class Session {
         private static final long serialVersionUID = 1L;
         private DepthLimit() { super(null, null, false, false); }
     }
+    /**
+     * issue #35 / D-070: {@code stackOverflowTripped} を見た呼出し側が、エスカレーション先の
+     * {@link Thread} に確保する stack size（byte）。実測（JSON 入れ子で 1 段あたり約 5.6 KiB、
+     * docs/reports/2026-09-24-runtime-limits.md）に安全率を見て 1 深さ単位 8 KiB とし、
+     * {@code maxDepth} を掛けた上で下限 8 MiB・上限 512 MiB に丸める（Rust 版
+     * {@code crates/ubnfc-rust/templates/runtime.rs} の `escalated_thread_stack_bytes` と対）。
+     */
+    public static long escalatedStackBytes(int maxDepth) {
+        long budget = (long) maxDepth * 8192L + 2L * 1024 * 1024;
+        return Math.max(8L * 1024 * 1024, Math.min(budget, 512L * 1024 * 1024));
+    }
     /** Abort the entire parse: an outer optional/choice must not swallow a resource limit. */
     public Match parse(Call entry, Frame f) {
         long start = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
@@ -369,6 +387,7 @@ public final class Session {
             restore(start); f.c = c0; f.m = m0; f.reset = reset0;
             if (diag) diagnostics = new Diagnostics(Label.count(), 256);
             String reason = limit instanceof StackOverflowError ? "JVM stack limit; maxDepth=" : "maxDepth=";
+            if (limit instanceof StackOverflowError) stackOverflowTripped = true;
             fail(reached, "maximum parse depth exceeded (" + reason + options.maxDepth() + ")");
             return null;
         } finally {

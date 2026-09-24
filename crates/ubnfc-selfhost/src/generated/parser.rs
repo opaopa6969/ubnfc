@@ -5,21 +5,50 @@ use super::runtime::*;
 #[allow(unused_imports)]
 use super::rt::{diag::Diag,memo::Key};
 pub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::default())}
-pub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {parse_with_scanner(text,options,&mut RejectExtern)}
+// issue #35 / D-070: 既定呼出しは呼出し元 thread の上で保守的な native stack 番兵
+// （NATIVE_STACK_SENTINEL_BYTES、呼出し元が明示的に小さい stack で呼んでも安全な値）の
+// まま解析する。番兵に max_depth より先に当たった（＝呼出し元の stack が小さいだけで、
+// 論理上限にはまだ余裕がある）ときだけ、max_depth から見積もった十分な stack を持つ
+// 専用 thread で 1 度だけ解析し直す。外部 TokenScanner を受け取る parse_with_scanner は
+// 任意の状態を持つ scanner を thread 境界へ渡せないためこの対象外（既知の制約）。
+pub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {
+let (result,stack_exhausted)=parse_with_options_budget(text,options,NATIVE_STACK_SENTINEL_BYTES);
+if result.ok || !stack_exhausted {return result;}
+let budget=escalated_stack_budget(options.max_depth);
+let stack_bytes=escalated_thread_stack_bytes(options.max_depth);
+std::thread::scope(|scope| {
+std::thread::Builder::new().stack_size(stack_bytes)
+.spawn_scoped(scope, move || parse_with_options_budget(text,options,budget).0)
+.expect("spawn escalated parser thread")
+.join()
+.unwrap_or_else(|payload| std::panic::resume_unwind(payload))
+})
+}
+fn parse_with_options_budget(text:&str,options:ParseOptions,budget:usize)->(ParseResult,bool) {
+parse_with_scanner_budget(text,options,&mut RejectExtern,budget)
+}
 pub fn parse_with_scanner(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner)->ParseResult {
+parse_with_scanner_budget(text,options,scanner,NATIVE_STACK_SENTINEL_BYTES).0
+}
+fn parse_with_scanner_budget(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner,budget:usize)->(ParseResult,bool) {
 // 診断は const DIAG で単相化する（D-036）。要求されていれば診断 session で 1 度だけ走り、
 // そうでなければ fast session で走って、診断が要る結果のときだけ診断 session で解析し直す（D-023）。
-if options.diagnostics {let mut parser=Session::<true>::new(text,options,scanner);
+if options.diagnostics {
+let mut parser=Session::<true>::new(text,options,scanner,budget);
 let step=parser.r0_c(State::default());
-return parser.finish(step);}
-let mut parser=Session::<false>::new(text,options,&mut *scanner);
+let stack_exhausted=parser.stack_sentinel_tripped();
+return (parser.finish(step),stack_exhausted);
+}
+let mut parser=Session::<false>::new(text,options,&mut *scanner,budget);
 let step=parser.r0_c(State::default());
+let stack_exhausted=parser.stack_sentinel_tripped();
 let (result,escalate)=parser.finish_checked(step);
-if !escalate {return result;}
-let options=ParseOptions{diagnostics:true,..options};
-let mut parser=Session::<true>::new(text,options,scanner);
+if !escalate {return (result,stack_exhausted);}
+let diag_options=ParseOptions{diagnostics:true,..options};
+let mut parser=Session::<true>::new(text,diag_options,scanner,budget);
 let step=parser.r0_c(State::default());
-parser.finish(step)
+let stack_exhausted=stack_exhausted || parser.stack_sentinel_tripped();
+(parser.finish(step),stack_exhausted)
 }
 fn entry_step<const DIAG: bool>(parser:&mut Session<'_,DIAG>,grammar:&str,entry:Option<&str>)->Result<Step,&'static str> {
 Ok(match (grammar,entry) {
@@ -84,20 +113,67 @@ Ok(match (grammar,entry) {
 ("UBNF",Some("DottedIdentifier"))=>parser.r57_c(State::default()),
 ("UBNF",Some("RuleBody"))=>parser.r58_c(State::default()),
 _=>return Err("unsupported grammar or entry"),})}
+// D-070: `parse_entry_budget` / `parse_entry_escalated` は `parse_entry_with_options` より
+// 前に置く。driver.rs の scanner_hook / examples/p4-rust の build.rs はこの関数を
+// テキストごと切り出して `parse_entry_with_scanner` へ改名するので、その範囲に
+// この 2 つを含めない（含めると全文を丸ごと差し込む方の写しと二重定義になる）。
+fn parse_entry_budget(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner,budget:usize)->Result<(ParseResult,bool),&'static str> {
+if options.diagnostics {
+let mut parser=Session::<true>::new(text,options,scanner,budget);
+let step=entry_step(&mut parser,grammar,entry)?;
+let stack_exhausted=parser.stack_sentinel_tripped();
+return Ok((parser.finish(step),stack_exhausted));
+}
+let mut parser=Session::<false>::new(text,options,scanner,budget);
+let step=entry_step(&mut parser,grammar,entry)?;
+let stack_exhausted=parser.stack_sentinel_tripped();
+let (result,escalate)=parser.finish_checked(step);
+if !escalate {return Ok((result,stack_exhausted));}
+let diag_options=ParseOptions{diagnostics:true,..options};
+let mut parser=Session::<true>::new(text,diag_options,scanner,budget);
+let step=entry_step(&mut parser,grammar,entry)?;
+let stack_exhausted=stack_exhausted || parser.stack_sentinel_tripped();
+Ok((parser.finish(step),stack_exhausted))
+}
+// issue #35 / D-070: native stack 番兵に max_depth より先へ当たった（＝呼出し元 thread の
+// stack が小さいだけ）ときだけ、max_depth から見積もった十分な stack を持つ専用 thread で
+// 1 度だけ解析し直す。RejectExtern は状態を持たないので thread をまたいで再構築してよい。
+fn parse_entry_escalated(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {
+let budget=escalated_stack_budget(options.max_depth);
+let stack_bytes=escalated_thread_stack_bytes(options.max_depth);
+std::thread::scope(|scope| {
+std::thread::Builder::new().stack_size(stack_bytes)
+.spawn_scoped(scope, move || {
+let mut scanner=RejectExtern;
+parse_entry_budget(grammar,entry,text,options,&mut scanner,budget)
+})
+.expect("spawn escalated parser thread")
+.join()
+.unwrap_or_else(|payload| std::panic::resume_unwind(payload))
+}).map(|(result,_)| result)
+}
 pub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {
 let mut scanner=RejectExtern;
-if options.diagnostics {let mut parser=Session::<true>::new(text,options,&mut scanner);
-let step=entry_step(&mut parser,grammar,entry)?;
-return Ok(parser.finish(step));}
-let mut parser=Session::<false>::new(text,options,&mut scanner);
-let step=entry_step(&mut parser,grammar,entry)?;
-let (result,escalate)=parser.finish_checked(step);
-if !escalate {return Ok(result);}
-let options=ParseOptions{diagnostics:true,..options};
-let mut parser=Session::<true>::new(text,options,&mut scanner);
-let step=entry_step(&mut parser,grammar,entry)?;
-Ok(parser.finish(step))}
+let (result,stack_exhausted)=parse_entry_budget(grammar,entry,text,options,&mut scanner,NATIVE_STACK_SENTINEL_BYTES)?;
+if result.ok || !stack_exhausted {return Ok(result);}
+/*STACK_ESCALATION*/parse_entry_escalated(grammar,entry,text,options)/*STACK_ESCALATION*/
+}
 impl<const DIAG: bool> Session<'_, DIAG> {
+/// D-072: 観測を残さない終端領域の走査。消費 byte 数を返す。
+#[allow(unused_mut)]
+fn s292(&self,mut p:usize)->Option<usize> {
+let start=p;
+let bytes=self.text.as_bytes();while let Some(&b)=bytes.get(p) {
+if b<0x80 {if (if b<64 {0x3ff000000000000u64>>b} else {0x0u64>>(b-64)})&1==0 {break;}p+=1;}
+else {let Some((c,n))=self.input.cp_at(p) else {break;};if !{let cp=c as u32;if cp<64 {(0x3ff000000000000u64>>cp)&1!=0} else if cp<128 {(0x0u64>>(cp-64))&1!=0} else {false}} {break;}p+=n;}
+}
+Some(p-start)
+}
+/// D-072: 観測を残さない終端領域の走査。消費 byte 数を返す。
+#[allow(unused_mut)]
+fn s293(&self,mut p:usize)->Option<usize> {
+match self.input.cp_at(p) {Some((c,n)) if {c.is_ascii_digit()}=>Some(n),_=>None}
+}
 fn r0_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e0_c(state);
 if out.ok {
@@ -5047,6 +5123,13 @@ out
 fn b292_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
+if self.options.scan && !DIAG && !self.options.lexical && !self.options.occurrences && !out.state.invert {
+let start=out.state.consumed;
+match self.s292(start) {
+Some(n)=>{out.state.advance::<false>(n);if n>0 {out.events=self.event(Event::Token{text_span:None,content_span:None,expr:usize::MAX,rule:usize::MAX,span:[start,start+n]});}}
+None=>{out.ok=false;out.state=state;out.diag=self.diag_fail(start,"expression");}
+}
+} else {
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
 let mut child=self.e293_c(out.state);out.diag=self.diag_join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
@@ -5054,6 +5137,7 @@ if before.position::<false>()==out.state.position::<false>() {break;}
 }
 let _=count;
 if false {out.ok=false;out.state=state;let d=self.diag_fail(state.position::<false>(),"expression");out.diag=self.diag_join(out.diag,d);}
+}
 out.state=if out.ok {state.commit(out.state)} else {state};
 out
 }

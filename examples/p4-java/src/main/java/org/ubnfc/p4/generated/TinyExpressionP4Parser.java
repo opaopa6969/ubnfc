@@ -21,6 +21,28 @@ public final class TinyExpressionP4Parser {
         return parseEntryInternal(grammar, entry, source, options, true);
     }
     private static ParseResult<TinyExpressionP4AST> parseEntryInternal(String grammar, String entry, CharSequence source, ParseOptions options, boolean rollback) {
+        boolean[] stackFlag = new boolean[1];
+        ParseResult<TinyExpressionP4AST> result = parseEntryAttempt(grammar, entry, source, options, rollback, stackFlag);
+        if (result.ok() || !stackFlag[0] || !options.scanners().isEmpty()) return result;
+        return parseEntryEscalated(grammar, entry, source, options, rollback);
+    }
+    private static ParseResult<TinyExpressionP4AST> parseEntryEscalated(String grammar, String entry, CharSequence source, ParseOptions options, boolean rollback) {
+        long stackBytes = Session.escalatedStackBytes(options.maxDepth());
+        var box = new java.util.concurrent.atomic.AtomicReference<ParseResult<TinyExpressionP4AST>>();
+        var error = new java.util.concurrent.atomic.AtomicReference<Throwable>();
+        Thread thread = new Thread(null, () -> {
+            try { box.set(parseEntryAttempt(grammar, entry, source, options, rollback, new boolean[1])); }
+            catch (Throwable t) { error.set(t); }
+        }, "ubnfc-parse-escalated", stackBytes);
+        thread.start();
+        try { thread.join(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new RuntimeException(e); }
+        Throwable failure = error.get();
+        if (failure instanceof RuntimeException re) throw re;
+        if (failure instanceof Error er) throw er;
+        if (failure != null) throw new RuntimeException(failure);
+        return box.get();
+    }
+    private static ParseResult<TinyExpressionP4AST> parseEntryAttempt(String grammar, String entry, CharSequence source, ParseOptions options, boolean rollback, boolean[] stackFlag) {
         Call entryPoint = switch (grammar) {
             case "TinyExpressionP4" -> switch (entry) {
                 case null -> TinyExpressionP4Parser::parseFormula_0;
@@ -154,10 +176,11 @@ public final class TinyExpressionP4Parser {
         };
         var s = new Session(source, options, K0, true);
         var f = new Frame(); Match match = s.parse(entryPoint, f);
+        stackFlag[0] = stackFlag[0] || s.stackOverflowTripped;
         if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }
         ParseResult<TinyExpressionP4AST> syntax = s.result(f, match, K1);
         // D-023: 認識専用の fast path は観測を記録しない。診断を要する結果だけ決定的に再解析する。
-        if (!syntax.ok() && !s.diag) return parseEntryInternal(grammar, entry, source, options.withDiagnostics(), rollback);
+        if (!syntax.ok() && !s.diag) return parseEntryAttempt(grammar, entry, source, options.withDiagnostics(), rollback, stackFlag);
         if (!syntax.ok() || !options.buildAst()) return syntax;
         if (match.mappingFailure()) throw s.mapping(match.start(), match.end(), "Recovered input cannot be mapped", null);
         if (match.nodes().isEmpty()) return syntax;

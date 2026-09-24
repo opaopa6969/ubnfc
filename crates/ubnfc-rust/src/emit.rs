@@ -24,6 +24,9 @@ pub(crate) struct Generator<'a> {
     pub guards: BTreeSet<(usize, bool)>,
     /// 統合 DFA に入れる literal 終端と、その id（lexical.rs）。
     pub lexicon: crate::lexical::Lexicon,
+    /// D-072: 観測を残さない終端領域の走査計画と、その走査関数の生成結果。
+    pub scans: crate::scan::Scans,
+    pub scan_source: String,
 }
 impl<'a> Generator<'a> {
     pub fn new(ir: &'a GrammarIr) -> Self {
@@ -68,6 +71,8 @@ impl<'a> Generator<'a> {
             },
             guards: BTreeSet::new(),
             lexicon: crate::lexical::Lexicon::new(ir),
+            scans: crate::scan::Scans::empty(),
+            scan_source: String::new(),
         };
         g.bodies = ir
             .semantics
@@ -138,6 +143,9 @@ impl<'a> Generator<'a> {
             }
         }
         g.guards = pending.into_iter().collect();
+        let mut scans = crate::scan::Scans::new(&g);
+        g.scan_source = crate::scan::generate(&g, &mut scans);
+        g.scans = scans;
         g
     }
     fn visit(&mut self, i: usize, mode: bool) {
@@ -261,11 +269,45 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         );
     }
     files.insert("Cargo.toml".into(), manifest);
-    let mut p=String::from("//! IR の expression/rule ごとの静的関数。c=consumed, m=matchOnly。\n#![allow(dead_code, unused_mut)]\nuse super::api::*;\nuse super::runtime::*;\n#[allow(unused_imports)]\nuse super::rt::{diag::Diag,memo::Key};\npub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::default())}\npub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {parse_with_scanner(text,options,&mut RejectExtern)}\npub fn parse_with_scanner(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner)->ParseResult {\n");
+    let mut p = String::from(
+        "//! IR の expression/rule ごとの静的関数。c=consumed, m=matchOnly。\n\
+#![allow(dead_code, unused_mut)]\n\
+use super::api::*;\n\
+use super::runtime::*;\n\
+#[allow(unused_imports)]\n\
+use super::rt::{diag::Diag,memo::Key};\n\
+pub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::default())}\n\
+// issue #35 / D-070: 既定呼出しは呼出し元 thread の上で保守的な native stack 番兵\n\
+// （NATIVE_STACK_SENTINEL_BYTES、呼出し元が明示的に小さい stack で呼んでも安全な値）の\n\
+// まま解析する。番兵に max_depth より先に当たった（＝呼出し元の stack が小さいだけで、\n\
+// 論理上限にはまだ余裕がある）ときだけ、max_depth から見積もった十分な stack を持つ\n\
+// 専用 thread で 1 度だけ解析し直す。外部 TokenScanner を受け取る parse_with_scanner は\n\
+// 任意の状態を持つ scanner を thread 境界へ渡せないためこの対象外（既知の制約）。\n\
+pub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {\n\
+let (result,stack_exhausted)=parse_with_options_budget(text,options,NATIVE_STACK_SENTINEL_BYTES);\n\
+if result.ok || !stack_exhausted {return result;}\n\
+let budget=escalated_stack_budget(options.max_depth);\n\
+let stack_bytes=escalated_thread_stack_bytes(options.max_depth);\n\
+std::thread::scope(|scope| {\n\
+std::thread::Builder::new().stack_size(stack_bytes)\n\
+.spawn_scoped(scope, move || parse_with_options_budget(text,options,budget).0)\n\
+.expect(\"spawn escalated parser thread\")\n\
+.join()\n\
+.unwrap_or_else(|payload| std::panic::resume_unwind(payload))\n\
+})\n\
+}\n\
+fn parse_with_options_budget(text:&str,options:ParseOptions,budget:usize)->(ParseResult,bool) {\n\
+parse_with_scanner_budget(text,options,&mut RejectExtern,budget)\n\
+}\n\
+pub fn parse_with_scanner(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner)->ParseResult {\n\
+parse_with_scanner_budget(text,options,scanner,NATIVE_STACK_SENTINEL_BYTES).0\n\
+}\n\
+fn parse_with_scanner_budget(text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner,budget:usize)->(ParseResult,bool) {\n",
+    );
     // fast mode（診断を記録しない）で解析し、診断が要る結果なら同じ入力を診断モードで解析し直す。
     writeln!(
         p,
-        "// 診断は const DIAG で単相化する（D-036）。要求されていれば診断 session で 1 度だけ走り、\n// そうでなければ fast session で走って、診断が要る結果のときだけ診断 session で解析し直す（D-023）。\nif options.diagnostics {{let mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nreturn parser.finish(step);}}\nlet mut parser=Session::<false>::new(text,options,&mut *scanner);\nlet step=parser.r{entry}_c(State::default());\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {{return result;}}\nlet options=ParseOptions{{diagnostics:true,..options}};\nlet mut parser=Session::<true>::new(text,options,scanner);\nlet step=parser.r{entry}_c(State::default());\nparser.finish(step)\n}}",
+        "// 診断は const DIAG で単相化する（D-036）。要求されていれば診断 session で 1 度だけ走り、\n// そうでなければ fast session で走って、診断が要る結果のときだけ診断 session で解析し直す（D-023）。\nif options.diagnostics {{\nlet mut parser=Session::<true>::new(text,options,scanner,budget);\nlet step=parser.r{entry}_c(State::default());\nlet stack_exhausted=parser.stack_sentinel_tripped();\nreturn (parser.finish(step),stack_exhausted);\n}}\nlet mut parser=Session::<false>::new(text,options,&mut *scanner,budget);\nlet step=parser.r{entry}_c(State::default());\nlet stack_exhausted=parser.stack_sentinel_tripped();\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {{return (result,stack_exhausted);}}\nlet diag_options=ParseOptions{{diagnostics:true,..options}};\nlet mut parser=Session::<true>::new(text,diag_options,scanner,budget);\nlet step=parser.r{entry}_c(State::default());\nlet stack_exhausted=stack_exhausted || parser.stack_sentinel_tripped();\n(parser.finish(step),stack_exhausted)\n}}",
         entry = g.rules[ir.entry.rule_id.as_str()]
     )
     .unwrap();
@@ -317,7 +359,56 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         )
         .unwrap();
     }
-    p.push_str("_=>return Err(\"unsupported grammar or entry\"),})}\npub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\nlet mut scanner=RejectExtern;\nif options.diagnostics {let mut parser=Session::<true>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nreturn Ok(parser.finish(step));}\nlet mut parser=Session::<false>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {return Ok(result);}\nlet options=ParseOptions{diagnostics:true,..options};\nlet mut parser=Session::<true>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nOk(parser.finish(step))}\nimpl<const DIAG: bool> Session<'_, DIAG> {\n");
+    p.push_str(
+        "_=>return Err(\"unsupported grammar or entry\"),})}\n\
+// D-070: `parse_entry_budget` / `parse_entry_escalated` は `parse_entry_with_options` より\n\
+// 前に置く。driver.rs の scanner_hook / examples/p4-rust の build.rs はこの関数を\n\
+// テキストごと切り出して `parse_entry_with_scanner` へ改名するので、その範囲に\n\
+// この 2 つを含めない（含めると全文を丸ごと差し込む方の写しと二重定義になる）。\n\
+fn parse_entry_budget(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions,scanner:&mut dyn TokenScanner,budget:usize)->Result<(ParseResult,bool),&'static str> {\n\
+if options.diagnostics {\n\
+let mut parser=Session::<true>::new(text,options,scanner,budget);\n\
+let step=entry_step(&mut parser,grammar,entry)?;\n\
+let stack_exhausted=parser.stack_sentinel_tripped();\n\
+return Ok((parser.finish(step),stack_exhausted));\n\
+}\n\
+let mut parser=Session::<false>::new(text,options,scanner,budget);\n\
+let step=entry_step(&mut parser,grammar,entry)?;\n\
+let stack_exhausted=parser.stack_sentinel_tripped();\n\
+let (result,escalate)=parser.finish_checked(step);\n\
+if !escalate {return Ok((result,stack_exhausted));}\n\
+let diag_options=ParseOptions{diagnostics:true,..options};\n\
+let mut parser=Session::<true>::new(text,diag_options,scanner,budget);\n\
+let step=entry_step(&mut parser,grammar,entry)?;\n\
+let stack_exhausted=stack_exhausted || parser.stack_sentinel_tripped();\n\
+Ok((parser.finish(step),stack_exhausted))\n\
+}\n\
+// issue #35 / D-070: native stack 番兵に max_depth より先へ当たった（＝呼出し元 thread の\n\
+// stack が小さいだけ）ときだけ、max_depth から見積もった十分な stack を持つ専用 thread で\n\
+// 1 度だけ解析し直す。RejectExtern は状態を持たないので thread をまたいで再構築してよい。\n\
+fn parse_entry_escalated(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\n\
+let budget=escalated_stack_budget(options.max_depth);\n\
+let stack_bytes=escalated_thread_stack_bytes(options.max_depth);\n\
+std::thread::scope(|scope| {\n\
+std::thread::Builder::new().stack_size(stack_bytes)\n\
+.spawn_scoped(scope, move || {\n\
+let mut scanner=RejectExtern;\n\
+parse_entry_budget(grammar,entry,text,options,&mut scanner,budget)\n\
+})\n\
+.expect(\"spawn escalated parser thread\")\n\
+.join()\n\
+.unwrap_or_else(|payload| std::panic::resume_unwind(payload))\n\
+}).map(|(result,_)| result)\n\
+}\n\
+pub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\n\
+let mut scanner=RejectExtern;\n\
+let (result,stack_exhausted)=parse_entry_budget(grammar,entry,text,options,&mut scanner,NATIVE_STACK_SENTINEL_BYTES)?;\n\
+if result.ok || !stack_exhausted {return Ok(result);}\n\
+/*STACK_ESCALATION*/parse_entry_escalated(grammar,entry,text,options)/*STACK_ESCALATION*/\n\
+}\n\
+impl<const DIAG: bool> Session<'_, DIAG> {\n",
+    );
+    p.push_str(&g.scan_source);
     for (i, rule) in ir.semantics.rules.iter().enumerate() {
         for mode in [false, true] {
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {
