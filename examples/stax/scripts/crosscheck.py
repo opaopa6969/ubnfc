@@ -7,9 +7,13 @@
   - accepted / allConsumed
   - canonical AST（type / span / fields の完全一致）
   - スコープ診断（未定義シンボルの名前と位置）
+  - golden/<sample>.ast.json がある sample は、両 backend の canonical AST をその golden と
+    突き合わせる（D-074: token の直接 capture は原文の文字列。`NUMBER @text` が
+    片方だけ数値になる退行をここで止める）。STAX_UPDATE_GOLDEN=1 で Rust の出力を書き直す。
 診断の expected ラベルと主 offset は言語別 oracle なので比較しない。
 """
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -68,6 +72,24 @@ def main():
     java = run(["java", "-cp", java_classes, "target.driver.Driver"], requests)
 
     failures = []
+    golden_dir = samples.parent / "golden"
+    goldens = sorted(golden_dir.glob("*.ast.json")) if golden_dir.is_dir() else []
+    for path in goldens:
+        name = path.name[: -len(".ast.json")]
+        if name not in files:
+            raise SystemExit(f"golden {path.name} に対応する sample が無い")
+        index = files.index(name)
+        r, j = rust.get(index, {}), java.get(index, {})
+        if os.environ.get("STAX_UPDATE_GOLDEN") == "1":
+            path.write_text(
+                json.dumps(r.get("ast"), sort_keys=True, ensure_ascii=False, indent=1) + "\n",
+                encoding="utf-8",
+            )
+        want = json.loads(path.read_text(encoding="utf-8"))
+        for backend, response in (("Rust", r), ("Java", j)):
+            if canonical(response.get("ast")) != canonical(want):
+                failures.append(f"{name}: {backend} の canonical AST が golden/{path.name} と違う")
+    print(f"canonical AST golden: {len(goldens)} 本（両 backend と突き合わせ）")
     print(f"{'サンプル':<26} {'受理':<6} {'AST':<5} {'スコープ':<8} 期待")
     for index, name in enumerate(files):
         want = expected["samples"][index]

@@ -270,7 +270,10 @@ fn the_stax_grammar_matches_its_committed_ir_golden() {
         "{}",
         String::from_utf8_lossy(&produced.stderr)
     );
-    assert_eq!(produced.stdout, expected, "golden: ir/examples/stax.ir.json");
+    assert_eq!(
+        produced.stdout, expected,
+        "golden: ir/examples/stax.ir.json"
+    );
     let typed = ir::from_json(std::str::from_utf8(&produced.stdout).unwrap()).unwrap();
     assert_eq!(typed.language_version, 2);
     assert!(ir::validate_references(&typed).is_empty());
@@ -321,7 +324,11 @@ fn the_stax_grammar_validates_strictly_clean() {
         String::from_utf8_lossy(&out.stdout),
         String::from_utf8_lossy(&out.stderr)
     );
-    assert!(out.stdout.is_empty(), "{}", String::from_utf8_lossy(&out.stdout));
+    assert!(
+        out.stdout.is_empty(),
+        "{}",
+        String::from_utf8_lossy(&out.stdout)
+    );
 }
 
 /// `examples/stax/samples/` の 20 本と `samples/expected.json` が 1 対 1 で対応すること。

@@ -64,6 +64,7 @@ fn token_value_is_a_complete_mapped_ast_including_null_lists_and_code_point_span
 #[test]
 fn numeric_field_and_semantic_evaluation_remain_distinct() {
     // NumericCaptureRuntimeTest.java:31-49,81-86。数値の型も比較する。
+    // D-074: 両 backend とも入力字句（`+007`）。旧 Java の int 7 も、正規化した "7" も Fail。
     let c = case(
         json!({"Numeric":{"java_int":7,"rust_lexeme":"+007","extra":{}}}),
         "numeric-capture",
@@ -72,11 +73,12 @@ fn numeric_field_and_semantic_evaluation_remain_distinct() {
     let mut a = actual(
         json!({"allConsumed":true,"mappingError":null,"value":null,"ast":{"fields":{"value":7}}}),
     );
-    pass(&c, &a);
+    fails(&c, &a);
     a.response["ast"]["fields"]["value"] = json!("7");
     fails(&c, &a);
-    a.backend = Backend::Rust;
     a.response["ast"]["fields"]["value"] = json!("+007");
+    pass(&c, &a);
+    a.backend = Backend::Rust;
     pass(&c, &a);
     // SemanticCardinalityConformance.java:154-175: L:/T:/O: は評価値。
     let c = case(

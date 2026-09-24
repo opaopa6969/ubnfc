@@ -53,21 +53,22 @@ fn shared_constructor_joins_types_but_preserves_each_site_conversion_in_both_ord
             "grammar G {{ token N = NumberParser @root Root ::= First | Second | Third; {} @mapping(Leaf) Leaf ::= 'x'; }}",
             rules.join(" ")
         ));
+        // D-074: 数値 token の直接 capture も text なので、join は text/node の 2 つ。
         let ValueType::Mixed { members } = &field(&ir, "GAST.Value", "value").value_type else {
-            panic!("共有 constructor は text/node/number の join");
+            panic!("共有 constructor は text/node の join");
         };
-        assert_eq!(members.len(), 3);
+        assert_eq!(members.len(), 2);
         assert!(members.contains(&ValueType::Text {}));
         assert!(members.contains(&ValueType::Node {
             type_id: "GAST.Leaf".into()
         }));
-        assert!(members
+        assert!(!members
             .iter()
             .any(|m| matches!(m, ValueType::Number { .. })));
         for (rule, local) in [
             ("First", Conversion::Text),
             ("Second", Conversion::Node),
-            ("Third", Conversion::Number),
+            ("Third", Conversion::Text),
         ] {
             let f = recipe(&ir, &format!("recipe:{rule}"), "value");
             assert_eq!(f.conversion, Conversion::Mixed);
@@ -103,10 +104,15 @@ fn compound_text_and_mapped_dispatch_keep_their_value_types() {
             Conversion::Text
         );
     }
-    assert!(matches!(
+    // D-074: token の直接 capture は数値 token でも原文の文字列。
+    assert_eq!(
         field(&ir, "GAST.All", "number").value_type,
-        ValueType::Number { .. }
-    ));
+        ValueType::Text {}
+    );
+    assert_eq!(
+        recipe(&ir, "recipe:Root", "number").conversion,
+        Conversion::Text
+    );
     let nodes = field(&ir, "GAST.All", "nodes");
     assert_eq!(nodes.cardinality, Cardinality::List);
     let ValueType::Mixed { members } = &nodes.value_type else {

@@ -1,0 +1,206 @@
+{
+ "fields": {
+  "items": [
+   {
+    "fields": {
+     "names": [
+      {
+       "fields": {
+        "name": "Vec2"
+       },
+       "span": [
+        69,
+        74
+       ],
+       "type": "ImportName"
+      },
+      {
+       "fields": {
+        "name": "vx"
+       },
+       "span": [
+        74,
+        77
+       ],
+       "type": "ImportName"
+      },
+      {
+       "fields": {
+        "name": "vy"
+       },
+       "span": [
+        77,
+        80
+       ],
+       "type": "ImportName"
+      },
+      {
+       "fields": {
+        "name": "vec_add"
+       },
+       "span": [
+        80,
+        88
+       ],
+       "type": "ImportName"
+      },
+      {
+       "fields": {
+        "name": "vec_len_sq"
+       },
+       "span": [
+        88,
+        99
+       ],
+       "type": "ImportName"
+      }
+     ],
+     "path": "16-veclib.stax"
+    },
+    "span": [
+     46,
+     104
+    ],
+    "type": "UseDecl"
+   },
+   {
+    "fields": {
+     "body": [
+      {
+       "fields": {
+        "text": "1"
+       },
+       "span": [
+        120,
+        122
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "text": "2"
+       },
+       "span": [
+        122,
+        124
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "name": "Vec2"
+       },
+       "span": [
+        124,
+        131
+       ],
+       "type": "WordRef"
+      },
+      {
+       "fields": {
+        "text": "3"
+       },
+       "span": [
+        131,
+        133
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "text": "4"
+       },
+       "span": [
+        133,
+        135
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "name": "Vec2"
+       },
+       "span": [
+        135,
+        142
+       ],
+       "type": "WordRef"
+      },
+      {
+       "fields": {
+        "name": "vec_add"
+       },
+       "span": [
+        142,
+        152
+       ],
+       "type": "WordRef"
+      },
+      {
+       "fields": {
+        "name": "vec_len_sq"
+       },
+       "span": [
+        152,
+        165
+       ],
+       "type": "WordRef"
+      },
+      {
+       "fields": {
+        "name": "int_to_str"
+       },
+       "span": [
+        165,
+        176
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "print"
+       },
+       "span": [
+        176,
+        182
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "newline"
+       },
+       "span": [
+        182,
+        190
+       ],
+       "type": "Prim"
+      }
+     ],
+     "effect": {
+      "fields": {
+       "inputs": [],
+       "outputs": []
+      },
+      "span": [
+       111,
+       120
+      ],
+      "type": "Effect"
+     },
+     "name": "main"
+    },
+    "span": [
+     104,
+     192
+    ],
+    "type": "WordDef"
+   }
+  ]
+ },
+ "span": [
+  0,
+  192
+ ],
+ "type": "Program"
+}

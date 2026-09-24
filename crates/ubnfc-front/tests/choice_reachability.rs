@@ -108,6 +108,74 @@ fn a_derivation_that_starts_with_an_earlier_alternative_and_consumes_more_is_sha
     .is_empty());
 }
 
+fn recovery_codes(text: &str) -> Vec<String> {
+    let issues = validate_file("/virtual/main.ubnf", &|_| Ok(text.into())).unwrap();
+    assert!(
+        issues.iter().all(|i| i.severity() != "ERROR"),
+        "{text}: {issues:?}"
+    );
+    issues
+        .iter()
+        .filter(|i| i.code == "W-RECOVERY-IN-CHOICE")
+        .map(|i| format!("{} {}", i.code, i.rule.clone().unwrap_or_default()))
+        .collect()
+}
+
+/// #71: `@recovery` 規則が順序付き選択の**末尾でない**候補の先頭で必ず呼ばれると、
+/// 後続候補のための入力でもその規則が失敗し、回復が成功を返して後続候補が試されない
+/// （stax の `TopLevel ::= UseDecl | WordDef | ... | StructDef` で実測）。
+#[test]
+fn a_recovering_rule_at_the_head_of_a_non_last_alternative_is_warned() {
+    let stax = "Pick ::= Use | Word | Struct ; Use ::= 'use' ';' ; \
+                @recovery(sync=';') Word ::= ':' 'w' ';' ; Struct ::= 'struct' ';' ;";
+    assert_eq!(
+        recovery_codes(&grammar(stax)),
+        ["W-RECOVERY-IN-CHOICE Pick"]
+    );
+    // 3 形とも。規則・group・省略可能・反復・列の先頭を経由しても先頭で呼ばれる。
+    for mode in ["auto", "skip", "sync=';'"] {
+        assert_eq!(
+            recovery_codes(&grammar(&format!(
+                "Pick ::= Wrap 'k' | 'x' ; Wrap ::= ( [ W ] ) ; @recovery({mode}) W ::= 'a' ';' ;"
+            ))),
+            ["W-RECOVERY-IN-CHOICE Pick"],
+            "{mode}"
+        );
+    }
+    // 入れ子の選択は、その選択の第 1 候補だけを必ず試す。
+    assert_eq!(
+        recovery_codes(&grammar(
+            "Pick ::= ( W | 'q' ) | 'x' ; @recovery(sync=';') W ::= 'a' ';' ;"
+        )),
+        ["W-RECOVERY-IN-CHOICE Pick"]
+    );
+}
+
+#[test]
+fn a_recovering_rule_that_is_not_forced_at_the_head_of_a_non_last_alternative_is_not_warned() {
+    for body in [
+        // 末尾の候補なら後続候補は無い。
+        "Pick ::= 'x' | W ; @recovery(sync=';') W ::= 'a' ';' ;",
+        // 回復規則を反復で包む慣用形（corpus の recovery-sync と同じ）は選択ではない。
+        "Pick ::= W { W } ; @recovery(sync=';') W ::= 'a' ';' ;",
+        // 先頭で先に消費する要素があれば、回復規則が走るのは候補を選び切った後。
+        "Pick ::= ':' W | 'x' ; @recovery(sync=';') W ::= 'a' ';' ;",
+        // 入れ子の選択の第 2 候補は、第 1 候補が失敗したときしか走らない（下界）。
+        "Pick ::= ( 'q' | W ) | 'x' ; @recovery(sync=';') W ::= 'a' ';' ;",
+        // 回復規則がどの選択の先頭にも無い（別の規則からだけ呼ばれる）。
+        "Pick ::= Top | 'x' ; Top ::= 'a' ; @recovery(sync=';') W ::= 'a' ';' ; Other ::= W ;",
+        // 回復規則を末尾でない候補に置いても、先頭に無ければ鳴らさない。
+        "Pick ::= 'y' W | 'x' ; @recovery(skip) W ::= 'a' ;",
+    ] {
+        assert!(recovery_codes(&grammar(body)).is_empty(), "{body}");
+    }
+    // 回復規則を「選択を含む規則」自体に付けるのが推奨形。
+    assert!(recovery_codes(&grammar(
+        "@recovery(sync=';') Pick ::= Use | Word ; Use ::= 'use' ';' ; Word ::= ':' ';' ;"
+    ))
+    .is_empty());
+}
+
 #[test]
 fn the_check_is_deterministic_and_does_not_change_acceptance() {
     let text = grammar("Pick ::= Num | Add ; Add ::= Num '+' Num | 'z' ; Num ::= '1' | '2' ;");
@@ -212,7 +280,7 @@ fn every_repository_grammar_reports_exactly_the_recorded_choice_warnings() {
             .unwrap_or_else(|e| panic!("{relative}: {e}"));
         let choice: Vec<_> = issues
             .iter()
-            .filter(|i| i.code.starts_with("W-CHOICE-"))
+            .filter(|i| i.code.starts_with("W-CHOICE-") || i.code == "W-RECOVERY-IN-CHOICE")
             .collect();
         assert_eq!(choice.len(), *expected, "{relative}: {choice:?}");
         for issue in choice {
@@ -221,9 +289,10 @@ fn every_repository_grammar_reports_exactly_the_recorded_choice_warnings() {
     }
     let p4 = tiny.join("tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf");
     let issues = validate_file(&p4, &|p| std::fs::read_to_string(p)).unwrap();
+    // #71 の W-RECOVERY-IN-CHOICE も同じ集計に含める（リポジトリ文法には 0 件）。
     let choice: Vec<_> = issues
         .iter()
-        .filter(|i| i.code.starts_with("W-CHOICE-"))
+        .filter(|i| i.code.starts_with("W-CHOICE-") || i.code == "W-RECOVERY-IN-CHOICE")
         .collect();
     assert_eq!(choice.len(), 9, "P4: {choice:?}");
     // 報告の見出しになった実例: Expression の NumberExpression が BooleanExpression を覆う。

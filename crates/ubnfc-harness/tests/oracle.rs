@@ -236,7 +236,8 @@ fn every_divergence_resolves_and_only_follow_spec_is_attached() {
             .iter()
             .filter(|e| e.decision == Decision::FollowSpec)
             .count(),
-        67
+        // D-074: common-field-type/1 の generation を new-contract:direct-token-capture-text へ。
+        66
     );
     // D-018 で undecided 15 件は名前付き契約（new-contract:*）に決定した。
     assert_eq!(
@@ -244,7 +245,8 @@ fn every_divergence_resolves_and_only_follow_spec_is_attached() {
             .iter()
             .filter(|e| matches!(e.decision, Decision::NewContract(_)))
             .count(),
-        15
+        // D-018 の 15 件 + D-074 の 1 件。
+        16
     );
     assert_eq!(
         entries

@@ -66,6 +66,7 @@ pub const FEATURES: &[&str] = &[
     "token:charRangeEscape",
     "token:charRangeSupplementary",
     "token:negationEscape",
+    "capture:directToken",
 ];
 
 /// UBNF v2（`@ubnf: 2`）を生成する seed の帯。
@@ -74,6 +75,28 @@ pub const FEATURES: &[&str] = &[
 /// 4001..4004 は CI の固定 campaign）。したがって v2 は乱数を引かず、
 /// **seed の値だけ**で決める。
 pub const V2_SEED_BASE: u64 = 100_000;
+
+/// token の**直接** capture（`NUMBER @x`）を必ず含める seed の帯（#75 / D-074）。
+///
+/// 乱択でも「token 参照 + capture」は出るが、`@mapping` の field になるかは乱数次第で、
+/// 比較側も D-022 の射影（Java の int → 字句）で差を消していた。この帯は乱数を 1 つも
+/// 引かずに `Direct` 規則を足し、数値・識別子・引用符付き文字列（v2 の奇数 seed は
+/// extern）の直接 capture と、group を挟んだ capture を必ず `@mapping` の field にする。
+/// 帯の中の版は `seed - DIRECT_CAPTURE_SEED_BASE` を既存の規則で読む:
+/// `DIRECT_CAPTURE_SEED_BASE + n`（n < `V2_SEED_BASE`）は v1、
+/// `DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE + n` は v2。
+/// 既存の帯（v1: `0..V2_SEED_BASE`、v2: `V2_SEED_BASE..DIRECT_CAPTURE_SEED_BASE`）の
+/// 生成物は 1 バイトも変わらない。
+pub const DIRECT_CAPTURE_SEED_BASE: u64 = 1_000_000;
+
+/// seed が v2（`@ubnf: 2`）の帯か。直接 capture の帯でも同じ区切りで v1 / v2 を分ける。
+pub fn is_v2_seed(seed: u64) -> bool {
+    if seed >= DIRECT_CAPTURE_SEED_BASE {
+        seed - DIRECT_CAPTURE_SEED_BASE >= V2_SEED_BASE
+    } else {
+        seed >= V2_SEED_BASE
+    }
+}
 
 /// UBNF v2 の token 綴り（D-041）。v2 の seed だけ、同じ述語を**言語中立な語彙**か
 /// **明示 extern** で綴り直す。トークン数も乱数の消費も変えないので、既存 seed の
@@ -355,7 +378,8 @@ impl Builder<'_> {
 pub fn generate(seed: u64) -> Grammar {
     let mut rng = Rng::new(seed);
     // v2 は乱数を消費せずに seed だけで決める（既存 seed の生成物を保つため）。
-    let v2 = seed >= V2_SEED_BASE;
+    let v2 = is_v2_seed(seed);
+    let direct = seed >= DIRECT_CAPTURE_SEED_BASE;
     let mut builder = Builder {
         rng: &mut rng,
         features: BTreeSet::new(),
@@ -775,9 +799,58 @@ pub fn generate(seed: u64) -> Grammar {
             capture: Some("tail".into()),
         });
     }
+    // 直接 capture の帯（#75）: 乱数を引かずに token 3 本と `Direct` 規則を足し、根から必ず通す。
+    if direct {
+        builder.mark("capture:directToken");
+        for (name, index) in [("DN", 0usize), ("DI", 1), ("DS", 2)] {
+            let spec = &TOKEN_PALETTE[index];
+            let declaration = match v2.then(|| v2_spelling(seed, spec.declaration)).flatten() {
+                Some((spelling, marker)) => {
+                    builder.mark(marker);
+                    spelling
+                }
+                None => spec.declaration,
+            };
+            builder.mark(spec.feature);
+            builder.tokens.push(Token {
+                name: name.into(),
+                declaration: declaration.to_owned(),
+                samples: spec.samples.iter().map(|s| (*s).to_owned()).collect(),
+                feature: spec.feature,
+            });
+        }
+        let reference = |name: &str| Atom::Ref(name.to_owned());
+        rules.push(Rule::plain(
+            vec!["@mapping(Direct, params=[dn, dg, di, dl, ds])".to_owned()],
+            "Direct".into(),
+            Body::single(vec![
+                // 数値 token の直接 capture と、group を挟んだ capture（両方とも原文の文字列）。
+                Element::captured(reference("DN"), "dn"),
+                Element::new(Atom::Literal(":".into())),
+                Element::captured(
+                    Atom::Group(Body::single(vec![Element::new(reference("DN"))])),
+                    "dg",
+                ),
+                // 省略可能・反復の中の直接 capture（Optional / List の要素型）。
+                Element::new(Atom::Optional(Body::single(vec![Element::captured(
+                    reference("DI"),
+                    "di",
+                )]))),
+                Element::new(Atom::Repeat(Body::single(vec![
+                    Element::new(Atom::Literal(",".into())),
+                    Element::captured(reference("DN"), "dl"),
+                ]))),
+                // 引用符付き文字列（v2 の奇数 seed は extern scanner）。
+                Element::captured(reference("DS"), "ds"),
+            ]),
+        ));
+        root_elements.push(Element::captured(reference("Direct"), "direct"));
+    }
     let root_captures = capture_names(&Body::single(root_elements.clone()));
     let mut root_annotations = vec!["@root".to_owned()];
-    if builder.rng.chance(60) {
+    // 直接 capture の帯は根を必ず `@mapping` にして、`Direct` の node を field に載せる
+    // （根が transparent だと entry が複数の AST 値を返す別の差になる）。乱数は同じだけ引く。
+    if builder.rng.chance(60) || direct {
         builder.mark("mapping");
         root_annotations.push(format!(
             "@mapping(Top, params=[{}])",
@@ -978,10 +1051,50 @@ mod tests {
         assert!(features.contains("token:extern"), "{features:?}");
     }
 
+    /// #75: 直接 capture の帯は v1 / v2 の両方にあり、既存の帯には `Direct` が現れない
+    /// （`Direct` の追加は乱数を引かないので、既存の帯の生成物は不変）。
+    #[test]
+    fn direct_token_captures_appear_only_in_their_own_band_for_both_versions() {
+        for seed in (0..200u64).chain(V2_SEED_BASE..V2_SEED_BASE + 200) {
+            let grammar = generate(seed);
+            assert!(
+                !grammar.features.contains("capture:directToken"),
+                "seed {seed}"
+            );
+            assert!(!grammar.render().contains("Direct"), "seed {seed}");
+        }
+        for (base, v2) in [
+            (DIRECT_CAPTURE_SEED_BASE, false),
+            (DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE, true),
+        ] {
+            for seed in base..base + 40 {
+                let grammar = generate(seed);
+                let text = grammar.render();
+                assert!(
+                    grammar.features.contains("capture:directToken"),
+                    "seed {seed}"
+                );
+                assert_eq!(grammar.features.contains("ubnf2"), v2, "seed {seed}");
+                assert!(text.contains("DN @dn"), "seed {seed}\n{text}");
+                assert!(text.contains("DS @ds"), "seed {seed}\n{text}");
+                assert!(text.contains("Direct @direct"), "seed {seed}\n{text}");
+            }
+        }
+        // v2 の直接 capture 帯は extern の直接 capture も踏む（奇数 seed）。
+        let base = DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE;
+        assert!(generate(base + 1)
+            .render()
+            .contains("DS = extern 'SingleQuotedParser'"));
+        assert!(generate(base).render().contains("DS = SINGLE_QUOTED"));
+    }
+
     #[test]
     fn every_declared_feature_name_is_reachable_from_some_seed() {
         let mut seen = BTreeSet::new();
-        for seed in (0..800u64).chain(V2_SEED_BASE..V2_SEED_BASE + 800) {
+        for seed in (0..800u64)
+            .chain(V2_SEED_BASE..V2_SEED_BASE + 800)
+            .chain(DIRECT_CAPTURE_SEED_BASE..DIRECT_CAPTURE_SEED_BASE + 4)
+        {
             seen.extend(generate(seed).features);
         }
         let missing: Vec<_> = FEATURES

@@ -407,3 +407,63 @@ fn b_recovery_auto_keeps_acceptance_identical_across_backends() {
         .collect();
     assert!(acceptance.is_empty(), "受理が食い違う差分: {acceptance:#?}");
 }
+
+/// #75 の回帰試験（固定 seed campaign）。直接 capture の帯（`gen::DIRECT_CAPTURE_SEED_BASE`）は
+/// 乱数を引かずに `Direct ::= DN @dn ':' ( DN ) @dg [ DI @di ] { ',' DN @dl } DS @ds` を足し、
+/// 根の `@mapping` の field に載せる。v1 帯 2 本と v2 帯 2 本（奇数 seed は `DS` が extern）。
+/// 旧 front（D-022: Java int / Rust 字句）では、同じ帯の seed 1000002 が
+/// `diff:/ast/fields/direct/fields/dn` と `.../dl/*` を出した（縮小入力 `iあ0:1''`、
+/// `tests/direct_token_capture.rs`）。seed 1000002 自体は乱択部分に別の既存差
+/// （`diff:/ast/fields/tail/*`、issue #78）を持つので固定帯からは外した。
+#[test]
+fn g_direct_token_captures_agree_across_backends() {
+    ubnfc_fuzz::tune_generated_builds();
+    let base = ubnfc_fuzz::gen::DIRECT_CAPTURE_SEED_BASE;
+    let v2 = base + ubnfc_fuzz::gen::V2_SEED_BASE;
+    let mut accepted = 0usize;
+    for seed in [base + 1, base + 3, v2 + 1, v2 + 2] {
+        let grammar = ubnfc_fuzz::gen::generate(seed);
+        assert!(
+            grammar.features.contains("capture:directToken"),
+            "seed {seed}: {:?}",
+            grammar.features
+        );
+        let scratch = scratch();
+        let summary = campaign::run(&Config {
+            start_seed: seed,
+            seeds: 1,
+            inputs: 12,
+            jobs: 1,
+            budget: Some(Duration::from_secs(600)),
+            findings: None,
+            shrink_builds: 0,
+            driver_timeout: Duration::from_secs(120),
+            workdir: scratch.0.clone(),
+        });
+        assert_eq!(
+            summary.discarded, 0,
+            "front の discard: {:?}",
+            summary.discards
+        );
+        assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
+        assert!(
+            summary.comparisons >= 10 && summary.driver_errors == 0,
+            "seed {seed}: 比較 {} / error {}",
+            summary.comparisons,
+            summary.driver_errors
+        );
+        accepted += summary.accepted_all;
+        let unknown: Vec<_> = summary
+            .findings
+            .iter()
+            .filter(|finding| !KNOWN.contains(&finding.signature.as_str()))
+            .map(|finding| format!("{} ({})", finding.signature, finding.slug))
+            .collect();
+        assert!(
+            unknown.is_empty(),
+            "seed {seed} の未登録の差分: {unknown:#?}"
+        );
+    }
+    // 全入力受理が無ければ `Direct` の AST を比較できていない。
+    assert!(accepted > 0, "直接 capture の帯で受理が 0 件");
+}

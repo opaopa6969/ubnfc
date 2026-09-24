@@ -28,10 +28,8 @@ fn only_the_documented_rejections_are_registered_per_backend() {
                         assert!(matches!(**original, Expectation::RuleValue(_)));
                     }
                     "E-LOWER-COMMON-FIELD" => {
-                        assert!(matches!(
-                            row.case_id.as_str(),
-                            "common-field-missing/1" | "common-field-type/1"
-                        ));
+                        // D-074: common-field-type/1 は生成できるようになったので外した。
+                        assert_eq!(row.case_id, "common-field-missing/1");
                         assert!(matches!(**original, Expectation::GenerationFailure { .. }));
                     }
                     "E-LOWER-SUM-EVAL" => {
@@ -59,7 +57,7 @@ fn only_the_documented_rejections_are_registered_per_backend() {
         }
         let mut expected = BTreeMap::from([
             (("validate", "E-PRECEDENCE-ORDER"), 24),
-            (("ir", "E-LOWER-COMMON-FIELD"), 2),
+            (("ir", "E-LOWER-COMMON-FIELD"), 1),
             (("ir", "E-LOWER-SUM-EVAL"), 1),
             (("ir", "E-IMPORT-CYCLE"), 1),
         ]);
@@ -147,20 +145,21 @@ fn expected_rejections_pass_but_wrong_codes_stages_and_runtime_fail() {
         assert_eq!(row.outcome, Outcome::Fail);
     }
     let report = Report::new(Backend::Java, 1, 5, 5, builds, passed);
-    assert_eq!(report.totals.expected_rejection_pass, 28);
+    assert_eq!(report.totals.expected_rejection_pass, 27);
     assert_eq!(report.totals.pass, 0);
     assert_eq!(report.totals.ir_failure, 0);
-    assert_eq!(report.totals.total(), 28);
+    assert_eq!(report.totals.total(), 27);
     assert_eq!(report.families["associative"].expected_rejection_pass, 24);
-    assert_eq!(report.families["oracle"].expected_rejection_pass, 4);
+    // D-074: common-field-type/1 は拒否契約から外した。
+    assert_eq!(report.families["oracle"].expected_rejection_pass, 3);
     for groups in [&report.families, &report.kinds, &report.grammars] {
-        assert_eq!(groups.values().map(Counts::total).sum::<usize>(), 28);
+        assert_eq!(groups.values().map(Counts::total).sum::<usize>(), 27);
     }
     assert_eq!(report.refusals["ir/E-PRECEDENCE-ORDER"].executions, 24);
     let json: Value = serde_json::from_str(&report.json()).unwrap();
-    assert_eq!(json["totals"]["expected_rejection_pass"], 28);
+    assert_eq!(json["totals"]["expected_rejection_pass"], 27);
     assert!(report.markdown().contains("| 期待拒否 Pass |"));
     assert!(report
         .markdown()
-        .contains("| 合計 | 0 | 0 | 0 | 0 | 0 | 28 | 0 | 0 | 0 |"));
+        .contains("| 合計 | 0 | 0 | 0 | 0 | 0 | 27 | 0 | 0 | 0 |"));
 }

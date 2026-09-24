@@ -157,8 +157,8 @@
     "file": "common-field-type.json",
     "caseId": "common-field-type/1",
     "observation": "generation",
-    "reason": "README.md#疑義 8: 共通 accessor の欠損/異型を持つ AST を生成して javac で落とすのではなく、全 variant に共通 field が必要という契約で frontend が拒否する。generation の失敗段階・理由の差として記録する。",
-    "decision": "follow-spec"
+    "reason": "README.md#疑義 8 の異型側。旧実装は共通 field name を A で String・B で int（NumberParser の直接 capture）にして javac で落ちた。D-074（token の直接 capture は数値 token でも原文の文字列）で両方 String になり型が揃うので、frontend は拒否せず生成・実行する。oracle の生成失敗との差として記録する。",
+    "decision": "new-contract:direct-token-capture-text"
   },
   {
     "file": "enum-collision.json",

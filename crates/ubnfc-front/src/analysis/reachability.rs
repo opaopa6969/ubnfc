@@ -246,6 +246,44 @@ impl Reach<'_, '_> {
         out
     }
 
+    /// 式を位置 p で試すと**必ず**同じ位置 p で最初に呼ばれる `@recovery` 適用 site の規則名（#71）。
+    ///
+    /// 辿るのは「試せば必ず先頭で走る」子だけ: 列の先頭要素、選択の第 1 候補（ordered /
+    /// longest。predictive は候補除外で飛ばしうるので辿らない）、group・省略可能・反復
+    /// （UNTIL 付きは終端判定が先に走るので除く）・区切り列の要素、規則参照の本体。
+    /// 1 本道なので再帰も分岐も無い。循環は訪問済みで打ち切る（下界＝警告が減る方向）。
+    fn recovery_head(&self, start: usize) -> Option<String> {
+        let mut seen = BTreeSet::new();
+        let mut i = start;
+        while seen.insert(i) {
+            if self.recovery[i] {
+                if let ExprNode::RuleRef { symbol_id } = self.node(i) {
+                    return Some(split(symbol_id).1);
+                }
+                return None;
+            }
+            i = match self.node(i) {
+                ExprNode::RuleRef { symbol_id } => self.body(symbol_id),
+                ExprNode::Seq { items } => self.at(items.first()?),
+                ExprNode::Choice {
+                    alternatives,
+                    selection: ChoiceSelection::Ordered | ChoiceSelection::Longest,
+                    ..
+                } => self.at(alternatives.first()?),
+                ExprNode::Group { child } | ExprNode::Optional { child } => self.at(child),
+                ExprNode::Repeat {
+                    child,
+                    terminator: None,
+                    max,
+                    ..
+                } if *max != Some(0) => self.at(child),
+                ExprNode::Separated { element, .. } => self.at(element),
+                _ => return None,
+            };
+        }
+        None
+    }
+
     /// 式が必ず先頭に持つ、大文字小文字を区別するリテラル文字列と、
     /// その途中で跨いだ trivia 挿入境界の policy。`PREFIX_CAP` で打ち切る。
     ///
@@ -680,6 +718,27 @@ pub(super) fn check(cx: &Context<'_>) -> Vec<ChoiceIssue> {
                         "PEG ordered choice does not retry a later alternative when the continuation fails; move the longer alternative before.".into(),
                     ));
                 }
+            }
+        }
+        // 4. #71: 末尾でない候補の先頭で `@recovery` 規則が必ず呼ばれる。回復は
+        //    「規則が開始位置で失敗した」ことしか見ない（§3.10）ので、後続候補のための
+        //    入力でもその規則が失敗して回復が成功を返し、後続候補は試されない。
+        for (k, &a) in indexes.iter().enumerate() {
+            if k + 1 == indexes.len() {
+                continue;
+            }
+            if let Some(name) = reach.recovery_head(a) {
+                found.push((
+                    "W-RECOVERY-IN-CHOICE".into(),
+                    format!(
+                        "alternative {} of rule {rule} always starts by calling {name}, which has @recovery; when {name} fails there (for example because the input belongs to a later alternative), recovery turns the failure into a success, so the {} alternative(s) after it are not tried at that position",
+                        k + 1,
+                        indexes.len() - k - 1
+                    ),
+                    format!(
+                        "Move @recovery to a rule that is reached only after the alternative has committed (e.g. put it on the enclosing list element such as `{{ {rule} }}`), or make the recovering alternative the last one."
+                    ),
+                ));
             }
         }
         issues.extend(found.into_iter().map(|(code, message, hint)| ChoiceIssue {
