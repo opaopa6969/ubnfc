@@ -3,17 +3,97 @@
 //! 型付き AST の値と、未 capture の suffix を含む rule occurrence を使う。
 //! ソース全体を字句・構文解析し直す経路は持たない。
 
-use std::collections::BTreeMap;
-
 use crate::syntax::ast::*;
 
 /// 生成バックエンドに依存しない、型付き AST の借用投影。
 /// ノードの構造は occurrence が保持し、ここには mapping 済みの文字列を置く。
+///
+/// ノード・field・値をそれぞれ 1 本の配列に詰める。ノードごと・field ごとに
+/// `Vec` を持つと投影だけで確保がノード数に比例して増えるため（実測 764 ノードで 885 回）、
+/// 範囲の始点だけを持ち、終点は次の要素の始点から求める。
+#[derive(Debug, Default)]
+pub struct MappedNodes<'a> {
+    nodes: Vec<MappedNode<'a>>,
+    fields: Vec<MappedField<'a>>,
+    values: Vec<&'a str>,
+}
+
 #[derive(Debug)]
-pub struct MappedNode<'a> {
-    pub kind: &'a str,
-    pub span_cp: [usize; 2],
-    pub fields: Vec<(&'a str, Vec<&'a str>)>,
+struct MappedNode<'a> {
+    kind: &'a str,
+    span_cp: [usize; 2],
+    field_start: u32,
+}
+
+#[derive(Debug)]
+struct MappedField<'a> {
+    name: &'a str,
+    value_start: u32,
+}
+
+impl<'a> MappedNodes<'a> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    /// `nodes` はノード数の上限の目安。field / 値も同じ目安で確保しておく。
+    pub fn with_capacity(nodes: usize) -> Self {
+        Self {
+            nodes: Vec::with_capacity(nodes),
+            fields: Vec::with_capacity(nodes),
+            values: Vec::with_capacity(nodes),
+        }
+    }
+    pub fn len(&self) -> usize {
+        self.nodes.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.nodes.is_empty()
+    }
+    /// ノードを 1 つ足す。field は返り値の `field` で続けて足す。
+    pub fn node<'s>(&'s mut self, kind: &'a str, span_cp: [usize; 2]) -> NodeFields<'s, 'a> {
+        let field_start = self.fields.len() as u32;
+        self.nodes.push(MappedNode {
+            kind,
+            span_cp,
+            field_start,
+        });
+        NodeFields { nodes: self }
+    }
+    fn kind(&self, node: usize) -> &'a str {
+        self.nodes[node].kind
+    }
+    fn span_cp(&self, node: usize) -> [usize; 2] {
+        self.nodes[node].span_cp
+    }
+    /// ノードの field 値。名前が無ければ `None`（呼び手は capture 経路に落ちる）。
+    fn values_of(&self, node: usize, field: &str) -> Option<&[&'a str]> {
+        let start = self.nodes[node].field_start as usize;
+        let end = self.nodes[node + 1..]
+            .first()
+            .map_or(self.fields.len(), |next| next.field_start as usize);
+        let at = start
+            + self.fields[start..end]
+                .iter()
+                .position(|f| f.name == field)?;
+        let from = self.fields[at].value_start as usize;
+        let to = self.fields[at + 1..]
+            .first()
+            .map_or(self.values.len(), |next| next.value_start as usize);
+        Some(&self.values[from..to])
+    }
+}
+
+/// 直前に足したノードへ field を足す借用。値は `&str` の並びをそのまま渡せる。
+pub struct NodeFields<'s, 'a> {
+    nodes: &'s mut MappedNodes<'a>,
+}
+impl<'a> NodeFields<'_, 'a> {
+    pub fn field(&mut self, name: &'a str, values: impl IntoIterator<Item = &'a str>) -> &mut Self {
+        let value_start = self.nodes.values.len() as u32;
+        self.nodes.fields.push(MappedField { name, value_start });
+        self.nodes.values.extend(values);
+        self
+    }
 }
 
 #[derive(Debug)]
@@ -60,14 +140,11 @@ pub struct SourceOffsets<'a> {
 }
 impl<'a> SourceOffsets<'a> {
     pub fn new(source: &'a str) -> Self {
-        Self {
-            source,
-            bytes: source
-                .char_indices()
-                .map(|(i, _)| i)
-                .chain([source.len()])
-                .collect(),
-        }
+        // code point 数は byte 数を超えないので、1 回の確保で表を作り切る。
+        let mut bytes = Vec::with_capacity(source.len() + 1);
+        bytes.extend(source.char_indices().map(|(i, _)| i));
+        bytes.push(source.len());
+        Self { source, bytes }
     }
     pub fn byte_span(&self, cp: [usize; 2]) -> Result<Span> {
         if cp[0] > cp[1] || cp[1] >= self.bytes.len() {
@@ -91,37 +168,46 @@ impl<'a> SourceOffsets<'a> {
 
     /// 採用済み span の境界 trivia だけを除く。内部の構文の採否は決定しない。
     /// 引用文字列の空白・// は残し、javaStyle の6文字と行コメントだけを除く。
+    ///
+    /// 走査は byte 単位で行う。判定に使う文字（空白・`/`・`\\`・`'`）はすべて ASCII で、
+    /// 多 byte 文字の各 byte は 0x80 以上なのでどれにも一致せず「内容」として扱われる。
+    /// 先頭 byte で `start` が、末尾の後続 byte で `end` が決まるので、
+    /// 文字単位で走るのと同じ結果になる（UTF-8 の復号ぶんだけ速い）。
     fn content_span(&self, cp: [usize; 2]) -> Result<Span> {
         let raw = self.byte_span(cp)?;
+        let source = self.source.as_bytes();
         let mut start = None;
         let mut end = raw.start;
-        let mut chars = self.source[raw.start..raw.end].char_indices().peekable();
+        let mut at = raw.start;
         let mut quoted = false;
         let mut escaped = false;
-        while let Some((at, ch)) = chars.next() {
+        while at < raw.end {
+            let byte = source[at];
             if !quoted {
-                if is_space(ch) {
+                if is_space(byte) {
+                    at += 1;
                     continue;
                 }
-                if ch == '/' && chars.peek().is_some_and(|(_, ch)| *ch == '/') {
-                    chars.next();
-                    for (_, ch) in chars.by_ref() {
-                        if matches!(ch, '\r' | '\n') {
-                            break;
-                        }
+                if byte == b'/' && at + 1 < raw.end && source[at + 1] == b'/' {
+                    at += 2;
+                    while at < raw.end && !matches!(source[at], b'\r' | b'\n') {
+                        at += 1;
                     }
+                    // 行末の改行自体も trivia として読み飛ばす。
+                    at += 1;
                     continue;
                 }
             }
-            start.get_or_insert(raw.start + at);
-            end = raw.start + at + ch.len_utf8();
+            start.get_or_insert(at);
+            end = at + 1;
             if escaped {
                 escaped = false;
-            } else if quoted && ch == '\\' {
+            } else if quoted && byte == b'\\' {
                 escaped = true;
-            } else if ch == '\'' {
+            } else if byte == b'\'' {
                 quoted = !quoted;
             }
+            at += 1;
         }
         // epsilon は次の構文トークンの位置。rule 開始時の trivia 消費後の位置を使う。
         Ok(Span {
@@ -130,8 +216,8 @@ impl<'a> SourceOffsets<'a> {
         })
     }
 }
-fn is_space(ch: char) -> bool {
-    matches!(ch, ' ' | '\t' | '\r' | '\n' | '\u{b}' | '\u{c}')
+fn is_space(byte: u8) -> bool {
+    matches!(byte, b' ' | b'\t' | b'\r' | b'\n' | 0x0b | 0x0c)
 }
 
 /// STRING capture の引用符を除去し、syntax lexer と同じ未知 escape 保持を行う。
@@ -143,7 +229,11 @@ pub fn decode_string(raw: &str, span: Span) -> Result<String> {
             message: "STRING capture に引用符がありません".into(),
             span,
         })?;
-    let mut result = String::new();
+    // escape の無い文字列（大多数）は 1 回の確保で複製する。
+    if !inner.contains('\\') {
+        return Ok(inner.to_owned());
+    }
+    let mut result = String::with_capacity(inner.len());
     let mut chars = inner.chars();
     while let Some(ch) = chars.next() {
         if ch != '\\' {
@@ -172,26 +262,92 @@ pub fn decode_string(raw: &str, span: Span) -> Result<String> {
 /// occurrence の親子関係が選択枝を表し、span 内文字列から枝を再推測しない。
 pub fn convert(
     source: &str,
-    nodes: &[MappedNode<'_>],
+    nodes: &MappedNodes<'_>,
     captures: &[Capture<'_>],
     occurrences: &[Occurrence<'_>],
 ) -> Result<UbnfFile> {
     Converter::new(source, nodes, captures, occurrences)?.file()
 }
 
+/// occurrence / node 索引の「無し」。索引は u32 に収める（超えたら変換を拒否する）。
+const NONE: u32 = u32::MAX;
+
+/// 圧縮隣接リスト（CSR）。`start[k]..start[k + 1]` が k 番の要素範囲。
+struct Csr {
+    start: Vec<u32>,
+    index: Vec<u32>,
+}
+impl Csr {
+    /// `owner[k]` が要素 k の所有者（`NONE` は所有者なし）。元の push 順（k の昇順）を保つ。
+    fn from_owners(owner: &[u32], groups: usize) -> Self {
+        let mut start = vec![0u32; groups + 1];
+        for &o in owner {
+            if o != NONE {
+                start[o as usize + 1] += 1;
+            }
+        }
+        for k in 0..groups {
+            start[k + 1] += start[k];
+        }
+        let mut index = vec![0u32; start[groups] as usize];
+        let mut cursor = start[..groups].to_vec();
+        for (k, &o) in owner.iter().enumerate() {
+            if o != NONE {
+                let slot = &mut cursor[o as usize];
+                index[*slot as usize] = k as u32;
+                *slot += 1;
+            }
+        }
+        Self { start, index }
+    }
+    fn slice(&self, k: usize) -> &[u32] {
+        &self.index[self.start[k] as usize..self.start[k + 1] as usize]
+    }
+    fn slice_mut(&mut self, k: usize) -> &mut [u32] {
+        &mut self.index[self.start[k] as usize..self.start[k + 1] as usize]
+    }
+}
+
+/// 生成物の静的文字列は同じ番地で来るので、まず番地で照合する。
+fn same_str(left: &str, right: &str) -> bool {
+    std::ptr::eq(left.as_ptr(), right.as_ptr()) && left.len() == right.len() || left == right
+}
+
+/// 反復子を 1 度だけ走査して要素数と先頭要素を採る。`Vec` に集めない。
+/// 要素の誤りは元の `collect::<Result<Vec<_>>>` と同じく個数検査より先に返す。
+fn count_and_first<'a, I: Iterator<Item = Result<&'a str>>>(
+    values: I,
+) -> Result<(usize, Option<&'a str>)> {
+    let mut count = 0usize;
+    let mut first = None;
+    for value in values {
+        let value = value?;
+        if count == 0 {
+            first = Some(value);
+        }
+        count += 1;
+    }
+    Ok((count, first))
+}
+
 struct Converter<'a> {
     offsets: SourceOffsets<'a>,
-    nodes: &'a [MappedNode<'a>],
+    nodes: &'a MappedNodes<'a>,
     captures: &'a [Capture<'a>],
     occurrences: &'a [Occurrence<'a>],
-    children: Vec<Vec<usize>>,
-    owned_captures: Vec<Vec<usize>>,
-    mapped: BTreeMap<(&'a str, [usize; 2]), usize>,
+    /// occurrence -> 子 occurrence（採用順 = occurrence 添字の昇順）。
+    children: Csr,
+    /// occurrence -> 所有 capture（completion_order 昇順）。
+    owned_captures: Csr,
+    /// occurrence -> 同じ kind・同じ span を持つ mapping ノード（無ければ `NONE`）。
+    node_of: Vec<u32>,
+    /// occurrence -> `rule_id` 末尾の kind。
+    kind_of: Vec<&'a str>,
 }
 impl<'a> Converter<'a> {
     fn new(
         source: &'a str,
-        nodes: &'a [MappedNode<'a>],
+        nodes: &'a MappedNodes<'a>,
         captures: &'a [Capture<'a>],
         occurrences: &'a [Occurrence<'a>],
     ) -> Result<Self> {
@@ -203,23 +359,34 @@ impl<'a> Converter<'a> {
                 end: source.len(),
             },
         };
-        let mut ids = BTreeMap::new();
+        let count = occurrences.len();
+        if count.max(nodes.len()).max(captures.len()) >= NONE as usize {
+            return Err(invalid("occurrence / capture / node が多すぎます"));
+        }
+        // occurrence ID -> 添字。整列した表の二分探索で、要素ごとの節点確保を避ける。
+        let mut ids: Vec<(usize, u32)> = Vec::with_capacity(count);
         for (i, o) in occurrences.iter().enumerate() {
             offsets.byte_span(o.span_cp)?;
-            if ids.insert(o.id, i).is_some() {
-                return Err(invalid("occurrence ID が重複しています"));
-            }
             if o.expr_id.is_empty() {
                 return Err(invalid("採用 expression ID がありません"));
             }
+            ids.push((o.id, i as u32));
         }
-        let mut children = vec![vec![]; occurrences.len()];
-        let mut depth = vec![0; occurrences.len()];
+        ids.sort_unstable();
+        if ids.windows(2).any(|w| w[0].0 == w[1].0) {
+            return Err(invalid("occurrence ID が重複しています"));
+        }
+        let index_of = |id: usize| {
+            ids.binary_search_by_key(&id, |&(key, _)| key)
+                .ok()
+                .map(|at| ids[at].1 as usize)
+        };
+
+        let mut parent_of = vec![NONE; count];
+        let mut depth = vec![0u32; count];
         for (i, o) in occurrences.iter().enumerate() {
             if let Some(parent) = o.parent {
-                let p = *ids
-                    .get(&parent)
-                    .ok_or_else(|| invalid("親 occurrence がありません"))?;
+                let p = index_of(parent).ok_or_else(|| invalid("親 occurrence がありません"))?;
                 let parent = &occurrences[p];
                 if p >= i
                     || parent.span_cp[0] > o.span_cp[0]
@@ -228,36 +395,130 @@ impl<'a> Converter<'a> {
                 {
                     return Err(invalid("occurrence の親子関係・範囲・完了順が不正です"));
                 }
-                children[p].push(i);
+                parent_of[i] = p as u32;
                 depth[i] = depth[p] + 1;
             }
         }
-        let mut owned_captures = vec![vec![]; occurrences.len()];
-        for (i, capture) in captures.iter().enumerate() {
-            offsets.byte_span(capture.span_cp)?;
-            let owner = occurrences
+        let children = Csr::from_owners(&parent_of, count);
+
+        // capture の所有 occurrence は「rule_id が一致し span を含むもののうち最も深いもの」。
+        // rule_id ごとに occurrence をまとめ、深さ昇順に並べて後ろから探すことで、
+        // 元の「全 occurrence の線形走査 × capture 数」（1,383 × 1,286）を避ける。
+        // 同じ深さが複数一致するときは元の `max_by_key`（最後の最大値）と同じく添字の大きい方を採る。
+        // rule_id は生成物の静的文字列なので、まず番地で照合して文字列比較を避ける。
+        let mut rule_ids: Vec<&'a str> = Vec::new();
+        let mut rule_group = vec![0u32; count];
+        for (i, o) in occurrences.iter().enumerate() {
+            let group = rule_ids
                 .iter()
-                .enumerate()
-                .filter(|(_, o)| {
-                    o.rule_id == capture.rule_id
-                        && o.span_cp[0] <= capture.span_cp[0]
-                        && capture.span_cp[1] <= o.span_cp[1]
-                })
-                .max_by_key(|(j, _)| depth[*j])
-                .map(|(j, _)| j)
-                .ok_or_else(|| invalid("capture の所有 occurrence がありません"))?;
-            owned_captures[owner].push(i);
+                .position(|rule| same_str(rule, o.rule_id))
+                .unwrap_or_else(|| {
+                    rule_ids.push(o.rule_id);
+                    rule_ids.len() - 1
+                });
+            rule_group[i] = group as u32;
         }
-        for indices in &mut owned_captures {
-            indices.sort_by_key(|&i| captures[i].completion_order);
+        let mut by_rule = Csr::from_owners(&rule_group, rule_ids.len());
+        // 走査は「所属 occurrence の span を順に読む」だけなので、span を並べて持つ。
+        // 1 グループぶんが cache に乗り、`occurrences` への飛び飛びの参照が消える。
+        let mut by_rule_span: Vec<(u32, [usize; 2])> = Vec::with_capacity(count);
+        for group in 0..rule_ids.len() {
+            by_rule.slice_mut(group).sort_by_key(|&i| depth[i as usize]);
+            by_rule_span.extend(
+                by_rule
+                    .slice(group)
+                    .iter()
+                    .map(|&i| (i, occurrences[i as usize].span_cp)),
+            );
         }
-        let mut mapped = BTreeMap::new();
-        for (i, node) in nodes.iter().enumerate() {
-            offsets.byte_span(node.span_cp)?;
-            if mapped.insert((node.kind, node.span_cp), i).is_some() {
-                return Err(invalid("mapping ノードの対応が曖昧です"));
+
+        let mut capture_owner: Vec<u32> = Vec::with_capacity(captures.len());
+        // capture 側の rule_id は別の静的表から来るので番地が一致しない。
+        // 一度引いた結果を番地で覚え、文字列比較を rule 種類の数だけに抑える。
+        let mut resolved: Vec<(*const u8, usize, u32)> = Vec::new();
+        for capture in captures {
+            offsets.byte_span(capture.span_cp)?;
+            let key = (capture.rule_id.as_ptr(), capture.rule_id.len());
+            let group = match resolved.iter().find(|r| (r.0, r.1) == key) {
+                Some(&(_, _, group)) => group,
+                None => {
+                    let group = rule_ids
+                        .iter()
+                        .position(|rule| *rule == capture.rule_id)
+                        .map_or(NONE, |group| group as u32);
+                    resolved.push((key.0, key.1, group));
+                    group
+                }
+            };
+            let owner = if group == NONE {
+                None
+            } else {
+                let group = group as usize;
+                by_rule_span[by_rule.start[group] as usize..by_rule.start[group + 1] as usize]
+                    .iter()
+                    .rev()
+                    .find(|(_, span)| {
+                        span[0] <= capture.span_cp[0] && capture.span_cp[1] <= span[1]
+                    })
+                    .map(|&(i, _)| i)
+            };
+            capture_owner
+                .push(owner.ok_or_else(|| invalid("capture の所有 occurrence がありません"))?);
+        }
+        let mut owned_captures = Csr::from_owners(&capture_owner, count);
+        for i in 0..count {
+            // 安定整列なので、completion_order が同じなら capture 添字の昇順が残る。
+            owned_captures
+                .slice_mut(i)
+                .sort_by_key(|&c| captures[c as usize].completion_order);
+        }
+
+        // (span, kind) -> mapping ノード。occurrence ごとに 1 度だけ引き当てておく。
+        // span の始点で直接引ける表を作り、二分探索の飛び飛びの参照を避ける。
+        let mut keys: Vec<([usize; 2], &'a str, u32)> = Vec::with_capacity(nodes.len());
+        for node in 0..nodes.len() {
+            let span_cp = nodes.span_cp(node);
+            offsets.byte_span(span_cp)?;
+            keys.push((span_cp, nodes.kind(node), node as u32));
+        }
+        keys.sort_unstable_by(|a, b| (a.0, a.1).cmp(&(b.0, b.1)));
+        if keys
+            .windows(2)
+            .any(|w| w[0].0 == w[1].0 && w[0].1 == w[1].1)
+        {
+            return Err(invalid("mapping ノードの対応が曖昧です"));
+        }
+        let mut first_at = vec![NONE; offsets.bytes.len()];
+        for (at, key) in keys.iter().enumerate().rev() {
+            first_at[key.0[0]] = at as u32;
+        }
+        // `rule_id` 末尾の kind は木を辿るたびに要るので、ここで 1 度だけ切り出す。
+        let mut kind_of: Vec<&'a str> = Vec::with_capacity(count);
+        kind_of.extend(
+            occurrences
+                .iter()
+                .map(|o| o.rule_id.rsplit("::").next().unwrap()),
+        );
+        let mut node_of = vec![NONE; count];
+        for (i, o) in occurrences.iter().enumerate() {
+            let mut at = first_at[o.span_cp[0]];
+            while at != NONE {
+                let key = &keys[at as usize];
+                if key.0[0] != o.span_cp[0] {
+                    break;
+                }
+                if key.0[1] == o.span_cp[1] && key.1 == kind_of[i] {
+                    node_of[i] = key.2;
+                    break;
+                }
+                at = if (at as usize + 1) < keys.len() {
+                    at + 1
+                } else {
+                    NONE
+                };
             }
         }
+
         Ok(Self {
             offsets,
             nodes,
@@ -265,11 +526,12 @@ impl<'a> Converter<'a> {
             occurrences,
             children,
             owned_captures,
-            mapped,
+            node_of,
+            kind_of,
         })
     }
-    fn kind(&self, i: usize) -> &str {
-        self.occurrences[i].rule_id.rsplit("::").next().unwrap()
+    fn kind(&self, i: usize) -> &'a str {
+        self.kind_of[i]
     }
     fn span(&self, i: usize) -> Result<Span> {
         self.offsets.content_span(self.occurrences[i].span_cp)
@@ -280,121 +542,158 @@ impl<'a> Converter<'a> {
             span: self.span(i).unwrap_or_default(),
         }
     }
-    fn children(&self, i: usize, kind: &str) -> Vec<usize> {
-        self.children[i]
+    /// 子 occurrence を kind で絞る。中間の `Vec` を作らない。
+    fn children<'s>(&'s self, i: usize, kind: &'s str) -> impl Iterator<Item = usize> + 's {
+        self.children
+            .slice(i)
             .iter()
-            .copied()
-            .filter(|&j| self.kind(j) == kind)
-            .collect()
+            .map(|&j| j as usize)
+            .filter(move |&j| self.kind(j) == kind)
     }
     fn child(&self, i: usize, kind: &str) -> Result<usize> {
-        let found = self.children(i, kind);
-        if found.len() != 1 {
-            return Err(self.error(i, format!("{} に {kind} が一つ必要です", self.kind(i))));
+        let mut found = None;
+        let mut count = 0usize;
+        for j in self.children(i, kind) {
+            if count == 0 {
+                found = Some(j);
+            }
+            count += 1;
         }
-        Ok(found[0])
+        match found {
+            Some(j) if count == 1 => Ok(j),
+            _ => Err(self.error(i, format!("{} に {kind} が一つ必要です", self.kind(i)))),
+        }
     }
     fn branch(&self, i: usize) -> Result<usize> {
-        if self.children[i].len() != 1 {
-            return Err(self.error(i, "採用枝が一つ必要です"));
+        match *self.children.slice(i) {
+            [only] => Ok(only as usize),
+            _ => Err(self.error(i, "採用枝が一つ必要です")),
         }
-        Ok(self.children[i][0])
     }
-    fn values(&self, i: usize, field: &str) -> Result<Vec<&str>> {
-        if let Some(&n) = self
-            .mapped
-            .get(&(self.kind(i), self.occurrences[i].span_cp))
-        {
-            if let Some((_, values)) = self.nodes[n].fields.iter().find(|(name, _)| *name == field)
-            {
-                return Ok(values.clone());
-            }
+    /// 型付き AST 側の値（借用のまま）。field が無ければ `None` で capture 経路に落ちる。
+    fn node_values(&self, i: usize, field: &str) -> Option<&'a [&'a str]> {
+        let at = self.node_of[i];
+        if at == NONE {
+            return None;
         }
-        self.owned_captures[i]
+        let nodes: &'a MappedNodes<'a> = self.nodes;
+        nodes.values_of(at as usize, field)
+    }
+    /// capture 経路の値。`raw` のときは引用符込みの原文（境界 trivia を除いたもの）。
+    fn capture_values<'s>(
+        &'s self,
+        i: usize,
+        field: &'s str,
+        raw: bool,
+    ) -> impl Iterator<Item = Result<&'a str>> + 's {
+        let captures: &'a [Capture<'a>] = self.captures;
+        self.owned_captures
+            .slice(i)
             .iter()
-            .map(|&c| &self.captures[c])
-            .filter(|c| c.name == field)
-            .map(|c| self.offsets.text(c.span_cp))
-            .collect()
+            .map(move |&c| &captures[c as usize])
+            .filter(move |c| c.name == field)
+            .map(move |c| {
+                if raw {
+                    let span = self.offsets.content_span(c.span_cp)?;
+                    Ok(&self.offsets.source[span.start..span.end])
+                } else {
+                    self.offsets.text(c.span_cp)
+                }
+            })
+    }
+    /// 型付き AST 側にあればそれを、無ければ capture 経路を反復子として渡す。
+    /// `Vec` に集めないので、値の複製はここでは起きない。
+    fn with_values<R>(
+        &self,
+        i: usize,
+        field: &str,
+        use_values: impl FnOnce(&mut dyn Iterator<Item = Result<&'a str>>) -> R,
+    ) -> R {
+        match self.node_values(i, field) {
+            Some(values) => use_values(&mut values.iter().copied().map(Ok)),
+            None => use_values(&mut self.capture_values(i, field, false)),
+        }
+    }
+    fn scalar_error(&self, i: usize, field: &str) -> ConversionError {
+        self.error(
+            i,
+            format!("{}.{field} に scalar capture が必要です", self.kind(i)),
+        )
+    }
+    fn optional_error(&self, i: usize, field: &str) -> ConversionError {
+        self.error(i, format!("{field} の optional capture が重複しています"))
+    }
+    fn value(&self, i: usize, field: &str) -> Result<String> {
+        self.with_values(i, field, |values| match count_and_first(values)? {
+            (1, Some(value)) => Ok(value.to_owned()),
+            _ => Err(self.scalar_error(i, field)),
+        })
+    }
+    fn optional(&self, i: usize, field: &str) -> Result<Option<String>> {
+        self.with_values(i, field, |values| match count_and_first(values)? {
+            (0, _) => Ok(None),
+            (1, Some(value)) => Ok(Some(value.to_owned())),
+            _ => Err(self.optional_error(i, field)),
+        })
+    }
+    fn strings(&self, i: usize, field: &str) -> Result<Vec<String>> {
+        self.with_values(i, field, |values| {
+            let mut out = Vec::new();
+            for value in values {
+                out.push(value?.to_owned());
+            }
+            Ok(out)
+        })
     }
     /// STRING capture の原文 (引用符付き)。型付き AST の値は引用符を除いた
     /// 内容なので、raw 保持と escape 復号は capture span の原文から行う。
-    fn raw_values(&self, i: usize, field: &str) -> Result<Vec<&str>> {
-        self.owned_captures[i]
-            .iter()
-            .map(|&c| &self.captures[c])
-            .filter(|c| c.name == field)
-            .map(|c| {
-                let span = self.offsets.content_span(c.span_cp)?;
-                Ok(&self.offsets.source[span.start..span.end])
-            })
-            .collect()
-    }
-    fn scalar(&self, i: usize, field: &str, values: Vec<&str>) -> Result<String> {
-        if values.len() != 1 {
-            return Err(self.error(
-                i,
-                format!("{}.{field} に scalar capture が必要です", self.kind(i)),
-            ));
+    fn raw_scalar(&self, i: usize, field: &str) -> Result<&'a str> {
+        match count_and_first(self.capture_values(i, field, true))? {
+            (1, Some(value)) => Ok(value),
+            _ => Err(self.scalar_error(i, field)),
         }
-        Ok(values[0].to_owned())
-    }
-    fn at_most_one(&self, i: usize, field: &str, values: Vec<&str>) -> Result<Option<String>> {
-        match values.as_slice() {
-            [] => Ok(None),
-            [value] => Ok(Some((*value).to_owned())),
-            _ => Err(self.error(i, format!("{field} の optional capture が重複しています"))),
-        }
-    }
-    fn value(&self, i: usize, field: &str) -> Result<String> {
-        self.scalar(i, field, self.values(i, field)?)
-    }
-    fn optional(&self, i: usize, field: &str) -> Result<Option<String>> {
-        self.at_most_one(i, field, self.values(i, field)?)
-    }
-    fn strings(&self, i: usize, field: &str) -> Result<Vec<String>> {
-        Ok(self
-            .values(i, field)?
-            .into_iter()
-            .map(str::to_owned)
-            .collect())
     }
     fn raw_string(&self, i: usize, field: &str) -> Result<String> {
-        self.scalar(i, field, self.raw_values(i, field)?)
+        Ok(self.raw_scalar(i, field)?.to_owned())
     }
     fn string(&self, i: usize, field: &str) -> Result<String> {
-        decode_string(&self.raw_string(i, field)?, self.span(i)?)
+        decode_string(self.raw_scalar(i, field)?, self.span(i)?)
     }
     fn optional_string(&self, i: usize, field: &str) -> Result<Option<String>> {
-        self.at_most_one(i, field, self.raw_values(i, field)?)?
-            .map(|v| decode_string(&v, self.span(i)?))
+        let raw = match count_and_first(self.capture_values(i, field, true))? {
+            (0, _) => None,
+            (1, Some(value)) => Some(value),
+            _ => return Err(self.optional_error(i, field)),
+        };
+        raw.map(|value| decode_string(value, self.span(i)?))
             .transpose()
     }
     fn file(&self) -> Result<UbnfFile> {
-        let roots: Vec<_> = self
-            .occurrences
-            .iter()
-            .enumerate()
-            .filter(|(_, o)| o.parent.is_none())
-            .map(|(i, _)| i)
-            .collect();
-        if roots.len() != 1 || self.kind(roots[0]) != "UBNFFile" {
-            return Err(ConversionError {
-                message: "UBNFFile の採用 root が一つ必要です".into(),
-                span: Span::default(),
-            });
+        let mut root = None;
+        let mut roots = 0usize;
+        for (i, o) in self.occurrences.iter().enumerate() {
+            if o.parent.is_none() {
+                if roots == 0 {
+                    root = Some(i);
+                }
+                roots += 1;
+            }
         }
-        let root = roots[0];
-        if !self
-            .mapped
-            .contains_key(&("UBNFFile", self.occurrences[root].span_cp))
-        {
+        let root = match root {
+            Some(root) if roots == 1 && self.kind(root) == "UBNFFile" => root,
+            _ => {
+                return Err(ConversionError {
+                    message: "UBNFFile の採用 root が一つ必要です".into(),
+                    span: Span::default(),
+                })
+            }
+        };
+        if self.node_of[root] == NONE {
             return Err(self.error(root, "生成結果に型付き UBNFFile がありません"));
         }
         Ok(UbnfFile {
             grammars: self
                 .children(root, "GrammarDecl")
-                .into_iter()
                 .map(|i| self.grammar(i))
                 .collect::<Result<_>>()?,
             span: Span {
@@ -411,7 +710,6 @@ impl<'a> Converter<'a> {
             templates: Vec::new(),
             imports: self
                 .children(i, "ImportDecl")
-                .into_iter()
                 .map(|j| {
                     Ok(ImportDecl {
                         alias: self.value(j, "alias")?,
@@ -422,12 +720,10 @@ impl<'a> Converter<'a> {
                 .collect::<Result<_>>()?,
             settings: self
                 .children(i, "GlobalSetting")
-                .into_iter()
                 .map(|j| self.setting(j))
                 .collect::<Result<_>>()?,
             tokens: self
                 .children(i, "TokenDecl")
-                .into_iter()
                 .map(|j| {
                     Ok(TokenDecl {
                         name: self.value(j, "name")?,
@@ -438,13 +734,23 @@ impl<'a> Converter<'a> {
                 .collect::<Result<_>>()?,
             rules: self
                 .children(i, "RuleDecl")
-                .into_iter()
                 .map(|j| self.rule(j))
                 .collect::<Result<_>>()?,
         })
     }
     fn dotted(&self, i: usize) -> Result<String> {
-        Ok(self.values(i, "parts")?.join("."))
+        self.with_values(i, "parts", |values| {
+            let mut out = String::new();
+            let mut first = true;
+            for value in values {
+                if !first {
+                    out.push('.');
+                }
+                first = false;
+                out.push_str(value?);
+            }
+            Ok(out)
+        })
     }
     fn setting(&self, i: usize) -> Result<GlobalSetting> {
         let key = self.value(i, "key")?;
@@ -466,7 +772,6 @@ impl<'a> Converter<'a> {
     }
     fn entries(&self, i: usize) -> Result<Vec<KeyValuePair>> {
         self.children(i, "KeyValuePair")
-            .into_iter()
             .map(|j| {
                 Ok(KeyValuePair {
                     key: self.value(j, "key")?,
@@ -523,7 +828,6 @@ impl<'a> Converter<'a> {
             name: self.value(i, "name")?,
             annotations: self
                 .children(i, "Annotation")
-                .into_iter()
                 .map(|j| self.annotation(self.branch(j)?))
                 .collect::<Result<_>>()?,
             body: self.body(self.child(i, "RuleBody")?)?,
@@ -607,11 +911,9 @@ impl<'a> Converter<'a> {
         let choice = self.child(i, "ChoiceBody")?;
         let alternatives = self
             .children(choice, "SequenceBody")
-            .into_iter()
             .map(|j| {
                 let elements = self
                     .children(j, "AnnotatedElement")
-                    .into_iter()
                     .map(|k| self.element(k))
                     .collect::<Result<Vec<_>>>()?;
                 let span = if let (Some(first), Some(last)) = (elements.first(), elements.last()) {
@@ -642,7 +944,6 @@ impl<'a> Converter<'a> {
         let atom = self.atom(self.child(i, "AtomicElement")?)?;
         let mut quantifier = self
             .children(i, "PostfixQuantifier")
-            .into_iter()
             .next()
             .map(|j| {
                 let span = self.span(j)?;
@@ -655,11 +956,10 @@ impl<'a> Converter<'a> {
             })
             .transpose()?;
         let mut postfix_quantifier = None;
-        if let Some(j) = self.children(i, "BoundedQuantifier").into_iter().next() {
+        if let Some(j) = self.children(i, "BoundedQuantifier").next() {
             let span = self.span(j)?;
-            let digits = self.children(j, "Digits");
             let mut numbers = Vec::new();
-            for k in digits {
+            for k in self.children(j, "Digits") {
                 let span = self.span(k)?;
                 numbers.push(
                     self.offsets.source[span.start..span.end]
@@ -684,13 +984,11 @@ impl<'a> Converter<'a> {
         }
         let separator = self
             .children(i, "SeparatedBy")
-            .into_iter()
             .next()
             .map(|j| self.atom(self.child(j, "AtomicElement")?))
             .transpose()?;
         let typeof_constraint = self
             .children(i, "TypeofElement")
-            .into_iter()
             .next()
             .map(|j| self.value(j, "captureName"))
             .transpose()?;
