@@ -1,0 +1,12 @@
+// 語の定義。`: 名前 ( 効果 ) 本体 ;`
+// 効果の入力は右端が最上段。square は Int を 1 つ取り Int を 1 つ返す。
+
+: square ( Int -- Int )
+  dup * ;
+
+: cube ( Int -- Int )
+  dup square * ;
+
+: main ( -- )
+  7 square int_to_str print newline
+  3 cube int_to_str print newline ;

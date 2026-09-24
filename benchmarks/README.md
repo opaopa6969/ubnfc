@@ -46,6 +46,18 @@ WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh profile
 WORK=$WORK CORE=26 RUNS=7 benchmarks/scripts/p4-antlr-idiomatic.sh speed
 ```
 
+JSON を **JSON 専用ライブラリ**（Jackson / Gson / serde_json）と並べるのは `run-json-libraries.sh`（issue #68）。
+`prepare-external.sh` が作った `$WORK`（ANTLR4 / tree-sitter / ubnfc / 入力）を借り、入力ごとに 15 モードを交互に回す。
+jar は `scripts/fetch-json-libraries.sh` が sha256 固定で `benchmarks/external/` に取る。serde_json は `--offline`。
+報告は `docs/reports/2026-09-24-json-libraries-comparison.md`。
+
+```sh
+WORK=$WORK benchmarks/scripts/run-json-libraries.sh prepare
+WORK=$WORK benchmarks/scripts/run-json-libraries.sh bench
+WORK=$WORK benchmarks/scripts/run-json-libraries.sh check           # JSONTestSuite: Jackson 3 設定 / Gson 2 設定 / serde_json
+WORK=$WORK benchmarks/scripts/run-json-libraries.sh check-features  # Jackson の寛容 feature 別の切り分け
+```
+
 ## 計測の作法
 
 - CPU は `taskset -c $CORE`（既定 30）で 1 コアに固定、単一 thread。

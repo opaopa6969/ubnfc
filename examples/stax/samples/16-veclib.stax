@@ -1,0 +1,15 @@
+// ライブラリ側。15-use-vec.stax がここの語を取込む。
+
+struct Vec2 { vx: Int vy: Int }
+
+: vec_add ( Vec2 Vec2 -- Vec2 )
+  let b
+  let a
+  a .vx b .vx +
+  a .vy b .vy +
+  Vec2 ;
+
+: vec_len_sq ( Vec2 -- Int )
+  dup .vx dup *
+  swap .vy dup *
+  + ;

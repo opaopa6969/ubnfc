@@ -1,0 +1,18 @@
+// while も同じ。条件の引用が真を返す間、本体の引用を実行する。
+
+: if_else ( Bool [ -- ] [ -- ] -- )
+  choose call ;
+
+: while ( [ -- Bool ] [ -- ] -- )
+  let body
+  let cond
+  cond call
+  [ body call cond body recurse ]
+  [ ]
+  if_else ;
+
+: main ( -- )
+  10 let n
+  [ n 0 > ]
+  [ n int_to_str print newline n 1 - let n ]
+  while ;

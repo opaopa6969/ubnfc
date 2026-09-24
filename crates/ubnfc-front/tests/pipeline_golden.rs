@@ -245,3 +245,105 @@ fn the_json_v2_grammar_matches_its_committed_ir_golden() {
         ]
     );
 }
+
+/// `examples/stax/stax.ubnf`（型の付いた連接言語、issue #66 stage 1）の golden。
+/// sibling repository に依存しない 2 本目の v2 golden で、**scope 注釈**（`@scopeTree` /
+/// `@declares` / `@symbolRef`）と `@catalog` / `@doc` が IR へどう落ちるかをここで固定する。
+///
+/// 再生成:
+/// ```sh
+/// cargo run -p ubnfc-front --bin ubnfc -- ir --grammar examples/stax/stax.ubnf \
+///   --out ir/examples/stax.ir.json
+/// ```
+#[test]
+fn the_stax_grammar_matches_its_committed_ir_golden() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let golden = root.join("ir/examples/stax.ir.json");
+    let expected = std::fs::read(&golden).unwrap_or_else(|e| panic!("{}: {e}", golden.display()));
+    let produced = Command::new(env!("CARGO_BIN_EXE_ubnfc"))
+        .current_dir(root.canonicalize().unwrap())
+        .args(["ir", "--grammar", "examples/stax/stax.ubnf", "--out", "-"])
+        .output()
+        .unwrap();
+    assert!(
+        produced.status.success(),
+        "{}",
+        String::from_utf8_lossy(&produced.stderr)
+    );
+    assert_eq!(produced.stdout, expected, "golden: ir/examples/stax.ir.json");
+    let typed = ir::from_json(std::str::from_utf8(&produced.stdout).unwrap()).unwrap();
+    assert_eq!(typed.language_version, 2);
+    assert!(ir::validate_references(&typed).is_empty());
+    // 語・型・struct フィールド・局所束縛の 4 種類の宣言と、語・型・フィールドの参照が
+    // scope 効果として載っていること（これが「文法だけで記号表が出る」ことの根拠）。
+    let declares = typed
+        .semantics
+        .scope
+        .effects
+        .iter()
+        .flat_map(|effect| effect.events.iter())
+        .filter(|event| matches!(event.action, ir::ScopeEffectEventsAction::Declare))
+        .count();
+    let uses = typed
+        .semantics
+        .scope
+        .effects
+        .iter()
+        .flat_map(|effect| effect.events.iter())
+        .filter(|event| matches!(event.action, ir::ScopeEffectEventsAction::Use))
+        .count();
+    assert!(declares >= 7, "宣言の scope 効果が少なすぎる: {declares}");
+    assert!(uses >= 4, "参照の scope 効果が少なすぎる: {uses}");
+}
+
+/// stax の文法は `--strict` で警告ゼロでなければならない。順序付き選択の到達不能検査
+/// （D-037、`W-CHOICE-*`）は、組込み語をリテラルで並べるこの文法の生命線である。
+#[test]
+fn the_stax_grammar_validates_strictly_clean() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_ubnfc"))
+        .current_dir(&root)
+        .args([
+            "validate",
+            "--grammar",
+            "examples/stax/stax.ubnf",
+            "--strict",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&out.stdout),
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(out.stdout.is_empty(), "{}", String::from_utf8_lossy(&out.stdout));
+}
+
+/// `examples/stax/samples/` の 20 本と `samples/expected.json` が 1 対 1 で対応すること。
+/// 受理・AST の突き合わせ自体は backend の生成を伴うので `scripts/crosscheck.sh` が行う。
+#[test]
+fn the_stax_samples_all_have_an_expected_verdict() {
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/stax/samples");
+    let expected = std::fs::read_to_string(dir.join("expected.json")).unwrap();
+    let mut listed: Vec<String> = expected
+        .lines()
+        .filter_map(|line| line.split("\"file\": \"").nth(1))
+        .filter_map(|rest| rest.split('"').next())
+        .map(str::to_owned)
+        .collect();
+    let mut found: Vec<String> = std::fs::read_dir(&dir)
+        .unwrap()
+        .filter_map(Result::ok)
+        .map(|e| e.file_name().to_string_lossy().into_owned())
+        .filter(|name| name.ends_with(".stax"))
+        .collect();
+    listed.sort();
+    found.sort();
+    assert_eq!(listed, found, "expected.json と samples/*.stax が食い違う");
+    assert_eq!(found.len(), 20, "サンプルは 20 本");
+}

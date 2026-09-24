@@ -28,6 +28,8 @@ UBNF 文法から、**実行時ライブラリに依存しない** Java パー�
 - 生成物は JDK 21 / Rust std だけに依存する（生成 Rust は `#![forbid(unsafe_code)]`、
   生成 Rust crate の依存は `json` feature のときの serde / serde_json だけ。
   `examples/handwritten-target/java` は同じ目標形を `jdeps -recursive` で `java.base` のみと確認している）。
+- 生成 Rust は wasm32 でビルド可、stack escalation は無効化されて深さ診断に落ちる
+  （issue #65 / D-070、`docs/reports/2026-09-24-wasm32-build.md`）。
 
 ## 2. 珍しいところ
 
@@ -175,6 +177,7 @@ issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で�
   内側ループ）。**JSON 1 MB 認識は 0.0364 → 0.0137 µs/byte（2.7 倍）、ANTLR4 比は 2.7 倍 → 1.35 倍**
   で、**issue の目標 ≤0.022 µs/byte を達成**した（D-072）。1 byte あたりの式評価は 5.08 → 1.25、
   cursor 更新は 7.70 → 1.67 回。typed AST は 0.477 → 0.181 µs/byte。
+- **JSON 専用ライブラリとの比較（issue #68、`docs/reports/2026-09-24-json-libraries-comparison.md`）**: 1 MB の最小値で **serde_json `IgnoredAny` 0.0008 µs/byte（1.2 GB/s）、Jackson streaming 0.0015（678 MB/s）、Jackson `readTree` 0.0035、Gson `JsonElement` 0.0039、serde_json `Value` 0.0055** に対し、ubnfc Rust 認識は 0.0133（**serde_json の 16 倍・Jackson の 9 倍遅い**）、typed AST（span・診断つき）は Rust 0.181 / Java 0.231（値の木より **33〜66 倍遅い**）。正しさは ubnfc・Jackson 既定・Gson STRICT・serde_json がすべて `y_` 95/95・`n_` 188/188 で並び、**Gson の既定（LENIENT）は `n_` を 86 件受理する**。
 - **速度（512 atom の算術式、認識のみ）**: ANTLR4 0.045 ms、ubnfc Rust 0.119 ms、tree-sitter 0.403 ms。
   木込みでは ubnfc Rust の typed AST 0.260 ms が ANTLR4 の parse tree 0.209 ms に近い。
 
@@ -368,6 +371,10 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   生成される `EvaluatorBridge`（interface + no-op 既定）に差し込む契約で、`evaluate` / `setVariable` は
   既定では「未対応」を明示的に返す（[`docs/reports/2026-09-24-dap-stage4.md`](docs/reports/2026-09-24-dap-stage4.md)）。
   VSIX に入れるには `scripts/build-vsix.sh --with-dap`。
+- **既存実装への差し込みも opt-in の形にできる**。`examples/p4-java-facade` は tinyexpression の
+  `P4PreferredAstMapper` と同じ公開面を持つ facade を生成パーサで組み直したもので、同 FQN の
+  classpath shadow だけで `FormulaInfo` → Java 生成 → javac → 実行 の経路が丸ごと入れ替わる
+  （tinyexpression は無変更。[`docs/reports/2026-09-24-te-facade.md`](docs/reports/2026-09-24-te-facade.md)）。
 - `@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
   `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-062）。
@@ -478,16 +485,18 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `crates/ubnfc-fuzz` | 2 backend の差分ファジング。`findings/` に最小再現 |
 | `crates/ubnfc-selfhost` | 生成 Rust frontend による self-host 経路と固定点テスト。`src/generated/` は生成物を commit |
 | `crates/ubnfc-rt-template` | 両 backend が写す runtime の原本（input / cursor / scope / memo / diag） |
-| `ir/schema`, `ir/fixtures`, `ir/examples` | Grammar IR v1 の JSON Schema、22 の golden IR、解説用の例（`tinycalc.ir.json` と、v2 の code point クラスを固定する `json-v2.ir.json`） |
+| `ir/schema`, `ir/fixtures`, `ir/examples` | Grammar IR v1 の JSON Schema、22 の golden IR、解説用の例（`tinycalc.ir.json`、v2 の code point クラスを固定する `json-v2.ir.json`、scope 注釈を固定する `stax.ir.json`） |
 | `corpus/oracle` | 旧実装から採取した独立 oracle 107 ファイル（+ `divergences.json`・採取ツール）。`ubnfc-harness list` の「oracle」107 ファイル / 398 ケース |
 | `corpus/spec` | 規範文書から導いた期待値（UBNF 129 ケース / P4 32 ケース / JSON 283 ケース）。実装の観測値を使わない。`corpus/spec/README.md`、issue #5・#26 |
 | `scanners/` | Extern token の scanner registry（`first-chars.json` と Java / Rust 実装） |
 | `examples/handwritten-target` | 生成物の**目標形**を手書きで固定した Operators / Power（Java・Rust） |
 | `examples/p4-java`, `examples/p4-rust` | tinyexpression P4（124 規則）の生成物を commit した実行例とベンチ |
+| `examples/p4-java-facade` | tinyexpression の `P4PreferredAstMapper` 互換 facade（中身は `examples/p4-java` の生成パーサ）。パリティ・経路実証・段別計測のドライバ付き |
 | `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + TextMate 文法 + VSIX）。`scripts/build-vsix.sh p4` |
 | `examples/ubnf-vscode` | UBNF 自身（`ubnf.ubnf`）の VS Code 拡張。同じ経路で組む。`scripts/build-vsix.sh ubnf` |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
 | `examples/json`, `examples/arith` | 同じ言語を `.ubnf` / ANTLR `.g4` / tree-sitter `grammar.js` の 3 記法で書いたもの（JSON = RFC 8259、算術式 = Operators / Power）。外部比較の材料。issue #26 |
+| `examples/stax` | **stax** — 型定義・構造定義のできる連接（Forth 系）言語。UBNF v2 の 3 つ目の実用文法で、`@scopeTree` / `@declares` / `@symbolRef` だけで記号表と未定義語の警告を出す。設計文書・文法・サンプル 20 本・両 backend の突き合わせ script。issue #66 |
 | `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27。同じ言語を各ツールの流儀で書き直した `TinyExpressionP4Idiomatic.g4` / `grammar.idiomatic.js` も同じディレクトリ（issue #39） |
 | `benchmarks/` | 速度比較のドライバ。`scripts/prepare-external.sh` 以下が ANTLR4 / tree-sitter との比較、`scripts/p4-external.sh` が P4 での同じ比較（取得はどちらも `scripts/fetch-external-tools.sh`） |
 | `docs/` | 設計・決定・報告。下記 |

@@ -1,0 +1,22 @@
+// 構造体。フィールドは宣言なので、`.x` / `!x` は宣言のある名前としてスコープで引ける。
+// どの struct の x なのかを決めるのは型検査（stage 3）の仕事。
+
+struct Point { x: Int y: Int }
+
+// 構造体の名前は、フィールドをスタックから取って値を作る語でもある。
+: origin ( -- Point )
+  0 0 Point ;
+
+: shift_x ( Point Int -- Point )
+  let dx
+  dup .x dx + !x ;
+
+: show ( Point -- )
+  dup .x int_to_str print
+  ", " print
+  .y int_to_str print
+  newline ;
+
+: main ( -- )
+  origin 5 shift_x show
+  3 4 Point show ;

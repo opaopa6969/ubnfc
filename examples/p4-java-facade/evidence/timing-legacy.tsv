@@ -1,0 +1,27 @@
+input	chars	parse_ms	generate_ms	javac_ms	execute_us	note
+fixture:comparison-heavy-x16.tiny	2864	NaN	-	-	-	parse 不可
+fixture:comparison-heavy-x4.tiny	716	NaN	-	-	-	parse 不可
+fixture:comparison-heavy-x64.tiny	11456	NaN	-	-	-	parse 不可
+fixture:comparison-heavy.tiny	179	NaN	-	-	-	parse 不可
+fixture:complex-half.tiny	163	NaN	-	-	-	parse 不可
+fixture:complex-tail.tiny	327	NaN	-	-	-	parse 不可
+fixture:complex-x16.tiny	5179	266.246	0.000	91.788	7.739	
+fixture:complex-x4.tiny	1293	57.826	1.106	88.862	4.151	
+fixture:complex-x64.tiny	20923	1435.775	651.744	310.957	34.581	
+fixture:complex.tiny	326	20.239	0.000	85.202	0.319	
+fixture:flat-arithmetic.tiny	1426	36.313	58.255	97.094	0.042	
+fixture:invalid-syntax.tiny	4	NaN	-	-	-	parse 不可
+fixture:large-match.tiny	1380	145.628	0.000	35.615	2.322	
+fixture:valid-basic.tiny	6	0.610	0.309	56.182	0.030	
+fixture:valid-multiline.tiny	40	0.691	0.011	34.615	0.053	
+fixture:valid-unicode.tiny	10	0.915	0.412	NaN	NaN	実行不可: java.lang.RuntimeException: org.unlaxer.compiler.CompileError: /StageTiming_88ce36b3_e2737bd8.java:9: エラー: 不適合な型: StringをFloatに変換できません:
+    "こんにちは😀"
+    ^
+エラー1個
+
+fraud#1	404	112.325	2.129	33.502	0.328	
+fraud#2	209	7.242	0.000	67.891	0.175	
+fraud#3	68	4.690	0.000	67.818	0.057	
+fraud#4	707	157.608	27.705	47.263	0.356	
+fraud#5	459	2131.405	0.000	47.891	0.074	
+formulaInfo:fraud-alert	2917	-	-	-	-	読み込み〜実行可能まで 2490.2 ms

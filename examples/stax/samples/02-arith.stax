@@ -1,0 +1,8 @@
+// 連接（concatenative）の基本。値を積み、語がそれを消費する。
+// `3 4 +` は 3 を積み、4 を積み、+ が 2 つ取って 7 を残す。
+
+: main ( -- )
+  3 4 + int_to_str print newline
+  10 4 - int_to_str print newline
+  6 7 * int_to_str print newline
+  20 6 mod int_to_str print newline ;

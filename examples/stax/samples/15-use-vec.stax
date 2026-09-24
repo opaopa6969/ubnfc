@@ -1,0 +1,10 @@
+// ライブラリを使う側。16-veclib.stax が定義する語を明示列挙で取込む。
+
+use "16-veclib.stax" ( Vec2 vx vy vec_add vec_len_sq ) ;
+
+: main ( -- )
+  1 2 Vec2
+  3 4 Vec2
+  vec_add
+  vec_len_sq
+  int_to_str print newline ;

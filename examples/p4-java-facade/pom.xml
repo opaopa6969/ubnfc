@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.ubnfc</groupId>
+  <artifactId>ubnfc-p4-java-facade</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <name>ubnfc-p4-java-facade</name>
+  <description>tinyexpression の P4PreferredAstMapper 互換 facade（ubnfc 生成パーサ実装）</description>
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- 読み取り専用で参照する隣接 checkout。jar ではなく作業ツリーのビルド出力を使う
+         （公開 jar は古く、新しい mapper API を持たない）。 -->
+    <tinyexpression.jar>${project.basedir}/target/te/tinyExpression-worktree.jar</tinyexpression.jar>
+    <unlaxer.version>3.0.15</unlaxer.version>
+  </properties>
+  <dependencies>
+    <!-- 順序が意味を持つ: tinyexpression は unlaxer のコアクラスをフォークして持つ。
+         tinyexpression 自身のテスト / JMH と同じ tiny-first の順に揃える。 -->
+    <dependency>
+      <groupId>org.unlaxer</groupId>
+      <artifactId>tinyExpression</artifactId>
+      <version>worktree</version>
+      <scope>system</scope>
+      <systemPath>${tinyexpression.jar}</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.unlaxer</groupId>
+      <artifactId>unlaxer-common</artifactId>
+      <version>${unlaxer.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.unlaxer</groupId>
+      <artifactId>unlaxer-dsl</artifactId>
+      <version>${unlaxer.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.2</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- tinyexpression 自身のテストを、こちらが決めた classpath 順で走らせるための launcher。 -->
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+      <version>1.10.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <id>add-generated-parser</id>
+            <phase>generate-sources</phase>
+            <goals><goal>add-source</goal></goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/../p4-java/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <!-- p4-java の計測・比較用の任意ツールは取り込まない。
+               生成パーサ本体と、その extern scanner（P4Scanners）だけを共有する。 -->
+          <excludes>
+            <exclude>org/ubnfc/p4/Benchmark.java</exclude>
+            <exclude>org/ubnfc/p4/DepthProbe.java</exclude>
+            <exclude>org/ubnfc/p4/FixtureProbe.java</exclude>
+            <exclude>org/ubnfc/p4/LegacyBenchmark.java</exclude>
+            <exclude>org/ubnfc/p4/LegacyProbe.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.3.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>

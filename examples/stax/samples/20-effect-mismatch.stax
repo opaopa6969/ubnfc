@@ -1,0 +1,13 @@
+// 拒否されるべき 4: 構文は通るが宣言したスタック効果と本体が合わない（stage 3）。
+//   two   は ( Int -- Int ) と宣言しているのに 2 つ残す
+//   empty は ( -- Int ) と宣言しているのに何も残さない
+
+: two ( Int -- Int )
+  dup ;
+
+: empty ( -- Int )
+  "nothing" print ;
+
+: main ( -- )
+  1 two drop drop
+  empty drop ;
