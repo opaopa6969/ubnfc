@@ -19,7 +19,9 @@ import java.util.Map;
  *
  * <p>mode（{@code bench.modes}、カンマ区切り）:
  * <ul>
- *   <li>{@code ast} — AST を作る（buildAst=true）</li>
+ *   <li>{@code ast} — AST を作る（buildAst=true、観測も全て要求）</li>
+ *   <li>{@code ast-noocc} — AST を作るが公開出現表を要求しない</li>
+ *   <li>{@code ast-fast} — AST を作るが観測を何も要求しない</li>
  *   <li>{@code recognize} — 認識、観測は従来どおり全て要求（出現表・診断）</li>
  *   <li>{@code recognize-notree} — 認識、出現表を要求しない（step A: Match 木・capture・Recipe を作らない）</li>
  *   <li>{@code recognize-fast} — 認識、観測を何も要求しない（step A+B: 診断 DAG も作らない。D-023 で失敗時のみ再解析）</li>
@@ -134,6 +136,10 @@ public final class FamilyBJavaBench {
         String base = memo ? mode : mode.substring(0, mode.length() - "-nomemo".length());
         Object value = switch (base) {
             case "ast" -> options.getConstructor(boolean.class, boolean.class).newInstance(true, true);
+            case "ast-noocc" -> options.getMethod("withObservations", boolean.class, boolean.class)
+                .invoke(options.getConstructor(boolean.class, boolean.class).newInstance(true, true), false, true);
+            case "ast-fast" -> options.getMethod("withObservations", boolean.class, boolean.class)
+                .invoke(options.getConstructor(boolean.class, boolean.class).newInstance(true, true), false, false);
             // 観測を全て要求する認識（PR #14 までの振る舞い）。
             case "recognize" -> options.getConstructor(boolean.class, boolean.class, boolean.class, boolean.class, Map.class)
                 .newInstance(false, true, false, true, Map.of());

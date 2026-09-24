@@ -90,7 +90,7 @@ mod contracts {
                 assert_eq!((r.consumed_cp, r.matched_cp), (0, 0));
             }
         }
-        // memo 表の上限は memo が付く文法でしか踏めない（D-057）。`lexical` の Root は
+        // memo 表の上限は memo が付く文法でしか踏めない（D-058）。`lexical` の Root は
         // 同じ位置へ再入し得ないので memo が無く、entry が 1 つも増えない。
         {
             let r = memo_budget::parse_with_options(

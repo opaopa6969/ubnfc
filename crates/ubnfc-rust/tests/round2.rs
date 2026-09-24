@@ -89,7 +89,7 @@ fn round2_generated_contracts_and_m3() {
         "lexical".into(),
         "grammar G { @root Root ::= 'a' 'b' 'x'; }".into(),
     ));
-    // memo の資源上限は「memo が付く文法」でしか踏めない（D-057 で rule ごとに決まるようになった）。
+    // memo の資源上限は「memo が付く文法」でしか踏めない（D-058 で rule ごとに決まるようになった）。
     // 2 候補が同じ位置から A を試すので A は再入し得る＝ memo が残る。
     sources.push((
         "memo_budget".into(),

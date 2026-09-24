@@ -34,6 +34,11 @@ resolve と lower は渡された main/import AST を使う。`ParsedSource` の
 - 生成 runtime の span は code point 半開区間である。source の全 `char_indices` と EOF から
   対応表を一度作り、全 node/capture/occurrence を UTF-8 byte 半開区間へ変換する。
   範囲外、逆順、親からはみ出す occurrence は丸めず変換エラーにする。
+- `QuantifiedRef ::= { IDENTIFIER '.' } @namespace IDENTIFIER @name` の `@namespace` は
+  反復 1 回ぶん（`IDENTIFIER '.'`）ごとの capture、すなわち `list<text>` である。
+  各成分の先頭識別子を取り出して `.` で連結し、手書き frontend と同じ `namespace`
+  （`a.b.Value` なら `a.b`）にする。0 個なら namespace 無し、1 個なら `a`。
+  連結先の `String` は 1 本だけで、成分ごとの中間 `String` は作らない。
 - 空 Sequence の span は occurrence が trivia を消費した後の位置を使う。非空 Sequence と
   Choice は子要素の先頭から末尾までとし、手書き AST の span 規則に合わせる。
 
@@ -56,22 +61,21 @@ cargo test -p ubnfc-front --offline --test selfhost_conversion --test selfhost_p
 
 ## 既知の差分
 
-比較対象25件（24 fixture + P4）のうち、`ubnf.ubnf` が記述する構文だけを使う19件は
-`UbnfFile` が全 field/span を含めて一致する。手書き frontend だけの互換拡張を使う次の6件は、
+比較対象25件（24 fixture + P4）のうち、`ubnf.ubnf` が記述する構文だけを使う20件は
+`UbnfFile` が全 field/span を含めて一致する。手書き frontend だけの互換拡張を使う次の5件は、
 生成 parser が表の byte offset で拒否する。self-host を通すための grammar/IR 加工はしていない。
 
 | source | byte | 手書き frontend の互換拡張 |
 |---|---:|---|
 | `positive/annotations.ubnf` | 43 | dotted mapping class (`Node.Item`) |
 | `known/eval-default.ubnf` | 32 | `@eval` entry の `=` 区切り |
-| `known/keyword-boundary.ubnf` | 24 | annotation keyword の識別子境界 (`@rooted`)。**D-040 の語境界そのもの**で、`ubnf.ubnf` を `@ubnf: 2`（または `@literalBoundary: word`）にすると解消する（実測: 受理 19 → 20、他の 5 件の位置は不変。`docs/reports/2026-09-23-ubnf-v2-word-boundary.md` §1.3）。self-description を v2 にするかは別の判断なので、この表は v1 のままの実測値 |
-| `known/namespace.ubnf` | 28 | 3成分以上の rule namespace (`a.b.Value`) |
+| `known/keyword-boundary.ubnf` | 24 | annotation keyword の識別子境界 (`@rooted`)。**D-040 の語境界そのもの**で、`ubnf.ubnf` を `@ubnf: 2`（または `@literalBoundary: word`）にすると解消する（実測は 2026-09-23、`QuantifiedRef` の chained dot 対応前の grammar 上: 受理 19 → 20、他の 5 件の位置は不変。`docs/reports/2026-09-23-ubnf-v2-word-boundary.md` §1.3）。self-description を v2 にするかは別の判断なので、この表は v1 のままの実測値 |
 | `unlaxer-dsl/examples/tinycalc.ubnf` | 276 | setting block 内の二重引用符 |
 | `tinyexpression-p4.ubnf` | 2595 | `@declares` description の capture 名（非 STRING） |
 
 ### 7 件目 — 唯一の逆向き乖離（生成側が広い）とその閉じ方
 
-上の 6 件はすべて「**手書き frontend だけが受理する**」向きで、self-host を通すための加工を
+上の 5 件はすべて「**手書き frontend だけが受理する**」向きで、self-host を通すための加工を
 していないことの記録だった。2026-09-23 のクロスチェック
 （[`../reports/2026-09-23-parser-feature-correctness-comparison.md`](../reports/2026-09-23-parser-feature-correctness-comparison.md) §3.1 (4)）で、
 **逆向きが 1 件だけ**見つかった。
@@ -102,50 +106,38 @@ IR・生成物・固定点は 1 byte も変わらない。
 外せる表層を足すこと）だが、どちらもこの repo からは行えない。上流で直れば、この門は外せる。
 
 独立した構文エラー3例は、Unicode を含む場合も手書き/生成変換後の byte span が一致する。
-validation error golden 3件では `all-tokens.ubnf` の AST が一致し、`annotations.ubnf` と
-`namespace.ubnf` は上記の文法差分として位置を固定している。
+validation error golden 3件では `all-tokens.ubnf` と `namespace.ubnf` の AST が一致し、
+`annotations.ubnf` は上記の文法差分として位置を固定している。
 
 `ubnfc-rust` に固定点を妨げる不足はない。将来の結合を単純化する改善として、公開
 `Capture` に宣言元 `rule_id` を含めるか、capture site metadata を生成物で公開できる。
 現在は unmodified golden IR から作った決定的な site→rule 表を selfhost crate に同梱し、
 全 entry が golden と一致することをテストしている。
 
-### 8 件目 — 3段以上の dotted ルール参照（`a.b.Value`）は `ubnf.ubnf` 側の文法欠陥
+### 8 件目 — 3段以上の dotted ルール参照（`a.b.Value`）: **解消済み**（unlaxer-parser #285）
 
-issue #12（`opaopa6969/ubnfc`）の調査。上の表の `known/namespace.ubnf`（byte 28）と
-同じ入力形（`grammar G { R ::= a.b.Value; }`）を、`unlaxer-parser` #279 で確定した
-仕様（`unlaxer-dsl/specs/ubnf-syntax.md` 「## ルール宣言」290-293行目、
-「UBNF 自体は `a.b.Value` 全体を1個の `IDENTIFIER` として扱う（分割しない）」）に
-照らして再調査した。
-
-- 手書き frontend（A, `crates/ubnfc-front/src/syntax`）: 受理（namespace=`a.b`, name=`Value`）
-- 自己ホスト生成 frontend（B）: **拒否**
-  `構文エラー (bytes 21..22): expected + or ? or * or { or % or @ or @typeof or ( or [ or ERROR or STRING or IDENTIFIER or | or ;`
-  （`ubnfc_selfhost::parse_file` と `examples/ubnf-crosscheck` の `ubnf-crosscheck` バイナリで
-  再現・確認済み。2段の `a.B` は A/B とも受理する）
-- unlaxer-ubnf（C）・Java bootstrap（D）: 受理
-
-根本原因は `unlaxer-parser/unlaxer-dsl/grammar/ubnf.ubnf`（読み取り専用）の
-`QuantifiedRef` 生成規則そのものにある。
+issue #12（`opaopa6969/ubnfc`）。`grammar G { R ::= a.b.Value; }` を手書き frontend（A）は
+受理する一方、自己ホスト生成 frontend（B）だけが bytes 21..22 で拒否していた。根本原因は
+`unlaxer-parser/unlaxer-dsl/grammar/ubnf.ubnf`（読み取り専用）の `QuantifiedRef` 生成規則が
 
 ```
-@backref(name=name)
 QuantifiedRef ::= [ IDENTIFIER @namespace '.' ] IDENTIFIER @name ;
 ```
 
-これは `IDENTIFIER ['.' IDENTIFIER]`、すなわちドット1個だけの任意分割であり、
-段数上限なしの chained dot を最初から想定していない。生成 parser
-（`crates/ubnfc-selfhost/src/generated/parser.rs` の `r55_c` / rule 55）はこの文法を
-忠実に実装しているだけで、`ubnfc_selfhost::parse_file` や
-`crates/ubnfc-front/src/selfhost/convert()` の投影・変換ロジックに欠陥はない
-（7件目と異なり、こちらは**生成側が仕様より狭い**方向の乖離で、self-host 経路の外側で
-埋める字句ゲートのような閉じ方も取れない — 文法自体が3段以上を受理しない以上、
-生成 parser の手前でドットを数えて許可判定をしても、後段の `QuantifiedRef` 本体の
-消費規則が2段までしか進まないため無意味）。
+とドット1個だけの任意分割で、段数上限なしの chained dot を想定していなかったことにあり
+（[`unlaxer-parser` issue #284](https://github.com/opaopa6969/unlaxer-parser/issues/284)、
+詳細は PR #16）、`ubnfc` 側の投影・変換ロジックの欠陥ではなかった。
 
-したがって直し方は `unlaxer-parser` 側で `QuantifiedRef` を chained dot 対応にし、
-`ubnf.ubnf` を再生成することであり、この repo（`ubnfc`）からは行えない。
-最小再現・仕様引用・修正方針は
-[`unlaxer-parser` issue #284](https://github.com/opaopa6969/unlaxer-parser/issues/284)
-で報告済み。`known/namespace.ubnf` の扱い（表の位置固定）は変更しない。上流で直れば、
-その修正後の `ubnf.ubnf` を取り込んだ時点でこの表の行と本節は不要になる。
+[`unlaxer-parser` PR #285](https://github.com/opaopa6969/unlaxer-parser/pull/285) が
+
+```
+QuantifiedRef ::= { IDENTIFIER '.' } @namespace IDENTIFIER @name ;
+```
+
+へ直したので、その `ubnf.ubnf` から IR fixture と `crates/ubnfc-selfhost/src/generated` を
+再生成し、`@namespace` が `list<text>` になったぶんを上の「変換規則」の規則で投影した。
+結果、**両 frontend の受理と `UbnfFile` が一致**し、上の表から `known/namespace.ubnf`
+（byte 28）の行が消えた（受理 19 件 → 20 件、拒否 6 件 → 5 件）。残る乖離は上の表の
+5 件と 7 件目の 1 件で、いずれも内容・位置とも変化していない。回帰は
+`crates/ubnfc-selfhost/tests/parity.rs` の
+`chained_dotted_rule_references_match_the_handwritten_frontend`（0〜3 成分と trivia 混じり）。
