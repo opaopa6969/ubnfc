@@ -174,7 +174,7 @@ public final class TinyExpressionP4Parser {
             };
             default -> throw new IllegalArgumentException("Unsupported grammar: " + grammar);
         };
-        var s = new Session(source, options, K0, true);
+        var s = new Session(source, options, K0, true, false);
         var f = new Frame(); Match match = s.parse(entryPoint, f);
         stackFlag[0] = stackFlag[0] || s.stackOverflowTripped;
         if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }

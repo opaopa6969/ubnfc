@@ -309,7 +309,7 @@ public final class JavaEmitter {
             out.append("                default -> throw new IllegalArgumentException(\"Unsupported entry: \" + entry);\n            };\n");
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
-            .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(", ").append(twoMode()).append(");\n")
+            .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(", ").append(twoMode()).append(", ").append(plainRecognition()).append(");\n")
             .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
             .append("        stackFlag[0] = stackFlag[0] || s.stackOverflowTripped;\n")
             .append("        if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }\n")
@@ -428,6 +428,14 @@ public final class JavaEmitter {
             Set.of("repeat", "optional", "separated").contains(e.node().kind())
                 && e.captureSiteIds().stream().anyMatch(scoped::contains));
     }
+    /**
+     * D-075: 認識専用経路（{@code tree=false}）の成功値が情報を持たなくてよい文法か。
+     * その経路で {@code Match} の区間・text・出現列を読むのは {@code Session.applyEffects}
+     * （scope 効果）と {@code Session.wrap} の scoped site だけで、どちらも {@code @scope} 効果が
+     * 1 つも無ければ存在しない（{@link #scopeSites} が空なら {@code capture} の包みは
+     * {@code bypassCapture} で飛ぶ）。@mapping の field を読むのは AST 経路だけである。
+     */
+    private boolean plainRecognition() { return ir.semantics().scope().effects().isEmpty(); }
     private boolean safe(String id, Set<String> visited) {
         if (!visited.add(id)) return true;
         Expr expr = expressions.get(id);
