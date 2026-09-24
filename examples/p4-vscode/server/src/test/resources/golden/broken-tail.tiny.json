@@ -1,0 +1,16 @@
+[
+  {
+    "range": [2, 0, 2, 0],
+    "severity": "Error",
+    "source": "ubnfc",
+    "code": "MulOp",
+    "message": "構文エラー: ' ' | '(' | ')' | '*' | '*/' | '+' | '-' | '/' ほか 13 件 を期待しました"
+  },
+  {
+    "range": [1, 5, 1, 10],
+    "severity": "Warning",
+    "source": "ubnfc",
+    "code": "scope-prefix",
+    "message": "未定義のシンボル: 'bonus'（構文エラーより前の範囲だけを見た結果）"
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "range": [2, 23, 2, 29],
+    "severity": "Warning",
+    "source": "ubnfc",
+    "code": "scope",
+    "message": "未定義のシンボル: 'double'"
+  }
+]

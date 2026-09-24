@@ -3,7 +3,7 @@
 
 新旧どちらのサーバにも同じ手順で話しかけられる（差は jar と languageId だけ）。
 使い方:
-  lsp-probe.py --jar <server.jar> --language-id <id> --fixtures <dir> [--jvm-arg X]...
+  lsp-probe.py --jar <server.jar> --language-id <id> --fixtures <dir> [--glob '*.tiny'] [--jvm-arg X]...
 """
 import argparse
 import json
@@ -100,6 +100,7 @@ def main():
     parser.add_argument("--jar", required=True)
     parser.add_argument("--language-id", required=True)
     parser.add_argument("--fixtures", required=True)
+    parser.add_argument("--glob", default="*.tiny")
     parser.add_argument("--jvm-arg", action="append", default=[])
     parser.add_argument("--settle", type=float, default=1.5,
                         help="publishDiagnostics を待ってから追加分を拾う秒数")
@@ -116,7 +117,7 @@ def main():
     client.notify("initialized", {})
 
     report = {}
-    for path in sorted(pathlib.Path(args.fixtures).glob("*.tiny")):
+    for path in sorted(pathlib.Path(args.fixtures).glob(args.glob)):
         text = path.read_text(encoding="utf-8")
         uri = path.resolve().as_uri()
         client.notify("textDocument/didOpen", {"textDocument": {

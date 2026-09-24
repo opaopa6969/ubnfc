@@ -1,0 +1,5 @@
+grammar Tiny {
+  token IDENTIFIER = org.unlaxer.parser.clang.IdentifierParser
+  Expr ::= Term { '+' Term } ;
+  Term ::= IDENTIFIER ;
+}

@@ -1,6 +1,6 @@
 .gitignore
 .vscodeignore
-scripts/**
+evidence/**
 server/**
 src/**
 tsconfig.json

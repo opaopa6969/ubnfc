@@ -1,0 +1,36 @@
+{
+  "documentSymbols": [
+    {"name": "Expr", "kind": "Variable", "detail": "RuleDecl", "range": [2, 2, 2, 6], "selectionRange": [2, 2, 2, 6]},
+    {"name": "Word", "kind": "Variable", "detail": "RuleDecl", "range": [2, 29, 2, 33], "selectionRange": [2, 29, 2, 33]}
+  ],
+  "semanticTokens": [
+    {"line": 0, "char": 0, "length": 7, "type": "keyword"},
+    {"line": 0, "char": 8, "length": 5, "type": "variable"},
+    {"line": 0, "char": 14, "length": 1, "type": "operator"},
+    {"line": 1, "char": 2, "length": 5, "type": "keyword"},
+    {"line": 1, "char": 8, "length": 10, "type": "variable"},
+    {"line": 1, "char": 19, "length": 1, "type": "operator"},
+    {"line": 1, "char": 21, "length": 3, "type": "variable"},
+    {"line": 1, "char": 24, "length": 1, "type": "operator"},
+    {"line": 1, "char": 25, "length": 7, "type": "variable"},
+    {"line": 1, "char": 32, "length": 1, "type": "operator"},
+    {"line": 1, "char": 33, "length": 6, "type": "variable"},
+    {"line": 1, "char": 39, "length": 1, "type": "operator"},
+    {"line": 1, "char": 40, "length": 5, "type": "variable"},
+    {"line": 1, "char": 45, "length": 1, "type": "operator"},
+    {"line": 1, "char": 46, "length": 16, "type": "variable"},
+    {"line": 2, "char": 2, "length": 4, "type": "variable"},
+    {"line": 2, "char": 7, "length": 3, "type": "operator"},
+    {"line": 2, "char": 11, "length": 4, "type": "variable"},
+    {"line": 2, "char": 16, "length": 1, "type": "operator"},
+    {"line": 2, "char": 29, "length": 4, "type": "variable"},
+    {"line": 2, "char": 34, "length": 3, "type": "operator"},
+    {"line": 2, "char": 38, "length": 10, "type": "variable"},
+    {"line": 2, "char": 49, "length": 1, "type": "operator"},
+    {"line": 3, "char": 0, "length": 1, "type": "operator"}
+  ],
+  "probes": [
+    {"at": [2, 11], "definition": [[2, 29, 2, 33]], "references": [[2, 11, 2, 15], [2, 29, 2, 33]], "referencesOnly": [[2, 11, 2, 15]], "hover": {"range": [2, 11, 2, 15], "markdown": "**Word** — 参照\n\n宣言: 3 行 30 桁"}, "completion": ["(", ")", ".", ";", "@typeof", "ERROR", "Expr", "[", "]", "{", "|", "}"], "completionCount": 12},
+    {"at": [2, 29], "definition": [[2, 29, 2, 33]], "references": [[2, 11, 2, 15], [2, 29, 2, 33]], "referencesOnly": [[2, 11, 2, 15]], "hover": {"range": [2, 29, 2, 33], "markdown": "**Word** — 宣言\n\n種類: `RuleDecl`"}, "completion": ["(", ")", "::=", ";", "=", "@", "@backref", "@catalog", "@commonField", "@declares", "@doc", "@enum", "@eval", "@interleave", "@leftAssoc", "@longestChoice", "@mapping", "@precedence", "@predictiveChoice", "@recovery"], "completionCount": 33}
+  ]
+}

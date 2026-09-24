@@ -1,0 +1,8 @@
+grammar Refs {
+  token IDENTIFIER = org.unlaxer.parser.clang.IdentifierParser
+  token UNSIGNED_INTEGER = org.unlaxer.parser.elementary.NumberParser
+  Start ::= Item { ',' Item } ;
+  Item ::= Name | Number ;
+  Name ::= IDENTIFIER ;
+  Number ::= UNSIGNED_INTEGER ;
+}

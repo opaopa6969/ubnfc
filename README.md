@@ -331,14 +331,19 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   矛盾で未定、3 件は駆動不能（[`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md) §6）。
 - **インクリメンタル解析は無い**。生成物は毎回全文を読み直す 1 回きりの解析器で、
   差分再解析・部分木の再利用は設計にも実装にも無い。
-- **LSP は opt-in の feature**（D-060、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
+- **LSP は opt-in の feature**（D-060 / D-062、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
   有効にすると `ubnfc-lsp --emit-lsp` が生成パーサを包む LSP サーバを**別パッケージへ追加**する。
-  生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**段階 2 の capability は診断のみ**
-  （構文エラーと未定義参照。completion / hover / definition / references は未実装）。
-  打鍵ごとに全文を再解析する（[`docs/reports/2026-09-24-lsp-vsix-stage1.md`](docs/reports/2026-09-24-lsp-vsix-stage1.md)
-  §6 に実測。P4 の 325 code point で 0.45 ms、20,923 code point で 15.6 ms）。DAP は未実装。
-- `@doc`、`@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
+  生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**capability は
+  診断 / definition / references / document symbols / semantic tokens / completion / hover と
+  TextMate 文法の生成**（[`docs/reports/2026-09-24-lsp-vsix-stage3.md`](docs/reports/2026-09-24-lsp-vsix-stage3.md) §1 の表）。
+  **無いもの**: DAP、増分解析、rename、文法の意味検査（`GrammarValidator` 相当。ubnfc では front が持つ）、
+  外部カタログの照合、folding / inlay hints / signature help / formatting / code actions。
+  打鍵ごとに全文を再解析する（同報告 §8 に実測。P4 の 325 code point で 0.29 ms、20,923 code point で 6.6 ms、
+  解析に失敗する文書は前半の再解析ぶん最大 2.8 倍）。VSIX は P4（`examples/p4-vscode`）と
+  UBNF 自身（`examples/ubnf-vscode`）の 2 つを `scripts/build-vsix.sh` で組む。
+- `@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
+  `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-062）。
 
 ---
 
@@ -452,7 +457,8 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `scanners/` | Extern token の scanner registry（`first-chars.json` と Java / Rust 実装） |
 | `examples/handwritten-target` | 生成物の**目標形**を手書きで固定した Operators / Power（Java・Rust） |
 | `examples/p4-java`, `examples/p4-rust` | tinyexpression P4（124 規則）の生成物を commit した実行例とベンチ |
-| `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + VSIX）。`scripts/build-vsix.sh` で組む |
+| `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + TextMate 文法 + VSIX）。`scripts/build-vsix.sh p4` |
+| `examples/ubnf-vscode` | UBNF 自身（`ubnf.ubnf`）の VS Code 拡張。同じ経路で組む。`scripts/build-vsix.sh ubnf` |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
 | `examples/json`, `examples/arith` | 同じ言語を `.ubnf` / ANTLR `.g4` / tree-sitter `grammar.js` の 3 記法で書いたもの（JSON = RFC 8259、算術式 = Operators / Power）。外部比較の材料。issue #26 |
 | `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27。同じ言語を各ツールの流儀で書き直した `TinyExpressionP4Idiomatic.g4` / `grammar.idiomatic.js` も同じディレクトリ（issue #39） |

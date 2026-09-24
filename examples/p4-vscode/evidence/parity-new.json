@@ -97,6 +97,18 @@
         ],
         "severity": 1,
         "source": "ubnfc"
+      },
+      {
+        "code": "scope-prefix",
+        "message": "未定義のシンボル: 'bonus'（構文エラーより前の範囲だけを見た結果）",
+        "range": [
+          4,
+          38,
+          4,
+          43
+        ],
+        "severity": 2,
+        "source": "ubnfc"
       }
     ],
     "timedOut": false

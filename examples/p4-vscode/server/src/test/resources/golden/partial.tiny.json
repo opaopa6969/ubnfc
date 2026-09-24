@@ -1,0 +1,9 @@
+[
+  {
+    "range": [1, 1, 1, 4],
+    "severity": "Warning",
+    "source": "ubnfc",
+    "code": "scope",
+    "message": "未定義のシンボル: 'pri'"
+  }
+]

@@ -1,0 +1,6 @@
+var $price as number set 10;
+var $count as number set 3;
+$price * $count + call double($price)
+float double($x as number) {
+  $x * 2
+}

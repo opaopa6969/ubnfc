@@ -1,0 +1,7 @@
+{
+  "documentSymbols": [],
+  "semanticTokens": [],
+  "probes": [
+    {"at": [0, 3], "definition": [], "references": [], "referencesOnly": [], "hover": null, "completion": ["$", "(", ")", ",", ".", ".length", ":", "?", "abs", "call", "ceil", "cos", "else", "exp", "external", "floor", "if", "internal", "len", "length"], "completionCount": 33}
+  ]
+}

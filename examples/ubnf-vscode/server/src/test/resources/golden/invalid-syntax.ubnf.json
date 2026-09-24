@@ -1,0 +1,9 @@
+[
+  {
+    "range": [2, 0, 2, 0],
+    "severity": "Error",
+    "source": "ubnfc",
+    "code": "TerminalElement",
+    "message": "構文エラー（余分な入力）: ' ' | '%' | '(' | ')' | '*' | '*/' | '+' | '.' ほか 20 件 を期待しました"
+  }
+]

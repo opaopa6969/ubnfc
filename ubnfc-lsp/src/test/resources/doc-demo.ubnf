@@ -1,0 +1,17 @@
+// @doc が IR に載ることを示すための最小文法（ubnfc-lsp のテスト資材）。
+// P4 と UBNF はどちらも読み取り専用の sibling repo にあり @doc を使っていないので、
+// 「@doc → IR → 生成 Meta.RULE_DOC → hover」の経路はこの文法で押さえる。
+grammar DocDemo {
+
+  token IDENTIFIER = org.unlaxer.parser.clang.IdentifierParser
+  token NUMBER     = org.unlaxer.parser.elementary.NumberParser
+
+  @root
+  @doc('式の入口。項を + でつないだもの。')
+  @mapping(Expr, params=[head, tail])
+  Expr ::= Term @head { '+' Term } @tail ;
+
+  @doc('項。識別子か数のどちらか。')
+  @mapping(Term, params=[value])
+  Term ::= IDENTIFIER @value | NUMBER @value ;
+}
