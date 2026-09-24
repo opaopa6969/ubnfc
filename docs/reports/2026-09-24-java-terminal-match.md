@@ -88,7 +88,7 @@ JSON / Operators / Power は効果 0 件なので `true`、P4（tinyexpression-p
   `values == result.values()` だけで、いずれも列の同一性であり `tree=true` の枝にある。
 - **top level が読むのは null か否かだけ**。`Session.result()` は `match.captures()` /
   `match.recoveries()` / `match.traces()` を読むが、認識専用経路ではすべて空である
-  （`OK` も空）。`match.start()` / `end()` / `nodes()` を読む `parseEntryInternal` の枝は
+  （`OK` も空）。`match.start()` / `end()` / `nodes()` を読む `parseEntryAttempt` の枝は
   `options.buildAst()` の後ろにあり、`buildAst=true` は `tree=true` を含む。
 - **memo に入れても安全**。payload に入るのは `OK` 1 個で、`consumedEnd` / `matchedEnd` は
   memo 表が別に持つ（`Match` からは読まない）。
