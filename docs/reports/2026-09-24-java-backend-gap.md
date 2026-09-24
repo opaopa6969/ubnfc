@@ -254,7 +254,7 @@ step 2 と合わせて **−1.9%** に反転させている（後掲 P4 表）�
   `examples/p4-java/scripts/generate.sh --check` 差分なし、`cargo fmt --check` と
   `cargo clippy --workspace --all-targets -- -D warnings` 緑。
 - `origin/master`（issue #1 の `P4Scanners` 引用符修正、D-050〜D-053 を含む）を取り込んだ上での結果。
-  本 PR の D 行は **D-054**。
+  本 PR の D 行は **D-055**。
 
 ## 残り（次のラウンドの順序）
 

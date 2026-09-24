@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use crate::resolve::{ResolvedAtom, ResolvedBody, ResolvedRule, SymbolId};
 use crate::syntax::ast::Annotation;
@@ -267,28 +267,42 @@ fn push_unique(out: &mut Vec<SymbolId>, id: SymbolId) {
 
 pub(super) fn left_recursion(cx: &mut Context<'_>) {
     let grammar = cx.grammar;
-    let mut graph = BTreeMap::new();
-    for rule in &grammar.rules {
-        let mut refs = Vec::new();
-        leftmost(&rule.body, &mut refs);
-        graph.insert(rule.id, refs);
-    }
+    let index: BTreeMap<SymbolId, usize> = grammar
+        .rules
+        .iter()
+        .enumerate()
+        .map(|(i, r)| (r.id, i))
+        .collect();
+    // 左端呼出しグラフ。token など rule でない記号は巡回に入らないので落とす
+    // （旧実装も `graph.get(&id)` が None になって同じ扱いだった）。
+    let graph: Vec<Vec<usize>> = grammar
+        .rules
+        .iter()
+        .map(|rule| {
+            let mut refs = Vec::new();
+            leftmost(&rule.body, &mut refs);
+            refs.iter().filter_map(|s| index.get(s).copied()).collect()
+        })
+        .collect();
+    let component = scc(&graph);
+    // 左端巡回に載っている rule ごとに、その rule を通る最短の巡回を 1 本だけ報告する。
+    // 旧実装は全単純経路を数え上げていて、互いを左端参照する 9 規則（505 byte）で
+    // 986,400 件の警告に 9 秒、10 規則で 120 秒超だった。
     let mut cycles = BTreeSet::new();
-    for rule in &grammar.rules {
-        find_cycles(rule.id, &graph, &mut Vec::new(), &mut cycles);
+    for start in 0..graph.len() {
+        if let Some(cycle) = shortest_cycle(&graph, &component, start) {
+            cycles.insert(
+                cycle
+                    .into_iter()
+                    .map(|r| grammar.rules[r].id)
+                    .collect::<Vec<_>>(),
+            );
+        }
     }
     for cycle in cycles {
         let names: Vec<_> = cycle
             .iter()
-            .map(|id| {
-                grammar
-                    .rules
-                    .iter()
-                    .find(|r| r.id == *id)
-                    .unwrap()
-                    .name
-                    .as_str()
-            })
+            .map(|id| grammar.rules[index[id]].name.as_str())
             .collect();
         cx.add(
             Some(names[0]),
@@ -297,6 +311,102 @@ pub(super) fn left_recursion(cx: &mut Context<'_>) {
             "Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
         );
     }
+}
+
+/// Tarjan の強連結成分。頂点ごとの成分番号を返す。明示スタックなので
+/// 規則数ぶんの深さ（`A ::= B; B ::= C; …`）でも stack を溢れさせない。
+fn scc(graph: &[Vec<usize>]) -> Vec<usize> {
+    let n = graph.len();
+    const UNVISITED: usize = usize::MAX;
+    let mut index = vec![UNVISITED; n];
+    let mut low = vec![0usize; n];
+    let mut active = vec![false; n];
+    let mut component = vec![UNVISITED; n];
+    let mut stack: Vec<usize> = Vec::new();
+    let mut frames: Vec<(usize, usize)> = Vec::new();
+    let (mut next, mut groups) = (0usize, 0usize);
+    for root in 0..n {
+        if index[root] != UNVISITED {
+            continue;
+        }
+        index[root] = next;
+        low[root] = next;
+        next += 1;
+        stack.push(root);
+        active[root] = true;
+        frames.push((root, 0));
+        while let Some(&(v, edge)) = frames.last() {
+            if let Some(&w) = graph[v].get(edge) {
+                frames.last_mut().expect("frame は直前に確認済み").1 += 1;
+                if index[w] == UNVISITED {
+                    index[w] = next;
+                    low[w] = next;
+                    next += 1;
+                    stack.push(w);
+                    active[w] = true;
+                    frames.push((w, 0));
+                } else if active[w] {
+                    low[v] = low[v].min(index[w]);
+                }
+                continue;
+            }
+            frames.pop();
+            if low[v] == index[v] {
+                while let Some(w) = stack.pop() {
+                    active[w] = false;
+                    component[w] = groups;
+                    if w == v {
+                        break;
+                    }
+                }
+                groups += 1;
+            }
+            if let Some(&(parent, _)) = frames.last() {
+                low[parent] = low[parent].min(low[v]);
+            }
+        }
+    }
+    component
+}
+
+/// `start` を通る最短の左端巡回。無ければ `None`（＝その rule は左再帰でない）。
+/// 探索は `start` と同じ強連結成分の中だけで、辺は文法に書かれた順に見るので決定的。
+fn shortest_cycle(graph: &[Vec<usize>], component: &[usize], start: usize) -> Option<Vec<usize>> {
+    let group = component[start];
+    let mut parent: BTreeMap<usize, usize> = BTreeMap::new();
+    let mut queue: VecDeque<usize> = VecDeque::new();
+    let enqueue = |v: usize, parent: &mut BTreeMap<usize, usize>, queue: &mut VecDeque<usize>| {
+        for &w in &graph[v] {
+            if w != start && component[w] == group && !parent.contains_key(&w) {
+                parent.insert(w, v);
+                queue.push_back(w);
+            }
+        }
+    };
+    if graph[start].contains(&start) {
+        return Some(vec![start, start]);
+    }
+    enqueue(start, &mut parent, &mut queue);
+    while let Some(v) = queue.pop_front() {
+        if graph[v].contains(&start) {
+            let mut path = vec![v];
+            let mut current = v;
+            while let Some(&up) = parent.get(&current) {
+                if up == start {
+                    break;
+                }
+                path.push(up);
+                current = up;
+            }
+            path.reverse();
+            let mut cycle = vec![start];
+            cycle.append(&mut path);
+            cycle.push(start);
+            return Some(cycle);
+        }
+        enqueue(v, &mut parent, &mut queue);
+    }
+    None
 }
 
 fn leftmost(body: &ResolvedBody, out: &mut Vec<SymbolId>) {
@@ -322,26 +432,4 @@ fn leftmost(body: &ResolvedBody, out: &mut Vec<SymbolId>) {
             }
         }
     }
-}
-
-fn find_cycles(
-    current: SymbolId,
-    graph: &BTreeMap<SymbolId, Vec<SymbolId>>,
-    path: &mut Vec<SymbolId>,
-    cycles: &mut BTreeSet<Vec<SymbolId>>,
-) {
-    if let Some(index) = path.iter().position(|&id| id == current) {
-        let mut cycle = path[index..].to_vec();
-        cycle.push(current);
-        cycles.insert(cycle);
-        return;
-    }
-    let Some(next) = graph.get(&current) else {
-        return;
-    };
-    path.push(current);
-    for &next in next {
-        find_cycles(next, graph, path, cycles);
-    }
-    path.pop();
 }
