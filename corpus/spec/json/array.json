@@ -1,0 +1,532 @@
+{
+  "family": "json",
+  "section": "5.  Arrays",
+  "summary": "配列（角括弧・要素・区切り）。",
+  "cases": [
+    {
+      "id": "json/n_array_1_true_without_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1 true]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_1_true_without_comma.json"
+    },
+    {
+      "id": "json/n_array_colon_instead_of_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\": 1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_colon_instead_of_comma.json"
+    },
+    {
+      "id": "json/n_array_comma_after_close",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\"],",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_comma_after_close.json"
+    },
+    {
+      "id": "json/n_array_comma_and_number",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[,1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_comma_and_number.json"
+    },
+    {
+      "id": "json/n_array_double_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1,,2]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_double_comma.json"
+    },
+    {
+      "id": "json/n_array_double_extra_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"x\",,]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_double_extra_comma.json"
+    },
+    {
+      "id": "json/n_array_extra_close",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"x\"]]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_extra_close.json"
+    },
+    {
+      "id": "json/n_array_extra_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\",]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_extra_comma.json"
+    },
+    {
+      "id": "json/n_array_incomplete",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"x\"",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_incomplete.json"
+    },
+    {
+      "id": "json/n_array_incomplete_invalid_value",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[x",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_incomplete_invalid_value.json"
+    },
+    {
+      "id": "json/n_array_inner_array_no_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[3[4]]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_inner_array_no_comma.json"
+    },
+    {
+      "id": "json/n_array_items_separated_by_semicolon",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1:2]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_items_separated_by_semicolon.json"
+    },
+    {
+      "id": "json/n_array_just_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[,]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_just_comma.json"
+    },
+    {
+      "id": "json/n_array_just_minus",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_just_minus.json"
+    },
+    {
+      "id": "json/n_array_missing_value",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[   , \"\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_missing_value.json"
+    },
+    {
+      "id": "json/n_array_newlines_unclosed",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"a\",\n4\n,1,",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_newlines_unclosed.json"
+    },
+    {
+      "id": "json/n_array_number_and_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1,]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_number_and_comma.json"
+    },
+    {
+      "id": "json/n_array_number_and_several_commas",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1,,]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_number_and_several_commas.json"
+    },
+    {
+      "id": "json/n_array_spaces_vertical_tab_formfeed",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\u000ba\"\\f]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_spaces_vertical_tab_formfeed.json"
+    },
+    {
+      "id": "json/n_array_star_inside",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[*]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_star_inside.json"
+    },
+    {
+      "id": "json/n_array_unclosed",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\"",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_unclosed.json"
+    },
+    {
+      "id": "json/n_array_unclosed_trailing_comma",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1,",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_unclosed_trailing_comma.json"
+    },
+    {
+      "id": "json/n_array_unclosed_with_new_lines",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1,\n1\n,1",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_unclosed_with_new_lines.json"
+    },
+    {
+      "id": "json/n_array_unclosed_with_object_inside",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[{}",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_unclosed_with_object_inside.json"
+    },
+    {
+      "id": "json/y_array_arraysWithSpaces",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[[]   ]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_arraysWithSpaces.json"
+    },
+    {
+      "id": "json/y_array_empty-string",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_empty-string.json"
+    },
+    {
+      "id": "json/y_array_empty",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_empty.json"
+    },
+    {
+      "id": "json/y_array_ending_with_newline",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"a\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_ending_with_newline.json"
+    },
+    {
+      "id": "json/y_array_false",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[false]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_false.json"
+    },
+    {
+      "id": "json/y_array_heterogeneous",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[null, 1, \"1\", {}]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_heterogeneous.json"
+    },
+    {
+      "id": "json/y_array_null",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[null]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_null.json"
+    },
+    {
+      "id": "json/y_array_with_1_and_newline",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1\n]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_with_1_and_newline.json"
+    },
+    {
+      "id": "json/y_array_with_leading_space",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": " [1]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_with_leading_space.json"
+    },
+    {
+      "id": "json/y_array_with_several_null",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1,null,null,null,2]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_with_several_null.json"
+    },
+    {
+      "id": "json/y_array_with_trailing_space",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "5.  Arrays",
+        "sentence": "An array structure is represented as square brackets surrounding zero or more values (or elements).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[2] ",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_array_with_trailing_space.json"
+    }
+  ]
+}

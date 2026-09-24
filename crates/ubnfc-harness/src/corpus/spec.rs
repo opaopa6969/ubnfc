@@ -27,13 +27,22 @@ pub enum Scope {
 }
 
 /// 引用元。`file` は sibling repository のルート相対。
+///
+/// workspace の外にある規範文書（RFC など）を引くときは `url` を付ける。その場合
+/// `file` は「この repo のルート相対で、取得済みの写しが置かれる場所」を指し
+/// （`scripts/fetch-external-tools.sh` が置く `benchmarks/external/…`）、写しが
+/// 無い環境では照合を省略する。sibling repository のときと同じ扱いである。
 #[derive(Clone, Debug, Deserialize)]
 pub struct Citation {
     pub file: String,
-    /// 仕様ファイルに実在する見出し行そのもの（`## …` を含む）。
+    /// 仕様ファイルに実在する見出し行そのもの（Markdown なら `## …` を含む。
+    /// `url` 付きの外部文書では、その文書の見出し行そのまま）。
     pub heading: String,
     /// 逐語の一文。空白の畳み込みだけを許して照合する。
     pub sentence: String,
+    /// 外部規範文書の URL。付いているときだけ `file` は外部文書の写しを指す。
+    #[serde(default)]
+    pub url: Option<String>,
 }
 
 /// 期待値。`verdict` ごとに意味のあるフィールドが変わる。
@@ -65,14 +74,43 @@ pub enum Verdict {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SpecCase {
     pub id: String,
     pub scope: Scope,
     pub citation: Citation,
+    /// 入力（UTF-8 で書ける場合）。`input_hex` とはどちらか一方だけを書く。
+    #[serde(default)]
     pub input: String,
+    /// 入力の byte 列を小文字 16 進で書いたもの。UTF-8 として不正な入力
+    /// （JSONTestSuite の符号化系ケース）は JSON 文字列に載らないのでこちらを使う。
+    #[serde(default)]
+    pub input_hex: Option<String>,
     pub expectation: Expectation,
+    /// 期待値の出所が外部の適合性テスト集であるとき、その中のファイル名。
+    /// 期待値そのものは `citation` の規範文から導く（README の絶対規則 1）。
+    #[serde(default)]
+    pub suite_file: Option<String>,
     #[serde(default)]
     pub note: Option<String>,
+}
+
+impl SpecCase {
+    /// 入力の byte 列。`input_hex` があればそれを、無ければ `input` の UTF-8 を返す。
+    #[must_use]
+    pub fn input_bytes(&self) -> Vec<u8> {
+        self.input_hex.as_ref().map_or_else(
+            || self.input.as_bytes().to_vec(),
+            |hex| {
+                hex.as_bytes()
+                    .chunks(2)
+                    .filter_map(|pair| {
+                        u8::from_str_radix(std::str::from_utf8(pair).ok()?, 16).ok()
+                    })
+                    .collect()
+            },
+        )
+    }
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -155,8 +193,24 @@ fn check_case(path: &Path, case: &SpecCase) -> Result<(), LoadError> {
     if case.citation.sentence.trim().is_empty() {
         return fail("引用文が空".to_owned());
     }
-    if !case.citation.heading.starts_with('#') {
+    if case.citation.url.is_some() {
+        // 外部文書（RFC など）の見出しは Markdown の `#` では始まらない。
+        if case.citation.heading.trim().is_empty() {
+            return fail("heading が空".to_owned());
+        }
+    } else if !case.citation.heading.starts_with('#') {
         return fail("heading は見出し行そのものである必要がある".to_owned());
+    }
+    match &case.input_hex {
+        Some(hex) => {
+            if !case.input.is_empty() {
+                return fail("input と inputHex は同時に書けない".to_owned());
+            }
+            if hex.len() % 2 != 0 || !hex.bytes().all(|b| b.is_ascii_hexdigit()) {
+                return fail("inputHex は偶数長の 16 進である必要がある".to_owned());
+            }
+        }
+        None => {}
     }
     match case.expectation.verdict {
         Verdict::Diagnostic if case.expectation.code.is_none() => {
