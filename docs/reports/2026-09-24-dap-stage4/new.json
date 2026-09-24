@@ -1,0 +1,108 @@
+{
+ "initialize": {
+  "supportsConfigurationDoneRequest": true,
+  "supportsConditionalBreakpoints": false,
+  "supportsHitConditionalBreakpoints": false,
+  "supportsEvaluateForHovers": false,
+  "exceptionBreakpointFilters": [],
+  "supportsStepBack": false,
+  "supportsSetVariable": false,
+  "supportsTerminateRequest": false
+ },
+ "launch": true,
+ "setBreakpoints": {
+  "breakpoints": [
+   {
+    "verified": true,
+    "line": 2
+   }
+  ]
+ },
+ "threads": {
+  "threads": [
+   {
+    "id": 1,
+    "name": "TinyCalc parse"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "after": "configurationDone",
+   "frames": [
+    {
+     "id": 1,
+     "name": "TinyCalcProgram",
+     "line": 1,
+     "column": 1,
+     "endLine": 3,
+     "endColumn": 1
+    }
+   ],
+   "scopes": [
+    {
+     "name": "AST node",
+     "variables": [
+      {
+       "name": "#type",
+       "value": "TinyCalcProgram",
+       "type": "astType"
+      },
+      {
+       "name": "#text",
+       "value": "\"var x set 2; 1 + 2 * 3 \"",
+       "type": "text"
+      },
+      {
+       "name": "#range",
+       "value": "1:1-3:1",
+       "type": "range"
+      },
+      {
+       "name": "declarations",
+       "value": "List(1)",
+       "type": "list"
+      },
+      {
+       "name": "expression",
+       "value": "BinaryExpr",
+       "type": "astNode"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "after": "next1",
+   "frames": []
+  },
+  {
+   "after": "next2",
+   "frames": []
+  },
+  {
+   "after": "next3",
+   "frames": []
+  },
+  {
+   "after": "next4",
+   "frames": []
+  }
+ ],
+ "evaluate": {
+  "type": "response",
+  "seq": 23,
+  "request_seq": 17,
+  "command": "evaluate",
+  "success": false,
+  "message": "evaluate は文法デバッガでは未対応です（値を計算する評価器を持っていません）。言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください（生成された EvaluatorBridge.java の Javadoc に例があります）。"
+ },
+ "events": [
+  "initialized",
+  "output",
+  "stopped:entry",
+  "output",
+  "terminated",
+  "exited"
+ ]
+}

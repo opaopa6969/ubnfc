@@ -20,6 +20,12 @@
     <!-- 旧スタック（ubnf-vscode / tinyexpression-p4-lsp-vscode）と同じ版に揃える。 -->
     <lsp4j.version>0.23.1</lsp4j.version>
     <junit.version>5.10.2</junit.version>
+    <!--
+      DAP（文法デバッガ）は opt-in。`-Pdap` を付けたときだけ lsp4j.debug を引き、
+      src/test/java/**/dap/** をコンパイルする。付けなければ jar も依存も今までどおり
+      （`scripts/build-vsix.sh` の with-dap 指定がこの profile と生成側の dap 出力を一緒に有効にする）。
+    -->
+    <dap.test.excludes>**/dap/**</dap.test.excludes>
   </properties>
   <dependencies>
     <dependency>
@@ -52,6 +58,9 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.13.0</version>
+        <configuration>
+          <testExcludes><testExclude>${dap.test.excludes}</testExclude></testExcludes>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.2.5</version>
@@ -91,4 +100,20 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>dap</id>
+      <properties>
+        <!-- 何も除外しない（存在しないパターンを 1 つ置く） -->
+        <dap.test.excludes>nothing/does/not/exist/**</dap.test.excludes>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.lsp4j</groupId>
+          <artifactId>org.eclipse.lsp4j.debug</artifactId>
+          <version>${lsp4j.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>
