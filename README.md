@@ -74,7 +74,7 @@ exit 5 になる。
 
 ---
 
-## 3. 現状（2026-09-23 時点）
+## 3. 現状（2026-09-24 時点）
 
 ### 3.1 互換性
 
@@ -110,11 +110,37 @@ root への `@recovery` 無効化など）で、新契約 `recovery-projection` 
 `allConsumed == (全入力解析が成功したか)`（D-024）。
 
 self-host（[`docs/design/05-selfhost.md`](docs/design/05-selfhost.md)）: 比較対象 25 件のうち
-`ubnf.ubnf` が記述する構文だけを使う 19 件は `UbnfFile` が全 field / span まで一致する。
-残り 6 件は**手書き frontend だけが持つ互換拡張**（dotted mapping class、`@eval` の `=` 区切り、
-3 成分以上の namespace、setting block 内の二重引用符、`@declares` description の非 STRING capture、
-annotation keyword の識別子境界）で、生成パーサが表の byte offset で拒否する。
-self-host を通すための文法 / IR の加工はしていない。
+`ubnf.ubnf` が記述する構文だけを使う 20 件は `UbnfFile` が全 field / span まで一致する。
+残り**5 件**は**手書き frontend だけが持つ互換拡張**（dotted mapping class、`@eval` の `=` 区切り、
+annotation keyword の識別子境界、setting block 内の二重引用符、`@declares` description の非 STRING capture）で、
+生成パーサが表の byte offset で拒否する。self-host を通すための文法 / IR の加工はしていない。
+これとは別に**唯一の逆向き乖離**（生成側だけが広い）があり、`ubnf.ubnf` 自身が `@whitespace: javaStyle`
+経由で UBNF が定義していない `/* ... */` ブロックコメントを受理してしまう問題を、
+`ubnfc_selfhost::parse_file` が生成パーサの外でブロックコメントを拒否する字句の門（**D-051**）で閉じている。
+以前は「8 件目」として記録していた**3 段以上の dotted ルール参照（`a.b.Value`）は解消済み**
+（[`unlaxer-parser` PR #285](https://github.com/opaopa6969/unlaxer-parser/pull/285) が
+`ubnf.ubnf` の `QuantifiedRef` を chained dot 対応へ直し、ubnfc 側は
+[PR #20](https://github.com/opaopa6969/ubnfc/pull/20) が self-host の生成物を再生成した）。
+詳細は `docs/design/05-selfhost.md`「7 件目」「8 件目」と
+[`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md) §9.6・追記。
+
+**仕様由来オラクル**: 旧実装の記録された振る舞いとの一致とは別に、`unlaxer-dsl/specs/*.md` の規範文だけから
+期待値を導いた corpus（`corpus/spec/` — UBNF 129 ケース、P4 32 ケース。どの実装の観測値も使っていない）を
+4 実装（ubnfc 手書き frontend、ubnfc 自己ホスト生成、`unlaxer-ubnf`、Java bootstrap）へ流している
+（PR [#10](https://github.com/opaopa6969/ubnfc/pull/10) が初回計測、PR
+[#23](https://github.com/opaopa6969/ubnfc/pull/23) が `unlaxer-parser` #279 の仕様訂正に追随）。
+`docs/compat-matrix.md` の「期待値の出所（provenance）」列が、旧実装から採取した項目と仕様由来の項目
+（`Sp` / `Sp4`）を区別する。詳細は
+[`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md)。
+
+**この workspace の 10 実装比較**: UBNF 文法・P4 文法・Operators/Power 文法のそれぞれで、
+このワークスペースにある実装を横並びにした報告が 2 本ある——機能面
+（[`docs/reports/2026-09-23-parser-feature-correctness-comparison.md`](docs/reports/2026-09-23-parser-feature-correctness-comparison.md)、
+3 リポジトリにまたがる 10 実装を対象）と速度面
+（[`docs/reports/2026-09-23-parser-speed-comparison.md`](docs/reports/2026-09-23-parser-speed-comparison.md)）。
+後者には、この README の性能比較（§3.2）が言及しない参照点として**`tinyexpression-rs`**
+（旧世代の Rust コード生成 + `unlaxer-runtime`。P4 complex で 1.569 ms、CST 構築込み）が載っている。
+ubnfc はこれと直接の比較対象ではないが、旧世代 Rust 生成物の実測値として記録に残す。
 
 ### 3.2 性能
 
@@ -154,6 +180,24 @@ ANTLR / tree-sitter とのベンチマークは**存在しない**（オフラ�
 - 公開 facade `P4PreferredAstMapper.parseDetailed` の 10.8 ms は候補選択込みの副次値で、
   認識 / AST の対比には使わない。
 
+**Java backend の追加ラウンド（issue #3 系列。上表は 2026-09-22 の M5 第 1 ラウンド時点、
+以下は 2026-09-24 の 3 ラウンドで更新）**: 手書き目標形との比較
+（[`2026-09-23-parser-speed-comparison.md`](docs/reports/2026-09-23-parser-speed-comparison.md) §7-1）
+から出発し、生成物が観測（Match 木・capture 出現・診断）を要求されたときだけ作るよう
+二段構えにした（D-023 の Java 版）。**認識専用の経路は手書き目標形を追い越した**が、
+**AST 経路は M5 の目標に届いていない**——正直に分けて書く。
+
+| ラウンド | 変更 | 結果 | 出典 |
+|---|---|---|---|
+| PR #14（issue #3） | `Session.combine` の逐次連結を線形化 | Operators 512 atom 認識 1.82→0.76 ms、割当 10.5→2.01 MB（手書き 2.09 MB を下回る）。**P4 complex/x64 は未達のまま** | `2026-09-24-java-backend-gap.md`（D-055） |
+| PR #18（issue #15） | 認識専用経路で Match 木・出現表・診断観測を作らない | **Operators 512 atom 認識 0.207 ms（手書き目標形 0.350 ms の 0.59 倍、目標 ≤0.4 ms 達成）**。**P4 complex-x64 認識 13.71 ms（目標 ≤15 ms 達成）**。complex 認識 0.213 ms（目標 0.2 ms に 6% 届かず） | `2026-09-24-java-two-mode.md`（D-056） |
+| PR #21（issue #19） | AST 経路にも観測の opt-in を広げる（出現表を作る条件を Match 木の条件から分離） | **Operators 512 atom AST 0.631 ms（issue の目標 0.693 ms を達成、手書き 0.560 ms の 1.13 倍）**。P4 complex AST 0.564→0.309 ms、x64 AST 50.0→28.0 ms。**M5 の AST 目標（complex ≤0.2 ms / x64 ≤15 ms）は未達**——同条件の認識専用が complex 0.220 ms / x64 17.5 ms なので、AST 層を 0 円にしても届かない | `2026-09-24-java-ast-path.md`（D-057） |
+| PR #24（issue #17） | rule 本体の memo を「同じ位置へ再入し得る」規則だけに絞る（Operators は全 rule で外れ、P4 の塔は残る） | Operators 512 atom 認識専用 0.204→0.160 ms、割当 465,664→350,168 B。**Rust も同判定で 0.176→0.115 ms、P4 complex-x64 認識 5.67→4.68 ms（最小値）**。P4 は両 backend で悪化なし | `2026-09-24-memo-plan.md`（D-058） |
+
+corpus（Java Pass 1,310 / Rust Pass 1,292、Fail 0）はこの 4 ラウンドいずれでも系統別表が既存報告と
+byte 一致、IR golden も `plan.memo.entries` 以外は不変。**結論**: Java backend の性能目標は
+「認識は達成、AST は未達」であり、§4 の記載もこれに合わせて分けてある。
+
 ### 3.3 言語の進化（UBNF v2）
 
 `@ubnf: 1|2`（既定 1）でバージョンを門にした（D-038）。**v1 は凍結**で、既存の 24 fixture・
@@ -166,8 +210,8 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
 | 左再帰ルール（候補順＝優先順位、ANTLR4 方式） | 実装済み | D-038 / D-039 |
 | リテラルの単語境界（v2 既定） | 実装済み | D-040 |
 | 言語中立な token 語彙（36 名前）＋ 明示 `extern` | 実装済み | D-041 / D-042 |
-| パラメータ化ルール `List<X, Sep>` | 本 commit 時点では未実装（`crates/ubnfc-front/src/desugar.rs` で作業中） | `06-ubnf-v2.md` §4 |
-| アノテーションの統廃合 | 棚卸しと提案 P1〜P7 のみ（**実装ではない**） | `docs/design/07-annotation-inventory.md` |
+| パラメータ化ルール `Name<P1,...,Pn>`（規則本体の雛形。resolve 前にその場で展開、`%inline` 方式） | 実装済み | D-043 / D-044 |
+| アノテーションの統廃合（P1 未知注釈警告・P2 `@backref` 分割・P3 `@interleave` 統合・P5 `@predictiveChoice` 非推奨・P7-1/P7-3） | 実装済み。**P7-2 は誤りと判明**（Java にも上限検査があった）。**P4・P6・P7-4 は未着手** | D-045〜D-049。棚卸し全体は `docs/design/07-annotation-inventory.md`（提案 P1〜P7 のうち実装済みの範囲を明記） |
 
 意味述語（ANTLR の `{...}?`）は v2 でも**入れない**。終端が「(入力, 位置) の純粋述語」である
 性質に memo・候補除外・字句キャッシュの健全性が乗っているため。文脈依存が要る場面は
@@ -177,13 +221,37 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
 **価値は規則数ではなく優先順位が宣言的になること**（初版の「同じ塔を 4 回書いている」は
 誇張だったと実装後に訂正されている）。
 
+### 3.4 堅牢性
+
+- **不正な token 宣言・注釈値を診断するようにした**（**D-050**、
+  [PR #6](https://github.com/opaopa6969/ubnfc/pull/6)）。2026-09-23 のクロスチェック
+  （`2026-09-23-parser-feature-correctness-comparison.md` §3.1 ①）で見つかった、
+  ubnfc だけが受理し他の 2 実装は拒否する不正宣言 7 件のうち `CHAR_RANGE('','a')` は
+  `lower/tokens.rs` の `unwrap()` で **panic（exit 101）していた**。新しい `E-TOKEN-*` 診断
+  6 種で拒否し、`unwrap` 自体も除いて利用者入力で panic しないことを二重に保証している。
+  corpus・IR golden・self-host 固定点は 1 byte も動いていない。
+- **深い文法連鎖でスタックオーバーフローしない**（**D-054**、
+  [PR #9](https://github.com/opaopa6969/ubnfc/pull/9)）。規則参照の連鎖長がそのまま深さになる
+  4 つの再帰的走査（SCC・scope 効果の要約・順序付き選択の左端・必須リテラル接頭辞）が
+  16,000 段の連鎖で **exit 134** していたのを、すべて明示スタックへ置き換えた（上限は設けない）。
+  `validate::operators::find_cycles` も互いに左端参照する規則で階乗時間になっていたのを
+  Tarjan の SCC + 成分内 BFS に直し、120 秒超だったものを規則ごと 1 件の線形時間にした。
+  IR golden・self-host 固定点・corpus は不変（`W-LEFT-RECURSION` の**件数**だけ変わり得るが、
+  文言・severity・順序は同じ）。詳細は
+  [`docs/reports/2026-09-24-deep-grammar-robustness.md`](docs/reports/2026-09-24-deep-grammar-robustness.md)。
+
 ---
 
 ## 4. できていないこと
 
-- **Java backend の性能目標は未達**。目標は complex ≤ 0.2 ms（AST）/ x64 ≤ 15 ms で、実測は
-  0.64 ms / 44.4 ms。届かせるには Match 木の構築を event arena へ置き換える構造変更（Rust が
-  M5 round 1 で行ったもの）が要る。Rust backend は両目標とも達成済み。
+- **Java backend の AST 性能目標は未達**（§3.2 の 3 ラウンドを経てもなお）。**認識専用経路は
+  目標を達成済み**（Operators 512 atom 0.207 ms、P4 complex-x64 13.71 ms ≤15 ms。PR #18/D-056）が、
+  AST 経路は complex 0.309 ms（目標 ≤0.2 ms）、x64 28.0 ms（目標 ≤15 ms）で未達
+  （PR #21/D-057、`2026-09-24-java-ast-path.md`）。**測定で分かった理由は AST の組み立てではなく
+  「認識そのもの」**——同条件の認識専用が complex 0.220 ms / x64 17.5 ms なので、AST 層を 0 円に
+  しても届かない。残作業（`MemoTable` の slot 配置、`ScopeStore` の取消し記録、trivia の速い経路）は
+  [issue #22](https://github.com/opaopa6969/ubnfc/issues/22) に切り出し済み（本 PR 時点で別エージェントが
+  `ubnfc-java/**` で作業中）。Rust backend は両目標とも達成済み。
 - **性能の内訳が割り切れていない**。Rust の complex 認識 66 µs のうち約 55 µs は
   「切ると受理が変わる機構の束」で、**このホストに `perf` が無いので分解できていない**
   （`2026-09-23-p4-rust-floor.md` §6）。以後の改善は計数（呼出し回数・確保回数）を
@@ -197,9 +265,12 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   driver の wire キーの不一致など）は記録済みで未修正。
 - **差分ファジングが見ていない範囲**: 両 backend が同じように間違っている場合、左再帰の
   runtime 差、`REGEX` token、`@import` の非最小形、大きな入力、`@root` 以外の entry。
-- **self-host の 6 件の既知乖離**（§3.1）。うち `known/keyword-boundary.ubnf` は D-040 の
-  語境界そのもので、`ubnf.ubnf` を `@ubnf: 2` にすると解消する（受理 19 → 20、他 5 件は不変）。
-  self-description を v2 にするかは別の判断なので、表は v1 のままの実測値。
+- **self-host の 5 件の既知乖離 + ブロックコメントの字句の門**（§3.1）。うち
+  `known/keyword-boundary.ubnf` は D-040 の語境界そのもので、`ubnf.ubnf` を `@ubnf: 2` にすると
+  解消する（受理 19 → 20、他 4 件は不変）。self-description を v2 にするかは別の判断なので、
+  表は v1 のままの実測値。3 段以上の dotted 参照（旧「8 件目」）は
+  [unlaxer-parser #285](https://github.com/opaopa6969/unlaxer-parser/pull/285) +
+  [ubnfc #20](https://github.com/opaopa6969/ubnfc/pull/20) で解消済み。
 - **corpus の未観測項目**（Java 59 / Rust 75）。`/evaluationError` 32、`/scope/resolved` 20、
   `/operations` 18、`/rollback` 10 ほか。欠落であって一致ではない。
   とくに **`scope-annotations` 系統 14 件は Rust 側が丸ごと未観測**（Java は 14 件とも Pass）で、
@@ -213,6 +284,13 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
 - **P4 の完全互換は達成していない**。16 fixture 中、Formula 入口で 9 件を全消費、
   意図的な不正入力 3 件と comparison-heavy 系 4 件を拒否する（両 backend で同じ）。
   comparison-heavy は `BooleanExpression` 入口なら全消費する。
+- **P4 の期待値は（32 件の仕様由来ケースを除き）観測由来のまま**。tinyexpression の
+  `SPEC.md` 等は自己申告で「実装ベースの記述」であり（UBNF の `ubnf-syntax.md` のような
+  先に書かれた規範ではない）、文書間で優先順位の矛盾もある。判定可能な 32 件のうち
+  25 件は R1（ubnfc p4-rust）・R2（tinyexpression-rs）とも仕様と一致、残り 4 件は文書間の
+  矛盾で未定、3 件は駆動不能（[`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md) §6）。
+- **インクリメンタル解析・LSP は無い**。生成物は毎回全文を読み直す 1 回きりの解析器で、
+  差分再解析・エディタ向けプロトコル・部分木の再利用は設計にも実装にも無い。
 - `@doc`、`@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
 
@@ -334,11 +412,11 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 
 | 文書 | 内容 |
 |---|---|
-| [`docs/design/03-design-v1.md`](docs/design/03-design-v1.md) | **正本**。全体構成、実行意味論、IR 契約、結果 API、マイルストーン、**§8 の決定表 D-001 … D-042**（本 commit 時点で 41 行。D-034 は採番の欠番。他のエージェントが行を追加中） |
+| [`docs/design/03-design-v1.md`](docs/design/03-design-v1.md) | **正本**。全体構成、実行意味論、IR 契約、結果 API、マイルストーン、**§8 の決定表 D-001 … D-058**（本 commit 時点で 57 行。D-034 は採番の欠番。行は増え続けている） |
 | [`docs/design/04-cursor-and-diagnostics-contract.md`](docs/design/04-cursor-and-diagnostics-contract.md) | 二重カーソルの遷移表、診断の主位置、self-host、左再帰、IR スキーマの要点 |
-| [`docs/design/05-selfhost.md`](docs/design/05-selfhost.md) | self-host 経路と固定点、既知の 6 差分 |
+| [`docs/design/05-selfhost.md`](docs/design/05-selfhost.md) | self-host 経路と固定点、既知の 5 差分 + ブロックコメントの字句の門 |
 | [`docs/design/06-ubnf-v2.md`](docs/design/06-ubnf-v2.md) | 言語の弱点と v2 の計画・実装状況 |
-| [`docs/design/07-annotation-inventory.md`](docs/design/07-annotation-inventory.md) | 26 の表層アノテーションの棚卸しと統廃合案（**提案であって実装ではない**） |
+| [`docs/design/07-annotation-inventory.md`](docs/design/07-annotation-inventory.md) | 26 の表層アノテーションの棚卸しと統廃合案（順位付き P1〜P7）。**P1/P2/P3/P5 と P7-1/P7-3 は実装済み（D-045〜D-049）、P7-2 は誤りと判明、P4/P6/P7-4 は未着手**（§3.3） |
 | [`docs/design/02-facts-tokens-bench-corpus.md`](docs/design/02-facts-tokens-bench-corpus.md) | 組込み token の受理範囲、ベンチ fixture、corpus の形式 |
 | [`docs/compat-matrix.md`](docs/compat-matrix.md) | 機能 × 観測面の oracle 対応表。「oracle なし」を空欄と区別する |
 | [`docs/harness-driver-protocol.md`](docs/harness-driver-protocol.md) | 生成物と手書き目標が共有する JSON Lines の driver 契約 |

@@ -121,11 +121,11 @@ echo "exit=$?"
 exit=0
 ```
 
-何も出なければ問題なし。わざと壊すと、たとえば `@leftAssoc` から `@precedence` と
-`@op` を落とした版はこう言われる（実際に試した出力）:
+何も出なければ問題なし。わざと壊すと、たとえば `@precedence` を落とし、`@mapping` の
+`params` と rule body の両方から `op` を落とした版はこう言われる（実際に試した出力）:
 
 ```
-rule Expression uses @leftAssoc but @mapping(Add) params does not contain 'op' [code: E-ASSOC-MAPPING-PARAM] [hint: Include left/op/right in @mapping params.]
+rule Expression uses @leftAssoc but @mapping(BinaryExpr) params does not contain 'op' [code: E-ASSOC-MAPPING-PARAM] [hint: Include left/op/right in @mapping params.]
 rule Expression uses @leftAssoc but capture @op is missing [code: E-ASSOC-MISSING-CAPTURE] [hint: Add @op capture in the rule body.]
 rule Expression uses @leftAssoc but has no @precedence [code: E-ASSOC-NO-PRECEDENCE] [hint: Add @precedence(level=...) to this operator rule.]
 exit=1
@@ -371,6 +371,7 @@ find "$WORK/java-out" -type f | sort
 /tmp/.../java-out/src/main/java/target/api/ParseOptions.java
 /tmp/.../java-out/src/main/java/target/api/ParseResult.java
 /tmp/.../java-out/src/main/java/target/api/SourceName.java
+/tmp/.../java-out/src/main/java/target/api/Span.java
 /tmp/.../java-out/src/main/java/target/api/TokenScanner.java
 /tmp/.../java-out/src/main/java/target/driver/Driver.java
 /tmp/.../java-out/src/main/java/target/internal/Recipe.java
@@ -563,10 +564,15 @@ grammar TinyLet {
   token NUMBER     = NUMBER
   token IDENTIFIER = IDENTIFIER
 
+rule VarRef uses @backref, whose meaning depends on whether any rule in the grammar has @scopeTree [code: W-ANNOTATION-BACKREF-AMBIGUOUS] [hint: Use @symbolRef(name=...) for a scope lookup, or @sameText(name=...) for a same-rule text match.]
 exit=0
 ```
 
-2 つ変わっている。
+`@ubnf: 2` にすると、この文法が使っている旧綴りの `@backref` に新しい警告が付く
+（決定 D-046。`docs/design/07-annotation-inventory.md` §4「P2」）。`@backref` の意味は
+「文法中のどこかに `@scopeTree` がある規則が 1 つでもあるか」という非局所判定で決まるため、
+v2 では明示的な `@symbolRef(name=...)` / `@sameText(name=...)` を勧める、というだけの
+WARNING で、受理・AST・診断は 1 byte も変えない（exit は 0 のまま）。以下は 2 つ変わっている。
 
 1. **token 語彙が言語中立になる**（決定 D-041）。`org.unlaxer.parser.clang.IdentifierParser`
    ではなく `IDENTIFIER` と書ける。裸の SCREAMING_SNAKE_CASE で 36 名前。
