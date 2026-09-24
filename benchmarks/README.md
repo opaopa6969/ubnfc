@@ -58,6 +58,17 @@ WORK=$WORK benchmarks/scripts/run-json-libraries.sh check           # JSONTestSu
 WORK=$WORK benchmarks/scripts/run-json-libraries.sh check-features  # Jackson の寛容 feature 別の切り分け
 ```
 
+Rust typed AST の arena 化（issue #59、D-077）の A/B は `run-arena-ab.sh`。基準 revision（`BASE`）の生成器と
+作業ツリーの生成器で P4 / JSON / Operators を生成し、1 つの bin（`src/family_arena.rs`）で 5 変種
+（before / after の認識と所有 AST、after の木）を交互に測る。報告は `docs/reports/2026-09-24-rust-arena-ast.md`。
+
+```sh
+WORK=$(mktemp -d) BASE=618225a benchmarks/scripts/run-arena-ab.sh prepare
+WORK=$WORK benchmarks/scripts/run-arena-ab.sh alloc   # 定常状態と cold の確保
+WORK=$WORK benchmarks/scripts/run-arena-ab.sh tree    # 木の節点・slot・容量
+WORK=$WORK CORE=30 RUNS=7 benchmarks/scripts/run-arena-ab.sh time
+```
+
 ## 計測の作法
 
 - CPU は `taskset -c $CORE`（既定 30）で 1 コアに固定、単一 thread。
@@ -74,6 +85,7 @@ WORK=$WORK benchmarks/scripts/run-json-libraries.sh check-features  # Jackson �
 - `src/bench_util.rs` … Rust 側の共通計時・計数（各 family の bench から `include!`）
 - `src/family_{a,b,c}.rs` … family ごとの Rust 計測本体
 - `src/family_d.rs` … family D の ubnfc Rust 側（`accept` / `bench`）
+- `src/family_arena.rs` / `scripts/run-arena-ab.sh` … arena AST（#59）の before / after A/B
 - `scripts/p4-external.sh` … family D の一式（外部ツールの取得・生成・受理・速度・profile）
 - `scripts/p4-antlr-idiomatic.sh` … family D の「流儀で書き直した文法」側（生成・受理・上位集合・profile・速度）
 - `java/FamilyBJavaBench.java` … family B の Java 2 実装を 1 JVM で交互に測る（反射）

@@ -42,7 +42,7 @@ pub(crate) fn field_type(f: &AstField) -> String {
         _ => base.into(),
     }
 }
-pub(crate) fn generate(ir: &GrammarIr) -> String {
+pub(crate) fn generate(ir: &GrammarIr) -> Result<String, crate::EmitError> {
     let mut s=String::from("//! 採用結果だけから構築する AST。数値 capture は字句 String。\n#![allow(non_camel_case_types, non_snake_case)]\nuse super::api::Span;\n#[derive(Clone,Debug,PartialEq)]\npub enum Ast { Text(String), Null,\n");
     for ty in &ir.semantics.ast_types {
         if !matches!(ty, AstType::TransparentUnion { .. }) {
@@ -196,5 +196,6 @@ pub(crate) fn generate(ir: &GrammarIr) -> String {
         }
     }
     s.push_str("}}\n#[cfg(feature=\"json\")] pub fn canonical_json(&self)->String {serde_json::to_string(&self.canonical_value()).expect(\"finite canonical AST\")}\n}\n#[cfg(feature=\"json\")] impl serde::Serialize for Ast {fn serialize<S:serde::Serializer>(&self,serializer:S)->Result<S::Ok,S::Error> {self.canonical_value().serialize(serializer)}}\n");
-    s
+    s.push_str(&crate::tree::generate(ir)?);
+    Ok(s)
 }

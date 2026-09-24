@@ -131,6 +131,90 @@ fn formula_accepts_and_matches_golden() {
     }
 }
 
+/// D-077: AST は arena（`AstTree`）に作り、所有 `Ast` はそこから写す。木だけを受け取る parse
+/// （`build_ast: false, ast_tree: true`）でも canonical AST は golden と byte 一致し、node span /
+/// value span / 所有形への写像は `build_ast` の結果と同じになる。木だけの parse は所有 `Ast` と
+/// `node_spans` を作らない。
+#[test]
+fn arena_tree_matches_owned_ast_and_golden() {
+    use ubnfc_p4_rust::ast::{tree::Node, Ast};
+    for &(name, cp) in ACCEPTED {
+        let text = fixture(name);
+        let owned = parse_formula(&text, observed(options(true, true)));
+        let tree_only = parse_formula(
+            &text,
+            ParseOptions {
+                ast_tree: true,
+                ..observed(options(false, true))
+            },
+        );
+        assert_full(name, &tree_only, cp);
+        assert!(
+            tree_only.ast.is_none(),
+            "{name}: 木だけの parse は所有 Ast を作らない"
+        );
+        assert!(tree_only.node_spans.is_empty(), "{name}");
+        let tree = tree_only.tree.as_ref().expect("tree");
+        assert_eq!(tree.source(), text);
+        let golden = std::fs::read_to_string(
+            root()
+                .join("tests/golden")
+                .join(format!("{name}.tiny.json")),
+        )
+        .unwrap();
+        assert_eq!(
+            tree.canonical_json().unwrap(),
+            golden.trim_end(),
+            "{name}: 木の canonical AST"
+        );
+        assert_eq!(tree.to_ast().as_ref(), owned.ast.as_ref(), "{name}: 写像");
+        assert_eq!(tree.node_spans(), owned.node_spans, "{name}: node span");
+        assert_eq!(tree.value_spans(), owned.value_spans, "{name}: value span");
+        assert_eq!(tree_only.value_spans, owned.value_spans, "{name}");
+        assert_eq!(tree.typed_node_count(), owned.node_spans.len(), "{name}");
+        assert_eq!(
+            tree_only.statistics.ast_nodes, owned.statistics.ast_nodes,
+            "{name}"
+        );
+        // 型付きの参照（field 名のメソッド）で読んだ値は所有形の field と同じ。
+        let root_ref = tree.root().unwrap();
+        let (
+            Node::g_TinyExpressionP4AST_2e_FormulaExpr(formula),
+            Some(Ast::g_TinyExpressionP4AST_2e_FormulaExpr(expected)),
+        ) = (root_ref.get(), owned.ast.as_ref())
+        else {
+            panic!("{name}: 根は FormulaExpr");
+        };
+        assert_eq!(formula.span(), expected.span);
+        assert_eq!(formula.node_id(), expected.node_id);
+        assert_eq!(formula.g_expression().to_ast(), *expected.g_expression);
+        assert_eq!(formula.g_imports().len(), expected.g_imports.len());
+        assert_eq!(
+            formula.g_declarations().len(),
+            expected.g_declarations.len()
+        );
+        assert_eq!(
+            formula
+                .g_methods()
+                .iter()
+                .map(|m| m.to_ast())
+                .collect::<Vec<_>>(),
+            expected.g_methods
+        );
+        // 両方を要求すると、所有 `Ast` は返した木の写像になる。
+        let both = parse_formula(
+            &text,
+            ParseOptions {
+                ast_tree: true,
+                ..options(true, true)
+            },
+        );
+        assert_eq!(both.ast, owned.ast, "{name}");
+        assert_eq!(both.tree.as_ref().unwrap().to_ast(), both.ast, "{name}");
+        assert_eq!(both.node_spans, owned.node_spans, "{name}");
+    }
+}
+
 /// D-035: 出現表（`captures` / `lexical` / `tokens`）と `value_spans` は opt-in。
 /// 既定では空になり、それ以外の観測（AST・node_spans・診断・scope・recovery・統計）は
 /// 要求したときと完全に一致する。要求すれば従来どおりの内容が返る。

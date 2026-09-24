@@ -163,6 +163,8 @@ fn instrument_runtime(runtime: &mut String) {
         ("lookup", "LOOKUP"),
         ("store", "STORE"),
         ("event", "EVENT"),
+        // D-077: literal / token 参照の Token 付け替えは `event` を経ずに packed のまま複製する。
+        ("relabel_token", "EVENT"),
         ("join", "JOIN"),
         ("combine", "COMBINE"),
         ("fail", "FAIL"),
@@ -175,8 +177,9 @@ fn instrument_runtime(runtime: &mut String) {
         ("quoted", "QUOTED"),
         ("until", "UNTIL"),
         ("scan", "SCAN"),
-        ("mapped_text", "MAPPED_TEXT"),
-        ("node", "NODE"),
+        // D-077: Text 値は `semantic_text` が木の Text 節点として作る（旧 `mapped_text`）。
+        // 型付き節点は共有の ast.rs（`AstTree::record`）が作り、複製しないので数えない。
+        ("semantic_text", "MAPPED_TEXT"),
     ] {
         let needle_plain = format!("    pub fn {name}(");
         let needle_generic = format!("    pub fn {name}<");
