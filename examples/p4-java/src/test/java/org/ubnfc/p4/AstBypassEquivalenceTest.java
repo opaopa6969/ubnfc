@@ -17,7 +17,7 @@ import org.ubnfc.p4.generated.api.ParseResult;
 import org.ubnfc.p4.generated.internal.Session;
 
 /**
- * capture の包みの迂回（D-064。{@code Session.bypassWrap}）が参照経路（全ての式で包みを通る経路）と
+ * capture の包みの迂回（D-068。{@code Session.bypassWrap}）が参照経路（全ての式で包みを通る経路）と
  * 同じ観測を残すことを、全 fixture の完全入力・code point 境界での切り詰め・1 文字破壊で確かめる。
  *
  * <p>迂回は「@mapping の field も scope 効果も読まない capture site しか持たない式」に限り、

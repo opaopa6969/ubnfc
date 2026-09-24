@@ -420,7 +420,7 @@ public final class JavaEmitter {
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         // 認識専用経路（Match 木も診断も作らない）で capture の包みが恒等になる式は、包みを飛ばして
         // 中身を直に呼ぶ。到達位置の更新だけ同じ位置で行う（包みの中の progress と同じ）。
-        // D-064: AST を作る経路でも、読まれる capture site を 1 つも持たない式は包みが
+        // D-068: AST を作る経路でも、読まれる capture site を 1 つも持たない式は包みが
         // 「意味値の射影」だけになる。射影を生成側の定数に畳んで包みを飛ばす。
         if (treeBypassable(expr))
             out.append("        if (s.bypassWrap) { Match r = f.matched ? ").append(method).append("M(s, f) : ").append(method)
@@ -451,7 +451,7 @@ public final class JavaEmitter {
         return expr.captureSiteIds().stream().map(captures::get).noneMatch(c -> scopeSites().contains(c.siteId()) && !c.skip());
     }
     /**
-     * D-064: 公開出現表を要求しない AST 経路（{@code Session.bypassWrap}）で、capture の包みが
+     * D-068: 公開出現表を要求しない AST 経路（{@code Session.bypassWrap}）で、capture の包みが
      * 「意味値の射影」だけになる式か。出現を 1 件も残さなくてよい条件は
      * 「この式が持つ capture site を、@mapping の field も scope 効果も読まない」こと。
      * 反復下の site は包みが項目ごとの Match を組み直すので、site を持つ反復は対象外にする。

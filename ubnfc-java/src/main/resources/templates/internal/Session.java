@@ -270,7 +270,7 @@ public final class Session {
      */
     public final boolean bypassCapture;
     /**
-     * D-064: 公開出現表も診断も lexical trace も要求しない解析。読まれない capture site しか
+     * D-068: 公開出現表も診断も lexical trace も要求しない解析。読まれない capture site しか
      * 持たない式は、包みが意味値の射影だけになるので生成側が包みを飛ばせる。
      * {@code !tree} は {@code !occ} かつ {@code !lexical} を含むので、D-059 の条件を包含する。
      */
@@ -280,7 +280,7 @@ public final class Session {
      * との差分検証と計測のためだけに false にする（system property {@code -Dubnfc.factor=false} でも切れる）。
      */
     public static boolean factoring = !"false".equals(System.getProperty("ubnfc.factor"));
-    /** D-064 の A/B 用。{@code -Dubnfc.astwrap=false} で AST 経路だけ参照経路（包みを通る）に戻す。 */
+    /** D-068 の A/B 用。{@code -Dubnfc.astwrap=false} で AST 経路だけ参照経路（包みを通る）に戻す。 */
     public static boolean astBypass = !"false".equals(System.getProperty("ubnfc.astwrap"));
     /**
      * この解析で左因数分解を使ってよいか。診断を記録する経路（主診断 DAG / display frame を組む）と
@@ -649,7 +649,7 @@ public final class Session {
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
     }
     /**
-     * {@link #wrap} の意味値射影だけを行う（D-064）。読まれる site を持たない式の迂回で使う。
+     * {@link #wrap} の意味値射影だけを行う（D-068）。読まれる site を持たない式の迂回で使う。
      * {@code projected} と同じ結果を返し、値列が変わらなければ {@code Match} を作らない。
      */
     public Match project(Match result, boolean mixedScalar) {

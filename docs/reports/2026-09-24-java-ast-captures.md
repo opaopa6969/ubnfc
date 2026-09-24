@@ -10,7 +10,7 @@
   （うち 11 件は scope 効果も読む）。IR fixture 17 文法 408 site を通しても**読まれない site は 1 件だけ**
   （`ubnf.ubnf`）。つまり「誰も読まない site」は**ほぼ存在しない**。
   2,276 回の正体は **capture site を 1 つも持たない式**で、P4 の 1,043 式のうち **797 式**がこれに当たる（§1）。
-- **その 797 式の包みを `tree=true` でも飛ばした**（**D-064**）。`tree=true` の包みは site が無ければ
+- **その 797 式の包みを `tree=true` でも飛ばした**（**D-068**）。`tree=true` の包みは site が無ければ
   「意味値の射影」しか残らないので、射影を生成側の定数に畳んで `s.capture(…)` の 14 引数呼出しと
   interface 呼出し（`Call.parse`）を消す。**1 parse の包み（`Session.wrap`）は complex で 2,276 → 600、
   x64 で 138,104 → 36,762**（残るのは全て「@mapping が読む site を持つ式」）。§2。
@@ -77,7 +77,7 @@ IR fixture 全体（capture を持つ 17 文法、408 site）でも**読まれ�
 site が無い包みは、`tree=true` でも **`projected()`（意味値の射影）以外は恒等**になる
 （出現を 1 件も足さないので `local` は同一、`values` が変わらなければ `wrap` は `result` をそのまま返す）。
 
-## 2. 入れたもの（D-064）
+## 2. 入れたもの（D-068）
 
 `JavaEmitter.treeBypassable(expr)` が「読まれる（かつ `skip` でない）site を 1 つも持たない式」を印付けし、
 式の先頭に迂回を前置する。`Session.bypassWrap = !occ && !diag && !options.lexical()` が実行時の条件。
