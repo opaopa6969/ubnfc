@@ -413,3 +413,42 @@ UNLAXER_PARSER_DIR=/path/to/unlaxer-parser MAVEN_REPO="$ISO/repository" \
 ```
 
 既存 corpus は不変・不退行（Java Pass 1310 / Fail 0、Rust Pass 1292 / Fail 0、下記参照）。
+
+## 追記（2026-09-24 その3、docs 整理 — issue #12 の解消を反映）
+
+§9.6 で報告した `rule/dotted-reference-three-segments`（ubnfc-selfhost だけが `a.b.Value` を
+bytes 21..22 で拒否する）は、その後 2 件の PR で解消した。**本節は履歴を書き換えず、追記だけする。**
+
+- 根本原因は `unlaxer-parser` 側の `unlaxer-dsl/grammar/ubnf.ubnf` にあった
+  （`QuantifiedRef` がドット1個だけの任意分割で、段数上限なしの chained dot を想定していなかった）。
+  [`unlaxer-parser` issue #284](https://github.com/opaopa6969/unlaxer-parser/issues/284) →
+  [`unlaxer-parser` PR #285](https://github.com/opaopa6969/unlaxer-parser/pull/285)
+  （`QuantifiedRef ::= { IDENTIFIER '.' } @namespace IDENTIFIER @name ;` へ修正）で直った。
+- `ubnfc` 側は [PR #20](https://github.com/opaopa6969/ubnfc/pull/20)
+  （`fix(selfhost): chained dotted 参照に追随して self-host を再生成する (#12)`）が、直った
+  `ubnf.ubnf` から IR fixture と `crates/ubnfc-selfhost/src/generated` を再生成し、
+  `@namespace` が `list<text>` になったぶんの投影・変換ロジックを足した。詳細は
+  [`docs/design/05-selfhost.md`](../design/05-selfhost.md) の「8 件目」。
+  [`opaopa6969/ubnfc#12`](https://github.com/opaopa6969/ubnfc/issues/12) はこの PR で close 済み。
+
+### 再実測（unlaxer-parser `124b484`、2026-09-24）
+
+sibling repo `unlaxer-parser` の現在の master（`124b484`。PR #285 と、無関係な PR #286 を含む）から
+§9.7 の手順どおり隔離 `~/.m2` を作り直し、`examples/ubnf-crosscheck/scripts/run-spec.sh` を
+本 branch（PR #20 取り込み後）の `ubnfc` に対して再実行した（出力は `mktemp` 配下、repo には
+commit していない。再現手順は本ファイル §9.7 と同じ）。
+
+| 実装 | 一致 | 一致(validate) | 違反 | 別コード | 未定 | 駆動不能 |
+|---|---:|---:|---:|---:|---:|---:|
+| A ubnfc 手書き frontend | 108 | 8 | 10 | 0 | 0 | 3 |
+| B ubnfc 自己ホスト生成 | **90**（89 → 90） | 0 | **10**（11 → 10） | 0 | 0 | 29 |
+| C unlaxer-ubnf（手書き Rust） | 108 | 0 | 0 | 0 | 0 | 21 |
+| D Java bootstrap | 125 | 0 | 0 | 0 | 0 | 4 |
+
+§9.5 との差分は **B の 1 行**（狙った差分）: `rule/dotted-reference-three-segments` が「違反」から
+「一致」に変わり、一致 89→90 / 違反 11→10。A・C は §9.5 と一致。**D は 122→125 で、§9.5 の表と
+食い違う**——ただし §9.5 の D 行は 122+0+0+0+0+4=126 で 129 件に 3 足りず、算術的に破綻している
+（本追記の D 行は 125+4=129 で揃う）。§9.5 の 122 は転記の誤りだった可能性が高く、**D の判定内容
+（違反 0 件・駆動不能 4 件）自体は §9.5 から変わっていない**。B の他 10 件の違反は D-052 の空構文
+8 件 + D-053 の量指定子併記 2 件で、意図的な既知の差のまま。既存 corpus（Java Pass 1,310 /
+Rust Pass 1,292、Fail 0）は本追記のための再測定でも動いていない。
