@@ -91,6 +91,21 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
         summary.partial,
         summary.rejected
     );
+    // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+    assert!(
+        summary.scan_comparisons >= 30,
+        "走査 A/B が回っていない: {}",
+        summary.scan_comparisons
+    );
+    assert!(
+        summary.scan_findings.is_empty(),
+        "一括走査 on / off で観測が食い違う: {:#?}",
+        summary
+            .scan_findings
+            .iter()
+            .map(|f| (f.seed, f.input.clone(), f.differences.clone()))
+            .collect::<Vec<_>>()
+    );
     let unknown: Vec<_> = summary
         .findings
         .iter()
@@ -136,6 +151,21 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
         "driver が動いていない: 比較 {} / error {}",
         summary.comparisons,
         summary.driver_errors
+    );
+    // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+    assert!(
+        summary.scan_comparisons >= 20,
+        "走査 A/B が回っていない: {}",
+        summary.scan_comparisons
+    );
+    assert!(
+        summary.scan_findings.is_empty(),
+        "一括走査 on / off で観測が食い違う: {:#?}",
+        summary
+            .scan_findings
+            .iter()
+            .map(|f| (f.seed, f.input.clone(), f.differences.clone()))
+            .collect::<Vec<_>>()
     );
     let unknown: Vec<_> = summary
         .findings
@@ -186,6 +216,21 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
         "driver が動いていない: 比較 {} / error {}",
         summary.comparisons,
         summary.driver_errors
+    );
+    // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+    assert!(
+        summary.scan_comparisons >= 20,
+        "走査 A/B が回っていない: {}",
+        summary.scan_comparisons
+    );
+    assert!(
+        summary.scan_findings.is_empty(),
+        "一括走査 on / off で観測が食い違う: {:#?}",
+        summary
+            .scan_findings
+            .iter()
+            .map(|f| (f.seed, f.input.clone(), f.differences.clone()))
+            .collect::<Vec<_>>()
     );
     let unknown: Vec<_> = summary
         .findings
@@ -241,6 +286,21 @@ fn e_v2_code_point_class_tokens_agree_across_backends() {
             "seed {seed}: 比較 {} / error {}",
             summary.comparisons,
             summary.driver_errors
+        );
+        // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+        assert!(
+            summary.scan_comparisons >= 10,
+            "seed {seed}: 走査 A/B が回っていない ({})",
+            summary.scan_comparisons
+        );
+        assert!(
+            summary.scan_findings.is_empty(),
+            "seed {seed}: 一括走査 on / off で観測が食い違う: {:#?}",
+            summary
+                .scan_findings
+                .iter()
+                .map(|f| (f.input.clone(), f.differences.clone()))
+                .collect::<Vec<_>>()
         );
         let unknown: Vec<_> = summary
             .findings

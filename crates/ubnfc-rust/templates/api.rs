@@ -19,6 +19,14 @@ pub struct ParseOptions {
     /// are tried in declaration order. false is the reference path that evaluates
     /// every alternative from its start; both produce the same result and diagnostics.
     pub factor: bool,
+    /// Bulk scan of terminal-only regions (design v1 §3.4, D-072): a region the front
+    /// proved to be built from terminals alone and to leave no observation behind
+    /// (`plan.scans`) is consumed by one generated scanning function instead of walking
+    /// the grammar expression by expression. It runs only in fast mode (`diagnostics:
+    /// false`) and only when the occurrence tables are not requested, so the recorded
+    /// diagnostics and occurrences are those of the reference path by construction;
+    /// `false` is the reference path. Both produce the same result and diagnostics.
+    pub scan: bool,
     /// Reuse the session's large buffers (memo table, diagnostics arena, event arena)
     /// across parses on the same thread instead of allocating them per parse. The
     /// retained set is bounded (`POOL_RETAIN_BYTES`) and only affects allocation
@@ -114,6 +122,7 @@ impl Default for ParseOptions {
             memo: true,
             predict: true,
             factor: true,
+            scan: true,
             reuse_buffers: true,
             lexical_cache: false,
             diagnostics: false,

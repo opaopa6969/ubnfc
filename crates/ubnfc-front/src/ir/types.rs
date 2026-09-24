@@ -383,6 +383,10 @@ pub enum ProofKind {
     /// 同じ位置へ再入し得るが、再導出が終端走査だけで済むので memo が割に合わない。
     #[serde(rename = "unprofitableTerminalScan")]
     UnprofitableTerminalScan,
+    /// 領域が終端だけで構成され、観測（capture・scope・recovery・Extern・trivia・
+    /// mapping）を 1 つも要求しないので、1 本の走査で同じ受理と同じカーソルを返せる。
+    #[serde(rename = "terminalOnlyScan")]
+    TerminalOnlyScan,
     #[serde(rename = "none")]
     None,
 }
@@ -1117,7 +1121,55 @@ pub struct Plan {
     pub memo: MemoPlan,
     pub operators: Vec<OperatorPlan>,
     pub profile: PlanProfile,
+    /// 一括走査（D-072）。既存キーを変えない追加であり、空のときは出力しない。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub scans: Vec<ScanPlan>,
     pub trivia_cache: TriviaCache,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub enum ScanPlanKind {
+    /// 反復の本体が単一 code point のクラス（またはクラスの順序付き選択）で、
+    /// `class` に合併した表が載る。backend は 1 ループで走査できる。
+    #[serde(rename = "charClassRepetition")]
+    CharClassRepetition,
+    /// 終端だけからなる列（literal / クラス / optional / 反復 / 規則参照の組合せ）。
+    /// backend は同じ構造を parser の機構抜きで静的に再生する。
+    #[serde(rename = "terminalSequence")]
+    TerminalSequence,
+}
+
+/// 単一 code point クラスの compact 表。`asciiLow` は U+0000..U+003F、
+/// `asciiHigh` は U+0040..U+007F の bitset（bit n = 先頭 code point + n）。
+/// `ranges` は U+0080 以上の昇順・互いに素な閉区間。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ScanClass {
+    pub ascii_high: u64,
+    pub ascii_low: u64,
+    /// 反復本体が成功する入力はこの表の中だけか。true なら backend は一括走査が
+    /// 止まった時点で反復も終わったと判断してよい（本体を 1 度も呼ばない）。
+    pub complete: bool,
+    pub ranges: Vec<CharRange>,
+}
+
+/// 観測を 1 つも要求しない終端領域。backend はこの式を 1 本の走査へ畳んでよい。
+/// 受理・消費長・カーソルは元の評価と同じで、失敗位置は走査が止まった位置になる
+/// （D-023 により失敗時の診断は診断 session が非最適化経路で作り直す）。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ScanPlan {
+    #[serde(deserialize_with = "super::json::required_nullable")]
+    pub class: Option<ScanClass>,
+    pub expr_id: ExprId,
+    pub kind: ScanPlanKind,
+    pub proof: Proof,
+    /// backend が走査関数を生成する起点（領域の根）。false の行は根の内側にある
+    /// 反復の一括走査表だけを載せる。
+    pub root: bool,
+    /// 走査が畳み込む規則（記号 ID の昇順）。IR の差分を読むためのもので、実行には使わない。
+    pub rule_ids: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

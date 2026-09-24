@@ -140,8 +140,25 @@ impl Engine {
         Ok(built)
     }
 
+    /// D-072 の in-backend A/B。Rust backend だけを `options.scan` 付きで走らせる。
+    /// driver はこのキーがあるとき fast mode（診断・出現表なし）で解析するので、
+    /// 一括走査が効く条件そのもので on / off を比べられる。
+    pub fn run_scan(&mut self, built: &Built, inputs: &[String], scan: bool) -> Vec<Value> {
+        self.run_with(built, Backend::Rust, inputs, Some(scan))
+    }
+
     /// 全入力を 1 プロセスに流す。応答は入力順に返り、欠落は error 応答になる。
     pub fn run(&mut self, built: &Built, backend: Backend, inputs: &[String]) -> Vec<Value> {
+        self.run_with(built, backend, inputs, None)
+    }
+
+    fn run_with(
+        &mut self,
+        built: &Built,
+        backend: Backend,
+        inputs: &[String],
+        scan: Option<bool>,
+    ) -> Vec<Value> {
         let executable = match backend {
             Backend::Java => &built.java,
             Backend::Rust => &built.rust,
@@ -149,7 +166,7 @@ impl Engine {
         let requests: Vec<Value> = inputs
             .iter()
             .enumerate()
-            .map(|(id, input)| request(id, &built.grammar_name, input))
+            .map(|(id, input)| request(id, &built.grammar_name, input, scan))
             .collect();
         match exchange(executable, &requests, self.timeout) {
             Ok(mut rows) => (0..inputs.len())
@@ -172,9 +189,13 @@ impl Engine {
 }
 
 /// `docs/harness-driver-protocol.md` のリクエスト 1 行。
-fn request(id: usize, grammar: &str, input: &str) -> Value {
+fn request(id: usize, grammar: &str, input: &str, scan: Option<bool>) -> Value {
+    let mut options = json!({"lexical": true, "scope": true});
+    if let Some(scan) = scan {
+        options["scan"] = json!(scan);
+    }
     json!({"id": id, "grammar": grammar, "entry": Value::Null, "input": input,
-        "options": {"lexical": true, "scope": true},
+        "options": options,
         "observations": {"family": "fuzz", "variant": "fuzz"}})
 }
 

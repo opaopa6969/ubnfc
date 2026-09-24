@@ -429,7 +429,7 @@ public final class JavaEmitter {
                 && e.captureSiteIds().stream().anyMatch(scoped::contains));
     }
     /**
-     * D-072: 認識専用経路（{@code tree=false}）の成功値が情報を持たなくてよい文法か。
+     * D-073: 認識専用経路（{@code tree=false}）の成功値が情報を持たなくてよい文法か。
      * その経路で {@code Match} の区間・text・出現列を読むのは {@code Session.applyEffects}
      * （scope 効果）と {@code Session.wrap} の scoped site だけで、どちらも {@code @scope} 効果が
      * 1 つも無ければ存在しない（{@link #scopeSites} が空なら {@code capture} の包みは
