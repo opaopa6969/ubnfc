@@ -14,7 +14,8 @@
 #   groupId org.ubnfc -> org.unlaxer (artifactIds unchanged)
 #
 # Deliberately NOT rewritten (historical records of what ran at the time):
-#   docs/reports/**, docs/reviews/**, examples/*/evidence/**, and this script.
+#   docs/reports/**, docs/reviews/**, examples/*/evidence/**, this script, and
+#   docs/design/03-design-v1.md (its D-076 row records the old -> new mapping).
 set -euo pipefail
 
 repo=$(cd "$(dirname "$0")/.." && pwd)
@@ -25,7 +26,7 @@ mode=apply
 self=scripts/rename-java-namespace.sh
 excluded() {
   case "$1" in
-    docs/reports/*|docs/reviews/*|examples/*/evidence/*|"$self") return 0 ;;
+    docs/reports/*|docs/reviews/*|examples/*/evidence/*|docs/design/03-design-v1.md|"$self") return 0 ;;
   esac
   return 1
 }
