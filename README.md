@@ -175,6 +175,13 @@ issue #27。文法は `examples/p4-antlr/TinyExpressionP4.g4` と `examples/p4-t
   **ubnfc Rust 0.0696 ms**、ubnfc Java 0.257 ms、**ANTLR4 645 ms**。
   ANTLR が 4 桁遅いのは P4 の型別の順序つき選択（`Expression ::= NumberExpression | BooleanExpression | …`）で
   ALL(\*) が毎回 LL 全文脈へ落ちるためで、`BooleanExpression` 入口なら同じ parser が 0.99 ms（650 倍速い）。
+- **その 645 ms は文法の書き方の問題だった**（issue #39、報告の「追補」節）。同じ言語を ANTLR の流儀
+  （型別の塔を 1 本の左再帰 `expression` に統合）で書き直すと、**同じ回転の中で 993 ms → 1.83 ms（542 倍）**、
+  LL 全文脈への転落は 12 fixture すべてで **0 回**、SLL だけで 16 fixture 全部が通る。
+  tree-sitter 側も同じ統合で `conflicts` 23 → 1 件、`prec.dynamic` 27 → 0 箇所、`STATE_COUNT` 882 → 307。
+  ただし受理する言語は P4 の**上位集合**になる（`1 + true` が型エラーになり構文エラーでなくなる）し、
+  流儀版でもなお ubnfc Rust の 17 倍・tree-sitter の 52 倍かかる。**「ANTLR が遅い」のではなく
+  「PEG 前提の型別の塔を ALL(\*) にそのまま持ち込むと遅い」**。
 - **scope 解決の代金**: ubnfc は `@scopeTree` / `@declares` / `@backref` を常に実行する。
   その効果を IR から外して生成し直すと認識が 17〜29% 速くなる（確保回数は 10 倍減）。
   ANTLR と tree-sitter はこの仕事を一切していない。
@@ -448,7 +455,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + VSIX）。`scripts/build-vsix.sh` で組む |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
 | `examples/json`, `examples/arith` | 同じ言語を `.ubnf` / ANTLR `.g4` / tree-sitter `grammar.js` の 3 記法で書いたもの（JSON = RFC 8259、算術式 = Operators / Power）。外部比較の材料。issue #26 |
-| `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27 |
+| `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27。同じ言語を各ツールの流儀で書き直した `TinyExpressionP4Idiomatic.g4` / `grammar.idiomatic.js` も同じディレクトリ（issue #39） |
 | `benchmarks/` | 速度比較のドライバ。`scripts/prepare-external.sh` 以下が ANTLR4 / tree-sitter との比較、`scripts/p4-external.sh` が P4 での同じ比較（取得はどちらも `scripts/fetch-external-tools.sh`） |
 | `docs/` | 設計・決定・報告。下記 |
 

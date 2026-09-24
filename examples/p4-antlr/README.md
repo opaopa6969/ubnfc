@@ -9,6 +9,12 @@
 の 2 本で、**対応表はこの README に 1 つだけ置く**（tree-sitter 側の README はここを参照する）。
 計測結果は [`docs/reports/2026-09-24-p4-antlr-treesitter.md`](../../docs/reports/2026-09-24-p4-antlr-treesitter.md)。
 
+さらに **「その道具の流儀で書き直した版」**が 2 本ある（issue #39。下の
+[ANTLR / tree-sitter 流に書き直した版](#antlr--tree-sitter-流に書き直した版39)）。
+
+- ANTLR 4: [`TinyExpressionP4Idiomatic.g4`](TinyExpressionP4Idiomatic.g4)
+- tree-sitter: [`../p4-treesitter/grammar.idiomatic.js`](../p4-treesitter/grammar.idiomatic.js)
+
 ## 移植していないもの
 
 P4 の注釈のうち、**scope 解決**（`@scopeTree(mode=lexical)` / `@declares` / `@backref` /
@@ -31,10 +37,18 @@ P4 の注釈のうち、**scope 解決**（`@scopeTree(mode=lexical)` / `@declar
 WORK=$(mktemp -d) benchmarks/scripts/p4-external.sh prepare
 WORK=$WORK benchmarks/scripts/p4-external.sh accept
 WORK=$WORK CORE=26 RUNS=7 benchmarks/scripts/p4-external.sh speed
+
+# 流儀で書き直した版（issue #39）。上の prepare と同じ $WORK を使う。
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh prepare
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh accept
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh superset
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh profile
+WORK=$WORK CORE=26 RUNS=7 benchmarks/scripts/p4-antlr-idiomatic.sh speed
 ```
 
-driver は [`P4AntlrDriver.java`](P4AntlrDriver.java) と
-[`../p4-treesitter/driver.c`](../p4-treesitter/driver.c)。
+driver は [`P4AntlrDriver.java`](P4AntlrDriver.java)（1:1 移植）、
+[`P4AntlrIdiomaticDriver.java`](P4AntlrIdiomaticDriver.java)（ANTLR 流）、
+[`../p4-treesitter/driver.c`](../p4-treesitter/driver.c)（tree-sitter は両方で共用）。
 
 ## 優先順位塔
 
@@ -266,3 +280,100 @@ P4 の雛形は規則を作らず、実体化した位置へ展開される。�
 | `NAryNumberFn<Kw>` | 2 | `minFunction` / `maxFunction` に直書き | `nAryNumberFn(kw, $)` |
 | `StringPredFn<Kw>` | 3 | `startsWith` / `endsWith` / `contains` の関数形に直書き | `stringPredFn(kw, $)` |
 | `StringPredDot<Kw>` | 3 | 同じ 3 つのドット形に直書き | `stringPredDot(kw, $)` |
+
+## ANTLR / tree-sitter 流に書き直した版（#39）
+
+上の 2 本は **P4 の規則を 1:1 で写した**ものである。そのままでは
+`Expression ::= NumberExpression | BooleanExpression | StringExpression | …` という
+**型別の順序つき選択**がそのまま残り、ALL(\*) は毎回 LL 全文脈へ落ちる（報告 §4）。
+「ANTLR が遅い」のか「PEG 前提の文法を ALL(\*) に持ち込むと遅い」のかを分けるため、
+**その道具の流儀で書き直した版**を別ファイルで用意した。文法以外（lexer 規則・token 定義・
+driver・fixture・計測規約）は 1:1 移植と同じにしてある。
+
+| | 1:1 移植 | 流儀で書き直した版 |
+|---|---|---|
+| ANTLR 4 | `TinyExpressionP4.g4` | [`TinyExpressionP4Idiomatic.g4`](TinyExpressionP4Idiomatic.g4) |
+| tree-sitter | `../p4-treesitter/grammar.js` | [`../p4-treesitter/grammar.idiomatic.js`](../p4-treesitter/grammar.idiomatic.js) |
+| 塔 | Number / String / Boolean / Object の 4 本 | `expression` 1 本 |
+| 優先順位 | 塔ごとの候補順 | 1 本の梯子（下表） |
+| ANTLR の意味述語 | 1 個（code fence の行頭） | 同じ 1 個（lexer は同一） |
+| tree-sitter の `conflicts` | 23 件 | **1 件** |
+| tree-sitter の `prec.dynamic` | 27 箇所 | **0 箇所** |
+| tree-sitter の `STATE_COUNT` | 882（Formula）/ 654（BooleanExpression） | **307**（Formula）/ **183**（Expression） |
+| 型の決定 | 構文で決める | 構文では決めない（後段の仕事） |
+
+### 1 本の優先順位の梯子
+
+`expression` は ANTLR の直接左再帰（候補順＝優先順位、高いものから）、tree-sitter は
+同じ順の `prec.left`。**P4 には `@rightAssoc` が 1 つも無い**ので `<assoc=right>` /
+`prec.right` を使うのは `?:` の 1 箇所だけで、これは P4 に対応物が無い（P4 の三項は
+引数位置か括弧付きに限られ、入れ子の裸三項をそもそも受理しない）。
+
+| 段 | 演算子 | P4 で対応するもの |
+|---:|---|---|
+| 8 | `[a:b:c]` / `.method()`（後置） | `Slice<>`、`*DotMethod`、`StringPredDot<>` |
+| 7 | `*` `/` | `NumberExpression` 候補1（`MulOp`） |
+| 6 | `+` `-` | `NumberExpression` 候補2（`AddOp`）と `StringExpression` 候補1（連結） |
+| 5 | `==` `!=` `<=` `>=` `<` `>` | `ComparisonExpression` / `StringComparisonExpression` / `BooleanEqualityExpression` |
+| 4 | `^` | `BooleanExpression` 候補1 |
+| 3 | `&` | `BooleanExpression` 候補2 |
+| 2 | `\|` | `BooleanExpression` 候補3 |
+| 1 | `?:`（右結合） | `ArgumentTernary` / `TernaryExpression` |
+
+塔のほかに次も 1 本へ畳んだ。いずれも **P4 では型ごとに別規則**になっていたものである。
+
+| P4 | 書き直した版 |
+|---|---|
+| `NumberVariableDeclaration` / `String…` / `Boolean…` / `Object…` | `variableDeclaration` 1 本（`typeHint?` + `expression`） |
+| `NumberMethodDeclaration` ほか 3 本 | `methodDeclaration` 1 本 |
+| `ExternalBooleanInvocation` ほか 3 本 | `externalInvocation` 1 本（返り値型はどの型でも省略可） |
+| `NumberMatchExpression` ほか 2 本 | `matchExpression` 1 本 |
+| `SinFunction` … `IsPresentFunction`（21 規則） | `functionCall : builtinFunction '(' arguments? ')'`（引数の個数と型は後段） |
+| `Slice<>` の 8 候補 × 2 受け手規則 | `expression '[' expression? ':' expression? (':' expression?)? ']'` |
+| `ArgumentExpression` / `BranchExpression` / `ObjectExpression` / `BooleanFactor` / `SliceBaseReceiver` / `StringPredicateReceiver` | すべて `expression` |
+
+`inDayTimeRange` だけは独立した規則のまま残した（引数が曜日名で、式ではないため）。
+
+### 受理する言語は P4 の上位集合になる
+
+**型の誤りは構文の誤りではなくなる**。次はすべて **1:1 移植が拒否し、書き直した版が受理する**
+入力である（`p4-antlr-idiomatic.sh superset` で ANTLR / tree-sitter とも確認。
+両方の書き直し版で 14/14 一致）。
+
+| 入力 | P4 が拒否する理由 | 書き直した版での扱い |
+|---|---|---|
+| `1 + true` | `NumberExpression` に `true` が無い | 型検査の仕事 |
+| `'a' * 2` | `StringExpression` に `*` が無い | 同上 |
+| `true & 1 * 2` | `BooleanExpression` の項に算術式が来ない | 同上 |
+| `1 == 2 == 3` | `ComparisonExpression` は左再帰でない（1 段だけ） | 比較段が左結合になった |
+| `$c ? 1 : 2` | 裸の三項は引数位置だけ。最上位では括弧が要る | `?:` が式の 1 段になった |
+| `pow(1)` / `min()` | 各関数が固有の引数個数を持つ | 引数の個数は後段 |
+| `toNum(1, 2)` | 第 1 引数は `StringExpression` | 引数の型は後段 |
+| `$a.startsWith(1)` | 引数は `StringExpression` | 同上 |
+| `not(1)` | 引数は `BooleanExpression` | 同上 |
+| `(1 + 2).trim()` | `.trim()` の受け手は変数か文字列関数だけ | 後置演算子はどの式にも付く |
+| `$a[0:1:]` | `Slice<>` の 8 候補にこの形は無い | 汎用の `[e? : e? (: e?)?]` |
+| `match { $a > 1 -> 1, default -> "x" }` | 3 本の `MatchBody<>` が型ごとに閉じている | 枝の型が揃うかは後段 |
+| `var $a as number set "text"; $a` | 宣言の型ヒントと初期値の塔が対応している | 同上 |
+
+**16 fixture の受理/拒否は 1:1 移植と完全に一致する**（受理 13・拒否 3。`comparison-heavy` 系
+4 件は 1:1 移植と同じく `Formula` 入口で受理される。詳しくは報告の新しい節）。
+`examples/p4-v2/scripts/compare.py` の拒否入力 10 件も 4 実装すべてで拒否のまま。
+
+### ANTLR の予測: 全文脈への転落が消える
+
+`setProfile(true)` → `getParseInfo()`（`p4-antlr-idiomatic.sh profile`）。
+**12 件すべてで `LL_Fallback` = 0、曖昧 0、文脈依存 0、`LL_MaxLook` = 0**。
+1:1 移植は `complex` の `expression` で 10 回の呼出しが 10 回とも全文脈へ落ちていた。
+
+`PredictionMode.SLL` + `BailErrorStrategy` だけでも **16 fixture すべてが 2 段と同じ判定**に
+なる（1:1 移植は 9 件で bail した）。つまり ANTLR の推奨形（SLL → LL）の 1 段目が
+初めて役に立つようになった。
+
+### tree-sitter 側
+
+同じ統合を `grammar.idiomatic.js` にも入れた。`conflicts` は 23 → **1 件**、
+`prec.dynamic` は 27 → **0 箇所**。残る 1 件は型とは無関係で、`Formula` 入口で
+`$a string` が「型キーワード付きの `variable_ref`」か「`variable_ref` に続く返り値型
+`string` の `method_declaration`」かが 1 token では決まらないというもの（`grammar.js` も
+`Formula` 入口でだけ同じ `[$.variable_ref]` を要求する）。`Expression` 入口では 0 件。
