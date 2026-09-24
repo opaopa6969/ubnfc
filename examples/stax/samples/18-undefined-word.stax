@@ -1,0 +1,16 @@
+// 拒否されるべき 2: 未定義の語。
+// 構文としては正しいので parse は通り、スコープ検査が WARNING を出す。
+// 「定義してから使う」が Forth と同じ規則なので、下の square は
+//   (a) どこにも定義が無い not_defined_anywhere
+//   (b) 定義が**後ろにある** later_word
+// の 2 通りで未解決になる。
+
+: uses_missing ( Int -- Int )
+  not_defined_anywhere
+  later_word ;
+
+: later_word ( Int -- Int )
+  1 + ;
+
+: main ( -- )
+  4 uses_missing int_to_str print newline ;

@@ -1,0 +1,26 @@
+// FizzBuzz。制御構造は prelude から取込む（組込みではない）。
+// use は取込む名前を明示列挙する。列挙した名前がこのファイルのスコープへ
+// 宣言として入るので、別ファイルを読まずに参照が解決できる。
+
+use "04-prelude.stax" ( if_else times ) ;
+
+: divides ( Int Int -- Bool )
+  mod 0 = ;
+
+: line ( Int -- )
+  let n
+  n 15 divides
+  [ "FizzBuzz" print ]
+  [ n 3 divides
+    [ "Fizz" print ]
+    [ n 5 divides
+      [ "Buzz" print ]
+      [ n int_to_str print ]
+      if_else ]
+    if_else ]
+  if_else
+  newline ;
+
+: main ( -- )
+  1 let i
+  15 [ i line i 1 + let i ] times ;

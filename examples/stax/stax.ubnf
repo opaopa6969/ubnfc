@@ -1,0 +1,201 @@
+// stax — 型の付いた連接（concatenative）スタック言語。UBNF v2 で書いた第 3 の実用文法。
+//
+// 設計文書は examples/stax/DESIGN.md。要点だけ:
+//   - 語の定義 `: name ( 効果 ) 本体 ;` は宣言（@declares）、語の使用は参照（@symbolRef）。
+//     「定義してから使う」という Forth の規則が、@scopeTree の宣言登録順そのままで出る。
+//   - 型は `type`（別名・和）、`struct`（フィールドは宣言）、語の効果は `( In -- Out )`。
+//   - 制御構造は組込みではなく、引用 `[ ... ]` と macro で言語側で定義する（構文は固定）。
+grammar Stax {
+
+  @ubnf: 2
+  @package: org.example.stax
+
+  // javaStyle は空白と `//` / `/* */` を区切りに入れる。stax のコメントはこの 2 形。
+  @whitespace: javaStyle
+
+  // v2 既定（word）だが、この文法は語境界に寄りかかっているので明示する。
+  // 'dup' が `duplicate` の頭を横取りしないこと（D-040）が、
+  // 「組込み語をリテラルで書き、利用者定義語を IDENTIFIER にする」設計の前提である。
+  @literalBoundary: word
+
+  token IDENT  = IDENTIFIER      // [A-Za-z_][A-Za-z0-9_]*
+  token NUMBER = NUMBER          // [+-]? ( D+ '.' D+ | D+ '.' | D+ | '.' D+ ) ( [eE] [+-]? D+ )?
+  token STRING = DOUBLE_QUOTED   // "..."
+  token EOF    = END_OF_INPUT
+
+  // ── プログラム ───────────────────────────────────────────────────────────
+  // ファイル全体が 1 つの語彙スコープ。ここに語・型・構造体・取込み名が登録され、
+  // 以後の参照がこのスコープで解決される。実行は語 `main` から始まる。
+  @root
+  @doc('stax のソースファイル。宣言の並び。実行は語 main から始まる')
+  @scopeTree(mode=lexical)
+  @mapping(Program, params=[items])
+  Program ::= { TopLevel @items } EOF ;
+
+  @doc('最上位に置けるもの: 取込み・語の定義・macro・struct・type')
+  @mapping(TopLevel)
+  TopLevel ::= UseDecl | WordDef | MacroDef | StructDef | TypeDef ;
+
+  // ── 取込み ───────────────────────────────────────────────────────────────
+  // `use "vec.stax" ( vec_len vec_add ) ;`
+  // 取込む名前を**明示列挙**する。列挙した名前はこのファイルのスコープへ宣言として
+  // 登録されるので、別ファイルを読まずに参照が解決できる（文法だけで完結する）。
+  // 名前が本当に相手側にあるかの検査は stage 3（型検査器）の仕事。
+  @doc('別ファイルの語を取込む。取込む名前を明示列挙する')
+  @mapping(UseDecl, params=[path, names])
+  UseDecl ::= 'use' STRING @path '(' { ImportName @names } ')' ';' ;
+
+  @declares(symbol=name)
+  @mapping(ImportName, params=[name])
+  ImportName ::= IDENT @name ;
+
+  // ── 語の定義 ─────────────────────────────────────────────────────────────
+  // `: square ( Int -- Int ) dup * ;`
+  // @scopeTree で語ごとのスコープを作り、@declares で語名を**親（ファイル）スコープ**へ
+  // 登録する。登録は規則を抜けたあとなので、本体からは自分の名前が見えない
+  // ＝ Forth の smudge bit と同じ。自己再帰は primitive `recurse` で書く。
+  @doc('語の定義。`: name ( 入力 -- 出力 ) 本体 ;`。本体から自分の名前は見えない（recurse を使う）')
+  @scopeTree(mode=lexical)
+  @declares(symbol=name)
+  @mapping(WordDef, params=[name, effect, body])
+  WordDef ::= ':' IDENT @name Effect @effect { Term @body } ';' ;
+
+  // macro は「引用を受け取って引用を返す、コンパイル時に走る語」。
+  // 構文は語と同じで、検査と実行の段が違うだけ（DESIGN.md §5）。
+  @doc('macro の定義。引用を受け取り引用を返す、コンパイル時に走る語')
+  @scopeTree(mode=lexical)
+  @declares(symbol=name)
+  @mapping(MacroDef, params=[name, effect, body])
+  MacroDef ::= 'macro' IDENT @name Effect @effect { Term @body } ';' ;
+
+  // ── 構造体 ───────────────────────────────────────────────────────────────
+  // `struct Point { x: Int y: Int }`
+  // フィールドは**ファイルスコープの宣言**にする。`.x` が宣言のある名前かどうかを
+  // 文法だけで言えるようにするためで、どの struct の x かを決めるのは型検査（stage 3）。
+  @doc('構造体の宣言。`struct Name { field: Type ... }`')
+  @declares(symbol=name)
+  @mapping(StructDef, params=[name, fields])
+  StructDef ::= 'struct' IDENT @name '{' { FieldDecl @fields } '}' ;
+
+  @declares(symbol=name)
+  @mapping(FieldDecl, params=[name, type])
+  FieldDecl ::= IDENT @name ':' TypeRef @type ;
+
+  // ── 型宣言 ───────────────────────────────────────────────────────────────
+  // 別名  : `type Meters = Int ;`
+  // 和/列挙: `type Color = | Red | Green | Blue ;`
+  // 和には先頭 `|` を必ず書く。これで「別名か和か」が 1 token で決まり、
+  // PEG の順序付き選択が後戻りしない（先頭集合が互いに素）。
+  @doc('型宣言。別名 `type A = B ;` と 和・列挙 `type C = | X | Y ;`')
+  @declares(symbol=name)
+  @mapping(TypeDef, params=[name, sum, alias])
+  TypeDef ::= 'type' IDENT @name '=' ( SumBody @sum | AliasBody @alias ) ';' ;
+
+  @mapping(SumBody, params=[variants])
+  SumBody ::= '|' Variant @variants { '|' Variant @variants } ;
+
+  @mapping(AliasBody, params=[type])
+  AliasBody ::= TypeRef @type ;
+
+  // 和の枝は値を積む 0 引数の語でもあるので、語と同じ名前空間へ宣言する。
+  @declares(symbol=name)
+  @mapping(Variant, params=[name])
+  Variant ::= IDENT @name ;
+
+  // ── 型の表記 ─────────────────────────────────────────────────────────────
+  @doc('型の表記。組込みの型・利用者の型・引用の型 `[ In -- Out ]`')
+  @mapping(TypeRef)
+  TypeRef ::= QuotType | BuiltinType | NamedType ;
+
+  // 組込みの型も実行系が供給する固定語彙なので、primitive と同じくリテラルで書く。
+  // 語境界（D-040）があるので利用者が `Integer` という型を宣言しても横取りされない。
+  @doc('組込みの型。実行系が供給する固定語彙')
+  @catalog(context='type')
+  @mapping(BuiltinType, params=[name])
+  BuiltinType ::= ( 'Int' | 'Float' | 'Bool' | 'Str' ) @name ;
+
+  @catalog(context='type')
+  @symbolRef(name=name)
+  @mapping(NamedType, params=[name])
+  NamedType ::= IDENT @name ;
+
+  // 引用そのものの型。`[ Int -- Int ]` は「Int を 1 つ取って Int を 1 つ返す引用」。
+  @mapping(QuotType, params=[inputs, outputs])
+  QuotType ::= '[' { TypeRef @inputs } '--' { TypeRef @outputs } ']' ;
+
+  // ── スタック効果 ─────────────────────────────────────────────────────────
+  // `( Int Int -- Int )`。入力は右が最上段。stage 3 の検査はこの宣言と本体を突き合わせる。
+  @doc('スタック効果。`( 入力の型... -- 出力の型... )`。入力は右端が最上段')
+  @mapping(Effect, params=[inputs, outputs])
+  Effect ::= '(' { TypeRef @inputs } '--' { TypeRef @outputs } ')' ;
+
+  // ── 本体の項 ─────────────────────────────────────────────────────────────
+  // 並び順が PEG の優先順位。数値リテラルを Prim より前に置くのは `-5` を
+  // 「語 `-` ＋ 5」ではなく負のリテラルとして読むため。`.5` と `.x` も同じ理由で
+  // NumLit を FieldGet より前に置く。利用者定義語（IDENT）は最後。
+  @doc('語の本体に置ける項。リテラル・引用・局所束縛・フィールド操作・組込み語・語の参照')
+  @mapping(Term)
+  Term ::= Quotation | NumLit | StrLit | BoolLit | LetBind | FieldGet | FieldSet | Prim | WordRef ;
+
+  // 引用は「まだ実行しない語の並び」。制御構造はこれを受け取る語として言語側で定義する。
+  @doc('引用。`[ ... ]` は実行を遅らせた語の並びで、制御構造の材料になる')
+  @mapping(Quotation, params=[body])
+  Quotation ::= '[' { Term @body } ']' ;
+
+  // token を直接 capture すると Java backend が `int` へ変換してしまい、Rust の
+  // 文字列と canonical JSON が食い違う（examples/stax/README.md「両 backend の差」）。
+  // examples/json/json.ubnf と同じく、group を挟んで原文のまま取り出す。
+  @mapping(NumLit, params=[text])
+  NumLit ::= ( NUMBER ) @text ;
+
+  @mapping(StrLit, params=[text])
+  StrLit ::= STRING @text ;
+
+  @mapping(BoolLit, params=[text])
+  BoolLit ::= ( 'true' | 'false' ) @text ;
+
+  // `let x` は最上段を取り出して語スコープの局所名 x に束縛する。
+  // 宣言先は WordDef の @scopeTree が作ったスコープなので、定義の外へは漏れない。
+  @doc('局所束縛。`let x` は最上段を取り出して語スコープの名前 x に束縛する')
+  @declares(symbol=name)
+  @mapping(LetBind, params=[name])
+  LetBind ::= 'let' IDENT @name ;
+
+  // `.x` は取得、`!x` は書き込み。名前は struct のフィールド宣言を引く。
+  @doc('フィールドの取得。`.x` は最上段の構造体からフィールド x を取り出す')
+  @catalog(context='field')
+  @symbolRef(name=name)
+  @mapping(FieldGet, params=[name])
+  FieldGet ::= '.' IDENT @name ;
+
+  @doc('フィールドの書き込み。`!x` は ( S V -- S ) で構造体の x を差し替える')
+  @catalog(context='field')
+  @symbolRef(name=name)
+  @mapping(FieldSet, params=[name])
+  FieldSet ::= '!' IDENT @name ;
+
+  // ── 組込み語（primitive） ────────────────────────────────────────────────
+  // 実行系が供給する固定語彙。文法にリテラルで書いてあるので、宣言が無くても
+  // 参照が解決する（＝未定義語の警告が出ない）。これが「実行時に決まる語彙」を
+  // 静的 PEG で扱うときの境界そのもので、DESIGN.md §5 の第 2 案が狙う場所である。
+  // 並び順は接頭辞の長い順。英字の語は語境界（D-040）が横取りを止めるので順不同でよい。
+  @doc('組込み語。実行系が供給する固定語彙')
+  @catalog(context='primitive')
+  @mapping(Prim, params=[name])
+  Prim ::= (
+      'dup' | 'drop' | 'swap' | 'over' | 'rot' | 'nip'
+    | 'and' | 'or' | 'not'
+    | 'mod' | 'neg'
+    | 'concat' | 'str_len' | 'int_to_str'
+    | 'print' | 'newline'
+    | 'call' | 'choose' | 'recurse'
+    | '<>' | '<=' | '>=' | '<' | '>' | '='
+    | '+' | '-' | '*' | '/'
+  ) @name ;
+
+  @doc('語の参照。宣言のある語だけが解決する。未定義なら WARNING が出る')
+  @catalog(context='word')
+  @symbolRef(name=name)
+  @mapping(WordRef, params=[name])
+  WordRef ::= IDENT @name ;
+}

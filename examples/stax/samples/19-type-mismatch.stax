@@ -1,0 +1,6 @@
+// 拒否されるべき 3: 構文は通るが型検査で落ちる（stage 3）。
+// print は ( Str -- ) なので Int を渡せない。Int を出すなら int_to_str を挟む。
+
+: main ( -- )
+  7 print
+  newline ;

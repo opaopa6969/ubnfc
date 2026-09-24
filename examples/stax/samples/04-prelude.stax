@@ -1,0 +1,32 @@
+// prelude.stax — 制御構造を「言語の中で」定義するライブラリ。
+//
+// stax の組込みに if も loop も無い。あるのは引用 `[ ... ]` と、
+// 引用を選ぶ choose・引用を実行する call・自分を呼び直す recurse の 3 つだけ。
+// 制御構造はここから普通の語として組み立てる（Factor / Kitten の流儀）。
+
+// 真偽で 2 つの引用のどちらかを選び、実行する。
+: if_else ( Bool [ -- ] [ -- ] -- )
+  choose call ;
+
+// 偽のときは何もしない版。何もしない引用 `[ ]` を渡すだけ。
+: if ( Bool [ -- ] -- )
+  [ ] if_else ;
+
+// 条件の引用が真を返す間、本体の引用を実行し続ける。
+// 自分の名前は定義が閉じるまで見えないので、再帰は recurse で書く。
+: while ( [ -- Bool ] [ -- ] -- )
+  let body
+  let cond
+  cond call
+  [ body call cond body recurse ]
+  [ ]
+  if_else ;
+
+// 本体を n 回実行する。
+: times ( Int [ -- ] -- )
+  let body
+  let n
+  n 0 >
+  [ body call n 1 - body recurse ]
+  [ ]
+  if_else ;

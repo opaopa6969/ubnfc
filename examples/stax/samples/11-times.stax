@@ -1,0 +1,12 @@
+// 制御構造を語として作る。times は組込みではなく、この 5 行が全部である。
+
+: times ( Int [ -- ] -- )
+  let body
+  let n
+  n 0 >
+  [ body call n 1 - body recurse ]
+  [ ]
+  choose call ;
+
+: main ( -- )
+  3 [ "tick" print newline ] times ;

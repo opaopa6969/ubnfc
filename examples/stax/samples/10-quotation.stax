@@ -1,0 +1,14 @@
+// 引用 `[ ... ]` は「まだ実行しない語の並び」。値として積める。
+// 引用の型は `[ 入力 -- 出力 ]` で書く。
+
+: apply_twice ( Int [ Int -- Int ] -- Int )
+  let f
+  f call
+  f call ;
+
+: inc ( Int -- Int )
+  1 + ;
+
+: main ( -- )
+  5 [ inc ] apply_twice int_to_str print newline
+  5 [ dup * ] apply_twice int_to_str print newline ;

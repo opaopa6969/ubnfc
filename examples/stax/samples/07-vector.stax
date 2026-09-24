@@ -1,0 +1,27 @@
+// struct を使う計算。2 次元ベクトルの和と内積。
+
+struct Vec2 { vx: Int vy: Int }
+
+: vec_add ( Vec2 Vec2 -- Vec2 )
+  let b
+  let a
+  a .vx b .vx +
+  a .vy b .vy +
+  Vec2 ;
+
+: vec_dot ( Vec2 Vec2 -- Int )
+  let b
+  let a
+  a .vx b .vx *
+  a .vy b .vy *
+  + ;
+
+: vec_show ( Vec2 -- )
+  dup .vx int_to_str print
+  " " print
+  .vy int_to_str print
+  newline ;
+
+: main ( -- )
+  1 2 Vec2  3 4 Vec2  vec_add vec_show
+  1 2 Vec2  3 4 Vec2  vec_dot int_to_str print newline ;
