@@ -183,6 +183,12 @@ public final class Session {
      */
     public static boolean predict = !"false".equals(System.getProperty("ubnfc.predict"));
     /**
+     * D-066（排他 predict の空振り短絡）の無効化スイッチ。既定は有効で、参照経路（元順で全候補を
+     * 試す経路）との差分検証と計測のためだけに false にする（{@code -Dubnfc.exclusive=false}）。
+     * 短絡するのは fast mode（{@code diag=false}）だけなので、公開される観測は両経路で等しい。
+     */
+    public static boolean exclusive = !"false".equals(System.getProperty("ubnfc.exclusive"));
+    /**
      * 除外した候補が記録したはずの観測の静的な再生計画（生成時に畳み込む。emit/Prediction 参照）。
      * allowed は「候補が成功し得る先頭 code point」に trivia 区切りの先頭 code point を足した閉区間列で、
      * 呼出し位置の文字がここに無ければ候補は最初の significant token で失敗し、trivia も 1 文字も進まない。
@@ -790,6 +796,24 @@ public final class Session {
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
         f.reset = reset0; return combine(Arrays.asList(matches), start, f.c);
     }
+    /**
+     * D-066（Rust backend の {@code expressions.rs::predict_literals} の Java 版）。front が
+     * {@code exclusiveCandidates} を証明した選択——候補が全て非 nullable・trivia なし・capture なしの
+     * 単一 code point の case-sensitive literal で、先頭文字が EOF 込みで互いに素——は、呼出し位置の
+     * 文字がどの候補の先頭でもない時点で全候補の失敗が確定する。元順で全部呼んでも、各候補は入口の
+     * literal で失敗して 0 文字消費するだけなので、fast mode（{@code diag=false}）がその走行から
+     * 残すのは到達位置 {@code reached} の更新だけで、それは {@link #exclusiveFail} が同じ位置へ入れる。
+     *
+     * <p>短絡してよい条件を「否定先読みの中でない」「記録位置と読み取り位置が一致する
+     * （{@code f.reset || f.c == f.m}）」に限るのは候補除外（{@link Guard}）と同じで、これにより
+     * 候補が literal を読む位置が {@code f.c} に確定する。診断モードは条件を満たさないので従来どおり
+     * 元順で全候補を走らせる（観測は構成上一致）。{@code -Dubnfc.exclusive=false} で参照経路へ戻る。
+     */
+    public boolean exclusiveReady(Frame f) {
+        return exclusive && !diag && !f.invert && (f.reset || f.c == f.m);
+    }
+    /** 排他 predict が外れた選択の失敗。全候補が入口で失敗したときと同じ到達位置だけを残す。 */
+    public Match exclusiveFail(Frame f) { progressAt(f.c); return null; }
     public Match choice(Frame f, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback) {
         return choice(f, alternatives, longest, eligible, fallback, null);
     }

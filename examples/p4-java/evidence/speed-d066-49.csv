@@ -1,0 +1,16 @@
+# issue #49 の P4 / Operators A/B 生データ。taskset -c 28、共有機（load 13〜19）。
+# p4 = 同一 JVM 内で cell ごとに Session.exclusive を切替（ExclusiveBench、11 run 巡回）。
+# operators = 同一 JVM 内で run ごとに切替（AbRunner、9 run）。
+grammar,fixture,mode,exclusive,warmup,iterations,median_ms,min_ms,max_ms,alloc_bytes_per_parse
+p4,complex,recognize-fast,on(D-066),1000,2000,0.086859,0.079555,0.172087,136192
+p4,complex,recognize-fast,off,1000,2000,0.095459,0.080818,0.244904,137296
+p4,complex,ast-fast,on(D-066),1000,2000,0.202675,0.168622,0.557132,263592
+p4,complex,ast-fast,off,1000,2000,0.185379,0.173955,0.646067,264696
+p4,complex-x64,recognize-fast,on(D-066),1000,50,7.232083,4.760527,15.496990,3944896
+p4,complex-x64,recognize-fast,off,1000,50,6.942756,4.978974,12.236472,4014040
+p4,complex-x64,ast-fast,on(D-066),1000,50,17.527160,13.923113,32.990951,11882640
+p4,complex-x64,ast-fast,off,1000,50,17.649822,13.948166,34.541195,11951784
+operators,operators-atoms-512,認識のみ,on(D-066),200,1801,0.084213,0.078030,0.274039,332680
+operators,operators-atoms-512,認識のみ,off,200,1801,0.091734,0.086535,0.122992,344992
+operators,operators-atoms-512,typed AST,on(D-066),200,459,0.419259,0.403622,0.768723,1452792
+operators,operators-atoms-512,typed AST,off,200,459,0.442232,0.410047,0.492985,1465104
