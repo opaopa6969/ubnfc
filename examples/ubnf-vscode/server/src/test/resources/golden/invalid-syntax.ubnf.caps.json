@@ -1,0 +1,7 @@
+{
+  "documentSymbols": [],
+  "semanticTokens": [],
+  "probes": [
+    {"at": [1, 2], "definition": [], "references": [], "referencesOnly": [], "hover": null, "completion": ["(", ")", ":", "::=", ";", "=", "@", "@backref", "@catalog", "@commonField", "@declares", "@doc", "@enum", "@eval", "@import", "@interleave", "@leftAssoc", "@longestChoice", "@mapping", "@precedence"], "completionCount": 36}
+  ]
+}

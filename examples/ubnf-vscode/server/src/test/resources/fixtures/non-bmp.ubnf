@@ -1,0 +1,4 @@
+grammar Emoji {
+  token IDENTIFIER = org.unlaxer.parser.clang.IdentifierParser
+  Expr ::= Word ; /* 😀😀 */ Word ::= IDENTIFIER ;
+}

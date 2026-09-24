@@ -1,0 +1,3 @@
+var $price as number set 10;
+call bonus($price) + 1
+}

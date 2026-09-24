@@ -60,7 +60,7 @@
 | `@enum` | 候補列を enum 型に | — | `AstType::Enum` + `RecipeKind::Enum` + `requiredFeatures` | 実装 (`ast_types`) | 実装 | 0/0 | 9/4 |
 | `@commonField(a,b)` | sealed interface へ field を引き上げ | — | `semantics.commonFields` | 実装 `mapping.rs` | 実装 | 0/0 | 9/4 |
 | `@skip` | AST から除外 | D-032 | `rules[].skip` | 実装 | 実装 | 0/0 | 2/1 |
-| `@doc('…')` | 説明文 | — | `rules[].annotations` のみ | **無視** | **無視** | 0/0 | 0/0 |
+| `@doc('…')` | 説明文 | D-062 | `rules[].annotations` のみ | **無視** | **無視** | 0/0 | 0/0 |
 | `@catalog(context='…')` | 補完カタログ metadata | — | `semantics.catalogs` | 実装 | 実装 | 2/2 | 9/4 |
 | `@eval(k='v', …)` | 評価器の種別/戦略 | — | `rules[].eval` | 実装 | 実装 | 0/0 | 19/8 |
 | `@backref(name=X)` | scope 参照 **または** 同一 rule 内テキスト一致 | D-029, §3.8 | `scope.effects[].events[].action=use` + `mode` | 実装（`sameRuleText` 含む） | 実装 | 5/3 | 6/5 |
@@ -176,6 +176,11 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
    合成 fixture の `@custom` も同じ経路。未知の **grammar 設定**（`@foo: bar`）も同様に素通りする。
 6. `@doc` は IR に載るが、両 backend が `annotations[]` を見るのは `root` と `rightAssoc` の 2 つだけなので
    生成コードに届かない。LSP 用 metadata としては筋が通るが、「生成に効く」とは書けない。
+   **追記（2026-09-24、D-062）**: その「LSP 用 metadata」として実際に読む側ができた。
+   `ubnfc-lsp` が生成時に `rules[].annotations` の `doc` を読み、hover の説明文の表
+   （生成される `Meta.RULE_DOC`）へ畳み込む。**IR にも front にも手を入れていない**
+   （`semantics.rules[].doc` のような欄を足すと `ir/fixtures/` の IR golden すべてに `"doc": null` が
+   増えるだけで、読める情報は同じ）。パーサ backend の欄が「無視」なのは変わらない。
 7. **`@rightAssoc` の span 補正条件が両 backend で非対称**。Rust（`emit.rs:353`）は
    `rightAssoc` **かつ** `interleave` / `whitespace` / `comment` 注釈が同じ規則に同居するときだけ
    span 終端を `significant_end` に切り替えるが、Java（`JavaEmitter.java:360`）は `rightAssoc` の
@@ -335,6 +340,7 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
 
 - **`@doc` の削除**: 生成コードには届かないが、`annotations[]` に載っていて LSP/カタログ側が
   読める意図的な tooling 表層。コストがほぼゼロなので残す。ただし「生成に効かない」と明記する。
+  （2026-09-24: 実際に `ubnfc-lsp` の hover が読むようになった。D-062）
 - **`@literalBoundary` の削除**: 使用 0 だが、v1 文法が v2 の語境界を個別に切るための唯一の逃げ道
   （D-040）。門を消してはいけない。
 - **`@scopeTree(mode=…)` から `dynamic` を消す**: 現状 lexical と同じ挙動なのは事実だが、

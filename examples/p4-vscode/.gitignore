@@ -3,3 +3,4 @@ out/
 target/
 *.vsix
 server-dist/
+syntaxes/
