@@ -164,6 +164,21 @@ issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で�
 ANTLR4 の適応的予測と**エラー回復**、tree-sitter の**増分解析**はどちらも測っていない
 （ubnfc が目指していないものでもある）。報告の §5 に「何が同条件でないか」を並べてある。
 
+同じ日に **実用文法 P4（119 規則）でも同じ 4 実装を比べた**
+（[`docs/reports/2026-09-24-p4-antlr-treesitter.md`](docs/reports/2026-09-24-p4-antlr-treesitter.md)、
+issue #27。文法は `examples/p4-antlr/TinyExpressionP4.g4` と `examples/p4-treesitter/grammar.js`）:
+
+- **受理**: 16 fixture 中 12 件で 4 実装が完全一致。残り 4 件（`comparison-heavy` 系）は
+  P4 が PEG の順序つき選択で先頭候補にコミットして拒否するのに対し、ALL(\*) と GLR が
+  後続文脈を見て別候補で受理する差。追加の拒否入力 10 件も 4 実装すべてで拒否。
+- **速度（`complex` 332 B、認識のみ）**: tree-sitter 0.0415 ms（CST 込み）、
+  **ubnfc Rust 0.0696 ms**、ubnfc Java 0.257 ms、**ANTLR4 645 ms**。
+  ANTLR が 4 桁遅いのは P4 の型別の順序つき選択（`Expression ::= NumberExpression | BooleanExpression | …`）で
+  ALL(\*) が毎回 LL 全文脈へ落ちるためで、`BooleanExpression` 入口なら同じ parser が 0.99 ms（650 倍速い）。
+- **scope 解決の代金**: ubnfc は `@scopeTree` / `@declares` / `@backref` を常に実行する。
+  その効果を IR から外して生成し直すと認識が 17〜29% 速くなる（確保回数は 10 倍減）。
+  ANTLR と tree-sitter はこの仕事を一切していない。
+
 `examples/handwritten-target` にある手書きパーサは「生成物の目標形」を固定したもので、
 その README 自身が「既存 parser と同一条件の比較計測はしておらず、速度比は主張しない」と書いている。
 
@@ -433,7 +448,8 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + VSIX）。`scripts/build-vsix.sh` で組む |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
 | `examples/json`, `examples/arith` | 同じ言語を `.ubnf` / ANTLR `.g4` / tree-sitter `grammar.js` の 3 記法で書いたもの（JSON = RFC 8259、算術式 = Operators / Power）。外部比較の材料。issue #26 |
-| `benchmarks/` | 速度比較のドライバ。`scripts/prepare-external.sh` 以下が ANTLR4 / tree-sitter との比較（取得は `scripts/fetch-external-tools.sh`） |
+| `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27 |
+| `benchmarks/` | 速度比較のドライバ。`scripts/prepare-external.sh` 以下が ANTLR4 / tree-sitter との比較、`scripts/p4-external.sh` が P4 での同じ比較（取得はどちらも `scripts/fetch-external-tools.sh`） |
 | `docs/` | 設計・決定・報告。下記 |
 
 ## 7. 設計と決定はどこにあるか

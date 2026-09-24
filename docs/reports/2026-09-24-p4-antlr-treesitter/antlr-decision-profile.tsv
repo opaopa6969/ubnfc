@@ -1,0 +1,17 @@
+fixture	decision	rule	invocations	ll_fallback	predict_ms	ll_maxlook	ambiguities	ctx_sensitivities
+# complex: profiled parse 5250.9 ms, prediction 5221.7 ms (99%)
+complex	98	expression	10	10	3498.8	70	10	1
+complex	92	branchExpression	2	2	1598.8	24	2	2
+complex	64	argumentExpression	8	0	44.2	0	0	0
+complex	13	stringVariableDeclaration	1	0	26.2	0	0	0
+complex	85	stringExpression	5	0	17.9	0	0	0
+complex	7	variableDeclaration	2	0	8.9	0	0	0
+complex	93	numberMatchExpression	2	0	7.6	0	0	0
+complex	68	numberExpression	28	0	6.6	0	0	0
+# comparison-heavy: profiled parse 8.2 ms, prediction 1.1 ms (13%)
+comparison-heavy	68	numberExpression	94	0	0.7	0	0	0
+comparison-heavy	88	booleanExpression	31	0	0.1	0	0	0
+comparison-heavy	67	numberExpression	31	0	0.1	0	0	0
+comparison-heavy	87	booleanExpression	15	0	0.1	0	0	0
+comparison-heavy	90	booleanFactor	16	0	0.0	0	0	0
+comparison-heavy	66	numberExpression	63	0	0.0	0	0	0
