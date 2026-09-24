@@ -72,16 +72,15 @@ mod contracts {
     #[test]
     fn resource_limits_fail_without_partial_success() {
         use lexical::*;
-        for limit in 0..4 {
+        for limit in 0..3 {
             let mut options = ParseOptions::default();
             match limit {
                 0 => options.limits.input_bytes = 2,
                 1 => options.limits.arena_entries = 2,
-                2 => options.limits.memo_entries = 0,
                 _ => options.limits.mapping_depth = 0,
             }
             let r = parse_with_options("abx", options);
-            if limit == 3 {
+            if limit == 2 {
                 assert!(r.ok);
                 assert!(r.ast.is_none());
                 assert_eq!(r.diagnostics[0].kind, DiagnosticKind::Mapping);
@@ -90,6 +89,26 @@ mod contracts {
                 assert_eq!(r.diagnostics[0].kind, DiagnosticKind::Resource);
                 assert_eq!((r.consumed_cp, r.matched_cp), (0, 0));
             }
+        }
+        // memo 表の上限は memo が付く文法でしか踏めない（D-058）。`lexical` の Root は
+        // 同じ位置へ再入し得ないので memo が無く、entry が 1 つも増えない。
+        {
+            let r = memo_budget::parse_with_options(
+                "ac",
+                memo_budget::ParseOptions {
+                    limits: memo_budget::ResourceLimits {
+                        memo_entries: 0,
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+            );
+            assert!(!r.ok);
+            assert_eq!(
+                r.diagnostics[0].kind,
+                memo_budget::DiagnosticKind::Resource
+            );
+            assert_eq!((r.consumed_cp, r.matched_cp), (0, 0));
         }
         let r = parse_with_options(
             "bad",

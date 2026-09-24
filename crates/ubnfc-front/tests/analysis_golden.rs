@@ -221,14 +221,13 @@ fn disjoint_choice_predicts_and_records_omission_proof() {
     check_properties(&s, &a, &p);
     assert_eq!(p.choices[0].strategy, ChoicePlanStrategy::Predict);
     assert_eq!(p.choices[0].fallback, ChoicePlanFallback::None);
+    // 単一規則・巻戻し無しなので同じ位置へ再入できず、本体 memo も証明付きで落ちる。
+    let body_entry = p.memo.entries.iter().find(|m| m.expr_id == body).unwrap();
+    assert_eq!(body_entry.reason, MemoEntryReason::ProvedOmission);
+    assert!(!body_entry.cache_success && !body_entry.cache_failure);
     assert_eq!(
-        p.memo
-            .entries
-            .iter()
-            .find(|m| m.expr_id == body)
-            .unwrap()
-            .reason,
-        MemoEntryReason::DefaultSafe
+        body_entry.omission_proof.as_ref().unwrap().kind,
+        ProofKind::UnreachableRevisit
     );
     for id in [x, y] {
         let m = p.memo.entries.iter().find(|m| m.expr_id == id).unwrap();
@@ -425,10 +424,20 @@ fn extern_closure_is_fail_closed_and_alias_guarantee_is_respected() {
     rule(&mut s, "C", c.clone());
     let (a, p) = analyze(&s).unwrap();
     check_properties(&s, &a, &p);
+    // どの規則も同じ位置へ再入し得ないので memo は付かない。区別したいのは落とした理由。
     for m in &p.memo.entries {
-        assert_eq!(m.cache_success, m.expr_id == c);
-        assert_eq!(m.cache_failure, m.expr_id == c);
+        assert!(!m.cache_success && !m.cache_failure);
+        assert_eq!(
+            m.reason,
+            if m.expr_id == c {
+                MemoEntryReason::ProvedOmission
+            } else {
+                MemoEntryReason::UnsafeExternClosure
+            }
+        );
     }
+    assert!(fact(&a, &c).memo_safety.success && fact(&a, &c).memo_safety.failure);
+    assert!(!fact(&a, &ext).memo_safety.success && !fact(&a, &ext).memo_safety.failure);
     assert_eq!(
         fact(&a, &ext).may_start.certainty,
         MayStartCertainty::Unknown
@@ -444,12 +453,23 @@ fn extern_closure_is_fail_closed_and_alias_guarantee_is_respected() {
         purity: MemoSafetyPurity::StateRead,
         reason: "@memoSafeToken".into(),
     };
-    let (_, p) = analyze(&s).unwrap();
+    let (a, p) = analyze(&s).unwrap();
+    // alias 保証で Extern 閉包が解ける。安全性は memoSafety、要否は再入判定が決める。
+    assert!(a
+        .expressions
+        .iter()
+        .all(|e| e.memo_safety.success && e.memo_safety.failure));
     assert!(p
         .memo
         .entries
         .iter()
-        .all(|m| m.cache_success && m.cache_failure));
+        .all(|m| m.reason != MemoEntryReason::UnsafeExternClosure));
+    // Extern を含む本体は判断材料が増えるので保持側に倒す（A と B の本体）。
+    assert!(p
+        .memo
+        .entries
+        .iter()
+        .any(|m| m.cache_success && m.cache_failure));
     s.tokens[0].memo_safety.asserted_alias = Some("別名".into());
     assert!(analyze(&s)
         .unwrap()

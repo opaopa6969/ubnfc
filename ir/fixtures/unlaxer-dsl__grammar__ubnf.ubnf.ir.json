@@ -15548,18 +15548,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1335:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1335:body/0/literal"
@@ -15573,7 +15579,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef"
@@ -15587,7 +15593,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1354:1360:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1354:1360:body/2/literal"
@@ -15601,7 +15607,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef"
@@ -15790,18 +15796,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1788:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1788:body/0/literal"
@@ -15815,7 +15827,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef"
@@ -15829,7 +15841,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1805:1808:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1805:1808:body/2/literal"
@@ -15843,7 +15855,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef"
@@ -15853,18 +15865,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1878:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1878:body/0/ruleRef"
@@ -15878,7 +15896,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1886:1903:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1886:1903:body/1/ruleRef"
@@ -15888,18 +15906,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef"
@@ -15909,18 +15933,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2087:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2087:body/0/literal"
@@ -15934,7 +15964,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat"
@@ -15948,7 +15978,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2090:2102:body/1/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat",
@@ -15963,7 +15993,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2114:2117:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2114:2117:body/2/literal"
@@ -16022,18 +16052,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2364:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2364:body/0/literal"
@@ -16047,7 +16083,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef"
@@ -16061,7 +16097,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2382:2385:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2382:2385:body/2/literal"
@@ -16075,7 +16111,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef"
@@ -16085,18 +16121,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2470:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2470:body/0/ruleRef"
@@ -16110,7 +16152,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2478:2496:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2478:2496:body/1/ruleRef"
@@ -16124,7 +16166,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2504:2523:body/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2504:2523:body/2/ruleRef"
@@ -16138,7 +16180,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2531:2558:body/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2531:2558:body/3/ruleRef"
@@ -16152,7 +16194,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2566:2585:body/4/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2566:2585:body/4/ruleRef"
@@ -16166,7 +16208,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2593:2605:body/5/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2593:2605:body/5/ruleRef"
@@ -16180,7 +16222,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2613:2628:body/6/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2613:2628:body/6/ruleRef"
@@ -16194,7 +16236,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2636:2649:body/7/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2636:2649:body/7/ruleRef"
@@ -16208,7 +16250,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2657:2670:body/8/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2657:2670:body/8/ruleRef"
@@ -16222,7 +16264,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2678:2693:body/9/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2678:2693:body/9/ruleRef"
@@ -16236,7 +16278,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2701:2717:body/10/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2701:2717:body/10/ruleRef"
@@ -16246,18 +16288,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2828:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2828:body/0/literal"
@@ -16271,7 +16319,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2829:2832:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2829:2832:body/1/literal"
@@ -16285,7 +16333,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef"
@@ -16299,7 +16347,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2852:2855:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2852:2855:body/3/literal"
@@ -16309,18 +16357,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2968:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2968:body/0/literal"
@@ -16334,7 +16388,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2969:2972:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2969:2972:body/1/literal"
@@ -16348,7 +16402,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef"
@@ -16362,7 +16416,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2987:2990:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:2987:2990:body/3/literal"
@@ -16372,18 +16426,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3111:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3111:body/0/literal"
@@ -16397,7 +16457,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3112:3115:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3112:3115:body/1/literal"
@@ -16411,7 +16471,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef"
@@ -16425,7 +16485,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3132:3135:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3132:3135:body/3/literal"
@@ -16435,18 +16495,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3290:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3290:body/0/literal"
@@ -16460,7 +16526,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3291:3294:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3291:3294:body/1/literal"
@@ -16474,7 +16540,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef"
@@ -16488,7 +16554,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3311:3314:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3311:3314:body/3/literal"
@@ -16498,18 +16564,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3436:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3436:body/0/literal"
@@ -16523,7 +16595,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3437:3440:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3437:3440:body/1/literal"
@@ -16537,7 +16609,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef"
@@ -16551,7 +16623,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3453:3456:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3453:3456:body/3/literal"
@@ -16565,7 +16637,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef"
@@ -16579,7 +16651,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3469:3472:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3469:3472:body/5/literal"
@@ -16589,18 +16661,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3562:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3562:body/0/literal"
@@ -16614,7 +16692,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3563:3566:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3563:3566:body/1/literal"
@@ -16628,7 +16706,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef"
@@ -16642,7 +16720,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3580:3583:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3580:3583:body/3/literal"
@@ -16652,18 +16730,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3688:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3688:body/0/literal"
@@ -16677,7 +16761,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3689:3692:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3689:3692:body/1/literal"
@@ -16691,7 +16775,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef"
@@ -16705,7 +16789,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3709:3712:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3709:3712:body/3/literal"
@@ -16715,18 +16799,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/0/literal"
@@ -16736,18 +16826,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/0/literal"
@@ -16757,18 +16853,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/0/literal"
@@ -16870,18 +16972,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4269:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4269:body/0/ruleRef"
@@ -16895,7 +17003,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4277:4294:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4277:4294:body/1/ruleRef"
@@ -16909,7 +17017,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4302:4316:body/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4302:4316:body/2/ruleRef"
@@ -16923,7 +17031,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4324:4344:body/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4324:4344:body/3/ruleRef"
@@ -16937,7 +17045,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4352:4372:body/4/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4352:4372:body/4/ruleRef"
@@ -16951,7 +17059,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4380:4397:body/5/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4380:4397:body/5/ruleRef"
@@ -16965,7 +17073,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4405:4424:body/6/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4405:4424:body/6/ruleRef"
@@ -16979,7 +17087,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4432:4450:body/7/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4432:4450:body/7/ruleRef"
@@ -16993,7 +17101,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4458:4475:body/8/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4458:4475:body/8/ruleRef"
@@ -17007,7 +17115,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4483:4502:body/9/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4483:4502:body/9/ruleRef"
@@ -17021,7 +17129,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4510:4530:body/10/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4510:4530:body/10/ruleRef"
@@ -17035,7 +17143,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4538:4561:body/11/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4538:4561:body/11/ruleRef"
@@ -17049,7 +17157,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4569:4595:body/12/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4569:4595:body/12/ruleRef"
@@ -17063,7 +17171,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4603:4623:body/13/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4603:4623:body/13/ruleRef"
@@ -17077,7 +17185,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4631:4644:body/14/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4631:4644:body/14/ruleRef"
@@ -17091,7 +17199,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4652:4670:body/15/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4652:4670:body/15/ruleRef"
@@ -17105,7 +17213,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4678:4692:body/16/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4678:4692:body/16/ruleRef"
@@ -17119,7 +17227,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4700:4721:body/17/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4700:4721:body/17/ruleRef"
@@ -17133,7 +17241,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4729:4743:body/18/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4729:4743:body/18/ruleRef"
@@ -17147,7 +17255,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4751:4767:body/19/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4751:4767:body/19/ruleRef"
@@ -17157,18 +17265,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/0/literal"
@@ -17178,18 +17292,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:4937:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:4937:body/0/literal"
@@ -17203,7 +17323,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4938:4941:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4938:4941:body/1/literal"
@@ -17217,7 +17337,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4949:4959:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4949:4959:body/2/tokenRef"
@@ -17231,7 +17351,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional"
@@ -17245,7 +17365,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4980:5058:body/3/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17260,7 +17380,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4980:4983:body/3/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17276,7 +17396,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4984:4992:body/3/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17292,7 +17412,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4993:4996:body/3/0/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17308,7 +17428,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4997:5000:body/3/0/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17324,7 +17444,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5001:5011:body/3/0/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17340,7 +17460,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5024:5054:body/3/0/5/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17356,7 +17476,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5026:5040:body/3/0/5/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17373,7 +17493,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5026:5029:body/3/0/5/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17391,7 +17511,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5030:5040:body/3/0/5/0/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17409,7 +17529,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5055:5058:body/3/0/6/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional",
@@ -17425,7 +17545,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5066:5069:body/4/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5066:5069:body/4/literal"
@@ -17435,18 +17555,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5149:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5149:body/0/literal"
@@ -17460,7 +17586,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5150:5153:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5150:5153:body/1/literal"
@@ -17474,7 +17600,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5154:5166:body/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5154:5166:body/2/ruleRef"
@@ -17488,7 +17614,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5176:5205:body/3/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5176:5205:body/3/repeat"
@@ -17502,7 +17628,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5178:5194:body/3/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5176:5205:body/3/repeat",
@@ -17517,7 +17643,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5178:5181:body/3/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5176:5205:body/3/repeat",
@@ -17533,7 +17659,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5182:5194:body/3/0/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5176:5205:body/3/repeat",
@@ -17549,7 +17675,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5206:5209:body/4/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5206:5209:body/4/literal"
@@ -17559,18 +17685,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5305:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5305:body/0/literal"
@@ -17584,7 +17716,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5306:5335:body/1/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5306:5335:body/1/optional"
@@ -17598,7 +17730,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5308:5333:body/1/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5306:5335:body/1/optional",
@@ -17613,7 +17745,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5308:5311:body/1/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5306:5335:body/1/optional",
@@ -17629,7 +17761,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5312:5322:body/1/0/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5306:5335:body/1/optional",
@@ -17645,7 +17777,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5330:5333:body/1/0/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5306:5335:body/1/optional",
@@ -17657,18 +17789,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5433:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5433:body/0/literal"
@@ -17682,7 +17820,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5434:5437:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5434:5437:body/1/literal"
@@ -17696,7 +17834,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5438:5447:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5438:5447:body/2/literal"
@@ -17710,7 +17848,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5448:5451:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5448:5451:body/3/literal"
@@ -17724,7 +17862,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5452:5462:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5452:5462:body/4/tokenRef"
@@ -17738,7 +17876,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5472:5475:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5472:5475:body/5/literal"
@@ -17748,18 +17886,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5561:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5561:body/0/literal"
@@ -17773,7 +17917,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5562:5565:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5562:5565:body/1/literal"
@@ -17787,7 +17931,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5566:5572:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5566:5572:body/2/literal"
@@ -17801,7 +17945,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5573:5576:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5573:5576:body/3/literal"
@@ -17815,7 +17959,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5577:5587:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5577:5587:body/4/tokenRef"
@@ -17829,7 +17973,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5594:5597:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5594:5597:body/5/literal"
@@ -17839,18 +17983,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5689:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5689:body/0/literal"
@@ -17864,7 +18014,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5690:5693:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5690:5693:body/1/literal"
@@ -17878,7 +18028,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5694:5700:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5694:5700:body/2/literal"
@@ -17892,7 +18042,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5701:5704:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5701:5704:body/3/literal"
@@ -17906,7 +18056,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5705:5715:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5705:5715:body/4/tokenRef"
@@ -17920,7 +18070,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5722:5725:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5722:5725:body/5/literal"
@@ -17930,18 +18080,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5829:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5829:body/0/literal"
@@ -17955,7 +18111,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5830:5833:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5830:5833:body/1/literal"
@@ -17969,7 +18125,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5834:5842:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5834:5842:body/2/literal"
@@ -17983,7 +18139,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5843:5846:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5843:5846:body/3/literal"
@@ -17997,7 +18153,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5847:5857:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5847:5857:body/4/tokenRef"
@@ -18011,7 +18167,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional"
@@ -18025,7 +18181,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5868:5896:body/5/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional",
@@ -18040,7 +18196,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5868:5871:body/5/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional",
@@ -18056,7 +18212,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5872:5885:body/5/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional",
@@ -18072,7 +18228,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5886:5889:body/5/0/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional",
@@ -18088,7 +18244,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5890:5896:body/5/0/3/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional",
@@ -18104,7 +18260,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5912:5915:body/6/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5912:5915:body/6/literal"
@@ -18114,18 +18270,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6004:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6004:body/0/literal"
@@ -18139,7 +18301,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6005:6008:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6005:6008:body/1/literal"
@@ -18153,7 +18315,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6009:6018:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6009:6018:body/2/literal"
@@ -18167,7 +18329,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6019:6022:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6019:6022:body/3/literal"
@@ -18181,7 +18343,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6023:6029:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6023:6029:body/4/tokenRef"
@@ -18195,7 +18357,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6039:6042:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6039:6042:body/5/literal"
@@ -18205,18 +18367,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/0/literal"
@@ -18226,18 +18394,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/0/literal"
@@ -18247,18 +18421,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/0/literal"
@@ -18268,18 +18448,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/0/literal"
@@ -18289,18 +18475,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6482:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6482:body/0/literal"
@@ -18314,7 +18506,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6483:6486:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6483:6486:body/1/literal"
@@ -18328,7 +18520,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6487:6494:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6487:6494:body/2/literal"
@@ -18342,7 +18534,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6495:6498:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6495:6498:body/3/literal"
@@ -18356,7 +18548,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6499:6515:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6499:6515:body/4/tokenRef"
@@ -18370,7 +18562,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6523:6526:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6523:6526:body/5/literal"
@@ -18380,18 +18572,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/0/literal"
@@ -18405,7 +18603,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6601:6604:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6601:6604:body/1/literal"
@@ -18419,7 +18617,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6605:6611:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6605:6611:body/2/tokenRef"
@@ -18433,7 +18631,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6618:6621:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6618:6621:body/3/literal"
@@ -18443,18 +18641,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6722:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6722:body/0/literal"
@@ -18468,7 +18672,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6723:6726:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6723:6726:body/1/literal"
@@ -18482,7 +18686,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group"
@@ -18496,7 +18700,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6771:body/2/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group",
@@ -18511,7 +18715,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6746:body/2/0/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group",
@@ -18527,7 +18731,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group",
@@ -18544,7 +18748,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6736:6739:body/2/0/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group",
@@ -18561,7 +18765,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6740:6746:body/2/0/0/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group",
@@ -18578,7 +18782,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6761:6771:body/2/0/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group",
@@ -18594,7 +18798,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6780:6783:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6780:6783:body/3/literal"
@@ -18604,18 +18808,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/0/literal"
@@ -18625,18 +18835,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7022:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7022:body/0/literal"
@@ -18650,7 +18866,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7023:7026:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7023:7026:body/1/literal"
@@ -18664,7 +18880,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7027:7037:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7027:7037:body/2/tokenRef"
@@ -18678,7 +18894,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7080:body/3/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7080:body/3/repeat"
@@ -18692,7 +18908,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7052:7066:body/3/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7080:body/3/repeat",
@@ -18707,7 +18923,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7052:7055:body/3/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7080:body/3/repeat",
@@ -18723,7 +18939,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7056:7066:body/3/0/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7080:body/3/repeat",
@@ -18739,7 +18955,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7081:7084:body/4/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7081:7084:body/4/literal"
@@ -18749,18 +18965,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/0/literal"
@@ -18770,18 +18992,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7287:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7287:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7276:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7287:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7276:body/0/literal"
@@ -18795,7 +19023,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7277:7287:body/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7287:body/seq",
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:7277:7287:body/1/tokenRef"

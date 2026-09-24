@@ -20,9 +20,14 @@ feature 名順に並べる。`scope_schedule` は rule の enter → 本体評�
   モードに応じた consume(0) の効果を復元する。長い literal は trie だけを構築し Ordered を維持。
   明示 predictive は predict + fullChoice。候補なし・全失敗の両方で完全選択を再試行する。
   trie は完了済みの短い候補と未知候補を後続 node に残し、元の候補順を保持する。
-- memo は全 rule 本体を保持し、判定不能/再帰 SCC は全体を保持する。保証のない Extern の
-  依存元閉包は成功・失敗とも対象外。保証は token alias に対応する userAliasAssertion を確認。
-  省略は非再帰・trivia/効果なし・単一所有の式に限定し、rule 本体 memo を支配点とする。
+- memo は rule 本体を既定で保持するが、**同じ位置へ再入し得ない rule は本体ごと落とす**
+  （`reentry.rs`）。hit の必要条件は同じ (rule, position) の 2 回評価で、位置が戻るのは
+  巻戻しだけなので、開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、
+  反復の周回境界と脱出、先読みの巻戻し）を列挙し、両側から同じ rule が同じ相対位置
+  （開始 / 開始より後 / 終端の 3 値）で試され得るかを見る。scope/recovery/Extern を含む
+  本体と予算超過は保持側へ倒す。保証のない Extern の依存元閉包は成功・失敗とも対象外。
+  保証は token alias に対応する userAliasAssertion を確認。部分式の省略は非再帰・
+  trivia/効果なし・単一所有の式に限定し、rule 本体 memo を支配点とする。
   Seq/Group の単一パス、fallback なしの排他選択、minConsume > 0 の反復の単調前進だけを
   通り、巻戻して同じ式へ再訪する祖先を通らない。証明の kind とパスを omissionProof に残す。
 - 演算子は左の Base { Op Base }、右の Base Op Self | Base を検算し、数値 precedence ではなく
@@ -44,7 +49,8 @@ nullable、minConsume、文字範囲/EOF/ゼロ消費条件、rule 解析、trie
 - transaction の16式の失敗は restore、R を変更しない18式は preserve に精密化。
 - AddOp / MulOp の2選択を Predict にし、proof を追加。3つの既存 trie を plan から参照。
 - 上記2 rule の本体 memo は保持し、4つの literal 式だけ証明付きで memo を省略。
-  2 SCC の memoPolicy と plan.profile を更新する。
+  2 SCC の memoPolicy と plan.profile を更新する。TinyCalc / VariableDeclaration の
+  2 本体は再入し得ないので unreachableRevisit の証明付きで落ちる（Expression 塔は残る）。
 - 演算子塔は trivia のため tierFunctions のまま。proof に非適用理由を追加する。
 - GrammarIr に統合する際は requiredFeatures に predictiveChoice を追加する。
 

@@ -14,6 +14,7 @@ mod graph;
 mod operators;
 mod planning;
 mod reachability;
+mod reentry;
 mod regex;
 pub use reachability::ChoiceIssue;
 pub(crate) use regex::attach as attach_regex_plans;

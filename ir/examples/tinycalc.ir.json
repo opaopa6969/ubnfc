@@ -2339,18 +2339,24 @@
     "memo": {
       "entries": [
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:483:body/0/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:483:body/0/repeat"
@@ -2364,7 +2370,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:462:481:body/0/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:483:body/0/repeat",
@@ -2379,7 +2385,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:503:513:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:460:513:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:503:513:body/1/ruleRef"
@@ -2389,18 +2395,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group"
@@ -2414,7 +2426,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:645:body/0/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
@@ -2429,7 +2441,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:627:632:body/0/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
@@ -2445,7 +2457,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:635:645:body/0/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:647:body/0/group",
@@ -2461,7 +2473,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:662:672:body/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:662:672:body/1/tokenRef"
@@ -2475,7 +2487,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional"
@@ -2489,7 +2501,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:702:body/2/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
@@ -2504,7 +2516,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:686:691:body/2/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
@@ -2520,7 +2532,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:692:702:body/2/0/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:684:710:body/2/optional",
@@ -2536,7 +2548,7 @@
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/examples/tinycalc.ubnf:716:719:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:625:719:body/seq",
               "expr:unlaxer-dsl/examples/tinycalc.ubnf:716:719:body/3/literal"

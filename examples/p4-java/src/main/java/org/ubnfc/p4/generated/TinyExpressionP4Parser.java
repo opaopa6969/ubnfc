@@ -629,7 +629,7 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 1, 1044, true, true, TinyExpressionP4Parser::e13, "recipe:CodeBlock", null, "construct", K6, K7, false, K4, false, K8);
     }
     private static Match parseImportDeclaration_2(Session s, Frame f) {
-        return s.rule(f, 2, 1045, true, true, TinyExpressionP4Parser::e17, "recipe:ImportDeclaration", null, "construct", K9, K7, false, K4, false, K10);
+        return s.rule(f, 2, 1045, false, false, TinyExpressionP4Parser::e17, "recipe:ImportDeclaration", null, "construct", K9, K7, false, K4, false, K10);
     }
     private static Match parseClassName_3(Session s, Frame f) {
         return s.rule(f, 3, 1046, true, true, TinyExpressionP4Parser::e27, "recipe:ClassName", null, "construct", K11, K7, false, K4, false, K12);
@@ -650,19 +650,19 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 8, 1051, true, true, TinyExpressionP4Parser::e92, "recipe:ObjectVariableDeclaration", null, "construct", K21, K22, false, K4, false, K16);
     }
     private static Match parseTypeHint_9(Session s, Frame f) {
-        return s.rule(f, 9, 1052, true, true, TinyExpressionP4Parser::e110, null, null, null, K6, K7, false, K4, false, K23);
+        return s.rule(f, 9, 1052, false, false, TinyExpressionP4Parser::e110, null, null, null, K6, K7, false, K4, false, K23);
     }
     private static Match parseNumberTypeHint_10(Session s, Frame f) {
-        return s.rule(f, 10, 1053, true, true, TinyExpressionP4Parser::e123, null, null, null, K6, K7, false, K4, false, K24);
+        return s.rule(f, 10, 1053, false, false, TinyExpressionP4Parser::e123, null, null, null, K6, K7, false, K4, false, K24);
     }
     private static Match parseStringTypeHint_11(Session s, Frame f) {
-        return s.rule(f, 11, 1054, true, true, TinyExpressionP4Parser::e132, null, null, null, K6, K7, false, K4, false, K25);
+        return s.rule(f, 11, 1054, false, false, TinyExpressionP4Parser::e132, null, null, null, K6, K7, false, K4, false, K25);
     }
     private static Match parseBooleanTypeHint_12(Session s, Frame f) {
-        return s.rule(f, 12, 1055, true, true, TinyExpressionP4Parser::e139, null, null, null, K6, K7, false, K4, false, K26);
+        return s.rule(f, 12, 1055, false, false, TinyExpressionP4Parser::e139, null, null, null, K6, K7, false, K4, false, K26);
     }
     private static Match parseObjectTypeHint_13(Session s, Frame f) {
-        return s.rule(f, 13, 1056, true, true, TinyExpressionP4Parser::e146, null, null, null, K6, K7, false, K4, false, K27);
+        return s.rule(f, 13, 1056, false, false, TinyExpressionP4Parser::e146, null, null, null, K6, K7, false, K4, false, K27);
     }
     private static Match parseOnlyIfAbsent_14(Session s, Frame f) {
         return s.rule(f, 14, 1057, true, true, TinyExpressionP4Parser::e153, "recipe:OnlyIfAbsent", null, "construct", K6, K7, false, K4, false, K28);

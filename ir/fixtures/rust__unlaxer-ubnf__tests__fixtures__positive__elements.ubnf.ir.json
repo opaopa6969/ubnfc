@@ -1220,18 +1220,24 @@
     "memo": {
       "entries": [
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:97:body/0/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:97:body/0/group"
@@ -1245,7 +1251,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:87:96:body/0/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:97:body/0/group",
@@ -1260,7 +1266,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:87:90:body/0/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:97:body/0/group",
@@ -1276,7 +1282,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:93:96:body/0/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:97:body/0/group",
@@ -1292,7 +1298,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:101:108:body/1/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:101:108:body/1/optional"
@@ -1306,7 +1312,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:103:106:body/1/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:101:108:body/1/optional",
@@ -1321,7 +1327,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:112:119:body/2/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:112:119:body/2/repeat"
@@ -1335,7 +1341,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:114:117:body/2/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:112:119:body/2/repeat",
@@ -1350,7 +1356,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:114:117:body/2/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:112:119:body/2/repeat",
@@ -1366,7 +1372,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:127:132:body/3/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:127:132:body/3/repeat"
@@ -1380,7 +1386,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:127:131:body/3/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:127:132:body/3/repeat",
@@ -1395,7 +1401,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:136:141:body/4/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:136:141:body/4/repeat"
@@ -1409,7 +1415,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:136:140:body/4/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:136:141:body/4/repeat",
@@ -1424,7 +1430,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:145:150:body/5/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:145:150:body/5/repeat"
@@ -1438,7 +1444,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:145:149:body/5/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:145:150:body/5/repeat",
@@ -1453,7 +1459,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:154:161:body/6/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:154:161:body/6/repeat"
@@ -1467,7 +1473,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:154:158:body/6/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:154:161:body/6/repeat",
@@ -1482,7 +1488,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:165:174:body/7/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:165:174:body/7/repeat"
@@ -1496,7 +1502,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:165:169:body/7/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:165:174:body/7/repeat",
@@ -1511,7 +1517,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:182:190:body/8/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:182:190:body/8/repeat"
@@ -1525,7 +1531,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:182:186:body/8/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:182:190:body/8/repeat",
@@ -1540,7 +1546,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/0",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/0"
@@ -1561,7 +1567,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/1",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/0",
@@ -1576,7 +1582,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/2",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/0",
@@ -1592,7 +1598,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:201:204:body/9/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/0",
@@ -1609,7 +1615,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:219:223:body/10/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:219:223:body/10/ruleRef"
@@ -1623,7 +1629,7 @@
           "cacheSuccess": false,
           "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:231:253:body/11/error",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:253:body/seq",
               "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:231:253:body/11/error"
