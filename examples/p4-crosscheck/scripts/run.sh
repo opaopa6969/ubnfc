@@ -22,7 +22,7 @@ cp "$examples/p4-rust"/tests/golden/*.json "$out/r1/" 2>/dev/null || true
 
 # J1: ubnfc Java backend。
 (cd "$examples/p4-java" && mvn -o -q -DskipTests package >/dev/null)
-java -cp "$examples/p4-java/target/classes" org.ubnfc.p4.FixtureProbe "$fixtures" "$out/j1" \
+java -cp "$examples/p4-java/target/classes" org.unlaxer.ubnfc.examples.p4.FixtureProbe "$fixtures" "$out/j1" \
   > "$out/j1-acceptance.tsv"
 
 # R2: tinyexpression-rs の parse CLI。

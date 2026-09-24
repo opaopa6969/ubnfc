@@ -1,6 +1,7 @@
 use crate::{
-    ast::{field_type, ident, nullable, text_type},
+    ast::{nullable, text_type},
     emit::Generator,
+    tree::{enum_variants, kind_const, Repr},
     validate::unsupported,
     EmitError,
 };
@@ -85,6 +86,33 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             .collect::<Vec<_>>()
     )
     .unwrap();
+    // D-077: 規則が作る record の slot 数（木の slot の見積りに使う。record を作らない規則は 0）。
+    writeln!(
+        s,
+        "const RULE_SLOTS:&[u32]=&{:?};",
+        g.ir.semantics
+            .rules
+            .iter()
+            .map(|r| {
+                let recipe =
+                    g.ir.semantics
+                        .recipes
+                        .iter()
+                        .find(|recipe| recipe.rule_id == r.symbol_id);
+                let ty = recipe
+                    .and_then(|recipe| recipe.result_type_id.as_deref())
+                    .and_then(|id| g.ir.semantics.ast_types.iter().find(|t| t.id() == id));
+                match ty {
+                    Some(AstType::Record { fields, .. }) if !r.skip => fields
+                        .iter()
+                        .map(|f| Repr::of(f).slots() as u32)
+                        .sum::<u32>(),
+                    _ => 0,
+                }
+            })
+            .collect::<Vec<_>>()
+    )
+    .unwrap();
     writeln!(
         s,
         "const SITES:&[(&str,&str)]=&{:?};",
@@ -95,16 +123,16 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             .collect::<Vec<_>>()
     )
     .unwrap();
-    s.push_str("impl<const DIAG: bool> Session<'_, DIAG> {\nfn build_values(&mut self,root:EventId)->Result<Vec<Ast>,String> {let mut out=Vec::new();self.build_values_into(root,&mut out)?;Ok(out)}\n#[inline(never)] fn build_values_into(&mut self,root:EventId,out:&mut Vec<Ast>)->Result<(),String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err(\"maximum mapping depth exceeded\".into());}self.mapping_depth+=1;let result=self.build_values_inner(root,out);self.mapping_depth-=1;result}\nfn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<Ast>)->Result<(),String> {
+    s.push_str("impl<const DIAG: bool> Session<'_, DIAG> {\nfn build_values(&mut self,root:EventId)->Result<Vec<u32>,String> {let mut out=Vec::new();self.build_values_into(root,&mut out)?;Ok(out)}\n#[inline(never)] fn build_values_into(&mut self,root:EventId,out:&mut Vec<u32>)->Result<(),String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err(\"maximum mapping depth exceeded\".into());}self.mapping_depth+=1;let result=self.build_values_inner(root,out);self.mapping_depth-=1;result}\nfn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<u32>)->Result<(),String> {
 // 大半の呼出しは Join を含まない 1 本の枝（P4 実測: complex-x64 で 10,883 回すべてが 1 event）。
 // その場合は pool から stack を借りずに降りる。
-loop {match self.arena[root.0] {
+loop {match self.ev(root) {
 Event::Capture{child,..}=>root=child,
-Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}return Ok(());},
+Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}return Ok(());},
 Event::Rule{rule,span,child,caps}=>return self.build_rule(rule,caps,span,child,out),
 Event::Join(..)=>break,
 _=>return Ok(()),}}
-let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}\nfn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);match ty {\n");
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.ev(id) {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}\nfn leaf(&mut self,ty:usize,span:Span,text:u32)->Result<u32,String> {let span=self.span(span);self.tree.set_extent(text,span);match ty {\n");
     let mut leaves = std::collections::BTreeSet::new();
     for recipe in &g.ir.semantics.recipes {
         if let Some(leaf) = &recipe.leaf_fallback {
@@ -115,12 +143,13 @@ let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=
                     .position(|t| t.id() == leaf.type_id)
                     .unwrap();
             if leaves.insert(index) {
-                let name = match &g.ir.semantics.ast_types[index] {
-                    AstType::Record { name, fields, .. }
+                let ty = &g.ir.semantics.ast_types[index];
+                let fields = match ty {
+                    AstType::Record { fields, .. }
                         if fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>()
                             == ["left", "op", "right"] =>
                     {
-                        name
+                        fields
                     }
                     _ => {
                         return Err(unsupported(
@@ -129,17 +158,27 @@ let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=
                         ))
                     }
                 };
-                let ty = ident(&leaf.type_id);
+                // 所有形では `left: None, op: vec![text], right: vec![]`。
+                let reprs = fields.iter().map(Repr::of).collect::<Vec<_>>();
+                if !matches!(reprs[0], Repr::OptNode | Repr::OptText)
+                    || !matches!(reprs[1], Repr::TextList | Repr::NodeList)
+                    || !matches!(reprs[2], Repr::TextList | Repr::NodeList)
+                {
+                    return Err(unsupported(
+                        "deferredMapping.leafFallback",
+                        "requires optional left and list op/right",
+                    ));
+                }
                 let rule = g.rules[recipe.rule_id.as_str()];
-                writeln!(s,"{index}=>{{let node_id=self.node(RULES[{rule}],{name:?},span);Ok(Ast::{ty}({ty}{{span,node_id,{}:None,{}:vec![text],{}:vec![]}}))}},",ident("left"),ident("op"),ident("right")).unwrap();
+                writeln!(s,"{index}=>{{let op=self.tree.list(&[text]);let right=self.tree.list(&[]);Ok(self.tree.record(tree::{},{rule},span,&[tree::NONE,op[0],op[1],right[0],right[1]]))}},",kind_const(ty)).unwrap();
             }
         }
     }
     if leaves.is_empty() {
         s = s.strip_suffix("match ty {\n").unwrap().to_owned();
-        s.push_str("let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}\nfn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);match rule {\n");
+        s.push_str("let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}\nfn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);match rule {\n");
     } else {
-        s.push_str("_=>{let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}}}\nfn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {let _=(caps,span,child,&out);match rule {\n");
+        s.push_str("_=>{let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}}}\nfn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);match rule {\n");
     }
     for i in 0..g.ir.semantics.rules.len() {
         writeln!(s, "{i}=>self.map_rule_{i}(caps,span,child,out),").unwrap();
@@ -153,11 +192,10 @@ let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=
             .trim_end()
             .strip_suffix(',')
             .unwrap();
-        writeln!(s,"fn map_rule_{i}(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<Ast>)->Result<(),String> {{let _=(caps,span,child,&out);{body}}}").unwrap();
+        writeln!(s,"fn map_rule_{i}(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {{let _=(caps,span,child,&out);{body}}}").unwrap();
     }
     s.push_str(include_str!("../templates/finish.rs"));
     s.push_str("}\n");
-    s.push_str(&value_spans(g));
     Ok(s)
 }
 
@@ -173,7 +211,7 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
         return Ok(s);
     }
     let Some(recipe) = recipe else {
-        writeln!(s,"{i}=>{{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {{let text=self.semantic_text(child,span);out.push(Ast::Text(text));}}Ok(())}},").unwrap();
+        writeln!(s,"{i}=>{{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {{let text=self.semantic_text(child,span);out.push(text);}}Ok(())}},").unwrap();
         return Ok(s);
     };
     if recipe.kind == RecipeKind::Transparent {
@@ -181,7 +219,7 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
         return Ok(s);
     }
     if recipe.kind == RecipeKind::Text {
-        writeln!(s, "{i}=>if self.directly_recovered(child) {{Ok(())}} else {{let text=self.semantic_text(child,span);out.push(Ast::Text(text));Ok(())}},").unwrap();
+        writeln!(s, "{i}=>if self.directly_recovered(child) {{Ok(())}} else {{let text=self.semantic_text(child,span);out.push(text);Ok(())}},").unwrap();
         return Ok(s);
     }
     let Some(type_id) = &recipe.result_type_id else {
@@ -196,9 +234,8 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
             .iter()
             .find(|t| t.id() == type_id)
             .unwrap();
-    let ty_id = ident(type_id);
     match ty {
-        AstType::Record { fields, name, .. } => {
+        AstType::Record { fields, .. } => {
             if recipe.fields.len() != fields.len() {
                 return Err(EmitError::InvalidIr(format!(
                     "{}: recipe fields must match record fields",
@@ -231,17 +268,17 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
                     .iter()
                     .map(|id| g.sites[id.as_str()])
                     .collect::<Vec<_>>();
-                let fty = field_type(f);
+                let repr = Repr::of(f);
                 if text_type(&f.value_type) {
                     match f.cardinality {
                         Cardinality::Scalar => {
-                            writeln!(s,"let mut t{n}=self.take_texts();self.text_values(&caps,&{sites:?},&mut t{n});if t{n}.is_empty() && self.missing_field(&caps,&{sites:?}) {{return Ok(());}}if t{n}.len()!=1 {{return Err({:?}.into());}}let f{n}=t{n}.pop().unwrap();self.give_texts(t{n});",format!("{} requires one value",f.name)).unwrap();
+                            writeln!(s,"let mut t{n}=self.take_values();self.text_values(&caps,&{sites:?},&mut t{n});if t{n}.is_empty() && self.missing_field(&caps,&{sites:?}) {{return Ok(());}}if t{n}.len()!=1 {{return Err({:?}.into());}}let f{n}=t{n}.pop().unwrap();self.give_values(t{n});",format!("{} requires one value",f.name)).unwrap();
                         }
                         Cardinality::Optional => {
-                            writeln!(s,"let mut t{n}=self.take_texts();self.text_values(&caps,&{sites:?},&mut t{n});if t{n}.len()>1 {{return Err({:?}.into());}}let f{n}=t{n}.pop();self.give_texts(t{n});",format!("{} requires at most one value", f.name)).unwrap();
+                            writeln!(s,"let mut t{n}=self.take_values();self.text_values(&caps,&{sites:?},&mut t{n});if t{n}.len()>1 {{return Err({:?}.into());}}let f{n}=t{n}.pop();self.give_values(t{n});",format!("{} requires at most one value", f.name)).unwrap();
                         }
                         _ => {
-                            writeln!(s, "let mut f{n}=Vec::new();self.text_values(&caps,&{sites:?},&mut f{n});").unwrap();
+                            writeln!(s, "let mut f{n}=self.take_values();self.text_values(&caps,&{sites:?},&mut f{n});").unwrap();
                         }
                     }
                 } else {
@@ -252,9 +289,9 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
                             .position(|t| t.id() == l.type_id)
                             .unwrap()
                     });
-                    // List は node へ移すので新しい Vec、scalar / optional は pool の作業 Vec。
+                    // 作業 Vec はどれも pool から借りる（list は木の slot へ写してから返す）。
                     let (var, alloc) = if f.cardinality == Cardinality::List {
-                        (format!("f{n}"), format!("let mut f{n}=Vec::new();"))
+                        (format!("f{n}"), format!("let mut f{n}=self.take_values();"))
                     } else {
                         (format!("v{n}"), format!("let mut v{n}=self.take_values();"))
                     };
@@ -278,16 +315,21 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
                     match f.cardinality {
                         Cardinality::List => {}
                         Cardinality::Optional => {
-                            writeln!(s,"if {var}.len()>1 {{return Err({:?}.into());}}let f{n}={var}.pop().map(Box::new);self.give_values({var});",format!("{} requires at most one node",f.name)).unwrap();
+                            writeln!(s,"if {var}.len()>1 {{return Err({:?}.into());}}let f{n}={var}.pop();self.give_values({var});",format!("{} requires at most one node",f.name)).unwrap();
                         }
                         Cardinality::Scalar if nullable(&f.value_type) => {
-                            writeln!(s,"if {var}.len()>1 {{return Err({:?}.into());}}let f{n}={var}.pop().map(Box::new);self.give_values({var});",format!("{} requires at most one node",f.name)).unwrap();
+                            writeln!(s,"if {var}.len()>1 {{return Err({:?}.into());}}let f{n}={var}.pop();self.give_values({var});",format!("{} requires at most one node",f.name)).unwrap();
                         }
                         _ => {
-                            writeln!(s,"if {var}.is_empty() && self.missing_field(&caps,&{sites:?}) {{return Ok(());}}if {var}.len()!=1 {{return Err({:?}.into());}}let f{n}=Box::new({var}.pop().unwrap());self.give_values({var});",format!("{} requires one node",f.name)).unwrap();
+                            writeln!(s,"if {var}.is_empty() && self.missing_field(&caps,&{sites:?}) {{return Ok(());}}if {var}.len()!=1 {{return Err({:?}.into());}}let f{n}={var}.pop().unwrap();self.give_values({var});",format!("{} requires one node",f.name)).unwrap();
                         }
                     }
                 }
+                let fty = match repr {
+                    Repr::Text | Repr::Node => "u32",
+                    Repr::OptText | Repr::OptNode => "Option<u32>",
+                    Repr::TextList | Repr::NodeList => "Vec<u32>",
+                };
                 writeln!(s, "let f{n}:{fty}=f{n};").unwrap();
             }
             for constraint in &g.ir.semantics.typeof_constraints {
@@ -307,14 +349,16 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
                         "Some((\"list\",\"list\"))".into()
                     } else if f.cardinality == Cardinality::Optional || nullable(&f.value_type) {
                         if text_type(&f.value_type) {
-                            format!("f{n}.as_ref().map(|_|(\"text\",\"text\"))")
+                            format!("f{n}.map(|_|(\"text\",\"text\"))")
                         } else {
-                            format!("f{n}.as_ref().map(|v|(v.type_id(),v.type_name()))")
+                            format!(
+                                "f{n}.map(|v|(self.tree.type_id_of(v),self.tree.type_name_of(v)))"
+                            )
                         }
                     } else if text_type(&f.value_type) {
                         "Some((\"text\",\"text\"))".into()
                     } else {
-                        format!("Some((f{n}.type_id(),f{n}.type_name()))")
+                        format!("Some((self.tree.type_id_of(f{n}),self.tree.type_name_of(f{n})))")
                     })
                 };
                 let left = key(&reference.name)?;
@@ -324,25 +368,42 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
                 // runtime 内部で作る他の mapping 失敗には付けない。
                 writeln!(s,"if let (Some(expected),Some(actual))=({left},{right}) {{if expected.0!=actual.0 {{let (expected,actual)=(expected.1,actual.1);return Err(format!({:?}));}}}}",format!("java.lang.IllegalArgumentException: @typeof constraint violated: {} must be same type as {}, expected {{expected}} but got {{actual}}",own.name,reference.name)).unwrap();
             }
-            writeln!(s,"self.give_captures(caps);let span=self.span(span);let node_id=self.node(RULES[{i}],{name:?},span);out.push(Ast::{ty_id}({ty_id}{{span,node_id,").unwrap();
+            s.push_str("self.give_captures(caps);let span=self.span(span);");
+            let mut slots = Vec::new();
             for (n, f) in fields.iter().enumerate() {
-                writeln!(s, "{}:f{n},", ident(&f.name)).unwrap();
+                match Repr::of(f) {
+                    Repr::Text | Repr::Node => slots.push(format!("f{n}")),
+                    Repr::OptText | Repr::OptNode => {
+                        slots.push(format!("f{n}.unwrap_or(tree::NONE)"))
+                    }
+                    Repr::TextList | Repr::NodeList => {
+                        write!(s, "let l{n}=self.tree.list(&f{n});self.give_values(f{n});")
+                            .unwrap();
+                        slots.push(format!("l{n}[0]"));
+                        slots.push(format!("l{n}[1]"));
+                    }
+                }
             }
-            s.push_str("}));Ok(())},\n");
+            writeln!(
+                s,
+                "let node=self.tree.record(tree::{},{i},span,&[{}]);out.push(node);Ok(())}},",
+                kind_const(ty),
+                slots.join(",")
+            )
+            .unwrap();
         }
-        AstType::Enum { variants, name, .. } => {
-            writeln!(s, "{i}=>{{let value=match self.text(span).as_str() {{").unwrap();
+        AstType::Enum { variants, .. } => {
+            writeln!(s, "{i}=>{{let value:u32=match self.trimmed(span) {{").unwrap();
+            let order = enum_variants(variants);
             let mut seen = std::collections::BTreeSet::new();
             for variant in variants.iter().filter(|v| seen.insert(&v.literal)) {
-                writeln!(
-                    s,
-                    "{:?}=>{ty_id}Value::{},",
-                    variant.literal,
-                    ident(&variant.rust_name)
-                )
-                .unwrap();
+                let index = order
+                    .iter()
+                    .position(|v| v.rust_name == variant.rust_name)
+                    .unwrap();
+                writeln!(s, "{:?}=>{index},", variant.literal).unwrap();
             }
-            writeln!(s,"_=>return Err(\"enum literal mismatch\".into()),}};let span=self.span(span);let node_id=self.node(RULES[{i}],{name:?},span);out.push(Ast::{ty_id}({ty_id}{{span,node_id,value}}));Ok(())}},").unwrap();
+            writeln!(s,"_=>return Err(\"enum literal mismatch\".into()),}};let span=self.span(span);let node=self.tree.enumeration(tree::{},{i},span,value);out.push(node);Ok(())}},",kind_const(ty)).unwrap();
         }
         AstType::TransparentUnion { .. } => {
             return Err(unsupported("deferredMapping.constructUnion", type_id))
@@ -366,11 +427,11 @@ fn accepts(g: &Generator<'_>, ty: &ValueType, value: &str) -> String {
                 continue;
             }
             Pending::Value(ValueType::Text {} | ValueType::Number { .. }) => {
-                clauses.insert(format!("matches!({value},Ast::Text(_))"));
+                clauses.insert("tree::KIND_TEXT".to_owned());
                 continue;
             }
             Pending::Value(ValueType::Null {}) => {
-                clauses.insert(format!("matches!({value},Ast::Null)"));
+                clauses.insert("tree::KIND_NULL".to_owned());
                 continue;
             }
             Pending::Value(ValueType::Node { type_id }) => type_id.as_str(),
@@ -389,42 +450,17 @@ fn accepts(g: &Generator<'_>, ty: &ValueType, value: &str) -> String {
         if let AstType::TransparentUnion { variants, .. } = ty {
             pending.extend(variants.iter().map(|s| Pending::Node(s)));
         } else {
-            clauses.insert(format!("matches!({value},Ast::{}(_))", ident(id)));
+            clauses.insert(format!("tree::{}", kind_const(ty)));
         }
     }
     if clauses.is_empty() {
         "false".into()
     } else {
-        clauses.into_iter().collect::<Vec<_>>().join(" || ")
+        let kinds = clauses
+            .into_iter()
+            .map(|k| format!("k=={k}"))
+            .collect::<Vec<_>>()
+            .join(" || ");
+        format!("{{let k=self.tree.kind(*{value});{kinds}}}")
     }
-}
-
-fn value_spans(g: &Generator<'_>) -> String {
-    let mut s = include_str!("../templates/value_spans.rs").to_owned();
-    s.push_str("impl CollectValueSpans for Ast { fn collect(&self,path:&mut String,texts:&TextSpans,out:&mut Vec<ValueSpan>) { match self { Self::Text(text)=>{if let Some(span)=texts.get(&(text.as_ptr() as usize)) {out.push(ValueSpan{path:path.clone(),span:*span,text:Some(text.clone())});}},Self::Null=>{},\n");
-    for ty in &g.ir.semantics.ast_types {
-        if matches!(ty, AstType::TransparentUnion { .. }) {
-            continue;
-        }
-        let id = ident(ty.id());
-        writeln!(
-            s,
-            "Self::{id}(node)=>{{out.push(ValueSpan{{path:path.clone(),span:node.span,text:None}});"
-        )
-        .unwrap();
-        if let AstType::Record { fields, .. } = ty {
-            for f in fields {
-                let field = f.name.replace('~', "~0").replace('/', "~1");
-                writeln!(
-                    s,
-                    "{{let len=path.len();path.push_str(\"/fields/{field}\");node.{}.collect(path,texts,out);path.truncate(len);}}",
-                    ident(&f.name)
-                )
-                .unwrap();
-            }
-        }
-        s.push_str("},\n");
-    }
-    s.push_str("}}}\n");
-    s
 }

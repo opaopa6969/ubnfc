@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.ubnfc</groupId>
+  <groupId>org.unlaxer</groupId>
   <artifactId>ubnfc-p4-java-facade</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <name>ubnfc-p4-java-facade</name>
@@ -79,11 +79,11 @@
           <!-- p4-java の計測・比較用の任意ツールは取り込まない。
                生成パーサ本体と、その extern scanner（P4Scanners）だけを共有する。 -->
           <excludes>
-            <exclude>org/ubnfc/p4/Benchmark.java</exclude>
-            <exclude>org/ubnfc/p4/DepthProbe.java</exclude>
-            <exclude>org/ubnfc/p4/FixtureProbe.java</exclude>
-            <exclude>org/ubnfc/p4/LegacyBenchmark.java</exclude>
-            <exclude>org/ubnfc/p4/LegacyProbe.java</exclude>
+            <exclude>org/unlaxer/ubnfc/examples/p4/Benchmark.java</exclude>
+            <exclude>org/unlaxer/ubnfc/examples/p4/DepthProbe.java</exclude>
+            <exclude>org/unlaxer/ubnfc/examples/p4/FixtureProbe.java</exclude>
+            <exclude>org/unlaxer/ubnfc/examples/p4/LegacyBenchmark.java</exclude>
+            <exclude>org/unlaxer/ubnfc/examples/p4/LegacyProbe.java</exclude>
           </excludes>
         </configuration>
       </plugin>

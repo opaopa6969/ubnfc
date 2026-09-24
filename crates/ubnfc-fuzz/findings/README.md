@@ -35,7 +35,7 @@ campaign が出した 92 クラスのうち、**A-2（入れ子ノード span �
 | A-1 `@recovery(AUTO)` の適用（受理そのものが変わる） | `diff-accepted-02147df8-seed269`、`diff-allconsumed-f9a21922-seed269`、`diff-consumed-ce9f4647-seed269`、`diff-matched-5923f95f-seed269`、`diff-parsedstatus-f5944912-seed269`、`diff-captures-span-94600c41-seed269`、`diff-captures-text-004b783b-seed269`、`diff-prefixcaptures-887bb90f-seed269`、`diff-prefixcaptures-span-039546d5-seed269`、`diff-prefixcaptures-text-445a73b7-seed269`、`diff-captures-name-4bfa2e37-seed272`、`diff-prefixcaptures-binding-80d2f5e1-seed272`、`diff-prefixcaptures-name-8f46bda3-seed272` |
 | D front が自分の契約に落ちる | `front-ir-recipe-cardinality`、`front-capture-cardinality-bounded`（seed 1..320 の front discard は 28 → 0） |
 | 回復の観測（issue #41 / D-069、`docs/reports/2026-09-24-fuzz-recovery-observations.md`） | `diff-diagnostics-expected-438fbb32-seed100276`、`diff-recoveries-captureoccurrences-cbee9ef9-seed100276`、`diff-diagnostics-farthestexpected-d88564a1-seed100276` |
-| mixed な選択の text 候補を Rust が意味値にしない（issue #78 / D-076、`docs/reports/2026-09-24-nested-capture-78.md`） | `diff-ast-fields-tail-bf11b609-seed1000002` |
+| mixed な選択の text 候補を Rust が意味値にしない（issue #78 / D-078、`docs/reports/2026-09-24-nested-capture-78.md`） | `diff-ast-fields-tail-bf11b609-seed1000002` |
 | C-1 / B-1 / A-5 / A-8 / A-9 観測契約の一本化（D-024 〜 D-029、`docs/reports/2026-09-23-observation-contract.md`） | `diff-catalogs-dd4854a9-seed1`、`diff-diagnostics-988b1c0e-seed1`、`diff-recoveries-7906c206-seed1`、`diff-scope-declarations-67b97a59-seed1`、`diff-scope-depth-2be9dc99-seed1`、`diff-scope-diagnostics-463a9328-seed1`、`diff-scope-references-3daa5d3e-seed1`、`diff-mappingerror-present-1278776d-seed1`、`diff-value-1e979fc2-seed1` |
 
 seed 1 を元の recipe（`--seeds 1 --inputs 24 --shrink-builds 10`）で回すと、残るのは

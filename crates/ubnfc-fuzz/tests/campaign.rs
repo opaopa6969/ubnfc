@@ -415,7 +415,7 @@ fn b_recovery_auto_keeps_acceptance_identical_across_backends() {
 /// `diff:/ast/fields/direct/fields/dn` と `.../dl/*` を出した（縮小入力 `iあ0:1''`、
 /// `tests/direct_token_capture.rs`）。seed 1000002 は乱択部分に別の差
 /// （`diff:/ast/fields/tail/*`、issue #78: mixed な選択の text 候補を Rust が意味値にしない）を
-/// 持っていた。D-076 で Rust を直したので固定帯へ戻した（`tests/mixed_choice_text_value.rs`）。
+/// 持っていた。D-078 で Rust を直したので固定帯へ戻した（`tests/mixed_choice_text_value.rs`）。
 #[test]
 fn g_direct_token_captures_agree_across_backends() {
     ubnfc_fuzz::tune_generated_builds();

@@ -62,7 +62,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         ExprNode::Literal { .. } | ExprNode::TokenRef { .. } | ExprNode::Any {}
     ) {
         let rule = g.rules[expr.rule_id.as_str()];
-        writeln!(s, "if let Event::Token{{span,text_span,content_span,..}}=self.arena[out.events.0] {{out.events=self.event(Event::Token{{expr:{i},rule:{rule},span,text_span,content_span}});}}").unwrap();
+        writeln!(s, "out.events=self.relabel_token(out.events,{i},{rule});").unwrap();
     }
     if matches!(
         expr.node,
@@ -639,10 +639,10 @@ pub(crate) fn capture_events(g: &Generator<'_>, expr: &Expr, state: &str, out: &
         .replace("[state.", &format!("[{state}."))
 }
 
-/// D-076: 意味値を持たない選択候補が採用されたときの値。一致範囲の字句 1 つ（空の一致でも）。
+/// D-078: 意味値を持たない選択候補が採用されたときの値。一致範囲の字句 1 つ（空の一致でも）。
 pub(crate) const TEXT_ALTERNATIVE_VALUES: &str = "out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});\n";
 
-/// D-076: 意味値を持つ選択の、意味値を持たない候補の index。旧実装は mixed な選択の
+/// D-078: 意味値を持つ選択の、意味値を持たない候補の index。旧実装は mixed な選択の
 /// text だけの候補に `#semantic:text` を束縛し、その字句を意味値にした
 /// （`CaptureBindingPlan.markSemanticValues`）。Rust の `semantic_shape` は text を数えないので、
 /// ここで補う。Java は `JavaEmitter.textAlternatives`（同じ規則）。

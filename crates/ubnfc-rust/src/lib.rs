@@ -12,6 +12,7 @@ mod metadata;
 mod predict;
 mod scan;
 mod tokens;
+mod tree;
 mod validate;
 
 use std::{collections::BTreeMap, fmt, path::Path};

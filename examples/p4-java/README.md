@@ -26,7 +26,7 @@ fixture は tinyexpression の指定ディレクトリから byte を変更せ�
 出典と SHA-256 は `evidence/provenance.json`。テストは外部の tinyexpression を必要としない。
 `target/` は commit しない。
 
-生成 Java は `src/main/java/org/ubnfc/p4/generated/` に commit する。
+生成 Java は `src/main/java/org/unlaxer/ubnfc/examples/p4/generated/` に commit する。
 再生成は次のスクリプトで行い、テストでも全ファイルの byte 一致を確認する。
 
 ```bash

@@ -62,7 +62,7 @@ cp "$ubnfc/ir/fixtures/unlaxer-dsl__src__test__resources__right-associative__Pow
 for name in json operators power; do
   "$ubnfc/target/release/ubnfc-rust" --ir "$work/ubnfc/ir/$name.ir.json" --out "$work/ubnfc/rust/$name" --no-emit-driver
   sed -i "s/^name = \"ubnfc-generated\"/name = \"gen-$name\"/" "$work/ubnfc/rust/$name/Cargo.toml"
-  java -cp "$jar" org.ubnfc.java.Main --ir "$work/ubnfc/ir/$name.ir.json" \
+  java -cp "$jar" org.unlaxer.ubnfc.java.Main --ir "$work/ubnfc/ir/$name.ir.json" \
     --out "$work/ubnfc/java/src" --package "gen.$name" --no-emit-driver
 done
 javac -nowarn -d "$work/ubnfc/java/classes" $(find "$work/ubnfc/java/src" -name '*.java')

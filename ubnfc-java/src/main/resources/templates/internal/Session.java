@@ -712,7 +712,7 @@ public final class Session {
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
     }
     /**
-     * D-076: 意味値を持つ選択の text だけの候補。values を plain text（null）に戻し、選択の射影が
+     * D-078: 意味値を持つ選択の text だけの候補。values を plain text（null）に戻し、選択の射影が
      * 一致範囲の字句 1 つを値にする。内側の空反復の「値なし」（空の values）で字句を消さない。
      */
     public Match textAlternative(Match result) {

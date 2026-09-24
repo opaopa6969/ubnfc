@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import org.ubnfc.p4.P4Scanners;
-import org.ubnfc.p4.generated.TinyExpressionP4Parser;
-import org.ubnfc.p4.generated.api.ParseOptions;
-import org.ubnfc.p4.generated.api.ParseResult;
+import org.unlaxer.ubnfc.examples.p4.P4Scanners;
+import org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4Parser;
+import org.unlaxer.ubnfc.examples.p4.generated.api.ParseOptions;
+import org.unlaxer.ubnfc.examples.p4.generated.api.ParseResult;
 import org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4AST;
 import org.unlaxer.tinyexpression.p4.P4SourceText;
 import org.unlaxer.tinyexpression.parser.ExpressionType;
@@ -233,14 +233,14 @@ public final class UbnfcP4Parse {
      */
     private static ParsedRoot parseRootToken(String parserSource, long deadlineNanos) {
         checkDeadline(deadlineNanos);
-        ParseResult<org.ubnfc.p4.generated.TinyExpressionP4AST> primary =
+        ParseResult<org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4AST> primary =
             parseEntry("Formula", parserSource);
         if (fullyConsumed(primary, parserSource)) {
             return toParsedRoot(primary, parserSource);
         }
         for (String alternate : List.of("BooleanExpression", "StringExpression", "ObjectExpression")) {
             checkDeadline(deadlineNanos);
-            ParseResult<org.ubnfc.p4.generated.TinyExpressionP4AST> result =
+            ParseResult<org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4AST> result =
                 parseEntry(alternate, parserSource);
             if (fullyConsumed(result, parserSource)) {
                 return toParsedRoot(result, parserSource);
@@ -259,20 +259,20 @@ public final class UbnfcP4Parse {
      * 全消費を要求しない形で解析する。旧実装は「成功したが消費が足りない」と「失敗」を
      * 区別してメッセージを変えるので、こちらもその区別が要る。
      */
-    private static ParseResult<org.ubnfc.p4.generated.TinyExpressionP4AST> parseEntry(
+    private static ParseResult<org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4AST> parseEntry(
             String entry, String parserSource) {
         ParseOptions options = new ParseOptions(true, false, false, true, P4Scanners.ALL);
         return TinyExpressionP4Parser.parseEntry("TinyExpressionP4", entry, parserSource, options);
     }
 
     private static boolean fullyConsumed(
-            ParseResult<org.ubnfc.p4.generated.TinyExpressionP4AST> result, String source) {
+            ParseResult<org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4AST> result, String source) {
         return result.ok() && result.ast().isPresent()
             && result.consumedCp() == source.codePointCount(0, source.length());
     }
 
     private static ParsedRoot toParsedRoot(
-            ParseResult<org.ubnfc.p4.generated.TinyExpressionP4AST> result, String parserSource) {
+            ParseResult<org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4AST> result, String parserSource) {
         UbnfcAstConverter converter = new UbnfcAstConverter(result.nodeSpans());
         TinyExpressionP4AST root = converter.convert(result.ast().orElseThrow());
         Map<Object, int[]> spans = converter.spans();
@@ -395,7 +395,7 @@ public final class UbnfcP4Parse {
             }
         };
         checkDeadline(deadlineNanos);
-        ParseResult<org.ubnfc.p4.generated.TinyExpressionP4AST> reparsed =
+        ParseResult<org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4AST> reparsed =
             parseEntry(entry, parserSource);
         if (!fullyConsumed(reparsed, parserSource)) {
             if (currentMatchFamily != null) throw matchTypeMismatch(source);

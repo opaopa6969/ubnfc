@@ -1,7 +1,7 @@
 # tinyexpression P4PreferredAstMapper の互換 facade
 
 tinyexpression の `org.unlaxer.tinyexpression.p4.P4PreferredAstMapper` と**同じ公開面**を持ち、
-中身を ubnfc 生成パーサ（`examples/p4-java` の `org.ubnfc.p4.generated`）に差し替えたもの。
+中身を ubnfc 生成パーサ（`examples/p4-java` の `org.unlaxer.ubnfc.examples.p4.generated`）に差し替えたもの。
 tinyexpression と `examples/p4-java` のソースは変更していない。
 
 - 本体: `src/main/java/org/unlaxer/tinyexpression/p4/ubnfc/UbnfcP4PreferredAstMapper.java`

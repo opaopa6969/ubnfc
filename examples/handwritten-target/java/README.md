@@ -1,7 +1,7 @@
 # 手書き Java 生成物ターゲット
 
 UBNF バックエンドが出力するコードの目標形を、Operators / Power の2文法で固定する。
-Java 21、独立 Maven モジュール `org.ubnfc:ubnfc-target-java:0.1.0-SNAPSHOT`。
+Java 21、独立 Maven モジュール `org.unlaxer:ubnfc-target-java:0.1.0-SNAPSHOT`。
 本体は JDK のみ、依存宣言は test scope の JUnit Jupiter 5.10.2 のみ。
 `jdeps -recursive -s target/classes` でも依存先が `java.base` のみであることを確認した。
 旧 parser のコードを実装へ転用せず、文法・仕様・テストを挙動の参照に使った。

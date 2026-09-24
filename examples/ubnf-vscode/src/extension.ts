@@ -36,7 +36,7 @@ class GrammarDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory
       ...jvmArgs,
       '-cp',
       jarPath(this.context),
-      'org.ubnfc.ubnf.lsp.dap.DapMain'
+      'org.unlaxer.ubnfc.examples.ubnf.lsp.dap.DapMain'
     ]);
   }
 }

@@ -176,7 +176,7 @@ fn generate_backend(target: &str, ir: &Path, out: &Path) -> Result<i32, String> 
         command
             .arg("-cp")
             .arg(&generator)
-            .arg("org.ubnfc.java.Main");
+            .arg("org.unlaxer.ubnfc.java.Main");
         command
     };
     command.arg("--ir").arg(ir).arg("--out");

@@ -37,6 +37,9 @@ cargo build --offline --bin ubnfc --bin ubnfc-rust
 
 `ubnfc-java/target/ubnfc-java-0.1.0-SNAPSHOT.jar` ができる。`ubnfc gen --target java` は
 これを自動で探す（`UBNFC_JAVA_JAR` で明示指定も可能）。
+`ubnfc gen --target java` は生成 Java を package `target` に置く。jar を直接
+`java -cp … org.unlaxer.ubnfc.java.Main --ir … --out … [--package x.y]` で呼ぶ場合、`--package` を省くと
+文法の package、それも無ければ `org.unlaxer.ubnfc.generated.<文法名小文字>` になる（D-076）。
 
 > **`ubnfc-java/` を編集したら必ずこの `mvn package` をやり直すこと。**
 > driver テンプレートと emitter は jar の resource なので、古い jar のまま走らせると
@@ -246,6 +249,29 @@ printf '\n[[bin]]\nname = "demo"\npath = "src/bin/demo.rs"\n' >> "$WORK/rust-out
 
 `canonical_value()` は `json` feature で生える。`{type, span, fields}` の正規形で、
 Java 側と byte 単位で比較できる形。
+
+AST は内部では arena（`ast::tree::AstTree`）に作り、`result.ast` の所有 `Ast` はそこから写した
+ものである（決定 D-077）。大きな入力で所有 `Ast` の `Box` / `String` / `Vec` の確保を避けたい
+ときは、`ParseOptions { build_ast: false, ast_tree: true, .. }` で木そのものを受け取る。
+文字列は入力の部分文字列として借り、field は同名のメソッドで読む（`result.ast` と同じ形）:
+
+```rust
+use ubnfc_generated::ast::tree::Node;
+let options = ParseOptions { build_ast: false, ast_tree: true, ..Default::default() };
+let result = parse_with_options(&source, options);
+if let Some(tree) = &result.tree {
+    if let Some(Node::g_TinyLetAST_2e_Program(program)) = tree.root().map(|r| r.get()) {
+        for binding in program.g_bindings().iter() {
+            println!("{:?} {:?}", binding.type_name(), binding.span());
+        }
+    }
+    let _owned = tree.to_ast();          // 必要なら所有形へ写してもよい
+    let _spans = tree.node_spans();      // `result.node_spans` と同じ表
+}
+```
+
+木だけを返す parse では `result.node_spans` は空で、`AstTree::node_spans()` が同じ表を作る。
+`canonical_json()` は木にもあり（`json` feature）、所有形と byte 一致する。
 
 ### 2.2 走らせる
 

@@ -138,7 +138,7 @@ bench_ubnfc_java() {  # <fixture> [entry]
   "${pin[@]}" java -Xms2g -Xmx2g -Xss16m -Dbench.warmup="${JAVA_WARMUP:-2000}" -Dbench.runs="$runs" \
     -Dbench.fixtures="$1" -Dbench.modes=recognize-fast,ast-fast \
     ${entry:+-Dbench.entry=$entry} \
-    -cp "$ubnfc/examples/p4-java/target/classes" org.ubnfc.p4.Benchmark "$fixtures" 2>/dev/null
+    -cp "$ubnfc/examples/p4-java/target/classes" org.unlaxer.ubnfc.examples.p4.Benchmark "$fixtures" 2>/dev/null
 }
 bench_antlr_1to1() {  # <fixture> [entry]
   local spec=$1; [[ -n ${2:-} ]] && spec="$1:$2"
