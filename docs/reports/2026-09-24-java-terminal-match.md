@@ -19,11 +19,16 @@ AST 経路（`tree=true`）は 1 byte も変えていない。
 | json-1m 認識 1 parse の `Match` 生成（全種） | 2,857,582 | **0** |
 | json-1m 認識 1 parse の割当 | 163,343,888 B | **3,319,296 B**（0.020 倍） |
 | json-1m 認識（最小値、同一 JVM 交互 session 2） | 50.52 ms / 0.0505 µs/byte | **39.48 ms / 0.0395 µs/byte** |
-| **json-1m の Java / Rust（同一走行・最小値）** | **1.49 倍**（#49） | **1.16 倍** |
+| **json-1m の Java / Rust（同一走行・最小値、Rust は #64 前）** | **1.49 倍**（#49） | **1.16 倍** |
+| json-1m の Java / Rust（同、Rust は #64 = D-072 bulk scan 後） | — | 2.90 倍 |
 | Operators 512 atom 認識（最小値） | 0.1012 ms | **0.0873 ms** |
 
-**issue の目標「JSON 1 MB で Rust の 1.2 倍以内」は達成した**（同一走行の最小値で
-ANTLR4 0.0104 / ubnfc Rust 0.0331 / **ubnfc Java 0.0385 µs/byte**。§2.3）。
+**issue の目標「JSON 1 MB で Rust の 1.2 倍以内」は、issue が基準にした Rust（#49 時点の 0.0348 µs/byte →
+上限 0.042）に対しては達成した**（同一走行の最小値で ANTLR4 0.0104 / ubnfc Rust 0.0331 /
+**ubnfc Java 0.0385 µs/byte**、master merge 後の最終 build でも Java 0.0397。§2.3）。
+**ただし作業中に PR #64（D-072、観測を要求しない終端領域を 1 本の走査へ畳む。Rust だけ）が入り、
+Rust は 0.0137 µs/byte へ下がったので、最新の Rust に対しては 2.9 倍**である。この差は
+Java に bulk scan が無いことによるもので、Java 版は #69 が持つ（§2.3.1）。
 割当の目標「Rust 並み（≤80 MB）」も達成で、実際には **Rust の arena 76.6 MB の 0.043 倍**、
 ANTLR4 の 27.1 MB の 0.12 倍になった。
 
@@ -182,6 +187,28 @@ D-066 の時点と変わらない。
 割当（同じ走行）: ANTLR4 27,067,376 B / ubnfc Rust 76,557,137 B（arena）/ **ubnfc Java 3,319,296 B**。
 **Java が 3 実装で最も少ない**。
 
+#### 2.3.1 master（#63 / #64 / #70）merge 後の最終 build
+
+同じ手順を最終 build（origin/master 103842e を merge）で 2 周取り直した。load 8〜15 だが
+core 28 に他の process が載っており、Java の 1 run 内の max/min が 2〜3 倍開く走行である。
+**round 2 の最小値**（round 1 は Java 1 MB が 0.195 µs/B と明らかに乱れたので読まない）:
+
+| 入力 | ANTLR4 | ubnfc Rust（D-072 入り） | **ubnfc Java** | Java / Rust |
+|---|---:|---:|---:|---:|
+| json-10k | 0.0138 | 0.0164 | **0.0459** | 2.80 |
+| json-100k | 0.0148 | 0.0169 | **0.0483** | 2.86 |
+| json-1m | 0.0451（乱れ） | 0.0137 | **0.0397** | 2.90 |
+
+**Java の値は merge 前と同じ帯**（1 MB 0.0385 → 0.0397）で、動いたのは Rust の側
+（0.0331 → 0.0137、#64 の報告どおり）。Java に残る 2.9 倍は、Rust が D-072 で
+「観測を要求しない終端領域（JSON の string / number / 空白）を式ごとに歩かず 1 本の走査で読む」
+ようになった差で、`Match` の割当ではない（本 PR 後の Java は `Match` を 1 個も作らない）。
+Java 版の bulk scan は #69。
+
+同じ最終 build の同一 JVM 交互 A/B（[`speed-json-55-java.csv`](../../examples/json/evidence/speed-json-55-java.csv)
+の `final-ab-*`）も向きは同じで、最小値の比は json-1m 0.736 / 0.746、json-100k 0.771 / 0.835、
+json-1k 0.729 / 0.829（json-10k は session 1 が 0.51 と乱れ、session 2 が 0.89）。
+
 ### 2.4 Operators / Power / P4
 
 **Operators・Power（同一 JVM 交互 A/B、11 run × 0.5 秒、`taskset -c 29`、load 20〜24）**
@@ -205,6 +232,12 @@ D-066 の時点と変わらない。
 | complex | ast-fast | 0.1838 / 0.1566 | 263,504 | 0.2027 / 0.1686、263,592 |
 | complex-x64 (20,923 B) | recognize-fast | 7.181 / 4.876 | 3,944,808 | 7.232 / 4.761、3,944,896 |
 | complex-x64 | ast-fast | 14.645 / 12.593 | 11,882,552 | 17.527 / 13.923、11,882,640 |
+
+最終 build（master merge 後、load 12〜15、core 28 に他 process）でも割当は complex 認識 136,216 B /
+x64 認識 3,944,920 B で同じ（時間は complex 認識 最小 0.123 ms と走行の雑音で遅く出た。
+`plain` は P4 では立たないので、差は機械の状態である）。Operators / Power の最終 build の A/B は
+認識の最小値比 0.915（operators）/ 0.729（power）、割当は 332,704 → 17,312 / 32,344 → 3,784 B
+（[`speed-match55.csv`](../../examples/p4-java/evidence/speed-match55.csv) の `final-ab`）。
 
 ---
 
@@ -244,12 +277,17 @@ bit mask に畳めるので、`Match` の次はここになる。
   **Java Pass 1,310 / Fail 0**。系統表は [`2026-09-24-java-corpus-d066-49.md`](2026-09-24-java-corpus-d066-49.md)
   と **byte 一致**（差分は先頭の generator / front の SHA-256 行だけ）。
   出力は [`2026-09-24-java-corpus-match55.md`](2026-09-24-java-corpus-match55.md) / `.json`。
-- **JSONTestSuite 318 件の判定が不変**: `benchmarks/scripts/check-jsontestsuite.sh` の
+- **JSONTestSuite 318 件の判定が不変**: merge 前の build では `benchmarks/scripts/check-jsontestsuite.sh` の
   `ubnfc-java` 列が committed の
   [`examples/json/evidence/jsontestsuite-verdicts.tsv`](../../examples/json/evidence/jsontestsuite-verdicts.tsv)
-  と 318 件すべて一致（y_ 95/95・n_ 188/188）。
+  と 318 件すべて一致（y_ 95/95・n_ 188/188）。最終 build では `i_structure_500_nested_arrays.json`
+  （実装依存）だけが reject → accept に変わるが、これは PR #63（#35、深い JSON の入れ子を受理する）の
+  意図した変化で、同じ最終 build で `-Dubnfc.plainmatch=true / false` を切り替えた 318 件の判定は
+  完全に一致する（本 PR 起因の差は 0）。
 - **IR golden 不変**: front も Rust backend も触っていない（`crates` / `ir` / `corpus` は
-  `origin/master` と byte 一致）。
+  merge した `origin/master` と byte 一致）。
+- 検証は origin/master 103842e（#63 / #64 / #70）を merge した最終 tree で全部取り直した
+  （corpus の系統表は #64 の [`2026-09-24-java-corpus-bulkscan.md`](2026-09-24-java-corpus-bulkscan.md) とも byte 一致）。
 - 差分ファジング: `cargo test -p ubnfc-fuzz --offline` の固定 seed campaign が緑。
 - `cargo test --workspace --offline --no-fail-fast` / `cargo clippy --workspace --all-targets -- -D warnings` /
   `cargo fmt --check` / `cd ubnfc-java && mvn -o -q test` / `cd examples/p4-java && mvn -o -q test` /
@@ -275,7 +313,7 @@ taskset -c 28 java -Xms2g -Xmx2g -Dubnfc.plainmatch=false -cp "$WORK/ubnfc/java/
 | もの | 場所 |
 |---|---|
 | 1 parse の `Match` 生成回数と割当（JSON / Operators / Power / P4、before / after） | [`examples/json/evidence/ops-json-55-java.csv`](../../examples/json/evidence/ops-json-55-java.csv) |
-| 速度（JSON の A/B 2 session と 3 実装の突き合わせ） | [`examples/json/evidence/speed-json-55-java.csv`](../../examples/json/evidence/speed-json-55-java.csv) |
+| 速度（JSON の A/B と 3 実装の突き合わせ。merge 前 / 最終 build の各 2 回） | [`examples/json/evidence/speed-json-55-java.csv`](../../examples/json/evidence/speed-json-55-java.csv) |
 | 速度（Operators / Power の A/B と P4 の非退行） | [`examples/p4-java/evidence/speed-match55.csv`](../../examples/p4-java/evidence/speed-match55.csv) |
 | corpus | [`2026-09-24-java-corpus-match55.md`](2026-09-24-java-corpus-match55.md) / `.json` |
 | 入力の sha256（PR #32 / #46 / #54 と同一） | [`examples/json/evidence/inputs.sha256`](../../examples/json/evidence/inputs.sha256) |
