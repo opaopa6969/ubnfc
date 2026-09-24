@@ -533,3 +533,9 @@ report は日付 + 話題で名前が付いている。性能の出発点は
 | 期待拒否 Pass | 文法を拒否することが期待値のケース。Pass とは別列に排他的に数える |
 | 未観測 | 比較に差分は無いが観測項目が欠けている状態。Pass に読み替えない |
 | fast mode | `ParseOptions.diagnostics = false`（既定）。診断を記録せず、必要なら同じ入力を決定的に再解析する（D-023） |
+
+## 名前と選び方
+
+- **unlaxer Classic**（`classic`）: `unlaxer-parser` のコンビネータ実行系（ParseContext / transaction / Token 木）と `unlaxer-dsl` の生成器。
+- **ubnfc**: このリポジトリ。UBNF コンパイラで、実行系に依存しない **ubnfc parser** を Java / Rust に書き出す。
+- どちらを使うかの目安（Classic にしか無いもの、ubnfc にしか無いもの、判断手順、保守方針）: [unlaxer-parser/docs/engine-selection-guide-ja.md](https://github.com/opaopa6969/unlaxer-parser/blob/master/docs/engine-selection-guide-ja.md)
