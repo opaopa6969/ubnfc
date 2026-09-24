@@ -144,8 +144,18 @@ public final class Session {
     /** A delimiter set with the failure hint groups of each failing prefix precomputed (one registered id per trivia round). */
     public static final class Delimiters {
         final Delimiter[] items; final Label[] prefixGroups;
+        /** どの区切りも始まり得ない先頭文字を 1 回の bit 試験で弾くための ASCII 表（非 ASCII が入る集合では使わない）。 */
+        final long startLow, startHigh; final boolean startAscii;
         public Delimiters(Delimiter... items) {
             this.items = items; prefixGroups = new Label[items.length];
+            long low = 0, high = 0; boolean ascii = true;
+            for (Delimiter item : items) {
+                if (item.isCharacters) { low |= item.asciiLow; high |= item.asciiHigh; ascii &= item.asciiOnly; }
+                else if (item.open == null || item.open.isEmpty()) ascii = false;
+                else { char c = item.open.charAt(0); if (c < 64) low |= 1L << c; else if (c < 128) high |= 1L << (c - 64); else ascii = false; }
+            }
+            // 区切りが 0 個の集合では一般経路が hint を 1 件も登録しないので、高速経路を使わない。
+            startLow = low; startHigh = high; startAscii = ascii && items.length > 0;
             var members = new ArrayList<Label>();
             for (int i = 0; i < items.length; i++) {
                 if (items[i].isCharacters) members.add(L_SPACE);
@@ -156,6 +166,12 @@ public final class Session {
         }
         /** 全ての区切りが失敗した周回が登録する 1 件（候補除外の再生が使う）。 */
         Label fullGroup() { return prefixGroups[prefixGroups.length - 1]; }
+        /** false なら「どの区切りもこの文字からは始まらない」ことが確定する。 */
+        boolean canStart(int ch) {
+            if (!startAscii) return true;
+            if (ch < 64) return ch >= 0 && (startLow & (1L << ch)) != 0;
+            return ch < 128 && (startHigh & (1L << (ch - 64))) != 0;
+        }
     }
 
     /**
@@ -229,7 +245,8 @@ public final class Session {
     private Diagnostics diagnostics;
     private final MemoTable memo;
     private final Payloads payloads = Payloads.acquire();
-    private final ArrayList<TokenScanner.Effect> effects = new ArrayList<>();
+    // 1 parse で数百件になるので、既定の 10 から育て直すのをやめる。
+    private final ArrayList<TokenScanner.Effect> effects = new ArrayList<>(64);
     private final String[] ruleNames; private final Label[] ruleParserLabels;
     private int depth;
     private int[] activeRules = new int[64]; private int activeDepth;
@@ -245,18 +262,25 @@ public final class Session {
      * 反復下の capture site を読む文法は完全経路だけ）。
      */
     public final boolean tree, diag, occ;
+    /**
+     * capture の包み（{@link #capture}）が何もしないことが確定する経路。生成側はこの旗が立つとき
+     * 包みを飛ばして中身を直に呼ぶ（site を 1 つも公開せず、失敗 hint も記録しないので観測は同じ）。
+     */
+    public final boolean bypassCapture;
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false); }
     public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode) {
         this.tree = !twoMode || options.buildAst() || options.lexical() || options.occurrences();
         this.occ = !twoMode || options.occurrences();
         this.diag = !twoMode || options.diagnostics();
+        this.bypassCapture = !this.tree && !this.diag;
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         // diag=false の経路は診断を 1 件も記録しない（書込みは全て diag で囲ってある）ので、
         // 読み出し専用の空実例を共有する。実例 1 個で 1 parse あたり約 9 KB の確保が消える。
         diagnostics = diag ? new Diagnostics(Label.count(), 1024) : DISABLED;
         ruleParserLabels = new Label[ruleNames.length];
-        // 観測: P4 で 1 文字あたり約 5 entry。成長の再ハッシュを避けつつ上限は固定する。
-        memo = new MemoTable(Math.max(1024, Math.min(1 << 20, input.length() * 8)));
+        // 観測: P4 で 1 文字あたり約 1.8 entry。load factor 0.5 の表は長さの 4 倍で足り、
+        // 8 倍だと（complex で 128 KB・x64 で 8 MB）表が cache に対して無駄に広くなる。
+        memo = new MemoTable(Math.max(1024, Math.min(1 << 20, input.length() * 4)));
     }
     /** 診断を要求しない解析が共有する空の診断（書込みは行わない）。 */
     private static final Diagnostics DISABLED = new Diagnostics(1, 16);
@@ -324,7 +348,8 @@ public final class Session {
     }
     public int cp(int at) { return at < input.length() ? input.codePointAt(at) : -1; }
     public Span span(int start, int end) { return new Span(input.cpIndex(start), input.cpIndex(end)); }
-    private void progress(Frame f) {
+    /** 到達位置の更新。capture の包みを飛ばす生成コードが同じ位置で呼ぶので public。 */
+    public void progress(Frame f) {
         int at = Math.max(f.c, f.m); if (at > reached) reached = at; if (diag) diagnostics.reach(at);
     }
     private void progressAt(int at) { if (at > reached) reached = at; if (diag) diagnostics.reach(at); }
@@ -336,20 +361,34 @@ public final class Session {
         if (at > reached) reached = at;
     }
     private long mark() { return ((long) scope.checkpoint() << 32) | effects.size(); }
+    /** 印から何も増えていない巻戻しが大多数（P4 complex で 2,070 回中 1,930 回）なので、判定だけ inline させる。 */
     private void restore(long mark) {
-        scope.restore((int) (mark >>> 32)); int size = (int) mark;
+        if (mark != mark()) undo(mark);
+    }
+    private void undo(long mark) {
+        int checkpoint = (int) (mark >>> 32);
+        if (checkpoint != scope.checkpoint()) scope.restore(checkpoint);
+        int size = (int) mark;
         // subList(...).clear() は SubList を 1 個確保する。取消しは 1 parse あたり数千回なので末尾から外す。
         for (int i = effects.size(); i > size; i--) effects.remove(i - 1);
     }
-    /** memo payload の効果列。{@code List.copyOf(subList)} は SubList と複製の 2 個を作るので配列 1 本にする。 */
+    /**
+     * memo payload の効果列。{@code List.copyOf(subList)} は SubList と複製の 2 個を作るので配列 1 本にする。
+     * 空のときは null を返す（1 parse の memo hit 464 件のうち効果を持つのは数件なので、再生の呼出しごと省く）。
+     */
     private List<TokenScanner.Effect> effectsSince(long mark) {
         int size = (int) mark, n = effects.size();
-        if (n == size) return List.of();
+        if (n == size) return null;
         var copy = new TokenScanner.Effect[n - size];
         for (int i = 0; i < copy.length; i++) copy[i] = effects.get(size + i);
         return Arrays.asList(copy);
     }
-    private void replay(List<TokenScanner.Effect> replay) { for (int i = 0, n = replay.size(); i < n; i++) effect(replay.get(i)); }
+    /** null は「効果なし」。呼出し側が毎回 null 検査をするより、ここで畳んで inline させる。 */
+    private void replay(List<TokenScanner.Effect> replay) {
+        if (replay == null) return;
+        replayAll(replay);
+    }
+    private void replayAll(List<TokenScanner.Effect> replay) { for (int i = 0, n = replay.size(); i < n; i++) effect(replay.get(i)); }
     private void effect(TokenScanner.Effect effect) {
         effects.add(effect);
         switch (effect.action()) {
@@ -711,7 +750,7 @@ public final class Session {
         return choice(f, alternatives, longest, eligible, fallback, null);
     }
     public Match choice(Frame f, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback, Guard[] guards) {
-        Match best = null; int bestC = 0, bestM = 0; List<TokenScanner.Effect> bestEffects = List.of();
+        Match best = null; int bestC = 0, bestM = 0; List<TokenScanner.Effect> bestEffects = null;
         int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
         // 候補除外は「記録位置 max(c,m) と読み取り位置 position() が一致し、否定先読みの中でない」ときだけ。
         int probe = predict && guards != null && !f.invert && (reset0 || c0 == m0) ? c0 : -1;
@@ -1004,6 +1043,9 @@ public final class Session {
         while (again) {
             again = false;
             int p = f.position(), at = Math.max(f.c, f.m), failed = 0;
+            // 高速経路: 先頭 1 文字がどの区切りの開始にもなり得ないなら、一般経路は必ず
+            // 全 delimiter を失敗して fullGroup を登録して終わる。同じ 1 件だけ登録して返る。
+            if (!set.canStart(p < input.length() ? input.codePointAt(p) : -1)) { fail(at, set.fullGroup()); return; }
             for (var delimiter : delimiters) {
                 int next = p, terminatorEnd = -1;
                 if (delimiter.isCharacters) {
