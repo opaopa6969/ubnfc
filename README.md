@@ -28,6 +28,8 @@ UBNF 文法から、**実行時ライブラリに依存しない** Java パー�
 - 生成物は JDK 21 / Rust std だけに依存する（生成 Rust は `#![forbid(unsafe_code)]`、
   生成 Rust crate の依存は `json` feature のときの serde / serde_json だけ。
   `examples/handwritten-target/java` は同じ目標形を `jdeps -recursive` で `java.base` のみと確認している）。
+- 生成 Rust は wasm32 でビルド可、stack escalation は無効化されて深さ診断に落ちる
+  （issue #65 / D-070、`docs/reports/2026-09-24-wasm32-build.md`）。
 
 ## 2. 珍しいところ
 
@@ -175,6 +177,7 @@ issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で�
   内側ループ）。**JSON 1 MB 認識は 0.0364 → 0.0137 µs/byte（2.7 倍）、ANTLR4 比は 2.7 倍 → 1.35 倍**
   で、**issue の目標 ≤0.022 µs/byte を達成**した（D-072）。1 byte あたりの式評価は 5.08 → 1.25、
   cursor 更新は 7.70 → 1.67 回。typed AST は 0.477 → 0.181 µs/byte。
+- **JSON 専用ライブラリとの比較（issue #68、`docs/reports/2026-09-24-json-libraries-comparison.md`）**: 1 MB の最小値で **serde_json `IgnoredAny` 0.0008 µs/byte（1.2 GB/s）、Jackson streaming 0.0015（678 MB/s）、Jackson `readTree` 0.0035、Gson `JsonElement` 0.0039、serde_json `Value` 0.0055** に対し、ubnfc Rust 認識は 0.0133（**serde_json の 16 倍・Jackson の 9 倍遅い**）、typed AST（span・診断つき）は Rust 0.181 / Java 0.231（値の木より **33〜66 倍遅い**）。正しさは ubnfc・Jackson 既定・Gson STRICT・serde_json がすべて `y_` 95/95・`n_` 188/188 で並び、**Gson の既定（LENIENT）は `n_` を 86 件受理する**。
 - **速度（512 atom の算術式、認識のみ）**: ANTLR4 0.045 ms、ubnfc Rust 0.119 ms、tree-sitter 0.403 ms。
   木込みでは ubnfc Rust の typed AST 0.260 ms が ANTLR4 の parse tree 0.209 ms に近い。
 

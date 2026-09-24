@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  wasm32:
+    name: wasm32-unknown-unknown build (issue #65 / D-070)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+
+      - name: build ubnfc / ubnfc-rust CLI (host)
+        run: cargo build --release --bin ubnfc --bin ubnfc-rust
+
+      # examples/json is not a committed crate: generate it (with its JSON Lines driver
+      # bin) the same way benchmarks/scripts/prepare-external.sh does, then link it for
+      # wasm32 so we get a real .wasm to size-check.
+      - name: generate examples/json driver crate and build it for wasm32
+        run: |
+          work=$(mktemp -d)
+          ./target/release/ubnfc ir --grammar examples/json/json.ubnf --out "$work/json.ir.json"
+          ./target/release/ubnfc-rust --ir "$work/json.ir.json" --out "$work/json"
+          (cd "$work/json" && cargo build --release --target wasm32-unknown-unknown)
+          ls -l "$work/json/target/wasm32-unknown-unknown/release/"*.wasm
+
+      # examples/p4-rust and ubnfc-selfhost embed the generated parser as a library
+      # module (no standalone bin needing a host), so --lib is the right build here.
+      - name: build examples/p4-rust for wasm32 (--lib)
+        run: cargo build --release --target wasm32-unknown-unknown -p ubnfc-p4-rust --lib
+
+      - name: build ubnfc-selfhost for wasm32 (--lib)
+        run: cargo build --release --target wasm32-unknown-unknown -p ubnfc-selfhost --lib
+
+  native:
+    name: native workspace tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: build ubnfc-java jar (needed by Rust<->Java cross-backend tests)
+        run: cd ubnfc-java && mvn -q -DskipTests package
+
+      # A number of tests default to a sibling checkout ../../../unlaxer-parser
+      # (front fixtures, self-host parity, corpus spec citations; see UNLAXER_PARSER_DIR
+      # in crates/ubnfc-front/tests, crates/ubnfc-selfhost/tests, crates/ubnfc-harness).
+      # unlaxer-parser is a separate private repo; wiring its checkout into this workflow
+      # needs a cross-repo token that is not set up yet, and issue #65 is scoped to the
+      # wasm32 build only. Tracked as a follow-up rather than blocking this fix, so this
+      # job is informational for now: the merge-blocking gate is the wasm32 job above.
+      # Full native/corpus regression for this change (Java Pass 1,310 / Rust Pass 1,292,
+      # Fail 0; clippy -D warnings; fmt) was verified locally — see
+      # docs/reports/2026-09-24-wasm32-build.md.
+      - name: cargo test --workspace
+        continue-on-error: true
+        run: cargo test --workspace --no-fail-fast

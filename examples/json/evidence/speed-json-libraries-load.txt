@@ -1,0 +1,26 @@
+# issue #68 走行ログ（load average）
+## rotation 1
+# host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64, core=30, runs=7, run_seconds=0.5
+# load average (開始): 6.25 4.40 7.22
+# === json-1k.json ===
+# load average: 13.36 11.95 9.83
+# === json-10k.json ===
+# load average: 11.03 14.87 14.16
+# === json-100k.json ===
+# load average: 10.29 13.54 13.82
+# === json-1m.json ===
+# load average: 14.21 15.50 15.09
+# load average (終了): 14.21 15.50 15.09
+benchmarks/scripts/run-json-libraries.sh: line 144: れる: command not found
+## rotation 2
+# host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64, core=30, runs=7, run_seconds=0.5
+# load average (開始): 14.21 15.50 15.09
+# === json-1k.json ===
+# load average: 14.61 14.55 14.74
+# === json-10k.json ===
+# load average: 21.10 17.16 15.64
+# === json-100k.json ===
+# load average: 14.11 16.02 15.44
+# === json-1m.json ===
+# load average: 11.91 14.42 14.93
+# load average (終了): 11.91 14.42 14.93
