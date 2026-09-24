@@ -6,7 +6,7 @@ Java corpus run-all
 
 Java generator SHA-256: `4a963854ff021af7bd946c2f2f5862ebb45ca1e485729e39a184bc52af872217`
 
-front SHA-256: `0e756e0e48a99eb35048102d4b95bcc57ff7978022f4c2477c95998f7cc842e2`
+front SHA-256: `ae6379129d19c4ff1081960a053f2b70bca66ee7aad7c6940bbb6ccd8c516788`
 
 期待拒否 Pass: 28件（Verdict は Pass）。通常の Pass・IR 失敗とは別列に排他的に計上する。build の実測失敗と診断は拒否理由表に保持する。
 
