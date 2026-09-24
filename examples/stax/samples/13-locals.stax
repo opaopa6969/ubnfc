@@ -1,0 +1,17 @@
+// 局所束縛。`let x` は最上段を取り出して語スコープの名前 x に束縛する。
+// 束縛は定義の外へ漏れない（WordDef が @scopeTree でスコープを作っている）。
+
+: hypot_sq ( Int Int -- Int )
+  let y
+  let x
+  x x *
+  y y *
+  + ;
+
+: describe ( Int Int -- Str )
+  hypot_sq
+  let d
+  "d2=" d int_to_str concat ;
+
+: main ( -- )
+  3 4 describe print newline ;

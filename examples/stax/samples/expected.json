@@ -1,0 +1,38 @@
+{
+  "about": [
+    "20 本のサンプルの期待判定。parse は stage 1 で検証できる（両 backend で同じであること）。",
+    "typecheck は stage 3（Rust インタプリタのスタック効果検査）の期待値で、いまは実行されない。",
+    "scopeWarnings は @scopeTree + @declares + @symbolRef が文法だけから出す未定義参照の一覧で、",
+    "受理・AST には影響しない（構文は成功したまま WARNING が別に出る）。"
+  ],
+  "samples": [
+    { "file": "01-hello.stax",           "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "hello world。( -- ) の語 main" },
+    { "file": "02-arith.stax",           "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "連接と算術の組込み語" },
+    { "file": "03-square.stax",          "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "語の定義と、定義済みの語の参照" },
+    { "file": "04-prelude.stax",         "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "制御構造を言語側で定義するライブラリ（if_else / if / while / times）" },
+    { "file": "05-fizzbuzz.stax",        "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "fizzbuzz。use で prelude の語を取込む" },
+    { "file": "06-point.stax",           "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "struct とフィールドの取得・書き込み" },
+    { "file": "07-vector.stax",          "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "struct を使う計算（ベクトルの和・内積）" },
+    { "file": "08-alias.stax",           "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "型の別名" },
+    { "file": "09-enum.stax",            "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "和（列挙）と枝の参照" },
+    { "file": "10-quotation.stax",       "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "引用を値として渡す。引用の型 [ In -- Out ]" },
+    { "file": "11-times.stax",           "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "times を引用と recurse だけで定義する" },
+    { "file": "12-while.stax",           "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "while を引用と recurse だけで定義して使う" },
+    { "file": "13-locals.stax",          "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "let による局所束縛" },
+    { "file": "14-macro.stax",           "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "macro で構文糖 unless を作る" },
+    { "file": "15-use-vec.stax",         "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "ライブラリを使う側。16-veclib.stax の語を取込む" },
+    { "file": "16-veclib.stax",          "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "ライブラリ側。15-use-vec.stax から使われる" },
+
+    { "file": "17-bad-syntax.stax",      "parse": "reject", "diagnostic": "syntax", "typecheck": "n/a",
+      "note": "拒否 1: スタック効果の ) が無い。両 backend とも accepted=false" },
+    { "file": "18-undefined-word.stax",  "parse": "accept",
+      "scopeWarnings": ["not_defined_anywhere", "later_word"], "typecheck": "error",
+      "note": "拒否 2: 未定義の語と前方参照。構文は成功し、スコープ検査が WARNING を 2 件出す" },
+    { "file": "19-type-mismatch.stax",   "parse": "accept", "scopeWarnings": [], "typecheck": "error",
+      "typecheckReason": "print は ( Str -- ) だが Int が渡されている",
+      "note": "拒否 3: 構文は通るが stage 3 の型検査で落ちる" },
+    { "file": "20-effect-mismatch.stax", "parse": "accept", "scopeWarnings": [], "typecheck": "error",
+      "typecheckReason": "two は ( Int -- Int ) と宣言して 2 つ残し、empty は ( -- Int ) と宣言して 0 個しか残さない",
+      "note": "拒否 4: 構文は通るが宣言したスタック効果と本体が合わない" }
+  ]
+}

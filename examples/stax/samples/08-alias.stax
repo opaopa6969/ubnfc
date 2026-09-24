@@ -1,0 +1,12 @@
+// 型の別名。`type A = B ;` は新しい名前であって新しい表現ではない。
+// stage 1 では別名は透過（Meters と Int は同じ）。不透明な新型は stage 2 の宿題。
+
+type Meters = Int ;
+type Seconds = Int ;
+type Speed = Int ;
+
+: speed ( Meters Seconds -- Speed )
+  / ;
+
+: main ( -- )
+  100 20 speed int_to_str print newline ;

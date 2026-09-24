@@ -482,7 +482,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `crates/ubnfc-fuzz` | 2 backend の差分ファジング。`findings/` に最小再現 |
 | `crates/ubnfc-selfhost` | 生成 Rust frontend による self-host 経路と固定点テスト。`src/generated/` は生成物を commit |
 | `crates/ubnfc-rt-template` | 両 backend が写す runtime の原本（input / cursor / scope / memo / diag） |
-| `ir/schema`, `ir/fixtures`, `ir/examples` | Grammar IR v1 の JSON Schema、22 の golden IR、解説用の例（`tinycalc.ir.json` と、v2 の code point クラスを固定する `json-v2.ir.json`） |
+| `ir/schema`, `ir/fixtures`, `ir/examples` | Grammar IR v1 の JSON Schema、22 の golden IR、解説用の例（`tinycalc.ir.json`、v2 の code point クラスを固定する `json-v2.ir.json`、scope 注釈を固定する `stax.ir.json`） |
 | `corpus/oracle` | 旧実装から採取した独立 oracle 107 ファイル（+ `divergences.json`・採取ツール）。`ubnfc-harness list` の「oracle」107 ファイル / 398 ケース |
 | `corpus/spec` | 規範文書から導いた期待値（UBNF 129 ケース / P4 32 ケース / JSON 283 ケース）。実装の観測値を使わない。`corpus/spec/README.md`、issue #5・#26 |
 | `scanners/` | Extern token の scanner registry（`first-chars.json` と Java / Rust 実装） |
@@ -493,6 +493,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `examples/ubnf-vscode` | UBNF 自身（`ubnf.ubnf`）の VS Code 拡張。同じ経路で組む。`scripts/build-vsix.sh ubnf` |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
 | `examples/json`, `examples/arith` | 同じ言語を `.ubnf` / ANTLR `.g4` / tree-sitter `grammar.js` の 3 記法で書いたもの（JSON = RFC 8259、算術式 = Operators / Power）。外部比較の材料。issue #26 |
+| `examples/stax` | **stax** — 型定義・構造定義のできる連接（Forth 系）言語。UBNF v2 の 3 つ目の実用文法で、`@scopeTree` / `@declares` / `@symbolRef` だけで記号表と未定義語の警告を出す。設計文書・文法・サンプル 20 本・両 backend の突き合わせ script。issue #66 |
 | `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27。同じ言語を各ツールの流儀で書き直した `TinyExpressionP4Idiomatic.g4` / `grammar.idiomatic.js` も同じディレクトリ（issue #39） |
 | `benchmarks/` | 速度比較のドライバ。`scripts/prepare-external.sh` 以下が ANTLR4 / tree-sitter との比較、`scripts/p4-external.sh` が P4 での同じ比較（取得はどちらも `scripts/fetch-external-tools.sh`） |
 | `docs/` | 設計・決定・報告。下記 |

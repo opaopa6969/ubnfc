@@ -56,3 +56,23 @@ cargo run -p ubnfc-front --bin ubnfc -- ir \
 
 照合は `crates/ubnfc-front/tests/pipeline_golden.rs` の
 `the_json_v2_grammar_matches_its_committed_ir_golden`。
+
+## `stax.ir.json` — 型の付いた連接言語（issue #66 stage 1）
+
+`examples/stax/stax.ubnf`（Forth 系の自己拡張型言語 stax）の canonical JSON 出力。
+sibling repository に依存しない 2 本目の golden で、**scope 注釈**が IR へどう落ちるかを
+ここで固定する（`@scopeTree(mode=lexical)` 3 箇所、`@declares` 8 箇所、
+`@symbolRef` 4 箇所、`@catalog` 6 箇所、`@doc` 17 箇所、`@mapping` 27 箇所）。
+
+```sh
+# ubnfc リポジトリのルートから実行する。extern token は無いので registry は要らない。
+cargo run -p ubnfc-front --bin ubnfc -- ir \
+  --grammar examples/stax/stax.ubnf \
+  --out ir/examples/stax.ir.json
+```
+
+照合は `crates/ubnfc-front/tests/pipeline_golden.rs` の
+`the_stax_grammar_matches_its_committed_ir_golden`。
+同じファイルの `the_stax_grammar_validates_strictly_clean` が `--strict` 警告ゼロを、
+`the_stax_samples_all_have_an_expected_verdict` が `examples/stax/samples/` の 20 本と
+`expected.json` の対応を固定する。

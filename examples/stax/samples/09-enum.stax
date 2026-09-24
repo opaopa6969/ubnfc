@@ -1,0 +1,14 @@
+// 和（列挙）。枝は値を積む 0 引数の語でもあるので、語と同じ名前空間に宣言される。
+// 和には先頭の `|` を必ず書く。これで「別名か和か」が 1 token で決まる。
+
+type Color = | Red | Green | Blue ;
+
+type Level = | Low | High ;
+
+: is_warm ( Color -- Bool )
+  Red = ;
+
+: main ( -- )
+  Red is_warm
+  [ "warm" print ] [ "cool" print ] choose call
+  newline ;

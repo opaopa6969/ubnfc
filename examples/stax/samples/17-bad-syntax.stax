@@ -1,0 +1,8 @@
+// 拒否されるべき 1: 構文エラー。スタック効果の `)` が無い。
+// 期待: parse reject（両 backend とも accepted=false、syntax 診断）。
+
+: broken ( Int -- Int
+  dup * ;
+
+: main ( -- )
+  4 broken int_to_str print newline ;
