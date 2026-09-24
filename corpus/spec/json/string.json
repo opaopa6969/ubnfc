@@ -1,0 +1,982 @@
+{
+  "family": "json",
+  "section": "7.  Strings",
+  "summary": "文字列（引用符・エスケープ・生で置けない文字）。",
+  "cases": [
+    {
+      "id": "json/n_incomplete_false",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[fals]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_incomplete_false.json"
+    },
+    {
+      "id": "json/n_incomplete_null",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[nul]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_incomplete_null.json"
+    },
+    {
+      "id": "json/n_incomplete_true",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[tru]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_incomplete_true.json"
+    },
+    {
+      "id": "json/n_string_1_surrogate_then_escape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD800\\\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_1_surrogate_then_escape.json"
+    },
+    {
+      "id": "json/n_string_1_surrogate_then_escape_u",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD800\\u\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_1_surrogate_then_escape_u.json"
+    },
+    {
+      "id": "json/n_string_1_surrogate_then_escape_u1",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD800\\u1\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_1_surrogate_then_escape_u1.json"
+    },
+    {
+      "id": "json/n_string_1_surrogate_then_escape_u1x",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD800\\u1x\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_1_surrogate_then_escape_u1x.json"
+    },
+    {
+      "id": "json/n_string_accentuated_char_no_quotes",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[é]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_accentuated_char_no_quotes.json"
+    },
+    {
+      "id": "json/n_string_backslash_00",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b225c00225d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_backslash_00.json"
+    },
+    {
+      "id": "json/n_string_escape_x",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\x00\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_escape_x.json"
+    },
+    {
+      "id": "json/n_string_escaped_backslash_bad",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\\\\\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_escaped_backslash_bad.json"
+    },
+    {
+      "id": "json/n_string_escaped_ctrl_char_tab",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\t\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_escaped_ctrl_char_tab.json"
+    },
+    {
+      "id": "json/n_string_escaped_emoji",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\🌀\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_escaped_emoji.json"
+    },
+    {
+      "id": "json/n_string_incomplete_escape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_incomplete_escape.json"
+    },
+    {
+      "id": "json/n_string_incomplete_escaped_character",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u00A\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_incomplete_escaped_character.json"
+    },
+    {
+      "id": "json/n_string_incomplete_surrogate",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD834\\uDd\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_incomplete_surrogate.json"
+    },
+    {
+      "id": "json/n_string_incomplete_surrogate_escape_invalid",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD800\\uD800\\x\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_incomplete_surrogate_escape_invalid.json"
+    },
+    {
+      "id": "json/n_string_invalid_backslash_esc",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\a\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_invalid_backslash_esc.json"
+    },
+    {
+      "id": "json/n_string_invalid_unicode_escape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uqqqq\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_invalid_unicode_escape.json"
+    },
+    {
+      "id": "json/n_string_leading_uescaped_thinspace",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\\u0020\"asd\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_leading_uescaped_thinspace.json"
+    },
+    {
+      "id": "json/n_string_no_quotes_with_bad_escape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\\n]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_no_quotes_with_bad_escape.json"
+    },
+    {
+      "id": "json/n_string_single_doublequote",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "\"",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_single_doublequote.json"
+    },
+    {
+      "id": "json/n_string_single_quote",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "['single quote']",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_single_quote.json"
+    },
+    {
+      "id": "json/n_string_single_string_no_double_quotes",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "abc",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_single_string_no_double_quotes.json"
+    },
+    {
+      "id": "json/n_string_start_escape_unclosed",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_start_escape_unclosed.json"
+    },
+    {
+      "id": "json/n_string_unescaped_ctrl_char",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b22610061225d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_unescaped_ctrl_char.json"
+    },
+    {
+      "id": "json/n_string_unescaped_newline",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"new\nline\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_unescaped_newline.json"
+    },
+    {
+      "id": "json/n_string_unescaped_tab",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\t\"]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_unescaped_tab.json"
+    },
+    {
+      "id": "json/n_string_unicode_CapitalU",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "\"\\UA66D\"",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_unicode_CapitalU.json"
+    },
+    {
+      "id": "json/n_string_with_trailing_garbage",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "\"\"x",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_with_trailing_garbage.json"
+    },
+    {
+      "id": "json/y_string_accepted_surrogate_pair",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD801\\udc37\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_accepted_surrogate_pair.json"
+    },
+    {
+      "id": "json/y_string_accepted_surrogate_pairs",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\ud83d\\ude39\\ud83d\\udc8d\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_accepted_surrogate_pairs.json"
+    },
+    {
+      "id": "json/y_string_allowed_escapes",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\"\\\\\\/\\b\\f\\n\\r\\t\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_allowed_escapes.json"
+    },
+    {
+      "id": "json/y_string_backslash_and_u_escaped_zero",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\\u0000\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_backslash_and_u_escaped_zero.json"
+    },
+    {
+      "id": "json/y_string_backslash_doublequotes",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\"\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_backslash_doublequotes.json"
+    },
+    {
+      "id": "json/y_string_comments",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"a/*b*/c/*d//e\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_comments.json"
+    },
+    {
+      "id": "json/y_string_double_escape_a",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\\a\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_double_escape_a.json"
+    },
+    {
+      "id": "json/y_string_double_escape_n",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\\\n\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_double_escape_n.json"
+    },
+    {
+      "id": "json/y_string_escaped_control_character",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u0012\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_escaped_control_character.json"
+    },
+    {
+      "id": "json/y_string_escaped_noncharacter",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uFFFF\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_escaped_noncharacter.json"
+    },
+    {
+      "id": "json/y_string_in_array",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"asd\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_in_array.json"
+    },
+    {
+      "id": "json/y_string_in_array_with_leading_space",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[ \"asd\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_in_array_with_leading_space.json"
+    },
+    {
+      "id": "json/y_string_last_surrogates_1_and_2",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uDBFF\\uDFFF\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_last_surrogates_1_and_2.json"
+    },
+    {
+      "id": "json/y_string_nbsp_uescaped",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"new\\u00A0line\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_nbsp_uescaped.json"
+    },
+    {
+      "id": "json/y_string_null_escape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u0000\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_null_escape.json"
+    },
+    {
+      "id": "json/y_string_pi",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"π\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_pi.json"
+    },
+    {
+      "id": "json/y_string_simple_ascii",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"asd \"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_simple_ascii.json"
+    },
+    {
+      "id": "json/y_string_space",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "\" \"",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_space.json"
+    },
+    {
+      "id": "json/y_string_surrogates_U+1D11E_MUSICAL_SYMBOL_G_CLEF",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD834\\uDd1e\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_surrogates_U+1D11E_MUSICAL_SYMBOL_G_CLEF.json"
+    },
+    {
+      "id": "json/y_string_u+2028_line_sep",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\" \"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_u+2028_line_sep.json"
+    },
+    {
+      "id": "json/y_string_u+2029_par_sep",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\" \"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_u+2029_par_sep.json"
+    },
+    {
+      "id": "json/y_string_uEscape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u0061\\u30af\\u30EA\\u30b9\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_uEscape.json"
+    },
+    {
+      "id": "json/y_string_uescaped_newline",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"new\\u000Aline\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_uescaped_newline.json"
+    },
+    {
+      "id": "json/y_string_unescaped_char_delete",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unescaped_char_delete.json"
+    },
+    {
+      "id": "json/y_string_unicode",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uA66D\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode.json"
+    },
+    {
+      "id": "json/y_string_unicodeEscapedBackslash",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u005C\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicodeEscapedBackslash.json"
+    },
+    {
+      "id": "json/y_string_unicode_2",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"⍂㈴⍂\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_2.json"
+    },
+    {
+      "id": "json/y_string_unicode_U+10FFFE_nonchar",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uDBFF\\uDFFE\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_U+10FFFE_nonchar.json"
+    },
+    {
+      "id": "json/y_string_unicode_U+1FFFE_nonchar",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uD83F\\uDFFE\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_U+1FFFE_nonchar.json"
+    },
+    {
+      "id": "json/y_string_unicode_U+200B_ZERO_WIDTH_SPACE",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u200B\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_U+200B_ZERO_WIDTH_SPACE.json"
+    },
+    {
+      "id": "json/y_string_unicode_U+2064_invisible_plus",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u2064\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_U+2064_invisible_plus.json"
+    },
+    {
+      "id": "json/y_string_unicode_U+FDD0_nonchar",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uFDD0\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_U+FDD0_nonchar.json"
+    },
+    {
+      "id": "json/y_string_unicode_U+FFFE_nonchar",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\uFFFE\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_U+FFFE_nonchar.json"
+    },
+    {
+      "id": "json/y_string_unicode_escaped_double_quote",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u0022\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_unicode_escaped_double_quote.json"
+    },
+    {
+      "id": "json/y_string_with_del_character",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "7.  Strings",
+        "sentence": "All Unicode characters may be placed within the quotation marks, except for the characters that MUST be escaped: quotation mark, reverse solidus, and the control characters (U+0000 through U+001F).",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"aa\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_with_del_character.json"
+    }
+  ]
+}

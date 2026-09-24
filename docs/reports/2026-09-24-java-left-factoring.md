@@ -13,7 +13,7 @@ AST 目標（P4 complex ≤0.2 ms / x64 ≤15 ms）への距離を今の数字�
 - **A の主因**: PR #29 の最大の一手（**D-059 = capture の包みの迂回**）は `tree=false` の認識専用経路にしか効かない。
   AST 経路は 1 parse あたり **2,276 回**の capture の包みを今も払っている（認識専用は 13 回）。
   そのため「AST 層の費用」は #19 の 0.089 ms から **0.175 ms（complex）**に増えて見える（§1.3）。
-- **B**: 左因数分解を Java backend へ入れた（**D-060**）。P4 complex 1 parse の
+- **B**: 左因数分解を Java backend へ入れた（**D-061**）。P4 complex 1 parse の
   **rule 関数呼出しは 1,076 → 782、memo hit は 464 → 170** で、**Rust の 759 / 169 にほぼ並んだ**（§2.4）。
   時間は **complex 認識 0.1277 → 0.1008 ms（最小 0.1067 → 0.0813）、complex-x64 認識 9.11 → 6.04 ms
   （最小 8.16 → 5.41）、complex AST 0.390 → 0.246 ms、x64 AST 23.9 → 18.2 ms**（binary 交互 3 周、§2.6）。
@@ -22,7 +22,7 @@ AST 目標（P4 complex ≤0.2 ms / x64 ≤15 ms）への距離を今の数字�
   **元の差 317 のうち左因数分解で説明できるのは 224 だけ**だった。§2.5）。
 - **B の契約選択**: 適用は**診断を記録しない経路**（`diag=false`）と **lexical trace を要求しない経路**に限る。
   D-023 の二段構えが「失敗・末尾入力は必ず診断モードで再解析」を保証するので、`diag=false` に限れば
-  Rust が要した「呼ばれない wrapper の label 再生」が**そもそも要らない**（D-060）。
+  Rust が要した「呼ばれない wrapper の label 再生」が**そもそも要らない**（D-061）。
 - 観測は動いていない: 新設の **`FactorEquivalenceTest` 10,608 件**（因数分解経路 対 参照経路）と
   `TwoModeEquivalenceTest` 2,652 件 / `PredictEquivalenceTest` 5,304 件、canonical JSON golden 13 件、
   corpus Java Pass 1,310 / Fail 0（系統別表は byte 一致）、IR golden 不変。
@@ -123,7 +123,7 @@ PEG では memo が「同じ状態の X は同じ結果を返す」ことを保�
    display label を同じ位置へ再生する」ことで同値にする。Java は **D-023 の二段構え**により
    `diag=false` の解析が失敗・末尾入力になれば**必ず同じ入力を診断モードで再解析する**ので、
    **`diag=false` に限れば再生そのものが要らない**。そこで `Session.factor = factoring && !diag && !options.lexical()`
-   とし、診断を記録する解析は参照経路のままにした（**D-060 の契約選択**）。
+   とし、診断を記録する解析は参照経路のままにした（**D-061 の契約選択**）。
    成功した解析が公開する hints は D-023 副作用 (a) のとおり元から空。
 2. **capture 出現 / 意味値**。共有要素は群の先頭候補の式で評価するので、採用候補が別のときは
    出現の site / name を採用候補のものへ**付け替える**（`Session.retag`、Rust の `Session::retag` と同じ）。

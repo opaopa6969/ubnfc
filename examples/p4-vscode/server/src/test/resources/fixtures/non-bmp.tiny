@@ -1,0 +1,2 @@
+var $country as string set '😀😀';
+call bonus(1) + 1

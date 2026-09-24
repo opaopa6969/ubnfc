@@ -588,7 +588,7 @@ public final class JavaEmitter {
             if (plans.stream().anyMatch(java.util.Objects::nonNull))
                 guards = constant("Guard[]", "new Guard[]{" + plans.stream().map(this::guard).collect(Collectors.joining(",")) + "}");
         }
-        // D-060: 先頭要素を共有する連続候補の左因数分解。候補除外の条件が一致する群だけを作る。
+        // D-061: 先頭要素を共有する連続候補の左因数分解。候補除外の条件が一致する群だけを作る。
         String groups = "null";
         if (!predict && !longest && prediction.ordered(expr)) {
             var keys = expr.node().alternatives().stream().map(id -> guardKey(prediction.guard(id))).toList();

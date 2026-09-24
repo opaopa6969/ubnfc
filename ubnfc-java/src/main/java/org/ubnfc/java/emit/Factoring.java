@@ -10,7 +10,7 @@ import org.ubnfc.java.ir.GrammarIr.*;
 import org.ubnfc.java.ir.Validation;
 
 /**
- * 順序付き選択の候補列の左因数分解（`crates/ubnfc-rust/src/factor.rs` の Java 版、D-060）。
+ * 順序付き選択の候補列の左因数分解（`crates/ubnfc-rust/src/factor.rs` の Java 版、D-061）。
  *
  * <p>`X A | X B` の形（連続する候補 Seq が構造的に等しい先頭要素列を持つ）で、共有接頭辞を
  * 1 回だけ評価し、続きを宣言順に試す trie を作る。PEG の意味論では X は同じ状態で同じ結果を

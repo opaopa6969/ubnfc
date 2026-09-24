@@ -17,7 +17,7 @@ import org.ubnfc.p4.generated.api.ParseResult;
 import org.ubnfc.p4.generated.internal.Session;
 
 /**
- * 左因数分解（D-060。{@code Session.Group}）が参照経路（候補ごとに共有接頭辞を評価し直す経路）と
+ * 左因数分解（D-061。{@code Session.Group}）が参照経路（候補ごとに共有接頭辞を評価し直す経路）と
  * 同じ観測を残すことを、全 fixture の完全入力・code point 境界での切り詰め・1 文字破壊で確かめる。
  *
  * <p>因数分解は診断を記録しない経路（{@code diagnostics=false}）と lexical trace を要求しない

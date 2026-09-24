@@ -1,0 +1,9 @@
+[
+  {
+    "range": [1, 5, 1, 10],
+    "severity": "Warning",
+    "source": "ubnfc",
+    "code": "scope",
+    "message": "未定義のシンボル: 'bonus'"
+  }
+]

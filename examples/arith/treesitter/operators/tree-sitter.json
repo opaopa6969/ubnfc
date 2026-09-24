@@ -1,0 +1,11 @@
+{
+  "grammars": [
+    { "name": "operators", "camelcase": "Operators", "scope": "source.operators", "path": ".", "file-types": ["txt"] }
+  ],
+  "metadata": {
+    "version": "0.0.1",
+    "license": "MIT",
+    "description": "Operators / Power 文法（ubnfc issue #26 の 3 記法比較用）",
+    "authors": [{ "name": "ubnfc" }]
+  }
+}

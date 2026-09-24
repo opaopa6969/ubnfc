@@ -98,7 +98,7 @@ public final class Session {
         private String site, name; private final Value value; long completed = -1;
         public Occurrence(String site, String name, Value value) { this.site = site; this.name = name; this.value = value; }
         public String site() { return site; } public String name() { return name; } public Value value() { return value; }
-        /** 左因数分解（D-060）が共有要素の出現を採用候補の site へ付け替える。実体は評価のたびに新しく作られる。 */
+        /** 左因数分解（D-061）が共有要素の出現を採用候補の site へ付け替える。実体は評価のたびに新しく作られる。 */
         void retag(String site, String name) { this.site = site; this.name = name; }
     }
     public record Trace(String rule, String expr, int start, int end, List<Trace> children, String token) {}
@@ -270,7 +270,7 @@ public final class Session {
      */
     public final boolean bypassCapture;
     /**
-     * 左因数分解（D-060）の無効化スイッチ。既定は有効で、参照経路（候補ごとに接頭辞を評価し直す）
+     * 左因数分解（D-061）の無効化スイッチ。既定は有効で、参照経路（候補ごとに接頭辞を評価し直す）
      * との差分検証と計測のためだけに false にする（system property {@code -Dubnfc.factor=false} でも切れる）。
      */
     public static boolean factoring = !"false".equals(System.getProperty("ubnfc.factor"));
@@ -587,7 +587,7 @@ public final class Session {
         progress(f);
         return wrap(f, c, m, result, sites, names, spanRules, skips, scoped, rule, expr, quantified, terminal, semanticKind, semanticMany, failureHints);
     }
-    /** {@link #capture} の「包む側」だけ。左因数分解（D-060）は中身を自分で評価してからここへ渡す。 */
+    /** {@link #capture} の「包む側」だけ。左因数分解（D-061）は中身を自分で評価してからここへ渡す。 */
     private Match wrap(Frame f, int c, int m, Match result, String[] sites, String[] names, String[] spanRules, boolean[] skips, boolean[] scoped,
                        String rule, String expr, boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints) {
         if (result == null) {
@@ -800,7 +800,7 @@ public final class Session {
         return best;
     }
     /**
-     * 左因数分解（D-060。`crates/ubnfc-rust/src/factor.rs` の Java 版）。順序付き選択の連続候補で
+     * 左因数分解（D-061。`crates/ubnfc-rust/src/factor.rs` の Java 版）。順序付き選択の連続候補で
      * 先頭要素列が構造的に等しいもの（`X A | X B`）を、共有接頭辞 1 回の評価で走らせる。
      * PEG の意味論では X は同じ状態で同じ結果を返す（memo が保証する決定性）ので
      * `X A | X B ≡ X (A | B)`。参照経路は {@code -Dubnfc.factor=false} で戻せる。

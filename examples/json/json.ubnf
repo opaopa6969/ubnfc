@@ -1,0 +1,81 @@
+// RFC 8259 の JSON を UBNF v2 で書いたもの。
+// 同じ言語を ANTLR (examples/json/antlr/JSON.g4) と tree-sitter
+// (examples/json/treesitter/grammar.js) でも書いてある。3 記法の対応と、
+// 揃えられなかった 1 点は examples/json/README.md を読むこと。
+grammar Json {
+
+  @ubnf: 2
+  @package: org.example.json
+
+  // 暗黙の trivia は使わない。@whitespace: javaStyle は `//` と `/* */` を必ず
+  // 区切りに入れてしまい（crates/ubnfc-front/src/lower/trivia.rs:85-99）、JSON では
+  // コメントが通ってしまう。さらに javaStyle は 0x0B/0x0C も空白扱いする。
+  // RFC 8259 §2 の ws はちょうど 4 文字なので、Ws 規則として自分で書く。
+  @whitespace: none
+
+  // @literalBoundary は v2 既定の word のまま。'true' / 'false' / 'null' が
+  // `truex` のような入力で語境界により失敗する（crates/ubnfc-front/src/boundary.rs）。
+  // ただし**英数字 1 文字のリテラル**（'0' 'e' 'u' 'b' …）も語境界の対象になり、
+  // `0e1` や `é` を壊すので、そこだけ token にしてある（token は対象外）。
+
+  token EOF     = END_OF_INPUT
+  token DIGIT   = DIGIT              // [0-9]
+  token HEX     = XDIGIT             // [0-9A-Fa-f]
+  token ZERO    = CHAR_RANGE('0','0')
+  token ONENINE = CHAR_RANGE('1','9')
+  token E_LOWER = CHAR_RANGE('e','e')
+  token E_UPPER = CHAR_RANGE('E','E')
+  token ESC_B   = CHAR_RANGE('b','b')
+  token ESC_F   = CHAR_RANGE('f','f')
+  token ESC_N   = CHAR_RANGE('n','n')
+  token ESC_R   = CHAR_RANGE('r','r')
+  token ESC_T   = CHAR_RANGE('t','t')
+  token ESC_U   = CHAR_RANGE('u','u')
+
+  // 文字列の「生のまま置ける 1 文字」。RFC 8259 §7 は `"` `\` と **U+0000..U+001F** を
+  // 除くと定めるが、UBNF には「制御文字を除く code point 集合」を書く手立てが無い:
+  //   - NEGATION の除外集合はリテラルなので、綴れる制御文字は \t \n \r の 3 つだけ
+  //   - CHAR_RANGE は Java char 境界（BMP 限定、E-TOKEN-CHAR-RANGE-SUPPLEMENTARY）なので
+  //     正の範囲で書くと補助面（U+10000 以上）の生文字を落とす
+  //     ＝ JSONTestSuite の y_string_utf8 等 3 件を**拒否**してしまう
+  // ここは前者を採り、「制御文字も通る」ことを README と報告に明記する。
+  token SAFE = NEGATION('"\\')
+
+  @root
+  @mapping(JsonDocument, params=[value])
+  Json ::= Ws Value @value Ws EOF ;
+
+  // RFC 8259 §2: ws = *( %x20 / %x09 / %x0A / %x0D )
+  Ws ::= { ' ' | '\t' | '\n' | '\r' } ;
+
+  Value ::= Object | Array | String | Number | True | False | Null ;
+
+  @mapping(ObjectNode, params=[members])
+  Object ::= '{' Ws [ Member @members { Ws ',' Ws Member @members } Ws ] '}' ;
+
+  @mapping(MemberNode, params=[key, value])
+  Member ::= String @key Ws ':' Ws Value @value ;
+
+  @mapping(ArrayNode, params=[items])
+  Array ::= '[' Ws [ Value @items { Ws ',' Ws Value @items } Ws ] ']' ;
+
+  @mapping(StringNode, params=[text])
+  String ::= '"' ( { Char } ) @text '"' ;
+
+  Char ::= Escape | SAFE ;
+
+  // RFC 8259 §7 escape。\uXXXX はサロゲートの対を検査しない（3 記法とも同じ）。
+  Escape ::= '\\' ( '"' | '\\' | '/' | ESC_B | ESC_F | ESC_N | ESC_R | ESC_T | ESC_U HEX{4} ) ;
+
+  // RFC 8259 §6 number。先頭 + 、先頭 0 の連なり、先頭・末尾のドットは無い。
+  @mapping(NumberNode, params=[text])
+  Number ::= ( [ '-' ] Int [ Frac ] [ Exp ] ) @text ;
+
+  Int  ::= ZERO | ONENINE { DIGIT } ;
+  Frac ::= '.' DIGIT+ ;
+  Exp  ::= ( E_LOWER | E_UPPER ) [ '+' | '-' ] DIGIT+ ;
+
+  @mapping(TrueNode)  True  ::= 'true' ;
+  @mapping(FalseNode) False ::= 'false' ;
+  @mapping(NullNode)  Null  ::= 'null' ;
+}
