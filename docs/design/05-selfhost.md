@@ -109,3 +109,43 @@ validation error golden 3件では `all-tokens.ubnf` の AST が一致し、`ann
 `Capture` に宣言元 `rule_id` を含めるか、capture site metadata を生成物で公開できる。
 現在は unmodified golden IR から作った決定的な site→rule 表を selfhost crate に同梱し、
 全 entry が golden と一致することをテストしている。
+
+### 8 件目 — 3段以上の dotted ルール参照（`a.b.Value`）は `ubnf.ubnf` 側の文法欠陥
+
+issue #12（`opaopa6969/ubnfc`）の調査。上の表の `known/namespace.ubnf`（byte 28）と
+同じ入力形（`grammar G { R ::= a.b.Value; }`）を、`unlaxer-parser` #279 で確定した
+仕様（`unlaxer-dsl/specs/ubnf-syntax.md` 「## ルール宣言」290-293行目、
+「UBNF 自体は `a.b.Value` 全体を1個の `IDENTIFIER` として扱う（分割しない）」）に
+照らして再調査した。
+
+- 手書き frontend（A, `crates/ubnfc-front/src/syntax`）: 受理（namespace=`a.b`, name=`Value`）
+- 自己ホスト生成 frontend（B）: **拒否**
+  `構文エラー (bytes 21..22): expected + or ? or * or { or % or @ or @typeof or ( or [ or ERROR or STRING or IDENTIFIER or | or ;`
+  （`ubnfc_selfhost::parse_file` と `examples/ubnf-crosscheck` の `ubnf-crosscheck` バイナリで
+  再現・確認済み。2段の `a.B` は A/B とも受理する）
+- unlaxer-ubnf（C）・Java bootstrap（D）: 受理
+
+根本原因は `unlaxer-parser/unlaxer-dsl/grammar/ubnf.ubnf`（読み取り専用）の
+`QuantifiedRef` 生成規則そのものにある。
+
+```
+@backref(name=name)
+QuantifiedRef ::= [ IDENTIFIER @namespace '.' ] IDENTIFIER @name ;
+```
+
+これは `IDENTIFIER ['.' IDENTIFIER]`、すなわちドット1個だけの任意分割であり、
+段数上限なしの chained dot を最初から想定していない。生成 parser
+（`crates/ubnfc-selfhost/src/generated/parser.rs` の `r55_c` / rule 55）はこの文法を
+忠実に実装しているだけで、`ubnfc_selfhost::parse_file` や
+`crates/ubnfc-front/src/selfhost/convert()` の投影・変換ロジックに欠陥はない
+（7件目と異なり、こちらは**生成側が仕様より狭い**方向の乖離で、self-host 経路の外側で
+埋める字句ゲートのような閉じ方も取れない — 文法自体が3段以上を受理しない以上、
+生成 parser の手前でドットを数えて許可判定をしても、後段の `QuantifiedRef` 本体の
+消費規則が2段までしか進まないため無意味）。
+
+したがって直し方は `unlaxer-parser` 側で `QuantifiedRef` を chained dot 対応にし、
+`ubnf.ubnf` を再生成することであり、この repo（`ubnfc`）からは行えない。
+最小再現・仕様引用・修正方針は
+[`unlaxer-parser` issue #284](https://github.com/opaopa6969/unlaxer-parser/issues/284)
+で報告済み。`known/namespace.ubnf` の扱い（表の位置固定）は変更しない。上流で直れば、
+その修正後の `ubnf.ubnf` を取り込んだ時点でこの表の行と本節は不要になる。
