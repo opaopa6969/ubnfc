@@ -108,7 +108,7 @@ final class ParityRun {
     private static Outcome run(Case testCase, boolean legacy) {
         try {
             if (testCase.preferredAstSimpleName() != null) {
-                long deadline = System.nanoTime() + 10_000L * 1_000_000L;
+                long deadline = 0L; // 期限なし。負荷で旧側だけ期限切れになるのは比較対象外
                 if (legacy) {
                     var parsed = P4PreferredAstMapper.parseByAstSimpleNameDetailed(
                         testCase.source(), testCase.preferredAstSimpleName(), deadline);

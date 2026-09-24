@@ -5,23 +5,23 @@ fixture:comparison-heavy-x64.tiny	11456	NaN	-	-	-	parse 不可
 fixture:comparison-heavy.tiny	179	NaN	-	-	-	parse 不可
 fixture:complex-half.tiny	163	NaN	-	-	-	parse 不可
 fixture:complex-tail.tiny	327	NaN	-	-	-	parse 不可
-fixture:complex-x16.tiny	5179	33.741	10.095	99.645	6.832	
-fixture:complex-x4.tiny	1293	7.249	0.000	68.417	1.928	
-fixture:complex-x64.tiny	20923	87.706	0.000	63.181	25.390	
-fixture:complex.tiny	326	1.321	0.591	81.196	0.339	
-fixture:flat-arithmetic.tiny	1426	2.664	0.151	40.624	0.030	
+fixture:complex-x16.tiny	5179	38.366	0.000	101.638	7.529	
+fixture:complex-x4.tiny	1293	5.330	1.949	85.392	0.941	
+fixture:complex-x64.tiny	20923	77.242	0.000	77.226	25.216	
+fixture:complex.tiny	326	1.276	0.000	51.471	0.247	
+fixture:flat-arithmetic.tiny	1426	2.635	0.000	36.009	0.031	
 fixture:invalid-syntax.tiny	4	NaN	-	-	-	parse 不可
-fixture:large-match.tiny	1380	6.953	2.277	54.052	2.356	
-fixture:valid-basic.tiny	6	0.113	0.000	53.813	0.041	
-fixture:valid-multiline.tiny	40	0.234	0.036	30.462	0.073	
-fixture:valid-unicode.tiny	10	0.079	0.051	NaN	NaN	実行不可: java.lang.RuntimeException: org.unlaxer.compiler.CompileError: /StageTiming_88ce36b3_e2737bd8.java:9: エラー: 不適合な型: StringをFloatに変換できません:
+fixture:large-match.tiny	1380	6.638	0.493	30.872	2.223	
+fixture:valid-basic.tiny	6	0.102	0.000	31.340	0.031	
+fixture:valid-multiline.tiny	40	0.100	0.022	29.066	0.058	
+fixture:valid-unicode.tiny	10	0.120	0.058	NaN	NaN	実行不可: java.lang.RuntimeException: org.unlaxer.compiler.CompileError: /StageTiming_88ce36b3_e2737bd8.java:9: エラー: 不適合な型: StringをFloatに変換できません:
     "こんにちは😀"
     ^
 エラー1個
 
-fraud#1	404	1.792	0.706	37.262	0.338	
-fraud#2	209	0.564	0.165	56.442	0.087	
-fraud#3	68	0.336	0.036	36.850	0.072	
-fraud#4	707	1.084	0.691	46.424	0.378	
-fraud#5	459	0.785	0.106	33.116	0.091	
-formulaInfo:fraud-alert	2917	-	-	-	-	読み込み〜実行可能まで 296.9 ms
+fraud#1	404	1.861	0.305	73.533	0.537	
+fraud#2	209	0.646	0.000	92.188	0.078	
+fraud#3	68	0.323	0.350	76.529	0.060	
+fraud#4	707	1.389	0.393	36.391	0.542	
+fraud#5	459	1.438	0.000	31.928	0.059	
+formulaInfo:fraud-alert	2917	-	-	-	-	読み込み〜実行可能まで 363.6 ms
