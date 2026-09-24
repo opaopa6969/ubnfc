@@ -1,0 +1,274 @@
+{
+ "fields": {
+  "items": [
+   {
+    "fields": {
+     "body": [
+      {
+       "fields": {
+        "text": "3"
+       },
+       "span": [
+        100,
+        102
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "text": "4"
+       },
+       "span": [
+        102,
+        104
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "name": "+"
+       },
+       "span": [
+        104,
+        106
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "int_to_str"
+       },
+       "span": [
+        106,
+        117
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "print"
+       },
+       "span": [
+        117,
+        123
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "newline"
+       },
+       "span": [
+        123,
+        133
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "text": "10"
+       },
+       "span": [
+        133,
+        136
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "text": "4"
+       },
+       "span": [
+        136,
+        138
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "name": "-"
+       },
+       "span": [
+        138,
+        140
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "int_to_str"
+       },
+       "span": [
+        140,
+        151
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "print"
+       },
+       "span": [
+        151,
+        157
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "newline"
+       },
+       "span": [
+        157,
+        167
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "text": "6"
+       },
+       "span": [
+        167,
+        169
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "text": "7"
+       },
+       "span": [
+        169,
+        171
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "name": "*"
+       },
+       "span": [
+        171,
+        173
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "int_to_str"
+       },
+       "span": [
+        173,
+        184
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "print"
+       },
+       "span": [
+        184,
+        190
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "newline"
+       },
+       "span": [
+        190,
+        200
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "text": "20"
+       },
+       "span": [
+        200,
+        203
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "text": "6"
+       },
+       "span": [
+        203,
+        205
+       ],
+       "type": "NumLit"
+      },
+      {
+       "fields": {
+        "name": "mod"
+       },
+       "span": [
+        205,
+        209
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "int_to_str"
+       },
+       "span": [
+        209,
+        220
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "print"
+       },
+       "span": [
+        220,
+        226
+       ],
+       "type": "Prim"
+      },
+      {
+       "fields": {
+        "name": "newline"
+       },
+       "span": [
+        226,
+        234
+       ],
+       "type": "Prim"
+      }
+     ],
+     "effect": {
+      "fields": {
+       "inputs": [],
+       "outputs": []
+      },
+      "span": [
+       91,
+       100
+      ],
+      "type": "Effect"
+     },
+     "name": "main"
+    },
+    "span": [
+     84,
+     236
+    ],
+    "type": "WordDef"
+   }
+  ]
+ },
+ "span": [
+  0,
+  236
+ ],
+ "type": "Program"
+}

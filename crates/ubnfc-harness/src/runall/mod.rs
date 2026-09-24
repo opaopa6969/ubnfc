@@ -341,11 +341,13 @@ fn expect_rejection(corpus: &str, case: &mut RunCase, backend: Backend) {
             "E-PRECEDENCE-ORDER",
             "docs/reports/2026-09-22-triage.md 末尾の訂正; GrammarValidator.java:917–945",
         ),
-        ("oracle/common-field-missing.json", _, "common-field-missing/1")
-        | ("oracle/common-field-type.json", _, "common-field-type/1") => (
+        // common-field-type/1 は D-074（token の直接 capture は数値 token でも text）で
+        // 共通 field の型が揃い、生成できるようになった。拒否契約から外し、oracle の
+        // 生成失敗との差は divergences.json の `new-contract:direct-token-capture-text`。
+        ("oracle/common-field-missing.json", _, "common-field-missing/1") => (
             "ir",
             "E-LOWER-COMMON-FIELD",
-            "docs/reports/2026-09-22-triage.md 末尾の訂正; corpus/oracle/common-field-{missing,type}.json compilation.diagnostics",
+            "docs/reports/2026-09-22-triage.md 末尾の訂正; corpus/oracle/common-field-missing.json compilation.diagnostics",
         ),
         ("oracle/eval-sum.json", _, "eval-sum/1") => (
             "ir",

@@ -256,24 +256,12 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
         }
         Expectation::Numeric(e) => {
             p.full(true, response);
-            match actual.backend {
-                // NumericCaptureRuntimeTest.java:31-49,81-86: AST field の int/lexeme。
-                Backend::Rust => p.field("value", json!(e.rust_lexeme), mapped_value(response)),
-                Backend::Java => {
-                    if let Some(value) = e.java_int {
-                        p.field("value", json!(value), mapped_value(response));
-                        p.wire("mappingError", Value::Null, response);
-                    } else {
-                        p.field(
-                            "mappingError",
-                            json!(true),
-                            response
-                                .get("mappingError")
-                                .map(|value| json!(value.is_string())),
-                        );
-                    }
-                }
-            }
+            // D-074: token の直接 capture は両 backend とも原文の文字列。旧 Java の
+            // `javaInt`（NumericCaptureRuntimeTest.java:31-49）は旧実装の観測として残し、
+            // 比較は `rustLexeme`（= 入力字句）で行う。数値変換の失敗（旧 Java の
+            // NumberFormatException）も起きないので mappingError は null。
+            p.field("value", json!(e.rust_lexeme), mapped_value(response));
+            p.wire("mappingError", Value::Null, response);
             for (key, value) in &e.extra {
                 p.wire(key, value.clone(), response);
             }
@@ -420,10 +408,10 @@ fn scope_fields(
 /// 欠落した観測は比較用コピーでのみ一致させ、受信値自体には書き足さない。
 fn oracle(case: &RunCase, actual: &Actual) -> (Expectation, Expectation, Vec<String>) {
     let mut expected = serde_json::to_value(&case.case.expect).unwrap();
+    // D-022 / D-074: 数値 token の直接 capture は両 backend とも字句（原文の文字列）。
+    // 旧 Java 採取 oracle の int を字句へ投影し、字句そのものは capture 原文と照合する。
+    numeric_lexeme_contract(&mut expected["Oracle"], actual.response.get("ast"));
     if actual.backend == Backend::Rust {
-        // D-022: 数値 capture は Java 厳密 int / Rust 字句保持の別契約。Java 採取 oracle を
-        // Rust 契約へ投影し、字句そのものは capture 原文と照合する。
-        numeric_lexeme_contract(&mut expected["Oracle"], actual.response.get("ast"));
         // D-011: 診断の主 offset は言語別 oracle。Rust 実走の採取値で置換する（farthestOffset は D-014 の共有契約）。
         if let Some(rust) = &case.case.rust_oracle {
             crate::rust_oracle::project_diagnostics(&mut expected["Oracle"]["diagnostics"], rust);
@@ -588,11 +576,6 @@ fn lexeme_fields(node: &mut Value, captures: &[Value]) {
             _ => {}
         }
     }
-}
-/// D-022 の投影（Java 採取の int field → 同名・同範囲・同値の capture 原文）を
-/// 差分 fuzzing からも同じ規則で使えるようにする。corpus と fuzzer の判定を揃えるための追加公開。
-pub fn project_numeric_lexemes(ast: &mut Value, captures: &[Value]) {
-    lexeme_fields(ast, captures);
 }
 fn has_text_field(node: &Value, name: &str, text: &str) -> bool {
     match node {
@@ -822,33 +805,33 @@ mod tests {
             "diagnostics": [], "mappingError": null})
     }
 
+    /// D-074（D-022 を置換）: 両 backend とも字句で比較する。旧 Java oracle の int は
+    /// 同名・同範囲・同値の capture 原文へ投影され、int を返す backend は Fail。
     #[test]
-    fn d022_rust_compares_int_captures_as_lexemes_and_java_as_ints() {
+    fn d074_both_backends_compare_int_oracle_captures_as_lexemes() {
         let case = run_case(int_oracle());
         let lexeme = response(
             json!({"type":"Value","span":[0,3],"fields":{"value":"7"}}),
             Value::Null,
         );
-        assert_eq!(
-            compare(&case, &actual(Backend::Rust, lexeme.clone()), &[]),
-            Verdict::Pass
-        );
-        assert!(matches!(
-            compare(&case, &actual(Backend::Java, lexeme), &[]),
-            Verdict::Fail(_)
-        ));
         let int = response(
             json!({"type":"Value","span":[0,3],"fields":{"value":7}}),
             Value::Null,
         );
-        assert_eq!(
-            compare(&case, &actual(Backend::Java, int.clone()), &[]),
-            Verdict::Pass
-        );
-        assert!(matches!(
-            compare(&case, &actual(Backend::Rust, int), &[]),
-            Verdict::Fail(_)
-        ));
+        for backend in [Backend::Rust, Backend::Java] {
+            assert_eq!(
+                compare(&case, &actual(backend, lexeme.clone()), &[]),
+                Verdict::Pass,
+                "{backend:?}"
+            );
+            assert!(
+                matches!(
+                    compare(&case, &actual(backend, int.clone()), &[]),
+                    Verdict::Fail(_)
+                ),
+                "{backend:?}"
+            );
+        }
         // 字句そのものを照合する: 同値でも綴りが違えば Fail。
         let other = response(
             json!({"type":"Value","span":[0,3],"fields":{"value":"07"}}),
@@ -884,16 +867,16 @@ mod tests {
             compare(&case, &actual(Backend::Rust, ok.clone()), &[]),
             Verdict::Pass
         );
-        // Java は旧 oracle どおり mappingError。
+        // D-074: Java も字句を保つ。旧 oracle どおりの mappingError はもう Fail。
+        assert_eq!(
+            compare(&case, &actual(Backend::Java, ok.clone()), &[]),
+            Verdict::Pass
+        );
         let mut java = ok.clone();
         java["ast"] = Value::Null;
         java["mappingError"] = json!("java.lang.NumberFormatException: For input string: \"1.5\"");
-        assert_eq!(
-            compare(&case, &actual(Backend::Java, java), &[]),
-            Verdict::Pass
-        );
         assert!(matches!(
-            compare(&case, &actual(Backend::Java, ok.clone()), &[]),
+            compare(&case, &actual(Backend::Java, java), &[]),
             Verdict::Fail(_)
         ));
         // Rust が字句を落とした／別の値にした／AST を作らなかった場合は Fail。
@@ -971,8 +954,9 @@ mod tests {
             Observation::Accepted,
         ];
         case.case.follow_spec = vec![Observation::Consumed];
+        // D-074: 数値 capture は両 backend とも字句で返る。
         let same = response(
-            json!({"type":"Value","span":[0,3],"fields":{"value":7}}),
+            json!({"type":"Value","span":[0,3],"fields":{"value":"7"}}),
             Value::Null,
         );
         let Verdict::Fail(diffs) = compare(

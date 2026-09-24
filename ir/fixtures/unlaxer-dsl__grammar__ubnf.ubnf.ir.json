@@ -21127,9 +21127,7 @@
             "cardinality": "scalar",
             "name": "level",
             "valueType": {
-              "java": "int32Exact",
-              "kind": "number",
-              "rust": "lexeme"
+              "kind": "text"
             }
           }
         ],
@@ -22162,7 +22160,7 @@
       },
       {
         "cardinality": "scalar",
-        "conversion": "number",
+        "conversion": "text",
         "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6499:6515:body/4/tokenRef",
         "name": "level",
         "occurrenceOrder": "completionInnerBeforeOuter",
@@ -22171,9 +22169,7 @@
         "skip": false,
         "spanRule": "consumedExtent",
         "valueType": {
-          "java": "int32Exact",
-          "kind": "number",
-          "rust": "lexeme"
+          "kind": "text"
         }
       },
       {
@@ -32148,7 +32144,7 @@
         "fields": [
           {
             "cardinality": "scalar",
-            "conversion": "number",
+            "conversion": "text",
             "field": "level",
             "siteIds": [
               "expr:unlaxer-dsl/grammar/ubnf.ubnf:6499:6515:body/4/tokenRef/capture/0"

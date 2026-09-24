@@ -142,11 +142,10 @@ grammar Stax {
   @mapping(Quotation, params=[body])
   Quotation ::= '[' { Term @body } ']' ;
 
-  // token を直接 capture すると Java backend が `int` へ変換してしまい、Rust の
-  // 文字列と canonical JSON が食い違う（examples/stax/README.md「両 backend の差」）。
-  // examples/json/json.ubnf と同じく、group を挟んで原文のまま取り出す。
+  // token の直接 capture は両 backend とも原文の文字列（D-074、#75）。数値への変換は
+  // 言語側（stage 3 のインタプリタ）が行う。
   @mapping(NumLit, params=[text])
-  NumLit ::= ( NUMBER ) @text ;
+  NumLit ::= NUMBER @text ;
 
   @mapping(StrLit, params=[text])
   StrLit ::= STRING @text ;

@@ -4,12 +4,12 @@
 //! - D-011 / D-014 (`docs/design/04-cursor-and-diagnostics-contract.md` §2):
 //!   `syntax` 診断の主 offset と hints の表記は言語別 oracle。`farthest*` と kind は共有契約。
 //! - D-019 / D-020: `nativeFailure` / `rulePath` / `deepestRule` は契約対象外。
-//! - D-022 (`docs/design/03-design-v1.md` §8): 数値 capture は Java=int / Rust=字句。
-//!   harness の `project_numeric_lexemes` をそのまま使い、corpus と同じ規則で射影する。
+//! - 数値 token の直接 capture は**射影しない**（D-074 が D-022 の言語別契約を置換）。
+//!   両 backend とも原文の文字列なので厳密比較する。以前は Java の int を字句へ射影して
+//!   いたため、`NUMBER @x` の backend 差（#75）をこの比較が消していた。
 
 use serde_json::{json, Map, Value};
 use ubnfc_harness::canonical::{diff_values, AstValue, Difference};
-use ubnfc_harness::runner::project_numeric_lexemes;
 
 /// 両バックエンドで同じでなければならない観測。
 const COMPARED: &[&str] = &[
@@ -131,22 +131,12 @@ fn project_captures(value: &Value) -> Value {
     }
 }
 
-/// 比較に使う形へ正規化する。`java` 側だけ D-022 の字句射影を適用する。
-fn projection(response: &Value, java: bool) -> Map<String, Value> {
+/// 比較に使う形へ正規化する。両 backend に同じ規則を当てる。
+fn projection(response: &Value) -> Map<String, Value> {
     let mut out = Map::new();
     for &key in COMPARED {
         let present = response.get(key).is_some();
         let value = match key {
-            "ast" if java => {
-                let mut ast = get(response, "ast");
-                let captures = response
-                    .get("captures")
-                    .and_then(Value::as_array)
-                    .cloned()
-                    .unwrap_or_default();
-                project_numeric_lexemes(&mut ast, &captures);
-                ast
-            }
             "captures" | "prefixCaptures" => project_captures(&get(response, key)),
             "diagnostics" => project_diagnostics(&get(response, key)),
             "scope" => {
@@ -177,14 +167,6 @@ fn projection(response: &Value, java: bool) -> Map<String, Value> {
     out
 }
 
-/// D-022: Java の NumberFormatException は Rust では起きない。
-fn numeric_mapping_exemption(java: &Value, rust: &Value) -> bool {
-    java.get("mappingError")
-        .and_then(Value::as_str)
-        .is_some_and(|m| m.starts_with("java.lang.NumberFormatException"))
-        && rust.get("mappingError").is_some_and(Value::is_null)
-}
-
 /// 両バックエンドの応答差。空なら観測上は一致。
 pub fn differences(java: &Value, rust: &Value) -> Vec<Difference> {
     // 片側だけが error（停止・異常終了・未対応）を返したらそれ自体が差。
@@ -200,11 +182,8 @@ pub fn differences(java: &Value, rust: &Value) -> Vec<Difference> {
             actual: rust_error.cloned(),
         }];
     }
-    let mut expected = projection(java, true);
-    let actual = projection(rust, false);
-    if numeric_mapping_exemption(java, rust) {
-        expected.insert("mappingError".into(), json!({"present": false}));
-    }
+    let expected = projection(java);
+    let actual = projection(rust);
     diff_values(&Value::Object(expected), &Value::Object(actual))
 }
 
@@ -552,20 +531,25 @@ mod tests {
         assert_eq!(differences(&trailing(2), &trailing(3)).len(), 1);
     }
 
+    /// #75 / D-074: 数値 capture の int と字句は**差**として出る（射影で消さない）。
+    /// 旧 Java の NumberFormatException も、もう免除しない。
     #[test]
-    fn d022_numeric_lexeme_and_number_format_error_follow_the_corpus_contract() {
+    fn d074_numeric_captures_are_compared_without_projection() {
         let java = response(json!({
             "ast": {"type": "V", "span": [0, 3], "fields": {"value": 7}},
             "captures": [{"name": "value", "span": [1, 2], "text": "7"}]}));
         let rust = response(json!({
             "ast": {"type": "V", "span": [0, 3], "fields": {"value": "7"}},
             "captures": [{"name": "value", "span": [1, 2], "text": "7"}]}));
-        assert_eq!(differences(&java, &rust), vec![]);
+        let differences_found = differences(&java, &rust);
+        assert_eq!(differences_found.len(), 1, "{differences_found:?}");
+        assert_eq!(differences_found[0].path, "/ast/fields/value");
+        assert_eq!(differences(&rust, &rust), vec![]);
         let java_error = response(
             json!({"mappingError": "java.lang.NumberFormatException: For input string: \"1.5\""}),
         );
-        assert_eq!(differences(&java_error, &response(json!({}))), vec![]);
-        // 数値以外の mapping 失敗は有無を比較する。
+        assert_eq!(differences(&java_error, &response(json!({}))).len(), 1);
+        // mapping 失敗は有無を比較する。
         let other = response(json!({"mappingError": "java.lang.IllegalArgumentException: x"}));
         assert_eq!(differences(&other, &response(json!({}))).len(), 1);
     }

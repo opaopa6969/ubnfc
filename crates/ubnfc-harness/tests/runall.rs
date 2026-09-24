@@ -132,11 +132,12 @@ fn associative(backend: &str) {
 }
 
 #[test]
-fn oracle_front_rejections_are_four_passes_with_separate_counts() {
+fn oracle_front_rejections_are_three_passes_with_separate_counts() {
     let workspace = build_front();
+    // D-074: common-field-type は共通 field の型が揃って生成できるので、拒否の集計から外した
+    // （`a_common_field_that_only_differed_by_numeric_capture_type_now_runs`）。
     let files = [
         "common-field-missing.json",
-        "common-field-type.json",
         "eval-sum.json",
         "import-cycle.json",
     ]
@@ -153,13 +154,13 @@ fn oracle_front_rejections_are_four_passes_with_separate_counts() {
         },
     )
     .unwrap();
-    assert_eq!(report.totals.expected_rejection_pass, 4);
+    assert_eq!(report.totals.expected_rejection_pass, 3);
     assert_eq!(report.totals.pass, 0);
     assert_eq!(report.totals.ir_failure, 0);
-    assert_eq!(report.totals.total(), 4);
+    assert_eq!(report.totals.total(), 3);
     assert!(report.cases.iter().all(|row| row.outcome == Outcome::Pass));
     for (code, executions) in [
-        ("E-LOWER-COMMON-FIELD", 2),
+        ("E-LOWER-COMMON-FIELD", 1),
         ("E-LOWER-SUM-EVAL", 1),
         ("E-IMPORT-CYCLE", 1),
     ] {
@@ -168,6 +169,46 @@ fn oracle_front_rejections_are_four_passes_with_separate_counts() {
             executions
         );
     }
+}
+
+/// D-074: 旧 oracle は `name` の型が String と int に割れて javac で落ちた。token の直接
+/// capture は数値 token でも text なので型が揃い、生成・実行できる。oracle（生成失敗）との差は
+/// `new-contract:direct-token-capture-text` として既知乖離になる（Fail ではない）。
+#[test]
+fn a_common_field_that_only_differed_by_numeric_capture_type_now_runs() {
+    let workspace = build_front();
+    // 台帳（divergences.json）を当てた corpus 全体から、この 1 ファイルだけを取り出す。
+    let files: Vec<_> = ubnfc_harness::load_all(ubnfc_harness::default_root())
+        .unwrap()
+        .into_iter()
+        .filter(|f| {
+            f.path
+                .file_name()
+                .is_some_and(|n| n == "common-field-type.json")
+        })
+        .collect();
+    assert_eq!(files.len(), 1);
+    let report = runall::run(
+        &files,
+        &Config {
+            backend: Backend::Rust,
+            front: workspace.join("target/debug/ubnfc"),
+            rust_generator: Some(workspace.join("target/debug/ubnfc-rust")),
+            ..Config::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(report.totals.total(), 1);
+    assert_eq!(report.totals.expected_rejection_pass, 0);
+    assert_eq!(report.totals.ir_failure, 0);
+    assert!(
+        report
+            .cases
+            .iter()
+            .all(|row| row.outcome == Outcome::KnownDivergence),
+        "{:?}",
+        report.cases
+    );
 }
 
 #[test]

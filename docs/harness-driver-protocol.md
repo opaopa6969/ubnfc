@@ -108,7 +108,7 @@ prefix の認識と全入力の AST 構築を二回呼び出す。生成 driver 
 | RuleValue | `accepted_in(variant)` による全入力受理、受理時の value、指定 texts/nodes/expected/prefix |
 | Accept | 全入力受理、prefix、span、fields、指定 value。span/fields は canonical AST からも参照 |
 | Diagnostics | 最初の診断の kind と backend ごとの javaOffset/rustOffset |
-| Numeric | 全入力受理。Rust は rust_lexeme、Java は java_int と mappingError。java_int=null は mappingError 文字列を期待 |
+| Numeric | 全入力受理。両 backend とも rust_lexeme（入力字句）と `mappingError=null`（D-074。java_int は旧 Java の観測として残るが比較しない） |
 | Oracle | 型付き全フィールド、および raw に残る references/scopeDepth/parsedStatus 等（nativeFailure は D-019 により情報保存のみ） |
 | GenerationFailure | build 成功後の応答は生成成否の差分。通常の runtime 差分とは混ぜない |
 | ScopeOps/Catalog/Raw | driver にない操作結果・静的 metadata・期待値自体がない場合を未観測で報告 |
