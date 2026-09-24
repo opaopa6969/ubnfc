@@ -71,6 +71,8 @@ pub(crate) enum Event {
         span: Span,
         child: EventId,
         wrap: bool,
+        /// D-076: 意味値を持つ選択の text だけの候補。一致範囲の字句（空でも）を 1 つの値にする。
+        text: bool,
     },
     Capture {
         token_extent: bool,
@@ -2925,11 +2927,11 @@ fn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<Ast>)->Result<(),S
 // その場合は pool から stack を借りずに降りる。
 loop {match self.arena[root.0] {
 Event::Capture{child,..}=>root=child,
-Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}return Ok(());},
+Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}return Ok(());},
 Event::Rule{rule,span,child,caps}=>return self.build_rule(rule,caps,span,child,out),
 Event::Join(..)=>break,
 _=>return Ok(()),}}
-let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.arena[id.0] {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && (matches!(&out[start..],[Ast::Text(_)]) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(Ast::Text(text));}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
 fn leaf(&mut self,ty:usize,span:Span,text:String)->Result<Ast,String> {let text=self.remember_text(text,span);let span=self.span(span);match ty {
 24=>{let node_id=self.node(RULES[40],"BinaryExpr",span);Ok(Ast::g_TinyExpressionP4AST_2e_BinaryExpr(g_TinyExpressionP4AST_2e_BinaryExpr{span,node_id,g_left:None,g_op:vec![text],g_right:vec![]}))},
 _=>{let _=(span,text);Err(format!("unknown leaf type {ty}"))}}}

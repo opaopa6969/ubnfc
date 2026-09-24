@@ -687,6 +687,15 @@ public final class Session {
         return new Match(result.nodes(), result.local(), result.captures(), result.traces(), result.start(), result.end(),
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
     }
+    /**
+     * D-076: 意味値を持つ選択の text だけの候補。values を plain text（null）に戻し、選択の射影が
+     * 一致範囲の字句 1 つを値にする。内側の空反復の「値なし」（空の values）で字句を消さない。
+     */
+    public Match plain(Match result) {
+        if (result == null || !tree || result.values() == null) return result;
+        return new Match(result.nodes(), result.local(), result.captures(), result.traces(), result.start(), result.end(),
+            result.mappingFailure(), result.recoveries(), result.items(), result.text(), null);
+    }
     private Match captured(Match result, int start, int end, String site, String name, boolean skip) {
         if (skip) return result;
         var occurrence = new Occurrence(site, name, new Value(start, end, result.nodes(), result.text(), result.values()));
@@ -702,6 +711,7 @@ public final class Session {
     /** 意味値の射影。Match を包み直さず値列だけ返し、呼出し側が出現の追加と 1 度にまとめる。 */
     private static List<Value> projected(Match result, String kind, boolean many) {
         if (kind.equals("text")) return result.values();
+        if (kind.equals("plain")) return null;
         List<Value> values = result.values();
         if (values == null) values = List.of(new Value(result.start(), result.end(), result.nodes(), result.text()));
         if (kind.equals("mixed") && !many && !values.isEmpty() && allLeaves(values))
@@ -875,7 +885,7 @@ public final class Session {
     public static final class Cap {
         final String[] sites, names, spanRules; final boolean[] skips, scoped;
         final String rule, expr, semanticKind; final boolean quantified, terminal, semanticMany, bypass;
-        final boolean treeBypass, textKind, mixedScalar;
+        final boolean treeBypass, textKind, plainKind, mixedScalar;
         final Label[] failureHints;
         public Cap(String[] sites, String[] names, String[] spanRules, boolean[] skips, boolean[] scoped, String rule, String expr,
                    boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints,
@@ -884,6 +894,7 @@ public final class Session {
             this.rule = rule; this.expr = expr; this.quantified = quantified; this.terminal = terminal;
             this.semanticKind = semanticKind; this.semanticMany = semanticMany; this.failureHints = failureHints; this.bypass = bypass;
             this.treeBypass = treeBypass; this.textKind = semanticKind.equals("text");
+            this.plainKind = semanticKind.equals("plain");
             this.mixedScalar = semanticKind.equals("mixed") && !semanticMany;
         }
     }
@@ -960,7 +971,7 @@ public final class Session {
         else { var items = new Match[n]; System.arraycopy(buf, 0, items, 0, n); seq = combine(Arrays.asList(items), start, f.c); }
         progress(f);
         Cap k = b.cap;
-        if (k.treeBypass && bypassWrap) return k.textKind || !tree ? seq : project(seq, k.mixedScalar);
+        if (k.treeBypass && bypassWrap) return k.textKind || !tree ? seq : k.plainKind ? plain(seq) : project(seq, k.mixedScalar);
         if (k.bypass && bypassCapture) return seq;
         return wrap(f, c, m, seq, k.sites, k.names, k.spanRules, k.skips, k.scoped, k.rule, k.expr,
             k.quantified, k.terminal, k.semanticKind, k.semanticMany, k.failureHints);

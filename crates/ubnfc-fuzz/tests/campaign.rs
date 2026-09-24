@@ -410,18 +410,19 @@ fn b_recovery_auto_keeps_acceptance_identical_across_backends() {
 
 /// #75 の回帰試験（固定 seed campaign）。直接 capture の帯（`gen::DIRECT_CAPTURE_SEED_BASE`）は
 /// 乱数を引かずに `Direct ::= DN @dn ':' ( DN ) @dg [ DI @di ] { ',' DN @dl } DS @ds` を足し、
-/// 根の `@mapping` の field に載せる。v1 帯 2 本と v2 帯 2 本（奇数 seed は `DS` が extern）。
+/// 根の `@mapping` の field に載せる。v1 帯 3 本と v2 帯 2 本（奇数 seed は `DS` が extern）。
 /// 旧 front（D-022: Java int / Rust 字句）では、同じ帯の seed 1000002 が
 /// `diff:/ast/fields/direct/fields/dn` と `.../dl/*` を出した（縮小入力 `iあ0:1''`、
-/// `tests/direct_token_capture.rs`）。seed 1000002 自体は乱択部分に別の既存差
-/// （`diff:/ast/fields/tail/*`、issue #78）を持つので固定帯からは外した。
+/// `tests/direct_token_capture.rs`）。seed 1000002 は乱択部分に別の差
+/// （`diff:/ast/fields/tail/*`、issue #78: mixed な選択の text 候補を Rust が意味値にしない）を
+/// 持っていた。D-076 で Rust を直したので固定帯へ戻した（`tests/mixed_choice_text_value.rs`）。
 #[test]
 fn g_direct_token_captures_agree_across_backends() {
     ubnfc_fuzz::tune_generated_builds();
     let base = ubnfc_fuzz::gen::DIRECT_CAPTURE_SEED_BASE;
     let v2 = base + ubnfc_fuzz::gen::V2_SEED_BASE;
     let mut accepted = 0usize;
-    for seed in [base + 1, base + 3, v2 + 1, v2 + 2] {
+    for seed in [base + 1, base + 2, base + 3, v2 + 1, v2 + 2] {
         let grammar = ubnfc_fuzz::gen::generate(seed);
         assert!(
             grammar.features.contains("capture:directToken"),

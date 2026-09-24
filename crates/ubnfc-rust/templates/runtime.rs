@@ -71,6 +71,8 @@ pub(crate) enum Event {
         span: Span,
         child: EventId,
         wrap: bool,
+        /// D-076: 意味値を持つ選択の text だけの候補。一致範囲の字句（空でも）を 1 つの値にする。
+        text: bool,
     },
     Capture {
         token_extent: bool,

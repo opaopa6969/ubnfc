@@ -1,0 +1,1057 @@
+{
+  "slug": "diff-ast-fields-tail-bf11b609-seed1000002",
+  "signature": "diff:/ast/fields/tail/*",
+  "seed": 1000002,
+  "grammar": "grammar Fuzz {\n  @import imp from 'imported.ubnf'\n  token T0 = org.unlaxer.parser.clang.IdentifierParser\n  token DN = NumberParser\n  token DI = org.unlaxer.parser.clang.IdentifierParser\n  token DS = org.unlaxer.parser.elementary.SingleQuotedParser\n  L0 ::= ;\n  L1 ::= ;\n  M0 ::= ;\n  @mapping(C1, params=[v4, v5, v6, v7]) @scopeTree(mode=dynamic) @declares(symbol=v4) @backref(name=v6) M1 ::= ( { '+' @v4 T0 @v5 }{2,4} ( L1* ':' ) | L0 @v6 { T0{0,} '😀'+ M0* % '+' } )* L0{0,} @typeof(v4) ')' @v7;\n  @mapping(C2, params=[v8, v9, v13, v10, v11, v12]) @doc('fuzz 😀') M2 ::= '\\n' 'ab' @v8 ( [ '-'{2,4} imp.Piece '(' @v9 ] )? % '=' @typeof(v8) ':' @v13 | ')' @v10 ';' @v11 | L1{1,} @v12 '+'{0,} % ',';\n  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= imp.Piece @left { '*' @op imp.Piece @right };\n  @mapping(Direct, params=[dn, dg, di, dl, ds]) Direct ::= DN @dn ':' ( DN ) @dg [ DI @di ] { ',' DN @dl } DS @ds;\n  @root @mapping(Top, params=[head, tail, v14, v15, direct]) Root ::= Op0 @head 'あ' @head ( ',' @tail ( M1+ @v14 | '=' @v15 )? )* @tail Direct @direct;\n}\n",
+  "imported": "grammar Imported {\n  Piece ::= 'i' | 'j';\n}\n",
+  "input": "iあ,=0:1''",
+  "input_code_points": 9,
+  "differences": [
+    {
+      "path": "/ast/fields/tail/1",
+      "expected": "=",
+      "actual": null
+    }
+  ],
+  "java_violations": [],
+  "rust_violations": [],
+  "java": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": {
+      "fields": {
+        "direct": {
+          "fields": {
+            "dg": "1",
+            "di": null,
+            "dl": [],
+            "dn": "0",
+            "ds": ""
+          },
+          "span": [
+            4,
+            9
+          ],
+          "type": "Direct"
+        },
+        "head": [
+          {
+            "fields": {
+              "left": "i",
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              1
+            ],
+            "type": "Bin0"
+          },
+          "あ"
+        ],
+        "tail": [
+          ",",
+          "="
+        ],
+        "v14": [],
+        "v15": [
+          "="
+        ]
+      },
+      "span": [
+        0,
+        9
+      ],
+      "type": "Top"
+    },
+    "captures": [
+      {
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": "あ"
+      },
+      {
+        "name": "tail",
+        "span": [
+          2,
+          3
+        ],
+        "text": ","
+      },
+      {
+        "name": "v15",
+        "span": [
+          3,
+          4
+        ],
+        "text": "="
+      },
+      {
+        "name": "tail",
+        "span": [
+          2,
+          4
+        ],
+        "text": ",="
+      },
+      {
+        "name": "dn",
+        "span": [
+          4,
+          5
+        ],
+        "text": "0"
+      },
+      {
+        "name": "dg",
+        "span": [
+          6,
+          7
+        ],
+        "text": "1"
+      },
+      {
+        "name": "ds",
+        "span": [
+          7,
+          9
+        ],
+        "text": "''"
+      },
+      {
+        "name": "direct",
+        "span": [
+          4,
+          9
+        ],
+        "text": "0:1''"
+      }
+    ],
+    "catalogs": [],
+    "consumed": 9,
+    "declarations": [],
+    "diagnostics": [],
+    "fullConsumed": 9,
+    "fullMatched": 9,
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 0,
+        "exprId": "expr:imported.ubnf:31:34:body/0/literal",
+        "occurrenceId": 5,
+        "parentOccurrenceId": 4,
+        "ruleId": "Fuzz::imp.Piece",
+        "span": [
+          0,
+          1
+        ],
+        "token": "i"
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:imported.ubnf:31:40:body/choice",
+        "occurrenceId": 4,
+        "parentOccurrenceId": 3,
+        "ruleId": "Fuzz::imp.Piece",
+        "span": [
+          0,
+          1
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:780:789:body/0/ruleRef",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          1
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:796:824:body/1/repeat",
+        "occurrenceId": 6,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          1,
+          1
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 4,
+        "exprId": "expr:grammar.ubnf:780:824:body/seq",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          1
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 5,
+        "exprId": "expr:grammar.ubnf:1011:1014:body/0/ruleRef",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          1
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 6,
+        "exprId": "expr:grammar.ubnf:1021:1024:body/1/literal",
+        "occurrenceId": 7,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          1,
+          2
+        ],
+        "token": "あ"
+      },
+      {
+        "completionOrder": 7,
+        "exprId": "expr:grammar.ubnf:1033:1036:body/2/0/0/0/0/literal",
+        "occurrenceId": 11,
+        "parentOccurrenceId": 10,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          2,
+          3
+        ],
+        "token": ","
+      },
+      {
+        "completionOrder": 8,
+        "exprId": "expr:grammar.ubnf:1056:1059:body/2/0/0/0/1/0/0/0/1/literal",
+        "occurrenceId": 16,
+        "parentOccurrenceId": 15,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          4
+        ],
+        "token": "="
+      },
+      {
+        "completionOrder": 9,
+        "exprId": "expr:grammar.ubnf:1045:1059:body/2/0/0/0/1/0/0/0/choice",
+        "occurrenceId": 15,
+        "parentOccurrenceId": 14,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          4
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 10,
+        "exprId": "expr:grammar.ubnf:1043:1066:body/2/0/0/0/1/0/0/group",
+        "occurrenceId": 14,
+        "parentOccurrenceId": 13,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          4
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 11,
+        "exprId": "expr:grammar.ubnf:1043:1066:body/2/0/0/0/1/0/seq",
+        "occurrenceId": 13,
+        "parentOccurrenceId": 12,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          4
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 12,
+        "exprId": "expr:grammar.ubnf:1043:1067:body/2/0/0/0/1/repeat",
+        "occurrenceId": 12,
+        "parentOccurrenceId": 10,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          4
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 13,
+        "exprId": "expr:grammar.ubnf:1033:1067:body/2/0/0/0/seq",
+        "occurrenceId": 10,
+        "parentOccurrenceId": 9,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          2,
+          4
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 14,
+        "exprId": "expr:grammar.ubnf:1031:1069:body/2/0/0/group",
+        "occurrenceId": 9,
+        "parentOccurrenceId": 8,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          2,
+          4
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 15,
+        "exprId": "expr:grammar.ubnf:1031:1069:body/2/0/seq",
+        "occurrenceId": 8,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          2,
+          4
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 16,
+        "exprId": "expr:grammar.ubnf:885:887:body/0/tokenRef",
+        "occurrenceId": 19,
+        "parentOccurrenceId": 18,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          4,
+          5
+        ],
+        "token": "0"
+      },
+      {
+        "completionOrder": 17,
+        "exprId": "expr:grammar.ubnf:892:895:body/1/literal",
+        "occurrenceId": 20,
+        "parentOccurrenceId": 18,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          5,
+          6
+        ],
+        "token": ":"
+      },
+      {
+        "completionOrder": 18,
+        "exprId": "expr:grammar.ubnf:898:900:body/2/0/0/tokenRef",
+        "occurrenceId": 23,
+        "parentOccurrenceId": 22,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          6,
+          7
+        ],
+        "token": "1"
+      },
+      {
+        "completionOrder": 19,
+        "exprId": "expr:grammar.ubnf:898:900:body/2/0/seq",
+        "occurrenceId": 22,
+        "parentOccurrenceId": 21,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          6,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 20,
+        "exprId": "expr:grammar.ubnf:896:902:body/2/group",
+        "occurrenceId": 21,
+        "parentOccurrenceId": 18,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          6,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 21,
+        "exprId": "expr:grammar.ubnf:907:917:body/3/optional",
+        "occurrenceId": 24,
+        "parentOccurrenceId": 18,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          7,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 22,
+        "exprId": "expr:grammar.ubnf:918:932:body/4/repeat",
+        "occurrenceId": 25,
+        "parentOccurrenceId": 18,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          7,
+          7
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 23,
+        "exprId": "expr:grammar.ubnf:933:935:body/5/tokenRef",
+        "occurrenceId": 26,
+        "parentOccurrenceId": 18,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          7,
+          9
+        ],
+        "token": "''"
+      },
+      {
+        "completionOrder": 24,
+        "exprId": "expr:grammar.ubnf:885:935:body/seq",
+        "occurrenceId": 18,
+        "parentOccurrenceId": 17,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          4,
+          9
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 25,
+        "exprId": "expr:grammar.ubnf:1077:1083:body/3/ruleRef",
+        "occurrenceId": 17,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          4,
+          9
+        ],
+        "token": null
+      },
+      {
+        "completionOrder": 26,
+        "exprId": "expr:grammar.ubnf:1011:1083:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": -1,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          9
+        ],
+        "token": null
+      }
+    ],
+    "mappingError": null,
+    "matched": 9,
+    "nativeFailure": {
+      "consumed": 7,
+      "expected": [
+        "','",
+        "'.'",
+        "AlphabetUnderScoreParser",
+        "DigitParser",
+        "EParser",
+        "ExponentParser",
+        "IdentifierParser",
+        "__CaptureSite"
+      ],
+      "matched": 7,
+      "offset": 7
+    },
+    "nodes": [],
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Op0:0",
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": "あ"
+      },
+      {
+        "binding": "Root:3",
+        "name": "tail",
+        "span": [
+          2,
+          3
+        ],
+        "text": ","
+      },
+      {
+        "binding": "Root:5",
+        "name": "v15",
+        "span": [
+          3,
+          4
+        ],
+        "text": "="
+      },
+      {
+        "binding": "Root:2",
+        "name": "tail",
+        "span": [
+          2,
+          4
+        ],
+        "text": ",="
+      },
+      {
+        "binding": "Direct:0",
+        "name": "dn",
+        "span": [
+          4,
+          5
+        ],
+        "text": "0"
+      },
+      {
+        "binding": "Direct:1",
+        "name": "dg",
+        "span": [
+          6,
+          7
+        ],
+        "text": "1"
+      },
+      {
+        "binding": "Direct:4",
+        "name": "ds",
+        "span": [
+          7,
+          9
+        ],
+        "text": "''"
+      },
+      {
+        "binding": "Root:6",
+        "name": "direct",
+        "span": [
+          4,
+          9
+        ],
+        "text": "0:1''"
+      }
+    ],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [
+        "dynamic"
+      ],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "texts": [
+      [
+        0,
+        1,
+        "i"
+      ],
+      [
+        1,
+        2,
+        "あ"
+      ],
+      [
+        2,
+        3,
+        ","
+      ],
+      [
+        3,
+        4,
+        "="
+      ],
+      [
+        3,
+        4,
+        "="
+      ],
+      [
+        4,
+        5,
+        "0"
+      ],
+      [
+        6,
+        7,
+        "1"
+      ],
+      [
+        7,
+        9,
+        ""
+      ]
+    ]
+  },
+  "rust": {
+    "accepted": true,
+    "allConsumed": true,
+    "ast": {
+      "fields": {
+        "direct": {
+          "fields": {
+            "dg": "1",
+            "di": null,
+            "dl": [],
+            "dn": "0",
+            "ds": ""
+          },
+          "span": [
+            4,
+            9
+          ],
+          "type": "Direct"
+        },
+        "head": [
+          {
+            "fields": {
+              "left": "i",
+              "op": [],
+              "right": []
+            },
+            "span": [
+              0,
+              1
+            ],
+            "type": "Bin0"
+          },
+          "あ"
+        ],
+        "tail": [
+          ","
+        ],
+        "v14": [],
+        "v15": [
+          "="
+        ]
+      },
+      "span": [
+        0,
+        9
+      ],
+      "type": "Top"
+    },
+    "captures": [
+      {
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": "あ"
+      },
+      {
+        "name": "tail",
+        "span": [
+          2,
+          3
+        ],
+        "text": ","
+      },
+      {
+        "name": "v15",
+        "span": [
+          3,
+          4
+        ],
+        "text": "="
+      },
+      {
+        "name": "tail",
+        "span": [
+          2,
+          4
+        ],
+        "text": ",="
+      },
+      {
+        "name": "dn",
+        "span": [
+          4,
+          5
+        ],
+        "text": "0"
+      },
+      {
+        "name": "dg",
+        "span": [
+          6,
+          7
+        ],
+        "text": "1"
+      },
+      {
+        "name": "ds",
+        "span": [
+          7,
+          9
+        ],
+        "text": "''"
+      },
+      {
+        "name": "direct",
+        "span": [
+          4,
+          9
+        ],
+        "text": "0:1''"
+      }
+    ],
+    "catalogs": [],
+    "consumed": 9,
+    "declarations": [],
+    "diagnostics": [],
+    "fullConsumed": 9,
+    "fullMatched": 9,
+    "hints": [
+      {
+        "deepestRule": "Fuzz::Direct",
+        "expected": [
+          "DI",
+          ","
+        ],
+        "offset": 7,
+        "rulePath": [
+          "Fuzz::Root",
+          "Fuzz::Direct"
+        ]
+      }
+    ],
+    "id": 0,
+    "lexical": [
+      {
+        "completionOrder": 11,
+        "exprId": "expr:grammar.ubnf:1011:1083:body/seq",
+        "occurrenceId": 0,
+        "parentOccurrenceId": null,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          0,
+          9
+        ]
+      },
+      {
+        "completionOrder": 2,
+        "exprId": "expr:grammar.ubnf:780:824:body/seq",
+        "occurrenceId": 1,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Op0",
+        "span": [
+          0,
+          1
+        ]
+      },
+      {
+        "completionOrder": 1,
+        "exprId": "expr:imported.ubnf:31:40:body/choice",
+        "occurrenceId": 2,
+        "parentOccurrenceId": 1,
+        "ruleId": "Fuzz::imp.Piece",
+        "span": [
+          0,
+          1
+        ]
+      },
+      {
+        "completionOrder": 10,
+        "exprId": "expr:grammar.ubnf:885:935:body/seq",
+        "occurrenceId": 3,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          4,
+          9
+        ]
+      },
+      {
+        "completionOrder": 0,
+        "exprId": "expr:imported.ubnf:31:34:body/0/literal",
+        "occurrenceId": 4,
+        "parentOccurrenceId": 2,
+        "ruleId": "Fuzz::imp.Piece",
+        "span": [
+          0,
+          1
+        ]
+      },
+      {
+        "completionOrder": 3,
+        "exprId": "expr:grammar.ubnf:1021:1024:body/1/literal",
+        "occurrenceId": 5,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          1,
+          2
+        ]
+      },
+      {
+        "completionOrder": 4,
+        "exprId": "expr:grammar.ubnf:1033:1036:body/2/0/0/0/0/literal",
+        "occurrenceId": 6,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          2,
+          3
+        ]
+      },
+      {
+        "completionOrder": 5,
+        "exprId": "expr:grammar.ubnf:1056:1059:body/2/0/0/0/1/0/0/0/1/literal",
+        "occurrenceId": 7,
+        "parentOccurrenceId": 0,
+        "ruleId": "Fuzz::Root",
+        "span": [
+          3,
+          4
+        ]
+      },
+      {
+        "completionOrder": 6,
+        "exprId": "expr:grammar.ubnf:885:887:body/0/tokenRef",
+        "occurrenceId": 8,
+        "parentOccurrenceId": 3,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          4,
+          5
+        ]
+      },
+      {
+        "completionOrder": 7,
+        "exprId": "expr:grammar.ubnf:892:895:body/1/literal",
+        "occurrenceId": 9,
+        "parentOccurrenceId": 3,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          5,
+          6
+        ]
+      },
+      {
+        "completionOrder": 8,
+        "exprId": "expr:grammar.ubnf:898:900:body/2/0/0/tokenRef",
+        "occurrenceId": 10,
+        "parentOccurrenceId": 3,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          6,
+          7
+        ]
+      },
+      {
+        "completionOrder": 9,
+        "exprId": "expr:grammar.ubnf:933:935:body/5/tokenRef",
+        "occurrenceId": 11,
+        "parentOccurrenceId": 3,
+        "ruleId": "Fuzz::Direct",
+        "span": [
+          7,
+          9
+        ]
+      }
+    ],
+    "mappingError": null,
+    "matched": 9,
+    "nodes": [],
+    "parsedStatus": "succeeded",
+    "prefixCaptures": [
+      {
+        "binding": "Op0:0",
+        "name": "left",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "binding": "Root:0",
+        "name": "head",
+        "span": [
+          0,
+          1
+        ],
+        "text": "i"
+      },
+      {
+        "binding": "Root:1",
+        "name": "head",
+        "span": [
+          1,
+          2
+        ],
+        "text": "あ"
+      },
+      {
+        "binding": "Root:3",
+        "name": "tail",
+        "span": [
+          2,
+          3
+        ],
+        "text": ","
+      },
+      {
+        "binding": "Root:5",
+        "name": "v15",
+        "span": [
+          3,
+          4
+        ],
+        "text": "="
+      },
+      {
+        "binding": "Root:2",
+        "name": "tail",
+        "span": [
+          2,
+          4
+        ],
+        "text": ",="
+      },
+      {
+        "binding": "Direct:0",
+        "name": "dn",
+        "span": [
+          4,
+          5
+        ],
+        "text": "0"
+      },
+      {
+        "binding": "Direct:1",
+        "name": "dg",
+        "span": [
+          6,
+          7
+        ],
+        "text": "1"
+      },
+      {
+        "binding": "Direct:4",
+        "name": "ds",
+        "span": [
+          7,
+          9
+        ],
+        "text": "''"
+      },
+      {
+        "binding": "Root:6",
+        "name": "direct",
+        "span": [
+          4,
+          9
+        ],
+        "text": "0:1''"
+      }
+    ],
+    "recoveries": [],
+    "references": [],
+    "scope": {
+      "declarations": [],
+      "depth": 0,
+      "diagnostics": [],
+      "events": [],
+      "mode": [
+        "dynamic"
+      ],
+      "references": []
+    },
+    "scopeDepth": 0,
+    "texts": [
+      [
+        1,
+        2,
+        "あ"
+      ],
+      [
+        2,
+        3,
+        ","
+      ]
+    ]
+  },
+  "shrink_rounds": 12
+}

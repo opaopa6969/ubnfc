@@ -1444,7 +1444,7 @@ let mark=self.mark();
 let key=Key {expression:0,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b0_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -1474,7 +1474,7 @@ out
 fn e1_c(&mut self,state:State)->Step {
 let mut out=self.b1_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -1505,7 +1505,7 @@ out
 fn e3_c(&mut self,state:State)->Step {
 let mut out=self.b3_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -1537,7 +1537,7 @@ out
 fn e5_c(&mut self,state:State)->Step {
 let mut out=self.b5_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -1569,7 +1569,7 @@ out
 fn e7_c(&mut self,state:State)->Step {
 let mut out=self.b7_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'('", "')'", "'@'"]);}
 out
 }
@@ -1612,7 +1612,7 @@ out
 fn e10_c(&mut self,state:State)->Step {
 let mut out=self.b10_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -1715,7 +1715,7 @@ out
 fn e17_c(&mut self,state:State)->Step {
 let mut out=self.b17_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
@@ -2035,7 +2035,7 @@ let mark=self.mark();
 let key=Key {expression:38,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b38_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -2176,7 +2176,7 @@ out
 fn e47_c(&mut self,state:State)->Step {
 let mut out=self.b47_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -2197,7 +2197,7 @@ out
 fn e48_c(&mut self,state:State)->Step {
 let mut out=self.b48_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -2231,7 +2231,7 @@ out
 fn e50_c(&mut self,state:State)->Step {
 let mut out=self.b50_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -2323,7 +2323,7 @@ let mark=self.mark();
 let key=Key {expression:56,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b56_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -2464,7 +2464,7 @@ out
 fn e65_c(&mut self,state:State)->Step {
 let mut out=self.b65_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -2485,7 +2485,7 @@ out
 fn e66_c(&mut self,state:State)->Step {
 let mut out=self.b66_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -2519,7 +2519,7 @@ out
 fn e68_c(&mut self,state:State)->Step {
 let mut out=self.b68_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -2611,7 +2611,7 @@ let mark=self.mark();
 let key=Key {expression:74,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b74_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -2752,7 +2752,7 @@ out
 fn e83_c(&mut self,state:State)->Step {
 let mut out=self.b83_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -2773,7 +2773,7 @@ out
 fn e84_c(&mut self,state:State)->Step {
 let mut out=self.b84_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -2807,7 +2807,7 @@ out
 fn e86_c(&mut self,state:State)->Step {
 let mut out=self.b86_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -2899,7 +2899,7 @@ let mark=self.mark();
 let key=Key {expression:92,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b92_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -3040,7 +3040,7 @@ out
 fn e101_c(&mut self,state:State)->Step {
 let mut out=self.b101_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -3061,7 +3061,7 @@ out
 fn e102_c(&mut self,state:State)->Step {
 let mut out=self.b102_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'set'"]);}
 out
 }
@@ -3095,7 +3095,7 @@ out
 fn e104_c(&mut self,state:State)->Step {
 let mut out=self.b104_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -3952,7 +3952,7 @@ let mark=self.mark();
 let key=Key {expression:161,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b161_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4016,7 +4016,7 @@ out
 fn e165_c(&mut self,state:State)->Step {
 let mut out=self.b165_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -4063,7 +4063,7 @@ let mark=self.mark();
 let key=Key {expression:168,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b168_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4094,7 +4094,7 @@ out
 fn e170_c(&mut self,state:State)->Step {
 let mut out=self.b170_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -4114,7 +4114,7 @@ out
 fn e171_c(&mut self,state:State)->Step {
 let mut out=self.b171_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','", "'='"]);}
 out
 }
@@ -4159,7 +4159,7 @@ let mark=self.mark();
 let key=Key {expression:174,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b174_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4287,7 +4287,7 @@ let mark=self.mark();
 let key=Key {expression:183,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b183_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4356,7 +4356,7 @@ out
 fn e187_c(&mut self,state:State)->Step {
 let mut out=self.b187_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -4442,7 +4442,7 @@ let mark=self.mark();
 let key=Key {expression:193,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b193_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4511,7 +4511,7 @@ out
 fn e197_c(&mut self,state:State)->Step {
 let mut out=self.b197_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -4597,7 +4597,7 @@ let mark=self.mark();
 let key=Key {expression:203,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b203_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4666,7 +4666,7 @@ out
 fn e207_c(&mut self,state:State)->Step {
 let mut out=self.b207_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -4752,7 +4752,7 @@ let mark=self.mark();
 let key=Key {expression:213,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b213_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4821,7 +4821,7 @@ out
 fn e217_c(&mut self,state:State)->Step {
 let mut out=self.b217_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -4907,7 +4907,7 @@ let mark=self.mark();
 let key=Key {expression:223,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b223_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -4939,7 +4939,7 @@ out
 fn e225_c(&mut self,state:State)->Step {
 let mut out=self.b225_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -4959,7 +4959,7 @@ out
 fn e226_c(&mut self,state:State)->Step {
 let mut out=self.b226_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -5317,7 +5317,7 @@ let mark=self.mark();
 let key=Key {expression:250,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b250_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -5490,7 +5490,7 @@ out
 fn e260_c(&mut self,state:State)->Step {
 let mut out=self.b260_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -5520,7 +5520,7 @@ out
 fn e262_c(&mut self,state:State)->Step {
 let mut out=self.b262_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -5580,6 +5580,7 @@ fn e266_c(&mut self,state:State)->Step {
 let mut out=self.b266_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:266,rule:31,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 out.events=self.event(Event::Capture {site:43,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["IdentifierParser", "__CaptureSite"]);}
 out
@@ -5605,7 +5606,7 @@ out
 fn e268_c(&mut self,state:State)->Step {
 let mut out=self.b268_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -5653,7 +5654,7 @@ let mark=self.mark();
 let key=Key {expression:271,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b271_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -5903,7 +5904,7 @@ out
 fn e286_c(&mut self,state:State)->Step {
 let mut out=self.b286_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -5933,7 +5934,7 @@ out
 fn e288_c(&mut self,state:State)->Step {
 let mut out=self.b288_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -5993,6 +5994,7 @@ fn e292_c(&mut self,state:State)->Step {
 let mut out=self.b292_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:292,rule:32,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 out.events=self.event(Event::Capture {site:47,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["IdentifierParser", "__CaptureSite"]);}
 out
@@ -6018,7 +6020,7 @@ out
 fn e294_c(&mut self,state:State)->Step {
 let mut out=self.b294_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -6066,7 +6068,7 @@ let mark=self.mark();
 let key=Key {expression:297,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b297_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -6239,7 +6241,7 @@ out
 fn e307_c(&mut self,state:State)->Step {
 let mut out=self.b307_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -6269,7 +6271,7 @@ out
 fn e309_c(&mut self,state:State)->Step {
 let mut out=self.b309_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -6329,6 +6331,7 @@ fn e313_c(&mut self,state:State)->Step {
 let mut out=self.b313_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:313,rule:33,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 out.events=self.event(Event::Capture {site:51,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["IdentifierParser", "__CaptureSite"]);}
 out
@@ -6354,7 +6357,7 @@ out
 fn e315_c(&mut self,state:State)->Step {
 let mut out=self.b315_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -6402,7 +6405,7 @@ let mark=self.mark();
 let key=Key {expression:318,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b318_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -6575,7 +6578,7 @@ out
 fn e328_c(&mut self,state:State)->Step {
 let mut out=self.b328_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -6605,7 +6608,7 @@ out
 fn e330_c(&mut self,state:State)->Step {
 let mut out=self.b330_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'#'"]);}
 out
 }
@@ -6665,6 +6668,7 @@ fn e334_c(&mut self,state:State)->Step {
 let mut out=self.b334_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:334,rule:34,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 out.events=self.event(Event::Capture {site:55,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["IdentifierParser", "__CaptureSite"]);}
 out
@@ -6690,7 +6694,7 @@ out
 fn e336_c(&mut self,state:State)->Step {
 let mut out=self.b336_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -6833,7 +6837,7 @@ let mark=self.mark();
 let key=Key {expression:345,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b345_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -6896,7 +6900,7 @@ out
 fn e349_c(&mut self,state:State)->Step {
 let mut out=self.b349_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Optional"]);}
 out
 }
@@ -6944,7 +6948,7 @@ let mark=self.mark();
 let key=Key {expression:352,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b352_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -7107,7 +7111,7 @@ let mark=self.mark();
 let key=Key {expression:363,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b363_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -7139,7 +7143,7 @@ out
 fn e365_c(&mut self,state:State)->Step {
 let mut out=self.b365_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -7159,7 +7163,7 @@ out
 fn e366_c(&mut self,state:State)->Step {
 let mut out=self.b366_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -7205,7 +7209,7 @@ let mark=self.mark();
 let key=Key {expression:369,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b369_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -7237,7 +7241,7 @@ out
 fn e371_c(&mut self,state:State)->Step {
 let mut out=self.b371_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -7257,7 +7261,7 @@ out
 fn e372_c(&mut self,state:State)->Step {
 let mut out=self.b372_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["NumberExpressionRepeat0Parser"]);}
 out
 }
@@ -7302,7 +7306,7 @@ let mark=self.mark();
 let key=Key {expression:375,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b375_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -7334,7 +7338,7 @@ out
 fn e377_c(&mut self,state:State)->Step {
 let mut out=self.b377_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -7354,7 +7358,7 @@ out
 fn e378_c(&mut self,state:State)->Step {
 let mut out=self.b378_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["NumberTermRepeat0Parser"]);}
 out
 }
@@ -7708,7 +7712,7 @@ let mark=self.mark();
 let key=Key {expression:402,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b402_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -7785,7 +7789,7 @@ let mark=self.mark();
 let key=Key {expression:407,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b407_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -7862,7 +7866,7 @@ let mark=self.mark();
 let key=Key {expression:412,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b412_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -7939,7 +7943,7 @@ let mark=self.mark();
 let key=Key {expression:417,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b417_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8016,7 +8020,7 @@ let mark=self.mark();
 let key=Key {expression:422,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b422_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8080,7 +8084,7 @@ out
 fn e426_c(&mut self,state:State)->Step {
 let mut out=self.b426_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -8100,7 +8104,7 @@ out
 fn e427_c(&mut self,state:State)->Step {
 let mut out=self.b427_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -8159,7 +8163,7 @@ let mark=self.mark();
 let key=Key {expression:431,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b431_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8223,7 +8227,7 @@ out
 fn e435_c(&mut self,state:State)->Step {
 let mut out=self.b435_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -8243,7 +8247,7 @@ out
 fn e436_c(&mut self,state:State)->Step {
 let mut out=self.b436_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -8361,7 +8365,7 @@ let mark=self.mark();
 let key=Key {expression:444,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b444_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8438,7 +8442,7 @@ let mark=self.mark();
 let key=Key {expression:449,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b449_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8515,7 +8519,7 @@ let mark=self.mark();
 let key=Key {expression:454,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b454_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8592,7 +8596,7 @@ let mark=self.mark();
 let key=Key {expression:459,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b459_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8669,7 +8673,7 @@ let mark=self.mark();
 let key=Key {expression:464,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b464_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8775,7 +8779,7 @@ let mark=self.mark();
 let key=Key {expression:471,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b471_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8852,7 +8856,7 @@ let mark=self.mark();
 let key=Key {expression:476,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b476_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -8929,7 +8933,7 @@ let mark=self.mark();
 let key=Key {expression:481,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b481_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9176,6 +9180,7 @@ fn e498_c(&mut self,state:State)->Step {
 let mut out=self.b498_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:498,rule:60,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 } else {self.display_failures(state.consumed.max(state.matched),&["NumberParser"]);}
 out
 }
@@ -9209,7 +9214,7 @@ out
 fn e501_c(&mut self,state:State)->Step {
 let mut out=self.b501_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'('", "')'"]);}
 out
 }
@@ -9269,7 +9274,7 @@ let mark=self.mark();
 let key=Key {expression:505,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b505_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9346,7 +9351,7 @@ let mark=self.mark();
 let key=Key {expression:510,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b510_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9423,7 +9428,7 @@ let mark=self.mark();
 let key=Key {expression:515,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b515_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9500,7 +9505,7 @@ let mark=self.mark();
 let key=Key {expression:520,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b520_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9577,7 +9582,7 @@ let mark=self.mark();
 let key=Key {expression:525,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b525_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9654,7 +9659,7 @@ let mark=self.mark();
 let key=Key {expression:530,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b530_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9731,7 +9736,7 @@ let mark=self.mark();
 let key=Key {expression:535,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b535_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9808,7 +9813,7 @@ let mark=self.mark();
 let key=Key {expression:540,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b540_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9885,7 +9890,7 @@ let mark=self.mark();
 let key=Key {expression:545,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b545_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -9962,7 +9967,7 @@ let mark=self.mark();
 let key=Key {expression:550,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b550_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -10055,7 +10060,7 @@ out
 fn e556_c(&mut self,state:State)->Step {
 let mut out=self.b556_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10075,7 +10080,7 @@ out
 fn e557_c(&mut self,state:State)->Step {
 let mut out=self.b557_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10134,7 +10139,7 @@ let mark=self.mark();
 let key=Key {expression:561,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b561_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -10227,7 +10232,7 @@ out
 fn e567_c(&mut self,state:State)->Step {
 let mut out=self.b567_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10247,7 +10252,7 @@ out
 fn e568_c(&mut self,state:State)->Step {
 let mut out=self.b568_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10306,7 +10311,7 @@ let mark=self.mark();
 let key=Key {expression:572,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b572_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -10399,7 +10404,7 @@ out
 fn e578_c(&mut self,state:State)->Step {
 let mut out=self.b578_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10419,7 +10424,7 @@ out
 fn e579_c(&mut self,state:State)->Step {
 let mut out=self.b579_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10478,7 +10483,7 @@ let mark=self.mark();
 let key=Key {expression:583,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b583_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -10556,7 +10561,7 @@ out
 fn e588_c(&mut self,state:State)->Step {
 let mut out=self.b588_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10576,7 +10581,7 @@ out
 fn e589_c(&mut self,state:State)->Step {
 let mut out=self.b589_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10635,7 +10640,7 @@ let mark=self.mark();
 let key=Key {expression:593,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b593_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -10713,7 +10718,7 @@ out
 fn e598_c(&mut self,state:State)->Step {
 let mut out=self.b598_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10733,7 +10738,7 @@ out
 fn e599_c(&mut self,state:State)->Step {
 let mut out=self.b599_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10792,7 +10797,7 @@ let mark=self.mark();
 let key=Key {expression:603,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b603_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -10870,7 +10875,7 @@ out
 fn e608_c(&mut self,state:State)->Step {
 let mut out=self.b608_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10890,7 +10895,7 @@ out
 fn e609_c(&mut self,state:State)->Step {
 let mut out=self.b609_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -10949,7 +10954,7 @@ let mark=self.mark();
 let key=Key {expression:613,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b613_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -11027,7 +11032,7 @@ out
 fn e618_c(&mut self,state:State)->Step {
 let mut out=self.b618_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -11047,7 +11052,7 @@ out
 fn e619_c(&mut self,state:State)->Step {
 let mut out=self.b619_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -11175,7 +11180,7 @@ let mark=self.mark();
 let key=Key {expression:628,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b628_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -11252,7 +11257,7 @@ let mark=self.mark();
 let key=Key {expression:633,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b633_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -11358,7 +11363,7 @@ let mark=self.mark();
 let key=Key {expression:640,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b640_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -11690,7 +11695,7 @@ out
 fn e661_c(&mut self,state:State)->Step {
 let mut out=self.b661_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'$'", "'('", "')'"]);}
 out
 }
@@ -11826,6 +11831,7 @@ fn e672_c(&mut self,state:State)->Step {
 let mut out=self.b672_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:672,rule:82,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 } else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
@@ -11861,7 +11867,7 @@ let mark=self.mark();
 let key=Key {expression:675,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b675_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -11892,7 +11898,7 @@ let mark=self.mark();
 let key=Key {expression:677,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b677_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -11923,7 +11929,7 @@ let mark=self.mark();
 let key=Key {expression:679,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b679_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -12021,7 +12027,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e690_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 diagnostic=self.diag_join(diagnostic,cur.diag);break 'factored cur;
 }
 self.display_failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
@@ -12031,7 +12037,7 @@ self.restore(m17);cur=b18;
 let child=self.e697_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f20;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(133),None);
 self.retag(ev3,None,Some(693));
 self.retag(ev7,Some(134),None);
@@ -12051,7 +12057,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e705_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(136),None);
 self.retag(ev3,None,Some(700));
 self.retag(ev7,Some(137),None);
@@ -12065,7 +12071,7 @@ self.restore(m13);cur=b14;
 let child=self.e711_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f22;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(139),None);
 self.retag(ev3,None,Some(708));
 self.retag(ev7,Some(140),None);
@@ -12103,7 +12109,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e719_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(141),None);
 self.retag(ev3,None,Some(714));
 diagnostic=self.diag_join(diagnostic,cur.diag);break 'factored cur;
@@ -12115,7 +12121,7 @@ self.restore(m29);cur=b30;
 let child=self.e725_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f32;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(144),None);
 self.retag(ev3,None,Some(722));
 self.retag(ev23,None,Some(723));
@@ -12134,7 +12140,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e732_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(146),None);
 self.retag(ev3,None,Some(728));
 self.retag(ev23,None,Some(729));
@@ -12147,7 +12153,7 @@ self.restore(m25);cur=b26;
 let child=self.e737_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f34;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:true});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:true,text:false});
 self.retag(ev0,Some(148),None);
 self.retag(ev3,None,Some(735));
 self.retag(ev23,None,Some(736));
@@ -12187,7 +12193,7 @@ out
 fn e682_c(&mut self,state:State)->Step {
 let mut out=self.b682_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -12318,7 +12324,7 @@ out
 fn e691_c(&mut self,state:State)->Step {
 let mut out=self.b691_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -12420,7 +12426,7 @@ out
 fn e698_c(&mut self,state:State)->Step {
 let mut out=self.b698_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -12537,7 +12543,7 @@ out
 fn e706_c(&mut self,state:State)->Step {
 let mut out=self.b706_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -12625,7 +12631,7 @@ out
 fn e712_c(&mut self,state:State)->Step {
 let mut out=self.b712_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -12742,7 +12748,7 @@ out
 fn e720_c(&mut self,state:State)->Step {
 let mut out=self.b720_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -12830,7 +12836,7 @@ out
 fn e726_c(&mut self,state:State)->Step {
 let mut out=self.b726_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -12933,7 +12939,7 @@ out
 fn e733_c(&mut self,state:State)->Step {
 let mut out=self.b733_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13075,7 +13081,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e747_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f19;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 diagnostic=self.diag_join(diagnostic,cur.diag);break 'factored cur;
 }
 self.display_failures(entry.consumed.max(entry.matched),&["':'", "'['", "']'"]);
@@ -13085,7 +13091,7 @@ self.restore(m17);cur=b18;
 let child=self.e754_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f20;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(153),None);
 self.retag(ev3,None,Some(750));
 self.retag(ev7,Some(154),None);
@@ -13105,7 +13111,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e762_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f21;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(156),None);
 self.retag(ev3,None,Some(757));
 self.retag(ev7,Some(157),None);
@@ -13119,7 +13125,7 @@ self.restore(m13);cur=b14;
 let child=self.e768_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f22;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(159),None);
 self.retag(ev3,None,Some(765));
 self.retag(ev7,Some(160),None);
@@ -13157,7 +13163,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e776_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f31;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(161),None);
 self.retag(ev3,None,Some(771));
 diagnostic=self.diag_join(diagnostic,cur.diag);break 'factored cur;
@@ -13169,7 +13175,7 @@ self.restore(m29);cur=b30;
 let child=self.e782_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f32;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(164),None);
 self.retag(ev3,None,Some(779));
 self.retag(ev23,None,Some(780));
@@ -13188,7 +13194,7 @@ let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 let child=self.e789_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f33;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:false,text:false});
 self.retag(ev0,Some(166),None);
 self.retag(ev3,None,Some(785));
 self.retag(ev23,None,Some(786));
@@ -13201,7 +13207,7 @@ self.restore(m25);cur=b26;
 let child=self.e794_c(cur.state);cur=self.combine(cur,child);if !cur.ok {break 'f34;}
 let trivia=self.trivia_1::<false>(cur.state);cur=self.combine(cur,trivia);
 cur.state=st.commit(cur.state);
-cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:true});
+cur.events=self.event(Event::Values{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:true,text:false});
 self.retag(ev0,Some(168),None);
 self.retag(ev3,None,Some(792));
 self.retag(ev23,None,Some(793));
@@ -13241,7 +13247,7 @@ out
 fn e739_c(&mut self,state:State)->Step {
 let mut out=self.b739_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13372,7 +13378,7 @@ out
 fn e748_c(&mut self,state:State)->Step {
 let mut out=self.b748_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13474,7 +13480,7 @@ out
 fn e755_c(&mut self,state:State)->Step {
 let mut out=self.b755_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13591,7 +13597,7 @@ out
 fn e763_c(&mut self,state:State)->Step {
 let mut out=self.b763_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13679,7 +13685,7 @@ out
 fn e769_c(&mut self,state:State)->Step {
 let mut out=self.b769_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13796,7 +13802,7 @@ out
 fn e777_c(&mut self,state:State)->Step {
 let mut out=self.b777_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13884,7 +13890,7 @@ out
 fn e783_c(&mut self,state:State)->Step {
 let mut out=self.b783_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -13987,7 +13993,7 @@ out
 fn e790_c(&mut self,state:State)->Step {
 let mut out=self.b790_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["':'", "'['", "']'"]);}
 out
 }
@@ -14105,7 +14111,7 @@ let mark=self.mark();
 let key=Key {expression:798,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b798_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -14137,7 +14143,7 @@ out
 fn e800_c(&mut self,state:State)->Step {
 let mut out=self.b800_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -14157,7 +14163,7 @@ out
 fn e801_c(&mut self,state:State)->Step {
 let mut out=self.b801_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'+'"]);}
 out
 }
@@ -14204,7 +14210,7 @@ let mark=self.mark();
 let key=Key {expression:804,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b804_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -14456,6 +14462,7 @@ fn e822_c(&mut self,state:State)->Step {
 let mut out=self.b822_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:822,rule:91,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 } else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
@@ -14736,7 +14743,7 @@ let mark=self.mark();
 let key=Key {expression:842,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b842_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -14768,7 +14775,7 @@ out
 fn e844_c(&mut self,state:State)->Step {
 let mut out=self.b844_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -14788,7 +14795,7 @@ out
 fn e845_c(&mut self,state:State)->Step {
 let mut out=self.b845_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'|'"]);}
 out
 }
@@ -14835,7 +14842,7 @@ let mark=self.mark();
 let key=Key {expression:848,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b848_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -14867,7 +14874,7 @@ out
 fn e850_c(&mut self,state:State)->Step {
 let mut out=self.b850_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -14887,7 +14894,7 @@ out
 fn e851_c(&mut self,state:State)->Step {
 let mut out=self.b851_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'&'"]);}
 out
 }
@@ -14934,7 +14941,7 @@ let mark=self.mark();
 let key=Key {expression:854,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b854_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -14966,7 +14973,7 @@ out
 fn e856_c(&mut self,state:State)->Step {
 let mut out=self.b856_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["Repeat"]);}
 out
 }
@@ -14986,7 +14993,7 @@ out
 fn e857_c(&mut self,state:State)->Step {
 let mut out=self.b857_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'^'"]);}
 out
 }
@@ -15033,7 +15040,7 @@ let mark=self.mark();
 let key=Key {expression:860,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b860_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -15318,6 +15325,7 @@ fn e880_c(&mut self,state:State)->Step {
 let mut out=self.b880_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:880,rule:98,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 } else {self.display_failures(state.consumed.max(state.matched),&["'true'"]);}
 out
 }
@@ -15331,6 +15339,7 @@ fn e881_c(&mut self,state:State)->Step {
 let mut out=self.b881_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:881,rule:98,span,text_span,content_span});}
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});
 } else {self.display_failures(state.consumed.max(state.matched),&["'false'"]);}
 out
 }
@@ -15365,7 +15374,7 @@ out
 fn e884_c(&mut self,state:State)->Step {
 let mut out=self.b884_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'('", "')'"]);}
 out
 }
@@ -15425,7 +15434,7 @@ let mark=self.mark();
 let key=Key {expression:888,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b888_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -15558,7 +15567,7 @@ let mark=self.mark();
 let key=Key {expression:897,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b897_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -15661,7 +15670,7 @@ let mark=self.mark();
 let key=Key {expression:904,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b904_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -15925,7 +15934,7 @@ let mark=self.mark();
 let key=Key {expression:922,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b922_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16234,7 +16243,7 @@ let mark=self.mark();
 let key=Key {expression:943,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b943_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16354,7 +16363,7 @@ let mark=self.mark();
 let key=Key {expression:951,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b951_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16422,7 +16431,7 @@ out
 fn e955_c(&mut self,state:State)->Step {
 let mut out=self.b955_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -16442,7 +16451,7 @@ out
 fn e956_c(&mut self,state:State)->Step {
 let mut out=self.b956_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -16526,7 +16535,7 @@ let mark=self.mark();
 let key=Key {expression:962,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b962_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16587,7 +16596,7 @@ let mark=self.mark();
 let key=Key {expression:966,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b966_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16649,7 +16658,7 @@ let mark=self.mark();
 let key=Key {expression:970,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b970_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16681,7 +16690,7 @@ let mark=self.mark();
 let key=Key {expression:972,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b972_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16749,7 +16758,7 @@ out
 fn e976_c(&mut self,state:State)->Step {
 let mut out=self.b976_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -16769,7 +16778,7 @@ out
 fn e977_c(&mut self,state:State)->Step {
 let mut out=self.b977_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -16853,7 +16862,7 @@ let mark=self.mark();
 let key=Key {expression:983,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b983_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16914,7 +16923,7 @@ let mark=self.mark();
 let key=Key {expression:987,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b987_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -16976,7 +16985,7 @@ let mark=self.mark();
 let key=Key {expression:991,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b991_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -17008,7 +17017,7 @@ let mark=self.mark();
 let key=Key {expression:993,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b993_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -17076,7 +17085,7 @@ out
 fn e997_c(&mut self,state:State)->Step {
 let mut out=self.b997_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -17096,7 +17105,7 @@ out
 fn e998_c(&mut self,state:State)->Step {
 let mut out=self.b998_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["','"]);}
 out
 }
@@ -17180,7 +17189,7 @@ let mark=self.mark();
 let key=Key {expression:1004,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1004_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -17241,7 +17250,7 @@ let mark=self.mark();
 let key=Key {expression:1008,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1008_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -17303,7 +17312,7 @@ let mark=self.mark();
 let key=Key {expression:1012,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1012_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
 if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
 out
@@ -17717,7 +17726,7 @@ out
 fn e1039_c(&mut self,state:State)->Step {
 let mut out=self.b1039_c(state);
 if out.ok {
-out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true});
+out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.display_failures(state.consumed.max(state.matched),&["'('", "')'"]);}
 out
 }
