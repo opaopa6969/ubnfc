@@ -34,6 +34,18 @@ WORK=$WORK CORE=26 RUNS=7 benchmarks/scripts/p4-external.sh speed
 WORK=$WORK benchmarks/scripts/p4-external.sh profile
 ```
 
+同じ family D で、**ANTLR / tree-sitter の流儀に書き直した文法**（塔を 1 本の
+`expression` に統合したもの、issue #39）を並べて測るのは `p4-antlr-idiomatic.sh`。
+上の `prepare` が作った生成物を同じ `$WORK` から借りる。
+
+```sh
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh prepare
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh accept
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh superset
+WORK=$WORK benchmarks/scripts/p4-antlr-idiomatic.sh profile
+WORK=$WORK CORE=26 RUNS=7 benchmarks/scripts/p4-antlr-idiomatic.sh speed
+```
+
 ## 計測の作法
 
 - CPU は `taskset -c $CORE`（既定 30）で 1 コアに固定、単一 thread。
@@ -51,6 +63,7 @@ WORK=$WORK benchmarks/scripts/p4-external.sh profile
 - `src/family_{a,b,c}.rs` … family ごとの Rust 計測本体
 - `src/family_d.rs` … family D の ubnfc Rust 側（`accept` / `bench`）
 - `scripts/p4-external.sh` … family D の一式（外部ツールの取得・生成・受理・速度・profile）
+- `scripts/p4-antlr-idiomatic.sh` … family D の「流儀で書き直した文法」側（生成・受理・上位集合・profile・速度）
 - `java/FamilyBJavaBench.java` … family B の Java 2 実装を 1 JVM で交互に測る（反射）
 - `java/UbnfLegacyBench.java` … family C の旧 Java `UBNFParsers`（反射）
 - family A の Java は既存の `examples/p4-java` の `Benchmark` / `LegacyBenchmark` をそのまま使う

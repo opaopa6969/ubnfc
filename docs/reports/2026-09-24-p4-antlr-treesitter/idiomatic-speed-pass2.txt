@@ -1,0 +1,159 @@
+# host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64, core=26, runs=7
+# load average (開始): 22.73 33.67 31.10
+## complex (Formula 入口)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex,332,認識,1866,7,0.106770,0.095162,0.112659,0.3216,324,31829
+D,ubnfc-rust(生成, scope あり),complex,332,AST,4646,7,0.140387,0.118898,0.156247,0.4229,509,77181
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=23.16 33.58 31.08 15/5364 2222326
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex,recognize-fast,Formula,2000,2000,0.244004,0.392045,0.181103,0.192512,0.201271,0.244004,0.181103,71728
+complex,ast-fast,Formula,2000,2000,0.631373,0.502180,0.474750,0.383732,0.465997,0.474750,0.361000,199912
+# loadavg=21.72 32.58 30.81 25/5416 2226373
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr(two-stage)	complex	332	Formula	recognition	7	8	3	993.1540	624.0755	21.97
+antlr(two-stage)	complex	332	Formula	tree	7	11	3	953.9276	613.6842	18.82
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(two-stage)	complex	332	Formula	recognition	7	2000	388	1.8338	1.6234	20.41
+antlr-idiomatic(two-stage)	complex	332	Formula	tree	7	2000	186	2.4346	1.6253	20.08
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(sll)	complex	332	Formula	recognition	7	2000	397	1.5236	1.4421	18.76
+antlr-idiomatic(sll)	complex	332	Formula	tree	7	2000	343	1.5317	1.3839	18.54
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex	332	recognition(CST)	7	12785	0.04463	0.04077	18.02	235
+tree-sitter	complex	332	tree(CST+walk)	7	11992	0.05146	0.04836	17.45	235
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex	332	recognition(CST)	7	10396	0.03519	0.03005	17.02	217
+tree-sitter	complex	332	tree(CST+walk)	7	8256	0.03634	0.03358	17.02	217
+# load average: 17.02 27.55 29.20
+## complex-x4 (Formula 入口)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex-x4,1293,認識,877,7,0.330781,0.297302,0.455614,0.2558,1211,63470
+D,ubnfc-rust(生成, scope あり),complex-x4,1293,AST,1012,7,0.420134,0.401847,0.473160,0.3249,1928,234276
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex-x4, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=16.61 27.30 29.10 12/5331 2247659
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex-x4,recognize-fast,Formula,2000,500,0.997714,0.778189,0.830416,0.376999,0.415303,0.415303,0.343036,256656
+complex-x4,ast-fast,Formula,2000,500,1.699800,2.206581,1.320171,1.216539,0.883808,1.216539,0.883808,756960
+# loadavg=17.38 26.79 28.90 16/5351 2251356
+# antlr(1:1): complex-x4 は ANTLR_FORMULA_FIXTURES に無いので測らない
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(two-stage)	complex-x4	1293	Formula	recognition	7	1430	37	5.8668	4.8983	16.08
+antlr-idiomatic(two-stage)	complex-x4	1293	Formula	tree	7	1284	63	5.6078	5.5108	15.33
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(sll)	complex-x4	1293	Formula	recognition	7	1375	50	7.3185	6.6085	15.04
+antlr-idiomatic(sll)	complex-x4	1293	Formula	tree	7	1537	97	5.0122	4.9398	14.77
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x4	1293	recognition(CST)	7	3476	0.15855	0.15032	14.15	904
+tree-sitter	complex-x4	1293	tree(CST+walk)	7	2789	0.18480	0.17399	13.74	904
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x4	1293	recognition(CST)	7	4507	0.11533	0.10854	18.56	838
+tree-sitter	complex-x4	1293	tree(CST+walk)	7	1564	0.16594	0.13964	18.56	838
+# load average: 18.56 24.89 28.08
+## complex-x16 (Formula 入口)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex-x16,5179,認識,351,7,1.317968,1.283779,1.566814,0.2545,4741,196225
+D,ubnfc-rust(生成, scope あり),complex-x16,5179,AST,414,7,1.896397,1.530013,2.163423,0.3662,7578,867301
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex-x16, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=17.66 24.48 27.91 11/5335 2259365
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex-x16,recognize-fast,Formula,2000,125,1.398152,1.834841,4.512873,5.394625,5.308861,4.512873,1.398152,1014440
+complex-x16,ast-fast,Formula,2000,125,4.258026,4.815401,9.380753,11.760565,23.522915,9.380753,4.258026,3002240
+# loadavg=23.14 24.92 27.93 40/5579 2265081
+# antlr(1:1): complex-x16 は ANTLR_FORMULA_FIXTURES に無いので測らない
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(two-stage)	complex-x16	5179	Formula	recognition	7	321	10	23.7571	20.2038	22.44
+antlr-idiomatic(two-stage)	complex-x16	5179	Formula	tree	7	447	22	21.0721	19.4539	20.77
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(sll)	complex-x16	5179	Formula	recognition	7	353	24	22.7916	20.0628	18.67
+antlr-idiomatic(sll)	complex-x16	5179	Formula	tree	7	402	18	26.9105	22.3188	17.10
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x16	5179	recognition(CST)	7	730	0.69348	0.60476	16.29	3580
+tree-sitter	complex-x16	5179	tree(CST+walk)	7	344	0.80894	0.74599	16.29	3580
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x16	5179	recognition(CST)	7	778	0.48251	0.46190	15.87	3322
+tree-sitter	complex-x16	5179	tree(CST+walk)	7	879	0.61668	0.52122	15.80	3322
+# load average: 15.80 22.46 26.87
+## complex-x64 (Formula 入口)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex-x64,20923,認識,80,7,10.986191,8.307730,13.552678,0.5251,18836,732673
+D,ubnfc-rust(生成, scope あり),complex-x64,20923,AST,52,7,22.710894,16.544889,26.448119,1.0855,30130,3414725
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex-x64, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=16.50 22.29 26.74 19/5507 2284876
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex-x64,recognize-fast,Formula,2000,50,7.684949,8.593459,5.962946,6.505691,5.745104,6.505691,5.430915,4114728
+complex-x64,ast-fast,Formula,2000,50,20.291303,16.730994,17.580293,17.187172,16.378373,16.913418,16.378373,12052472
+# loadavg=11.04 19.43 25.40 9/5397 2291695
+# antlr(1:1): complex-x64 は ANTLR_FORMULA_FIXTURES に無いので測らない
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(two-stage)	complex-x64	20923	Formula	recognition	7	105	6	81.9592	80.0409	10.54
+antlr-idiomatic(two-stage)	complex-x64	20923	Formula	tree	7	107	6	80.2346	79.3340	12.25
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(sll)	complex-x64	20923	Formula	recognition	7	107	6	87.0831	79.8898	10.86
+antlr-idiomatic(sll)	complex-x64	20923	Formula	tree	7	111	5	83.5367	80.4823	10.09
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x64	20923	recognition(CST)	7	225	2.38930	2.31441	10.09	14284
+tree-sitter	complex-x64	20923	tree(CST+walk)	7	188	3.00292	2.71055	9.76	14284
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x64	20923	recognition(CST)	7	291	1.82021	1.74062	9.38	13258
+tree-sitter	complex-x64	20923	tree(CST+walk)	7	241	2.41691	2.08394	9.59	13258
+# load average: 9.59 17.25 24.18
+## comparison-heavy (BooleanExpression / Expression 入口)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),comparison-heavy,179,認識,5632,7,0.044415,0.043506,0.049274,0.2481,22,19208
+D,ubnfc-rust(生成, scope あり),comparison-heavy,179,AST,7728,7,0.078217,0.073661,0.087445,0.4370,435,107335
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=comparison-heavy, -Dbench.modes=recognize-fast,ast-fast, -Dbench.entry=BooleanExpression]
+# loadavg=9.94 17.20 24.13 18/5538 2299386
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+comparison-heavy,recognize-fast,BooleanExpression,2000,2000,0.068776,0.061080,0.036576,0.042292,0.035908,0.041459,0.035908,46224
+comparison-heavy,ast-fast,BooleanExpression,2000,2000,0.174800,0.188548,0.131000,0.128809,0.122700,0.131000,0.120928,235440
+# loadavg=10.03 17.10 24.06 13/5503 2300100
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr(two-stage)	comparison-heavy	179	BooleanExpression	recognition	7	200	63	2.9675	2.0901	10.99
+antlr(two-stage)	comparison-heavy	179	BooleanExpression	tree	7	200	484	1.1774	1.0023	10.75
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(two-stage)	comparison-heavy	179	Expression	recognition	7	2000	487	1.1545	1.0850	10.87
+antlr-idiomatic(two-stage)	comparison-heavy	179	Expression	tree	7	2000	310	1.0922	0.9804	10.88
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(sll)	comparison-heavy	179	Expression	recognition	7	2000	306	1.0523	1.0011	10.49
+antlr-idiomatic(sll)	comparison-heavy	179	Expression	tree	7	2000	540	0.9718	0.9461	10.29
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	comparison-heavy	179	recognition(CST)	7	15153	0.04036	0.03372	9.87	330
+tree-sitter	comparison-heavy	179	tree(CST+walk)	7	8547	0.05618	0.05096	10.44	330
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	comparison-heavy	179	recognition(CST)	7	9689	0.06178	0.05748	11.45	361
+tree-sitter	comparison-heavy	179	tree(CST+walk)	7	5360	0.07374	0.07131	11.45	361
+# load average: 11.45 16.36 23.44
+## comparison-heavy-x64 (BooleanExpression / Expression 入口)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),comparison-heavy-x64,11456,認識,72,7,7.172452,6.074209,8.989666,0.6261,1030,43400
+D,ubnfc-rust(生成, scope あり),comparison-heavy-x64,11456,AST,55,7,24.261555,23.297978,31.261847,2.1178,26715,5542030
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=comparison-heavy-x64, -Dbench.modes=recognize-fast,ast-fast, -Dbench.entry=BooleanExpression]
+# loadavg=14.81 16.87 23.49 21/5570 2310464
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+comparison-heavy-x64,recognize-fast,BooleanExpression,2000,50,10.474862,8.111602,10.379783,10.095073,7.787998,10.095073,7.787998,2693224
+comparison-heavy-x64,ast-fast,BooleanExpression,2000,50,35.503445,34.920271,30.872790,37.232487,32.709765,34.790606,28.238862,14643728
+# loadavg=28.29 21.00 24.27 35/5530 2339191
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr(two-stage)	comparison-heavy-x64	11456	BooleanExpression	recognition	7	84	6	101.9177	88.0574	26.95
+antlr(two-stage)	comparison-heavy-x64	11456	BooleanExpression	tree	7	85	4	106.8374	95.5775	25.69
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(two-stage)	comparison-heavy-x64	11456	Expression	recognition	7	86	5	89.8110	82.5520	24.97
+antlr-idiomatic(two-stage)	comparison-heavy-x64	11456	Expression	tree	7	100	4	105.5065	85.1440	24.95
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr-idiomatic(sll)	comparison-heavy-x64	11456	Expression	recognition	7	72	4	110.8702	88.5291	30.10
+antlr-idiomatic(sll)	comparison-heavy-x64	11456	Expression	tree	7	85	4	108.6924	92.7572	29.33
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	comparison-heavy-x64	11456	recognition(CST)	7	147	3.18857	2.39596	27.54	21183
+tree-sitter	comparison-heavy-x64	11456	tree(CST+walk)	7	176	3.12067	2.93246	27.54	21183
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	comparison-heavy-x64	11456	recognition(CST)	7	194	12.38206	2.70799	36.01	23167
+tree-sitter	comparison-heavy-x64	11456	tree(CST+walk)	7	65	13.16230	10.16114	38.02	23167
+# load average: 38.02 25.38 25.39
+# load average (終了): 38.02 25.38 25.39
