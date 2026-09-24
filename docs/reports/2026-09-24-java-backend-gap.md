@@ -243,13 +243,21 @@ step 2 と合わせて **−1.9%** に反転させている（後掲 P4 表）�
   `2026-09-23-java-corpus-contract.md` および直近の `2026-09-23-java-corpus-crosscheckfix.md` と
   **1 行も違わない**（`diff` で確認）。
 - **IR golden 不変**: `crates/ubnfc-front` を変更していないので IR も self-host も動かない
-  （`cargo test --workspace --offline` が golden を照合して緑）。
+  （`crates/ubnfc-front` の `fixtures` 13 件・`regenerate` 1 件、`ubnfc-selfhost` の `regenerate` 2 件が緑）。
 - **差分ファジング**: `cargo test -p ubnfc-fuzz --offline` が固定 seed キャンペーン
   （`a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_divergence` ほか 4 件）、
   `choice_reachability` 2 件、`right_assoc_span` 1 件、unit 22 件すべて緑。
 - **1 parse の計数が完全に一致**（Operators 512 atom、認識・AST とも
   rule 2,561 / memo hit 0 / memo store 2,561 / fail 12,810 / trivia 5,633 / combine 2,561 /
   capture append 2,047）。確保の仕方だけを変えたことの直接の証拠。
+- `cargo test --workspace --offline --no-fail-fast` は **1 target だけ赤**:
+  `ubnfc-harness` の `spec_corpus::ubnf_citations_resolve_to_real_spec_headings`
+  （`annotation/mapping-extra-capture` の引用文が `unlaxer-dsl/specs/validation.md` に逐語で無い）。
+  **本 PR とは無関係**で、`crates/` `corpus/` `ir/` は `origin/master` と **byte 一致**
+  （`git diff origin/master HEAD -- crates corpus ir` が空）。原因は兄弟 repo `unlaxer-parser` が
+  `932c802` で `E-MAPPING-EXTRA-CAPTURE` を `E-MAPPING-UNLISTED-CAPTURE` へ改名し、
+  PR #10 が入れた引用検査がドリフトしたこと。**master でも同じく赤**なので、
+  仕様由来オラクル側（issue #5 系列）の作業で直すべきものとして残す。他の target は全て緑。
 - `ubnfc-java` / `ubnfc-java/runtime-template` / `examples/p4-java` の maven test 緑、
   `examples/p4-java/scripts/generate.sh --check` 差分なし、`cargo fmt --check` と
   `cargo clippy --workspace --all-targets -- -D warnings` 緑。
