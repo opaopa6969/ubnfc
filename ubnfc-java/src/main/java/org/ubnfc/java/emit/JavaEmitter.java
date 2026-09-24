@@ -30,6 +30,7 @@ public final class JavaEmitter {
     private final SemanticShape semanticShapes;
     private final DiagnosticPlan diagnosticPlan;
     private final Prediction prediction;
+    private final Factoring factoring;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
     /** Generated constants (arrays of boundaries, fields, hints, ...) hoisted to static finals: expression text -> field name. */
     private final Map<String, String> constants = new LinkedHashMap<>();
@@ -51,6 +52,7 @@ public final class JavaEmitter {
         for (String id : expressions.keySet()) exprIds.put(id, exprIds.size());
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
         prediction = new Prediction(ir, expressions, rules, tokens, ruleIds, diagnosticPlan, this::labelText);
+        factoring = new Factoring(ir, expressions, rules, captures, semanticShapes, diagnosticPlan, this::labelText, id -> scopeSites().contains(id));
     }
     public Map<String, String> sources() throws IOException {
         var result = new TreeMap<String, String>(); String prefix = pkg.replace('.', '/') + "/";
@@ -406,7 +408,6 @@ public final class JavaEmitter {
     }
     private void emitExpr(StringBuilder out, Expr expr) {
         String method = method(expr.id());
-        var sites = expr.captureSiteIds().stream().map(captures::get).toList();
         out.append("    private static Match ").append(method).append("(Session s, Frame f) {\n");
         var memo = ir.plan().memo().entries().stream().filter(e -> e.exprId().equals(expr.id())).findFirst().orElse(null);
         // A rule body is memoized by Session.rule with the same key and flags; wrapping it again only doubles the table.
@@ -419,15 +420,30 @@ public final class JavaEmitter {
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         // 認識専用経路（Match 木も診断も作らない）で capture の包みが恒等になる式は、包みを飛ばして
         // 中身を直に呼ぶ。到達位置の更新だけ同じ位置で行う（包みの中の progress と同じ）。
-        if (sites.stream().noneMatch(c -> scopeSites().contains(c.siteId()) && !c.skip()))
+        if (bypassable(expr))
             out.append("        if (s.bypassCapture) { Match r = f.matched ? ").append(method).append("M(s, f) : ").append(method)
                 .append("C(s, f); s.progress(f); return r; }\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
-            .append(kStrings(expr.captureSiteIds())).append(", ").append(kStrings(sites.stream().map(Capture::name).toList())).append(", ").append(kStrings(sites.stream().map(Capture::spanRule).toList()))
-            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}"))
-            .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> Boolean.toString(scopeSites().contains(c.siteId()))).collect(Collectors.joining(",")) + "}")).append(", ").append(q(expr.ruleId())).append(", ").append(q(expr.id())).append(", ").append(Set.of("repeat", "optional", "separated").contains(expr.node().kind())).append(", ").append(Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())).append(", ").append(q(semanticShapes.of(expr.id()).kind())).append(", ").append(semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/")).append(", ").append(kLabels(diagnosticPlan.expression(expr.id()))).append(");\n    }\n");
+            .append(capArgs(expr)).append(");\n    }\n");
         String body = expression(expr);
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
+    }
+    /** {@code Session.capture} / {@code Session.Cap} が共有する 12 引数（site 表・span 規則・意味形・失敗 hint）。 */
+    private String capArgs(Expr expr) {
+        var sites = expr.captureSiteIds().stream().map(captures::get).toList();
+        return kStrings(expr.captureSiteIds()) + ", " + kStrings(sites.stream().map(Capture::name).toList()) + ", " + kStrings(sites.stream().map(Capture::spanRule).toList())
+            + ", " + constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}")
+            + ", " + constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> Boolean.toString(scopeSites().contains(c.siteId()))).collect(Collectors.joining(",")) + "}")
+            + ", " + q(expr.ruleId()) + ", " + q(expr.id())
+            + ", " + Set.of("repeat", "optional", "separated").contains(expr.node().kind())
+            + ", " + Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())
+            + ", " + q(semanticShapes.of(expr.id()).kind())
+            + ", " + (semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/"))
+            + ", " + kLabels(diagnosticPlan.expression(expr.id()));
+    }
+    /** 認識専用経路（{@code Session.bypassCapture}）で capture の包みが恒等になる式か（D-059）。 */
+    private boolean bypassable(Expr expr) {
+        return expr.captureSiteIds().stream().map(captures::get).noneMatch(c -> scopeSites().contains(c.siteId()) && !c.skip());
     }
     /** The label a primitive expression registers on failure (shared with Prediction). */
     String labelText(Expr expr) {
@@ -572,7 +588,57 @@ public final class JavaEmitter {
             if (plans.stream().anyMatch(java.util.Objects::nonNull))
                 guards = constant("Guard[]", "new Guard[]{" + plans.stream().map(this::guard).collect(Collectors.joining(",")) + "}");
         }
-        return eofGuard + "return s.choice(f," + calls(expr.node().alternatives()) + "," + longest + "," + eligible + "," + (predict && (plan == null || plan.fallback().equals("fullChoice"))) + (guards.equals("null") ? "" : "," + guards) + ");";
+        // D-060: 先頭要素を共有する連続候補の左因数分解。候補除外の条件が一致する群だけを作る。
+        String groups = "null";
+        if (!predict && !longest && prediction.ordered(expr)) {
+            var keys = expr.node().alternatives().stream().map(id -> guardKey(prediction.guard(id))).toList();
+            var factored = factoring.plan(expr.node().alternatives(), keys);
+            if (!factored.isEmpty()) groups = constant("Group[]", "new Group[]{" + factored.stream()
+                .map(g -> group(expr.node().alternatives(), g)).collect(Collectors.joining(",")) + "}");
+        }
+        String tail = groups.equals("null") ? (guards.equals("null") ? "" : "," + guards) : "," + guards + "," + groups;
+        return eofGuard + "return s.choice(f," + calls(expr.node().alternatives()) + "," + longest + "," + eligible + "," + (predict && (plan == null || plan.fallback().equals("fullChoice"))) + tail + ");";
+    }
+    /** 候補除外の条件の同一性（群にできるのは条件が一致する候補だけ）。 */
+    private static String guardKey(Prediction.Guard guard) {
+        if (guard == null) return "";
+        var out = new StringBuilder();
+        for (int[] range : guard.allowed().items()) out.append(range[0]).append(':').append(range[1]).append(',');
+        return out.append('|').append(guard.labels()).append('|').append(guard.triviaPolicyId())
+            .append('|').append(guard.suffix()).append('|').append(guard.maxRuleDepth()).toString();
+    }
+    private String group(List<String> alternatives, Factoring.Group g) {
+        Expr first = expressions.get(alternatives.get(g.start()));
+        int width = 0;
+        for (int k = g.start(); k < g.end(); k++) width = Math.max(width, expressions.get(alternatives.get(k)).node().items().size());
+        return "new Group(" + g.start() + "," + g.end() + "," + first.execution().entryFlag().equals("setFalse") + ","
+            + boundaries(first.id()) + "," + width + "," + level(alternatives, g, 0, new int[0]) + ")";
+    }
+    /** 群の 1 段（index {@code depth} の要素を共有し、次の段で分岐する）。 */
+    private String level(List<String> alternatives, Factoring.Group g, int depth, int[] evaluated) {
+        Expr head = expressions.get(alternatives.get(g.start()));
+        int[] next = java.util.Arrays.copyOf(evaluated, depth + 1); next[depth] = g.start();
+        String branches = factoring.level(alternatives, g, depth + 1).stream()
+            .map(sub -> sub.end() - sub.start() >= 2 ? "new Branch(" + level(alternatives, sub, depth + 1, next) + ")"
+                : branch(alternatives, sub.start(), depth + 1, next))
+            .collect(Collectors.joining(","));
+        return "new Level(" + call(head.node().items().get(depth)) + "," + boundaries(head.id()) + "," + depth + "," + branches + ")";
+    }
+    /** 単独候補になった枝（残りの要素・出口 trivia・capture の包み・共有要素の付け替え）。 */
+    private String branch(List<String> alternatives, int k, int from, int[] evaluated) {
+        Expr candidate = expressions.get(alternatives.get(k));
+        List<String> items = candidate.node().items();
+        var retags = new ArrayList<String>();
+        boolean any = false;
+        for (int d = 0; d < from; d++) {
+            Expr element = expressions.get(items.get(d));
+            var site = element.captureSiteIds().stream().map(captures::get).filter(c -> !c.skip()).findFirst().orElse(null);
+            if (evaluated[d] == k || site == null) { retags.add("null"); retags.add("null"); continue; }
+            any = true; retags.add(q(site.siteId())); retags.add(q(site.name()));
+        }
+        return "new Branch(" + calls(items.subList(from, items.size())) + "," + boundaries(candidate.id()) + "," + from + ","
+            + constant("Cap", "new Cap(" + capArgs(candidate) + "," + bypassable(candidate) + ")") + ","
+            + (any ? constant("String[]", "new String[]{" + String.join(",", retags) + "}") : "null") + ")";
     }
     /** Static replay plan of one excluded alternative; see Prediction. */
     private String guard(Prediction.Guard plan) {

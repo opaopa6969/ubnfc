@@ -95,9 +95,11 @@ public final class Session {
     }
     /** Capture occurrence; completion order is stamped by the completing rule (was an identity map). */
     public static final class Occurrence {
-        private final String site, name; private final Value value; long completed = -1;
+        private String site, name; private final Value value; long completed = -1;
         public Occurrence(String site, String name, Value value) { this.site = site; this.name = name; this.value = value; }
         public String site() { return site; } public String name() { return name; } public Value value() { return value; }
+        /** 左因数分解（D-060）が共有要素の出現を採用候補の site へ付け替える。実体は評価のたびに新しく作られる。 */
+        void retag(String site, String name) { this.site = site; this.name = name; }
     }
     public record Trace(String rule, String expr, int start, int end, List<Trace> children, String token) {}
     public record RecoveryEvent(String rule, String mode, int start, int end, String pattern, int syncStart,
@@ -267,12 +269,25 @@ public final class Session {
      * 包みを飛ばして中身を直に呼ぶ（site を 1 つも公開せず、失敗 hint も記録しないので観測は同じ）。
      */
     public final boolean bypassCapture;
+    /**
+     * 左因数分解（D-060）の無効化スイッチ。既定は有効で、参照経路（候補ごとに接頭辞を評価し直す）
+     * との差分検証と計測のためだけに false にする（system property {@code -Dubnfc.factor=false} でも切れる）。
+     */
+    public static boolean factoring = !"false".equals(System.getProperty("ubnfc.factor"));
+    /**
+     * この解析で左因数分解を使ってよいか。診断を記録する経路（主診断 DAG / display frame を組む）と
+     * lexical trace を要求する経路では、呼ばれない wrapper の記録と共有要素の trace の付け替えが
+     * 要るので参照経路のままにする。D-023 の二段構えにより、失敗・末尾入力は必ず診断モードで
+     * 再解析されるので、公開される診断は参照経路のものと一致する。
+     */
+    public final boolean factor;
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false); }
     public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode) {
         this.tree = !twoMode || options.buildAst() || options.lexical() || options.occurrences();
         this.occ = !twoMode || options.occurrences();
         this.diag = !twoMode || options.diagnostics();
         this.bypassCapture = !this.tree && !this.diag;
+        this.factor = factoring && !this.diag && !options.lexical();
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         // diag=false の経路は診断を 1 件も記録しない（書込みは全て diag で囲ってある）ので、
         // 読み出し専用の空実例を共有する。実例 1 個で 1 parse あたり約 9 KB の確保が消える。
@@ -570,6 +585,11 @@ public final class Session {
                          String rule, String expr, boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints) {
         int c = f.c, m = f.m; Match result = call.parse(this, f);
         progress(f);
+        return wrap(f, c, m, result, sites, names, spanRules, skips, scoped, rule, expr, quantified, terminal, semanticKind, semanticMany, failureHints);
+    }
+    /** {@link #capture} の「包む側」だけ。左因数分解（D-060）は中身を自分で評価してからここへ渡す。 */
+    private Match wrap(Frame f, int c, int m, Match result, String[] sites, String[] names, String[] spanRules, boolean[] skips, boolean[] scoped,
+                       String rule, String expr, boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints) {
         if (result == null) {
             if (diag) for (Label hint : failureHints) fail(Math.max(c, m), hint);
             return null;
@@ -778,6 +798,131 @@ public final class Session {
         f.reset = reset0;
         if (best != null) { f.c = bestC; f.m = bestM; replay(bestEffects); } else { f.c = c0; f.m = m0; }
         return best;
+    }
+    /**
+     * 左因数分解（D-060。`crates/ubnfc-rust/src/factor.rs` の Java 版）。順序付き選択の連続候補で
+     * 先頭要素列が構造的に等しいもの（`X A | X B`）を、共有接頭辞 1 回の評価で走らせる。
+     * PEG の意味論では X は同じ状態で同じ結果を返す（memo が保証する決定性）ので
+     * `X A | X B ≡ X (A | B)`。参照経路は {@code -Dubnfc.factor=false} で戻せる。
+     */
+    public static final class Cap {
+        final String[] sites, names, spanRules; final boolean[] skips, scoped;
+        final String rule, expr, semanticKind; final boolean quantified, terminal, semanticMany, bypass;
+        final Label[] failureHints;
+        public Cap(String[] sites, String[] names, String[] spanRules, boolean[] skips, boolean[] scoped, String rule, String expr,
+                   boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints, boolean bypass) {
+            this.sites = sites; this.names = names; this.spanRules = spanRules; this.skips = skips; this.scoped = scoped;
+            this.rule = rule; this.expr = expr; this.quantified = quantified; this.terminal = terminal;
+            this.semanticKind = semanticKind; this.semanticMany = semanticMany; this.failureHints = failureHints; this.bypass = bypass;
+        }
+    }
+    /** 群の 1 段: 共有要素を 1 回評価してから、次の段の枝を宣言順に試す。 */
+    public static final class Level {
+        final Call element; final Trivia trivia; final int depth; final Branch[] branches;
+        public Level(Call element, Trivia trivia, int depth, Branch... branches) {
+            this.element = element; this.trivia = trivia; this.depth = depth; this.branches = branches;
+        }
+    }
+    /** 枝: さらに共有する段（{@code level}）か、単独候補の残り（{@code rest} 以下）。 */
+    public static final class Branch {
+        final Level level; final Call[] rest; final Trivia trivia; final int from; final Cap cap; final String[] retag;
+        public Branch(Level level) { this(level, null, null, 0, null, null); }
+        public Branch(Call[] rest, Trivia trivia, int from, Cap cap, String[] retag) { this(null, rest, trivia, from, cap, retag); }
+        private Branch(Level level, Call[] rest, Trivia trivia, int from, Cap cap, String[] retag) {
+            this.level = level; this.rest = rest; this.trivia = trivia; this.from = from; this.cap = cap; this.retag = retag;
+        }
+    }
+    /** 先頭要素を共有する連続候補の区間 [start, end)（候補 index は選択の宣言順）。 */
+    public static final class Group {
+        final int start, end, width; final boolean setFalse; final Trivia trivia; final Level root;
+        public Group(int start, int end, boolean setFalse, Trivia trivia, int width, Level root) {
+            this.start = start; this.end = end; this.setFalse = setFalse; this.trivia = trivia; this.width = width; this.root = root;
+        }
+    }
+    /** 群 1 つを走らせる。候補 Seq の入口（transaction / 入口 trivia）は群で共通。 */
+    private Match factored(Frame f, Group g) {
+        int c = f.c, m = f.m;
+        if (g.setFalse) f.reset = false;
+        long mark = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
+        if (reset0) f.m = f.c;
+        int start = f.c;
+        Trivia trivia = g.trivia;
+        if (trivia.entry != null) trivia(f, trivia.entry); if (trivia.helperEntry != null) trivia(f, trivia.helperEntry);
+        Match result = level(f, g.root, new Match[g.width], start, reset0, c, m);
+        if (result == null) { restore(mark); f.c = c0; f.m = m0; f.reset = reset0; }
+        return result;
+    }
+    private Match level(Frame f, Level lv, Match[] buf, int start, boolean reset0, int c, int m) {
+        Match head = lv.element.parse(this, f);
+        if (head == null) return null;
+        buf[lv.depth] = head;
+        Delimiters[] after = lv.trivia.afterChild;
+        if (after != null && after[lv.depth] != null) trivia(f, after[lv.depth]);
+        Branch[] branches = lv.branches;
+        long mark = mark(); int bc = f.c, bm = f.m; boolean reset = f.reset;
+        for (int i = 0; i < branches.length; i++) {
+            if (i > 0) { restore(mark); f.c = bc; f.m = bm; f.reset = reset; }
+            Branch branch = branches[i];
+            Match result = branch.level != null ? level(f, branch.level, buf, start, reset0, c, m)
+                : tail(f, branch, buf, start, reset0, c, m);
+            if (result != null) return result;
+        }
+        return null;
+    }
+    private Match tail(Frame f, Branch b, Match[] buf, int start, boolean reset0, int c, int m) {
+        Call[] rest = b.rest; Delimiters[] after = b.trivia.afterChild;
+        for (int i = 0; i < rest.length; i++) {
+            Match result = rest[i].parse(this, f);
+            if (result == null) return null;
+            buf[b.from + i] = result;
+            if (after != null && after[b.from + i] != null) trivia(f, after[b.from + i]);
+        }
+        if (b.trivia.helperExit != null) trivia(f, b.trivia.helperExit);
+        if (b.trivia.exit != null) trivia(f, b.trivia.exit);
+        f.reset = reset0;
+        // 共有要素は群の先頭候補の式で評価したので、採用候補の site へ出現を付け替える。
+        String[] retag = b.retag;
+        if (retag != null) for (int d = 0; d < b.from; d++) if (retag[2 * d] != null) retag(buf[d], retag[2 * d], retag[2 * d + 1]);
+        int n = b.from + rest.length;
+        Match seq;
+        if (n == 0) seq = Match.empty(start, f.c);
+        else { var items = new Match[n]; System.arraycopy(buf, 0, items, 0, n); seq = combine(Arrays.asList(items), start, f.c); }
+        progress(f);
+        Cap k = b.cap;
+        if (k.bypass && bypassCapture) return seq;
+        return wrap(f, c, m, seq, k.sites, k.names, k.spanRules, k.skips, k.scoped, k.rule, k.expr,
+            k.quantified, k.terminal, k.semanticKind, k.semanticMany, k.failureHints);
+    }
+    /** 共有要素の局所出現（site を 1 つだけ持つ要素の 1 件）を採用候補のものに付け替える。 */
+    private static void retag(Match head, String site, String name) {
+        List<Occurrence> local = head.local();
+        if (!local.isEmpty()) local.get(local.size() - 1).retag(site, name);
+    }
+    /** 群を持つ順序付き選択。{@code groups} は候補 index の昇順・非重複。 */
+    public Match choice(Frame f, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback, Guard[] guards, Group[] groups) {
+        if (!factor || f.invert || longest || eligible != null) return choice(f, alternatives, longest, eligible, fallback, guards);
+        int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
+        int probe = predict && guards != null && (reset0 || c0 == m0) ? c0 : -1;
+        int probed = probe < 0 ? -2 : cp(probe);
+        int next = 0;
+        for (int i = 0; i < alternatives.length; i++) {
+            while (next < groups.length && groups[next].end <= i) next++;
+            Group group = next < groups.length && groups[next].start == i ? groups[next] : null;
+            // 群の候補は候補除外の条件が一致することを生成時に確かめてあるので、群ごとに 1 度だけ判定する。
+            if (probe >= 0 && guards[i] != null && !guards[i].allows(probed)
+                && depth + guards[i].maxRuleDepth < options.maxDepth()) {
+                progressAt(probe);
+                if (group != null) i = group.end - 1;
+                continue;
+            }
+            long mark = mark(); f.c = c0; f.m = reset0 ? c0 : m0; f.reset = reset0;
+            Match result = group != null ? factored(f, group) : alternatives[i].parse(this, f);
+            if (result != null) { f.reset = reset0; return result; }
+            restore(mark);
+            if (group != null) i = group.end - 1;
+        }
+        f.reset = reset0; f.c = c0; f.m = m0;
+        return null;
     }
     public Match optional(Frame parent, Call child) {
         return repeat(parent, child, 0, 1, null, Trivia.NONE);
