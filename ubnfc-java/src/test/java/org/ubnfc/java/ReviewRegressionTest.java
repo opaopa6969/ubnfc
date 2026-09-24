@@ -336,17 +336,24 @@ class ReviewRegressionTest {
                 assertTrue(ok(h.parse("(".repeat(7) + "a" + ")".repeat(7), opts)));
                 Object failed = h.parse("(".repeat(8) + "a" + ")".repeat(8), opts);
                 cursors(failed, false, 0, 0); diagnostic(failed, "syntax", 8, List.of("maximum parse depth exceeded (maxDepth=8)"));
-                Object deep = h.parse("(".repeat(2000) + "a" + ")".repeat(2000), h.options(false, false, false, memo, Map.of()));
-                assertFalse(ok(deep)); assertEquals("syntax", get(get(deep, "diagnostics"), "kind"));
-                assertEquals(List.of(), get(get(deep, "scope"), "events"));
-                assertTrue(((List<?>) get(get(deep, "diagnostics"), "expected")).getFirst().toString().contains("maximum parse depth"));
+                // issue #35 / D-070: 2,000 段は maxDepth（既定 10,000）の範囲内なので、
+                // StackOverflowError を捕まえても maxDepth から見積もった十分な stack を持つ
+                // 専用 Thread へ 1 度だけエスカレーションして通る（以前はここで誤って
+                // 失敗になっていた＝本 issue の再現条件）。20,000 段は maxDepth を超えるので、
+                // エスカレーション後でも論理上限に当たり、クラッシュせず同じ診断になる。
+                Object shallowDeep = h.parse("(".repeat(2000) + "a" + ")".repeat(2000), h.options(false, false, false, memo, Map.of()));
+                assertTrue(ok(shallowDeep));
+                Object tooDeep = h.parse("(".repeat(20_000) + "a" + ")".repeat(20_000), h.options(false, false, false, memo, Map.of()));
+                assertFalse(ok(tooDeep)); assertEquals("syntax", get(get(tooDeep, "diagnostics"), "kind"));
+                assertEquals(List.of(), get(get(tooDeep, "scope"), "events"));
+                assertTrue(((List<?>) get(get(tooDeep, "diagnostics"), "expected")).getFirst().toString().contains("maximum parse depth"));
             }
             for (String stack : List.of("256k", "1m")) {
                 var process = new ProcessBuilder("java", "-Xss" + stack, "-cp", h.directory.resolve("classes").toString(), h.pkg + ".driver.Driver")
                     .redirectError(h.directory.resolve("depth.stderr").toFile()).start();
                 try {
                     try (var input = process.getOutputStream()) {
-                        for (String source : List.of("(".repeat(2000) + "a" + ")".repeat(2000), "a")) {
+                        for (String source : List.of("(".repeat(2000) + "a" + ")".repeat(2000), "(".repeat(20_000) + "a" + ")".repeat(20_000), "a")) {
                             var request = obj("id", source.length(), "grammar", "Probe", "entry", "Root", "input", source,
                                 "options", obj("lexical", false, "scope", false));
                             input.write((Json.write(request) + "\n").getBytes(StandardCharsets.UTF_8));
@@ -355,9 +362,13 @@ class ReviewRegressionTest {
                     String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
                     assertEquals(0, process.waitFor(), Files.readString(h.directory.resolve("depth.stderr")));
                     assertEquals("", Files.readString(h.directory.resolve("depth.stderr")));
-                    var rows = output.lines().map(Json::read).map(Json::object).toList(); assertEquals(2, rows.size());
-                    assertEquals(false, rows.getFirst().get("accepted"));
-                    assertEquals("syntax", Json.object(Json.array(rows.getFirst().get("diagnostics")).getFirst()).get("kind"));
+                    var rows = output.lines().map(Json::read).map(Json::object).toList(); assertEquals(3, rows.size());
+                    // issue #35 / D-070: 呼出し元プロセスの -Xss を絞っていても、2,000 段は
+                    // エスカレーション先の専用 Thread で通る。20,000 段は maxDepth に当たって
+                    // クラッシュせず診断になる。
+                    assertEquals(true, rows.get(0).get("allConsumed"));
+                    assertEquals(false, rows.get(1).get("accepted"));
+                    assertEquals("syntax", Json.object(Json.array(rows.get(1).get("diagnostics")).getFirst()).get("kind"));
                     assertEquals(true, rows.getLast().get("allConsumed"));
                 } finally { process.destroyForcibly(); }
             }

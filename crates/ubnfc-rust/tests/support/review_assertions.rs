@@ -144,11 +144,20 @@ mod review {
             assert!(parse!(recursive, "a", memo).ok);
         }
         // The child process running this generated test must survive native stack pressure.
+        // issue #35 / D-070: 2,000 段は `max_depth`（既定 10,000）の範囲内なので、native stack
+        // 番兵に呼出し元 thread（ここではわざと 1–2 MiB に絞っている）の上で当たっても、
+        // 専用の大きい thread へ 1 度だけエスカレーションして通る（以前はここで
+        // 誤って `maximum parse depth exceeded` になっていた＝本 issue の再現条件）。
+        // 20,000 段は `max_depth` を超えるので、エスカレーション後の thread でも
+        // 論理上限にちょうど当たり、クラッシュせず同じ診断になる。
         for stack_size in [1024 * 1024, 2 * 1024 * 1024] {
             std::thread::Builder::new()
                 .stack_size(stack_size)
                 .spawn(|| {
                     let input = format!("{}a{}", "(".repeat(2000), ")".repeat(2000));
+                    let r = parse!(recursive, &input, true);
+                    assert!(r.ok, "{r:?}");
+                    let input = format!("{}a{}", "(".repeat(20_000), ")".repeat(20_000));
                     let r = parse!(recursive, &input, true);
                     assert!(!r.ok);
                     assert_eq!(

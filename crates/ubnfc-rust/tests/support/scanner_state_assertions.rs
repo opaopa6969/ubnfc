@@ -45,8 +45,12 @@ mod scanner_state_regression {
                         calls: 0,
                     };
                     // 診断は const DIAG で単相化されている（D-036）。fast 側で確かめる。
-                    let mut session =
-                        Session::<false>::new("abc", Default::default(), &mut scanner);
+                    let mut session = Session::<false>::new(
+                        "abc",
+                        Default::default(),
+                        &mut scanner,
+                        NATIVE_STACK_SENTINEL_BYTES,
+                    );
                     let out = if mode {
                         session.token_0::<true>(state, "T", "T")
                     } else {

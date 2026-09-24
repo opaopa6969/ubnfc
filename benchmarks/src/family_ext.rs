@@ -24,9 +24,10 @@ fn read(path: &str) -> Result<String, String> {
 
 /// `UBNFC_ARENA_ENTRIES` で `ResourceLimits.arena_entries` を上書きする。
 ///
-/// 既定は 2,000,000 で、1 MB の JSON を typed AST で解析するとこれを超えて
-/// Resource 診断（"arena budget exceeded"）で失敗する。速度比較では入力サイズごとに
-/// 設定を変えたくないので、全サイズで同じ値へ上げて測り、上げたことを報告に書く。
+/// issue #35 / D-071: 既定値（2,000,000）は `Session::new` が入力長に応じて自動的に
+/// 引き上げる（未設定のときだけ）ので、1 MB の JSON も既定のままで通るようになった。
+/// この env var は速度比較で入力サイズごとに設定を変えず**固定値**で揃えたいときの
+/// 明示的な上書き用に残してある（明示すると自動スケーリングの対象外になる）。
 /// 認識のみの経路はこの上限に触れない。
 macro_rules! limits {
     ($ns:ident) => {{
