@@ -1,0 +1,9 @@
+.gitignore
+.vscodeignore
+evidence/**
+server/**
+src/**
+tsconfig.json
+**/*.map
+**/*.ts
+!out/**/*.js

@@ -1,7 +1,7 @@
 {
   "name": "ubnfc-tinyexpression-p4",
   "displayName": "TinyExpression P4 (ubnfc)",
-  "description": "ubnfc が生成した TinyExpression P4 パーサを LSP で使う（段階 2: 診断のみ）",
+  "description": "ubnfc が生成した TinyExpression P4 パーサを LSP で使う（診断 / 定義・参照 / アウトライン / semantic tokens / 補完 / hover）",
   "version": "0.1.0",
   "publisher": "ubnfc",
   "license": "MIT",
@@ -31,6 +31,13 @@
           ".tiny"
         ],
         "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "tinyexpression-p4",
+        "scopeName": "source.tinyexpression-p4",
+        "path": "./syntaxes/tinyexpression-p4.tmLanguage.json"
       }
     ],
     "configuration": {

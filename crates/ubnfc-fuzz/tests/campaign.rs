@@ -196,7 +196,7 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
     assert!(unknown.is_empty(), "未登録の差分: {unknown:#?}");
 }
 
-/// UBNF v2 の code point クラス（D-062）を両 backend で突き合わせる。
+/// UBNF v2 の code point クラス（D-063）を両 backend で突き合わせる。
 /// 3 つの seed は、`NEGATION` の除外集合のエスケープ・`CHAR_RANGE` の**補助面**の範囲・
 /// `CHAR_RANGE` の `\uXXXX` / `\u{X…}` 境界を 1 つずつ含む（生成器の v2 seed 帯）。
 /// 前後 2 つは v1 の綴りと**同じ集合**を別の書き方で表すので、front の展開が狂えば

@@ -1,0 +1,561 @@
+{
+  "rust__unlaxer-ubnf__tests__fixtures__known__common-field-space.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-GENERAL-NO-ROOT",
+        "message": "grammar Spaces has no @root rule — Add @root to at least one entry rule.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__known__eval-default.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-GENERAL-NO-ROOT",
+        "message": "grammar EvalDefault has no @root rule — Add @root to at least one entry rule.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__known__keyword-boundary.ubnf": {
+    "diagnostics": [
+      {
+        "code": "ULX-PARSE-001",
+        "message": "Expected ' ' or '//' or ':' or '::=' (in WordParser)",
+        "range": [
+          0,
+          24,
+          0,
+          25
+        ],
+        "severity": 1,
+        "source": "unlaxer"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__known__namespace.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-GENERAL-NO-ROOT",
+        "message": "grammar Names has no @root rule — Add @root to at least one entry rule.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'a.b' — Define a rule or token named 'a.b'.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__all-tokens.ubnf": {
+    "diagnostics": [
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'N U' — Did you mean 'N'?",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'X L' — Did you mean 'X'?",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'A E' — Did you mean 'A'?",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'Z R' — Did you mean 'Z'?",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'C RE' — Did you mean 'RE'?",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "W-GENERAL-NO-ROOT",
+        "message": "grammar Second has no @root rule — Add @root to at least one entry rule.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__annotations.ubnf": {
+    "diagnostics": [
+      {
+        "code": "E-ASSOC-MAPPING-PARAM",
+        "message": "rule Root uses @leftAssoc but @mapping(Node.Item) params does not contain 'op' — Include left/op/right in @mapping params.",
+        "range": [
+          8,
+          2,
+          8,
+          6
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Root uses @leftAssoc but capture @op is missing — Add @op capture in the rule body.",
+        "range": [
+          8,
+          2,
+          8,
+          6
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-NO-REPEAT",
+        "message": "rule Root uses @leftAssoc but has no repeat segment — Use canonical operator pattern: Base { Op Right }.",
+        "range": [
+          8,
+          2,
+          8,
+          6
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ANNOTATION-INTERLEAVE-PROFILE",
+        "message": "rule Root uses unsupported @interleave profile: comments — Use @interleave(profile=javaStyle) or @interleave(profile=commentsAndSpaces).",
+        "range": [
+          8,
+          2,
+          8,
+          6
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-NO-MAPPING",
+        "message": "rule Other uses @rightAssoc but has no @mapping — Add @mapping(ClassName, params=[left, op, right]) to this rule.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Other uses @rightAssoc but capture @left is missing — Add @left capture in the rule body.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Other uses @rightAssoc but capture @op is missing — Add @op capture in the rule body.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-MISSING-CAPTURE",
+        "message": "rule Other uses @rightAssoc but capture @right is missing — Add @right capture in the rule body.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-NO-REPEAT",
+        "message": "rule Other uses @rightAssoc but has no repeat segment — Use canonical operator pattern: Base { Op Right }.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-RIGHTASSOC-NONCANONICAL",
+        "message": "rule Other uses @rightAssoc but body is not canonical: expected Base { Op Other } — Rewrite right-assoc rule as Base { op Other }.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-ASSOC-NO-PRECEDENCE",
+        "message": "rule Other uses @rightAssoc but has no @precedence — Add @precedence(level=...) to this operator rule.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__boundaries.ubnf": {
+    "diagnostics": [
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'T Item' — Did you mean 'Item'?",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "E-RULE-UNDEFINED",
+        "message": "rule Root references undefined rule or token 'T // comment\n    Item' — Define a rule or token named 'T // comment\n    Item'.",
+        "range": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "severity": 1,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__elements.ubnf": {
+    "diagnostics": [
+      {
+        "code": "ULX-PARSE-001",
+        "message": "Expected ' ' or ''' or '(' or ')' or '.' or '//' or ';' or '@typeof' or 'ERROR' or '[' or ']' or '{' or '|' or '}' or AlphabetNumericUnderScoreParser or AlphabetUnderScoreParser or AnnotatedElementParser or IdentifierParser or QuantifiedRefParser or RuleRefElementParser (in WordParser)",
+        "range": [
+          3,
+          8,
+          3,
+          9
+        ],
+        "severity": 1,
+        "source": "unlaxer"
+      }
+    ],
+    "timedOut": false
+  },
+  "story__code__calc-leftrec.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: Expression -> Expression — Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "range": [
+          7,
+          2,
+          7,
+          12
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      },
+      {
+        "code": "W-LEFT-RECURSION",
+        "message": "left-recursive cycle detected: Term -> Term — Rewrite using repetition (e.g. A ::= B { Op B }) or right recursion.",
+        "range": [
+          8,
+          2,
+          8,
+          6
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "story__code__calc-var.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "story__code__calc.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__examples__tinycalc.ubnf": {
+    "diagnostics": [
+      {
+        "code": "ULX-PARSE-001",
+        "message": "Expected ' ' or ''' or '//' (in WordParser)",
+        "range": [
+          8,
+          20,
+          8,
+          21
+        ],
+        "severity": 1,
+        "source": "unlaxer"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__grammar__ubnf.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__associative__Operators.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser — Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          29
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__cardinality__Cardinality.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser — Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          29
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__0__Evolution.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser — Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          29
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__1__Evolution.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser — Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          29
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__2__Evolution.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser — Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          29
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__3__Evolution.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser — Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          29
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__mixed-values__Delimited.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token STRING references unresolved parser class: SingleQuotedParser — Did you mean 'org.unlaxer.parser.elementary.SingleQuotedParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          35
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__mixed-values__Mixed.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token STRING references unresolved parser class: SingleQuotedParser — Did you mean 'org.unlaxer.parser.elementary.SingleQuotedParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          35
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__mixed-values__Shared.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__right-associative__Power.ubnf": {
+    "diagnostics": [
+      {
+        "code": "W-TOKEN-UNRESOLVED",
+        "message": "token NUMBER references unresolved parser class: NumberParser — Did you mean 'org.unlaxer.parser.elementary.NumberParser'? Ensure the parser class is fully qualified or in a known package (org.unlaxer.parser.clang, elementary, posix).",
+        "range": [
+          3,
+          17,
+          3,
+          29
+        ],
+        "severity": 2,
+        "source": "ubnf-validator"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__tinycalc-vscode__grammar__tinycalc.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  }
+}

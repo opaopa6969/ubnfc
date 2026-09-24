@@ -39,7 +39,7 @@ main の親を使い、import が外にあれば全ソースを含む共通親�
 `ir::from_json` の型往復、`ir::validate_references` を検査する。
 JSON Schema validator は使用しない。
 
-## `json-v2.ir.json` — この repository の中にある v2 文法（D-062）
+## `json-v2.ir.json` — この repository の中にある v2 文法（D-063）
 
 `examples/json/json.ubnf`（RFC 8259 の JSON を UBNF v2 で書いたもの）の canonical JSON 出力。
 sibling repository に依存しない唯一の golden で、**v2 の code point クラス**が IR の

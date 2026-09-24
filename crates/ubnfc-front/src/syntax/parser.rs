@@ -118,7 +118,7 @@ impl Parser<'_> {
         Ok(self.string_with_raw()?.0)
     }
 
-    /// 字句値と、引用符の内側の原文。原文は v2 の `\uXXXX` 展開（D-062）が使う。
+    /// 字句値と、引用符の内側の原文。原文は v2 の `\uXXXX` 展開（D-063）が使う。
     fn string_with_raw(&mut self) -> ParseResult<(String, String)> {
         if let Kind::String { value, raw } = &self.peek(0).kind {
             let value = value.clone();

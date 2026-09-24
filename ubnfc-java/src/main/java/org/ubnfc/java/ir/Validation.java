@@ -195,7 +195,7 @@ public final class Validation {
         var unsafe = new HashSet<String>();
         for (Token token : tokens.values()) {
             TokenSpec spec = token.spec();
-            // D-062: 境界は code point（U+0000..U+10FFFF）。surrogate を**含む**範囲も拒否して
+            // D-063: 境界は code point（U+0000..U+10FFFF）。surrogate を**含む**範囲も拒否して
             // front / Rust backend（analysis/checks.rs、ir/references.rs）と同じ条件にする。
             if (spec.kind().equals("charRange")) require(spec.min() <= spec.max() && spec.max() <= 0x10ffff
                 && !(spec.min() <= 0xdfff && spec.max() >= 0xd800), "Invalid charRange endpoints");

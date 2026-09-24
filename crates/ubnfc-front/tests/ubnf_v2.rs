@@ -708,7 +708,7 @@ fn right_associative_rules_with_a_rule_reference_operator_compile() {
         .is_none());
 }
 
-// ── §6 code point クラス（D-062） ─────────────────────────────────────────
+// ── §6 code point クラス（D-063） ─────────────────────────────────────────
 
 /// v2 のエスケープは `CHAR_RANGE` の境界と `NEGATION` の除外集合にだけ効く。
 /// **同じ集合を別の綴りで書いた 2 つの文法は、IR が 1 バイトも違わない**。

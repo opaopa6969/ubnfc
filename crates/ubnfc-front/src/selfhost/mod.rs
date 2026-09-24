@@ -690,7 +690,7 @@ impl<'a> Converter<'a> {
     fn string(&self, i: usize, field: &str) -> Result<String> {
         decode_string(self.raw_scalar(i, field)?, self.span(i)?)
     }
-    /// STRING capture の原文から引用符を落としたもの。v2 の `\uXXXX` 展開（D-062）が
+    /// STRING capture の原文から引用符を落としたもの。v2 の `\uXXXX` 展開（D-063）が
     /// 使う。手書き parser の `string_with_raw` と同じ文字列になる。
     fn inner_raw(&self, i: usize, field: &str) -> Result<String> {
         let raw = self.raw_scalar(i, field)?;

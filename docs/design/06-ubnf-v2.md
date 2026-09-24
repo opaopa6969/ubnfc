@@ -245,7 +245,7 @@ P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の
   本当の不具合は `@rightAssoc` + 規則参照演算子が `InvalidOperator` で文法ごと落ちること（D-047）。
 - P1〜P3・P5 は**警告を足すだけ**で IR も backend も動かないので 1 本にまとめられる。
 
-## 7. code point クラス — **実装済み（D-062）**
+## 7. code point クラス — **実装済み（D-063）**
 
 ### 問題
 
@@ -306,7 +306,7 @@ UTF-8 1 scalar 復号、Java は `Character.codePointAt` + `Character.charCount`
 | | `y_` 受理 / 95 | `n_` 拒否 / 188 | ANTLR / tree-sitter との不一致 |
 |---|---:|---:|---|
 | 従来（`NEGATION('"\\')`） | 95 | 185 | 3 件（`n_string_unescaped_*`） |
-| **D-062 後** | **95** | **188** | **0 件** |
+| **D-063 後** | **95** | **188** | **0 件** |
 
 残る不一致は `i_`（実装依存）の 2 件だけ——先頭 BOM（tree-sitter だけ受理）と
 500 重ネスト（issue #35）。証拠は
@@ -325,5 +325,5 @@ UTF-8 1 scalar 復号、Java は `Character.codePointAt` + `Character.charCount`
 4. ~~§5 token 語彙~~ **完了（D-041 / D-042）**
 5. ~~§4 パラメータ化ルール~~ **完了（D-043 / D-044）**
 6. ~~§6 統廃合の P1 / P2 / P3 / P5 と P7-1 / P7-3~~ **完了（D-045 〜 D-049）**
-7. ~~§7 code point クラス~~ **完了（D-062）**
+7. ~~§7 code point クラス~~ **完了（D-063）**
 8. §6 の残り（P4 / P6 / P7-4）

@@ -26,7 +26,7 @@
 //! `CHAR_RANGE(…)` / `LOOKAHEAD(…)` / `NEGATIVE_LOOKAHEAD(…)` / `REGEX(…)` は
 //! v1 から既に中立な綴りなので、この表には入らない（直すものが無い）。
 //!
-//! v2 の code point クラス（D-062）も**この表を動かさない**。新しい構成子を足さず、
+//! v2 の code point クラス（D-063）も**この表を動かさない**。新しい構成子を足さず、
 //! 既にある `CHAR_RANGE(…)` / `NEGATION(…)` の引数に `\uXXXX` / `\u{X…}` を許し、
 //! `CHAR_RANGE` の境界から BMP 制限を外しただけだからである（`crate::escape`）。
 //! 「host 言語の綴りを表層から消す」という D-041 の目的から見ても、

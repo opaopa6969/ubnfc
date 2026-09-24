@@ -17,6 +17,7 @@ public final class Main {
           --scanner-class <fqcn>   extern token scanner を持つクラス（public static Map<String,TokenScanner> ALL）
           --server-name <name>     initialize が返す serverInfo.name
           --server-version <v>     initialize が返す serverInfo.version
+          --emit-tmlanguage <path> TextMate 文法（*.tmLanguage.json）も書く（生成物・毎回上書き）
         LSP は opt-in feature。--emit-lsp を付けないと何も出さない。--emit-dap は未実装（段階 4）。""";
 
     private Main() {}
@@ -24,7 +25,7 @@ public final class Main {
     public static void main(String[] args) throws IOException {
         if (args.length == 0 || args.length == 1 && args[0].equals("--help")) { System.out.println(USAGE); return; }
         String ir = null, out = null, pkg = null, parserPkg = null, languageId = null;
-        String scannerClass = null, serverName = null, serverVersion = null;
+        String scannerClass = null, serverName = null, serverVersion = null, tmLanguage = null;
         boolean emitLsp = false;
         for (int i = 0; i < args.length; i++) {
             String option = args[i];
@@ -42,12 +43,21 @@ public final class Main {
                 case "--scanner-class" -> { if (scannerClass != null) throw new IllegalArgumentException("Duplicate --scanner-class"); scannerClass = value; }
                 case "--server-name" -> { if (serverName != null) throw new IllegalArgumentException("Duplicate --server-name"); serverName = value; }
                 case "--server-version" -> { if (serverVersion != null) throw new IllegalArgumentException("Duplicate --server-version"); serverVersion = value; }
+                case "--emit-tmlanguage" -> { if (tmLanguage != null) throw new IllegalArgumentException("Duplicate --emit-tmlanguage"); tmLanguage = value; }
                 default -> throw new IllegalArgumentException("Unknown option: " + option);
             }
         }
         if (!emitLsp) throw new IllegalArgumentException("--emit-lsp が要ります（LSP は opt-in feature）");
         if (ir == null || out == null) throw new IllegalArgumentException("--ir と --out が要ります");
-        new LspEmitter(IrReader.read(Path.of(ir)), pkg, parserPkg, languageId, scannerClass, serverName, serverVersion)
-            .write(Path.of(out));
+        var grammarIr = IrReader.read(Path.of(ir));
+        var emitter = new LspEmitter(grammarIr, pkg, parserPkg, languageId, scannerClass, serverName, serverVersion);
+        emitter.write(Path.of(out));
+        if (tmLanguage != null) {
+            Path path = Path.of(tmLanguage);
+            if (path.getParent() != null) java.nio.file.Files.createDirectories(path.getParent());
+            java.nio.file.Files.writeString(path,
+                new TmLanguageEmitter(grammarIr, emitter.languageId(), emitter.grammar()).json(),
+                java.nio.charset.StandardCharsets.UTF_8);
+        }
     }
 }

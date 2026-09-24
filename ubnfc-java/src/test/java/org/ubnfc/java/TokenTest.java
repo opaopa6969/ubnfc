@@ -17,7 +17,7 @@ class TokenTest {
             new Case(obj("kind", "builtin", "which", "Identifier", "codePoints", List.of()), List.of("_", "aZ_09"), List.of("é", "9a", "😀")),
             new Case(obj("kind", "caseInsensitive", "word", "AbC", "comparison", "javaEqualsIgnoreCase", "wordBoundary", false), List.of("abc", "ABC"), List.of("ab", "abcd")),
             new Case(obj("kind", "charRange", "min", 97, "max", 99), List.of("a", "c"), List.of("d", "ab", "😀")),
-            // D-062: 補助面の charRange。Java の照合は code point 単位（Character.codePointAt）なので
+            // D-063: 補助面の charRange。Java の照合は code point 単位（Character.codePointAt）なので
             // surrogate 対 1 組をちょうど 1 文字として読む。
             new Case(obj("kind", "charRange", "min", 0x1F600, "max", 0x1F607), List.of("😀", "😇"), List.of("a", "😈", "\ud83d")),
             new Case(obj("kind", "charRange", "min", 0xE000, "max", 0x10FFFF), List.of("😀", "\ue000"), List.of("a", "\ud7ff")),

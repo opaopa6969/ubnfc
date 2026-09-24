@@ -190,7 +190,7 @@ fn three_invalid_fixtures_match_validation_text_goldens_and_json_counts() {
     }
 }
 
-/// D-062: この repository の中にある v2 文法の golden。sibling repository に依存しない
+/// D-063: この repository の中にある v2 文法の golden。sibling repository に依存しない
 /// 唯一の golden で、code point クラス（`\uXXXX` / `\u{X…}` の境界、補助面）が
 /// IR の `charRange` としてどう落ちるかをここで固定する。
 ///

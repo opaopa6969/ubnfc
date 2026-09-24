@@ -1,0 +1,6 @@
+complex-x16.tiny #0 ok=true 25407 ms load1=12.16
+complex-x16.tiny #1 ok=true 13688 ms load1=11.33
+complex-x16.tiny #2 ok=true 17590 ms load1=13.29
+complex-x64.tiny #0 ok=true 69403 ms load1=17.99
+complex-x64.tiny #1 ok=true 62577 ms load1=13.36
+complex-x64.tiny #2 ok=true 62710 ms load1=13.00

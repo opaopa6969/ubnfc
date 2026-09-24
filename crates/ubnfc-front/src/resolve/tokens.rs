@@ -120,7 +120,7 @@ pub fn builtin_class(class_name: &str) -> Option<BuiltinKind> {
 
 /// `v2` は `@ubnf: 2` 以上を宣言した grammar かどうか（D-038）。v2 のときだけ
 /// `CHAR_RANGE` の境界と `NEGATION` の除外集合で `\uXXXX` / `\u{X…}` を展開する
-/// （D-062、`crate::escape`）。展開に失敗した場合は v1 の字句値をそのまま残し、
+/// （D-063、`crate::escape`）。展開に失敗した場合は v1 の字句値をそのまま残し、
 /// validate の `E-TOKEN-ESCAPE-*` が理由を述べる（lower には入らない）。
 pub(super) fn classify(value: &TokenValue, v2: bool) -> (ResolvedTokenValue, bool) {
     use ResolvedTokenValue as R;

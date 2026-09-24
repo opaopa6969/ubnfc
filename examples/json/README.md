@@ -21,7 +21,7 @@
 | **語境界（`@literalBoundary` の v2 既定 `word`）** | `'true'` / `'false'` / `'null'` | `truex` を `true` + 余りではなく**リテラル不一致**として落とす。v1 既定の `none` では語境界が無い |
 | `@whitespace: none`（暗黙 trivia を切る） | 冒頭 | RFC 8259 の ws はちょうど 4 文字。`javaStyle` は `//` `/* */` を必ず区切りに入れてしまい、JSON でコメントが通る（`crates/ubnfc-front/src/lower/trivia.rs:85-99`）。さらに `javaStyle` は 0x0B / 0x0C も空白扱いする |
 | `CHAR_RANGE(...)` token | `ZERO` `ONENINE` `E_LOWER` `ESC_U` ほか | **語境界は rule 本体のリテラルにだけ効き、token には効かない**。`'0'` `'e'` `'u'` をリテラルで書くと `0e1` や `é` が語境界で失敗する。英数 1 文字は token にして避けている |
-| **code point クラス（D-062）** — `CHAR_RANGE` の境界の `\uXXXX` / `\u{X…}` と BMP 外 | `SAFE_SP` `SAFE_MID` `SAFE_BMP` `SAFE_SUPP` | 文字列の中に生で置ける 1 文字（`"` `\` と U+0000..U+001F を除く全 code point）。v1 では書けない |
+| **code point クラス（D-063）** — `CHAR_RANGE` の境界の `\uXXXX` / `\u{X…}` と BMP 外 | `SAFE_SP` `SAFE_MID` `SAFE_BMP` `SAFE_SUPP` | 文字列の中に生で置ける 1 文字（`"` `\` と U+0000..U+001F を除く全 code point）。v1 では書けない |
 | `XDIGIT` / `DIGIT`（v2 の言語中立な組込み語彙、D-041） | `HEX` / `DIGIT` | host クラス名（`org.unlaxer...`）を書かずに済む |
 | 有界反復 `HEX{4}` | `Escape` | `\uXXXX` の 4 桁 |
 | `@mapping(...)` と、**全候補が mapped rule への参照だけの選択**（`Value`） | 各規則 | `JsonAST` が sealed interface + record の和型として自動で出る |
@@ -31,7 +31,7 @@
 
 ## 3 記法で揃えられなかった点
 
-### 1. 文字列の中の制御文字（U+0000..U+001F）— **D-062 で解消**
+### 1. 文字列の中の制御文字（U+0000..U+001F）— **D-063 で解消**
 
 RFC 8259 §7 は「引用符・逆ソリダス・制御文字 (U+0000〜U+001F) 以外の Unicode 文字は
 そのまま置ける」と定める。ANTLR は `~["\\\u0000-\u001F]`、tree-sitter は
@@ -39,7 +39,7 @@ RFC 8259 §7 は「引用符・逆ソリダス・制御文字 (U+0000〜U+001F) 
 `token SAFE = NEGATION('"\\')` で**制御文字が通ることを受け入れていた**——
 JSONTestSuite の `n_string_unescaped_{ctrl_char,newline,tab}` 3 件で他の 2 記法と判定が割れていた。
 
-**v2 の code point クラス（D-062）で書けるようになった。**正の範囲を 4 本並べる:
+**v2 の code point クラス（D-063）で書けるようになった。**正の範囲を 4 本並べる:
 
 ```ubnf
 token SAFE_SP   = CHAR_RANGE('\u0020','\u0021')        // U+0020..U+0021

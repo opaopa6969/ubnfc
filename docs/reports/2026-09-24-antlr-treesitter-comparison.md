@@ -22,7 +22,7 @@
 **ファイル × 4 実装の全 318 行**（期待値と理由つき）は
 [`examples/json/evidence/jsontestsuite-verdicts.tsv`](../../examples/json/evidence/jsontestsuite-verdicts.tsv) にある。
 
-> **2026-09-24 追記（issue #34 / D-062）**: 下記 A の 3 件は **UBNF v2 に code point クラスを足して解消した**。
+> **2026-09-24 追記（issue #34 / D-063）**: 下記 A の 3 件は **UBNF v2 に code point クラスを足して解消した**。
 > 現在は ubnfc の 2 backend も `n_` 188/188・`y_` 95/95 で、suite との不一致は 0 件、
 > 実装間で割れるのは `i_` の 2 件（BOM と 500 重ネスト）だけである。
 > この節の表と `examples/json/` の生データは**改訂後の値**になっている。改訂の記録は
@@ -43,7 +43,7 @@
 | `i_structure_500_nested_arrays` | 実装依存 | reject | reject | accept | accept | **B**: ubnfc の生成ランタイムはネイティブスタック 256 KiB で再帰を止める（issue #35） |
 | `i_structure_UTF-8_BOM_empty_object` | 実装依存 | reject | reject | reject | accept | **C**: tree-sitter だけ先頭 BOM を読み飛ばす |
 
-当初（この報告の初版、ubnfc `d257a9b`）は次の 3 件でも割れていた。**D-062 で解消済み**。
+当初（この報告の初版、ubnfc `d257a9b`）は次の 3 件でも割れていた。**D-063 で解消済み**。
 
 | file | suite の分類 | 当初の ubnfc | 現在の ubnfc | 理由 |
 |---|---|---|---|---|
@@ -65,7 +65,7 @@ UBNF では書けない。
 
 そこで当初は `token SAFE = NEGATION('"\\')` を採り、**制御文字が通ることを受け入れた**。
 文法の書き方の問題ではなく、**UBNF v2 に足りない機能**だった。
-→ **2026-09-24 に D-062 で解消**（`CHAR_RANGE` の境界に `\uXXXX` / `\u{X…}` と補助面を許す。
+→ **2026-09-24 に D-063 で解消**（`CHAR_RANGE` の境界に `\uXXXX` / `\u{X…}` と補助面を許す。
 issue #34、[`2026-09-24-v2-codepoint-classes.md`](2026-09-24-v2-codepoint-classes.md)）。
 
 **B — 入れ子の深さ**。生成ランタイムはスタック番兵（`anchor.abs_diff(address) > 256 * 1024`）で
@@ -95,7 +95,7 @@ UTF-16 ファイル・overlong 符号化・裸の継続 byte はいずれも「U
 ### 1.2 JSON の速度
 
 > **2026-09-24 追記**: この節の数字は**初版の文法**（`token SAFE = NEGATION('"\\')`）で測ったもので、
-> D-062 で `SAFE` を 4 本の `CHAR_RANGE` へ置き換えた後には測り直していない。
+> D-063 で `SAFE` を 4 本の `CHAR_RANGE` へ置き換えた後には測り直していない。
 > 置き換えで `Char` の選択が 2 候補から 5 候補に増えるので、ubnfc の JSON の速度は動き得る。
 > 速度の比較をやり直すときは §4.4 の手順をそのまま走らせること（他の 3 実装の文法は不変）。
 
@@ -347,7 +347,7 @@ benchmarks/scripts/run-external.sh arith            # 速度（§1.3）
 ## 6. 申し送り
 
 1. ~~**UBNF v2 に「制御文字を除く code point 集合」を書く手立てを足す**（§1.1 A）。~~
-   **完了（2026-09-24、issue #34 / D-062）**: 候補 (a)+(b) を採り、`CHAR_RANGE` の境界と
+   **完了（2026-09-24、issue #34 / D-063）**: 候補 (a)+(b) を採り、`CHAR_RANGE` の境界と
    `NEGATION` の除外集合に `\uXXXX` / `\u{X…}` を、`CHAR_RANGE` に補助面を許した（v2 限定）。
    `unlaxer-parser` 側の字句と corpus の `expected` 表記には触れていない（ubnfc が先行実装）。
    以下は当初の検討メモ。

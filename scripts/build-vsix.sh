@@ -1,58 +1,102 @@
 #!/usr/bin/env bash
-# examples/p4-vscode の VSIX を「生成物だけ」から組む。
+# examples/*-vscode の VSIX を「生成物だけ」から組む。
 #
 #   1. 生成器を組む（LSP は opt-in の Maven profile `lsp`。既定ビルドには入らない）
 #   2. ubnfc-java でパーサを生成（LSP feature とは無関係。出力はこの手順で変わらない）
-#   3. ubnfc-lsp --emit-lsp で LSP 包みを別パッケージへ生成
-#   4. extern token scanner を examples/p4-java から複製（読むだけ。編集しない）
+#   3. ubnfc-lsp --emit-lsp で LSP 包みを別パッケージへ生成し、--emit-tmlanguage で TextMate 文法も出す
+#   4. extern token scanner を複製（P4 のみ。読むだけ。編集しない）
 #   5. サーバ fat jar（golden テストもここで走る）
-#   6. npm ci + vsce package → examples/p4-vscode/target/*.vsix
+#   6. npm ci + vsce package → examples/<target>-vscode/target/*.vsix
 #
+# 使い方: scripts/build-vsix.sh [p4|ubnf|all]（既定 all）
 # 環境変数: MVN（既定 mvn）、MAVEN_FLAGS（既定 -o。依存が未取得なら空にする）、SKIP_VSIX=1 で 6 を飛ばす。
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/.." && pwd)
-example="$repo/examples/p4-vscode"
-server="$example/server"
-generated="$server/target/generated-sources/ubnfc"
-ir="$repo/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
 mvn_bin=${MVN:-mvn}
 mvn_flags=${MAVEN_FLAGS--o}
 version=0.1.0-SNAPSHOT
+targets=${1:-all}
+[[ "$targets" == "all" ]] && targets="p4 ubnf"
 
 echo "[1/6] 生成器（-Plsp）"
 "$mvn_bin" $mvn_flags -q -f "$repo/pom.xml" -Plsp -DskipTests package
 
-echo "[2/6] パーサ生成"
-rm -rf "$generated"
-mkdir -p "$generated"
-java -cp "$repo/ubnfc-java/target/ubnfc-java-$version.jar" org.ubnfc.java.Main \
-  --ir "$ir" --out "$generated" --package org.ubnfc.p4.generated --no-emit-driver
+build_one() {
+  local target=$1 ir example lsp_package parser_package language_id scanner_class server_name jar vsix scanner_source
+  case "$target" in
+    p4)
+      ir="$repo/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
+      example="$repo/examples/p4-vscode"
+      parser_package=org.ubnfc.p4.generated
+      lsp_package=org.ubnfc.p4.lsp
+      language_id=tinyexpression-p4
+      scanner_class=org.ubnfc.p4.P4Scanners
+      scanner_source="$repo/examples/p4-java/src/main/java/org/ubnfc/p4/P4Scanners.java"
+      server_name="TinyExpression P4 (ubnfc)"
+      jar=ubnfc-p4-lsp-server
+      vsix=ubnfc-tinyexpression-p4-0.1.0.vsix
+      ;;
+    ubnf)
+      ir="$repo/ir/fixtures/unlaxer-dsl__grammar__ubnf.ubnf.ir.json"
+      example="$repo/examples/ubnf-vscode"
+      parser_package=org.ubnfc.ubnf.generated
+      lsp_package=org.ubnfc.ubnf.lsp
+      language_id=ubnf
+      scanner_class=""
+      scanner_source=""
+      server_name="UBNF (ubnfc)"
+      jar=ubnfc-ubnf-lsp-server
+      vsix=ubnfc-ubnf-0.1.0.vsix
+      ;;
+    *) echo "不明な target: $target" >&2; return 1 ;;
+  esac
+  local server="$example/server"
+  local generated="$server/target/generated-sources/ubnfc"
 
-echo "[3/6] LSP 包み生成（opt-in: --emit-lsp）"
-java -cp "$repo/ubnfc-lsp/target/ubnfc-lsp-$version.jar:$repo/ubnfc-java/target/ubnfc-java-$version.jar" \
-  org.ubnfc.lsp.Main --emit-lsp --ir "$ir" --out "$generated" \
-  --package org.ubnfc.p4.lsp --parser-package org.ubnfc.p4.generated \
-  --language-id tinyexpression-p4 --scanner-class org.ubnfc.p4.P4Scanners \
-  --server-name "TinyExpression P4 (ubnfc)" --server-version 0.1.0
+  echo "[2/6] パーサ生成（$target）"
+  rm -rf "$generated"
+  mkdir -p "$generated"
+  java -cp "$repo/ubnfc-java/target/ubnfc-java-$version.jar" org.ubnfc.java.Main \
+    --ir "$ir" --out "$generated" --package "$parser_package" --no-emit-driver
 
-echo "[4/6] extern token scanner"
-mkdir -p "$generated/org/ubnfc/p4"
-cp "$repo/examples/p4-java/src/main/java/org/ubnfc/p4/P4Scanners.java" "$generated/org/ubnfc/p4/P4Scanners.java"
+  echo "[3/6] LSP 包み + TextMate 文法（opt-in: --emit-lsp）"
+  mkdir -p "$example/syntaxes"
+  local scanner_option=()
+  [[ -n "$scanner_class" ]] && scanner_option=(--scanner-class "$scanner_class")
+  java -cp "$repo/ubnfc-lsp/target/ubnfc-lsp-$version.jar:$repo/ubnfc-java/target/ubnfc-java-$version.jar" \
+    org.ubnfc.lsp.Main --emit-lsp --ir "$ir" --out "$generated" \
+    --package "$lsp_package" --parser-package "$parser_package" \
+    --language-id "$language_id" "${scanner_option[@]}" \
+    --server-name "$server_name" --server-version 0.1.0 \
+    --emit-tmlanguage "$example/syntaxes/$language_id.tmLanguage.json"
 
-echo "[5/6] サーバ jar（golden テストを含む）"
-"$mvn_bin" $mvn_flags -q -f "$server/pom.xml" package
-mkdir -p "$example/server-dist"
-cp "$server/target/ubnfc-p4-lsp-server.jar" "$example/server-dist/ubnfc-p4-lsp-server.jar"
+  echo "[4/6] extern token scanner"
+  if [[ -n "$scanner_source" ]]; then
+    mkdir -p "$generated/org/ubnfc/p4"
+    cp "$scanner_source" "$generated/org/ubnfc/p4/P4Scanners.java"
+  else
+    echo "  （この文法は extern token を使わない）"
+  fi
 
-if [[ "${SKIP_VSIX:-0}" == "1" ]]; then
-  echo "[6/6] SKIP_VSIX=1 のため VSIX は組まない"
-  exit 0
-fi
+  echo "[5/6] サーバ jar（golden テストを含む）"
+  "$mvn_bin" $mvn_flags -q -f "$server/pom.xml" package
+  mkdir -p "$example/server-dist"
+  cp "$server/target/$jar.jar" "$example/server-dist/$jar.jar"
 
-echo "[6/6] VSIX"
-cd "$example"
-if [[ -f package-lock.json ]]; then npm ci --silent; else npm install --silent; fi
-npm run --silent compile
-mkdir -p target
-./node_modules/.bin/vsce package --allow-missing-repository --out "target/ubnfc-tinyexpression-p4-0.1.0.vsix"
-echo "できた: $example/target/ubnfc-tinyexpression-p4-0.1.0.vsix"
+  if [[ "${SKIP_VSIX:-0}" == "1" ]]; then
+    echo "[6/6] SKIP_VSIX=1 のため VSIX は組まない（$target）"
+    return 0
+  fi
+
+  echo "[6/6] VSIX（$target）"
+  (
+    cd "$example"
+    if [[ -f package-lock.json ]]; then npm ci --silent; else npm install --silent; fi
+    npm run --silent compile
+    mkdir -p target
+    ./node_modules/.bin/vsce package --allow-missing-repository --out "target/$vsix"
+  )
+  echo "できた: $example/target/$vsix"
+}
+
+for target in $targets; do build_one "$target"; done

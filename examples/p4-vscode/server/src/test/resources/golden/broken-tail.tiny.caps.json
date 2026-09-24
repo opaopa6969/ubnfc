@@ -1,0 +1,29 @@
+{
+  "documentSymbols": [
+    {"name": "Formula", "kind": "Namespace", "detail": null, "range": [0, 0, 2, 0], "selectionRange": [0, 0, 0, 0], "children": [
+      {"name": "price", "kind": "Variable", "detail": "NumberVariableDeclaration", "range": [0, 5, 0, 10], "selectionRange": [0, 5, 0, 10]}
+    ]}
+  ],
+  "semanticTokens": [
+    {"line": 0, "char": 0, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 4, "length": 1, "type": "operator"},
+    {"line": 0, "char": 5, "length": 5, "type": "variable"},
+    {"line": 0, "char": 11, "length": 2, "type": "keyword"},
+    {"line": 0, "char": 14, "length": 6, "type": "keyword"},
+    {"line": 0, "char": 21, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 25, "length": 2, "type": "number"},
+    {"line": 0, "char": 27, "length": 1, "type": "operator"},
+    {"line": 1, "char": 0, "length": 4, "type": "keyword"},
+    {"line": 1, "char": 5, "length": 5, "type": "variable"},
+    {"line": 1, "char": 10, "length": 1, "type": "operator"},
+    {"line": 1, "char": 11, "length": 1, "type": "operator"},
+    {"line": 1, "char": 12, "length": 5, "type": "variable"},
+    {"line": 1, "char": 17, "length": 1, "type": "operator"},
+    {"line": 1, "char": 19, "length": 1, "type": "operator"},
+    {"line": 1, "char": 21, "length": 1, "type": "number"}
+  ],
+  "probes": [
+    {"at": [0, 5], "definition": [[0, 5, 0, 10]], "references": [[0, 5, 0, 10], [1, 12, 1, 17]], "referencesOnly": [[1, 12, 1, 17]], "hover": {"range": [0, 5, 0, 10], "markdown": "**price** — 宣言\n\n種類: `NumberVariableDeclaration`\n\ndesc"}, "completion": [], "completionCount": 0},
+    {"at": [1, 12], "definition": [[0, 5, 0, 10]], "references": [[0, 5, 0, 10], [1, 12, 1, 17]], "referencesOnly": [[1, 12, 1, 17]], "hover": {"range": [1, 12, 1, 17], "markdown": "**price** — 参照\n\n宣言: 1 行 6 桁"}, "completion": ["price"], "completionCount": 1}
+  ]
+}

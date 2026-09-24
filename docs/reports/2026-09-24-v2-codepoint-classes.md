@@ -1,4 +1,4 @@
-# UBNF v2 の code point クラス（D-062）
+# UBNF v2 の code point クラス（D-063）
 
 2026-09-24。issue [#34](https://github.com/opaopa6969/ubnfc/issues/34)。
 [`2026-09-24-antlr-treesitter-comparison.md`](2026-09-24-antlr-treesitter-comparison.md) §1.1 A の申し送り。
@@ -17,7 +17,7 @@ ANTLR は `~["\\\u0000-\u001F]`、tree-sitter は `/[^"\\\x00-\x1f]/` で 1 行�
 そのため `examples/json/json.ubnf` は `token SAFE = NEGATION('"\\')` を採り、**制御文字が通ることを受け入れていた**。
 JSONTestSuite でちょうど 3 件（`n_string_unescaped_{ctrl_char,newline,tab}`）だけ ANTLR / tree-sitter と割れていた。
 
-## 1. 採った拡張（D-062）
+## 1. 採った拡張（D-063）
 
 **新しい構成子を足さない。**既存の 2 つに、`@ubnf: 2` 限定（D-038）で 2 つのことを許す。
 
@@ -181,7 +181,7 @@ CI の固定 campaign に `e_v2_code_point_class_tokens_agree_across_backends` �
 
 > **副産物**: 帯を探す途中で v2 seed 100276 が `diff:/diagnostics/*/expected/*` と
 > `diff:/recoveries/*/captureOccurrences/*` で両 backend 不一致になることが分かった。
-> **D-062 とは無関係**（生成器の差し替えを一時的に無効化して同じ seed を `NEGATION('ab\n')` で
+> **D-063 とは無関係**（生成器の差し替えを一時的に無効化して同じ seed を `NEGATION('ab\n')` で
 > 生成し直しても同じ 3 つの signature が出る）なので、この PR では直さず
 > [ubnfc#41](https://github.com/opaopa6969/ubnfc/issues/41) に切り出した。
 

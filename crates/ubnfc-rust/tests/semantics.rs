@@ -353,7 +353,7 @@ fn generated_semantic_contracts() {
             Some(json!({"kind":"charRange","min":97,"max":122})),
         ),
     ));
-    // D-062: 補助面まで届く charRange。Rust の照合は UTF-8 を 1 scalar 復号して
+    // D-063: 補助面まで届く charRange。Rust の照合は UTF-8 を 1 scalar 復号して
     // code point で比べるので、surrogate 対の概念なしに 1 文字として読む。
     grammars.push((
         "char_range_supplementary",

@@ -33,7 +33,7 @@ grammar Json {
   token ESC_U   = CHAR_RANGE('u','u')
 
   // 文字列の「生のまま置ける 1 文字」。RFC 8259 §7 は `"` `\` と **U+0000..U+001F** を
-  // 除く任意の Unicode 文字、と定める。v2 の code point クラス（D-062）で正の範囲として
+  // 除く任意の Unicode 文字、と定める。v2 の code point クラス（D-063）で正の範囲として
   // 素直に書ける:
   //   - CHAR_RANGE の境界に `\uXXXX` / `\u{X…}` を書ける（v2 のみ）
   //   - CHAR_RANGE の境界が BMP に限られない（v2 のみ。U+10FFFF まで）

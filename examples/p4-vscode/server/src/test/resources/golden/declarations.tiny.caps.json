@@ -1,0 +1,62 @@
+{
+  "documentSymbols": [
+    {"name": "Formula", "kind": "Namespace", "detail": null, "range": [0, 0, 6, 0], "selectionRange": [0, 0, 0, 0], "children": [
+      {"name": "price", "kind": "Variable", "detail": "NumberVariableDeclaration", "range": [0, 5, 0, 10], "selectionRange": [0, 5, 0, 10]},
+      {"name": "count", "kind": "Variable", "detail": "NumberVariableDeclaration", "range": [1, 5, 1, 10], "selectionRange": [1, 5, 1, 10]},
+      {"name": "NumberMethodDeclaration", "kind": "Namespace", "detail": null, "range": [3, 0, 6, 0], "selectionRange": [3, 0, 3, 0], "children": [
+        {"name": "x", "kind": "Variable", "detail": "MethodParameter", "range": [3, 14, 3, 15], "selectionRange": [3, 14, 3, 15]}
+      ]},
+      {"name": "double", "kind": "Variable", "detail": "NumberMethodDeclaration", "range": [3, 6, 3, 12], "selectionRange": [3, 6, 3, 12]}
+    ]}
+  ],
+  "semanticTokens": [
+    {"line": 0, "char": 0, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 4, "length": 1, "type": "operator"},
+    {"line": 0, "char": 5, "length": 5, "type": "variable"},
+    {"line": 0, "char": 11, "length": 2, "type": "keyword"},
+    {"line": 0, "char": 14, "length": 6, "type": "keyword"},
+    {"line": 0, "char": 21, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 25, "length": 2, "type": "number"},
+    {"line": 0, "char": 27, "length": 1, "type": "operator"},
+    {"line": 1, "char": 0, "length": 3, "type": "keyword"},
+    {"line": 1, "char": 4, "length": 1, "type": "operator"},
+    {"line": 1, "char": 5, "length": 5, "type": "variable"},
+    {"line": 1, "char": 11, "length": 2, "type": "keyword"},
+    {"line": 1, "char": 14, "length": 6, "type": "keyword"},
+    {"line": 1, "char": 21, "length": 3, "type": "keyword"},
+    {"line": 1, "char": 25, "length": 1, "type": "number"},
+    {"line": 1, "char": 26, "length": 1, "type": "operator"},
+    {"line": 2, "char": 0, "length": 1, "type": "operator"},
+    {"line": 2, "char": 1, "length": 5, "type": "variable"},
+    {"line": 2, "char": 7, "length": 1, "type": "operator"},
+    {"line": 2, "char": 9, "length": 1, "type": "operator"},
+    {"line": 2, "char": 10, "length": 5, "type": "variable"},
+    {"line": 2, "char": 16, "length": 1, "type": "operator"},
+    {"line": 2, "char": 18, "length": 4, "type": "keyword"},
+    {"line": 2, "char": 23, "length": 6, "type": "variable"},
+    {"line": 2, "char": 29, "length": 1, "type": "operator"},
+    {"line": 2, "char": 30, "length": 1, "type": "operator"},
+    {"line": 2, "char": 31, "length": 5, "type": "variable"},
+    {"line": 2, "char": 36, "length": 1, "type": "operator"},
+    {"line": 3, "char": 0, "length": 5, "type": "keyword"},
+    {"line": 3, "char": 6, "length": 6, "type": "variable"},
+    {"line": 3, "char": 12, "length": 1, "type": "operator"},
+    {"line": 3, "char": 13, "length": 1, "type": "operator"},
+    {"line": 3, "char": 14, "length": 1, "type": "variable"},
+    {"line": 3, "char": 16, "length": 2, "type": "keyword"},
+    {"line": 3, "char": 19, "length": 6, "type": "keyword"},
+    {"line": 3, "char": 25, "length": 1, "type": "operator"},
+    {"line": 3, "char": 27, "length": 1, "type": "operator"},
+    {"line": 4, "char": 2, "length": 1, "type": "operator"},
+    {"line": 4, "char": 3, "length": 1, "type": "variable"},
+    {"line": 4, "char": 5, "length": 1, "type": "operator"},
+    {"line": 4, "char": 7, "length": 1, "type": "number"},
+    {"line": 5, "char": 0, "length": 1, "type": "operator"}
+  ],
+  "probes": [
+    {"at": [0, 5], "definition": [[0, 5, 0, 10]], "references": [[0, 5, 0, 10], [2, 1, 2, 6], [2, 31, 2, 36]], "referencesOnly": [[2, 1, 2, 6], [2, 31, 2, 36]], "hover": {"range": [0, 5, 0, 10], "markdown": "**price** — 宣言\n\n種類: `NumberVariableDeclaration`\n\ndesc"}, "completion": [], "completionCount": 0},
+    {"at": [2, 11], "definition": [[1, 5, 1, 10]], "references": [[1, 5, 1, 10], [2, 10, 2, 15]], "referencesOnly": [[2, 10, 2, 15]], "hover": {"range": [2, 10, 2, 15], "markdown": "**count** — 参照\n\n宣言: 2 行 6 桁"}, "completion": ["count"], "completionCount": 1},
+    {"at": [2, 23], "definition": [[3, 6, 3, 12]], "references": [[3, 6, 3, 12], [2, 23, 2, 29]], "referencesOnly": [[2, 23, 2, 29]], "hover": {"range": [2, 23, 2, 29], "markdown": "**double** — 参照\n\n宣言: 4 行 7 桁"}, "completion": ["count", "internal", "price"], "completionCount": 3},
+    {"at": [4, 2], "definition": [], "references": [], "referencesOnly": [], "hover": {"range": [4, 2, 4, 3], "markdown": "`$`\n\n規則: `VariableRef`"}, "completion": ["$", "(", ")", ",", ".", ".length", ":", "?", "abs", "call", "ceil", "cos", "count", "double", "else", "exp", "external", "floor", "if", "internal"], "completionCount": 37}
+  ]
+}

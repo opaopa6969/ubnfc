@@ -229,7 +229,7 @@ fn crosscheck_wellformed_declarations_stay_accepted() {
     }
 }
 
-/// D-062: v2 の code point クラス。`\uXXXX` / `\u{X…}` は v2 でのみエスケープで、
+/// D-063: v2 の code point クラス。`\uXXXX` / `\u{X…}` は v2 でのみエスケープで、
 /// v1 では `E-TOKEN-ESCAPE-V2-ONLY` として拒否する（v1 で黙って別の意味に読まない）。
 /// 補助面の境界は v2 でのみ許す（`E-TOKEN-CHAR-RANGE-SUPPLEMENTARY` は v1 専用になった）。
 #[test]

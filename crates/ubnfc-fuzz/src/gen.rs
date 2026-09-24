@@ -90,7 +90,7 @@ fn v2_spelling(seed: u64, declaration: &str) -> Option<(&'static str, &'static s
             ("extern 'SingleQuotedParser'", "token:extern")
         }
         "org.unlaxer.parser.elementary.SingleQuotedParser" => ("SINGLE_QUOTED", "token:neutral"),
-        // v2 の code point クラス（D-062）。同じ述語を別の綴りで書くだけなので
+        // v2 の code point クラス（D-063）。同じ述語を別の綴りで書くだけなので
         // サンプルも乱数も変わらない: `CHAR_RANGE('a','f')` と
         // `CHAR_RANGE('\u0061','\u{66}')` は同じ集合で、両 backend が
         // 一致しなければ campaign が落ちる。
@@ -104,7 +104,7 @@ fn v2_spelling(seed: u64, declaration: &str) -> Option<(&'static str, &'static s
     })
 }
 
-/// v2 で `CHAR_RANGE` の境界が BMP を越えられること（D-062）を踏む差し替え。
+/// v2 で `CHAR_RANGE` の境界が BMP を越えられること（D-063）を踏む差し替え。
 /// **述語が変わる**ので samples も差し替える。乱数は引かない。
 fn v2_supplementary(
     seed: u64,
@@ -403,7 +403,7 @@ pub fn generate(seed: u64) -> Grammar {
             }
             None => declaration,
         };
-        // 補助面の CHAR_RANGE（D-062）だけは述語が変わるので samples も入れ替える。
+        // 補助面の CHAR_RANGE（D-063）だけは述語が変わるので samples も入れ替える。
         let declaration = match v2
             .then(|| v2_supplementary(seed, spec.declaration))
             .flatten()
