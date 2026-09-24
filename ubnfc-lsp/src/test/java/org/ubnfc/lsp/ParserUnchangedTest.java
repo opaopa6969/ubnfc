@@ -77,7 +77,7 @@ class ParserUnchangedTest {
         var emitter = new LspEmitter(org.ubnfc.java.ir.IrReader.read(IR), "org.ubnfc.p4.lsp",
             "org.ubnfc.p4.generated", "tinyexpression-p4", "org.ubnfc.p4.P4Scanners", null, null);
         var sources = emitter.sources();
-        assertEquals(5, sources.size());
+        assertEquals(11, sources.size());
         assertEquals("TinyExpressionP4", emitter.grammar());
         assertEquals("Formula", emitter.entry());
         assertEquals("org.ubnfc.p4.lsp.ServerMain", emitter.serverMainClass());

@@ -1,0 +1,28 @@
+{
+  "documentSymbols": [
+    {"name": "Formula", "kind": "Namespace", "detail": null, "range": [0, 0, 2, 0], "selectionRange": [0, 0, 0, 0], "children": [
+      {"name": "country", "kind": "Variable", "detail": "StringVariableDeclaration", "range": [0, 5, 0, 12], "selectionRange": [0, 5, 0, 12]}
+    ]}
+  ],
+  "semanticTokens": [
+    {"line": 0, "char": 0, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 4, "length": 1, "type": "operator"},
+    {"line": 0, "char": 5, "length": 7, "type": "variable"},
+    {"line": 0, "char": 13, "length": 2, "type": "keyword"},
+    {"line": 0, "char": 16, "length": 6, "type": "keyword"},
+    {"line": 0, "char": 23, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 27, "length": 6, "type": "string"},
+    {"line": 0, "char": 33, "length": 1, "type": "operator"},
+    {"line": 1, "char": 0, "length": 4, "type": "keyword"},
+    {"line": 1, "char": 5, "length": 5, "type": "variable"},
+    {"line": 1, "char": 10, "length": 1, "type": "operator"},
+    {"line": 1, "char": 11, "length": 1, "type": "number"},
+    {"line": 1, "char": 12, "length": 1, "type": "operator"},
+    {"line": 1, "char": 14, "length": 1, "type": "operator"},
+    {"line": 1, "char": 16, "length": 1, "type": "number"}
+  ],
+  "probes": [
+    {"at": [0, 5], "definition": [[0, 5, 0, 12]], "references": [[0, 5, 0, 12]], "referencesOnly": [], "hover": {"range": [0, 5, 0, 12], "markdown": "**country** — 宣言\n\n種類: `StringVariableDeclaration`\n\ndesc"}, "completion": [], "completionCount": 0},
+    {"at": [1, 6], "definition": [], "references": [[1, 5, 1, 10]], "referencesOnly": [[1, 5, 1, 10]], "hover": {"range": [1, 5, 1, 10], "markdown": "**bonus** — 参照\n\n宣言が見つかりません。"}, "completion": [], "completionCount": 0}
+  ]
+}

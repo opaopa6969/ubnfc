@@ -1,0 +1,2 @@
+grammar Broken {
+  Expr ::= 'a'

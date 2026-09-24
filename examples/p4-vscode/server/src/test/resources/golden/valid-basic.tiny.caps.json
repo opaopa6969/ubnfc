@@ -1,0 +1,14 @@
+{
+  "documentSymbols": [
+    {"name": "Formula", "kind": "Namespace", "detail": null, "range": [0, 0, 1, 0], "selectionRange": [0, 0, 0, 0]}
+  ],
+  "semanticTokens": [
+    {"line": 0, "char": 0, "length": 1, "type": "number"},
+    {"line": 0, "char": 2, "length": 1, "type": "operator"},
+    {"line": 0, "char": 4, "length": 1, "type": "number"}
+  ],
+  "probes": [
+    {"at": [0, 0], "definition": [], "references": [], "referencesOnly": [], "hover": {"range": [0, 0, 0, 1], "markdown": "`1`\n\n規則: `NumberFactor`"}, "completion": ["$", "(", ")", ",", ".", ".contains", ".endsWith", ".in", ".length", ".startsWith", ".toLowerCase", ".toUpperCase", ".trim", ":", ";", "?", "@", "String", "[", "]"], "completionCount": 64},
+    {"at": [0, 4], "definition": [], "references": [], "referencesOnly": [], "hover": {"range": [0, 4, 0, 5], "markdown": "`2`\n\n規則: `NumberFactor`"}, "completion": ["$", "(", ")", ",", ".", ".length", ":", "?", "abs", "call", "ceil", "cos", "else", "exp", "external", "floor", "if", "internal", "len", "length"], "completionCount": 33}
+  ]
+}

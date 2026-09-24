@@ -1,0 +1,22 @@
+{
+  "documentSymbols": [
+    {"name": "Formula", "kind": "Namespace", "detail": null, "range": [0, 0, 2, 0], "selectionRange": [0, 0, 0, 0], "children": [
+      {"name": "price", "kind": "Variable", "detail": "NumberVariableDeclaration", "range": [0, 5, 0, 10], "selectionRange": [0, 5, 0, 10]}
+    ]}
+  ],
+  "semanticTokens": [
+    {"line": 0, "char": 0, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 4, "length": 1, "type": "operator"},
+    {"line": 0, "char": 5, "length": 5, "type": "variable"},
+    {"line": 0, "char": 11, "length": 2, "type": "keyword"},
+    {"line": 0, "char": 14, "length": 6, "type": "keyword"},
+    {"line": 0, "char": 21, "length": 3, "type": "keyword"},
+    {"line": 0, "char": 25, "length": 2, "type": "number"},
+    {"line": 0, "char": 27, "length": 1, "type": "operator"},
+    {"line": 1, "char": 0, "length": 1, "type": "operator"},
+    {"line": 1, "char": 1, "length": 3, "type": "variable"}
+  ],
+  "probes": [
+    {"at": [1, 4], "definition": [], "references": [[1, 1, 1, 4]], "referencesOnly": [[1, 1, 1, 4]], "hover": {"range": [1, 1, 1, 4], "markdown": "**pri** — 参照\n\n宣言が見つかりません。"}, "completion": ["price"], "completionCount": 1}
+  ]
+}
