@@ -90,8 +90,6 @@ fn p4_keeps_the_expression_tower_memoized() {
         "StringComparisonExpression",
         "VariableRef",
         "MethodInvocation",
-        "AddOp",
-        "MulOp",
     ];
     for name in tower {
         let id = format!("TinyExpressionP4::{name}");
@@ -106,21 +104,45 @@ fn p4_keeps_the_expression_tower_memoized() {
         );
         assert_eq!(golden.reason, MemoEntryReason::DefaultSafe, "{id}");
     }
-    // 全部残すわけではない。型ヒントのような葉は再入しないので落ちる。
+    // 全部残すわけではない。型ヒントのような葉は再入しないので落ち（unreachableRevisit）、
+    // 再入し得ても本体が終端走査だけの規則は割に合わないので落ちる（unprofitableTerminalScan）。
     let dropped: Vec<_> = rules
         .iter()
         .filter(|(_, golden, _)| !golden.cache_success)
-        .map(|(rule, _, _)| rule.rsplit("::").next().unwrap())
+        .map(|(rule, golden, _)| {
+            (
+                rule.rsplit("::").next().unwrap(),
+                golden.omission_proof.as_ref().unwrap().kind,
+            )
+        })
         .collect();
+    let revisit = ProofKind::UnreachableRevisit;
+    let terminal = ProofKind::UnprofitableTerminalScan;
     assert_eq!(
         dropped,
         [
-            "ImportDeclaration",
-            "TypeHint",
-            "NumberTypeHint",
-            "StringTypeHint",
-            "BooleanTypeHint",
-            "ObjectTypeHint",
+            ("ImportDeclaration", revisit),
+            ("ClassName", terminal),
+            ("TypeHint", revisit),
+            ("NumberTypeHint", revisit),
+            ("StringTypeHint", revisit),
+            ("BooleanTypeHint", revisit),
+            ("ObjectTypeHint", revisit),
+            ("OnlyIfAbsent", terminal),
+            ("NumberReturnType", terminal),
+            ("StringReturnType", terminal),
+            ("BooleanReturnType", terminal),
+            ("ObjectReturnType", terminal),
+            ("MethodInvocationHeader", terminal),
+            ("AddOp", terminal),
+            ("MulOp", terminal),
+            ("RandomFunction", terminal),
+            ("DayOfWeek", terminal),
+            ("StringCastVariable", terminal),
+            ("StringTypedVariable", terminal),
+            ("EqualityOp", terminal),
+            ("CompareOp", terminal),
+            ("TypeKeyword", terminal),
         ]
     );
 }

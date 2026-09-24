@@ -54222,18 +54222,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1931:body/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1931:body/0/tokenRef"
@@ -54247,7 +54253,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1938:1962:body/1/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1938:1962:body/1/repeat"
@@ -54261,7 +54267,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1940:1954:body/1/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1938:1962:body/1/repeat",
@@ -54276,7 +54282,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1940:1943:body/1/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1938:1962:body/1/repeat",
@@ -54292,7 +54298,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1944:1954:body/1/0/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1938:1962:body/1/repeat",
@@ -56058,18 +56064,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4077:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4077:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4062:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4077:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4062:body/0/literal"
@@ -56083,7 +56095,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4063:4068:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4077:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4063:4068:body/1/literal"
@@ -56097,7 +56109,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4069:4077:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4077:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4069:4077:body/2/literal"
@@ -57156,18 +57168,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6120:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6120:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6110:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6120:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6110:body/0/literal"
@@ -57181,7 +57199,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6113:6120:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6120:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6113:6120:body/1/literal"
@@ -57191,18 +57209,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/0/literal"
@@ -57212,18 +57236,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/0/literal"
@@ -57233,18 +57263,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/0/literal"
@@ -58663,18 +58699,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7881:body/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7881:body/0/seq"
@@ -58688,7 +58730,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7866:body/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7881:body/0/seq",
@@ -58703,7 +58745,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7867:7881:body/0/1/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7881:body/0/seq",
@@ -58718,7 +58760,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7869:7879:body/0/1/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7881:body/0/seq",
@@ -58734,7 +58776,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7884:7894:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7884:7894:body/1/literal"
@@ -59222,18 +59264,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9078:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9078:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9072:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9078:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9072:body/0/literal"
@@ -59247,7 +59295,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9075:9078:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9078:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9075:9078:body/1/literal"
@@ -59257,18 +59305,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9102:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9102:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9096:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9102:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9096:body/0/literal"
@@ -59282,7 +59336,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9099:9102:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9102:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9099:9102:body/1/literal"
@@ -59995,18 +60049,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10175:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10175:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10167:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10175:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10167:body/0/literal"
@@ -60020,7 +60080,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10168:10171:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10175:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10168:10171:body/1/literal"
@@ -60034,7 +60094,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10172:10175:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10175:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10172:10175:body/2/literal"
@@ -62777,18 +62837,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15092:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15092:body/0/literal"
@@ -62802,7 +62868,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15095:15104:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15095:15104:body/1/literal"
@@ -62816,7 +62882,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15107:15118:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15107:15118:body/2/literal"
@@ -62830,7 +62896,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15121:15131:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15121:15131:body/3/literal"
@@ -62844,7 +62910,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15134:15142:body/4/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15134:15142:body/4/literal"
@@ -62858,7 +62924,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15145:15155:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15145:15155:body/5/literal"
@@ -62872,7 +62938,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15158:15166:body/6/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15158:15166:body/6/literal"
@@ -65240,18 +65306,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18664:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18664:body/0/literal"
@@ -65265,7 +65337,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18665:18688:body/1/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18665:18688:body/1/group"
@@ -65279,7 +65351,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18667:18686:body/1/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18665:18688:body/1/group",
@@ -65294,7 +65366,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18667:18675:body/1/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18665:18688:body/1/group",
@@ -65310,7 +65382,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18678:18686:body/1/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18665:18688:body/1/group",
@@ -65326,7 +65398,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18689:18692:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18689:18692:body/2/literal"
@@ -65340,7 +65412,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18693:18696:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18693:18696:body/3/literal"
@@ -65354,7 +65426,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18697:18707:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18697:18707:body/4/tokenRef"
@@ -65364,18 +65436,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18800:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18800:body/0/literal"
@@ -65389,7 +65467,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18801:18811:body/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18801:18811:body/1/tokenRef"
@@ -65403,7 +65481,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18818:18822:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18818:18822:body/2/literal"
@@ -65417,7 +65495,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18823:18846:body/3/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18823:18846:body/3/group"
@@ -65431,7 +65509,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18825:18844:body/3/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18823:18846:body/3/group",
@@ -65446,7 +65524,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18825:18833:body/3/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18823:18846:body/3/group",
@@ -65462,7 +65540,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18836:18844:body/3/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18823:18846:body/3/group",
@@ -66262,18 +66340,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20896:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20896:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20889:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20896:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20889:body/0/literal"
@@ -66287,7 +66371,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20892:20896:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20896:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20892:20896:body/1/literal"
@@ -66346,18 +66430,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21063:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21063:body/0/literal"
@@ -66371,7 +66461,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21066:21070:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21066:21070:body/1/literal"
@@ -66385,7 +66475,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21073:21077:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21073:21077:body/2/literal"
@@ -66399,7 +66489,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21080:21084:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21080:21084:body/3/literal"
@@ -66413,7 +66503,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21087:21090:body/4/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21087:21090:body/4/literal"
@@ -66427,7 +66517,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21093:21096:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21093:21096:body/5/literal"
@@ -67839,18 +67929,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24414:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24414:body/0/literal"
@@ -67864,7 +67960,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24417:24425:body/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24417:24425:body/1/literal"
@@ -67878,7 +67974,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24428:24435:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24428:24435:body/2/literal"
@@ -67892,7 +67988,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24438:24445:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24438:24445:body/3/literal"
@@ -67906,7 +68002,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24452:24460:body/4/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24452:24460:body/4/literal"
@@ -67920,7 +68016,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24463:24471:body/5/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24463:24471:body/5/literal"
@@ -67934,7 +68030,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24474:24483:body/6/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24474:24483:body/6/literal"
@@ -67948,7 +68044,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24486:24495:body/7/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24486:24495:body/7/literal"
@@ -67962,7 +68058,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24498:24506:body/8/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24498:24506:body/8/literal"
@@ -67976,7 +68072,7 @@
           "cacheSuccess": false,
           "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24509:24517:body/9/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
               "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24509:24517:body/9/literal"

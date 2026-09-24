@@ -1990,6 +1990,7 @@
             "diagnosticEquivalent",
             "noTriviaEffectsRecovery",
             "leftRecursionNormalization",
+            "unprofitableTerminalScan",
             "none"
           ]
         }

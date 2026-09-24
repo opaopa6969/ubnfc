@@ -756,16 +756,23 @@ fn tinycalc_compare_recorded_differences() {
             .iter()
             .find(|e| e.id == expected.expr_id)
             .unwrap();
-        if ["TinyCalc::AddOp", "TinyCalc::MulOp"].contains(&e.rule_id.as_str())
-            && matches!(e.node, ExprNode::Literal { .. })
-        {
+        if ["TinyCalc::AddOp", "TinyCalc::MulOp"].contains(&e.rule_id.as_str()) {
+            // AddOp / MulOp は終端走査だけの規則なので本体 memo を入れない（D-060）。
+            // 本体の下の単一所有の literal は従来どおり単一実行経路で省く。
+            let literal = matches!(e.node, ExprNode::Literal { .. });
             expected.cache_failure = false;
             expected.cache_success = false;
             expected.reason = MemoEntryReason::ProvedOmission;
             let proof = actual.omission_proof.as_ref().unwrap();
-            assert_eq!(proof.kind, ProofKind::ExclusiveCandidates);
-            assert_eq!(proof.expr_ids.last(), Some(&e.id));
-            assert!(proof.explanation.contains("rule 本体の memo を保持"));
+            if literal {
+                assert_eq!(proof.kind, ProofKind::ExclusiveCandidates);
+                assert_eq!(proof.expr_ids.last(), Some(&e.id));
+                assert!(proof.explanation.contains("本体 memo も省略した"));
+            } else {
+                assert_eq!(proof.kind, ProofKind::UnprofitableTerminalScan);
+                assert_eq!(proof.expr_ids, vec![e.id.clone()]);
+                assert!(proof.explanation.contains("終端走査だけ"));
+            }
             expected.omission_proof = Some(proof.clone());
         }
     }
