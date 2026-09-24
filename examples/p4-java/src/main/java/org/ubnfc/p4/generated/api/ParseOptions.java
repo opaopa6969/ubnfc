@@ -4,6 +4,10 @@ import java.util.Map;
  * 観測の要求。{@code occurrences} は公開する capture 出現表（D-035 の Java 版）、
  * {@code diagnostics} は診断観測（D-023）。どちらも false の認識専用経路は Match 木も
  * 診断 DAG も作らず、失敗・末尾入力の結果だけを診断モードで決定的に再解析する。
+ *
+ * <p>D-057: この 2 つは {@code buildAst=true} でも効く。AST だけが要るなら
+ * {@code options.withObservations(false, false)} を使うと、出現表と診断を作らずに typed AST を組む
+ * （typed AST と canonical JSON は要求した場合と完全に一致する。失敗・末尾入力は決定的に再解析される）。
  */
 public record ParseOptions(boolean buildAst, boolean requireFullInput, boolean lexical,
                            boolean memo, Map<String, TokenScanner> scanners, int maxDepth,

@@ -18,7 +18,8 @@ import org.ubnfc.p4.generated.api.ParseOptions;
  * bench.warmup（既定 2000）、bench.runs（既定 5）、bench.iterations（既定は fixture ごとの規定値）、
  * bench.entry（既定 null=Formula。comparison-heavy 系は BooleanExpression を指定する）。
  *
- * <p>mode: {@code ast} / {@code recognize}（観測を全て要求）/ {@code recognize-notree}（出現表を
+ * <p>mode: {@code ast}（出現表も診断も要求する従来形）/ {@code ast-noocc}（AST を作るが公開出現表は
+ * 要求しない）/ {@code ast-fast}（AST を作るが観測を何も要求しない）/ {@code recognize}（観測を全て要求）/ {@code recognize-notree}（出現表を
  * 要求しない = Match 木・capture・Recipe を作らない）/ {@code recognize-fast}（観測を何も要求しない
  * = 診断 DAG も作らず、D-023 で失敗時だけ再解析）。末尾に {@code -nomemo} で memo を切る。
  */
@@ -96,6 +97,8 @@ public final class Benchmark {
         String base = memo ? mode : mode.substring(0, mode.length() - "-nomemo".length());
         ParseOptions options = switch (base) {
             case "ast" -> P4Scanners.options(true);
+            case "ast-noocc" -> P4Scanners.options(true).withObservations(false, true);
+            case "ast-fast" -> P4Scanners.options(true).withObservations(false, false);
             case "recognize" -> P4Scanners.options(false);
             case "recognize-notree" -> P4Scanners.recognize().withObservations(false, true);
             case "recognize-fast" -> P4Scanners.recognize();

@@ -358,7 +358,7 @@ public final class JavaEmitter {
         String fields = recipe == null ? "" : recipe.fields().stream().map(f -> "new Field(" + q(f.field()) + "," + strings(f.siteIds()) + "," + q(f.conversion()) + "," + q(f.cardinality()) + ")").collect(Collectors.joining(","));
         out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("(Session s, Frame f) {\n        return s.rule(f, ").append(ruleIds.get(rule.symbolId())).append(", ").append(exprIds.size() + ruleIds.get(rule.symbolId())).append(", ").append(success).append(", ").append(failure)
             .append(", ").append(call(rule.body())).append(", ").append(q(recipe == null ? null : recipe.id())).append(", ").append(q(recipe == null || recipe.leafFallback() == null ? null : recipe.leafFallback().typeId())).append(", ").append(q(recipe == null ? null : recipe.kind()))
-            .append(", ").append(constant("Field[]", "new Field[]{" + fields + "}")).append(", ").append(constant("Effect[]", "new Effect[]{" + effects + "}")).append(", ").append(rule.skip()).append(", ")
+            .append(", ").append(constant("Fields", fields.isEmpty() ? "Fields.NONE" : "new Fields(" + fields + ")")).append(", ").append(constant("Effect[]", "new Effect[]{" + effects + "}")).append(", ").append(rule.skip()).append(", ")
             .append(kLabels(ir.semantics().recovery().stream().filter(r -> r.ruleId().equals(rule.symbolId())).flatMap(r -> r.resolvedSyncPatterns().stream()).distinct().map(hint -> "'" + hint + "'").toList())).append(", ").append(rightAssociativeSpan(rule)).append(", ").append(kLabels(diagnosticPlan.rule(rule.symbolId()))).append(");\n    }\n");
         Recovery recovery = entryRecovery(rule.symbolId());
         if (recovery != null) out.append("    private static Match ").append(ruleMethod(rule.symbolId())).append("$entry(Session s, Frame f) {\n        ")
@@ -607,8 +607,10 @@ public final class JavaEmitter {
                 for (AstField field : type.fields()) {
                     String local = "field" + locals.size(); locals.put(field.name(), local);
                     var mapping = recipe.fields().stream().filter(f -> f.field().equals(field.name())).findFirst().orElseThrow();
+                    // Session.rule は recipe.fields() の順で値列を詰めるので、添字は生成時に確定する。
+                    int index = recipe.fields().indexOf(mapping);
                     out.append("                ").append(fieldType(field)).append(' ').append(local).append(" = s.")
-                        .append(mapping.cardinality()).append("(r,").append(q(field.name())).append(",v -> ")
+                        .append(mapping.cardinality()).append("(r,").append(index).append(',').append(q(field.name())).append(",v -> ")
                         .append(convert(field.valueType(), mapping.conversion())).append(");\n");
                 }
                 for (var constraint : ir.semantics().typeofConstraints()) {

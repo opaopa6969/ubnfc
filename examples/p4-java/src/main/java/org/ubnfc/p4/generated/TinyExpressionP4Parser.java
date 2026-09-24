@@ -169,451 +169,451 @@ public final class TinyExpressionP4Parser {
         try {
         Object node = switch (r.id()) {
             case "recipe:Formula" -> {
-                java.util.List<TinyExpressionP4AST.ImportDeclarationExpr> field0 = s.list(r,"imports",v -> (TinyExpressionP4AST.ImportDeclarationExpr) build(s.node(v, r), s));
-                java.util.List<java.lang.Object> field1 = s.list(r,"declarations",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
-                TinyExpressionP4AST.ExpressionExpr field2 = s.scalar(r,"expression",v -> (TinyExpressionP4AST.ExpressionExpr) build(s.node(v, r), s));
-                java.util.List<java.lang.Object> field3 = s.list(r,"methods",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.util.List<TinyExpressionP4AST.ImportDeclarationExpr> field0 = s.list(r,0,"imports",v -> (TinyExpressionP4AST.ImportDeclarationExpr) build(s.node(v, r), s));
+                java.util.List<java.lang.Object> field1 = s.list(r,1,"declarations",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                TinyExpressionP4AST.ExpressionExpr field2 = s.scalar(r,2,"expression",v -> (TinyExpressionP4AST.ExpressionExpr) build(s.node(v, r), s));
+                java.util.List<java.lang.Object> field3 = s.list(r,3,"methods",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.FormulaExpr(field0, field1, field2, field3);
             }
             case "recipe:CodeBlock" -> {
                 yield new TinyExpressionP4AST.CodeBlockExpr();
             }
             case "recipe:ImportDeclaration" -> {
-                TinyExpressionP4AST.QualifiedNameExpr field0 = s.scalar(r,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
-                java.util.Optional<java.lang.String> field1 = s.optional(r,"method",v -> s.text(v));
-                java.lang.String field2 = s.scalar(r,"alias",v -> s.text(v));
+                TinyExpressionP4AST.QualifiedNameExpr field0 = s.scalar(r,0,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
+                java.util.Optional<java.lang.String> field1 = s.optional(r,1,"method",v -> s.text(v));
+                java.lang.String field2 = s.scalar(r,2,"alias",v -> s.text(v));
                 yield new TinyExpressionP4AST.ImportDeclarationExpr(field0, field1, field2);
             }
             case "recipe:ClassName" -> {
-                java.lang.String field0 = s.scalar(r,"head",v -> s.text(v));
-                java.util.List<java.lang.String> field1 = s.list(r,"tail",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"head",v -> s.text(v));
+                java.util.List<java.lang.String> field1 = s.list(r,1,"tail",v -> s.text(v));
                 yield new TinyExpressionP4AST.QualifiedNameExpr(field0, field1);
             }
             case "recipe:NumberVariableDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"varName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = s.optional(r,"value",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                java.util.Optional<java.lang.String> field3 = s.optional(r,"desc",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"varName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,1,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = s.optional(r,2,"value",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.util.Optional<java.lang.String> field3 = s.optional(r,3,"desc",v -> s.text(v));
                 yield new TinyExpressionP4AST.NumberVariableDeclarationExpr(field0, field1, field2, field3);
             }
             case "recipe:StringVariableDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"varName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.StringConcatExpr> field2 = s.optional(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
-                java.util.Optional<java.lang.String> field3 = s.optional(r,"desc",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"varName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,1,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.StringConcatExpr> field2 = s.optional(r,2,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.util.Optional<java.lang.String> field3 = s.optional(r,3,"desc",v -> s.text(v));
                 yield new TinyExpressionP4AST.StringVariableDeclarationExpr(field0, field1, field2, field3);
             }
             case "recipe:BooleanVariableDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"varName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.BooleanOrExpr> field2 = s.optional(r,"value",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
-                java.util.Optional<java.lang.String> field3 = s.optional(r,"desc",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"varName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,1,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.BooleanOrExpr> field2 = s.optional(r,2,"value",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                java.util.Optional<java.lang.String> field3 = s.optional(r,3,"desc",v -> s.text(v));
                 yield new TinyExpressionP4AST.BooleanVariableDeclarationExpr(field0, field1, field2, field3);
             }
             case "recipe:ObjectVariableDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"varName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.ObjectExpr> field2 = s.optional(r,"value",v -> (TinyExpressionP4AST.ObjectExpr) build(s.node(v, r), s));
-                java.util.Optional<java.lang.String> field3 = s.optional(r,"desc",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"varName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = s.optional(r,1,"onlyIfAbsent",v -> (TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.ObjectExpr> field2 = s.optional(r,2,"value",v -> (TinyExpressionP4AST.ObjectExpr) build(s.node(v, r), s));
+                java.util.Optional<java.lang.String> field3 = s.optional(r,3,"desc",v -> s.text(v));
                 yield new TinyExpressionP4AST.ObjectVariableDeclarationExpr(field0, field1, field2, field3);
             }
             case "recipe:OnlyIfAbsent" -> {
                 yield new TinyExpressionP4AST.OnlyIfAbsentExpr();
             }
             case "recipe:NumberMethodDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"methodName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BinaryExpr field2 = s.scalar(r,"expression",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.lang.String field0 = s.scalar(r,0,"methodName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,1,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BinaryExpr field2 = s.scalar(r,2,"expression",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.NumberMethodDeclarationExpr(field0, field1, field2);
             }
             case "recipe:StringMethodDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"methodName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.StringConcatExpr field2 = s.scalar(r,"expression",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.lang.String field0 = s.scalar(r,0,"methodName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,1,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field2 = s.scalar(r,2,"expression",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StringMethodDeclarationExpr(field0, field1, field2);
             }
             case "recipe:BooleanMethodDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"methodName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BooleanOrExpr field2 = s.scalar(r,"expression",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                java.lang.String field0 = s.scalar(r,0,"methodName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,1,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field2 = s.scalar(r,2,"expression",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanMethodDeclarationExpr(field0, field1, field2);
             }
             case "recipe:ObjectMethodDeclaration" -> {
-                java.lang.String field0 = s.scalar(r,"methodName",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.ObjectExpr field2 = s.scalar(r,"expression",v -> (TinyExpressionP4AST.ObjectExpr) build(s.node(v, r), s));
+                java.lang.String field0 = s.scalar(r,0,"methodName",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = s.optional(r,1,"parameters",v -> (TinyExpressionP4AST.MethodParametersExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ObjectExpr field2 = s.scalar(r,2,"expression",v -> (TinyExpressionP4AST.ObjectExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ObjectMethodDeclarationExpr(field0, field1, field2);
             }
             case "recipe:MethodParameters" -> {
-                java.util.List<TinyExpressionP4AST.MethodParameterExpr> field0 = s.list(r,"values",v -> (TinyExpressionP4AST.MethodParameterExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.MethodParameterExpr> field0 = s.list(r,0,"values",v -> (TinyExpressionP4AST.MethodParameterExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.MethodParametersExpr(field0);
             }
             case "recipe:MethodParameter" -> {
-                java.lang.String field0 = s.scalar(r,"paramName",v -> s.text(v));
-                java.util.Optional<java.lang.String> field1 = s.optional(r,"type",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"paramName",v -> s.text(v));
+                java.util.Optional<java.lang.String> field1 = s.optional(r,1,"type",v -> s.text(v));
                 yield new TinyExpressionP4AST.MethodParameterExpr(field0, field1);
             }
             case "recipe:ExternalBooleanInvocation" -> {
-                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
-                java.lang.String field1 = s.scalar(r,"name",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,0,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
+                java.lang.String field1 = s.scalar(r,1,"name",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,2,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ExternalBooleanInvocationExpr(field0, field1, field2);
             }
             case "recipe:ExternalNumberInvocation" -> {
-                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
-                java.lang.String field1 = s.scalar(r,"name",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,0,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
+                java.lang.String field1 = s.scalar(r,1,"name",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,2,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ExternalNumberInvocationExpr(field0, field1, field2);
             }
             case "recipe:ExternalStringInvocation" -> {
-                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
-                java.lang.String field1 = s.scalar(r,"name",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,0,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
+                java.lang.String field1 = s.scalar(r,1,"name",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,2,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ExternalStringInvocationExpr(field0, field1, field2);
             }
             case "recipe:ExternalObjectInvocation" -> {
-                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
-                java.lang.String field1 = s.scalar(r,"name",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = s.optional(r,0,"className",v -> (TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v, r), s));
+                java.lang.String field1 = s.scalar(r,1,"name",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = s.optional(r,2,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ExternalObjectInvocationExpr(field0, field1, field2);
             }
             case "recipe:MethodInvocation" -> {
-                java.lang.String field0 = s.scalar(r,"name",v -> s.text(v));
-                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field1 = s.optional(r,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
+                java.lang.String field0 = s.scalar(r,0,"name",v -> s.text(v));
+                java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field1 = s.optional(r,1,"args",v -> (TinyExpressionP4AST.ArgumentsExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.MethodInvocationExpr(field0, field1);
             }
             case "recipe:ArgumentTernary" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BranchExpressionExpr field1 = s.scalar(r,"thenExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BranchExpressionExpr field2 = s.scalar(r,"elseExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BranchExpressionExpr field1 = s.scalar(r,1,"thenExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BranchExpressionExpr field2 = s.scalar(r,2,"elseExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.TernaryExpr(field0, field1, field2);
             }
             case "recipe:ArgumentExpression" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.ArgumentExpressionExpr(field0);
             }
             case "recipe:Arguments" -> {
-                java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field0 = s.list(r,"values",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field0 = s.list(r,0,"values",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ArgumentsExpr(field0);
             }
             case "recipe:NumberExpression" -> {
-                TinyExpressionP4AST field0 = s.scalar(r,"left",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
-                java.util.List<java.lang.String> field1 = s.list(r,"op",v -> s.text(v));
-                java.util.List<TinyExpressionP4AST> field2 = s.list(r,"right",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
+                TinyExpressionP4AST field0 = s.scalar(r,0,"left",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
+                java.util.List<java.lang.String> field1 = s.list(r,1,"op",v -> s.text(v));
+                java.util.List<TinyExpressionP4AST> field2 = s.list(r,2,"right",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BinaryExpr(field0, field1, field2);
             }
             case "recipe:NumberTerm" -> {
-                TinyExpressionP4AST field0 = s.scalar(r,"left",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
-                java.util.List<java.lang.String> field1 = s.list(r,"op",v -> s.text(v));
-                java.util.List<TinyExpressionP4AST> field2 = s.list(r,"right",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
+                TinyExpressionP4AST field0 = s.scalar(r,0,"left",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
+                java.util.List<java.lang.String> field1 = s.list(r,1,"op",v -> s.text(v));
+                java.util.List<TinyExpressionP4AST> field2 = s.list(r,2,"right",v -> (TinyExpressionP4AST) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BinaryExpr(field0, field1, field2);
             }
             case "recipe:SinFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.SinExpr(field0);
             }
             case "recipe:CosFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.CosExpr(field0);
             }
             case "recipe:TanFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.TanExpr(field0);
             }
             case "recipe:SqrtFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.SqrtExpr(field0);
             }
             case "recipe:MinFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"first",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field1 = s.list(r,"rest",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"first",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field1 = s.list(r,1,"rest",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.MinExpr(field0, field1);
             }
             case "recipe:MaxFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"first",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field1 = s.list(r,"rest",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"first",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field1 = s.list(r,1,"rest",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.MaxExpr(field0, field1);
             }
             case "recipe:RandomFunction" -> {
                 yield new TinyExpressionP4AST.RandomExpr();
             }
             case "recipe:AbsFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.AbsExpr(field0);
             }
             case "recipe:RoundFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.RoundExpr(field0);
             }
             case "recipe:CeilFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.CeilExpr(field0);
             }
             case "recipe:FloorFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.FloorExpr(field0);
             }
             case "recipe:PowFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"base",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.ArgumentExpressionExpr field1 = s.scalar(r,"exponent",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"base",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field1 = s.scalar(r,1,"exponent",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.PowExpr(field0, field1);
             }
             case "recipe:LogFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.LogExpr(field0);
             }
             case "recipe:ExpFunction" -> {
-                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.scalar(r,0,"arg",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ExpExpr(field0);
             }
             case "recipe:ToNumFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.ArgumentExpressionExpr field1 = s.scalar(r,"defaultValue",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.ArgumentExpressionExpr field1 = s.scalar(r,1,"defaultValue",v -> (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ToNumExpr(field0, field1);
             }
             case "recipe:ToUpperCaseFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ToUpperCaseExpr(field0);
             }
             case "recipe:ToLowerCaseFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ToLowerCaseExpr(field0);
             }
             case "recipe:TrimFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.TrimExpr(field0);
             }
             case "recipe:LengthFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.LengthExpr(field0);
             }
             case "recipe:LenFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.LengthExpr(field0);
             }
             case "recipe:ToUpperCaseDotMethod" -> {
-                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ToUpperCaseDotExpr(field0);
             }
             case "recipe:ToLowerCaseDotMethod" -> {
-                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ToLowerCaseDotExpr(field0);
             }
             case "recipe:TrimDotMethod" -> {
-                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.TrimDotExpr(field0);
             }
             case "recipe:LengthDotMethod" -> {
-                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.LengthDotExpr(field0);
             }
             case "recipe:StartsWithFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,1,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StartsWithExpr(field0, field1);
             }
             case "recipe:EndsWithFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,1,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.EndsWithExpr(field0, field1);
             }
             case "recipe:ContainsFunction" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,1,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ContainsExpr(field0, field1);
             }
             case "recipe:InMethod" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,"candidates",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,1,"candidates",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.InExpr(field0, field1);
             }
             case "recipe:StartsWithDotMethod" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
-                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,1,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StartsWithDotExpr(field0, field1);
             }
             case "recipe:EndsWithDotMethod" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
-                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,1,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.EndsWithDotExpr(field0, field1);
             }
             case "recipe:ContainsDotMethod" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
-                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.list(r,1,"patterns",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ContainsDotExpr(field0, field1);
             }
             case "recipe:IsPresentFunction" -> {
-                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.VariableRefExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.VariableRefExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.IsPresentExpr(field0);
             }
             case "recipe:InTimeRangeFunction" -> {
-                TinyExpressionP4AST.BinaryExpr field0 = s.scalar(r,"startHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BinaryExpr field1 = s.scalar(r,"endHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BinaryExpr field0 = s.scalar(r,0,"startHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BinaryExpr field1 = s.scalar(r,1,"endHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.InTimeRangeExpr(field0, field1);
             }
             case "recipe:InDayTimeRangeFunction" -> {
-                java.lang.String field0 = s.scalar(r,"startDay",v -> s.text(v));
-                TinyExpressionP4AST.BinaryExpr field1 = s.scalar(r,"startHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                java.lang.String field2 = s.scalar(r,"endDay",v -> s.text(v));
-                TinyExpressionP4AST.BinaryExpr field3 = s.scalar(r,"endHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.lang.String field0 = s.scalar(r,0,"startDay",v -> s.text(v));
+                TinyExpressionP4AST.BinaryExpr field1 = s.scalar(r,1,"startHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.lang.String field2 = s.scalar(r,2,"endDay",v -> s.text(v));
+                TinyExpressionP4AST.BinaryExpr field3 = s.scalar(r,3,"endHour",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.InDayTimeRangeExpr(field0, field1, field2, field3);
             }
             case "recipe:SliceBaseExpression" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
-                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field1 = s.optional(r,"start",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = s.optional(r,"end",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field3 = s.optional(r,"step",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
+                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field1 = s.optional(r,1,"start",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = s.optional(r,2,"end",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field3 = s.optional(r,3,"step",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.SliceExpr(field0, field1, field2, field3);
             }
             case "recipe:SliceNestedExpression" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
-                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field1 = s.optional(r,"start",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = s.optional(r,"end",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field3 = s.optional(r,"step",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
+                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field1 = s.optional(r,1,"start",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = s.optional(r,2,"end",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.util.Optional<TinyExpressionP4AST.BinaryExpr> field3 = s.optional(r,3,"step",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.SliceExpr(field0, field1, field2, field3);
             }
             case "recipe:StringExpression" -> {
-                java.lang.Object field0 = s.scalar(r,"left",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
-                java.util.List<java.lang.String> field1 = s.list(r,"op",v -> s.text(v));
-                java.util.List<java.lang.Object> field2 = s.list(r,"right",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
+                java.lang.Object field0 = s.scalar(r,0,"left",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
+                java.util.List<java.lang.String> field1 = s.list(r,1,"op",v -> s.text(v));
+                java.util.List<java.lang.Object> field2 = s.list(r,2,"right",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.StringConcatExpr(field0, field1, field2);
             }
             case "recipe:StringCastVariable" -> {
-                java.lang.String field0 = s.scalar(r,"name",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"name",v -> s.text(v));
                 yield new TinyExpressionP4AST.StringCastVariableRefExpr(field0);
             }
             case "recipe:StringTypedVariable" -> {
-                java.lang.String field0 = s.scalar(r,"name",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"name",v -> s.text(v));
                 yield new TinyExpressionP4AST.StringTypedVariableRefExpr(field0);
             }
             case "recipe:BooleanExpression" -> {
-                TinyExpressionP4AST.BooleanAndExpr field0 = s.scalar(r,"left",v -> (TinyExpressionP4AST.BooleanAndExpr) build(s.node(v, r), s));
-                java.util.List<java.lang.String> field1 = s.list(r,"op",v -> s.text(v));
-                java.util.List<TinyExpressionP4AST.BooleanAndExpr> field2 = s.list(r,"right",v -> (TinyExpressionP4AST.BooleanAndExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanAndExpr field0 = s.scalar(r,0,"left",v -> (TinyExpressionP4AST.BooleanAndExpr) build(s.node(v, r), s));
+                java.util.List<java.lang.String> field1 = s.list(r,1,"op",v -> s.text(v));
+                java.util.List<TinyExpressionP4AST.BooleanAndExpr> field2 = s.list(r,2,"right",v -> (TinyExpressionP4AST.BooleanAndExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanOrExpr(field0, field1, field2);
             }
             case "recipe:BooleanAndExpression" -> {
-                TinyExpressionP4AST.BooleanXorExpr field0 = s.scalar(r,"left",v -> (TinyExpressionP4AST.BooleanXorExpr) build(s.node(v, r), s));
-                java.util.List<java.lang.String> field1 = s.list(r,"op",v -> s.text(v));
-                java.util.List<TinyExpressionP4AST.BooleanXorExpr> field2 = s.list(r,"right",v -> (TinyExpressionP4AST.BooleanXorExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanXorExpr field0 = s.scalar(r,0,"left",v -> (TinyExpressionP4AST.BooleanXorExpr) build(s.node(v, r), s));
+                java.util.List<java.lang.String> field1 = s.list(r,1,"op",v -> s.text(v));
+                java.util.List<TinyExpressionP4AST.BooleanXorExpr> field2 = s.list(r,2,"right",v -> (TinyExpressionP4AST.BooleanXorExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanAndExpr(field0, field1, field2);
             }
             case "recipe:BooleanXorExpression" -> {
-                TinyExpressionP4AST.BooleanFactorExpr field0 = s.scalar(r,"left",v -> (TinyExpressionP4AST.BooleanFactorExpr) build(s.node(v, r), s));
-                java.util.List<java.lang.String> field1 = s.list(r,"op",v -> s.text(v));
-                java.util.List<TinyExpressionP4AST.BooleanFactorExpr> field2 = s.list(r,"right",v -> (TinyExpressionP4AST.BooleanFactorExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanFactorExpr field0 = s.scalar(r,0,"left",v -> (TinyExpressionP4AST.BooleanFactorExpr) build(s.node(v, r), s));
+                java.util.List<java.lang.String> field1 = s.list(r,1,"op",v -> s.text(v));
+                java.util.List<TinyExpressionP4AST.BooleanFactorExpr> field2 = s.list(r,2,"right",v -> (TinyExpressionP4AST.BooleanFactorExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanXorExpr(field0, field1, field2);
             }
             case "recipe:NotExpression" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.NotExpr(field0);
             }
             case "recipe:BooleanEqualityExpression" -> {
-                java.lang.Object field0 = s.scalar(r,"left",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
-                java.lang.String field1 = s.scalar(r,"op",v -> s.text(v));
-                java.lang.Object field2 = s.scalar(r,"right",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
+                java.lang.Object field0 = s.scalar(r,0,"left",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
+                java.lang.String field1 = s.scalar(r,1,"op",v -> s.text(v));
+                java.lang.Object field2 = s.scalar(r,2,"right",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.BooleanEqualityExpr(field0, field1, field2);
             }
             case "recipe:BooleanFactor" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.BooleanFactorExpr(field0);
             }
             case "recipe:StringComparisonExpression" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"left",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
-                java.lang.String field1 = s.scalar(r,"op",v -> s.text(v));
-                TinyExpressionP4AST.StringConcatExpr field2 = s.scalar(r,"right",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"left",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                java.lang.String field1 = s.scalar(r,1,"op",v -> s.text(v));
+                TinyExpressionP4AST.StringConcatExpr field2 = s.scalar(r,2,"right",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StringComparisonExpr(field0, field1, field2);
             }
             case "recipe:ComparisonExpression" -> {
-                TinyExpressionP4AST.BinaryExpr field0 = s.scalar(r,"left",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
-                java.lang.String field1 = s.scalar(r,"op",v -> s.text(v));
-                TinyExpressionP4AST.BinaryExpr field2 = s.scalar(r,"right",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BinaryExpr field0 = s.scalar(r,0,"left",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                java.lang.String field1 = s.scalar(r,1,"op",v -> s.text(v));
+                TinyExpressionP4AST.BinaryExpr field2 = s.scalar(r,2,"right",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.ComparisonExpr(field0, field1, field2);
             }
             case "recipe:ObjectExpression" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.ObjectExpr(field0);
             }
             case "recipe:IfExpression" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BranchExpressionExpr field1 = s.scalar(r,"thenExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BranchExpressionExpr field2 = s.scalar(r,"elseExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BranchExpressionExpr field1 = s.scalar(r,1,"thenExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BranchExpressionExpr field2 = s.scalar(r,2,"elseExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.IfExpr(field0, field1, field2);
             }
             case "recipe:BranchExpression" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.BranchExpressionExpr(field0);
             }
             case "recipe:TernaryExpression" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BranchExpressionExpr field1 = s.scalar(r,"thenExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BranchExpressionExpr field2 = s.scalar(r,"elseExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BranchExpressionExpr field1 = s.scalar(r,1,"thenExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BranchExpressionExpr field2 = s.scalar(r,2,"elseExpr",v -> (TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.TernaryExpr(field0, field1, field2);
             }
             case "recipe:NumberMatchExpression" -> {
-                TinyExpressionP4AST.NumberCaseExpr field0 = s.scalar(r,"firstCase",v -> (TinyExpressionP4AST.NumberCaseExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.NumberCaseExpr> field1 = s.list(r,"moreCases",v -> (TinyExpressionP4AST.NumberCaseExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.NumberDefaultCaseExpr field2 = s.scalar(r,"defaultCase",v -> (TinyExpressionP4AST.NumberDefaultCaseExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.NumberCaseExpr field0 = s.scalar(r,0,"firstCase",v -> (TinyExpressionP4AST.NumberCaseExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.NumberCaseExpr> field1 = s.list(r,1,"moreCases",v -> (TinyExpressionP4AST.NumberCaseExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.NumberDefaultCaseExpr field2 = s.scalar(r,2,"defaultCase",v -> (TinyExpressionP4AST.NumberDefaultCaseExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.NumberMatchExpr(field0, field1, field2);
             }
             case "recipe:NumberCase" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.NumberCaseValueExpr field1 = s.scalar(r,"value",v -> (TinyExpressionP4AST.NumberCaseValueExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.NumberCaseValueExpr field1 = s.scalar(r,1,"value",v -> (TinyExpressionP4AST.NumberCaseValueExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.NumberCaseExpr(field0, field1);
             }
             case "recipe:NumberDefaultCase" -> {
-                TinyExpressionP4AST.NumberCaseValueExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.NumberCaseValueExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.NumberCaseValueExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.NumberCaseValueExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.NumberDefaultCaseExpr(field0);
             }
             case "recipe:NumberCaseValue" -> {
-                TinyExpressionP4AST.BinaryExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BinaryExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.BinaryExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.NumberCaseValueExpr(field0);
             }
             case "recipe:StringMatchExpression" -> {
-                TinyExpressionP4AST.StringCaseExpr field0 = s.scalar(r,"firstCase",v -> (TinyExpressionP4AST.StringCaseExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.StringCaseExpr> field1 = s.list(r,"moreCases",v -> (TinyExpressionP4AST.StringCaseExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.StringDefaultCaseExpr field2 = s.scalar(r,"defaultCase",v -> (TinyExpressionP4AST.StringDefaultCaseExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringCaseExpr field0 = s.scalar(r,0,"firstCase",v -> (TinyExpressionP4AST.StringCaseExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.StringCaseExpr> field1 = s.list(r,1,"moreCases",v -> (TinyExpressionP4AST.StringCaseExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringDefaultCaseExpr field2 = s.scalar(r,2,"defaultCase",v -> (TinyExpressionP4AST.StringDefaultCaseExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StringMatchExpr(field0, field1, field2);
             }
             case "recipe:StringCase" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.StringCaseValueExpr field1 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringCaseValueExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringCaseValueExpr field1 = s.scalar(r,1,"value",v -> (TinyExpressionP4AST.StringCaseValueExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StringCaseExpr(field0, field1);
             }
             case "recipe:StringDefaultCase" -> {
-                TinyExpressionP4AST.StringCaseValueExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringCaseValueExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringCaseValueExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringCaseValueExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StringDefaultCaseExpr(field0);
             }
             case "recipe:StringCaseValue" -> {
-                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.StringConcatExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.StringCaseValueExpr(field0);
             }
             case "recipe:BooleanMatchExpression" -> {
-                TinyExpressionP4AST.BooleanCaseExpr field0 = s.scalar(r,"firstCase",v -> (TinyExpressionP4AST.BooleanCaseExpr) build(s.node(v, r), s));
-                java.util.List<TinyExpressionP4AST.BooleanCaseExpr> field1 = s.list(r,"moreCases",v -> (TinyExpressionP4AST.BooleanCaseExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BooleanDefaultCaseExpr field2 = s.scalar(r,"defaultCase",v -> (TinyExpressionP4AST.BooleanDefaultCaseExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanCaseExpr field0 = s.scalar(r,0,"firstCase",v -> (TinyExpressionP4AST.BooleanCaseExpr) build(s.node(v, r), s));
+                java.util.List<TinyExpressionP4AST.BooleanCaseExpr> field1 = s.list(r,1,"moreCases",v -> (TinyExpressionP4AST.BooleanCaseExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanDefaultCaseExpr field2 = s.scalar(r,2,"defaultCase",v -> (TinyExpressionP4AST.BooleanDefaultCaseExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanMatchExpr(field0, field1, field2);
             }
             case "recipe:BooleanCase" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
-                TinyExpressionP4AST.BooleanCaseValueExpr field1 = s.scalar(r,"value",v -> (TinyExpressionP4AST.BooleanCaseValueExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"condition",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanCaseValueExpr field1 = s.scalar(r,1,"value",v -> (TinyExpressionP4AST.BooleanCaseValueExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanCaseExpr(field0, field1);
             }
             case "recipe:BooleanDefaultCase" -> {
-                TinyExpressionP4AST.BooleanCaseValueExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.BooleanCaseValueExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanCaseValueExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.BooleanCaseValueExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanDefaultCaseExpr(field0);
             }
             case "recipe:BooleanCaseValue" -> {
-                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,"value",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
+                TinyExpressionP4AST.BooleanOrExpr field0 = s.scalar(r,0,"value",v -> (TinyExpressionP4AST.BooleanOrExpr) build(s.node(v, r), s));
                 yield new TinyExpressionP4AST.BooleanCaseValueExpr(field0);
             }
             case "recipe:VariableRef" -> {
-                java.lang.String field0 = s.scalar(r,"name",v -> s.text(v));
-                java.util.Optional<java.lang.String> field1 = s.optional(r,"type",v -> s.text(v));
+                java.lang.String field0 = s.scalar(r,0,"name",v -> s.text(v));
+                java.util.Optional<java.lang.String> field1 = s.optional(r,1,"type",v -> s.text(v));
                 yield new TinyExpressionP4AST.VariableRefExpr(field0, field1);
             }
             case "recipe:Expression" -> {
-                java.lang.Object field0 = s.scalar(r,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
+                java.lang.Object field0 = s.scalar(r,0,"value",v -> (v.nodes().isEmpty() ? null : build(s.node(v, r), s)));
                 yield new TinyExpressionP4AST.ExpressionExpr(field0);
             }
             case "#leaf:TinyExpressionP4AST.BinaryExpr" -> new TinyExpressionP4AST.BinaryExpr(null, List.of(s.source.substring(r.start(), r.end()).strip()), List.of());
@@ -10541,26 +10541,26 @@ public final class TinyExpressionP4Parser {
     }
     private static final String[] K0 = new String[]{"Formula","CodeBlock","ImportDeclaration","ClassName","VariableDeclaration","NumberVariableDeclaration","StringVariableDeclaration","BooleanVariableDeclaration","ObjectVariableDeclaration","TypeHint","NumberTypeHint","StringTypeHint","BooleanTypeHint","ObjectTypeHint","OnlyIfAbsent","Description","Annotation","AnnotationParameters","AnnotationParameter","MethodDeclaration","NumberMethodDeclaration","StringMethodDeclaration","BooleanMethodDeclaration","ObjectMethodDeclaration","MethodParameters","MethodParameter","NumberReturnType","StringReturnType","BooleanReturnType","ObjectReturnType","ReturnType","ExternalBooleanInvocation","ExternalNumberInvocation","ExternalStringInvocation","ExternalObjectInvocation","MethodInvocationHeader","MethodInvocation","ArgumentTernary","ArgumentExpression","Arguments","NumberExpression","NumberTerm","AddOp","MulOp","MathFunction","SinFunction","CosFunction","TanFunction","SqrtFunction","MinFunction","MaxFunction","RandomFunction","AbsFunction","RoundFunction","CeilFunction","FloorFunction","PowFunction","LogFunction","ExpFunction","ToNumFunction","NumberFactor","ToUpperCaseFunction","ToLowerCaseFunction","TrimFunction","LengthFunction","LenFunction","ToUpperCaseDotMethod","ToLowerCaseDotMethod","TrimDotMethod","LengthDotMethod","StartsWithFunction","EndsWithFunction","ContainsFunction","InMethod","StartsWithDotMethod","EndsWithDotMethod","ContainsDotMethod","StringPredicateReceiver","IsPresentFunction","InTimeRangeFunction","InDayTimeRangeFunction","DayOfWeek","SliceBaseReceiver","SliceStartIndex","SliceEndIndex","SliceStepIndex","SliceBaseExpression","SliceNestedExpression","SliceExpression","StringExpression","ParenthesizedStringExpression","StringTerm","StringCastVariable","StringTypedVariable","BooleanExpression","BooleanAndExpression","BooleanXorExpression","NotExpression","BooleanComparable","BooleanEqualityExpression","BooleanFactor","StringComparisonExpression","EqualityOp","ComparisonExpression","CompareOp","ObjectExpression","IfExpression","BranchExpression","TernaryExpression","NumberMatchExpression","NumberCase","NumberDefaultCase","NumberCaseValue","StringMatchExpression","StringCase","StringDefaultCase","StringCaseValue","BooleanMatchExpression","BooleanCase","BooleanDefaultCase","BooleanCaseValue","VariableRef","TypeKeyword","Expression"};
     private static final Map<String,String> K1 = Map.ofEntries(Map.entry("expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24337:24347:body/1/tokenRef/capture/0","variable"),Map.entry("expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24365:24376:body/2/0/1/ruleRef/capture/0","variable"));
-    private static final Field[] K2 = new Field[]{new Field("imports",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:902:919:body/1/0/ruleRef/capture/0"},"node","list"),new Field("declarations",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:933:952:body/2/0/ruleRef/capture/0"},"mixed","list"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:988:998:body/4/ruleRef/capture/0"},"node","scalar"),new Field("methods",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1013:1030:body/5/0/ruleRef/capture/0"},"mixed","list")};
+    private static final Fields K2 = new Fields(new Field("imports",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:902:919:body/1/0/ruleRef/capture/0"},"node","list"),new Field("declarations",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:933:952:body/2/0/ruleRef/capture/0"},"mixed","list"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:988:998:body/4/ruleRef/capture/0"},"node","scalar"),new Field("methods",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1013:1030:body/5/0/ruleRef/capture/0"},"mixed","list"));
     private static final Effect[] K3 = new Effect[]{new Effect("entry","enter",null,"Formula","lexical"),new Effect("successBeforeLeave","leave",null,"Formula","lexical")};
     private static final Label[] K4 = new Label[]{};
     private static final Label[] K5 = new Label[]{Label.of("FormulaParser")};
-    private static final Field[] K6 = new Field[]{};
+    private static final Fields K6 = Fields.NONE;
     private static final Effect[] K7 = new Effect[]{};
     private static final Label[] K8 = new Label[]{Label.of("CodeBlockParser")};
-    private static final Field[] K9 = new Field[]{new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1776:1785:body/1/ruleRef/capture/0"},"node","scalar"),new Field("method",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1803:1813:body/2/0/1/tokenRef/capture/0"},"text","optional"),new Field("alias",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1829:1839:body/4/tokenRef/capture/0"},"text","scalar")};
+    private static final Fields K9 = new Fields(new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1776:1785:body/1/ruleRef/capture/0"},"node","scalar"),new Field("method",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1803:1813:body/2/0/1/tokenRef/capture/0"},"text","optional"),new Field("alias",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1829:1839:body/4/tokenRef/capture/0"},"text","scalar"));
     private static final Label[] K10 = new Label[]{Label.of("'import'"),Label.of("'as'"),Label.of("';'")};
-    private static final Field[] K11 = new Field[]{new Field("head",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1931:body/0/tokenRef/capture/0"},"text","scalar"),new Field("tail",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1944:1954:body/1/0/1/tokenRef/capture/0"},"text","list")};
+    private static final Fields K11 = new Fields(new Field("head",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1931:body/0/tokenRef/capture/0"},"text","scalar"),new Field("tail",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1944:1954:body/1/0/1/tokenRef/capture/0"},"text","list"));
     private static final Label[] K12 = new Label[]{Label.of("ClassNameParser")};
     private static final Label[] K13 = new Label[]{Label.of("'$'"),Label.of("';'")};
-    private static final Field[] K14 = new Field[]{new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2439:2449:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2496:2508:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2525:2541:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2557:2568:body/5/0/ruleRef/capture/0"},"text","optional")};
+    private static final Fields K14 = new Fields(new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2439:2449:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2496:2508:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2525:2541:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2557:2568:body/5/0/ruleRef/capture/0"},"text","optional"));
     private static final Effect[] K15 = new Effect[]{new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2439:2449:body/2/tokenRef/capture/0","varName","lexical")};
     private static final Label[] K16 = new Label[]{Label.of("'variable'"),Label.of("'var'"),Label.of("'$'"),Label.of("';'")};
-    private static final Field[] K17 = new Field[]{new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2788:2798:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2845:2857:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2874:2890:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2906:2917:body/5/0/ruleRef/capture/0"},"text","optional")};
+    private static final Fields K17 = new Fields(new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2788:2798:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2845:2857:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2874:2890:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2906:2917:body/5/0/ruleRef/capture/0"},"text","optional"));
     private static final Effect[] K18 = new Effect[]{new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2788:2798:body/2/tokenRef/capture/0","varName","lexical")};
-    private static final Field[] K19 = new Field[]{new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3139:3149:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3197:3209:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3226:3243:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3259:3270:body/5/0/ruleRef/capture/0"},"text","optional")};
+    private static final Fields K19 = new Fields(new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3139:3149:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3197:3209:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3226:3243:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3259:3270:body/5/0/ruleRef/capture/0"},"text","optional"));
     private static final Effect[] K20 = new Effect[]{new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3139:3149:body/2/tokenRef/capture/0","varName","lexical")};
-    private static final Field[] K21 = new Field[]{new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3490:3500:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3547:3559:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3576:3592:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3608:3619:body/5/0/ruleRef/capture/0"},"text","optional")};
+    private static final Fields K21 = new Fields(new Field("varName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3490:3500:body/2/tokenRef/capture/0"},"text","scalar"),new Field("onlyIfAbsent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3547:3559:body/4/0/1/0/ruleRef/capture/0"},"node","optional"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3576:3592:body/4/0/2/ruleRef/capture/0"},"node","optional"),new Field("desc",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3608:3619:body/5/0/ruleRef/capture/0"},"text","optional"));
     private static final Effect[] K22 = new Effect[]{new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3490:3500:body/2/tokenRef/capture/0","varName","lexical")};
     private static final Label[] K23 = new Label[]{Label.of("'as'"),Label.of("'number'"),Label.of("'Number'"),Label.of("'string'"),Label.of("'String'"),Label.of("'boolean'"),Label.of("'Boolean'"),Label.of("'object'"),Label.of("'Object'")};
     private static final Label[] K24 = new Label[]{Label.of("'as'"),Label.of("'number'"),Label.of("'Number'"),Label.of("'float'"),Label.of("'Float'")};
@@ -10572,21 +10572,21 @@ public final class TinyExpressionP4Parser {
     private static final Label[] K30 = new Label[]{Label.of("'@'"),Label.of("'('"),Label.of("')'")};
     private static final Label[] K31 = new Label[]{Label.of("'='")};
     private static final Label[] K32 = new Label[]{Label.of("'('"),Label.of("')'"),Label.of("'{'"),Label.of("'}'")};
-    private static final Field[] K33 = new Field[]{new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4668:4678:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4707:4723:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4760:4776:body/6/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K33 = new Fields(new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4668:4678:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4707:4723:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4760:4776:body/6/ruleRef/capture/0"},"node","scalar"));
     private static final Effect[] K34 = new Effect[]{new Effect("entry","enter",null,"NumberMethodDeclaration","lexical"),new Effect("successBeforeLeave","leave",null,"NumberMethodDeclaration","lexical"),new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4668:4678:body/1/tokenRef/capture/0","methodName","lexical")};
     private static final Label[] K35 = new Label[]{Label.of("'number'"),Label.of("'float'"),Label.of("'('"),Label.of("')'"),Label.of("'{'"),Label.of("'}'")};
-    private static final Field[] K36 = new Field[]{new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4994:5004:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5033:5049:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5086:5102:body/6/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K36 = new Fields(new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4994:5004:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5033:5049:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5086:5102:body/6/ruleRef/capture/0"},"node","scalar"));
     private static final Effect[] K37 = new Effect[]{new Effect("entry","enter",null,"StringMethodDeclaration","lexical"),new Effect("successBeforeLeave","leave",null,"StringMethodDeclaration","lexical"),new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4994:5004:body/1/tokenRef/capture/0","methodName","lexical")};
     private static final Label[] K38 = new Label[]{Label.of("'string'"),Label.of("'('"),Label.of("')'"),Label.of("'{'"),Label.of("'}'")};
-    private static final Field[] K39 = new Field[]{new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5323:5333:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5362:5378:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5415:5432:body/6/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K39 = new Fields(new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5323:5333:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5362:5378:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5415:5432:body/6/ruleRef/capture/0"},"node","scalar"));
     private static final Effect[] K40 = new Effect[]{new Effect("entry","enter",null,"BooleanMethodDeclaration","lexical"),new Effect("successBeforeLeave","leave",null,"BooleanMethodDeclaration","lexical"),new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5323:5333:body/1/tokenRef/capture/0","methodName","lexical")};
     private static final Label[] K41 = new Label[]{Label.of("'boolean'"),Label.of("'('"),Label.of("')'"),Label.of("'{'"),Label.of("'}'")};
-    private static final Field[] K42 = new Field[]{new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5650:5660:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5689:5705:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5742:5758:body/6/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K42 = new Fields(new Field("methodName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5650:5660:body/1/tokenRef/capture/0"},"text","scalar"),new Field("parameters",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5689:5705:body/3/0/ruleRef/capture/0"},"node","optional"),new Field("expression",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5742:5758:body/6/ruleRef/capture/0"},"node","scalar"));
     private static final Effect[] K43 = new Effect[]{new Effect("entry","enter",null,"ObjectMethodDeclaration","lexical"),new Effect("successBeforeLeave","leave",null,"ObjectMethodDeclaration","lexical"),new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5650:5660:body/1/tokenRef/capture/0","methodName","lexical")};
     private static final Label[] K44 = new Label[]{Label.of("'object'"),Label.of("'('"),Label.of("')'"),Label.of("'{'"),Label.of("'}'")};
-    private static final Field[] K45 = new Field[]{new Field("values",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5855:5870:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5885:5900:body/1/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K45 = new Fields(new Field("values",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5855:5870:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5885:5900:body/1/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K46 = new Label[]{Label.of("MethodParametersParser")};
-    private static final Field[] K47 = new Field[]{new Field("paramName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6028:6038:body/1/tokenRef/capture/0"},"text","scalar"),new Field("type",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6057:6067:body/2/0/1/ruleRef/capture/0"},"text","optional")};
+    private static final Fields K47 = new Fields(new Field("paramName",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6028:6038:body/1/tokenRef/capture/0"},"text","scalar"),new Field("type",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6057:6067:body/2/0/1/ruleRef/capture/0"},"text","optional"));
     private static final Effect[] K48 = new Effect[]{new Effect("successAfterLeave","declare","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6028:6038:body/1/tokenRef/capture/0","paramName","lexical")};
     private static final Label[] K49 = new Label[]{Label.of("'$'")};
     private static final Label[] K50 = new Label[]{Label.of("'number'"),Label.of("'float'")};
@@ -10594,166 +10594,166 @@ public final class TinyExpressionP4Parser {
     private static final Label[] K52 = new Label[]{Label.of("'boolean'")};
     private static final Label[] K53 = new Label[]{Label.of("'object'")};
     private static final Label[] K54 = new Label[]{Label.of("'number'"),Label.of("'float'"),Label.of("'string'"),Label.of("'boolean'"),Label.of("'object'")};
-    private static final Field[] K55 = new Field[]{new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6716:6725:body/4/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6741:6751:body/4/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6760:6770:body/4/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6789:6798:body/6/0/ruleRef/capture/0"},"node","optional")};
+    private static final Fields K55 = new Fields(new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6716:6725:body/4/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6741:6751:body/4/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6760:6770:body/4/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6789:6798:body/6/0/ruleRef/capture/0"},"node","optional"));
     private static final Label[] K56 = new Label[]{Label.of("'external'"),Label.of("'boolean'"),Label.of("':'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K57 = new Field[]{new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7007:7016:body/2/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7032:7042:body/2/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7051:7061:body/2/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7080:7089:body/4/0/ruleRef/capture/0"},"node","optional")};
+    private static final Fields K57 = new Fields(new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7007:7016:body/2/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7032:7042:body/2/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7051:7061:body/2/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7080:7089:body/4/0/ruleRef/capture/0"},"node","optional"));
     private static final Label[] K58 = new Label[]{Label.of("'external'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K59 = new Field[]{new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7284:7293:body/4/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7309:7319:body/4/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7328:7338:body/4/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7357:7366:body/6/0/ruleRef/capture/0"},"node","optional")};
+    private static final Fields K59 = new Fields(new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7284:7293:body/4/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7309:7319:body/4/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7328:7338:body/4/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7357:7366:body/6/0/ruleRef/capture/0"},"node","optional"));
     private static final Label[] K60 = new Label[]{Label.of("'external'"),Label.of("'string'"),Label.of("':'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K61 = new Field[]{new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7561:7570:body/4/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7586:7596:body/4/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7605:7615:body/4/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7634:7643:body/6/0/ruleRef/capture/0"},"node","optional")};
+    private static final Fields K61 = new Fields(new Field("className",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7561:7570:body/4/0/0/0/ruleRef/capture/0"},"node","optional"),new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7586:7596:body/4/0/0/2/tokenRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7605:7615:body/4/0/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7634:7643:body/6/0/ruleRef/capture/0"},"node","optional"));
     private static final Label[] K62 = new Label[]{Label.of("'external'"),Label.of("'object'"),Label.of("':'"),Label.of("'('"),Label.of("')'")};
     private static final Label[] K63 = new Label[]{Label.of("'call'"),Label.of("'internal'")};
-    private static final Field[] K64 = new Field[]{new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8020:8030:body/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8043:8052:body/3/0/ruleRef/capture/0"},"node","optional")};
+    private static final Fields K64 = new Fields(new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8020:8030:body/1/tokenRef/capture/0"},"text","scalar"),new Field("args",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8043:8052:body/3/0/ruleRef/capture/0"},"node","optional"));
     private static final Effect[] K65 = new Effect[]{new Effect("afterDeclarations","use","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8020:8030:body/1/tokenRef/capture/0","name","lexical")};
     private static final Label[] K66 = new Label[]{Label.of("'internal'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K67 = new Field[]{new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8231:8248:body/0/ruleRef/capture/0"},"node","scalar"),new Field("thenExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8264:8280:body/2/ruleRef/capture/0"},"node","scalar"),new Field("elseExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8295:8311:body/4/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K67 = new Fields(new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8231:8248:body/0/ruleRef/capture/0"},"node","scalar"),new Field("thenExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8264:8280:body/2/ruleRef/capture/0"},"node","scalar"),new Field("elseExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8295:8311:body/4/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K68 = new Label[]{Label.of("'?'"),Label.of("':'")};
-    private static final Field[] K69 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8407:8422:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8436:8456:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8470:8496:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8510:8520:body/3/ruleRef/capture/0"},"mixed","scalar")};
+    private static final Fields K69 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8407:8422:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8436:8456:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8470:8496:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8510:8520:body/3/ruleRef/capture/0"},"mixed","scalar"));
     private static final Label[] K70 = new Label[]{Label.of("ArgumentExpressionParser")};
-    private static final Field[] K71 = new Field[]{new Field("values",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8590:8608:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8623:8641:body/1/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K71 = new Fields(new Field("values",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8590:8608:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8623:8641:body/1/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K72 = new Label[]{Label.of("ArgumentsParser")};
-    private static final Field[] K73 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8846:8856:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8865:8870:body/1/0/0/ruleRef/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8875:8885:body/1/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K73 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8846:8856:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8865:8870:body/1/0/0/ruleRef/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8875:8885:body/1/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K74 = new Label[]{Label.of("NumberExpressionParser")};
-    private static final Field[] K75 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9001:9013:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9022:9027:body/1/0/0/ruleRef/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9032:9044:body/1/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K75 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9001:9013:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9022:9027:body/1/0/0/ruleRef/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9032:9044:body/1/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K76 = new Label[]{Label.of("NumberTermParser")};
     private static final Label[] K77 = new Label[]{Label.of("'+'"),Label.of("'-'")};
     private static final Label[] K78 = new Label[]{Label.of("'*'"),Label.of("'/'")};
     private static final Label[] K79 = new Label[]{Label.of("'sin'"),Label.of("'('"),Label.of("')'"),Label.of("'cos'"),Label.of("'tan'"),Label.of("'sqrt'"),Label.of("'min'"),Label.of("'max'"),Label.of("'random'"),Label.of("'abs'"),Label.of("'round'"),Label.of("'ceil'"),Label.of("'floor'"),Label.of("'pow'"),Label.of("','"),Label.of("'log'"),Label.of("'exp'")};
-    private static final Field[] K80 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9530:9548:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K80 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9530:9548:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K81 = new Label[]{Label.of("'sin'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K82 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9623:9641:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K82 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9623:9641:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K83 = new Label[]{Label.of("'cos'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K84 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9716:9734:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K84 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9716:9734:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K85 = new Label[]{Label.of("'tan'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K86 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9812:9830:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K86 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9812:9830:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K87 = new Label[]{Label.of("'sqrt'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K88 = new Field[]{new Field("first",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9913:9931:body/2/ruleRef/capture/0"},"node","scalar"),new Field("rest",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9945:9963:body/3/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K88 = new Fields(new Field("first",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9913:9931:body/2/ruleRef/capture/0"},"node","scalar"),new Field("rest",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9945:9963:body/3/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K89 = new Label[]{Label.of("'min'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K90 = new Field[]{new Field("first",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10049:10067:body/2/ruleRef/capture/0"},"node","scalar"),new Field("rest",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10081:10099:body/3/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K90 = new Fields(new Field("first",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10049:10067:body/2/ruleRef/capture/0"},"node","scalar"),new Field("rest",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10081:10099:body/3/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K91 = new Label[]{Label.of("'max'"),Label.of("'('"),Label.of("')'")};
     private static final Label[] K92 = new Label[]{Label.of("'random'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K93 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10241:10259:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K93 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10241:10259:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K94 = new Label[]{Label.of("'abs'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K95 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10340:10358:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K95 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10340:10358:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K96 = new Label[]{Label.of("'round'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K97 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10436:10454:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K97 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10436:10454:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K98 = new Label[]{Label.of("'ceil'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K99 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10535:10553:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K99 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10535:10553:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K100 = new Label[]{Label.of("'floor'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K101 = new Field[]{new Field("base",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10639:10657:body/2/ruleRef/capture/0"},"node","scalar"),new Field("exponent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10668:10686:body/4/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K101 = new Fields(new Field("base",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10639:10657:body/2/ruleRef/capture/0"},"node","scalar"),new Field("exponent",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10668:10686:body/4/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K102 = new Label[]{Label.of("'pow'"),Label.of("'('"),Label.of("','"),Label.of("')'")};
-    private static final Field[] K103 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10766:10784:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K103 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10766:10784:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K104 = new Label[]{Label.of("'log'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K105 = new Field[]{new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10859:10877:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K105 = new Fields(new Field("arg",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10859:10877:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K106 = new Label[]{Label.of("'exp'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K107 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11052:11068:body/2/ruleRef/capture/0"},"node","scalar"),new Field("defaultValue",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11080:11098:body/4/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K107 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11052:11068:body/2/ruleRef/capture/0"},"node","scalar"),new Field("defaultValue",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11080:11098:body/4/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K108 = new Label[]{Label.of("'toNum'"),Label.of("'('"),Label.of("','"),Label.of("')'")};
     private static final Label[] K109 = new Label[]{Label.of("'('"),Label.of("'?'"),Label.of("':'"),Label.of("')'"),Label.of("'match'"),Label.of("'{'"),Label.of("','"),Label.of("'}'"),Label.of("'if'"),Label.of("'else'"),Label.of("'toNum'"),Label.of("'.length'"),Label.of("'len'"),Label.of("'length'"),Label.of("'external'"),Label.of("'$'")};
-    private static final Field[] K110 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11596:11612:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K110 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11596:11612:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K111 = new Label[]{Label.of("'toUpperCase'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K112 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11715:11731:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K112 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11715:11731:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K113 = new Label[]{Label.of("'toLowerCase'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K114 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11813:11829:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K114 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11813:11829:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K115 = new Label[]{Label.of("'trim'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K116 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11917:11933:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K116 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11917:11933:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K117 = new Label[]{Label.of("'length'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K118 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12015:12031:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K118 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12015:12031:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K119 = new Label[]{Label.of("'len'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K120 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12367:12378:body/0/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K120 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12367:12378:body/0/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K121 = new Label[]{Label.of("'.toUpperCase'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K122 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12486:12497:body/0/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K122 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12486:12497:body/0/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K123 = new Label[]{Label.of("'.toLowerCase'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K124 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12591:12602:body/0/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K124 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12591:12602:body/0/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K125 = new Label[]{Label.of("'.trim'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K126 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12693:12704:body/0/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K126 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12693:12704:body/0/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K127 = new Label[]{Label.of("'.length'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K128 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12966:12982:body/2/ruleRef/capture/0"},"node","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12994:13010:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13031:13047:body/5/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K128 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12966:12982:body/2/ruleRef/capture/0"},"node","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12994:13010:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13031:13047:body/5/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K129 = new Label[]{Label.of("'startsWith'"),Label.of("'('"),Label.of("','"),Label.of("')'")};
-    private static final Field[] K130 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13156:13172:body/2/ruleRef/capture/0"},"node","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13184:13200:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13221:13237:body/5/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K130 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13156:13172:body/2/ruleRef/capture/0"},"node","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13184:13200:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13221:13237:body/5/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K131 = new Label[]{Label.of("'endsWith'"),Label.of("'('"),Label.of("','"),Label.of("')'")};
-    private static final Field[] K132 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13346:13362:body/2/ruleRef/capture/0"},"node","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13374:13390:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13411:13427:body/5/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K132 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13346:13362:body/2/ruleRef/capture/0"},"node","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13374:13390:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13411:13427:body/5/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K133 = new Label[]{Label.of("'contains'"),Label.of("'('"),Label.of("','"),Label.of("')'")};
-    private static final Field[] K134 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13509:13525:body/0/ruleRef/capture/0"},"node","scalar"),new Field("candidates",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13543:13559:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13578:13594:body/4/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K134 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13509:13525:body/0/ruleRef/capture/0"},"node","scalar"),new Field("candidates",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13543:13559:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13578:13594:body/4/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K135 = new Label[]{Label.of("'.in'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K136 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13777:13800:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13826:13842:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13863:13879:body/4/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K136 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13777:13800:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13826:13842:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13863:13879:body/4/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K137 = new Label[]{Label.of("'.startsWith'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K138 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13977:14000:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14024:14040:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14061:14077:body/4/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K138 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13977:14000:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14024:14040:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14061:14077:body/4/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K139 = new Label[]{Label.of("'.endsWith'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K140 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14175:14198:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14222:14238:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14259:14275:body/4/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K140 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14175:14198:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("patterns",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14222:14238:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14259:14275:body/4/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K141 = new Label[]{Label.of("'.contains'"),Label.of("'('"),Label.of("')'")};
     private static final Label[] K142 = new Label[]{Label.of("'toLowerCase'"),Label.of("'('"),Label.of("')'"),Label.of("'toUpperCase'"),Label.of("'trim'"),Label.of("'$'")};
-    private static final Field[] K143 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14560:14571:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K143 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14560:14571:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K144 = new Label[]{Label.of("'isPresent'"),Label.of("'('"),Label.of("')'")};
-    private static final Field[] K145 = new Field[]{new Field("startHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14764:14780:body/2/ruleRef/capture/0"},"node","scalar"),new Field("endHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14796:14812:body/4/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K145 = new Fields(new Field("startHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14764:14780:body/2/ruleRef/capture/0"},"node","scalar"),new Field("endHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14796:14812:body/4/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K146 = new Label[]{Label.of("'inTimeRange'"),Label.of("'('"),Label.of("','"),Label.of("')'")};
-    private static final Field[] K147 = new Field[]{new Field("startDay",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14957:14966:body/2/ruleRef/capture/0"},"text","scalar"),new Field("startHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14981:14997:body/4/ruleRef/capture/0"},"node","scalar"),new Field("endDay",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15013:15022:body/6/ruleRef/capture/0"},"text","scalar"),new Field("endHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15035:15051:body/8/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K147 = new Fields(new Field("startDay",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14957:14966:body/2/ruleRef/capture/0"},"text","scalar"),new Field("startHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14981:14997:body/4/ruleRef/capture/0"},"node","scalar"),new Field("endDay",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15013:15022:body/6/ruleRef/capture/0"},"text","scalar"),new Field("endHour",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15035:15051:body/8/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K148 = new Label[]{Label.of("'inDayTimeRange'"),Label.of("'('"),Label.of("','"),Label.of("')'")};
     private static final Label[] K149 = new Label[]{Label.of("'MONDAY'"),Label.of("'TUESDAY'"),Label.of("'WEDNESDAY'"),Label.of("'THURSDAY'"),Label.of("'FRIDAY'"),Label.of("'SATURDAY'"),Label.of("'SUNDAY'")};
     private static final Label[] K150 = new Label[]{Label.of("'external'"),Label.of("'('"),Label.of("')'"),Label.of("'toUpperCase'"),Label.of("'toLowerCase'"),Label.of("'trim'"),Label.of("'.toUpperCase'"),Label.of("'.toLowerCase'"),Label.of("'.trim'"),Label.of("'$'")};
     private static final Label[] K151 = new Label[]{Label.of("SliceStartIndexParser")};
     private static final Label[] K152 = new Label[]{Label.of("SliceEndIndexParser")};
     private static final Label[] K153 = new Label[]{Label.of("SliceStepIndexParser")};
-    private static final Field[] K154 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16309:16326:body/0/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16419:16436:body/1/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16504:16521:body/2/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16595:16612:body/3/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16661:16678:body/4/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16748:16765:body/5/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16810:16827:body/6/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16878:16895:body/7/0/ruleRef/capture/0"},"mixed","scalar"),new Field("start",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16338:16353:body/0/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16448:16463:body/1/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16533:16548:body/2/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16624:16639:body/3/2/ruleRef/capture/0"},"node","optional"),new Field("end",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16365:16378:body/0/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16475:16488:body/1/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16694:16707:body/4/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16781:16794:body/5/3/ruleRef/capture/0"},"node","optional"),new Field("step",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16388:16402:body/0/6/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16564:16578:body/2/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16717:16731:body/4/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16847:16861:body/6/4/ruleRef/capture/0"},"node","optional")};
+    private static final Fields K154 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16309:16326:body/0/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16419:16436:body/1/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16504:16521:body/2/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16595:16612:body/3/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16661:16678:body/4/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16748:16765:body/5/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16810:16827:body/6/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16878:16895:body/7/0/ruleRef/capture/0"},"mixed","scalar"),new Field("start",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16338:16353:body/0/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16448:16463:body/1/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16533:16548:body/2/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16624:16639:body/3/2/ruleRef/capture/0"},"node","optional"),new Field("end",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16365:16378:body/0/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16475:16488:body/1/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16694:16707:body/4/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16781:16794:body/5/3/ruleRef/capture/0"},"node","optional"),new Field("step",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16388:16402:body/0/6/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16564:16578:body/2/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16717:16731:body/4/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16847:16861:body/6/4/ruleRef/capture/0"},"node","optional"));
     private static final Label[] K155 = new Label[]{Label.of("'['"),Label.of("':'"),Label.of("']'")};
-    private static final Field[] K156 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17008:17027:body/0/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17120:17139:body/1/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17207:17226:body/2/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17300:17319:body/3/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17368:17387:body/4/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17457:17476:body/5/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17521:17540:body/6/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17591:17610:body/7/0/ruleRef/capture/0"},"mixed","scalar"),new Field("start",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17039:17054:body/0/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17151:17166:body/1/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17238:17253:body/2/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17331:17346:body/3/2/ruleRef/capture/0"},"node","optional"),new Field("end",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17066:17079:body/0/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17178:17191:body/1/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17403:17416:body/4/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17492:17505:body/5/3/ruleRef/capture/0"},"node","optional"),new Field("step",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17089:17103:body/0/6/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17269:17283:body/2/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17426:17440:body/4/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17560:17574:body/6/4/ruleRef/capture/0"},"node","optional")};
+    private static final Fields K156 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17008:17027:body/0/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17120:17139:body/1/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17207:17226:body/2/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17300:17319:body/3/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17368:17387:body/4/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17457:17476:body/5/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17521:17540:body/6/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17591:17610:body/7/0/ruleRef/capture/0"},"mixed","scalar"),new Field("start",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17039:17054:body/0/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17151:17166:body/1/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17238:17253:body/2/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17331:17346:body/3/2/ruleRef/capture/0"},"node","optional"),new Field("end",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17066:17079:body/0/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17178:17191:body/1/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17403:17416:body/4/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17492:17505:body/5/3/ruleRef/capture/0"},"node","optional"),new Field("step",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17089:17103:body/0/6/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17269:17283:body/2/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17426:17440:body/4/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17560:17574:body/6/4/ruleRef/capture/0"},"node","optional"));
     private static final Label[] K157 = new Label[]{Label.of("SliceExpressionParser")};
-    private static final Field[] K158 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17899:17909:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17918:17921:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17926:17936:body/1/0/1/ruleRef/capture/0"},"mixed","list")};
+    private static final Fields K158 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17899:17909:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17918:17921:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17926:17936:body/1/0/1/ruleRef/capture/0"},"mixed","list"));
     private static final Label[] K159 = new Label[]{Label.of("StringExpressionParser")};
     private static final Label[] K160 = new Label[]{Label.of("'('"),Label.of("')'")};
     private static final Label[] K161 = new Label[]{Label.of("'match'"),Label.of("'{'"),Label.of("','"),Label.of("'}'"),Label.of("'if'"),Label.of("'('"),Label.of("')'"),Label.of("'else'"),Label.of("'$'"),Label.of("'as'"),Label.of("'external'"),Label.of("'toUpperCase'"),Label.of("'toLowerCase'"),Label.of("'trim'"),Label.of("'.toUpperCase'"),Label.of("'.toLowerCase'"),Label.of("'.trim'")};
-    private static final Field[] K162 = new Field[]{new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18697:18707:body/4/tokenRef/capture/0"},"text","scalar")};
+    private static final Fields K162 = new Fields(new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18697:18707:body/4/tokenRef/capture/0"},"text","scalar"));
     private static final Label[] K163 = new Label[]{Label.of("'('"),Label.of("'string'"),Label.of("'String'"),Label.of("')'"),Label.of("'$'")};
-    private static final Field[] K164 = new Field[]{new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18801:18811:body/1/tokenRef/capture/0"},"text","scalar")};
+    private static final Fields K164 = new Fields(new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18801:18811:body/1/tokenRef/capture/0"},"text","scalar"));
     private static final Label[] K165 = new Label[]{Label.of("'$'"),Label.of("'as'"),Label.of("'string'"),Label.of("'String'")};
-    private static final Field[] K166 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19077:19097:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19106:19109:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19114:19134:body/1/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K166 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19077:19097:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19106:19109:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19114:19134:body/1/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K167 = new Label[]{Label.of("BooleanExpressionParser")};
-    private static final Field[] K168 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19280:19300:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19309:19312:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19317:19337:body/1/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K168 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19280:19300:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19309:19312:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19317:19337:body/1/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K169 = new Label[]{Label.of("BooleanAndExpressionParser")};
-    private static final Field[] K170 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19483:19496:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19505:19508:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19513:19526:body/1/0/1/ruleRef/capture/0"},"node","list")};
+    private static final Fields K170 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19483:19496:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19505:19508:body/1/0/0/literal/capture/0"},"text","list"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19513:19526:body/1/0/1/ruleRef/capture/0"},"node","list"));
     private static final Label[] K171 = new Label[]{Label.of("BooleanXorExpressionParser")};
-    private static final Field[] K172 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19683:19700:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K172 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19683:19700:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K173 = new Label[]{Label.of("'not'"),Label.of("'('"),Label.of("')'")};
     private static final Label[] K174 = new Label[]{Label.of("'not'"),Label.of("'('"),Label.of("')'"),Label.of("'if'"),Label.of("'{'"),Label.of("'}'"),Label.of("'else'"),Label.of("'match'"),Label.of("','"),Label.of("'external'"),Label.of("'.in'"),Label.of("'.startsWith'"),Label.of("'.endsWith'"),Label.of("'.contains'"),Label.of("'startsWith'"),Label.of("'endsWith'"),Label.of("'contains'"),Label.of("'isPresent'"),Label.of("'inTimeRange'"),Label.of("'inDayTimeRange'"),Label.of("'true'"),Label.of("'false'"),Label.of("'$'")};
-    private static final Field[] K175 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20271:20288:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20295:20305:body/1/ruleRef/capture/0"},"text","scalar"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20310:20327:body/2/ruleRef/capture/0"},"mixed","scalar")};
+    private static final Fields K175 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20271:20288:body/0/ruleRef/capture/0"},"mixed","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20295:20305:body/1/ruleRef/capture/0"},"text","scalar"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20310:20327:body/2/ruleRef/capture/0"},"mixed","scalar"));
     private static final Label[] K176 = new Label[]{Label.of("BooleanEqualityExpressionParser")};
-    private static final Field[] K177 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20410:20435:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20449:20469:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20483:20509:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20523:20540:body/3/ruleRef/capture/0"},"mixed","scalar")};
+    private static final Fields K177 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20410:20435:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20449:20469:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20483:20509:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20523:20540:body/3/ruleRef/capture/0"},"mixed","scalar"));
     private static final Label[] K178 = new Label[]{Label.of("BooleanFactorParser")};
-    private static final Field[] K179 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20804:20820:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20827:20837:body/1/ruleRef/capture/0"},"text","scalar"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20842:20858:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K179 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20804:20820:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20827:20837:body/1/ruleRef/capture/0"},"text","scalar"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20842:20858:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K180 = new Label[]{Label.of("StringComparisonExpressionParser")};
     private static final Label[] K181 = new Label[]{Label.of("'=='"),Label.of("'!='")};
-    private static final Field[] K182 = new Field[]{new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20980:20996:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21003:21012:body/1/ruleRef/capture/0"},"text","scalar"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21017:21033:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K182 = new Fields(new Field("left",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20980:20996:body/0/ruleRef/capture/0"},"node","scalar"),new Field("op",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21003:21012:body/1/ruleRef/capture/0"},"text","scalar"),new Field("right",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21017:21033:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K183 = new Label[]{Label.of("ComparisonExpressionParser")};
     private static final Label[] K184 = new Label[]{Label.of("'=='"),Label.of("'!='"),Label.of("'<='"),Label.of("'>='"),Label.of("'<'"),Label.of("'>'")};
-    private static final Field[] K185 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21250:21266:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21280:21296:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21310:21327:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21341:21365:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21379:21390:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21404:21420:body/5/ruleRef/capture/0"},"mixed","scalar")};
+    private static final Fields K185 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21250:21266:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21280:21296:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21310:21327:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21341:21365:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21379:21390:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21404:21420:body/5/ruleRef/capture/0"},"mixed","scalar"));
     private static final Label[] K186 = new Label[]{Label.of("ObjectExpressionParser")};
-    private static final Field[] K187 = new Field[]{new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21604:21621:body/2/ruleRef/capture/0"},"node","scalar"),new Field("thenExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21645:21661:body/5/ruleRef/capture/0"},"node","scalar"),new Field("elseExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21695:21711:body/9/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K187 = new Fields(new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21604:21621:body/2/ruleRef/capture/0"},"node","scalar"),new Field("thenExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21645:21661:body/5/ruleRef/capture/0"},"node","scalar"),new Field("elseExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21695:21711:body/9/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K188 = new Label[]{Label.of("'if'"),Label.of("'('"),Label.of("')'"),Label.of("'{'"),Label.of("'}'"),Label.of("'else'")};
-    private static final Field[] K189 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21807:21827:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21841:21867:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21881:21906:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21920:21936:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21950:21967:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21981:21997:body/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22011:22027:body/6/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22041:22057:body/7/ruleRef/capture/0"},"mixed","scalar")};
+    private static final Fields K189 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21807:21827:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21841:21867:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21881:21906:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21920:21936:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21950:21967:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21981:21997:body/5/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22011:22027:body/6/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22041:22057:body/7/ruleRef/capture/0"},"mixed","scalar"));
     private static final Label[] K190 = new Label[]{Label.of("BranchExpressionParser")};
-    private static final Field[] K191 = new Field[]{new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22236:22253:body/1/ruleRef/capture/0"},"node","scalar"),new Field("thenExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22269:22285:body/3/ruleRef/capture/0"},"node","scalar"),new Field("elseExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22300:22316:body/5/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K191 = new Fields(new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22236:22253:body/1/ruleRef/capture/0"},"node","scalar"),new Field("thenExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22269:22285:body/3/ruleRef/capture/0"},"node","scalar"),new Field("elseExpr",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22300:22316:body/5/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K192 = new Label[]{Label.of("'('"),Label.of("'?'"),Label.of("':'"),Label.of("')'")};
-    private static final Field[] K193 = new Field[]{new Field("firstCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22538:22548:body/2/ruleRef/capture/0"},"node","scalar"),new Field("moreCases",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22566:22576:body/3/0/1/ruleRef/capture/0"},"node","list"),new Field("defaultCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22600:22617:body/5/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K193 = new Fields(new Field("firstCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22538:22548:body/2/ruleRef/capture/0"},"node","scalar"),new Field("moreCases",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22566:22576:body/3/0/1/ruleRef/capture/0"},"node","list"),new Field("defaultCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22600:22617:body/5/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K194 = new Label[]{Label.of("'match'"),Label.of("'{'"),Label.of("','"),Label.of("'}'")};
-    private static final Field[] K195 = new Field[]{new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22713:22730:body/0/ruleRef/capture/0"},"node","scalar"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22747:22762:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K195 = new Fields(new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22713:22730:body/0/ruleRef/capture/0"},"node","scalar"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22747:22762:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K196 = new Label[]{Label.of("'->'")};
-    private static final Field[] K197 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22861:22876:body/2/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K197 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22861:22876:body/2/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K198 = new Label[]{Label.of("'default'"),Label.of("'->'")};
-    private static final Field[] K199 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22956:22972:body/0/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K199 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22956:22972:body/0/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K200 = new Label[]{Label.of("NumberCaseValueParser")};
-    private static final Field[] K201 = new Field[]{new Field("firstCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23105:23115:body/2/ruleRef/capture/0"},"node","scalar"),new Field("moreCases",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23133:23143:body/3/0/1/ruleRef/capture/0"},"node","list"),new Field("defaultCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23167:23184:body/5/ruleRef/capture/0"},"node","scalar")};
-    private static final Field[] K202 = new Field[]{new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23280:23297:body/0/ruleRef/capture/0"},"node","scalar"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23314:23329:body/2/ruleRef/capture/0"},"node","scalar")};
-    private static final Field[] K203 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23428:23443:body/2/ruleRef/capture/0"},"node","scalar")};
-    private static final Field[] K204 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23523:23539:body/0/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K201 = new Fields(new Field("firstCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23105:23115:body/2/ruleRef/capture/0"},"node","scalar"),new Field("moreCases",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23133:23143:body/3/0/1/ruleRef/capture/0"},"node","list"),new Field("defaultCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23167:23184:body/5/ruleRef/capture/0"},"node","scalar"));
+    private static final Fields K202 = new Fields(new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23280:23297:body/0/ruleRef/capture/0"},"node","scalar"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23314:23329:body/2/ruleRef/capture/0"},"node","scalar"));
+    private static final Fields K203 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23428:23443:body/2/ruleRef/capture/0"},"node","scalar"));
+    private static final Fields K204 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23523:23539:body/0/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K205 = new Label[]{Label.of("StringCaseValueParser")};
-    private static final Field[] K206 = new Field[]{new Field("firstCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23674:23685:body/2/ruleRef/capture/0"},"node","scalar"),new Field("moreCases",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23703:23714:body/3/0/1/ruleRef/capture/0"},"node","list"),new Field("defaultCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23738:23756:body/5/ruleRef/capture/0"},"node","scalar")};
-    private static final Field[] K207 = new Field[]{new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23854:23871:body/0/ruleRef/capture/0"},"node","scalar"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23888:23904:body/2/ruleRef/capture/0"},"node","scalar")};
-    private static final Field[] K208 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24005:24021:body/2/ruleRef/capture/0"},"node","scalar")};
-    private static final Field[] K209 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24103:24120:body/0/ruleRef/capture/0"},"node","scalar")};
+    private static final Fields K206 = new Fields(new Field("firstCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23674:23685:body/2/ruleRef/capture/0"},"node","scalar"),new Field("moreCases",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23703:23714:body/3/0/1/ruleRef/capture/0"},"node","list"),new Field("defaultCase",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23738:23756:body/5/ruleRef/capture/0"},"node","scalar"));
+    private static final Fields K207 = new Fields(new Field("condition",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23854:23871:body/0/ruleRef/capture/0"},"node","scalar"),new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23888:23904:body/2/ruleRef/capture/0"},"node","scalar"));
+    private static final Fields K208 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24005:24021:body/2/ruleRef/capture/0"},"node","scalar"));
+    private static final Fields K209 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24103:24120:body/0/ruleRef/capture/0"},"node","scalar"));
     private static final Label[] K210 = new Label[]{Label.of("BooleanCaseValueParser")};
-    private static final Field[] K211 = new Field[]{new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24337:24347:body/1/tokenRef/capture/0"},"text","scalar"),new Field("type",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24365:24376:body/2/0/1/ruleRef/capture/0"},"text","optional")};
+    private static final Fields K211 = new Fields(new Field("name",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24337:24347:body/1/tokenRef/capture/0"},"text","scalar"),new Field("type",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24365:24376:body/2/0/1/ruleRef/capture/0"},"text","optional"));
     private static final Effect[] K212 = new Effect[]{new Effect("afterDeclarations","use","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24337:24347:body/1/tokenRef/capture/0","name","lexical")};
     private static final Label[] K213 = new Label[]{Label.of("'number'"),Label.of("'Number'"),Label.of("'float'"),Label.of("'Float'"),Label.of("'string'"),Label.of("'String'"),Label.of("'boolean'"),Label.of("'Boolean'"),Label.of("'object'"),Label.of("'Object'")};
-    private static final Field[] K214 = new Field[]{new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24836:24852:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24866:24883:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24897:24913:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24927:24943:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24957:24973:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24991:25001:body/5/1/ruleRef/capture/0"},"mixed","scalar")};
+    private static final Fields K214 = new Fields(new Field("value",new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24836:24852:body/0/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24866:24883:body/1/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24897:24913:body/2/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24927:24943:body/3/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24957:24973:body/4/ruleRef/capture/0","expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24991:25001:body/5/1/ruleRef/capture/0"},"mixed","scalar"));
     private static final String[] K215 = new String[]{};
     private static final boolean[] K216 = new boolean[]{};
     private static final Delimiters K217 = new Delimiters(new Delimiter("characters",null,null,new int[]{9,10,11,12,13,32}),new Delimiter("lineComment","//",null,new int[]{}),new Delimiter("blockComment","/*","*/",new int[]{}));
