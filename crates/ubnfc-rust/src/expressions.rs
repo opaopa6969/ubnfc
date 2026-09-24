@@ -62,7 +62,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         ExprNode::Literal { .. } | ExprNode::TokenRef { .. } | ExprNode::Any {}
     ) {
         let rule = g.rules[expr.rule_id.as_str()];
-        writeln!(s, "if let Event::Token{{span,text_span,content_span,..}}=self.arena[out.events.0] {{out.events=self.event(Event::Token{{expr:{i},rule:{rule},span,text_span,content_span}});}}").unwrap();
+        writeln!(s, "out.events=self.relabel_token(out.events,{i},{rule});").unwrap();
     }
     if matches!(
         expr.node,

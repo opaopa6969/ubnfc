@@ -1,4 +1,5 @@
 use super::api::*;
+use super::ast::tree::AstTree;
 use super::rt::{
     diag::{Diag, Diagnostics, DisplayDiagnostics, DisplaySnapshot},
     input::Input,
@@ -56,15 +57,11 @@ pub(crate) struct EventId(pub usize);
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Event {
     Empty,
+    /// 回復した領域。残りの観測（規則・mode・同期範囲・診断・公開候補）は
+    /// `Session::recovery_events[detail]` にある（event arena の要素を小さく保つため）。
     Recovery {
-        rule: usize,
-        mode: &'static str,
         span: Span,
-        sync_span: Option<Span>,
-        diag: Diag,
-        /// `Session::recovery_hints` の添字。回復した規則の frame に属する公開候補
-        /// （D-027 の表示語彙）を回復時に取っておく（診断は後段の走査で組み立てる）。
-        hints: u32,
+        detail: u32,
     },
     Join(EventId, EventId),
     Values {
@@ -94,6 +91,183 @@ pub(crate) enum Event {
         rule: usize,
         span: Span,
     },
+}
+/// 回復 event の本体（`Event::Recovery::detail` が索く）。
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct RecoveryEvent {
+    rule: usize,
+    mode: &'static str,
+    sync_span: Option<Span>,
+    diag: Diag,
+    /// `Session::recovery_hints` の添字。回復した規則の frame に属する公開候補
+    /// （D-027 の表示語彙）を回復時に取っておく（診断は後段の走査で組み立てる）。
+    hints: u32,
+}
+/// event arena の 1 要素（D-077、32 byte。`Event` のままだと 88 byte で、JSON 1 MB の
+/// typed AST では 156 万 event × 88 byte の arena とその伸長が確保の 7 割を占めていた）。
+/// 位置・event id・site / expr の番号は u32 に収まる（入力は `u32::MAX` byte 以下、arena は
+/// `u32::MAX` 要素以下で打ち切る）。Recovery の本体は別表（`RecoveryEvent`）。
+/// 読むときは `Session::ev` で `Event` に戻す（値の複製。書き換えは `set_ev`）。
+/// `unpack` の結果は scalar だけなので、`match self.ev(id)` は memory へ実体化されない。
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct PackedEvent {
+    tag: u8,
+    flags: u8,
+    /// Token の規則（`u16::MAX` は無し）。
+    rule: u16,
+    w: [u32; 7],
+}
+const EV_EMPTY: u8 = 0;
+const EV_RECOVERY: u8 = 1;
+const EV_JOIN: u8 = 2;
+const EV_VALUES: u8 = 3;
+const EV_CAPTURE: u8 = 4;
+const EV_RULE: u8 = 5;
+const EV_TOKEN: u8 = 6;
+const NO_RULE: u16 = u16::MAX;
+#[inline(always)]
+fn w32(value: usize) -> u32 {
+    debug_assert!(value <= u32::MAX as usize);
+    value as u32
+}
+#[inline(always)]
+fn wide(value: u32) -> usize {
+    if value == u32::MAX {
+        usize::MAX
+    } else {
+        value as usize
+    }
+}
+impl PackedEvent {
+    const EMPTY: Self = Self {
+        tag: EV_EMPTY,
+        flags: 0,
+        rule: 0,
+        w: [0; 7],
+    };
+    #[inline(always)]
+    fn pack(event: Event) -> Self {
+        let mut p = Self::EMPTY;
+        match event {
+            Event::Empty => {}
+            Event::Recovery { span, detail } => {
+                p.tag = EV_RECOVERY;
+                p.w[0] = w32(span[0]);
+                p.w[1] = w32(span[1]);
+                p.w[2] = detail;
+            }
+            Event::Join(a, b) => {
+                p.tag = EV_JOIN;
+                p.w[0] = w32(a.0);
+                p.w[1] = w32(b.0);
+            }
+            Event::Values { span, child, wrap } => {
+                p.tag = EV_VALUES;
+                p.flags = wrap as u8;
+                p.w[..3].copy_from_slice(&[w32(span[0]), w32(span[1]), w32(child.0)]);
+            }
+            Event::Capture {
+                token_extent,
+                site,
+                span,
+                child,
+            } => {
+                p.tag = EV_CAPTURE;
+                p.flags = token_extent as u8;
+                p.w[..4].copy_from_slice(&[w32(site), w32(span[0]), w32(span[1]), w32(child.0)]);
+            }
+            Event::Rule {
+                rule,
+                span,
+                child,
+                caps,
+            } => {
+                p.tag = EV_RULE;
+                p.w[..6].copy_from_slice(&[
+                    w32(rule),
+                    w32(span[0]),
+                    w32(span[1]),
+                    w32(child.0),
+                    caps.0,
+                    caps.1,
+                ]);
+            }
+            Event::Token {
+                text_span,
+                content_span,
+                expr,
+                rule,
+                span,
+            } => {
+                p.tag = EV_TOKEN;
+                p.rule = if rule == usize::MAX {
+                    NO_RULE
+                } else {
+                    debug_assert!(rule < NO_RULE as usize);
+                    rule as u16
+                };
+                p.w[0] = w32(span[0]);
+                p.w[1] = w32(span[1]);
+                if let Some(t) = text_span {
+                    p.flags |= 1;
+                    p.w[2] = w32(t[0]);
+                    p.w[3] = w32(t[1]);
+                }
+                if let Some(c) = content_span {
+                    p.flags |= 2;
+                    p.w[4] = w32(c[0]);
+                    p.w[5] = w32(c[1]);
+                }
+                p.w[6] = if expr == usize::MAX {
+                    u32::MAX
+                } else {
+                    w32(expr)
+                };
+            }
+        }
+        p
+    }
+    #[inline(always)]
+    fn unpack(self) -> Event {
+        let w = self.w;
+        let span = |i: usize| [w[i] as usize, w[i + 1] as usize];
+        match self.tag {
+            EV_JOIN => Event::Join(EventId(w[0] as usize), EventId(w[1] as usize)),
+            EV_VALUES => Event::Values {
+                span: span(0),
+                child: EventId(w[2] as usize),
+                wrap: self.flags != 0,
+            },
+            EV_CAPTURE => Event::Capture {
+                token_extent: self.flags != 0,
+                site: w[0] as usize,
+                span: span(1),
+                child: EventId(w[3] as usize),
+            },
+            EV_RULE => Event::Rule {
+                rule: w[0] as usize,
+                span: span(1),
+                child: EventId(w[3] as usize),
+                caps: (w[4], w[5]),
+            },
+            EV_TOKEN => Event::Token {
+                text_span: (self.flags & 1 != 0).then(|| span(2)),
+                content_span: (self.flags & 2 != 0).then(|| span(4)),
+                expr: wide(w[6]),
+                rule: if self.rule == NO_RULE {
+                    usize::MAX
+                } else {
+                    self.rule as usize
+                },
+                span: span(0),
+            },
+            EV_RECOVERY => Event::Recovery {
+                span: span(0),
+                detail: w[2],
+            },
+            _ => Event::Empty,
+        }
+    }
 }
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Step {
@@ -155,25 +329,6 @@ impl Saved {
         }
     }
 }
-/// mapped text の識別子（String の先頭 pointer）から span を引く。乗算 hash で十分に散る。
-#[derive(Default)]
-pub(crate) struct PtrHasher(u64);
-impl std::hash::Hasher for PtrHasher {
-    fn finish(&self) -> u64 {
-        let h = self.0.wrapping_mul(0x9E37_79B9_7F4A_7C15);
-        h ^ (h >> 29)
-    }
-    fn write(&mut self, bytes: &[u8]) {
-        for &b in bytes {
-            self.0 = (self.0 << 8) | u64::from(b);
-        }
-    }
-    fn write_usize(&mut self, n: usize) {
-        self.0 = n as u64 >> 3;
-    }
-}
-pub(crate) type TextSpans =
-    std::collections::HashMap<usize, Span, std::hash::BuildHasherDefault<PtrHasher>>;
 /// capture の出現（site, span, 子 event）。
 pub(crate) type Cap = (usize, Span, EventId);
 #[derive(Clone, Copy)]
@@ -196,7 +351,7 @@ struct Effect {
 /// 内容は parse ごとに捨て、確保だけを thread ごとに 1 組保持する。大きな入力を扱った後は
 /// `POOL_RETAIN_BYTES` を超える組を捨てて、常駐量を抑える。結果には影響しない。
 pub(crate) struct Buffers {
-    arena: Vec<Event>,
+    arena: Vec<PackedEvent>,
     diag: Diagnostics,
     display: DisplayDiagnostics,
     memo: Memo<Saved>,
@@ -207,10 +362,10 @@ pub(crate) struct Buffers {
     saved_effects: Vec<Effect>,
     stacks: Vec<Vec<(EventId, bool)>>,
     captures_pool: Vec<Vec<Cap>>,
-    values_pool: Vec<Vec<Ast>>,
-    texts_pool: Vec<Vec<String>>,
+    values_pool: Vec<Vec<u32>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
-    text_spans: TextSpans,
+    /// AST の構築先（D-077）。所有 `Ast` だけを返す parse では木を捨てずに再利用する。
+    tree: AstTree,
     caps_flat: Vec<Cap>,
     caps_pending: Vec<Cap>,
 }
@@ -222,7 +377,7 @@ thread_local! {
 }
 impl Buffers {
     fn bytes(&self) -> usize {
-        self.arena.capacity() * std::mem::size_of::<Event>()
+        self.arena.capacity() * std::mem::size_of::<PackedEvent>()
             + self.diag.capacity_bytes()
             + self.display.capacity_bytes()
             + self.memo.capacity_bytes()
@@ -243,7 +398,9 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     pub input: Input<'a>,
     pub options: ParseOptions,
     pub scanner: &'a mut dyn TokenScanner,
-    pub arena: Vec<Event>,
+    pub arena: Vec<PackedEvent>,
+    /// `Event::Recovery` の本体（`Event::Recovery::detail` が索く）。
+    recovery_events: Vec<RecoveryEvent>,
     pub diag: Diagnostics,
     pub display: DisplayDiagnostics,
     pub memo: Memo<Saved>,
@@ -258,16 +415,13 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     effects: Vec<Effect>,
     saved_effects: Vec<Effect>,
     pub statistics: Statistics,
-    pub node_spans: Vec<NodeSpan>,
-    // Allocation identity is used only while mapping. finish resolves it into
-    // owned AST paths, so ParseResult remains valid after moves and clones.
-    pub text_spans: TextSpans,
+    /// AST の構築先（D-077）。節点・Text はここへ積み、所有 `Ast` はここから写す。
+    pub tree: AstTree,
     /// AST 構築の走査用 stack の再利用 pool（再帰するので複数）。
     stacks: Vec<Vec<(EventId, bool)>>,
     /// AST 構築の作業 Vec の再利用 pool（capture 出現、field 値、field 文字列）。
     captures_pool: Vec<Vec<Cap>>,
-    values_pool: Vec<Vec<Ast>>,
-    texts_pool: Vec<Vec<String>>,
+    values_pool: Vec<Vec<u32>>,
     scope_pool: Vec<Vec<(usize, Span)>>,
     /// 出現収集で組み立てる「rule ごとの直下 capture」の並び。どの区間がどの rule のものかは
     /// `Event::Rule::caps`（開始, 個数）が持つ。AST 構築はその区間を写すだけで木を再走査しない。
@@ -412,9 +566,17 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         } else {
             options.limits.arena_entries
         };
-        let arena_capacity = if options.build_ast || options.lexical || HAS_SCOPE || HAS_RECOVERY {
-            // P4 実測 約 4.4 event / byte。
-            text.len().saturating_mul(5).saturating_add(8).min(32768)
+        let arena_capacity = if options.wants_ast() || options.lexical || HAS_SCOPE || HAS_RECOVERY {
+            // P4 実測 約 4.4 event / byte（小さい入力はこの見積りで倍々伸長を避ける）。
+            // D-077: 大きい入力は 2 event / byte を下限に見積もる（JSON は D-072 後 1.56、
+            // P4 3.8、Operators 9.0）。以前は 32,768 で打ち切って倍々で伸ばしていたので、
+            // pool の無い最初の parse は JSON 1 MB で 210 万 event 分を 7 回確保し直していた。
+            text.len()
+                .saturating_mul(5)
+                .min(32768)
+                .max(text.len().saturating_mul(2))
+                .min(arena_limit)
+                .saturating_add(8)
         } else {
             1
         };
@@ -460,9 +622,8 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
                 b.trivia_skip.reset(skip_policies, lex_positions);
                 b.effects.clear();
                 b.saved_effects.clear();
-                b.text_spans.clear();
+                b.tree.clear();
                 b.values_pool.iter_mut().for_each(Vec::clear);
-                b.texts_pool.iter_mut().for_each(Vec::clear);
                 b
             }
             None => Buffers {
@@ -486,9 +647,8 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
                 stacks: vec![],
                 captures_pool: vec![],
                 values_pool: vec![],
-                texts_pool: vec![],
                 scope_pool: vec![],
-                text_spans: Default::default(),
+                tree: AstTree::default(),
                 caps_flat: vec![],
                 caps_pending: vec![],
             },
@@ -496,14 +656,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         buffers.diag.enable(diag_on);
         buffers.display.enable(diag_on);
         let mut arena = buffers.arena;
-        arena.push(Event::Empty);
-        // AST node は入力 byte の約 1/2.5（P4 実測 332 byte / 131 node、20,923 byte / 8,195 node）。
-        // 結果へ移すので pool 化しない。
-        let node_capacity = if options.build_ast {
-            text.len() / 2
-        } else {
-            0
-        };
+        arena.push(PackedEvent::EMPTY);
         Self {
             text,
             input: Input::new(text),
@@ -521,12 +674,10 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             effects: buffers.effects,
             saved_effects: buffers.saved_effects,
             statistics: Statistics::default(),
-            node_spans: Vec::with_capacity(node_capacity),
-            text_spans: buffers.text_spans,
+            tree: buffers.tree,
             stacks: buffers.stacks,
             captures_pool: buffers.captures_pool,
             values_pool: buffers.values_pool,
-            texts_pool: buffers.texts_pool,
             scope_pool: buffers.scope_pool,
             caps_flat: buffers.caps_flat,
             caps_pending: buffers.caps_pending,
@@ -542,6 +693,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             mapping_depth: 0,
             mapping_anchor: None,
             recovery_hints: Vec::new(),
+            recovery_events: Vec::new(),
         }
     }
     /// 大きな buffer を thread の pool へ返す（`finish` の最後）。
@@ -549,7 +701,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         if !self.options.reuse_buffers {
             return;
         }
-        let buffers = Buffers {
+        let mut buffers = Buffers {
             arena: std::mem::take(&mut self.arena),
             diag: std::mem::replace(&mut self.diag, Diagnostics::with_limit_and_capacity(0, 0)),
             display: std::mem::replace(&mut self.display, DisplayDiagnostics::new(0)),
@@ -562,12 +714,19 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             stacks: std::mem::take(&mut self.stacks),
             captures_pool: std::mem::take(&mut self.captures_pool),
             values_pool: std::mem::take(&mut self.values_pool),
-            texts_pool: std::mem::take(&mut self.texts_pool),
             scope_pool: std::mem::take(&mut self.scope_pool),
-            text_spans: std::mem::take(&mut self.text_spans),
+            tree: std::mem::take(&mut self.tree),
             caps_flat: std::mem::take(&mut self.caps_flat),
             caps_pending: std::mem::take(&mut self.caps_pending),
         };
+        if buffers.bytes() > POOL_RETAIN_BYTES {
+            // 伸長の倍々で余った容量だけで上限を超えることがある（JSON 1 MB: event 156 万に
+            // 容量 210 万）。使った分へ縮めて収まるなら保持する。同じ規模の次の parse は
+            // 伸長しないので、縮めるのは規模が変わったときだけ。
+            buffers.arena.shrink_to_fit();
+            buffers.caps_flat.shrink_to_fit();
+            buffers.caps_pending.shrink_to_fit();
+        }
         if buffers.bytes() <= POOL_RETAIN_BYTES {
             POOL.with(|p| *p.borrow_mut() = Some(buffers));
         }
@@ -624,23 +783,22 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     pub fn cp(&self, byte: usize) -> usize {
         self.input.byte_to_cp(byte).expect("parser UTF-8 boundary")
     }
-    /// `remember_text` へ渡す複製は識別用の 1 byte を最初から確保する
-    /// （`to_owned` は丁度 len で確保するので、直後の `reserve(1)` が必ず再確保になる）。
-    fn owned_text(text: &str) -> String {
-        let mut owned = String::with_capacity(text.len() + 1);
-        owned.push_str(text);
-        owned
-    }
-    fn text_for_identity(&self, span: Span) -> String {
-        Self::owned_text(self.trimmed(span))
-    }
     pub fn span(&self, span: Span) -> Span {
         [self.cp(span[0]), self.cp(span[1])]
     }
     fn trimmed(&self, span: Span) -> &str {
-        self.text[span[0]..span[1]].trim_matches(|c: char| {
+        let [start, end] = self.trimmed_range(span);
+        &self.text[start..end]
+    }
+    /// `trimmed` の byte 範囲（AST の Text 節点は値を複製せずこの範囲で持つ）。
+    fn trimmed_range(&self, span: Span) -> [usize; 2] {
+        let trim = |c: char| {
             c.is_whitespace() && !matches!(c, '\u{85}' | '\u{a0}' | '\u{2007}' | '\u{202f}')
-        })
+        };
+        let text = &self.text[span[0]..span[1]];
+        let head = text.trim_start_matches(trim);
+        let start = span[0] + (text.len() - head.len());
+        [start, start + head.trim_end_matches(trim).len()]
     }
     pub fn text(&self, span: Span) -> String {
         self.trimmed(span).to_owned()
@@ -825,18 +983,66 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         let snapshot = self.display_snapshot();
         self.memo.insert(key, Saved::new(step, effects, snapshot));
     }
+    #[inline(always)]
     pub fn event(&mut self, event: Event) -> EventId {
-        if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE && !HAS_RECOVERY {
+        // 認識だけの parse（scope / recovery の無い文法）は記録しない。判定だけを呼出し側へ inline する。
+        if !self.options.build_ast
+            && !self.options.ast_tree
+            && !self.options.lexical
+            && !HAS_SCOPE
+            && !HAS_RECOVERY
+        {
             return EventId(0);
         }
+        self.record_event(PackedEvent::pack(event))
+    }
+    #[inline]
+    fn record_event(&mut self, packed: PackedEvent) -> EventId {
         if self.arena.len() >= self.arena_limit.min(u32::MAX as usize) {
             self.resource_failure
                 .get_or_insert((0, "arena budget exceeded"));
             return EventId(0);
         }
         let id = EventId(self.arena.len());
-        self.arena.push(event);
+        self.arena.push(packed);
         id
+    }
+    /// event を読む（`PackedEvent` から戻した値）。
+    #[inline(always)]
+    pub fn ev(&self, id: EventId) -> Event {
+        self.arena[id.0].unpack()
+    }
+    /// literal / token 参照の結果の Token event を、expr と規則を付け替えて複製する
+    /// （`Event` に戻さず packed のまま写す。Token でなければ `id` をそのまま返す）。
+    #[inline(always)]
+    pub fn relabel_token(&mut self, id: EventId, expr: usize, rule: usize) -> EventId {
+        // 認識だけの parse では event を記録しない（`id` は 0 = Empty）ので、判定だけを inline にする。
+        if self.arena[id.0].tag != EV_TOKEN {
+            return id;
+        }
+        self.relabel_token_copy(id, expr, rule)
+    }
+    #[inline(never)]
+    fn relabel_token_copy(&mut self, id: EventId, expr: usize, rule: usize) -> EventId {
+        let mut packed = self.arena[id.0];
+        debug_assert!(rule < NO_RULE as usize);
+        packed.rule = rule as u16;
+        packed.w[6] = w32(expr);
+        self.record_event(packed)
+    }
+    /// Rule event の直下 capture 表の区間（出現収集が書く）。
+    #[inline]
+    pub fn set_rule_caps(&mut self, id: EventId, caps: (u32, u32)) {
+        let packed = &mut self.arena[id.0];
+        if packed.tag == EV_RULE {
+            packed.w[4] = caps.0;
+            packed.w[5] = caps.1;
+        }
+    }
+    /// event を書き換える（書き換える箇所は Token / Capture だけ）。
+    #[inline(always)]
+    pub fn set_ev(&mut self, id: EventId, event: Event) {
+        self.arena[id.0] = PackedEvent::pack(event);
     }
     pub fn join(&mut self, a: EventId, b: EventId) -> EventId {
         if a.0 == 0 {
@@ -1063,9 +1269,11 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             p += n;
             if c == quote {
                 let step = self.primitive::<MATCH>(state, Some(p - start), label);
-                if let Event::Token { text_span, content_span, .. } = &mut self.arena[step.events.0] {
+                let mut event = self.ev(step.events);
+                if let Event::Token { text_span, content_span, .. } = &mut event {
                     *text_span = Some([start, p]);
                     *content_span = Some([start + 1, p - 1]);
+                    self.set_ev(step.events, event);
                 }
                 return step;
             }
@@ -1164,21 +1372,25 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             return;
         }
         let mut target = id;
+        let mut event = self.ev(id);
         if let Event::Capture {
             site: current,
             child,
             ..
-        } = &mut self.arena[id.0]
+        } = &mut event
         {
             if let Some(site) = site {
                 *current = site;
+                target = *child;
+                self.set_ev(id, event);
+            } else {
+                target = *child;
             }
-            target = *child;
         }
-        if let (Some(expr), Event::Token { expr: current, .. }) =
-            (expr, &mut self.arena[target.0])
-        {
+        let mut event = self.ev(target);
+        if let (Some(expr), Event::Token { expr: current, .. }) = (expr, &mut event) {
             *current = expr;
+            self.set_ev(target, event);
         }
     }
     pub fn take_stack(&mut self) -> Vec<(EventId, bool)> {
@@ -1204,24 +1416,16 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     pub fn give_captures(&mut self, v: Vec<Cap>) {
         self.captures_pool.push(v);
     }
-    pub fn take_values(&mut self) -> Vec<Ast> {
+    pub fn take_values(&mut self) -> Vec<u32> {
         let mut v = self.values_pool.pop().unwrap_or_default();
         v.clear();
         v
     }
-    pub fn give_values(&mut self, v: Vec<Ast>) {
+    pub fn give_values(&mut self, v: Vec<u32>) {
         self.values_pool.push(v);
     }
-    pub fn take_texts(&mut self) -> Vec<String> {
-        let mut v = self.texts_pool.pop().unwrap_or_default();
-        v.clear();
-        v
-    }
-    pub fn give_texts(&mut self, v: Vec<String>) {
-        self.texts_pool.push(v);
-    }
     /// text 変換の field 値（recovery で直接置換された出現は除く）。
-    pub fn text_values(&mut self, caps: &[Cap], sites: &[usize], out: &mut Vec<String>) {
+    pub fn text_values(&mut self, caps: &[Cap], sites: &[usize], out: &mut Vec<u32>) {
         for &(site, span, child) in caps {
             if sites.contains(&site) && !self.directly_recovered(child) {
                 let text = self.semantic_text(child, span);
@@ -1229,13 +1433,8 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             }
         }
     }
-    pub fn text_nodes(&mut self, caps: &[Cap], sites: &[usize], out: &mut Vec<Ast>) {
-        for &(site, span, child) in caps {
-            if sites.contains(&site) && !self.directly_recovered(child) {
-                let text = self.semantic_text(child, span);
-                out.push(Ast::Text(text));
-            }
-        }
+    pub fn text_nodes(&mut self, caps: &[Cap], sites: &[usize], out: &mut Vec<u32>) {
+        self.text_values(caps, sites, out);
     }
     /// node 変換の field 値。出現ごとに子の値を構築し、値が無く空でない出現は字句 Text にする。
     /// `fallback` は leaf 型（Text を leaf node に昇格する recipe）。
@@ -1244,7 +1443,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         caps: &[Cap],
         sites: &[usize],
         fallback: Option<usize>,
-        out: &mut Vec<Ast>,
+        out: &mut Vec<u32>,
     ) -> Result<(), String> {
         for &(site, span, child) in caps {
             if !sites.contains(&site) {
@@ -1258,14 +1457,13 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
                 && !self.has_value_group(child)
             {
                 let text = self.semantic_text(child, span);
-                out.push(Ast::Text(text));
+                out.push(text);
             }
             if let Some(ty) = fallback {
                 let mut i = start;
                 while i < out.len() {
-                    if let Ast::Text(text) = &mut out[i] {
-                        let text = std::mem::take(text);
-                        out[i] = self.leaf(ty, span, text)?;
+                    if self.tree.kind(out[i]) == super::ast::tree::KIND_TEXT {
+                        out[i] = self.leaf(ty, span, out[i])?;
                     }
                     i += 1;
                 }
@@ -1290,7 +1488,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         stack.push((root, false));
         let mut span = None;
         while let Some((id, _)) = stack.pop() {
-            match self.arena[id.0] {
+            match self.ev(id) {
                 Event::Join(a, b) => {
                     stack.push((b, false));
                     stack.push((a, false));
@@ -1313,7 +1511,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     pub fn significant_end(&self, root: EventId) -> Option<usize> {
         let mut stack = vec![root];
         while let Some(id) = stack.pop() {
-            match self.arena[id.0] {
+            match self.ev(id) {
                 Event::Join(a, b) => {
                     stack.push(a);
                     stack.push(b);
@@ -1336,7 +1534,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         stack.push((root, false));
         let mut found = false;
         while let Some((id, _)) = stack.pop() {
-            match self.arena[id.0] {
+            match self.ev(id) {
                 Event::Recovery { .. } => {
                     found = true;
                     break;
@@ -1359,7 +1557,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             return false;
         }
         loop {
-            match self.arena[root.0] {
+            match self.ev(root) {
                 Event::Recovery { .. } => return true,
                 Event::Capture { child, .. } | Event::Values { child, .. } => root = child,
                 _ => return false,
@@ -1440,13 +1638,17 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         let hints = u32::try_from(self.recovery_hints.len()).unwrap_or(u32::MAX);
         self.recovery_hints
             .push(if DIAG { self.display.local_summary() } else { None });
-        let events = self.event(Event::Recovery {
+        let detail = u32::try_from(self.recovery_events.len()).unwrap_or(u32::MAX);
+        self.recovery_events.push(RecoveryEvent {
             rule,
             mode,
-            span: [start, end],
             sync_span,
             diag,
             hints,
+        });
+        let events = self.event(Event::Recovery {
+            span: [start, end],
+            detail,
         });
         Step {
             ok: true,
@@ -1460,7 +1662,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         stack.push((root, false));
         let mut found = false;
         while let Some((id, _)) = stack.pop() {
-            match self.arena[id.0] {
+            match self.ev(id) {
                 Event::Values { .. } => {
                     found = true;
                     break;
@@ -1478,19 +1680,9 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         self.give_stack(stack);
         found
     }
-    pub fn mapped_text(&mut self, span: Span) -> String {
-        self.remember_text(self.text_for_identity(span), span)
-    }
-    fn remember_text(&mut self, mut text: String, span: Span) -> String {
-        // Empty strings also need distinct identities until paths are resolved.
-        text.reserve(1);
-        self.text_spans
-            .insert(text.as_ptr() as usize, self.span(span));
-        text
-    }
     pub fn has_token_text(&self, mut root: EventId) -> bool {
         loop {
-            match self.arena[root.0] {
+            match self.ev(root) {
                 Event::Capture { child, .. }
                 | Event::Rule { child, .. }
                 | Event::Values { child, .. } => root = child,
@@ -1501,7 +1693,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     }
     pub fn text_extent(&self, mut root: EventId, fallback: Span) -> Span {
         loop {
-            match self.arena[root.0] {
+            match self.ev(root) {
                 Event::Capture { child, .. }
                 | Event::Rule { child, .. }
                 | Event::Values { child, .. } => root = child,
@@ -1515,19 +1707,20 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     }
     fn text_content_extent(&self, mut root: EventId, fallback: Span) -> Span {
         loop {
-            match self.arena[root.0] {
+            match self.ev(root) {
                 Event::Capture { child, .. } | Event::Rule { child, .. } | Event::Values { child, .. } => root = child,
                 Event::Token { content_span, text_span, .. } => return content_span.or(text_span).unwrap_or(fallback),
                 _ => return fallback,
             }
         }
     }
-    pub fn semantic_text(&mut self, root: EventId, span: Span) -> String {
+    /// capture の値となる Text 節点を作る（D-077: 値は複製せず入力の byte 範囲で持つ）。
+    pub fn semantic_text(&mut self, root: EventId, span: Span) -> u32 {
         // Token まで下って text_span / content_span を 1 回の走査で読む
         // （text_extent / text_content_extent / has_token_text と同じ規則）。
         let mut node = root;
         let token = loop {
-            match self.arena[node.0] {
+            match self.ev(node) {
                 Event::Capture { child, .. } | Event::Rule { child, .. } | Event::Values { child, .. } => node = child,
                 Event::Token { text_span, content_span, .. } => break Some((text_span, content_span)),
                 _ => break None,
@@ -1538,8 +1731,9 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             Some((None, content)) => (span, content.unwrap_or(span), false),
             None => (span, span, false),
         };
-        let value = if token_text { Self::owned_text(&self.text[content[0]..content[1]]) } else { self.text_for_identity(content) };
-        self.remember_text(value, extent)
+        let value = if token_text { content } else { self.trimmed_range(content) };
+        let extent = self.span(extent);
+        self.tree.text(extent, value)
     }
     pub fn take_scope(&mut self) -> Vec<(usize, Span)> {
         let mut v = self.scope_pool.pop().unwrap_or_default();
@@ -1554,7 +1748,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         let mut stack = self.take_stack();
         stack.push((root, false));
         while let Some((id, done)) = stack.pop() {
-            match self.arena[id.0] {
+            match self.ev(id) {
                 Event::Join(a, b) => {
                     stack.push((b, false));
                     stack.push((a, false));
@@ -1580,15 +1774,5 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             }
         }
         self.give_stack(stack);
-    }
-    pub fn node(&mut self, rule: &'static str, name: &'static str, span: Span) -> usize {
-        let id = self.node_spans.len();
-        self.node_spans.push(NodeSpan {
-            node_id: id,
-            rule_id: rule,
-            node_type: name,
-            span,
-        });
-        id
     }
 }
