@@ -74,7 +74,7 @@ class ParserUnchangedTest {
     }
 
     /**
-     * DAP は opt-in（D-064）。{@code --emit-dap} を足しても
+     * DAP は opt-in（D-067）。{@code --emit-dap} を足しても
      * <b>パーサも LSP の 11 ファイルも 1 byte も変わらず</b>、
      * {@code <lsp-package>.dap} にファイルが増えるだけ。
      */
