@@ -149,7 +149,13 @@ after = このブランチ）、**6 往復・各 9 run** を直後に切り替�
   `three_validation_error_golden_sources_have_fixed_parse_outcomes` 含む）と
   `tests/regenerate.rs`（固定点: IR・生成 Rust の byte 一致）を含め全緑。
 - `cd ubnfc-java && mvn -o -q -DskipTests package` を先に実行（jar の鮮度検査 D-033）した上で
-  `cargo test --workspace --offline`: 全緑。
+  `cargo test --workspace --offline`: 1 件を除き全緑。
+  唯一の失敗 `ubnfc-harness --test spec_corpus` の
+  `ubnf_citations_resolve_to_real_spec_headings` は**この変更の前から origin/master で失敗している**
+  （`origin/master`（4b6f438）の detached worktree で同じ失敗を確認済み）。
+  原因は読み取り専用の兄弟 repo 側で `unlaxer-dsl/specs/validation.md` の誤り符号が
+  `E-MAPPING-EXTRA-CAPTURE` → `E-MAPPING-UNLISTED-CAPTURE` に改名された（unlaxer-parser 932c802）ことで、
+  `corpus/spec/ubnf/annotations.json` の逐語引用が spec に無くなったため。射影層とは無関係。
 - `cargo clippy --workspace --offline --all-targets -- -D warnings`: warning 無し。
 - `cargo fmt --all -- --check`: 差分無し。生成物（`src/generated/`）は `#[rustfmt::skip]` のまま触れていない。
 
