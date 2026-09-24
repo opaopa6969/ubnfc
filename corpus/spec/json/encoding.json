@@ -1,0 +1,292 @@
+{
+  "family": "json",
+  "section": "8.1.  Character Encoding",
+  "summary": "文字符号化（UTF-8 必須、BOM、不正な byte 列）。",
+  "cases": [
+    {
+      "id": "json/n_array_a_invalid_utf8",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b61e55d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_a_invalid_utf8.json"
+    },
+    {
+      "id": "json/n_array_invalid_utf8",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5bff5d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_array_invalid_utf8.json"
+    },
+    {
+      "id": "json/n_number_invalid-utf-8-in-bigger-int",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b313233e55d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_invalid-utf-8-in-bigger-int.json"
+    },
+    {
+      "id": "json/n_number_invalid-utf-8-in-exponent",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b316531e55d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_invalid-utf-8-in-exponent.json"
+    },
+    {
+      "id": "json/n_number_invalid-utf-8-in-int",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b30e55d0a",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_invalid-utf-8-in-int.json"
+    },
+    {
+      "id": "json/n_number_real_with_invalid_utf8_after_e",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b3165e55d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_real_with_invalid_utf8_after_e.json"
+    },
+    {
+      "id": "json/n_string_invalid-utf-8-in-escape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b225c75e5225d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_invalid-utf-8-in-escape.json"
+    },
+    {
+      "id": "json/n_string_invalid_utf8_after_escape",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "5b225ce5225d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_string_invalid_utf8_after_escape.json"
+    },
+    {
+      "id": "json/n_structure_UTF8_BOM_no_data",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "﻿",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_structure_UTF8_BOM_no_data.json"
+    },
+    {
+      "id": "json/n_structure_incomplete_UTF8_BOM",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "efbb7b7d",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_structure_incomplete_UTF8_BOM.json"
+    },
+    {
+      "id": "json/n_structure_lone-invalid-utf-8",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "e5",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_structure_lone-invalid-utf-8.json"
+    },
+    {
+      "id": "json/y_string_1_2_3_bytes_UTF-8_sequences",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u0060\\u012a\\u12AB\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_1_2_3_bytes_UTF-8_sequences.json"
+    },
+    {
+      "id": "json/y_string_nonCharacterInUTF-8_U+10FFFF",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"􏿿\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_nonCharacterInUTF-8_U+10FFFF.json"
+    },
+    {
+      "id": "json/y_string_nonCharacterInUTF-8_U+FFFF",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"￿\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_nonCharacterInUTF-8_U+FFFF.json"
+    },
+    {
+      "id": "json/y_string_one-byte-utf-8",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u002c\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_one-byte-utf-8.json"
+    },
+    {
+      "id": "json/y_string_reservedCharacterInUTF-8_U+1BFFF",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"𛿿\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_reservedCharacterInUTF-8_U+1BFFF.json"
+    },
+    {
+      "id": "json/y_string_three-byte-utf-8",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u0821\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_three-byte-utf-8.json"
+    },
+    {
+      "id": "json/y_string_two-byte-utf-8",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"\\u0123\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_two-byte-utf-8.json"
+    },
+    {
+      "id": "json/y_string_utf8",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "8.1.  Character Encoding",
+        "sentence": "JSON text exchanged between systems that are not part of a closed ecosystem MUST be encoded using UTF-8 [RFC3629].",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[\"€𝄞\"]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_string_utf8.json"
+    }
+  ]
+}

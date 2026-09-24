@@ -1,0 +1,1012 @@
+{
+  "family": "json",
+  "section": "6.  Numbers",
+  "summary": "数値（符号・整数部・小数部・指数部）。",
+  "cases": [
+    {
+      "id": "json/n_multidigit_number_then_00",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "inputHex": "31323300",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_multidigit_number_then_00.json"
+    },
+    {
+      "id": "json/n_number_++",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[++1234]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_++.json"
+    },
+    {
+      "id": "json/n_number_+1",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[+1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_+1.json"
+    },
+    {
+      "id": "json/n_number_+Inf",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[+Inf]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_+Inf.json"
+    },
+    {
+      "id": "json/n_number_-01",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-01]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_-01.json"
+    },
+    {
+      "id": "json/n_number_-1.0.",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-1.0.]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_-1.0..json"
+    },
+    {
+      "id": "json/n_number_-2.",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-2.]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_-2..json"
+    },
+    {
+      "id": "json/n_number_-NaN",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-NaN]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_-NaN.json"
+    },
+    {
+      "id": "json/n_number_.-1",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[.-1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_.-1.json"
+    },
+    {
+      "id": "json/n_number_.2e-3",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[.2e-3]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_.2e-3.json"
+    },
+    {
+      "id": "json/n_number_0.1.2",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0.1.2]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0.1.2.json"
+    },
+    {
+      "id": "json/n_number_0.3e+",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0.3e+]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0.3e+.json"
+    },
+    {
+      "id": "json/n_number_0.3e",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0.3e]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0.3e.json"
+    },
+    {
+      "id": "json/n_number_0.e1",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0.e1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0.e1.json"
+    },
+    {
+      "id": "json/n_number_0_capital_E+",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0E+]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0_capital_E+.json"
+    },
+    {
+      "id": "json/n_number_0_capital_E",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0E]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0_capital_E.json"
+    },
+    {
+      "id": "json/n_number_0e+",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0e+]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0e+.json"
+    },
+    {
+      "id": "json/n_number_0e",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0e]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_0e.json"
+    },
+    {
+      "id": "json/n_number_1.0e+",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1.0e+]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_1.0e+.json"
+    },
+    {
+      "id": "json/n_number_1.0e-",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1.0e-]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_1.0e-.json"
+    },
+    {
+      "id": "json/n_number_1.0e",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1.0e]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_1.0e.json"
+    },
+    {
+      "id": "json/n_number_1_000",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1 000.0]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_1_000.json"
+    },
+    {
+      "id": "json/n_number_1eE2",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1eE2]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_1eE2.json"
+    },
+    {
+      "id": "json/n_number_2.e+3",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[2.e+3]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_2.e+3.json"
+    },
+    {
+      "id": "json/n_number_2.e-3",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[2.e-3]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_2.e-3.json"
+    },
+    {
+      "id": "json/n_number_2.e3",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[2.e3]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_2.e3.json"
+    },
+    {
+      "id": "json/n_number_9.e+",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[9.e+]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_9.e+.json"
+    },
+    {
+      "id": "json/n_number_Inf",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[Inf]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_Inf.json"
+    },
+    {
+      "id": "json/n_number_NaN",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[NaN]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_NaN.json"
+    },
+    {
+      "id": "json/n_number_U+FF11_fullwidth_digit_one",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[１]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_U+FF11_fullwidth_digit_one.json"
+    },
+    {
+      "id": "json/n_number_expression",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1+2]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_expression.json"
+    },
+    {
+      "id": "json/n_number_hex_1_digit",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0x1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_hex_1_digit.json"
+    },
+    {
+      "id": "json/n_number_hex_2_digits",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0x42]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_hex_2_digits.json"
+    },
+    {
+      "id": "json/n_number_infinity",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[Infinity]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_infinity.json"
+    },
+    {
+      "id": "json/n_number_invalid+-",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0e+-1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_invalid+-.json"
+    },
+    {
+      "id": "json/n_number_invalid-negative-real",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-123.123foo]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_invalid-negative-real.json"
+    },
+    {
+      "id": "json/n_number_minus_infinity",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-Infinity]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_minus_infinity.json"
+    },
+    {
+      "id": "json/n_number_minus_sign_with_trailing_garbage",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-foo]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_minus_sign_with_trailing_garbage.json"
+    },
+    {
+      "id": "json/n_number_minus_space_1",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[- 1]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_minus_space_1.json"
+    },
+    {
+      "id": "json/n_number_neg_int_starting_with_zero",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-012]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_neg_int_starting_with_zero.json"
+    },
+    {
+      "id": "json/n_number_neg_real_without_int_part",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-.123]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_neg_real_without_int_part.json"
+    },
+    {
+      "id": "json/n_number_neg_with_garbage_at_end",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-1x]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_neg_with_garbage_at_end.json"
+    },
+    {
+      "id": "json/n_number_real_garbage_after_e",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1ea]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_real_garbage_after_e.json"
+    },
+    {
+      "id": "json/n_number_real_without_fractional_part",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1.]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_real_without_fractional_part.json"
+    },
+    {
+      "id": "json/n_number_starting_with_dot",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[.123]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_starting_with_dot.json"
+    },
+    {
+      "id": "json/n_number_with_alpha",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1.2a-3]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_with_alpha.json"
+    },
+    {
+      "id": "json/n_number_with_alpha_char",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1.8011670033376514H-308]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_with_alpha_char.json"
+    },
+    {
+      "id": "json/n_number_with_leading_zero",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[012]",
+      "expectation": {
+        "verdict": "reject"
+      },
+      "suiteFile": "n_number_with_leading_zero.json"
+    },
+    {
+      "id": "json/y_number",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[123e65]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number.json"
+    },
+    {
+      "id": "json/y_number_0e+1",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0e+1]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_0e+1.json"
+    },
+    {
+      "id": "json/y_number_0e1",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[0e1]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_0e1.json"
+    },
+    {
+      "id": "json/y_number_after_space",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[ 4]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_after_space.json"
+    },
+    {
+      "id": "json/y_number_double_close_to_zero",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-0.000000000000000000000000000000000000000000000000000000000000000000000000000001]\n",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_double_close_to_zero.json"
+    },
+    {
+      "id": "json/y_number_int_with_exp",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[20e1]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_int_with_exp.json"
+    },
+    {
+      "id": "json/y_number_minus_zero",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-0]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_minus_zero.json"
+    },
+    {
+      "id": "json/y_number_negative_int",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-123]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_negative_int.json"
+    },
+    {
+      "id": "json/y_number_negative_one",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-1]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_negative_one.json"
+    },
+    {
+      "id": "json/y_number_negative_zero",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[-0]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_negative_zero.json"
+    },
+    {
+      "id": "json/y_number_real_capital_e",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1E22]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_real_capital_e.json"
+    },
+    {
+      "id": "json/y_number_real_capital_e_neg_exp",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1E-2]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_real_capital_e_neg_exp.json"
+    },
+    {
+      "id": "json/y_number_real_capital_e_pos_exp",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1E+2]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_real_capital_e_pos_exp.json"
+    },
+    {
+      "id": "json/y_number_real_exponent",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[123e45]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_real_exponent.json"
+    },
+    {
+      "id": "json/y_number_real_fraction_exponent",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[123.456e78]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_real_fraction_exponent.json"
+    },
+    {
+      "id": "json/y_number_real_neg_exp",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1e-2]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_real_neg_exp.json"
+    },
+    {
+      "id": "json/y_number_real_pos_exponent",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[1e+2]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_real_pos_exponent.json"
+    },
+    {
+      "id": "json/y_number_simple_int",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[123]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_simple_int.json"
+    },
+    {
+      "id": "json/y_number_simple_real",
+      "scope": "parse",
+      "citation": {
+        "file": "benchmarks/external/rfc8259.txt",
+        "heading": "6.  Numbers",
+        "sentence": "Numeric values that cannot be represented in the grammar below (such as Infinity and NaN) are not permitted.",
+        "url": "https://www.rfc-editor.org/rfc/rfc8259.txt"
+      },
+      "input": "[123.456789]",
+      "expectation": {
+        "verdict": "accept"
+      },
+      "suiteFile": "y_number_simple_real.json"
+    }
+  ]
+}
