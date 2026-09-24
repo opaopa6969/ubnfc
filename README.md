@@ -328,7 +328,7 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   矛盾で未定、3 件は駆動不能（[`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md) §6）。
 - **インクリメンタル解析は無い**。生成物は毎回全文を読み直す 1 回きりの解析器で、
   差分再解析・部分木の再利用は設計にも実装にも無い。
-- **LSP は opt-in の feature**（D-060 / D-063、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
+- **LSP は opt-in の feature**（D-060 / D-062、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
   有効にすると `ubnfc-lsp --emit-lsp` が生成パーサを包む LSP サーバを**別パッケージへ追加**する。
   生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**capability は
   診断 / definition / references / document symbols / semantic tokens / completion / hover と
@@ -340,7 +340,7 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   UBNF 自身（`examples/ubnf-vscode`）の 2 つを `scripts/build-vsix.sh` で組む。
 - `@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
-  `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-063）。
+  `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-062）。
 
 ---
 
