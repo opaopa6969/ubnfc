@@ -7294,6 +7294,444 @@
     },
     "operators": [],
     "profile": "optimized",
+    "scans": [
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2042:2044:body/0/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2042:2044:body/0/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2058:2060:body/2/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2058:2060:body/2/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2131:2159:body/seq",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2131:2159:body/seq"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": []
+      },
+      {
+        "class": {
+          "asciiHigh": 0,
+          "asciiLow": 4294977024,
+          "complete": true,
+          "ranges": []
+        },
+        "exprId": "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
+        "kind": "charClassRepetition",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2131:2159:body/0/repeat"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": false,
+        "ruleIds": []
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2291:2293:body/1/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2291:2293:body/1/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2314:2316:body/2/0/1/0/0/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2314:2316:body/2/0/1/0/0/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2321:2323:body/2/0/1/0/2/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2321:2323:body/2/0/1/0/2/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2342:2344:body/2/0/2/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2342:2344:body/2/0/2/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2423:2425:body/1/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2423:2425:body/1/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2430:2432:body/3/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2430:2432:body/3/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2503:2505:body/1/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2503:2505:body/1/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2523:2525:body/2/0/1/0/0/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2523:2525:body/2/0/1/0/0/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2530:2532:body/2/0/1/0/2/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2530:2532:body/2/0/1/0/2/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2548:2550:body/2/0/2/ruleRef",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2548:2550:body/2/0/2/ruleRef"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Ws"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2617:2625:body/1/0/seq",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2617:2625:body/1/0/seq"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Char",
+          "Json::Escape"
+        ]
+      },
+      {
+        "class": {
+          "asciiHigh": 18446744073441116159,
+          "asciiLow": 18446744052234715136,
+          "complete": false,
+          "ranges": [
+            {
+              "end": 55295,
+              "start": 128
+            },
+            {
+              "end": 1114111,
+              "start": 57344
+            }
+          ]
+        },
+        "exprId": "expr:examples/json/json.ubnf:2617:2625:body/1/0/0/repeat",
+        "kind": "charClassRepetition",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2617:2625:body/1/0/0/repeat"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": false,
+        "ruleIds": []
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2652:2702:body/choice",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2652:2702:body/choice"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Escape"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2776:2856:body/seq",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2776:2856:body/seq"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": []
+      },
+      {
+        "class": {
+          "asciiHigh": 541165879422,
+          "asciiLow": 287948901175001088,
+          "complete": true,
+          "ranges": []
+        },
+        "exprId": "expr:examples/json/json.ubnf:2848:2854:body/1/0/8/1/repeat",
+        "kind": "charClassRepetition",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2848:2854:body/1/0/8/1/repeat"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": false,
+        "ruleIds": []
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:2967:2995:body/0/0/seq",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:2967:2995:body/0/0/seq"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": [
+          "Json::Exp",
+          "Json::Frac",
+          "Json::Int"
+        ]
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:3018:3042:body/choice",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:3018:3042:body/choice"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": []
+      },
+      {
+        "class": {
+          "asciiHigh": 0,
+          "asciiLow": 287948901175001088,
+          "complete": true,
+          "ranges": []
+        },
+        "exprId": "expr:examples/json/json.ubnf:3033:3042:body/1/1/repeat",
+        "kind": "charClassRepetition",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:3033:3042:body/1/1/repeat"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": false,
+        "ruleIds": []
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:3056:3066:body/seq",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:3056:3066:body/seq"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": []
+      },
+      {
+        "class": {
+          "asciiHigh": 0,
+          "asciiLow": 287948901175001088,
+          "complete": true,
+          "ranges": []
+        },
+        "exprId": "expr:examples/json/json.ubnf:3060:3066:body/1/repeat",
+        "kind": "charClassRepetition",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:3060:3066:body/1/repeat"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": false,
+        "ruleIds": []
+      },
+      {
+        "class": null,
+        "exprId": "expr:examples/json/json.ubnf:3080:3122:body/seq",
+        "kind": "terminalSequence",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:3080:3122:body/seq"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": []
+      },
+      {
+        "class": {
+          "asciiHigh": 0,
+          "asciiLow": 287948901175001088,
+          "complete": true,
+          "ranges": []
+        },
+        "exprId": "expr:examples/json/json.ubnf:3116:3122:body/2/repeat",
+        "kind": "charClassRepetition",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:examples/json/json.ubnf:3116:3122:body/2/repeat"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": false,
+        "ruleIds": []
+      }
+    ],
     "triviaCache": {
       "enabled": false,
       "key": [

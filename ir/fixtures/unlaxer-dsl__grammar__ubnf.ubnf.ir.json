@@ -20265,6 +20265,27 @@
       }
     ],
     "profile": "optimized",
+    "scans": [
+      {
+        "class": {
+          "asciiHigh": 0,
+          "asciiLow": 287948901175001088,
+          "complete": true,
+          "ranges": []
+        },
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8169:8178:body/1/repeat",
+        "kind": "charClassRepetition",
+        "proof": {
+          "explanation": "領域は終端だけで構成され、capture site・scope 効果・recovery・Extern token・trivia 挿入・mapping 節点を 1 つも含まない。よって評価が残す観測は「受理したか」と「どこまで消費したか」だけで、1 本の走査が同じ受理と同じカーソルを返す。失敗した解析は D-023 により診断 session が非最適化経路で解析し直すので、主診断 DAG と expected は構成上変わらない。",
+          "exprIds": [
+            "expr:unlaxer-dsl/grammar/ubnf.ubnf:8169:8178:body/1/repeat"
+          ],
+          "kind": "terminalOnlyScan"
+        },
+        "root": true,
+        "ruleIds": []
+      }
+    ],
     "triviaCache": {
       "enabled": false,
       "key": [

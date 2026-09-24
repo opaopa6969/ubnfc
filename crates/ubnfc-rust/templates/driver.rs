@@ -43,6 +43,17 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     let options = required(request, "options")?;
     let lexical = required(options, "lexical")?.boolean()?;
     let scope = required(options, "scope")?.boolean()?;
+    // D-072 の A/B 用の任意キー。`options.scan` があるときは「fast mode で走らせて
+    // 一括走査だけを切り替える」という意味にする（走査は fast mode でしか効かず、
+    // 出現表を要求すると畳まないため、診断と出現表を外して同じ条件で 2 度測る）。
+    // 既定（キーが無い）は従来どおり診断ありで、走査経路には入らない。
+    let scan_ab = match options.get("scan") {
+        Some(value) => Some(value.boolean()?),
+        None => None,
+    };
+    let scan = scan_ab.unwrap_or(true);
+    let diagnostics = scan_ab.is_none();
+    let lexical = lexical && scan_ab.is_none();
     let observations = request.get("observations").unwrap_or(&Json::Null);
     let family = observations.get("family").and_then(|v| v.string().ok());
     let max_depth = match options.get("maxDepth") {
@@ -62,8 +73,9 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             lexical,
             lexical_cache,
             max_depth,
+            scan,
             // driver は成功時も hints（投機的失敗）を出すので、診断を明示的に要求する。
-            diagnostics: true,
+            diagnostics,
             // prefix parse の出現は `lexical` のときだけ観測に出る。`lexical: true` が
             // 出現表の要求を含むので（D-035）、ここで別に要求する必要はない。value span は使わない。
             ..Default::default()
@@ -79,7 +91,8 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             lexical,
             lexical_cache,
             max_depth,
-            diagnostics: true,
+            scan,
+            diagnostics,
             // AST が出たときは必ず texts / nodes / valueSpans を出すので value span を要求する。
             // 出現表は `lexical` のときだけ観測に出る（D-035。`lexical: true` が要求を含む）。
             value_spans: true,
