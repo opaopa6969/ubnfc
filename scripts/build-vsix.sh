@@ -11,7 +11,7 @@
 #
 # 使い方: scripts/build-vsix.sh [--with-dap] [p4|ubnf|all]（既定 all）
 #   --with-dap: DAP（文法デバッガ）も生成し、server の -Pdap で lsp4j.debug を引いて
-#               golden DAP テストも走らせる。付けないと生成物も jar も従来どおり（opt-in、D-064）。
+#               golden DAP テストも走らせる。付けないと生成物も jar も従来どおり（opt-in、D-067）。
 # 環境変数: MVN（既定 mvn）、MAVEN_FLAGS（既定 -o。依存が未取得なら空にする）、SKIP_VSIX=1 で 6 を飛ばす。
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/.." && pwd)
