@@ -151,10 +151,13 @@ ubnfc はこれと直接の比較対象ではないが、旧世代 Rust 生成�
 issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で書き、
 [JSONTestSuite](https://github.com/nst/JSONTestSuite) 318 件と同一入力の速度で突き合わせた結果は:
 
-- **正しさ**: `y_` 95 件は 4 実装すべて受理、`n_` 188 件は ANTLR / tree-sitter が全件拒否、
-  **ubnfc は 185 件**（文字列中の生の制御文字 3 件を受理してしまう。UBNF v2 に
-  「U+0000–U+001F を除く code point 集合」を書く手立てが無いため。文法の書き方の問題ではない）。
-  実装間で判定が割れたのは 318 件中 **5 件だけ**。
+- **正しさ**: `y_` 95 件は 4 実装すべて受理、`n_` 188 件も **4 実装すべて拒否**。
+  初回の測定では ubnfc だけ 185 件だった（文字列中の生の制御文字 3 件を受理していた。UBNF v2 に
+  「U+0000–U+001F を除く code point 集合」を書く手立てが無かったため）が、
+  **v2 に code point クラスを足して解消した**（issue #34 / D-063、
+  [`docs/reports/2026-09-24-v2-codepoint-classes.md`](docs/reports/2026-09-24-v2-codepoint-classes.md)）。
+  いま実装間で判定が割れるのは 318 件中 **2 件だけ**で、どちらも `i_`（実装依存）——
+  先頭 BOM（tree-sitter だけ受理）と 500 重ネスト（issue #35）。
 - **速度（JSON 1 MB、認識のみ）**: ANTLR4 11.2 ms（89.6 MB/s）、tree-sitter 47.3 ms（CST 込み）、
   ubnfc Rust 234.5 ms（4.3 MB/s）。ubnfc は入力が大きいほど µs/byte が悪化し、
   原因は **memo の `defaultSafe` 判定**と特定した（memo を切ると 1 MB が 51 ms・µs/byte が平ら）。
@@ -183,6 +186,13 @@ issue #27。文法は `examples/p4-antlr/TinyExpressionP4.g4` と `examples/p4-t
   **ubnfc Rust 0.0696 ms**、ubnfc Java 0.257 ms、**ANTLR4 645 ms**。
   ANTLR が 4 桁遅いのは P4 の型別の順序つき選択（`Expression ::= NumberExpression | BooleanExpression | …`）で
   ALL(\*) が毎回 LL 全文脈へ落ちるためで、`BooleanExpression` 入口なら同じ parser が 0.99 ms（650 倍速い）。
+- **その 645 ms は文法の書き方の問題だった**（issue #39、報告の「追補」節）。同じ言語を ANTLR の流儀
+  （型別の塔を 1 本の左再帰 `expression` に統合）で書き直すと、**同じ回転の中で 993 ms → 1.83 ms（542 倍）**、
+  LL 全文脈への転落は 12 fixture すべてで **0 回**、SLL だけで 16 fixture 全部が通る。
+  tree-sitter 側も同じ統合で `conflicts` 23 → 1 件、`prec.dynamic` 27 → 0 箇所、`STATE_COUNT` 882 → 307。
+  ただし受理する言語は P4 の**上位集合**になる（`1 + true` が型エラーになり構文エラーでなくなる）し、
+  流儀版でもなお ubnfc Rust の 17 倍・tree-sitter の 52 倍かかる。**「ANTLR が遅い」のではなく
+  「PEG 前提の型別の塔を ALL(\*) にそのまま持ち込むと遅い」**。
 - **scope 解決の代金**: ubnfc は `@scopeTree` / `@declares` / `@backref` を常に実行する。
   その効果を IR から外して生成し直すと認識が 17〜29% 速くなる（確保回数は 10 倍減）。
   ANTLR と tree-sitter はこの仕事を一切していない。
@@ -254,6 +264,7 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
 | 言語中立な token 語彙（36 名前）＋ 明示 `extern` | 実装済み | D-041 / D-042 |
 | パラメータ化ルール `Name<P1,...,Pn>`（規則本体の雛形。resolve 前にその場で展開、`%inline` 方式） | 実装済み | D-043 / D-044 |
 | アノテーションの統廃合（P1 未知注釈警告・P2 `@backref` 分割・P3 `@interleave` 統合・P5 `@predictiveChoice` 非推奨・P7-1/P7-3） | 実装済み。**P7-2 は誤りと判明**（Java にも上限検査があった）。**P4・P6・P7-4 は未着手** | D-045〜D-049。棚卸し全体は `docs/design/07-annotation-inventory.md`（提案 P1〜P7 のうち実装済みの範囲を明記） |
+| code point クラス（`CHAR_RANGE` の境界と `NEGATION` の除外集合の `\uXXXX` / `\u{X…}`、`CHAR_RANGE` の補助面） | 実装済み | D-063 |
 
 意味述語（ANTLR の `{...}?`）は v2 でも**入れない**。終端が「(入力, 位置) の純粋述語」である
 性質に memo・候補除外・字句キャッシュの健全性が乗っているため。文脈依存が要る場面は
@@ -453,7 +464,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `crates/ubnfc-fuzz` | 2 backend の差分ファジング。`findings/` に最小再現 |
 | `crates/ubnfc-selfhost` | 生成 Rust frontend による self-host 経路と固定点テスト。`src/generated/` は生成物を commit |
 | `crates/ubnfc-rt-template` | 両 backend が写す runtime の原本（input / cursor / scope / memo / diag） |
-| `ir/schema`, `ir/fixtures`, `ir/examples` | Grammar IR v1 の JSON Schema、22 の golden IR、解説用の例 |
+| `ir/schema`, `ir/fixtures`, `ir/examples` | Grammar IR v1 の JSON Schema、22 の golden IR、解説用の例（`tinycalc.ir.json` と、v2 の code point クラスを固定する `json-v2.ir.json`） |
 | `corpus/oracle` | 旧実装から採取した独立 oracle 107 ファイル（+ `divergences.json`・採取ツール）。`ubnfc-harness list` の「oracle」107 ファイル / 398 ケース |
 | `corpus/spec` | 規範文書から導いた期待値（UBNF 129 ケース / P4 32 ケース / JSON 283 ケース）。実装の観測値を使わない。`corpus/spec/README.md`、issue #5・#26 |
 | `scanners/` | Extern token の scanner registry（`first-chars.json` と Java / Rust 実装） |
@@ -463,7 +474,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `examples/ubnf-vscode` | UBNF 自身（`ubnf.ubnf`）の VS Code 拡張。同じ経路で組む。`scripts/build-vsix.sh ubnf` |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
 | `examples/json`, `examples/arith` | 同じ言語を `.ubnf` / ANTLR `.g4` / tree-sitter `grammar.js` の 3 記法で書いたもの（JSON = RFC 8259、算術式 = Operators / Power）。外部比較の材料。issue #26 |
-| `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27 |
+| `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27。同じ言語を各ツールの流儀で書き直した `TinyExpressionP4Idiomatic.g4` / `grammar.idiomatic.js` も同じディレクトリ（issue #39） |
 | `benchmarks/` | 速度比較のドライバ。`scripts/prepare-external.sh` 以下が ANTLR4 / tree-sitter との比較、`scripts/p4-external.sh` が P4 での同じ比較（取得はどちらも `scripts/fetch-external-tools.sh`） |
 | `docs/` | 設計・決定・報告。下記 |
 

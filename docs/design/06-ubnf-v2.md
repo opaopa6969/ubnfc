@@ -245,6 +245,78 @@ P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の
   本当の不具合は `@rightAssoc` + 規則参照演算子が `InvalidOperator` で文法ごと落ちること（D-047）。
 - P1〜P3・P5 は**警告を足すだけ**で IR も backend も動かないので 1 本にまとめられる。
 
+## 7. code point クラス — **実装済み（D-063）**
+
+### 問題
+
+RFC 8259 §7 は「文字列の中に生で置ける文字」を「`"` と `\` と U+0000〜U+001F を除く全 Unicode 文字」と
+定める。ANTLR は `~["\\\u0000-\u001F]`、tree-sitter は `/[^"\\\x00-\x1f]/` でそのまま書けるが、
+UBNF v2 には**この集合を書く手立てが無かった**（issue #34、
+[`../reports/2026-09-24-antlr-treesitter-comparison.md`](../reports/2026-09-24-antlr-treesitter-comparison.md) §1.1 A）。
+
+- `NEGATION('…')` の除外集合はリテラルで、リテラルのエスケープは `\n \t \r \\ \'` の 5 つだけ。
+  綴れる制御文字は 3 つしかない。
+- 正の範囲で書くと `CHAR_RANGE` の境界が **Java `char` = BMP 限定**（`E-TOKEN-CHAR-RANGE-SUPPLEMENTARY`）
+  なので、補助面の生文字を落として**受理必須の `y_string_utf8` 等を拒否**してしまう。
+- `REGEX('[^"\\\x00-\x1F]')` は front の正則部分集合パーサが `\x` を拒否する。
+
+そのため `examples/json/json.ubnf` は `token SAFE = NEGATION('"\\')` を採り、**制御文字が通ること**を
+受け入れていた。JSONTestSuite で `n_string_unescaped_{ctrl_char,newline,tab}` の 3 件だけ、
+ANTLR / tree-sitter と判定が割れていた。
+
+### 採った形（v2）
+
+**新しい構成子を足さない。**既存の 2 つに、v2 限定で 2 つのことを許す。
+
+```ubnf
+@ubnf: 2
+token SAFE_SP   = CHAR_RANGE('\u0020','\u0021')        // (a) \uXXXX 境界
+token SAFE_MID  = CHAR_RANGE('\u0023','\u005B')
+token SAFE_BMP  = CHAR_RANGE('\u005D','\u{D7FF}')      // (a) \u{X…} 境界
+token SAFE_SUPP = CHAR_RANGE('\u{E000}','\u{10FFFF}')  // (b) BMP 制限を外す
+token NOT_CTRL  = NEGATION('"\\\u0000\u{7F}')          // (a) 除外集合でも使える
+```
+
+- **(a) エスケープ**: `\uXXXX`（16 進 4 桁ちょうど）と `\u{X…}`（1〜6 桁、U+10FFFF まで）を
+  **code point 1 個**へ展開する。効くのは `CHAR_RANGE` の 2 つの境界と `NEGATION` の除外集合**だけ**。
+  rule 本体のリテラル・`UNTIL` / `CI` / `LOOKAHEAD` / `NEGATIVE_LOOKAHEAD` / `REGEX` は v1 のまま。
+- **(b) 補助面**: `CHAR_RANGE` の境界は U+0000..U+10FFFF の任意の code point 1 個。
+  `E-TOKEN-CHAR-RANGE-SUPPLEMENTARY` は **v1 専用**になった。D-050 の残り 3 条件
+  （展開後にちょうど 1 個・`min <= max`・surrogate を含まない）は v2 でもそのまま。
+- **v1 は門で止める**（`E-TOKEN-ESCAPE-V2-ONLY`）。v1 の `'\u0041'` は「表にないエスケープ」として
+  6 文字に読まれ受理されていたので、黙って意味を変えず**明示的に拒否**する。
+  実在の v1 文法にこの綴りは 1 件も無い。
+- **展開は字句値ではなく原文から**行う。字句は `\\` を 1 個の `\` に畳むので、
+  `'\\u0041'`（バックスラッシュ + `u0041`）と `'\u0041'`（エスケープ）が字句値では同じになってしまう。
+  AST に引用符の内側の原文を持たせ、`crates/ubnfc-front/src/escape.rs` が 1 度だけ走査する。
+  走査規則は v1 と同じで `\u` の枝を足しただけなので、**`\u` を含まない原文では v1 の字句値と
+  1 文字も違わない**（`crates/ubnfc-front/tests/escape.rs`）。
+
+### backend と IR
+
+**どちらも増えない。**両 backend の照合はもともと code point 単位（Rust は `Input::cp_at` の
+UTF-8 1 scalar 復号、Java は `Character.codePointAt` + `Character.charCount`）で、
+`TokenSpec.charRange` は既に `{min,max}` の整数だった。schema の `maximum` を `65535` → `1114111` へ
+**広げた**だけで、既存の IR はすべて有効なまま・v1 golden は 1 byte も動かない。
+
+### 実測
+
+`examples/json/json.ubnf` を 4 本の `CHAR_RANGE` へ書き換えて JSONTestSuite 318 件:
+
+| | `y_` 受理 / 95 | `n_` 拒否 / 188 | ANTLR / tree-sitter との不一致 |
+|---|---:|---:|---|
+| 従来（`NEGATION('"\\')`） | 95 | 185 | 3 件（`n_string_unescaped_*`） |
+| **D-063 後** | **95** | **188** | **0 件** |
+
+残る不一致は `i_`（実装依存）の 2 件だけ——先頭 BOM（tree-sitter だけ受理）と
+500 重ネスト（issue #35）。証拠は
+[`../reports/2026-09-24-v2-codepoint-classes.md`](../reports/2026-09-24-v2-codepoint-classes.md)。
+
+### 残っている宿題
+
+`REGEX` の正則部分集合に `\xHH` / `\uHHHH` / `\u{X…}` とクラス否定（`[^…]`）を足すこと（issue #34 の候補 (c)）。
+`REGEX` の文字列は解析器が生の `\` 列を読むので、前段で展開すると意味が二重になる。別 issue で扱う。
+
 ## 実施順
 
 1. ~~§2 到達不能候補の検出（v1 で警告、低リスク）~~ **完了（D-037）**
@@ -253,4 +325,5 @@ P4-v2 の移行では IR の差が `originalDeclaration` / `reason` / extern の
 4. ~~§5 token 語彙~~ **完了（D-041 / D-042）**
 5. ~~§4 パラメータ化ルール~~ **完了（D-043 / D-044）**
 6. ~~§6 統廃合の P1 / P2 / P3 / P5 と P7-1 / P7-3~~ **完了（D-045 〜 D-049）**
-7. §6 の残り（P4 / P6 / P7-4）
+7. ~~§7 code point クラス~~ **完了（D-063）**
+8. §6 の残り（P4 / P6 / P7-4）

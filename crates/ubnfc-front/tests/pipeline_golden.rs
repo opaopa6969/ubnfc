@@ -189,3 +189,59 @@ fn three_invalid_fixtures_match_validation_text_goldens_and_json_counts() {
         );
     }
 }
+
+/// D-063: この repository の中にある v2 文法の golden。sibling repository に依存しない
+/// 唯一の golden で、code point クラス（`\uXXXX` / `\u{X…}` の境界、補助面）が
+/// IR の `charRange` としてどう落ちるかをここで固定する。
+///
+/// 再生成:
+/// ```sh
+/// cargo run -p ubnfc-front --bin ubnfc -- ir --grammar examples/json/json.ubnf \
+///   --extern-first-chars scanners/first-chars.json --out ir/examples/json-v2.ir.json
+/// ```
+#[test]
+fn the_json_v2_grammar_matches_its_committed_ir_golden() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let golden = root.join("ir/examples/json-v2.ir.json");
+    let expected = std::fs::read(&golden).unwrap_or_else(|e| panic!("{}: {e}", golden.display()));
+    let produced = Command::new(env!("CARGO_BIN_EXE_ubnfc"))
+        .current_dir(root.canonicalize().unwrap())
+        .args(["ir", "--grammar", "examples/json/json.ubnf", "--out", "-"])
+        .args(["--extern-first-chars"])
+        .arg(first_chars())
+        .output()
+        .unwrap();
+    assert!(
+        produced.status.success(),
+        "{}",
+        String::from_utf8_lossy(&produced.stderr)
+    );
+    assert_eq!(
+        produced.stdout, expected,
+        "golden: ir/examples/json-v2.ir.json"
+    );
+    let typed = ir::from_json(std::str::from_utf8(&produced.stdout).unwrap()).unwrap();
+    assert_eq!(typed.language_version, 2);
+    assert!(ir::validate_references(&typed).is_empty());
+    // RFC 8259 §7 の「生で置ける 1 文字」を 4 つの code point 範囲で覆う。
+    let mut ranges: Vec<(u64, u64)> = typed
+        .semantics
+        .tokens
+        .iter()
+        .filter(|t| t.symbol_id.contains("::SAFE_"))
+        .filter_map(|t| match t.spec {
+            ir::TokenSpec::CharRange { min, max } => Some((min, max)),
+            _ => None,
+        })
+        .collect();
+    ranges.sort_unstable();
+    assert_eq!(
+        ranges,
+        vec![
+            (0x20, 0x21),
+            (0x23, 0x5b),
+            (0x5d, 0xd7ff),
+            (0xe000, 0x10ffff)
+        ]
+    );
+}
