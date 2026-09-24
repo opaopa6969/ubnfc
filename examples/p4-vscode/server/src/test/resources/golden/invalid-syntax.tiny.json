@@ -1,0 +1,9 @@
+[
+  {
+    "range": [1, 0, 1, 0],
+    "severity": "Error",
+    "source": "ubnfc",
+    "code": "SinFunction",
+    "message": "構文エラー: ' ' | '$' | '(' | ')' | '*/' | ',' | '.' | '.length' ほか 36 件 を期待しました"
+  }
+]
