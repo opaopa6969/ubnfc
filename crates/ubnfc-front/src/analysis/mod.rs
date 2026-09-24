@@ -16,6 +16,7 @@ mod planning;
 mod reachability;
 mod reentry;
 mod regex;
+mod scan;
 pub use reachability::ChoiceIssue;
 pub(crate) use regex::attach as attach_regex_plans;
 
@@ -274,6 +275,7 @@ pub fn analyze_with_choice_issues(
         choices,
         operators,
         memo,
+        scans: scan::plans(&cx),
         lexical: semantics.tokens.iter().map(regex::plan).collect(),
         trivia_cache: TriviaCache {
             enabled: false,

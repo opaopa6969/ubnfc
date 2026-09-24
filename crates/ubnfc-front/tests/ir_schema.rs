@@ -252,6 +252,8 @@ fn every_definition_and_inline_enum_round_trips_and_rejects_invalid_structure() 
         Rewrite,
         Rule,
         RuleAnalysis,
+        ScanClass,
+        ScanPlan,
         Scc,
         Scope,
         ScopeEffect,
