@@ -43,7 +43,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
     let options = required(request, "options")?;
     let lexical = required(options, "lexical")?.boolean()?;
     let scope = required(options, "scope")?.boolean()?;
-    // D-070 の A/B 用の任意キー。`options.scan` があるときは「fast mode で走らせて
+    // D-072 の A/B 用の任意キー。`options.scan` があるときは「fast mode で走らせて
     // 一括走査だけを切り替える」という意味にする（走査は fast mode でしか効かず、
     // 出現表を要求すると畳まないため、診断と出現表を外して同じ条件で 2 度測る）。
     // 既定（キーが無い）は従来どおり診断ありで、走査経路には入らない。

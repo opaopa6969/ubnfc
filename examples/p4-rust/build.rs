@@ -68,6 +68,14 @@ fn entry_with_scanner(parser: &str) -> String {
         )
         .replacen("let mut scanner=RejectExtern;\n", "", 1)
         .replace("&mut scanner", "&mut *scanner")
+        // issue #35 / D-070: 外部 scanner は状態を持ち得るので thread をまたげない。native
+        // stack 番兵に max_depth より先へ当たったときの専用 thread へのエスカレーションは
+        // この変種では行わない（既知の制約。docs/reports/2026-09-24-runtime-limits.md）。
+        .replacen(
+            "/*STACK_ESCALATION*/parse_entry_escalated(grammar,entry,text,options)/*STACK_ESCALATION*/",
+            "Ok(result)",
+            1,
+        )
 }
 
 /// 行頭 `fn rN_c(` / `fn rN_m(` / `fn eN_c(` / `fn eN_m(` の本体先頭にフックを挿入し、

@@ -183,6 +183,12 @@ public final class Session {
      */
     public static boolean predict = !"false".equals(System.getProperty("ubnfc.predict"));
     /**
+     * D-066（排他 predict の空振り短絡）の無効化スイッチ。既定は有効で、参照経路（元順で全候補を
+     * 試す経路）との差分検証と計測のためだけに false にする（{@code -Dubnfc.exclusive=false}）。
+     * 短絡するのは fast mode（{@code diag=false}）だけなので、公開される観測は両経路で等しい。
+     */
+    public static boolean exclusive = !"false".equals(System.getProperty("ubnfc.exclusive"));
+    /**
      * 除外した候補が記録したはずの観測の静的な再生計画（生成時に畳み込む。emit/Prediction 参照）。
      * allowed は「候補が成功し得る先頭 code point」に trivia 区切りの先頭 code point を足した閉区間列で、
      * 呼出し位置の文字がここに無ければ候補は最初の significant token で失敗し、trivia も 1 文字も進まない。
@@ -264,6 +270,13 @@ public final class Session {
      * 反復下の capture site を読む文法は完全経路だけ）。
      */
     public final boolean tree, diag, occ;
+    /**
+     * issue #35 / D-070: {@link #parse} が {@code DepthLimit} ではなく {@code StackOverflowError}
+     * を捕まえたか（＝ {@code options.maxDepth()} にはまだ達していない、JVM stack がこの呼出しの
+     * 上では小さいだけの失敗）。呼出し側はこれを見て、{@code maxDepth} から見積もった十分な
+     * stack を持つ専用 {@link Thread} で 1 度だけ解析し直すかを決める。
+     */
+    public boolean stackOverflowTripped;
     /**
      * capture の包み（{@link #capture}）が何もしないことが確定する経路。生成側はこの旗が立つとき
      * 包みを飛ばして中身を直に呼ぶ（site を 1 つも公開せず、失敗 hint も記録しないので観測は同じ）。
@@ -355,6 +368,17 @@ public final class Session {
         private static final long serialVersionUID = 1L;
         private DepthLimit() { super(null, null, false, false); }
     }
+    /**
+     * issue #35 / D-070: {@code stackOverflowTripped} を見た呼出し側が、エスカレーション先の
+     * {@link Thread} に確保する stack size（byte）。実測（JSON 入れ子で 1 段あたり約 5.6 KiB、
+     * docs/reports/2026-09-24-runtime-limits.md）に安全率を見て 1 深さ単位 8 KiB とし、
+     * {@code maxDepth} を掛けた上で下限 8 MiB・上限 512 MiB に丸める（Rust 版
+     * {@code crates/ubnfc-rust/templates/runtime.rs} の `escalated_thread_stack_bytes` と対）。
+     */
+    public static long escalatedStackBytes(int maxDepth) {
+        long budget = (long) maxDepth * 8192L + 2L * 1024 * 1024;
+        return Math.max(8L * 1024 * 1024, Math.min(budget, 512L * 1024 * 1024));
+    }
     /** Abort the entire parse: an outer optional/choice must not swallow a resource limit. */
     public Match parse(Call entry, Frame f) {
         long start = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
@@ -363,6 +387,7 @@ public final class Session {
             restore(start); f.c = c0; f.m = m0; f.reset = reset0;
             if (diag) diagnostics = new Diagnostics(Label.count(), 256);
             String reason = limit instanceof StackOverflowError ? "JVM stack limit; maxDepth=" : "maxDepth=";
+            if (limit instanceof StackOverflowError) stackOverflowTripped = true;
             fail(reached, "maximum parse depth exceeded (" + reason + options.maxDepth() + ")");
             return null;
         } finally {
@@ -790,6 +815,24 @@ public final class Session {
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
         f.reset = reset0; return combine(Arrays.asList(matches), start, f.c);
     }
+    /**
+     * D-066（Rust backend の {@code expressions.rs::predict_literals} の Java 版）。front が
+     * {@code exclusiveCandidates} を証明した選択——候補が全て非 nullable・trivia なし・capture なしの
+     * 単一 code point の case-sensitive literal で、先頭文字が EOF 込みで互いに素——は、呼出し位置の
+     * 文字がどの候補の先頭でもない時点で全候補の失敗が確定する。元順で全部呼んでも、各候補は入口の
+     * literal で失敗して 0 文字消費するだけなので、fast mode（{@code diag=false}）がその走行から
+     * 残すのは到達位置 {@code reached} の更新だけで、それは {@link #exclusiveFail} が同じ位置へ入れる。
+     *
+     * <p>短絡してよい条件を「否定先読みの中でない」「記録位置と読み取り位置が一致する
+     * （{@code f.reset || f.c == f.m}）」に限るのは候補除外（{@link Guard}）と同じで、これにより
+     * 候補が literal を読む位置が {@code f.c} に確定する。診断モードは条件を満たさないので従来どおり
+     * 元順で全候補を走らせる（観測は構成上一致）。{@code -Dubnfc.exclusive=false} で参照経路へ戻る。
+     */
+    public boolean exclusiveReady(Frame f) {
+        return exclusive && !diag && !f.invert && (f.reset || f.c == f.m);
+    }
+    /** 排他 predict が外れた選択の失敗。全候補が入口で失敗したときと同じ到達位置だけを残す。 */
+    public Match exclusiveFail(Frame f) { progressAt(f.c); return null; }
     public Match choice(Frame f, Call[] alternatives, boolean longest, boolean[] eligible, boolean fallback) {
         return choice(f, alternatives, longest, eligible, fallback, null);
     }

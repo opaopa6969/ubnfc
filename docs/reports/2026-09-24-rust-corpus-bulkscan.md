@@ -4,11 +4,11 @@ Rust corpus run-all
 
 集計単位は case × variant（文法なし操作列は各1件）。段階失敗後は比較しない。比較に差分がある場合は Fail / Known、差分がなく欠落観測がある場合は未観測、それ以外は Pass。Known/Fail に併存する未観測は JSON の missing と未観測項目表に残す。
 
-Rust generator SHA-256: `da4ba401ad2f1f540a2e6b23bdd25d63495e1d976509b400a64f974c235af118`
+Rust generator SHA-256: `8cb37fba03dd3fdfd0fa438bd41acc09cc7d3aad7c24151cb8018b6a56ba15e4`
 
 front SHA-256: `b1cf181e994f10ae435bf1c4075e5b26ae1e029fd6c3cae1e394c7f495695945`
 
-Rust 一括 cargo build --release --offline --workspace: 130.074 秒。個別切り分け込み: 130.074 秒、cargo 起動 1 回。生成 228 crate、生成物 hash 重複除去後 228 crate、既存 cache hit 0 件。
+Rust 一括 cargo build --release --offline --workspace: 135.665 秒。個別切り分け込み: 135.665 秒、cargo 起動 1 回。生成 228 crate、生成物 hash 重複除去後 228 crate、既存 cache hit 0 件。
 
 JSON の build_failure / builds[].cargo は Rust、javac_failure / builds[].javac は Java の build 段階。表の build 失敗は両者の合計。比較規則は共通で、診断 offset と数値字句は backend ごとの既存 oracle を使う。
 

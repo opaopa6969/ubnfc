@@ -91,7 +91,7 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
         summary.partial,
         summary.rejected
     );
-    // D-070: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+    // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
     assert!(
         summary.scan_comparisons >= 30,
         "走査 A/B が回っていない: {}",
@@ -152,7 +152,7 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
         summary.comparisons,
         summary.driver_errors
     );
-    // D-070: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+    // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
     assert!(
         summary.scan_comparisons >= 20,
         "走査 A/B が回っていない: {}",
@@ -217,7 +217,7 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
         summary.comparisons,
         summary.driver_errors
     );
-    // D-070: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+    // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
     assert!(
         summary.scan_comparisons >= 20,
         "走査 A/B が回っていない: {}",
@@ -287,7 +287,7 @@ fn e_v2_code_point_class_tokens_agree_across_backends() {
             summary.comparisons,
             summary.driver_errors
         );
-        // D-070: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+        // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
         assert!(
             summary.scan_comparisons >= 10,
             "seed {seed}: 走査 A/B が回っていない ({})",

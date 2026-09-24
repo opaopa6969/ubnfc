@@ -140,7 +140,7 @@ impl Engine {
         Ok(built)
     }
 
-    /// D-070 の in-backend A/B。Rust backend だけを `options.scan` 付きで走らせる。
+    /// D-072 の in-backend A/B。Rust backend だけを `options.scan` 付きで走らせる。
     /// driver はこのキーがあるとき fast mode（診断・出現表なし）で解析するので、
     /// 一括走査が効く条件そのもので on / off を比べられる。
     pub fn run_scan(&mut self, built: &Built, inputs: &[String], scan: bool) -> Vec<Value> {

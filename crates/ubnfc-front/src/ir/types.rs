@@ -1121,7 +1121,7 @@ pub struct Plan {
     pub memo: MemoPlan,
     pub operators: Vec<OperatorPlan>,
     pub profile: PlanProfile,
-    /// 一括走査（D-070）。既存キーを変えない追加であり、空のときは出力しない。
+    /// 一括走査（D-072）。既存キーを変えない追加であり、空のときは出力しない。
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub scans: Vec<ScanPlan>,
     pub trivia_cache: TriviaCache,

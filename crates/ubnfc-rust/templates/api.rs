@@ -19,7 +19,7 @@ pub struct ParseOptions {
     /// are tried in declaration order. false is the reference path that evaluates
     /// every alternative from its start; both produce the same result and diagnostics.
     pub factor: bool,
-    /// Bulk scan of terminal-only regions (design v1 §3.4, D-070): a region the front
+    /// Bulk scan of terminal-only regions (design v1 §3.4, D-072): a region the front
     /// proved to be built from terminals alone and to leave no observation behind
     /// (`plan.scans`) is consumed by one generated scanning function instead of walking
     /// the grammar expression by expression. It runs only in fast mode (`diagnostics:
@@ -79,6 +79,15 @@ pub struct ParseOptions {
     pub value_spans: bool,
     pub limits: ResourceLimits,
 }
+/// `ResourceLimits::default()` の `arena_entries`（issue #35 / D-071）。`Session::new` は
+/// `arena_entries` がこの値と**一致するとき**だけ入力長に応じて実効上限を引き上げる
+/// （下の `scaled_default_arena_entries`）。既定と異なる値（`1` や `1 << 30` など）を
+/// 明示した呼出しは常にその値をそのまま使う — 小さい budget をわざと設定して
+/// `arena budget exceeded` を確実に踏ませるテスト（`resource_limits_fail_without_partial_success`）
+/// はこの分岐に入らない。既定と全く同じ値をあえて明示した場合は既定と区別できないので
+/// スケーリングされる（`arena_entries` を固定の 2,000,000 に留めたいだけの目的なら
+/// 別の値、例えば `2_000_001` を使うこと）。
+pub const DEFAULT_ARENA_ENTRIES: usize = 2_000_000;
 /// Per-session hard limits, checked before indexing input or retaining data.
 #[derive(Clone, Copy, Debug)]
 pub struct ResourceLimits {
@@ -94,7 +103,7 @@ impl Default for ResourceLimits {
     fn default() -> Self {
         Self {
             input_bytes: 16 * 1024 * 1024,
-            arena_entries: 2_000_000,
+            arena_entries: DEFAULT_ARENA_ENTRIES,
             diagnostics: 2_000_000,
             memo_entries: 1_000_000,
             effect_entries: 1_000_000,

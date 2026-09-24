@@ -1,6 +1,6 @@
 {
   "backend": "java",
-  "generator_sha256": "cf3fbfc9de770891a5b4b64fcb66534d4405f8755eaf9aa5492a92daa14d30a0",
+  "generator_sha256": "1856298cd1cc4c203b288e4e4cf1216dd45be340b2b14a032d03228c85b38648",
   "front_sha256": "b1cf181e994f10ae435bf1c4075e5b26ae1e029fd6c3cae1e394c7f495695945",
   "jobs": 4,
   "corpus_files": 127,

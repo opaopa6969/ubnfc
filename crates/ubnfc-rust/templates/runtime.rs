@@ -7,6 +7,50 @@ use super::rt::{
     scope::{Checkpoint, ScopeStore},
 };
 
+// issue #35 / D-070: ネイティブスタック番兵と、それに当たったときのエスカレーション先
+// thread のサイズをここへ集める。Rust cannot recover from native stack overflow, so a
+// proactive check must fire before the real stack is exhausted — but the check cannot
+// know the calling thread's actual stack size. 既定呼出し（呼出し元 thread で直接走る）は
+// 保守的な小さい値のままにし（呼出し元が明示的に小さい stack で呼んでも安全）、
+// `max_depth` にまだ達していないのに番兵へ当たったときだけ、`max_depth` から見積もった
+// 十分な stack を持つ専用 thread へ 1 度だけエスカレーションする（`parse_with_options` /
+// `parse_entry_with_options` 側。外部 `TokenScanner` を受け取る `parse_with_scanner` は
+// 任意の状態を持つ scanner を thread 境界へ渡せないので対象外 — 既知の制約として
+// docs/reports/2026-09-24-runtime-limits.md に記録）。
+//
+// 実測（同報告）: JSON 入れ子（typed AST）は深さ単位（`enter_rule` 呼出し）あたり約 568 byte、
+// P4 の括弧入れ子は約 620–750 byte。3 倍前後の安全率を見て 1 深さ単位 2048 byte とする。
+/// 既定呼出し（呼出し元 thread）の番兵。旧来の固定値のまま（呼出し元が 1 MiB 未満の
+/// 明示的に小さい stack で呼んでも安全）。
+pub(crate) const NATIVE_STACK_SENTINEL_BYTES: usize = 256 * 1024;
+/// エスカレーション先 thread が使ってよい native stack の目安（byte）。
+pub(crate) fn escalated_stack_budget(max_depth: usize) -> usize {
+    const BYTES_PER_DEPTH: usize = 2048;
+    max_depth.saturating_mul(BYTES_PER_DEPTH)
+}
+/// エスカレーション先 thread に実際に確保する stack size。番兵の閾値より確実に大きくし
+/// （番兵が実枯渇より先に必ず発火するように）、下限 8 MiB・上限 512 MiB に丸める。
+pub(crate) fn escalated_thread_stack_bytes(max_depth: usize) -> usize {
+    escalated_stack_budget(max_depth)
+        .saturating_add(2 * 1024 * 1024)
+        .clamp(8 * 1024 * 1024, 512 * 1024 * 1024)
+}
+
+// issue #35 / D-071: 既定の `arena_entries`（2,000,000）は 1 MB の入力を typed AST 付きで
+// 解析すると足りない（実測 4.29 entries/byte、docs/reports/2026-09-24-runtime-limits.md）。
+// 明示的に小さい値を設定したテスト・呼出し（`resource_limits_fail_without_partial_success` 等）
+// を壊さないよう、既定値と厳密に一致するときだけ入力長に比例して引き上げる。
+/// 実測の最大（Operators-512 の 9.00 entries/byte）に約 1.8 倍の安全率を見た値。
+const ARENA_ENTRIES_PER_BYTE: usize = 16;
+/// 既定スケーリングの上限（約 2,000,000 byte 入力相当）。それを超える入力は
+/// `arena_entries` を明示するか、`ResourceLimits::default()` 以外の値を選ぶ。
+const ARENA_ENTRIES_CEILING: usize = 32_000_000;
+pub(crate) fn scaled_default_arena_entries(input_bytes: usize) -> usize {
+    DEFAULT_ARENA_ENTRIES
+        .max(input_bytes.saturating_mul(ARENA_ENTRIES_PER_BYTE))
+        .min(ARENA_ENTRIES_CEILING)
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub(crate) struct EventId(pub usize);
 #[derive(Clone, Copy, Debug)]
@@ -232,6 +276,19 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     pub depth: usize,
     stack_anchor: Option<usize>,
     depth_failure: Option<usize>,
+    /// D-070: `depth_failure` が native stack 番兵（`native_stack_budget`）によるものか。
+    /// true なら `options.max_depth` へはまだ達していない失敗で、大きい stack を持つ
+    /// thread へのエスカレーションで通る可能性がある（`enter_rule` は論理上限に先に
+    /// 当たっていれば `limit` を呼ぶ前に `depth_failure` を確定させるので、両方が
+    /// 同時に true になることはない）。
+    depth_failure_is_stack: bool,
+    /// この session が使ってよい native stack の目安（byte）。既定呼出しは
+    /// `NATIVE_STACK_SENTINEL_BYTES`、エスカレーション後の thread は
+    /// `escalated_stack_budget(options.max_depth)`。
+    native_stack_budget: usize,
+    /// D-071: 実効の arena 上限（byte 単位の `arena_entries`）。既定値のときだけ
+    /// `scaled_default_arena_entries` で入力長に応じて引き上げたもの。
+    arena_limit: usize,
     pub resource_failure: Option<(usize, &'static str)>,
     effect_work: usize,
     effect_bytes: usize,
@@ -341,9 +398,20 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         }
     }
 
-    pub fn new(text: &'a str, options: ParseOptions, scanner: &'a mut dyn TokenScanner) -> Self {
+    pub fn new(
+        text: &'a str,
+        options: ParseOptions,
+        scanner: &'a mut dyn TokenScanner,
+        native_stack_budget: usize,
+    ) -> Self {
         let rejected = text.len() > options.limits.input_bytes.min(u32::MAX as usize);
         let text = if rejected { "" } else { text };
+        // D-071: 既定値のときだけ入力長に応じて引き上げる（明示的に設定した値はそのまま使う）。
+        let arena_limit = if options.limits.arena_entries == DEFAULT_ARENA_ENTRIES {
+            scaled_default_arena_entries(text.len())
+        } else {
+            options.limits.arena_entries
+        };
         let arena_capacity = if options.build_ast || options.lexical || HAS_SCOPE || HAS_RECOVERY {
             // P4 実測 約 4.4 event / byte。
             text.len().saturating_mul(5).saturating_add(8).min(32768)
@@ -465,6 +533,9 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             depth: 0,
             stack_anchor: None,
             depth_failure: None,
+            depth_failure_is_stack: false,
+            native_stack_budget,
+            arena_limit,
             resource_failure: rejected.then_some((0, "input byte budget exceeded")),
             effect_work: 0,
             effect_bytes: 0,
@@ -516,11 +587,18 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         let frame = 0u8;
         let address = std::ptr::addr_of!(frame) as usize;
         let anchor = *self.stack_anchor.get_or_insert(address);
-        if self.depth_failure.is_none() && anchor.abs_diff(address) > 256 * 1024 {
+        if self.depth_failure.is_none() && anchor.abs_diff(address) > self.native_stack_budget {
             self.depth_failure = Some(state.consumed.max(state.matched));
+            self.depth_failure_is_stack = true;
         }
         self.depth_failure
             .map(|offset| self.fail(state, offset, "maximum parse depth exceeded"))
+    }
+    /// D-070: 直近の `depth_failure` が native stack 番兵によるものだったか
+    /// （`options.max_depth` にはまだ達していない）。エスカレーション判定に使う。
+    #[inline]
+    pub fn stack_sentinel_tripped(&self) -> bool {
+        self.depth_failure_is_stack
     }
     // 候補除外の失敗再生（§3.4、predict.rs）は rule 入口の検査を行わないので、
     // 再生中に limit / 深さ上限が発火し得る状態では本物の候補関数へ戻す。
@@ -751,7 +829,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         if !self.options.build_ast && !self.options.lexical && !HAS_SCOPE && !HAS_RECOVERY {
             return EventId(0);
         }
-        if self.arena.len() >= self.options.limits.arena_entries.min(u32::MAX as usize) {
+        if self.arena.len() >= self.arena_limit.min(u32::MAX as usize) {
             self.resource_failure
                 .get_or_insert((0, "arena budget exceeded"));
             return EventId(0);

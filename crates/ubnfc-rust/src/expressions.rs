@@ -118,7 +118,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     }
     s.push_str(&g.trivia(&expr.id, BoundaryAt::Entry, None, mode));
     s.push_str(&g.trivia(&expr.id, BoundaryAt::HelperEntry, None, mode));
-    // D-070: 観測を残さない終端領域は 1 本の走査へ畳む（scan.rs）。参照経路は
+    // D-072: 観測を残さない終端領域は 1 本の走査へ畳む（scan.rs）。参照経路は
     // `options.scan` が偽のとき・診断 session・出現表の要求時にそのまま残る。
     let fast = crate::scan::fast_path(g, &g.scans, i, mode);
     if let Some(fast) = &fast {

@@ -41,7 +41,7 @@ runner は生成器を呼ばず、指定済み artifact のコンパイル・実
 - `options.scope`: scope の宣言・参照の採取を有効にする。false なら
   `declarations`/`references` を省略する。いずれも解析する文法を変更しない。
   CLI は両方 true。手書き目標の二文法には scope annotation がないため空列を返す。
-- `options.scan`（任意、Rust 生成 driver のみ）: D-070 の一括走査（`plan.scans`）を
+- `options.scan`（任意、Rust 生成 driver のみ）: D-072 の一括走査（`plan.scans`）を
   切り替える **A/B 用の穴**。このキーがあるときは、走査が効く条件そのもので測るために
   **fast mode** で解析する（`diagnostics: false`、`lexical` は false 扱い）。したがって
   `hints` は「fast mode が失敗して診断モードへ上がったとき」だけ出る。キーが無ければ
