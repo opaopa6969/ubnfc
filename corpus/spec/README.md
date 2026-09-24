@@ -85,7 +85,13 @@
 ```bash
 bash examples/ubnf-crosscheck/scripts/run-spec.sh   # UBNF 4 実装 × 全ケース
 cargo test --offline -p ubnfc-harness --test spec_corpus   # 引用の解決とスキーマ
+
+# JSON の 283 ケース（入力は JSONTestSuite のファイルそのもの＝ケースの input と byte 同一）を
+# ubnfc Rust / ubnfc Java / ANTLR4 / tree-sitter の 4 実装へ流す:
+WORK=$(mktemp -d) benchmarks/scripts/prepare-external.sh
+WORK=$WORK benchmarks/scripts/check-jsontestsuite.sh   # $WORK/check/{verdicts.tsv,summary.md}
 ```
 
 結果は `examples/ubnf-crosscheck/out-spec/report.md`（`evidence/` に実行済みの写しがある）。
 分析は `docs/reports/2026-09-24-spec-derived-oracle.md`。
+JSON の結果と分析は `docs/reports/2026-09-24-antlr-treesitter-comparison.md` §1.1。
