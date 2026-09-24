@@ -68,6 +68,7 @@ public final class Session {
         static int count() { return count; }
         /** Expand ids into sorted distinct hint texts (group members flattened). */
         static List<String> texts(int[] ids) {
+            if (ids.length == 0) return List.of();
             var result = new java.util.TreeSet<String>();
             for (int id : ids) {
                 Label label = REGISTRY.get(texts[id]);
@@ -201,15 +202,33 @@ public final class Session {
         }
     }
     public record Field(String name, String[] sites, String conversion, String cardinality) {}
+    /**
+     * 規則ごとの field 表。名前配列と conversion / cardinality の判定は規則ごとに不変なので、
+     * 生成コードが持つ定数の中で 1 度だけ畳む（rule 呼出しごとに配列を作り直さない）。
+     */
+    public static final class Fields {
+        public static final Fields NONE = new Fields();
+        final Field[] items; final String[] names; final boolean[] nodeLike, list, scalar;
+        public Fields(Field... items) {
+            this.items = items; names = new String[items.length];
+            nodeLike = new boolean[items.length]; list = new boolean[items.length]; scalar = new boolean[items.length];
+            for (int i = 0; i < items.length; i++) {
+                Field field = items[i];
+                names[i] = field.name();
+                nodeLike[i] = field.conversion().equals("node") || field.conversion().equals("mixed");
+                list[i] = field.cardinality().equals("list"); scalar[i] = field.cardinality().equals("scalar");
+            }
+        }
+    }
     public record Effect(String when, String action, String site, String name, String mode) {}
-    private record Memo(Match match, boolean reset, List<TokenScanner.Effect> effects, Diagnostics.Snapshot diagnostics) {}
+    // memo payload は 1 parse あたり数百件になるので record を作らず 4 本の並列配列に置く。
     public final String source;
     public final Input input;
     public final ParseOptions options;
     public final ScopeStore scope = new ScopeStore();
     private Diagnostics diagnostics;
     private final MemoTable memo;
-    private final ArrayList<Memo> payloads = new ArrayList<>();
+    private final Payloads payloads = Payloads.acquire();
     private final ArrayList<TokenScanner.Effect> effects = new ArrayList<>();
     private final String[] ruleNames; private final Label[] ruleParserLabels;
     private int depth;
@@ -225,16 +244,63 @@ public final class Session {
      * {@code twoMode} は生成側が決める文法ごとの可否（@recover を持つ文法や scope 効果が
      * 反復下の capture site を読む文法は完全経路だけ）。
      */
-    public final boolean tree, diag;
+    public final boolean tree, diag, occ;
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false); }
     public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode) {
         this.tree = !twoMode || options.buildAst() || options.lexical() || options.occurrences();
+        this.occ = !twoMode || options.occurrences();
         this.diag = !twoMode || options.diagnostics();
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
-        diagnostics = new Diagnostics(Label.count(), 1024);
+        // diag=false の経路は診断を 1 件も記録しない（書込みは全て diag で囲ってある）ので、
+        // 読み出し専用の空実例を共有する。実例 1 個で 1 parse あたり約 9 KB の確保が消える。
+        diagnostics = diag ? new Diagnostics(Label.count(), 1024) : DISABLED;
         ruleParserLabels = new Label[ruleNames.length];
         // 観測: P4 で 1 文字あたり約 5 entry。成長の再ハッシュを避けつつ上限は固定する。
         memo = new MemoTable(Math.max(1024, Math.min(1 << 20, input.length() * 8)));
+    }
+    /** 診断を要求しない解析が共有する空の診断（書込みは行わない）。 */
+    private static final Diagnostics DISABLED = new Diagnostics(1, 16);
+    /**
+     * memo payload の並列配列。1 parse あたり数百件になるので record を作らず列で持ち、
+     * 大きくなった配列は MemoTable と同じく thread local で次の解析へ持ち越す（中身は持ち越さない）。
+     */
+    private static final class Payloads {
+        private static final ThreadLocal<Payloads> POOL = new ThreadLocal<>();
+        Match[] match; boolean[] reset; List<TokenScanner.Effect>[] effects; Diagnostics.Snapshot[] diagnostics;
+        int count;
+        @SuppressWarnings({"unchecked", "rawtypes"}) private Payloads(int capacity) {
+            match = new Match[capacity]; reset = new boolean[capacity];
+            effects = new List[capacity]; diagnostics = new Diagnostics.Snapshot[capacity];
+        }
+        static Payloads acquire() {
+            Payloads pooled = POOL.get();
+            if (pooled == null) return new Payloads(256);
+            POOL.remove(); return pooled;
+        }
+        int store(Match value, boolean resetFlag, List<TokenScanner.Effect> effect, Diagnostics.Snapshot snapshot) {
+            if (count == match.length) {
+                int n = count * 2;
+                match = Arrays.copyOf(match, n); reset = Arrays.copyOf(reset, n);
+                effects = Arrays.copyOf(effects, n); diagnostics = Arrays.copyOf(diagnostics, n);
+            }
+            int payload = count++;
+            match[payload] = value; reset[payload] = resetFlag; effects[payload] = effect; diagnostics[payload] = snapshot;
+            return payload;
+        }
+        /** 参照を捨てて thread local へ返す。返した後も（小さい配列で）正しく動く。 */
+        void release() {
+            Arrays.fill(match, 0, count, null); Arrays.fill(effects, 0, count, null);
+            Arrays.fill(diagnostics, 0, count, null); count = 0;
+            Payloads pooled = POOL.get();
+            if (pooled == null || pooled.match.length < match.length) {
+                var kept = new Payloads(0);
+                kept.match = match; kept.reset = reset; kept.effects = effects; kept.diagnostics = diagnostics;
+                POOL.set(kept);
+            }
+            var replacement = new Payloads(16);
+            match = replacement.match; reset = replacement.reset;
+            effects = replacement.effects; diagnostics = replacement.diagnostics;
+        }
     }
     private static final class DepthLimit extends RuntimeException {
         private static final long serialVersionUID = 1L;
@@ -246,14 +312,14 @@ public final class Session {
         try { return entry.parse(this, f); }
         catch (DepthLimit | StackOverflowError limit) {
             restore(start); f.c = c0; f.m = m0; f.reset = reset0;
-            diagnostics = new Diagnostics(Label.count(), 256);
+            if (diag) diagnostics = new Diagnostics(Label.count(), 256);
             String reason = limit instanceof StackOverflowError ? "JVM stack limit; maxDepth=" : "maxDepth=";
             fail(reached, "maximum parse depth exceeded (" + reason + options.maxDepth() + ")");
             return null;
         } finally {
             // memo 表と診断 event log はここから先は読まれない（result() は global の集約だけを見る）。
             // 大きな配列を thread local の pool へ返し、次の解析で中身を捨てて使い回す。
-            memo.release(); payloads.clear();
+            memo.release(); payloads.release();
         }
     }
     public int cp(int at) { return at < input.length() ? input.codePointAt(at) : -1; }
@@ -272,12 +338,18 @@ public final class Session {
     private long mark() { return ((long) scope.checkpoint() << 32) | effects.size(); }
     private void restore(long mark) {
         scope.restore((int) (mark >>> 32)); int size = (int) mark;
-        if (effects.size() > size) effects.subList(size, effects.size()).clear();
+        // subList(...).clear() は SubList を 1 個確保する。取消しは 1 parse あたり数千回なので末尾から外す。
+        for (int i = effects.size(); i > size; i--) effects.remove(i - 1);
     }
+    /** memo payload の効果列。{@code List.copyOf(subList)} は SubList と複製の 2 個を作るので配列 1 本にする。 */
     private List<TokenScanner.Effect> effectsSince(long mark) {
-        int size = (int) mark; return effects.size() == size ? List.of() : List.copyOf(effects.subList(size, effects.size()));
+        int size = (int) mark, n = effects.size();
+        if (n == size) return List.of();
+        var copy = new TokenScanner.Effect[n - size];
+        for (int i = 0; i < copy.length; i++) copy[i] = effects.get(size + i);
+        return Arrays.asList(copy);
     }
-    private void replay(List<TokenScanner.Effect> replay) { for (var effect : replay) effect(effect); }
+    private void replay(List<TokenScanner.Effect> replay) { for (int i = 0, n = replay.size(); i < n; i++) effect(replay.get(i)); }
     private void effect(TokenScanner.Effect effect) {
         effects.add(effect);
         switch (effect.action()) {
@@ -292,18 +364,18 @@ public final class Session {
         }
     }
     public Match rule(Frame f, int id, int memoId, boolean successMemo, boolean failureMemo, Call body,
-                      String recipe, String fallback, String recipeKind, Field[] fields, Effect[] scopeEffects, boolean skip, Label[] recoveryHints, boolean rightAssociative, Label[] failureHints) {
+                      String recipe, String fallback, String recipeKind, Fields fields, Effect[] scopeEffects, boolean skip, Label[] recoveryHints, boolean rightAssociative, Label[] failureHints) {
         int c = f.c, m = f.m, state = scope.stateVersion();
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
         boolean cache = options.memo() && (successMemo || failureMemo);
         if (cache) {
             int slot = memo.get(memoId, c, m, mode, state);
             if (slot >= 0) {
-                Memo value = payloads.get(memo.payload(slot));
-                if (diag) diagnostics.merge(value.diagnostics());
-                replay(value.effects());
-                f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = value.reset();
-                return value.match();
+                int payload = memo.payload(slot);
+                if (diag) diagnostics.merge(payloads.diagnostics[payload]);
+                replay(payloads.effects[payload]);
+                f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = payloads.reset[payload];
+                return payloads.match[payload];
             }
         }
         progress(f);
@@ -328,28 +400,36 @@ public final class Session {
             if (!tree) nodes = List.of();
             else if (skipped) nodes = List.of();
             else if (recipe != null && !"transparent".equals(recipeKind) && !"text".equals(recipeKind)) {
-                var names = new String[fields.length]; List<Value>[] lists = Recipe.lists(fields.length);
-                for (int fi = 0; fi < fields.length; fi++) {
-                    Field field = fields[fi];
-                    // 値の付かない field が多数派なので、集める要素が出るまで list を確保しない。
-                    ArrayList<Value> captures = null;
-                    boolean nodeLike = "node".equals(field.conversion()) || "mixed".equals(field.conversion());
-                    boolean list = field.cardinality().equals("list"), scalar = field.cardinality().equals("scalar");
-                    List<Occurrence> local = result.local();
-                    for (int k = 0, n = local.size(); k < n; k++) { Occurrence occurrence = local.get(k); if (!contains(field.sites(), occurrence.site())) continue;
+                Field[] items = fields.items; List<Value>[] lists = Recipe.lists(items.length);
+                List<Occurrence> local = result.local();
+                int localCount = local.size();
+                for (int fi = 0; fi < items.length; fi++) {
+                    String[] sites = items[fi].sites();
+                    boolean nodeLike = fields.nodeLike[fi], list = fields.list[fi], scalar = fields.scalar[fi];
+                    // 1 値しか集まらない field が多数派なので、2 件目が出るまで list を確保しない。
+                    Value single = null; ArrayList<Value> captures = null;
+                    for (int k = 0; k < localCount; k++) { Occurrence occurrence = local.get(k); if (!contains(sites, occurrence.site())) continue;
                         Value v = occurrence.value();
                         if (nodeLike && !scalar && v.elements() != null) {
                             List<Value> elements = v.elements();
-                            if (!elements.isEmpty()) { if (captures == null) captures = new ArrayList<>(); captures.addAll(elements); }
+                            if (elements.isEmpty()) continue;
+                            if (captures == null) { captures = new ArrayList<>(elements.size() + 1); if (single != null) { captures.add(single); single = null; } }
+                            captures.addAll(elements);
                         } else if (nodeLike && list && !v.nodes().isEmpty()) {
-                            if (captures == null) captures = new ArrayList<>();
-                            for (Recipe node : v.nodes()) captures.add(new Value(node.start(), node.end(), List.of(node)));
+                            List<Recipe> children = v.nodes();
+                            if (captures == null && children.size() == 1 && single == null) {
+                                Recipe node = children.getFirst(); single = new Value(node.start(), node.end(), children);
+                                continue;
+                            }
+                            if (captures == null) { captures = new ArrayList<>(children.size() + 1); if (single != null) { captures.add(single); single = null; } }
+                            for (int ni = 0, nn = children.size(); ni < nn; ni++) { Recipe node = children.get(ni); captures.add(new Value(node.start(), node.end(), List.of(node))); }
                         } else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) {
-                            if (captures == null) captures = new ArrayList<>();
-                            captures.add(v);
+                            if (captures != null) captures.add(v);
+                            else if (single == null) single = v;
+                            else { captures = new ArrayList<>(); captures.add(single); captures.add(v); single = null; }
                         }
                     }
-                    names[fi] = field.name(); lists[fi] = captures == null ? List.of() : List.copyOf(captures);
+                    lists[fi] = captures != null ? List.copyOf(captures) : single == null ? List.of() : List.of(single);
                 }
                 int nodeEnd = f.c;
                 if (rightAssociative && nested) {
@@ -357,7 +437,7 @@ public final class Session {
                     for (List<Value> list : lists) for (int k = 0; k < list.size(); k++) max = Math.max(max, list.get(k).end());
                     if (max != Integer.MIN_VALUE) nodeEnd = max;
                 }
-                nodes = List.of(new Recipe(recipe, c, nodeEnd, names, lists, fallback));
+                nodes = List.of(new Recipe(recipe, c, nodeEnd, fields.names, lists, fallback));
             }
             List<Occurrence> completed = result.local();
             for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
@@ -382,8 +462,7 @@ public final class Session {
         boolean store = cache && (result != null ? successMemo : failureMemo);
         var diagnostic = diag ? diagnostics.leaveRule(store) : null;
         if (store) {
-            int payload = payloads.size();
-            payloads.add(new Memo(result, f.reset, effectsSince(mark), diagnostic));
+            int payload = payloads.store(result, f.reset, effectsSince(mark), diagnostic);
             memo.put(memoId, c, m, mode, state, result != null, f.c, f.m, payload);
         }
         return result;
@@ -398,19 +477,18 @@ public final class Session {
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
         int slot = memo.get(id, c, m, mode, state);
         if (slot >= 0) {
-            Memo value = payloads.get(memo.payload(slot));
-            if (diag) diagnostics.merge(value.diagnostics());
-            replay(value.effects());
-            f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = value.reset();
-            return value.match();
+            int payload = memo.payload(slot);
+            if (diag) diagnostics.merge(payloads.diagnostics[payload]);
+            replay(payloads.effects[payload]);
+            f.c = memo.consumedEnd(slot); f.m = memo.matchedEnd(slot); f.reset = payloads.reset[payload];
+            return payloads.match[payload];
         }
         long mark = mark(); if (diag) diagnostics.enterExpression(); progress(f);
         Match result = body.parse(this, f);
         boolean store = result != null ? successMemo : failureMemo;
         var diagnostic = diag ? diagnostics.leaveRule(store) : null;
         if (store) {
-            int payload = payloads.size();
-            payloads.add(new Memo(result, f.reset, effectsSince(mark), diagnostic));
+            int payload = payloads.store(result, f.reset, effectsSince(mark), diagnostic);
             memo.put(id, c, m, mode, state, result != null, f.c, f.m, payload);
         }
         return result;
@@ -426,7 +504,8 @@ public final class Session {
                 effect(new TokenScanner.Effect(definition.action(), definition.name(), result == null ? 0 : input.cpIndex(result.end()), 0, definition.mode())); continue;
             }
             if (result == null) continue;
-            for (Occurrence capture : result.local()) if (capture.site().equals(definition.site())) {
+            List<Occurrence> locals = result.local();
+            for (int li = 0, ln = locals.size(); li < ln; li++) { Occurrence capture = locals.get(li); if (!capture.site().equals(definition.site())) continue;
                 Value v = capture.value();
                 int trimmedStart = v.start(), trimmedEnd = v.end();
                 while (trimmedStart < trimmedEnd && source.charAt(trimmedStart) <= 0x20) trimmedStart++;
@@ -437,7 +516,7 @@ public final class Session {
                     String key = definition.name() == null ? capture.name() : definition.name();
                     // Declarations can belong to an earlier phase; inspect the selected local captures.
                     String target = declared == null ? null : declared.get(key);
-                    for (Occurrence own : result.local()) if (own.name().equals(key)) {
+                    for (int oi = 0; oi < ln; oi++) { Occurrence own = locals.get(oi); if (!own.name().equals(key)) continue;
                         target = source.substring(own.value().start(), own.value().end()).trim(); break;
                     }
                     if (definition.action().equals("declare")) { if (declared == null) declared = new HashMap<>(); declared.put(key, name); }
@@ -463,7 +542,7 @@ public final class Session {
             for (int i = 0; i < scoped.length; i++) if (scoped[i] && !skips[i]) { needed = true; break; }
             if (!needed) return result;
         }
-        if (tree) result = project(result, semanticKind, semanticMany);
+        List<Value> values = tree ? projected(result, semanticKind, semanticMany) : result.values();
         if (quantified && sites.length > 0) {
             var items = new ArrayList<Match>();
             for (Match item : result.items()) {
@@ -480,40 +559,46 @@ public final class Session {
             }
             Match joined = combine(items, result.start(), result.end());
             return new Match(result.nodes(), joined.local(), joined.captures(), result.traces(), result.start(), result.end(),
-                result.mappingFailure(), result.recoveries(), items, result.text(), result.values());
+                result.mappingFailure(), result.recoveries(), items, result.text(), values);
         }
-        Match captured = result;
+        // 出現を site ごとに Match へ包み直すと 1 site につき 1 個の Match を捨てることになる。
+        // nodes / text / values は出現を足しても変わらないので、列だけ足して最後に 1 個だけ作る。
+        List<Occurrence> local = result.local(), captures = result.captures();
         for (int i = 0; i < sites.length; i++) {
-            if (!tree && !scoped[i]) continue;
+            if (!tree && !scoped[i] || skips[i]) continue;
             int start = spanRules[i].equals("matchedExtent") ? m : spanRules[i].equals("selectedChildExtent") ? result.start() : c;
             int end = spanRules[i].equals("matchedExtent") ? f.m : spanRules[i].equals("selectedChildExtent") ? result.end() : f.c;
-            captured = captured(captured, start, Math.max(start, end), sites[i], names[i], skips[i]);
+            var occurrence = new Occurrence(sites[i], names[i], new Value(start, Math.max(start, end), result.nodes(), result.text(), values));
+            local = appended(local, occurrence);
+            if (occ) captures = appended(captures, occurrence);
         }
-        if (!options.lexical()) return captured;
+        if (!options.lexical()) return local == result.local() && values == result.values() ? result
+            : new Match(result.nodes(), local, captures, result.traces(), result.start(), result.end(),
+                result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
         List<Trace> traces = List.of(new Trace(rule, expr, c, f.c, result.traces(), terminal ? source.substring(result.start(), result.end()) : null));
-        return new Match(captured.nodes(), captured.local(), captured.captures(), traces, result.start(), result.end(),
-            result.mappingFailure(), result.recoveries(), result.items(), result.text(), result.values());
+        return new Match(result.nodes(), local, captures, traces, result.start(), result.end(),
+            result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
     }
     private Match captured(Match result, int start, int end, String site, String name, boolean skip) {
         if (skip) return result;
         var occurrence = new Occurrence(site, name, new Value(start, end, result.nodes(), result.text(), result.values()));
         return new Match(result.nodes(), appended(result.local(), occurrence),
-            tree ? appended(result.captures(), occurrence) : result.captures(), result.traces(), result.start(), result.end(),
+            occ ? appended(result.captures(), occurrence) : result.captures(), result.traces(), result.start(), result.end(),
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), result.values());
     }
+    /** {@code List.of(Object[])} は配列をもう一度複製するので、確保済みの配列をそのまま包む。 */
     private static List<Occurrence> appended(List<Occurrence> list, Occurrence occurrence) {
         if (list.isEmpty()) return List.of(occurrence);
-        var copy = new Occurrence[list.size() + 1]; list.toArray(copy); copy[list.size()] = occurrence; return List.of(copy);
+        var copy = new Occurrence[list.size() + 1]; list.toArray(copy); copy[list.size()] = occurrence; return Arrays.asList(copy);
     }
-    private Match project(Match result, String kind, boolean many) {
-        if (kind.equals("text")) return result;
+    /** 意味値の射影。Match を包み直さず値列だけ返し、呼出し側が出現の追加と 1 度にまとめる。 */
+    private static List<Value> projected(Match result, String kind, boolean many) {
+        if (kind.equals("text")) return result.values();
         List<Value> values = result.values();
         if (values == null) values = List.of(new Value(result.start(), result.end(), result.nodes(), result.text()));
         if (kind.equals("mixed") && !many && !values.isEmpty() && allLeaves(values))
             values = List.of(new Value(result.start(), result.end(), List.of(), result.text()));
-        if (values == result.values()) return result;
-        return new Match(result.nodes(), result.local(), result.captures(), result.traces(), result.start(), result.end(),
-            result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
+        return values;
     }
     private static boolean allLeaves(List<Value> values) {
         for (int k = 0, n = values.size(); k < n; k++) if (!values.get(k).nodes().isEmpty()) return false;
@@ -603,8 +688,18 @@ public final class Session {
             if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
             f.reset = reset0; return fast(local, start, f.c);
         }
+        if (children.length == 0) {
+            if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
+            f.reset = reset0; return Match.empty(start, f.c);
+        }
+        // 失敗する連接の多数は最初の子で落ちる（1 parse の 759 件中 503 件）。
+        // 子の配列は最初の子が通ってから確保する。
+        Match head = children[0].parse(this, f);
+        if (head == null) { restore(mark); f.c = c0; f.m = m0; f.reset = reset0; return null; }
+        if (trivia.afterChild != null && trivia.afterChild[0] != null) trivia(f, trivia.afterChild[0]);
         var matches = new Match[children.length];
-        for (int i = 0; i < children.length; i++) {
+        matches[0] = head;
+        for (int i = 1; i < children.length; i++) {
             Match result = children[i].parse(this, f);
             if (result == null) { restore(mark); f.c = c0; f.m = m0; f.reset = reset0; return null; }
             matches[i] = result; if (trivia.afterChild != null && trivia.afterChild[i] != null) trivia(f, trivia.afterChild[i]);
@@ -984,27 +1079,46 @@ public final class Session {
         boolean ok = match != null; String kind = ok ? "none" : "syntax"; int offset = -1;
         if (ok && options.requireFullInput() && f.c != input.length()) { ok = false; kind = "trailing_input"; offset = f.c; }
         if (!ok && offset < 0) offset = diagnostics.farthest() < 0 ? reached : diagnostics.farthest();
-        var captures = new ArrayList<Capture>(); var lexical = new ArrayList<ParseResult.Lexical>();
-        var catalog = new LinkedHashMap<String, List<Capture>>();
+        // 出現表・lexical・catalog・scope event は要求されなければ空のままなので、空なら何も確保しない。
+        List<Capture> captures = List.of(); List<ParseResult.Lexical> lexical = List.of();
+        Map<String, List<Capture>> catalog = Map.of();
         if (ok || match != null && !match.recoveries().isEmpty()) {
-            long occurrence = 0;
-            for (var capture : match.captures()) {
-                var value = new Capture(occurrence, capture.site(), capture.name(), span(capture.value().start(), capture.value().end()), occurrence++, capture.completed);
-                captures.add(value);
-                String context = catalogs.get(capture.site()); if (context != null) catalog.computeIfAbsent(context, key -> new ArrayList<>()).add(value);
+            List<Occurrence> published = match.captures();
+            if (!published.isEmpty()) {
+                var collected = new ArrayList<Capture>(published.size()); captures = collected;
+                LinkedHashMap<String, List<Capture>> byContext = null;
+                long occurrence = 0;
+                for (int i = 0, n = published.size(); i < n; i++) { Occurrence capture = published.get(i);
+                    var value = new Capture(occurrence, capture.site(), capture.name(), span(capture.value().start(), capture.value().end()), occurrence++, capture.completed);
+                    collected.add(value);
+                    String context = catalogs.get(capture.site());
+                    if (context != null) {
+                        if (byContext == null) byContext = new LinkedHashMap<>();
+                        byContext.computeIfAbsent(context, key -> new ArrayList<>()).add(value);
+                    }
+                }
+                if (byContext != null) { byContext.replaceAll((key, values) -> List.copyOf(values)); catalog = byContext; }
             }
-            long[] counter = {0, 0}; for (var trace : match.traces()) trace(trace, -1, counter, lexical);
+            if (!match.traces().isEmpty()) {
+                var collected = new ArrayList<ParseResult.Lexical>(); lexical = collected;
+                long[] counter = {0, 0}; for (var trace : match.traces()) trace(trace, -1, counter, collected);
+            }
         }
-        catalog.replaceAll((key, values) -> List.copyOf(values));
         var farthestExpected = Label.texts(diagnostics.expected());
-        var scopeEvents = new ArrayList<ParseResult.ScopeEvent>();
-        for (var effect : effects) scopeEvents.add(new ParseResult.ScopeEvent(scopeEvents.size(), effect.action(), effect.mode(), effect.name(), effect.offsetCp(), effect.lengthCp()));
+        List<ParseResult.ScopeEvent> scopeEvents = List.of();
+        if (!effects.isEmpty()) {
+            var collected = new ArrayList<ParseResult.ScopeEvent>(effects.size()); scopeEvents = collected;
+            for (int i = 0, n = effects.size(); i < n; i++) { var effect = effects.get(i);
+                collected.add(new ParseResult.ScopeEvent(collected.size(), effect.action(), effect.mode(), effect.name(), effect.offsetCp(), effect.lengthCp())); }
+        }
         var diagnostic = new Diagnostic(kind, offset < 0 ? -1 : input.cpIndex(offset), diagnostics.farthest() < 0 ? kind.equals("trailing_input") ? input.cpIndex(Math.max(diagnostics.reached(), Math.max(f.c, f.m))) : -1 : input.cpIndex(diagnostics.farthest()),
             kind.equals("trailing_input") ? List.of("end of input") : farthestExpected,
             diagnostics.deepestRule() < 0 ? null : ruleNames[diagnostics.deepestRule()],
-            Arrays.stream(diagnostics.ruleStack()).mapToObj(i -> ruleNames[i]).toList(), farthestExpected);
-        var recoveries = new ArrayList<ParseResult.Recovery>();
-        if (match != null) for (RecoveryEvent recovery : match.recoveries()) {
+            ruleNames(diagnostics.ruleStack()), farthestExpected);
+        List<ParseResult.Recovery> recoveryList = List.of();
+        if (match != null && !match.recoveries().isEmpty()) {
+        var recoveries = new ArrayList<ParseResult.Recovery>(match.recoveries().size()); recoveryList = recoveries;
+        for (RecoveryEvent recovery : match.recoveries()) {
             var occurrences = new ArrayList<Long>();
             for (int i = 0; i < match.captures().size(); i++)
                 if (match.captures().get(i).value().nodes().stream().anyMatch(n -> n == recovery.marker())) occurrences.add((long) i);
@@ -1012,11 +1126,18 @@ public final class Session {
                 span(recovery.start(), recovery.mode().equals("SKIP") || recovery.syncStart() < 0 ? recovery.end() : Math.min(recovery.end(), recovery.syncStart())),
                 recovery.syncStart() < 0 ? null : span(recovery.syncStart(), recovery.syncEnd()), occurrences, recovery.diagnostic()));
         }
+        }
         var result = new ParseResult<N>(ok, input.cpIndex(f.c), input.cpIndex(f.m), Optional.empty(), Map.of(), captures, lexical,
-            new ParseResult.Scope(scope.allDeclarations(), scope.references(), scope.diagnostics(), scopeEvents, scope.depth(), resolved()), diagnostic, catalog, recoveries,
+            new ParseResult.Scope(scope.allDeclarations(), scope.references(), scope.diagnostics(), scopeEvents, scope.depth(), resolved()), diagnostic, catalog, recoveryList,
             new ParseResult.Failure(diagnostics.farthest() < 0 ? input.cpIndex(f.c) : input.cpIndex(diagnostics.farthest()),
                 input.cpIndex(diagnostics.farthest() < 0 ? f.c : diagnostics.snapshot().consumed()), input.cpIndex(diagnostics.farthest() < 0 ? f.m : diagnostics.snapshot().matched()), farthestExpected));
         syntax = result; return result;
+    }
+    private List<String> ruleNames(int[] stack) {
+        if (stack.length == 0) return List.of();
+        var names = new String[stack.length];
+        for (int i = 0; i < stack.length; i++) names[i] = ruleNames[stack[i]];
+        return List.of(names);
     }
     private Map<String, ScopeStore.Decl> resolved() {
         var resolved = new LinkedHashMap<String, ScopeStore.Decl>();
@@ -1046,19 +1167,20 @@ public final class Session {
         if (owner.fallback() != null) return new Recipe("#leaf:" + owner.fallback(), value.start(), value.end(), Map.of(), null);
         throw mapping(value.start(), value.end(), "Missing mapped node", null);
     }
-    public <T> T scalar(Recipe recipe, String field, Function<Value, T> conversion) {
-        List<Value> values = recipe.field(field);
+    // field は生成時に確定した添字で引く（名前の線形走査は 1 AST ノードにつき field 数回になる）。
+    public <T> T scalar(Recipe recipe, int index, String field, Function<Value, T> conversion) {
+        List<Value> values = recipe.fieldValues(index);
         if (values.isEmpty()) throw mapping(recipe.start(), recipe.end(), "Missing scalar capture: " + field, null);
         T value = conversion.apply(values.getFirst());
         if (value == null && !values.getFirst().nodes().isEmpty()) throw new RecoveredNodeMissing();
         return value;
     }
-    public <T> Optional<T> optional(Recipe recipe, String field, Function<Value, T> conversion) {
-        List<Value> values = recipe.field(field);
+    public <T> Optional<T> optional(Recipe recipe, int index, String field, Function<Value, T> conversion) {
+        List<Value> values = recipe.fieldValues(index);
         return values.isEmpty() ? Optional.empty() : Optional.ofNullable(conversion.apply(values.getFirst()));
     }
-    public <T> List<T> list(Recipe recipe, String field, Function<Value, T> conversion) {
-        List<Value> values = recipe.field(field);
+    public <T> List<T> list(Recipe recipe, int index, String field, Function<Value, T> conversion) {
+        List<Value> values = recipe.fieldValues(index);
         if (values.isEmpty()) return List.of();
         var result = new ArrayList<T>(values.size());
         for (int k = 0, n = values.size(); k < n; k++) { T converted = conversion.apply(values.get(k)); if (converted != null) result.add(converted); }
