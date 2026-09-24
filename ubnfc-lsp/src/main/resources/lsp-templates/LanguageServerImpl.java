@@ -28,7 +28,7 @@ import __API_PACKAGE__.TokenScanner;
  * __GRAMMAR__ 用に生成された LSP サーバ（段階 2: 診断のみ）。
  *
  * <p>生成パーサは依存ゼロのまま。lsp4j に依存するのはこの薄い包み側だけ
- * （D-059、opt-in feature）。
+ * （D-060、opt-in feature）。
  *
  * <p>増分解析は無い。{@code didOpen} / {@code didChange} のたびに<b>全文を解析し直す</b>。
  * 認識モード（D-023 の二段構え）で解析し、失敗したときだけ生成パーサ自身が診断モードで

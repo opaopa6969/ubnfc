@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * LSP は opt-in の feature（D-059）。「off のときは何も変わらない」を機械で押さえる。
+ * LSP は opt-in の feature（D-060）。「off のときは何も変わらない」を機械で押さえる。
  *
  * <ul>
  *   <li>{@code org.ubnfc.lsp.Main} を同じ出力先へ重ねても、{@code org.ubnfc.java.Main} が書いた

@@ -2,7 +2,7 @@
 <!--
   ubnfc の Maven 集約 pom。既定では ubnfc-java（生成器）だけを組む。
   LSP/DAP は opt-in の feature なので、`-Plsp` を付けたときだけ ubnfc-lsp を reactor に入れる
-  （D-059）。プロファイル無しのビルドは lsp4j を一切引かない。
+  （D-060）。プロファイル無しのビルドは lsp4j を一切引かない。
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

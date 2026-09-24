@@ -1,7 +1,7 @@
 # LSP サーバ生成と VSIX 梱包 — 段階 1（調査）と段階 2（薄い縦切り）
 
 issue #28。ubnfc は「LSP は非ゴール」としてきた（README「インクリメンタル解析・LSP は無い」）。
-ユーザー要望でこれを撤回し、**opt-in の feature** として LSP サーバ生成を足す（D-059）。
+ユーザー要望でこれを撤回し、**opt-in の feature** として LSP サーバ生成を足す（D-060）。
 本報告は段階 1（旧スタックの棚卸しと材料の突き合わせ）と段階 2（診断だけ動く縦切り）。
 段階 3（completion / hover / definition / references）と段階 4（UBNF 自身の VSIX・DAP）は別 PR。
 
@@ -52,7 +52,7 @@ lsp4j は 4 拡張すべて **0.23.1**。`vscode-languageclient` は `^9.0.1`、
 | **signature help** | ○ | 固定シグネチャ文字列 | IR `semantics.rules` の `mappingParams` | 段階 3 以降 |
 | **inlay hints** | ○（P4 のみ） | AST 型 | `astTypes` の `valueType` | 段階 3 以降 |
 | **TextMate 文法** | ○（両方に `syntaxes/*.tmLanguage.json`） | `org.unlaxer.dsl.init.TmLanguageEmitter` が `.ubnf` の literal から**雛形を 1 度だけ**出す（`unlaxer-dsl init`）。通常ビルド（`--generators Parser,AST,...`）では再生成されず、以後は**手書きで維持** | IR の literal 一覧（`expectedDisplay` 390 件が実質そのもの）、token の `TokenSpec` | 生成器が無い。**段階 3 の項目**（雛形だけなら IR から機械的に出せる） |
-| **incremental parsing** | ✕（旧も全文再解析） | — | — | 無い。D-059 で「持たない」と決めた（§6 に実測費用） |
+| **incremental parsing** | ✕（旧も全文再解析） | — | — | 無い。D-060 で「持たない」と決めた（§6 に実測費用） |
 
 ### 2.1 位置変換 — 旧実装の UTF-16 / code point 取り違え
 
@@ -207,7 +207,7 @@ min が信頼できる下限、p90 は騒音込みの上限として読む。
 
 **判断**: 実用的な P4 の式（数百 code point）では打鍵ごとに **0.5 ms 未満**、5,000 code point でも
 **3 ms 程度**で、60 fps の 16 ms 予算に十分収まる。20,000 code point（複製 fixture であり実在の式ではない）で
-ようやく 12〜16 ms に届く。**増分解析は入れない**（D-059）。入れるとしても、その前に
+ようやく 12〜16 ms に届く。**増分解析は入れない**（D-060）。入れるとしても、その前に
 「全文再解析で困る大きさの実文書がある」という証拠が要る。
 
 ---

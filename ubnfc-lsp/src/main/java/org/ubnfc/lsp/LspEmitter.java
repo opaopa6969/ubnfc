@@ -13,7 +13,7 @@ import org.ubnfc.java.ir.GrammarIr;
 import org.ubnfc.java.ir.Validation;
 
 /**
- * Grammar IR から、生成パーサを包む LSP サーバのソースを出す（opt-in feature、D-059）。
+ * Grammar IR から、生成パーサを包む LSP サーバのソースを出す（opt-in feature、D-060）。
  *
  * <p>生成パーサ側には一切手を入れない。出力は {@code --package} で指定した<b>別パッケージ</b>に
  * 追加されるだけなので、この emitter を動かしても

@@ -417,6 +417,11 @@ public final class JavaEmitter {
                 .append("    private static Match ").append(method).append("Body(Session s, Frame f) {\n");
         }
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
+        // 認識専用経路（Match 木も診断も作らない）で capture の包みが恒等になる式は、包みを飛ばして
+        // 中身を直に呼ぶ。到達位置の更新だけ同じ位置で行う（包みの中の progress と同じ）。
+        if (sites.stream().noneMatch(c -> scopeSites().contains(c.siteId()) && !c.skip()))
+            out.append("        if (s.bypassCapture) { Match r = f.matched ? ").append(method).append("M(s, f) : ").append(method)
+                .append("C(s, f); s.progress(f); return r; }\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(kStrings(expr.captureSiteIds())).append(", ").append(kStrings(sites.stream().map(Capture::name).toList())).append(", ").append(kStrings(sites.stream().map(Capture::spanRule).toList()))
             .append(", ").append(constant("boolean[]", "new boolean[]{" + sites.stream().map(c -> c.skip().toString()).collect(Collectors.joining(",")) + "}"))

@@ -6,7 +6,7 @@ import org.ubnfc.java.ir.IrReader;
 
 /**
  * LSP サーバ生成器の入口。LSP/DAP は opt-in なので、<b>明示的に {@code --emit-lsp} を渡したときだけ</b>
- * 何かを出す（D-059）。既定のパーサ生成（{@code org.ubnfc.java.Main}）はこの module を知らない。
+ * 何かを出す（D-060）。既定のパーサ生成（{@code org.ubnfc.java.Main}）はこの module を知らない。
  */
 public final class Main {
     private static final String USAGE = """

@@ -30,7 +30,8 @@ public final class ScopeStore {
     private final List<Decl> declarationView = Collections.unmodifiableList(declarations);
     private final List<Reference> referenceView = Collections.unmodifiableList(references);
     private final List<Diagnostic> diagnosticView = Collections.unmodifiableList(diagnostics);
-    private final ArrayList<Undo> journal = new ArrayList<>();
+    // 1 parse で数百件になるので、既定の 10 から 8 回育て直すのをやめる。
+    private final ArrayList<Undo> journal = new ArrayList<>(64);
     private int stateVersion;
     private int epoch;
 
@@ -140,7 +141,10 @@ public final class ScopeStore {
     }
 
     public void restore(int checkpoint) {
-        if (checkpoint < 0 || checkpoint > journal.size()) {
+        int size = journal.size();
+        // 取消し記録が 1 件も増えていない巻戻しが大多数（P4 complex で 2,070 回中 1,930 回）。
+        if (checkpoint == size) return;
+        if (checkpoint < 0 || checkpoint > size) {
             throw new IllegalArgumentException("Checkpoint is outside the current undo history");
         }
         while (journal.size() > checkpoint) {
