@@ -10,8 +10,9 @@ ANTLR 版とまとめて 1 つだけ置いてある。** ここには tree-sitte
 | ファイル | 中身 |
 |---|---|
 | `grammar.js` | 文法本体（119 規則 1:1、塔の統合なし） |
+| `grammar.idiomatic.js` | 塔を 1 本の `expression` に統合した版（issue #39）。`../p4-antlr/README.md` の「ANTLR / tree-sitter 流に書き直した版」を参照 |
 | `tree-sitter.json` | CLI 用の metadata（これが無いと ABI 14 で生成される） |
-| `driver.c` | 受理・速度計測の driver |
+| `driver.c` | 受理・速度計測の driver（両方の文法で共用） |
 
 生成物（`src/parser.c` など）は commit しない。
 
@@ -106,3 +107,27 @@ GLR は複数の解析が同時に成功しうる。P4 の候補順（先頭が�
 tree-sitter に「認識のみ」は無い。`ts_parser_parse` は必ず CST を作る。
 driver の `recognition(CST)` は parse + `ts_node_has_error` + 解放、`tree(CST+walk)` は
 そこに全 node の深さ優先走査を足したもの。**どちらも CST 構築を含む**。
+
+## 流儀で書き直した版（`grammar.idiomatic.js`、#39）
+
+型別の塔を 1 本の `expression`（`prec.left` の梯子）に統合したもの。
+入口は `P4_TS_ENTRY=Formula`（既定）/ `Expression`。
+受理・拒否は 16 fixture・拒否入力 10 件とも `grammar.js` と完全に一致し、
+P4 が型で拒否する 14 件を追加で受理する（上位集合。一覧は `../p4-antlr/README.md`）。
+
+| | `grammar.js`（1:1） | `grammar.idiomatic.js`（流儀） |
+|---|---:|---:|
+| `conflicts` | 23 件 | **1 件**（`Formula` 入口のみ。`Expression` 入口は 0） |
+| `prec.dynamic` | 27 箇所 / 7 規則 | **0 箇所** |
+| `STATE_COUNT`（Formula / 第 2 入口） | 882 / 654 | **307 / 183** |
+| `LARGE_STATE_COUNT` | 103 / 84 | 3 / 2 |
+| `SYMBOL_COUNT` | 238 / 194 | 154 / 122 |
+| `TOKEN_COUNT` | 106 / 94 | 106 / 94 |
+| `src/parser.c` | 1,018,051 / 748,372 byte | **356,765 / 223,062 byte** |
+| `LANGUAGE_VERSION` | 15 | 15 |
+| `EXTERNAL_TOKEN_COUNT` | 0 | 0 |
+
+残る 1 件の conflict は型と無関係で、`Formula` 入口で `$a string` が
+「型キーワード付きの `variable_ref`」か「`variable_ref` の次に返り値型 `string` の
+`method_declaration` が始まる」かが決まらないというもの。`grammar.js` も
+`Formula` 入口でだけ同じ `[$.variable_ref]` を要求する。

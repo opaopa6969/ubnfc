@@ -1,0 +1,23 @@
+# ANTLR 流
+fixture	bytes	entry	antlr_ok	sll_sufficed	detail
+trailing-plus	4	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+double-star	7	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+unclosed-paren	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+unclosed-paren-mul	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+empty	0	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-atom	5	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-bool	5	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-xor	5	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-concat	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+var-decl	19	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+# tree-sitter 流
+trailing-plus	4	false	10
+double-star	7	false	13
+unclosed-paren	6	false	14
+unclosed-paren-mul	6	false	14
+empty	0	false	1
+bad-atom	5	false	9
+bad-bool	5	false	10
+bad-xor	5	false	10
+bad-concat	6	false	9
+var-decl	19	false	20

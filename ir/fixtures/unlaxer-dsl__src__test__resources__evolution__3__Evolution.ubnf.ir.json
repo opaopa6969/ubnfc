@@ -1672,18 +1672,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/3/Evolution.ubnf:367:373:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:unlaxer-dsl/src/test/resources/evolution/3/Evolution.ubnf:367:373:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/3/Evolution.ubnf:367:373:body/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:unlaxer-dsl/src/test/resources/evolution/3/Evolution.ubnf:367:373:body/seq",
               "expr:unlaxer-dsl/src/test/resources/evolution/3/Evolution.ubnf:367:373:body/0/tokenRef"

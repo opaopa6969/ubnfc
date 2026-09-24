@@ -90,10 +90,11 @@ fn round2_generated_contracts_and_m3() {
         "grammar G { @root Root ::= 'a' 'b' 'x'; }".into(),
     ));
     // memo の資源上限は「memo が付く文法」でしか踏めない（D-058 で rule ごとに決まるようになった）。
-    // 2 候補が同じ位置から A を試すので A は再入し得る＝ memo が残る。
+    // 2 候補が同じ位置から A を試すので A は再入し得る。さらに D-065 で「本体が終端走査だけ」の
+    // 規則は memo を入れなくなったので、A の本体は別の規則を呼ぶ形にしてある。
     sources.push((
         "memo_budget".into(),
-        "grammar G { @root Root ::= ( A 'b' ) | ( A 'c' ); A ::= 'a'; }".into(),
+        "grammar G { @root Root ::= ( A 'b' ) | ( A 'c' ); A ::= B; B ::= 'a'; }".into(),
     ));
     for (name, field, body) in [
         ("scalar", "item", "Stmt @item"),
