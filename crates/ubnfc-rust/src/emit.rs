@@ -24,6 +24,9 @@ pub(crate) struct Generator<'a> {
     pub guards: BTreeSet<(usize, bool)>,
     /// 統合 DFA に入れる literal 終端と、その id（lexical.rs）。
     pub lexicon: crate::lexical::Lexicon,
+    /// D-067: 観測を残さない終端領域の走査計画と、その走査関数の生成結果。
+    pub scans: crate::scan::Scans,
+    pub scan_source: String,
 }
 impl<'a> Generator<'a> {
     pub fn new(ir: &'a GrammarIr) -> Self {
@@ -68,6 +71,8 @@ impl<'a> Generator<'a> {
             },
             guards: BTreeSet::new(),
             lexicon: crate::lexical::Lexicon::new(ir),
+            scans: crate::scan::Scans::empty(),
+            scan_source: String::new(),
         };
         g.bodies = ir
             .semantics
@@ -138,6 +143,9 @@ impl<'a> Generator<'a> {
             }
         }
         g.guards = pending.into_iter().collect();
+        let mut scans = crate::scan::Scans::new(&g);
+        g.scan_source = crate::scan::generate(&g, &mut scans);
+        g.scans = scans;
         g
     }
     fn visit(&mut self, i: usize, mode: bool) {
@@ -318,6 +326,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         .unwrap();
     }
     p.push_str("_=>return Err(\"unsupported grammar or entry\"),})}\npub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {\nlet mut scanner=RejectExtern;\nif options.diagnostics {let mut parser=Session::<true>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nreturn Ok(parser.finish(step));}\nlet mut parser=Session::<false>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nlet (result,escalate)=parser.finish_checked(step);\nif !escalate {return Ok(result);}\nlet options=ParseOptions{diagnostics:true,..options};\nlet mut parser=Session::<true>::new(text,options,&mut scanner);\nlet step=entry_step(&mut parser,grammar,entry)?;\nOk(parser.finish(step))}\nimpl<const DIAG: bool> Session<'_, DIAG> {\n");
+    p.push_str(&g.scan_source);
     for (i, rule) in ir.semantics.rules.iter().enumerate() {
         for mode in [false, true] {
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {

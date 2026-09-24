@@ -118,6 +118,12 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     }
     s.push_str(&g.trivia(&expr.id, BoundaryAt::Entry, None, mode));
     s.push_str(&g.trivia(&expr.id, BoundaryAt::HelperEntry, None, mode));
+    // D-067: 観測を残さない終端領域は 1 本の走査へ畳む（scan.rs）。参照経路は
+    // `options.scan` が偽のとき・診断 session・出現表の要求時にそのまま残る。
+    let fast = crate::scan::fast_path(g, &g.scans, i, mode);
+    if let Some(fast) = &fast {
+        s.push_str(fast);
+    }
     match &expr.node {
         ExprNode::Seq { items } => {
             for (index, child) in items.iter().enumerate() {
@@ -308,6 +314,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
                 s.push_str("self.display_leave();out.ok=child.ok;out.diag=child.diag;out.events=EventId(0);out.state=if child.ok {state.commit(child.state)} else {state};\n");
             }
         }
+    }
+    if fast.is_some() {
+        s.push_str("}\n");
     }
     if matches!(
         expr.node,

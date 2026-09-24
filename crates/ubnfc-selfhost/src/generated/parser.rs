@@ -98,6 +98,21 @@ let mut parser=Session::<true>::new(text,options,&mut scanner);
 let step=entry_step(&mut parser,grammar,entry)?;
 Ok(parser.finish(step))}
 impl<const DIAG: bool> Session<'_, DIAG> {
+/// D-067: 観測を残さない終端領域の走査。消費 byte 数を返す。
+#[allow(unused_mut)]
+fn s292(&self,mut p:usize)->Option<usize> {
+let start=p;
+let bytes=self.text.as_bytes();while let Some(&b)=bytes.get(p) {
+if b<0x80 {if (if b<64 {0x3ff000000000000u64>>b} else {0x0u64>>(b-64)})&1==0 {break;}p+=1;}
+else {let Some((c,n))=self.input.cp_at(p) else {break;};if !{let cp=c as u32;if cp<64 {(0x3ff000000000000u64>>cp)&1!=0} else if cp<128 {(0x0u64>>(cp-64))&1!=0} else {false}} {break;}p+=n;}
+}
+Some(p-start)
+}
+/// D-067: 観測を残さない終端領域の走査。消費 byte 数を返す。
+#[allow(unused_mut)]
+fn s293(&self,mut p:usize)->Option<usize> {
+match self.input.cp_at(p) {Some((c,n)) if {c.is_ascii_digit()}=>Some(n),_=>None}
+}
 fn r0_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e0_c(state);
 if out.ok {
@@ -5047,6 +5062,13 @@ out
 fn b292_c(&mut self,mut state:State)->Step {
 let mut out=Step::yes(state);
 out.state=state.begin();
+if self.options.scan && !DIAG && !self.options.lexical && !self.options.occurrences && !out.state.invert {
+let start=out.state.consumed;
+match self.s292(start) {
+Some(n)=>{out.state.advance::<false>(n);if n>0 {out.events=self.event(Event::Token{text_span:None,content_span:None,expr:usize::MAX,rule:usize::MAX,span:[start,start+n]});}}
+None=>{out.ok=false;out.state=state;out.diag=self.diag_fail(start,"expression");}
+}
+} else {
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
 let mut child=self.e293_c(out.state);out.diag=self.diag_join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
 out.events=self.join(out.events,child.events);count+=1;
@@ -5054,6 +5076,7 @@ if before.position::<false>()==out.state.position::<false>() {break;}
 }
 let _=count;
 if false {out.ok=false;out.state=state;let d=self.diag_fail(state.position::<false>(),"expression");out.diag=self.diag_join(out.diag,d);}
+}
 out.state=if out.ok {state.commit(out.state)} else {state};
 out
 }

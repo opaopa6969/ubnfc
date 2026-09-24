@@ -234,6 +234,36 @@ tree-sitter と typed AST の列、算術式（§1.3）、正しさ（§1.1）�
 
 ---
 
+## 1.5 2026-09-24 追記 — issue #48 後の JSON（**§1.2 / §1.4 の数字は上の表のまま**）
+
+issue [#48](https://github.com/opaopa6969/ubnfc/issues/48)（[`2026-09-24-bulk-scan.md`](2026-09-24-bulk-scan.md)）で
+§1.4 が指摘した「残差は回数」を減らした。front が「終端だけでできていて観測を 1 つも要求しない領域」を
+証明して `plan.scans` に載せ、backend がそこを parser の機構（Step / 事象 / 診断 / mark / transaction /
+memo）を通さない 1 本の走査へ畳む（D-067）。以下は別セッションの測り直しで、
+`benchmarks/scripts/run-external.sh json` が入力ごとに 4 実装を交互に回したもの。
+`taskset -c 30`、7 run、load average 開始 21.16 / 18.91 / 21.08 → 終了 14.55 / 16.99 / 19.97。
+生データは [`examples/json/evidence/speed-scan-48-external.csv`](../../examples/json/evidence/speed-scan-48-external.csv)。
+
+### µs/byte（中央値 / 最小値）— 認識のみ
+
+| 実装 | 1 KB | 10 KB | 100 KB | 1 MB |
+|---|---:|---:|---:|---:|
+| ANTLR4 | 0.0170 / 0.0127 | 0.0228 / 0.0154 | 0.0136 / 0.0122 | 0.0162 / 0.0113 |
+| tree-sitter（CST 構築。認識だけにはできない） | 0.0447 / 0.0378 | 0.0468 / 0.0376 | 0.0401 / 0.0376 | 0.0601 / 0.0503 |
+| **ubnfc Rust（issue #48）** | **0.0155 / 0.0134** | **0.0151 / 0.0139** | **0.0171 / 0.0160** | **0.0174 / 0.0153** |
+| ubnfc Rust（issue #33 = PR #46） | 0.0291 | 0.0309 | 0.0316 | 0.0305 |
+| ubnfc Java（走査は未実装。issue #49） | 0.1373 / 0.0970 | 0.0723 / 0.0650 | 0.0824 / 0.0667 | 0.0650 / 0.0568 |
+
+**ANTLR4 比は 2.7 倍 → 1.35 倍（1 MB 最小値）/ 1.08 倍（中央値）**で、
+issue #33 から掲げていた「ANTLR の 2 倍以内」を満たした。10 KB では ubnfc のほうが速い。
+**tree-sitter の CST 構築に対しては 3.3 倍速い**（作る物が違うので §5 の注意を読むこと）。
+
+typed AST（`@mapping` の record 木）は 1 MB 最小 174.9 ms で、ANTLR4 の parse tree + walk 26.7 ms に対し
+**6.5 倍残る**。支配的なのは事象 arena と mapping の確保（1 parse 490 MB）で、認識側の話ではない（別 issue）。
+正しさ（§1.1）と算術式（§1.3）はこの変更で動かない。
+
+---
+
 ## 2. ツールと版
 
 | もの | 版 | 取得元 |

@@ -878,6 +878,25 @@ impl<'a> Validator<'a> {
             self.exprs(&operator.boundary_expr_ids, &format!("{p}/boundaryExprIds"));
             self.optional_proof(&operator.proof, &format!("{p}/proof"));
         }
+        for (i, scan) in ir.plan.scans.iter().enumerate() {
+            let p = format!("/plan/scans/{i}");
+            self.check("expression", scan.expr_id.as_str(), &format!("{p}/exprId"));
+            self.refs("rule", &scan.rule_ids, &format!("{p}/ruleIds"));
+            self.proof(&scan.proof, &format!("{p}/proof"));
+            if let Some(class) = &scan.class {
+                let ranges = &class.ranges;
+                if ranges
+                    .iter()
+                    .any(|r| r.start > r.end || r.end > 0x10ffff || r.start < 128)
+                    || ranges.windows(2).any(|w| w[0].end >= w[1].start)
+                {
+                    self.error(
+                        &format!("{p}/class/ranges"),
+                        "ranges must be non-ASCII, valid, non-overlapping and ascending",
+                    );
+                }
+            }
+        }
         for (i, lexical) in ir.plan.lexical.iter().enumerate() {
             let p = format!("/plan/lexical/{i}");
             self.check("token", &lexical.token_id, &format!("{p}/tokenId"));
