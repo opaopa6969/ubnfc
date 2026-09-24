@@ -2,7 +2,6 @@ package org.ubnfc.p4.lsp;
 
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +26,6 @@ import org.ubnfc.p4.P4Scanners;
 final class ScriptedClient implements AutoCloseable {
     private final LanguageServer proxy;
     private final Collector collector = new Collector();
-    private final List<Thread> owned = new ArrayList<>();
 
     static final class Collector implements LanguageClient {
         private final Map<String, CompletableFuture<List<Diagnostic>>> pending = new java.util.concurrent.ConcurrentHashMap<>();
@@ -74,6 +72,5 @@ final class ScriptedClient implements AutoCloseable {
     @Override public void close() throws Exception {
         proxy.shutdown().get(30, TimeUnit.SECONDS);
         proxy.exit();
-        for (Thread thread : owned) thread.interrupt();
     }
 }
