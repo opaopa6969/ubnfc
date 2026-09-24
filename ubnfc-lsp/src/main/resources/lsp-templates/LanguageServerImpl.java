@@ -1,39 +1,55 @@
 package __PACKAGE__;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
+import org.eclipse.lsp4j.CompletionOptions;
+import org.eclipse.lsp4j.CompletionParams;
+import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
+import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.DocumentSymbolParams;
+import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.ReferenceParams;
+import org.eclipse.lsp4j.SemanticTokensParams;
+import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.ServerInfo;
+import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import __API_PACKAGE__.ParseOptions;
-import __API_PACKAGE__.ParseResult;
 import __API_PACKAGE__.TokenScanner;
 
 /**
- * __GRAMMAR__ 用に生成された LSP サーバ（段階 2: 診断のみ）。
+ * __GRAMMAR__ 用に生成された LSP サーバ（段階 3）。
  *
- * <p>生成パーサは依存ゼロのまま。lsp4j に依存するのはこの薄い包み側だけ
- * （D-060、opt-in feature）。
+ * <p>提供するもの: 診断（構文・scope・前半 scope）/ definition / references / document symbols /
+ * semantic tokens / completion / hover。DAP と増分解析は入っていない（D-060 / 段階 4）。
+ *
+ * <p>生成パーサは依存ゼロのまま。lsp4j に依存するのはこの薄い包み側だけ（opt-in feature）。
  *
  * <p>増分解析は無い。{@code didOpen} / {@code didChange} のたびに<b>全文を解析し直す</b>。
  * 認識モード（D-023 の二段構え）で解析し、失敗したときだけ生成パーサ自身が診断モードで
- * 決定的に再解析する。成功する文書では診断観測を一切作らないので、打鍵ごとの費用は
- * 認識だけの費用になる。
+ * 決定的に再解析する。lexical（semantic tokens 用）は要求されたときだけ解析し直す。
  */
 public final class LanguageServerImpl implements LanguageServer, LanguageClientAware,
         TextDocumentService, WorkspaceService {
@@ -63,16 +79,22 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
         }
     }
 
-    /** 診断を要求しない認識モード。失敗したら生成パーサが診断モードで解析し直す（D-023）。 */
-    public ParseOptions options() {
-        return new ParseOptions(false, true, false, true, scanners, ParseOptions.DEFAULT_MAX_DEPTH, false, false);
-    }
-
     @Override public void connect(LanguageClient client) { this.client = client; }
 
     @Override public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
         var capabilities = new ServerCapabilities();
         capabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
+        capabilities.setDefinitionProvider(true);
+        capabilities.setReferencesProvider(true);
+        capabilities.setDocumentSymbolProvider(true);
+        capabilities.setHoverProvider(true);
+        var completion = new CompletionOptions();
+        completion.setResolveProvider(false);
+        capabilities.setCompletionProvider(completion);
+        var semantic = new SemanticTokensWithRegistrationOptions(SemanticTokens.legend());
+        semantic.setFull(true);
+        semantic.setRange(false);
+        capabilities.setSemanticTokensProvider(semantic);
         var result = new InitializeResult(capabilities);
         result.setServerInfo(new ServerInfo("__SERVER_NAME__", "__SERVER_VERSION__"));
         return CompletableFuture.completedFuture(result);
@@ -110,25 +132,97 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     @Override public void didChangeWatchedFiles(DidChangeWatchedFilesParams params) { }
 
-    /** 1 文書を全文解析して診断を publish する。テストからも直接呼べるように公開している。 */
-    public List<org.eclipse.lsp4j.Diagnostic> analyze(String uri, String text) {
-        ParseResult<?> result;
-        try {
-            result = __PARSER_CLASS__.parseEntry(GRAMMAR, ENTRY, text, options());
-        } catch (RuntimeException error) {
-            var positions = new Positions(text);
-            var diagnostic = new org.eclipse.lsp4j.Diagnostic(positions.rangeOf(0, 0),
-                "解析器の内部エラー: " + error);
-            diagnostic.setSeverity(org.eclipse.lsp4j.DiagnosticSeverity.Error);
-            diagnostic.setSource(Diagnostics.SOURCE);
-            return List.of(diagnostic);
+    // ---- capability -------------------------------------------------------
+
+    @Override public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
+            definition(DefinitionParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        var out = new ArrayList<Location>();
+        if (analysis != null) {
+            var symbols = analysis.symbols();
+            var symbol = symbols.at(analysis.positions().offsetOf(params.getPosition()));
+            if (symbol != null)
+                for (var declaration : symbols.declarationsOf(symbol.name()))
+                    out.add(new Location(analysis.uri(),
+                        analysis.positions().rangeOf(declaration.offsetCp(), declaration.endCp())));
         }
-        return Diagnostics.of(uri, text, result);
+        return CompletableFuture.completedFuture(Either.forLeft(out));
+    }
+
+    @Override public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        var out = new ArrayList<Location>();
+        if (analysis != null) {
+            var symbols = analysis.symbols();
+            var symbol = symbols.at(analysis.positions().offsetOf(params.getPosition()));
+            if (symbol != null) {
+                boolean includeDeclaration = params.getContext() != null && params.getContext().isIncludeDeclaration();
+                for (var found : symbols.named(symbol.name()))
+                    if (!found.declaration() || includeDeclaration)
+                        out.add(new Location(analysis.uri(),
+                            analysis.positions().rangeOf(found.offsetCp(), found.endCp())));
+            }
+        }
+        return CompletableFuture.completedFuture(out);
+    }
+
+    @Override public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>>
+            documentSymbol(DocumentSymbolParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        var out = new ArrayList<Either<SymbolInformation, DocumentSymbol>>();
+        if (analysis != null)
+            for (var node : analysis.symbols().documentSymbols())
+                out.add(Either.forRight(symbol(analysis, node)));
+        return CompletableFuture.completedFuture(out);
+    }
+
+    private static DocumentSymbol symbol(Analysis analysis, Symbols.Node node) {
+        var positions = analysis.positions();
+        var children = new ArrayList<DocumentSymbol>();
+        for (var child : node.children()) children.add(symbol(analysis, child));
+        var result = new DocumentSymbol(node.name(),
+            node.container() ? SymbolKind.Namespace : SymbolKind.Variable,
+            positions.rangeOf(node.startCp(), node.endCp()),
+            positions.rangeOf(node.nameStartCp(), node.nameStartCp() + node.nameLengthCp()));
+        result.setDetail(node.detail());
+        if (!children.isEmpty()) result.setChildren(children);
+        return result;
+    }
+
+    @Override public CompletableFuture<org.eclipse.lsp4j.Hover> hover(HoverParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        return CompletableFuture.completedFuture(analysis == null ? null : Hovers.at(analysis, params.getPosition()));
+    }
+
+    @Override public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        List<CompletionItem> items = analysis == null ? List.of()
+            : Completion.at(analysis, params.getPosition(), scanners);
+        return CompletableFuture.completedFuture(Either.forLeft(items));
+    }
+
+    @Override public CompletableFuture<org.eclipse.lsp4j.SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        List<Integer> data = analysis == null ? List.of() : SemanticTokens.data(analysis);
+        return CompletableFuture.completedFuture(new org.eclipse.lsp4j.SemanticTokens(data));
+    }
+
+    // ---- 解析 --------------------------------------------------------------
+
+    /** 1 文書を全文解析して診断を返す。テストからも直接呼べるように公開している。 */
+    public List<org.eclipse.lsp4j.Diagnostic> analyze(String uri, String text) {
+        return Diagnostics.of(analysis(uri, text));
+    }
+
+    /** 1 文書を解析して覚える。 */
+    public Analysis analysis(String uri, String text) {
+        var analysis = Analysis.of(uri, text, scanners);
+        documents.put(uri, analysis);
+        return analysis;
     }
 
     private void update(String uri, String text) {
-        documents.put(uri, text);
-        publish(uri, analyze(uri, text));
+        publish(uri, Diagnostics.of(analysis(uri, text)));
     }
 
     private void publish(String uri, List<org.eclipse.lsp4j.Diagnostic> diagnostics) {

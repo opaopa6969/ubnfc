@@ -1,0 +1,150 @@
+{
+  "rust__unlaxer-ubnf__tests__fixtures__known__common-field-space.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__known__eval-default.ubnf": {
+    "diagnostics": [
+      {
+        "code": "KeyValuePair",
+        "message": "構文エラー（余分な入力）: ' ' | '*/' | '/*' | '//' | ':' | AlphabetNumericUnderScoreParser を期待しました",
+        "range": [
+          0,
+          32,
+          0,
+          32
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__known__keyword-boundary.ubnf": {
+    "diagnostics": [
+      {
+        "code": "GlobalSetting",
+        "message": "構文エラー（余分な入力）: ' ' | '*/' | '/*' | '//' | ':' | '::=' を期待しました",
+        "range": [
+          0,
+          24,
+          0,
+          24
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__known__namespace.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__all-tokens.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__annotations.ubnf": {
+    "diagnostics": [
+      {
+        "code": "MappingAnnotation",
+        "message": "構文エラー（余分な入力）: ' ' | ')' | '*/' | ',' | '/*' | '//' | '=' | '[' ほか 3 件 を期待しました",
+        "range": [
+          1,
+          21,
+          1,
+          21
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__boundaries.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "rust__unlaxer-ubnf__tests__fixtures__positive__elements.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "story__code__calc-leftrec.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "story__code__calc-var.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "story__code__calc.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__examples__tinycalc.ubnf": {
+    "diagnostics": [
+      {
+        "code": "KeyValuePair",
+        "message": "構文エラー（余分な入力）: ' ' | '*/' | '/*' | '//' | STRINGParser | SingleQuoted | __CaptureSite を期待しました",
+        "range": [
+          8,
+          20,
+          8,
+          20
+        ],
+        "severity": 1,
+        "source": "ubnfc"
+      }
+    ],
+    "timedOut": false
+  },
+  "unlaxer-dsl__grammar__ubnf.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__associative__Operators.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__cardinality__Cardinality.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__0__Evolution.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__1__Evolution.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__2__Evolution.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__evolution__3__Evolution.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__mixed-values__Delimited.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__mixed-values__Mixed.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__mixed-values__Shared.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__src__test__resources__right-associative__Power.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  },
+  "unlaxer-dsl__tinycalc-vscode__grammar__tinycalc.ubnf": {
+    "diagnostics": [],
+    "timedOut": false
+  }
+}

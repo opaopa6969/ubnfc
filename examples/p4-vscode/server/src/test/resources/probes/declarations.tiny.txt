@@ -1,0 +1,8 @@
+# price の宣言
+0 5
+# count の参照
+2 11
+# double の参照（宣言は後ろの MethodDeclaration）
+2 23
+# 補完: 行頭
+4 2

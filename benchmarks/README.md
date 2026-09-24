@@ -8,6 +8,7 @@
 | A | tinyexpression P4（124 rule） | ubnfc Rust 生成 / ubnfc Java 生成 / tinyexpression-rs（unlaxer Rust codegen + Expr 解釈） / 旧 Java（tinyexpression 生成物 + unlaxer combinator） |
 | B | Operators / Power | ubnfc Rust 生成 / ubnfc Java 生成 / 手書き Rust 目標形 / 手書き Java 目標形 |
 | C | UBNF 自身 | ubnfc-front（手書き Rust） / ubnfc-selfhost（生成 Rust） / unlaxer-ubnf（手書き Rust） / unlaxer-dsl `UBNFParsers`（旧 Java combinator） |
+| D | tinyexpression P4（同上） | ubnfc Rust 生成（scope あり / scope 無効化 IR） / ubnfc Java 生成 / **ANTLR 4**（`examples/p4-antlr`） / **tree-sitter**（`examples/p4-treesitter`） |
 
 ## 使い方
 
@@ -21,6 +22,17 @@ WORK=$WORK benchmarks/scripts/run-family.sh c
 `prepare.sh` は兄弟リポジトリ（`unlaxer-parser` / `tinyexpression`）のソース・pom・git 状態を変更しない。
 private maven repository・tinyexpression のビルドコピー・生成コード・計測 crate は全て `$WORK` 配下に作る。
 `M2_SEED` は依存 jar の再取得を避けるための既存 isolated repo（`org/unlaxer` は捨てて seed にする）。
+
+family D だけは別スクリプト。外部ツール（ANTLR jar・tree-sitter CLI と runtime）は
+`$WORK` 配下へ取ってくる。報告は `docs/reports/2026-09-24-p4-antlr-treesitter.md`。
+
+```sh
+WORK=$(mktemp -d) benchmarks/scripts/p4-external.sh prepare
+WORK=$WORK benchmarks/scripts/p4-external.sh accept
+WORK=$WORK benchmarks/scripts/p4-external.sh negatives
+WORK=$WORK CORE=26 RUNS=7 benchmarks/scripts/p4-external.sh speed
+WORK=$WORK benchmarks/scripts/p4-external.sh profile
+```
 
 ## 計測の作法
 
@@ -37,6 +49,8 @@ private maven repository・tinyexpression のビルドコピー・生成コー�
 
 - `src/bench_util.rs` … Rust 側の共通計時・計数（各 family の bench から `include!`）
 - `src/family_{a,b,c}.rs` … family ごとの Rust 計測本体
+- `src/family_d.rs` … family D の ubnfc Rust 側（`accept` / `bench`）
+- `scripts/p4-external.sh` … family D の一式（外部ツールの取得・生成・受理・速度・profile）
 - `java/FamilyBJavaBench.java` … family B の Java 2 実装を 1 JVM で交互に測る（反射）
 - `java/UbnfLegacyBench.java` … family C の旧 Java `UBNFParsers`（反射）
 - family A の Java は既存の `examples/p4-java` の `Benchmark` / `LegacyBenchmark` をそのまま使う

@@ -55,6 +55,10 @@
 - ubnfc Rust / Java は `comparison-heavy` を `BooleanExpression` 入口で解析する。
   tinyexpression-rs と旧 Java の計測経路には入口指定 API が無いので、この 2 fixture の行が無い（§4）。
 
+> 同じ P4 文法を **ANTLR 4 と tree-sitter へ移植**して受理と速度を比べたものは
+> [`2026-09-24-p4-antlr-treesitter.md`](2026-09-24-p4-antlr-treesitter.md)（別セッションの新規測定。
+> 文法が同じでも作るものが違うので、この表の数字と横に並べて読んではいけない）。
+
 ---
 
 ## 2. Family B — Operators / Power（小さな式文法）

@@ -96,6 +96,15 @@ public final class Positions {
         return new Range(positionOf(start), positionOf(end));
     }
 
+    /** 行 {@code line} の UTF-16 幅（行末の改行を含まない）。 */
+    public int columnsOf(int line) {
+        if (line < 0 || line >= lineStartChar.length) return 0;
+        int start = lineStartChar[line];
+        int end = line + 1 < lineStartChar.length ? lineStartChar[line + 1] : text.length();
+        while (end > start && (text.charAt(end - 1) == '\n' || text.charAt(end - 1) == '\r')) end--;
+        return end - start;
+    }
+
     private int lineOf(int offsetCp) {
         int low = 0;
         int high = lineStartCp.length - 1;

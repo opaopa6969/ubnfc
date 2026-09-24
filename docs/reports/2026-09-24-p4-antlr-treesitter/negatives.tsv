@@ -1,0 +1,47 @@
+# ubnfc Rust（生成）
+# ubnfc-rust(生成, scope あり)
+fixture	bytes	entry	ok	consumed_cp	total_cp
+trailing-plus	4	Formula	false	0	4
+double-star	7	Formula	false	0	7
+unclosed-paren	6	Formula	false	0	6
+unclosed-paren-mul	6	Formula	false	0	6
+empty	0	Formula	false	0	0
+bad-atom	5	Formula	false	0	5
+bad-bool	5	Formula	false	0	5
+bad-xor	5	Formula	false	0	5
+bad-concat	6	Formula	false	0	6
+var-decl	19	Formula	false	0	19
+# ubnfc Java（生成）
+bad-atom.tiny	ok=false	consumed=0/5
+bad-bool.tiny	ok=false	consumed=0/5
+bad-concat.tiny	ok=false	consumed=0/6
+bad-xor.tiny	ok=false	consumed=0/5
+double-star.tiny	ok=false	consumed=0/7
+empty.tiny	ok=false	consumed=0/0
+trailing-plus.tiny	ok=false	consumed=0/4
+unclosed-paren-mul.tiny	ok=false	consumed=0/6
+unclosed-paren.tiny	ok=false	consumed=0/6
+var-decl.tiny	ok=false	consumed=0/19
+# ANTLR 4
+fixture	bytes	entry	antlr_ok	sll_sufficed	detail
+trailing-plus	4	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+double-star	7	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+unclosed-paren	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+unclosed-paren-mul	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+empty	0	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-atom	5	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-bool	5	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-xor	5	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bad-concat	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+var-decl	19	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+# tree-sitter
+trailing-plus	4	false	10
+double-star	7	false	12
+unclosed-paren	6	false	13
+unclosed-paren-mul	6	false	13
+empty	0	false	1
+bad-atom	5	false	9
+bad-bool	5	false	15
+bad-xor	5	false	15
+bad-concat	6	false	7
+var-decl	19	false	21

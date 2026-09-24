@@ -1,0 +1,80 @@
+{
+  "name": "ubnfc-ubnf",
+  "displayName": "UBNF (ubnfc)",
+  "description": "ubnfc が UBNF 自身の文法（ubnf.ubnf）から生成したパーサを LSP で使う（診断 / 定義・参照 / アウトライン / semantic tokens / 補完 / hover）",
+  "version": "0.1.0",
+  "publisher": "ubnfc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opaopa6969/ubnfc.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onLanguage:ubnf"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "ubnf",
+        "aliases": [
+          "UBNF (ubnfc)"
+        ],
+        "extensions": [
+          ".ubnf"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ubnf",
+        "scopeName": "source.ubnf",
+        "path": "./syntaxes/ubnf.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "UBNF (ubnfc)",
+      "properties": {
+        "ubnfcUbnf.java.path": {
+          "type": "string",
+          "default": "java",
+          "description": "サーバ jar を起動する java 実行ファイル"
+        },
+        "ubnfcUbnf.server.jarPath": {
+          "type": "string",
+          "default": "",
+          "description": "サーバ jar のパス（空なら拡張同梱の server-dist/ubnfc-ubnf-lsp-server.jar）"
+        },
+        "ubnfcUbnf.server.jvmArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "サーバ JVM への追加引数"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "3.9.2",
+    "typescript": "5.4.5"
+  }
+}
