@@ -66,7 +66,7 @@
 | `@backref(name=X)` | scope 参照 **または** 同一 rule 内テキスト一致 | D-029, §3.8 | `scope.effects[].events[].action=use` + `mode` | 実装（`sameRuleText` 含む） | 実装 | 5/3 | 6/5 |
 | `@declares(symbol=X[, description=…])` | scope へ宣言登録 | D-029, §3.8 | `scope.effects[].events[].action=declare` | 実装 | 実装 | 19/3 | 13/9 |
 | `@scopeTree(mode=lexical\|dynamic)` | 規則境界で scope enter/leave | D-029, §3.8 | `scope.effects[].mode` | 実装（**dynamic は lexical と同じ**） | 同左 | 10/2 | 11/9 |
-| `@recovery(sync='…'\|auto\|skip)` | エラー回復 | D-021, D-031, D-017 | `semantics.recovery`（mode/同期集合/consumeSync/noSyncAction を front が確定） | 実装 | 実装 | 0/0 | 8/4 |
+| `@recovery(sync='…'\|auto\|skip)` | エラー回復。試行の失敗でも発火するので、順序付き選択の末尾でない候補の先頭で必ず呼ばれる規則に置くと後続候補を塞ぐ（front が `W-RECOVERY-IN-CHOICE` で警告、D-073） | D-021, D-031, D-017, D-073 | `semantics.recovery`（mode/同期集合/consumeSync/noSyncAction を front が確定） | 実装 | 実装 | 0/0 | 8/4 |
 | `@whitespace[(style)]` | trivia 有効/無効（rule 上書き） | D-030, §3.5 | `trivia.policies[].rawSettings.whitespace` → `rules[].triviaPolicyId` | 実装 | 実装 | 17/17 | 17/14 |
 | `@interleave(profile=…)` | trivia 有効（rule 上書き、旧経路） | D-030, §3.5, compat C10 | 同上 `rawSettings.interleave` | 実装（**whitespace と同一物**） | 同左 | 6/2 | **0/0** |
 | `@precedence(level=N)` | 演算子優先度 | D-004, D-039 | `rules[].operator.precedence` | **値は無視** | **値は無視** | 13/5 | 1/1 |

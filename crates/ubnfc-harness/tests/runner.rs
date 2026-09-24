@@ -277,8 +277,9 @@ fn token_null_success_modes_rule_fields_texts_and_numeric_offsets() {
         json!({"allConsumed":true,"accepted":true,"consumed":2,"matched":2,"value":"a😀","ast":{"span":[0,2],"fields":{"value":"a😀"}}}),
     );
     assert_eq!(compare(&rule, &observed, &[]), Verdict::Pass);
+    // D-074: 両 backend とも字句を保ち、mapping は失敗しない（旧 Java の int 変換失敗は Fail）。
     let numeric = case(json!({"Numeric":{"java_int":null,"rust_lexeme":"1.5","extra":{}}}));
-    assert_eq!(
+    assert!(matches!(
         compare(
             &numeric,
             &actual(
@@ -287,30 +288,22 @@ fn token_null_success_modes_rule_fields_texts_and_numeric_offsets() {
             ),
             &[]
         ),
-        Verdict::Pass
-    );
-    assert_eq!(
-        fail_paths(compare(
-            &numeric,
-            &actual(
-                Backend::Java,
-                json!({"allConsumed":true,"mappingError":null})
+        Verdict::Fail(_)
+    ));
+    for backend in [Backend::Java, Backend::Rust] {
+        assert_eq!(
+            compare(
+                &numeric,
+                &actual(
+                    backend,
+                    json!({"allConsumed":true,"mappingError":null,"ast":{"fields":{"value":"1.5"}}})
+                ),
+                &[]
             ),
-            &[]
-        )),
-        ["/mappingError"]
-    );
-    assert_eq!(
-        compare(
-            &numeric,
-            &actual(
-                Backend::Rust,
-                json!({"allConsumed":true,"ast":{"fields":{"value":"1.5"}}})
-            ),
-            &[]
-        ),
-        Verdict::Pass
-    );
+            Verdict::Pass,
+            "{backend:?}"
+        );
+    }
     let diagnostic = case(json!({"Diagnostics":{"kind":"syntax","javaOffset":7,"rustOffset":5}}));
     for (backend, offset) in [(Backend::Java, 7), (Backend::Rust, 5)] {
         assert_eq!(

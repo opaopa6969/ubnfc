@@ -411,6 +411,9 @@ Rust の小さなインタプリタ（stage 3）。JVM は要らない。
 
 ### 7.1 `@recovery` を外した理由（実測）
 
+> **追記（#71 / D-073）**: この形は `ubnfc validate` が `W-RECOVERY-IN-CHOICE` で警告する
+> （`--strict` で exit 5）。回復を置くなら選択を含む規則そのもの（`@recovery TopLevel ::= …`）にする。
+
 最初 `WordDef` に `@recovery(sync=';')` を付けたが、**正しいプログラムが壊れた**。
 
 `TopLevel ::= UseDecl | WordDef | MacroDef | StructDef | TypeDef` の順序付き選択では、

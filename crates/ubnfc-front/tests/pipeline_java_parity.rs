@@ -164,7 +164,6 @@ fn oracle_generation_and_compilation_failures_remain_explicit_lower_errors() {
     // eval-sum は EvaluatorGenerator.java:35-41 が明示拒否する。
     for (body, code) in [
         ("token ID=IdentifierParser @root @mapping(Node) @commonField(name) Root ::= A | B; @mapping(A,params=[name]) A ::= 'a:' ID @name; @mapping(B) B ::= 'b';", "E-LOWER-COMMON-FIELD"),
-        ("token NUM=NumberParser token ID=IdentifierParser @root @mapping(Node) @commonField(name) Root ::= A | B; @mapping(A,params=[name]) A ::= 'a:' ID @name; @mapping(B,params=[name]) B ::= 'b:' NUM @name;", "E-LOWER-COMMON-FIELD"),
         ("@root @eval(kind='literal',strategy='default') @mapping(Node) Root ::= Leaf; @mapping(Item) Leaf ::= 'a';", "E-LOWER-SUM-EVAL"),
     ] {
         let Err(PipelineError::Lower(issues)) = source(&format!("grammar Probe {{ {body} }}")) else {
@@ -174,4 +173,9 @@ fn oracle_generation_and_compilation_failures_remain_explicit_lower_errors() {
             ubnfc_front::lower::LowerError::Error { code: actual, .. } if actual == code
         )), "{issues:?}");
     }
+    // D-074: 旧 common-field-type oracle は `name` が A で String・B で int になって javac が
+    // 拒否した。token の直接 capture は数値 token でも text なので型が揃い、生成できる
+    // （corpus は `new-contract:direct-token-capture-text` で既知乖離として登録）。
+    source("grammar Probe { token NUM=NumberParser token ID=IdentifierParser @root @mapping(Node) @commonField(name) Root ::= A | B; @mapping(A,params=[name]) A ::= 'a:' ID @name; @mapping(B,params=[name]) B ::= 'b:' NUM @name; }")
+        .unwrap_or_else(|e| panic!("D-074 で common field の型が揃うはず: {e:?}"));
 }

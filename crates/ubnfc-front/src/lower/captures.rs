@@ -168,31 +168,9 @@ fn captured_at(cx: &Context<'_>, atom: &A, site: bool) -> Shape {
         A::OneOrMore { body, .. } | A::Separated { element: body, .. } => {
             wrap(captured_at(cx, body, false), Cardinality::List)
         }
-        A::Ref { symbol, .. } => {
-            if let Some(token) = cx
-                .grammar
-                .grammars
-                .iter()
-                .flat_map(|g| &g.tokens)
-                .find(|t| t.id == *symbol)
-            {
-                if matches!(
-                    token.value,
-                    r::ResolvedTokenValue::Builtin {
-                        kind: r::BuiltinKind::Number | r::BuiltinKind::Digit
-                    }
-                ) {
-                    return Shape {
-                        value: ValueType::Number {
-                            java: ValueTypeNumberJava,
-                            rust: ValueTypeNumberRust,
-                        },
-                        count: Cardinality::Scalar,
-                    };
-                }
-            }
-            shape_atom(cx, atom, &mut BTreeSet::new())
-        }
+        // #75 / D-074: token の直接 capture（`NUMBER @x`）も原文の文字列。数値 token を
+        // 言語別の数値型（Java int / Rust 字句）へ変える特例は、同じ文法の canonical AST を
+        // backend ごとに変えていたので廃止した。型付けは `@mapping` の利用側が行う。
         _ => shape_atom(cx, atom, &mut BTreeSet::new()),
     }
 }

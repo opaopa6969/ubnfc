@@ -90,13 +90,16 @@ printf '%s\n' '{"id":0,"grammar":"Stax","entry":null,"input":": main ( -- ) 1 2 
 ## 両 backend の差として見つかったこと
 
 `NUMBER` token を `@mapping` の field へ**直接** capture すると、Java backend は
-`int` へ変換し（driver 契約の `java_int`）、Rust backend は字句の文字列を返すため、
-canonical AST が食い違う。`examples/json/json.ubnf` と同じく **group を 1 つ挟んで**
-原文のまま取り出すと一致する。
+`int` へ変換し、Rust backend は字句の文字列を返して canonical AST が食い違っていた
+（当初は `( NUMBER ) @text` と group を挟んで回避）。issue #75 / D-074 で
+**token の直接 capture は両 backend とも原文の文字列**に揃えたので、いまは
+`NumLit ::= NUMBER @text ;` とそのまま書いている。canonical AST の golden は
+[`golden/`](golden/)（`scripts/crosscheck.py` が両 backend をこれと突き合わせる）。
 
-```ubnf
-NumLit ::= ( NUMBER ) @text ;   // NUMBER @text ではなく
-```
+`@recovery` を順序付き選択の末尾でない候補から到達する規則（`WordDef`）に置くと、
+後続候補（`StructDef` など）のための入力でも回復が成功を返してしまう。
+これは #71 / D-073 で `validate` の警告 `W-RECOVERY-IN-CHOICE` になった
+（`--strict` で exit 5）。[`DESIGN.md`](DESIGN.md) §7.1。
 
 ## 次の段
 

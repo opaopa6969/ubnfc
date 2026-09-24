@@ -82,12 +82,20 @@ fn nested_capture_cardinality_table_and_completion() {
     }
 }
 #[test]
-fn numeric_capture_is_direct_and_quantified_values_are_bound() {
+fn numeric_capture_is_direct_text_and_quantified_values_are_bound() {
     let out=compile("grammar G { token N = NumberParser token D = DigitParser @root @mapping(Node,params=[a,b,c,d,e]) Root ::= N @a D? @b (N) @c N+ @d Leaf @e; @mapping(Leaf,params=[x]) Leaf ::= 'x' @x; }").unwrap();
-    assert!(matches!(
-        field(&out, "GAST.Node", "a").value_type,
-        ValueType::Number { .. }
-    ));
+    // D-074: 数値 token の直接 capture も group を挟んだ capture と同じく原文の文字列。
+    for name in ["a", "c"] {
+        assert_eq!(
+            field(&out, "GAST.Node", name).value_type,
+            ValueType::Text {}
+        );
+    }
+    assert!(out
+        .semantics
+        .captures
+        .iter()
+        .all(|c| !matches!(c.value_type, ValueType::Number { .. })));
     assert_eq!(
         field(&out, "GAST.Node", "b").cardinality,
         Cardinality::Optional
@@ -266,7 +274,13 @@ fn ast_sum_nested_enum_common_skip_and_shared_join() {
             .collect::<Vec<_>>(),
         ["CAMEL_CASE", "KEBAB_CASE", "SYNC"]
     );
-    let mixed=compile("grammar G { token N = NumberParser @root @mapping(Node,params=[v]) A ::= N @v; @mapping(Node,params=[v]) B ::= 'x' @v; }").unwrap();
+    // D-074: 数値 token の直接 capture は text なので、text との共有は Mixed にならない。
+    let shared=compile("grammar G { token N = NumberParser @root @mapping(Node,params=[v]) A ::= N @v; @mapping(Node,params=[v]) B ::= 'x' @v; }").unwrap();
+    assert_eq!(
+        field(&shared, "GAST.Node", "v").value_type,
+        ValueType::Text {}
+    );
+    let mixed=compile("grammar G { @root @mapping(Node,params=[v]) A ::= Leaf @v; @mapping(Node,params=[v]) B ::= 'x' @v; @mapping(Leaf) Leaf ::= 'l'; }").unwrap();
     assert!(matches!(
         field(&mixed, "GAST.Node", "v").value_type,
         ValueType::Mixed { .. }
