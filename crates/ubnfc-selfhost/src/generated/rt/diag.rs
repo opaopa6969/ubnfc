@@ -662,6 +662,39 @@ impl DisplayDiagnostics {
         }
         self.compact_if_long(base);
     }
+    /// 最も内側 frame の最遠失敗位置（記録が無ければ `None`）。
+    /// Java `Diagnostics.localFarthest()` に対応する（回復の同期候補の記録条件）。
+    #[allow(dead_code)]
+    pub fn local_far(&self) -> Option<usize> {
+        if !self.enabled || self.log.len() <= self.current.base {
+            return None;
+        }
+        Some(self.current.far)
+    }
+    /// 最も内側の frame **だけ**を畳み込む（D-025 の回復診断用）。
+    /// 回復は「その規則の解析が失敗した」ことの診断なので、候補は規則の frame に
+    /// 属するものに限る（Java `Session.recover` の `diagnostics.leaveRule()` と同じ範囲）。
+    /// frame に記録が無ければ `None`（Java の `failure.farthest() < 0`）。
+    #[allow(dead_code)]
+    pub fn local_summary(&self) -> Option<(usize, Vec<&'static str>)> {
+        if !self.enabled {
+            return None;
+        }
+        let frame = self.current;
+        if self.log.len() <= frame.base {
+            return None;
+        }
+        let mut labels = Vec::new();
+        for &entry in &self.log[frame.base..] {
+            for &label in self.registry.entries[entry as usize].labels() {
+                if !labels.contains(&label) {
+                    labels.push(label);
+                }
+            }
+        }
+        labels.sort();
+        Some((frame.far, labels))
+    }
     // 全 frame を内側から畳み込む（parse 終了後は global frame だけ）。
     pub fn summary(&self) -> (usize, Vec<&'static str>) {
         if !self.enabled {
