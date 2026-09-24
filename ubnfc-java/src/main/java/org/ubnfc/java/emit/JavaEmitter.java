@@ -420,7 +420,12 @@ public final class JavaEmitter {
         if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         // 認識専用経路（Match 木も診断も作らない）で capture の包みが恒等になる式は、包みを飛ばして
         // 中身を直に呼ぶ。到達位置の更新だけ同じ位置で行う（包みの中の progress と同じ）。
-        if (bypassable(expr))
+        // D-064: AST を作る経路でも、読まれる capture site を 1 つも持たない式は包みが
+        // 「意味値の射影」だけになる。射影を生成側の定数に畳んで包みを飛ばす。
+        if (treeBypassable(expr))
+            out.append("        if (s.bypassWrap) { Match r = f.matched ? ").append(method).append("M(s, f) : ").append(method)
+                .append("C(s, f); s.progress(f); ").append(projectTail(expr)).append(" }\n");
+        else if (bypassable(expr))
             out.append("        if (s.bypassCapture) { Match r = f.matched ? ").append(method).append("M(s, f) : ").append(method)
                 .append("C(s, f); s.progress(f); return r; }\n");
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
@@ -444,6 +449,43 @@ public final class JavaEmitter {
     /** 認識専用経路（{@code Session.bypassCapture}）で capture の包みが恒等になる式か（D-059）。 */
     private boolean bypassable(Expr expr) {
         return expr.captureSiteIds().stream().map(captures::get).noneMatch(c -> scopeSites().contains(c.siteId()) && !c.skip());
+    }
+    /**
+     * D-064: 公開出現表を要求しない AST 経路（{@code Session.bypassWrap}）で、capture の包みが
+     * 「意味値の射影」だけになる式か。出現を 1 件も残さなくてよい条件は
+     * 「この式が持つ capture site を、@mapping の field も scope 効果も読まない」こと。
+     * 反復下の site は包みが項目ごとの Match を組み直すので、site を持つ反復は対象外にする。
+     */
+    private boolean treeBypassable(Expr expr) {
+        var sites = expr.captureSiteIds();
+        if (!sites.isEmpty() && Set.of("repeat", "optional", "separated").contains(expr.node().kind())) return false;
+        return sites.stream().map(captures::get).noneMatch(c -> readSites().contains(c.siteId()) && !c.skip());
+    }
+    /** {@link #treeBypassable} の式が包みの代わりに行う射影（{@code Session.project}）。 */
+    private String projectTail(Expr expr) {
+        var shape = semanticShapes.of(expr.id());
+        boolean many = shape.many() || expr.id().contains("/lower/separated/");
+        // 認識専用経路（tree=false）では射影そのものが無いので、呼出しを出さずに畳む。
+        return shape.kind().equals("text") ? "return r;"
+            : "return s.tree ? s.project(r, " + (shape.kind().equals("mixed") && !many) + ") : r;";
+    }
+    private Set<String> readSiteIds;
+    /**
+     * 実行時に capture 出現を読む site。@mapping の recipe field（{@code Session.rule} が
+     * 局所出現から field 値を集める）と scope 効果（{@code Session.applyEffects}）の 2 つだけが読む。
+     * {@code sameRuleText} は site ではなく名前で引くので、その mode があれば名前一致も読む側に数える。
+     */
+    private Set<String> readSites() {
+        if (readSiteIds == null) {
+            var read = new java.util.HashSet<>(scopeSites());
+            for (Recipe recipe : recipes.values()) for (var field : recipe.fields()) read.addAll(field.siteIds());
+            var byName = ir.semantics().scope().effects().stream().filter(e -> "sameRuleText".equals(e.mode()))
+                .flatMap(e -> e.events().stream()).map(GrammarIr.ScopeEffectEventsItem::name)
+                .filter(java.util.Objects::nonNull).collect(Collectors.toSet());
+            if (!byName.isEmpty()) captures.values().stream().filter(c -> byName.contains(c.name())).forEach(c -> read.add(c.siteId()));
+            readSiteIds = read;
+        }
+        return readSiteIds;
     }
     /** The label a primitive expression registers on failure (shared with Prediction). */
     String labelText(Expr expr) {
@@ -637,7 +679,7 @@ public final class JavaEmitter {
             any = true; retags.add(q(site.siteId())); retags.add(q(site.name()));
         }
         return "new Branch(" + calls(items.subList(from, items.size())) + "," + boundaries(candidate.id()) + "," + from + ","
-            + constant("Cap", "new Cap(" + capArgs(candidate) + "," + bypassable(candidate) + ")") + ","
+            + constant("Cap", "new Cap(" + capArgs(candidate) + "," + bypassable(candidate) + "," + treeBypassable(candidate) + ")") + ","
             + (any ? constant("String[]", "new String[]{" + String.join(",", retags) + "}") : "null") + ")";
     }
     /** Static replay plan of one excluded alternative; see Prediction. */
