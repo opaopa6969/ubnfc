@@ -20,7 +20,7 @@ import org.ubnfc.java.ir.IrReader;
 import org.ubnfc.java.ir.Json;
 
 /**
- * D-073（認識専用経路の成功値が {@code Match} を作らない）が参照経路と同じ観測を残すことを、
+ * D-075（認識専用経路の成功値が {@code Match} を作らない）が参照経路と同じ観測を残すことを、
  * {@code @scope} 効果を持たない 2 文法の全 corpus 入力・接頭辞・1 文字破壊で確かめる。
  *
  * <p>短絡するのは {@code tree=false} の経路だけなので、比較は認識専用の options（診断あり /
@@ -85,7 +85,7 @@ class PlainMatchEquivalenceTest {
                         plainMatch(h, true);
                         Object after = observe(h, input, options);
                         plainMatch(h, false);
-                        assertEquals(before, after, "D-073 の on / off で観測が違う");
+                        assertEquals(before, after, "D-075 の on / off で観測が違う");
                     }
                 }));
             }

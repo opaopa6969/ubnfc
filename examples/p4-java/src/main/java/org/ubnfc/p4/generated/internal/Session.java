@@ -189,14 +189,14 @@ public final class Session {
      */
     public static boolean exclusive = !"false".equals(System.getProperty("ubnfc.exclusive"));
     /**
-     * D-073（認識専用経路の終端が {@code Match} を作らない）の無効化スイッチ。既定は有効で、
+     * D-075（認識専用経路の終端が {@code Match} を作らない）の無効化スイッチ。既定は有効で、
      * 参照経路（成功のたびに区間付きの {@code Match} を作る経路）との差分検証と計測のためだけに
      * false にする（{@code -Dubnfc.plainmatch=false}）。返り値の同一性しか変わらないので、
      * 公開される観測は両経路で等しい。
      */
     public static boolean plainMatch = !"false".equals(System.getProperty("ubnfc.plainmatch"));
     /**
-     * 認識専用経路の「成功したが情報を持たない」ことだけを表す共有実例（D-073）。
+     * 認識専用経路の「成功したが情報を持たない」ことだけを表す共有実例（D-075）。
      * 列は全て空・{@code text} と {@code values} は null で、{@code start} / {@code end} は
      * 読まれない（読む側は {@link #plain} の条件で存在しないことが生成時に確かめてある）。
      */
@@ -284,7 +284,7 @@ public final class Session {
      */
     public final boolean tree, diag, occ;
     /**
-     * D-073: 認識専用経路の成功値が情報を持たなくてよい解析。{@code tree} が false で、かつ
+     * D-075: 認識専用経路の成功値が情報を持たなくてよい解析。{@code tree} が false で、かつ
      * 文法が {@code @scope} 効果を 1 つも持たない（生成側が {@code plainRecognition} で渡す）とき、
      * 終端も結合子も {@link #OK} 1 個を返す。この条件下で {@code Match} の区間を読む経路は
      * {@link #applyEffects}（scope 効果）と {@link #wrap} の scoped site だけで、どちらも存在しない。

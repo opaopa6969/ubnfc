@@ -1,7 +1,7 @@
-# issue #55 / D-073: 1 parse あたりの Match 生成回数と thread allocated bytes（計時ではない）。
+# issue #55 / D-075: 1 parse あたりの Match 生成回数と thread allocated bytes（計時ではない）。
 # Match の正準コンストラクタ（match_alloc）と Match.empty（match_empty）に静的カウンタを入れた複製を
 # 別ディレクトリで組み、同一 JVM の中で Session.plainMatch を反転して 1 parse ずつ数えた（scratch driver）。
-# plainMatch=false が before（参照経路）、true が after（D-073）。p4 は @scope 効果を持つので生成側が
+# plainMatch=false が before（参照経路）、true が after（D-075）。p4 は @scope 効果を持つので生成側が
 # plainRecognition=false を渡す（両変種で同じ経路＝参照経路のまま）。
 # 値は master 103842e を merge した最終 build で取り直したもの（merge 前の build と Match 回数は全 cell 一致）。
 grammar,input,bytes,mode,plainMatch,match_alloc,match_empty,alloc_bytes
