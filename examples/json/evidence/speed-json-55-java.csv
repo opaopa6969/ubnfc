@@ -1,0 +1,87 @@
+# issue #55 / D-072 の速度計測。共有機（AMD Ryzen 9 7950X / WSL2、load 11〜25）。
+# section=ab-*: 同一 JVM の中で Session.plainMatch を 1 run ごとに反転した A/B（AbRunner。本 PR の scratch driver）。
+#   暖機は 200 反復を両変種交互。variant=before が参照経路、after(D-072) が本 PR。taskset -c 28。
+# section=external-*: benchmarks/scripts/run-external.sh json（CORE=28 RUNS=9 RUN_SECONDS=0.5）。
+#   round1 は load 20〜26 の走行で雑音が大きい。round2（load 11.4）を読む。
+#   json-1k の ubnfc-java は run-external.sh の反復数決定（冷えた 1 反復から決める）が負荷に当たると乱れるので読まない。
+section,impl,input,bytes,mode,variant,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+ab-session1,ubnfc-java(生成),json-1k.json,1067,認識のみ,before,2988,200,9,0.093286,0.063083,0.314928,0.0874,,165528
+ab-session1,ubnfc-java(生成),json-1k.json,1067,認識のみ,after(D-072),2988,200,9,0.072256,0.056740,0.080061,0.0677,,6488
+ab-session1,ubnfc-java(生成),json-10k.json,10066,認識のみ,before,635,200,9,0.728471,0.547874,1.105470,0.0724,,1642376
+ab-session1,ubnfc-java(生成),json-10k.json,10066,認識のみ,after(D-072),635,200,9,0.479064,0.438288,0.997430,0.0476,,36408
+ab-session1,ubnfc-java(生成),json-100k.json,100039,認識のみ,before,118,200,9,6.419810,5.257073,10.091889,0.0642,,16338184
+ab-session1,ubnfc-java(生成),json-100k.json,100039,認識のみ,after(D-072),118,200,9,5.067917,4.200096,9.139298,0.0507,,334784
+ab-session1,ubnfc-java(生成),json-1m.json,1000112,認識のみ,before,8,200,9,59.522289,51.103117,96.515954,0.0595,,163343768
+ab-session1,ubnfc-java(生成),json-1m.json,1000112,認識のみ,after(D-072),8,200,9,54.022336,41.734498,82.942313,0.0540,,3319176
+ab-session2,ubnfc-java(生成),json-1k.json,1067,認識のみ,before,2678,200,11,0.058456,0.050738,0.276947,0.0548,,165528
+ab-session2,ubnfc-java(生成),json-1k.json,1067,認識のみ,after(D-072),2678,200,11,0.049061,0.040589,0.058309,0.0460,,6488
+ab-session2,ubnfc-java(生成),json-10k.json,10066,認識のみ,before,1506,200,11,0.621445,0.555068,1.011183,0.0617,,1642376
+ab-session2,ubnfc-java(生成),json-10k.json,10066,認識のみ,after(D-072),1506,200,11,0.472379,0.413980,0.638949,0.0469,,36408
+ab-session2,ubnfc-java(生成),json-100k.json,100039,認識のみ,before,256,200,11,5.748448,5.107953,8.985532,0.0575,,16338184
+ab-session2,ubnfc-java(生成),json-100k.json,100039,認識のみ,after(D-072),256,200,11,4.730732,3.994039,5.934410,0.0473,,334784
+ab-session2,ubnfc-java(生成),json-1m.json,1000112,認識のみ,before,24,200,11,57.342235,50.522814,141.353824,0.0573,,163343768
+ab-session2,ubnfc-java(生成),json-1m.json,1000112,認識のみ,after(D-072),24,200,11,49.905678,39.479836,108.708361,0.0499,,3319176
+external-round1,ANTLR4,json-1k.json,1067,認識のみ,,4558,200,9,0.054959,0.019210,0.156255,0.0515,19.41,25592
+external-round1,ANTLR4,json-1k.json,1067,parse tree+walk,,4181,200,9,0.085270,0.047843,0.218200,0.0799,12.51,40768
+external-round1,tree-sitter,json-1k.json,1067,CST構築,,6752,,9,0.095248,0.074438,0.102005,0.0893,11.20,
+external-round1,tree-sitter,json-1k.json,1067,CST+走査,,5506,,9,0.109473,0.081604,0.137577,0.1026,9.75,
+external-round1,ubnfc-rust(生成),json-1k.json,1067,認識のみ,,8967,,9,0.081682,0.076448,0.102427,0.0766,13.06,18785
+external-round1,ubnfc-rust(生成),json-1k.json,1067,typed AST,,1952,,9,0.190884,0.136970,0.244165,0.1789,5.59,120037
+external-round1,ubnfc-java(生成),json-1k.json,1067,認識のみ,,338,200,9,0.376387,0.217701,0.797435,0.3528,2.83,6608
+external-round1,ubnfc-java(生成),json-1k.json,1067,typed AST,,403,200,9,0.677199,0.368841,2.568991,0.6347,1.58,336000
+external-round1,ANTLR4,json-10k.json,10066,認識のみ,,1010,200,9,0.289169,0.209389,1.476047,0.0287,34.81,274712
+external-round1,ANTLR4,json-10k.json,10066,parse tree+walk,,433,200,9,0.627957,0.506453,2.229747,0.0624,16.03,442616
+external-round1,tree-sitter,json-10k.json,10066,CST構築,,652,,9,0.893829,0.758247,1.140495,0.0888,11.26,
+external-round1,tree-sitter,json-10k.json,10066,CST+走査,,458,,9,1.040424,0.917825,1.413686,0.1034,9.67,
+external-round1,ubnfc-rust(生成),json-10k.json,10066,認識のみ,,949,,9,1.000680,0.733962,1.052308,0.0994,10.06,20705
+external-round1,ubnfc-rust(生成),json-10k.json,10066,typed AST,,104,,9,5.747814,2.660269,6.580538,0.5710,1.75,1004707
+external-round1,ubnfc-java(生成),json-10k.json,10066,認識のみ,,482,200,9,1.134209,1.059821,1.465788,0.1127,8.87,36528
+external-round1,ubnfc-java(生成),json-10k.json,10066,typed AST,,157,200,9,9.221474,6.398990,14.447647,0.9161,1.09,3476096
+external-round1,ANTLR4,json-100k.json,100039,認識のみ,,76,200,9,4.821427,3.214149,6.606582,0.0482,20.75,2774944
+external-round1,ANTLR4,json-100k.json,100039,parse tree+walk,,37,200,9,9.821840,6.091191,13.608675,0.0982,10.19,4471296
+external-round1,tree-sitter,json-100k.json,100039,CST構築,,18,,9,30.284664,16.069230,46.059926,0.3027,3.30,
+external-round1,tree-sitter,json-100k.json,100039,CST+走査,,21,,9,24.012096,18.352539,30.132804,0.2400,4.17,
+external-round1,ubnfc-rust(生成),json-100k.json,100039,認識のみ,,36,,9,10.630933,7.873924,13.193629,0.1063,9.41,35041
+external-round1,ubnfc-rust(生成),json-100k.json,100039,typed AST,,4,,9,85.945025,56.256912,149.731349,0.8591,1.16,126762777
+external-round1,ubnfc-java(生成),json-100k.json,100039,認識のみ,,82,200,9,5.439154,4.467970,5.982854,0.0544,18.39,334904
+external-round1,ubnfc-java(生成),json-100k.json,100039,typed AST,,28,200,9,19.708996,17.859109,24.508243,0.1970,5.08,34706200
+external-round1,ANTLR4,json-1m.json,1000112,認識のみ,,45,200,9,10.956057,10.721717,12.664118,0.0110,91.28,27067376
+external-round1,ANTLR4,json-1m.json,1000112,parse tree+walk,,14,200,9,44.168328,33.411486,58.335585,0.0442,22.64,43605056
+external-round1,tree-sitter,json-1m.json,1000112,CST構築,,5,,9,114.442540,82.362028,145.773556,0.1144,8.74,
+external-round1,tree-sitter,json-1m.json,1000112,CST+走査,,3,,9,115.567763,89.127420,157.309366,0.1156,8.65,
+external-round1,ubnfc-rust(生成),json-1m.json,1000112,認識のみ,,9,,9,51.824475,41.117260,56.678307,0.0518,19.30,76557137
+external-round1,ubnfc-rust(生成),json-1m.json,1000112,typed AST,,3,,9,822.455894,699.700992,932.822888,0.8224,1.22,1677897853
+external-round1,ubnfc-java(生成),json-1m.json,1000112,認識のみ,,7,200,9,68.740154,62.193935,79.558675,0.0687,14.55,3319296
+external-round1,ubnfc-java(生成),json-1m.json,1000112,typed AST,,3,31,9,488.060621,467.871705,543.253545,0.4880,2.05,350851856
+external-round2,ANTLR4,json-1k.json,1067,認識のみ,,8128,200,9,0.017191,0.016295,0.098680,0.0161,62.07,25472
+external-round2,ANTLR4,json-1k.json,1067,parse tree+walk,,4360,200,9,0.043508,0.033997,0.209501,0.0408,24.52,40800
+external-round2,tree-sitter,json-1k.json,1067,CST構築,,3685,,9,0.051533,0.049627,0.061598,0.0483,20.71,
+external-round2,tree-sitter,json-1k.json,1067,CST+走査,,6027,,9,0.060257,0.057883,0.064852,0.0565,17.71,
+external-round2,ubnfc-rust(生成),json-1k.json,1067,認識のみ,,13634,,9,0.051937,0.049220,0.057468,0.0487,20.54,18785
+external-round2,ubnfc-rust(生成),json-1k.json,1067,typed AST,,5932,,9,0.106282,0.096130,0.116149,0.0996,10.04,120037
+external-round2,ubnfc-java(生成),json-1k.json,1067,認識のみ,,155,200,9,0.355936,0.184912,0.568129,0.3336,3.00,6608
+external-round2,ubnfc-java(生成),json-1k.json,1067,typed AST,,91,200,9,1.539902,0.985768,2.830391,1.4432,0.69,336000
+external-round2,ANTLR4,json-10k.json,10066,認識のみ,,987,200,9,0.161237,0.152520,1.080609,0.0160,62.43,274712
+external-round2,ANTLR4,json-10k.json,10066,parse tree+walk,,95,200,9,1.617935,0.696442,2.483665,0.1607,6.22,442616
+external-round2,tree-sitter,json-10k.json,10066,CST構築,,733,,9,0.542895,0.501882,0.677844,0.0539,18.54,
+external-round2,tree-sitter,json-10k.json,10066,CST+走査,,519,,9,0.746586,0.600019,0.790248,0.0742,13.48,
+external-round2,ubnfc-rust(生成),json-10k.json,10066,認識のみ,,928,,9,0.547484,0.515973,0.588081,0.0544,18.39,20705
+external-round2,ubnfc-rust(生成),json-10k.json,10066,typed AST,,134,,9,2.675815,1.141841,4.029765,0.2658,3.76,1004707
+external-round2,ubnfc-java(生成),json-10k.json,10066,認識のみ,,669,200,9,0.742546,0.573531,0.908540,0.0738,13.56,36496
+external-round2,ubnfc-java(生成),json-10k.json,10066,typed AST,,151,200,9,2.903456,2.522599,3.272086,0.2884,3.47,3476096
+external-round2,ANTLR4,json-100k.json,100039,認識のみ,,269,200,9,1.667878,1.508718,2.137971,0.0167,59.98,2790784
+external-round2,ANTLR4,json-100k.json,100039,parse tree+walk,,116,200,9,3.933161,3.507940,4.598792,0.0393,25.43,4471296
+external-round2,tree-sitter,json-100k.json,100039,CST構築,,48,,9,11.939899,7.633769,15.349462,0.1194,8.38,
+external-round2,tree-sitter,json-100k.json,100039,CST+走査,,36,,9,12.397913,8.045974,14.732822,0.1239,8.07,
+external-round2,ubnfc-rust(生成),json-100k.json,100039,認識のみ,,88,,9,5.382569,4.991397,6.395387,0.0538,18.59,35041
+external-round2,ubnfc-rust(生成),json-100k.json,100039,typed AST,,4,,9,55.334651,47.441442,70.335970,0.5531,1.81,126762777
+external-round2,ubnfc-java(生成),json-100k.json,100039,認識のみ,,115,200,9,4.310301,4.167339,5.344144,0.0431,23.21,334904
+external-round2,ubnfc-java(生成),json-100k.json,100039,typed AST,,30,200,9,17.905278,15.599099,18.600798,0.1790,5.59,34706200
+external-round2,ANTLR4,json-1m.json,1000112,認識のみ,,44,200,9,10.700459,10.393724,11.213177,0.0107,93.46,27067376
+external-round2,ANTLR4,json-1m.json,1000112,parse tree+walk,,19,200,9,27.876203,25.632664,30.952595,0.0279,35.88,43763576
+external-round2,tree-sitter,json-1m.json,1000112,CST構築,,9,,9,45.563295,43.538042,56.486529,0.0456,21.95,
+external-round2,tree-sitter,json-1m.json,1000112,CST+走査,,7,,9,62.756593,52.554789,90.079069,0.0627,15.94,
+external-round2,ubnfc-rust(生成),json-1m.json,1000112,認識のみ,,13,,9,33.514550,33.114378,37.170139,0.0335,29.84,76557137
+external-round2,ubnfc-rust(生成),json-1m.json,1000112,typed AST,,3,,9,450.402369,421.798264,561.807793,0.4504,2.22,1677897853
+external-round2,ubnfc-java(生成),json-1m.json,1000112,認識のみ,,12,200,9,40.529643,38.459949,57.645214,0.0405,24.68,3319296
+external-round2,ubnfc-java(生成),json-1m.json,1000112,typed AST,,3,70,9,272.685195,235.858373,592.239896,0.2727,3.67,350851856
