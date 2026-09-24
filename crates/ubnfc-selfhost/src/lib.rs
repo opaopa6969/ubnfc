@@ -7,7 +7,7 @@ pub mod generated;
 mod capture_sites;
 mod projection;
 
-use ubnfc_front::selfhost::{self as convert, ConversionError, SourceOffsets};
+use ubnfc_front::selfhost::{self as convert, ConversionError, MappedNodes, SourceOffsets};
 use ubnfc_front::syntax::ast::{Span, UbnfFile};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -111,7 +111,6 @@ pub fn parse_file(source: &str) -> Result<UbnfFile, SelfhostError> {
             ..Default::default()
         },
     );
-    let offsets = SourceOffsets::new(source);
     if let Some(start) = block_comment_start(source) {
         return Err(SelfhostError::Syntax {
             span: Span {
@@ -129,6 +128,8 @@ pub fn parse_file(source: &str) -> Result<UbnfFile, SelfhostError> {
         // 主経路の失敗位置 (hints の offset_cp) を使い、trailing-input の
         // 巻戻し位置と混同しない。farthest_cp は D-014 の表示用最遠観測で、
         // 未閉の文字列では EOF を指すため手書き lexer の開始位置と一致しない。
+        // code point 表は失敗時にしか要らない。成功経路で作らない（確保 1 回ぶん）。
+        let offsets = SourceOffsets::new(source);
         let diagnostic = syntax_diagnostic(&result);
         let span = syntax_error_span(source, &offsets, failure_cp(&result))?;
         return Err(SelfhostError::Syntax {
@@ -147,7 +148,7 @@ pub fn parse_file(source: &str) -> Result<UbnfFile, SelfhostError> {
             .join("; "),
     })?;
     // 生成物の occurrence 数を上限の目安にして push の再確保を避ける（実測: 764 node / 1,286 occurrence）。
-    let mut nodes = Vec::with_capacity(result.lexical.len());
+    let mut nodes = MappedNodes::with_capacity(result.lexical.len());
     projection::project(ast, &mut nodes);
     let captures = result
         .captures

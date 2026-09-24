@@ -255,12 +255,40 @@ pub(crate) const CAPTURE_RULES: &[(&str, &str)] = &[
 /// 62 件の線形探索で照合していたため、プロセス寿命で 1 回だけ構築する
 /// `HashMap` に置き換える。中身・順序は `CAPTURE_RULES` を単に索引するだけで、
 /// `tests::capture_site_metadata_matches_unmodified_golden` が検査する配列自体は変えない。
+///
+/// site_id は 60 文字前後で先頭 35 文字が共通なので、既定の SipHash では
+/// 1 parse あたり 1,383 回の hash が無視できない。索引は同一プロセス内に閉じた
+/// 一時的なもの（外部へ漏れず、鍵も持たない）なので、乗算とシフトだけの
+/// 安価な hash を使う。
 pub(crate) fn rule_for(site_id: &str) -> Option<&'static str> {
     use std::collections::HashMap;
+    use std::hash::BuildHasherDefault;
     use std::sync::OnceLock;
-    static INDEX: OnceLock<HashMap<&'static str, &'static str>> = OnceLock::new();
+    static INDEX: OnceLock<HashMap<&'static str, &'static str, BuildHasherDefault<SiteHasher>>> =
+        OnceLock::new();
     INDEX
         .get_or_init(|| CAPTURE_RULES.iter().copied().collect())
         .get(site_id)
         .copied()
+}
+
+/// site_id 専用の安価な hash（FxHash と同じ乗算・回転の繰り返し）。
+#[derive(Default)]
+pub(crate) struct SiteHasher(u64);
+impl std::hash::Hasher for SiteHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, bytes: &[u8]) {
+        const SEED: u64 = 0x51_7c_c1_b7_27_22_0a_95;
+        let mut rest = bytes;
+        while let Some((chunk, next)) = rest.split_at_checked(8) {
+            let word = u64::from_le_bytes(chunk.try_into().unwrap());
+            self.0 = (self.0.rotate_left(5) ^ word).wrapping_mul(SEED);
+            rest = next;
+        }
+        for &byte in rest {
+            self.0 = (self.0.rotate_left(5) ^ u64::from(byte)).wrapping_mul(SEED);
+        }
+    }
 }
