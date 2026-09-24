@@ -14,6 +14,16 @@ pub fn parse(text:&str)->ParseResult {parse_with_options(text,ParseOptions::defa
 pub fn parse_with_options(text:&str,options:ParseOptions)->ParseResult {
 let (result,stack_exhausted)=parse_with_options_budget(text,options,NATIVE_STACK_SENTINEL_BYTES);
 if result.ok || !stack_exhausted {return result;}
+parse_with_options_escalated(text,options)
+}
+// issue #65 / D-070 wasm: wasm32 には OS スレッドの stack size 制御が無く
+// （`wasm32-unknown-unknown` は既定で `std::thread` 自体を欠く）、この escalation は
+// コンパイルできない。生成物は依存ゼロ・std のみのままにするため wasm32 では
+// escalation を丸ごとコンパイル対象から外し、番兵budget（NATIVE_STACK_SENTINEL_BYTES）
+// の結果、つまり既に "maximum parse depth exceeded" が入った診断へそのまま fallback する
+// （crash しない。D-070 の契約どおり）。
+#[cfg(not(target_arch = "wasm32"))]
+fn parse_with_options_escalated(text:&str,options:ParseOptions)->ParseResult {
 let budget=escalated_stack_budget(options.max_depth);
 let stack_bytes=escalated_thread_stack_bytes(options.max_depth);
 std::thread::scope(|scope| {
@@ -23,6 +33,10 @@ std::thread::Builder::new().stack_size(stack_bytes)
 .join()
 .unwrap_or_else(|payload| std::panic::resume_unwind(payload))
 })
+}
+#[cfg(target_arch = "wasm32")]
+fn parse_with_options_escalated(text:&str,options:ParseOptions)->ParseResult {
+parse_with_options_budget(text,options,NATIVE_STACK_SENTINEL_BYTES).0
 }
 fn parse_with_options_budget(text:&str,options:ParseOptions,budget:usize)->(ParseResult,bool) {
 parse_with_scanner_budget(text,options,&mut RejectExtern,budget)
@@ -138,6 +152,7 @@ Ok((parser.finish(step),stack_exhausted))
 // issue #35 / D-070: native stack 番兵に max_depth より先へ当たった（＝呼出し元 thread の
 // stack が小さいだけ）ときだけ、max_depth から見積もった十分な stack を持つ専用 thread で
 // 1 度だけ解析し直す。RejectExtern は状態を持たないので thread をまたいで再構築してよい。
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_entry_escalated(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {
 let budget=escalated_stack_budget(options.max_depth);
 let stack_bytes=escalated_thread_stack_bytes(options.max_depth);
@@ -151,6 +166,14 @@ parse_entry_budget(grammar,entry,text,options,&mut scanner,budget)
 .join()
 .unwrap_or_else(|payload| std::panic::resume_unwind(payload))
 }).map(|(result,_)| result)
+}
+// issue #65 / D-070 wasm: wasm32 では escalation を丸ごとコンパイル対象から外し、番兵
+// budget（NATIVE_STACK_SENTINEL_BYTES）での再解析結果、つまり既に "maximum parse depth
+// exceeded" が入った診断へそのまま fallback する（crash しない。D-070 の契約どおり）。
+#[cfg(target_arch = "wasm32")]
+fn parse_entry_escalated(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {
+let mut scanner=RejectExtern;
+parse_entry_budget(grammar,entry,text,options,&mut scanner,NATIVE_STACK_SENTINEL_BYTES).map(|(result,_)| result)
 }
 pub fn parse_entry_with_options(grammar:&str,entry:Option<&str>,text:&str,options:ParseOptions)->Result<ParseResult,&'static str> {
 let mut scanner=RejectExtern;

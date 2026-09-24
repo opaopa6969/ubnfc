@@ -28,6 +28,8 @@ UBNF 文法から、**実行時ライブラリに依存しない** Java パー�
 - 生成物は JDK 21 / Rust std だけに依存する（生成 Rust は `#![forbid(unsafe_code)]`、
   生成 Rust crate の依存は `json` feature のときの serde / serde_json だけ。
   `examples/handwritten-target/java` は同じ目標形を `jdeps -recursive` で `java.base` のみと確認している）。
+- 生成 Rust は wasm32 でビルド可、stack escalation は無効化されて深さ診断に落ちる
+  （issue #65 / D-070、`docs/reports/2026-09-24-wasm32-build.md`）。
 
 ## 2. 珍しいところ
 
