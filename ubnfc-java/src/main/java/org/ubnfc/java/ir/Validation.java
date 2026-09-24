@@ -195,8 +195,10 @@ public final class Validation {
         var unsafe = new HashSet<String>();
         for (Token token : tokens.values()) {
             TokenSpec spec = token.spec();
-            if (spec.kind().equals("charRange")) require(spec.min() <= spec.max()
-                && !(spec.min() >= 0xd800 && spec.min() <= 0xdfff) && !(spec.max() >= 0xd800 && spec.max() <= 0xdfff), "Invalid charRange endpoints");
+            // D-063: 境界は code point（U+0000..U+10FFFF）。surrogate を**含む**範囲も拒否して
+            // front / Rust backend（analysis/checks.rs、ir/references.rs）と同じ条件にする。
+            if (spec.kind().equals("charRange")) require(spec.min() <= spec.max() && spec.max() <= 0x10ffff
+                && !(spec.min() <= 0xdfff && spec.max() >= 0xd800), "Invalid charRange endpoints");
             if (spec.kind().equals("regex") && spec.dfa() == null) {
                 try { java.util.regex.Pattern.compile(spec.pattern()); }
                 catch (java.util.regex.PatternSyntaxException error) { throw new IllegalArgumentException("Invalid regex: " + token.symbolId(), error); }

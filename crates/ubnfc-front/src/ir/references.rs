@@ -329,10 +329,10 @@ impl<'a> Validator<'a> {
             self.annotations(&token.annotations, &format!("{p}/annotations"));
             self.memo_safety(&token.memo_safety, &format!("{p}/memoSafety"));
             if let TokenSpec::CharRange { min, max } = token.spec {
-                if min > max || max > 65535 || (min <= 0xdfff && max >= 0xd800) {
+                if min > max || max > 0x10ffff || (min <= 0xdfff && max >= 0xd800) {
                     self.error(
                         &format!("{p}/spec"),
-                        "invalid UTF-16 charRange or surrogate range",
+                        "invalid code point charRange or surrogate range",
                     );
                 }
             }

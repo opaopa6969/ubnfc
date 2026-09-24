@@ -235,6 +235,11 @@ mod tests {
         assert!(case_insensitive::parse("KİſS").ok);
         assert!(char_range::parse("a").ok);
         assert!(!char_range::parse("0").ok);
+        // D-063: 補助面（U+1F600）は 1 文字として通り、BMP の U+D7FF 未満は落ちる。
+        assert!(char_range_supplementary::parse("\u{1f600}").ok);
+        assert!(char_range_supplementary::parse("\u{e000}").ok);
+        assert!(!char_range_supplementary::parse("a").ok);
+        assert!(!char_range_supplementary::parse("\u{d7ff}").ok);
         assert!(negation::parse("😀").ok);
         assert!(!negation::parse("a").ok);
     }

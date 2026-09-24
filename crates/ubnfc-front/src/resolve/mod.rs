@@ -434,7 +434,8 @@ impl Resolver<'_> {
         for (unit, prefix, token) in pending.tokens {
             let name = qualify(&prefix, &token.name);
             let id = self.result.lookup(pending.id, &name).unwrap();
-            let (value, unresolved) = tokens::classify(&token.value);
+            let (value, unresolved) =
+                tokens::classify(&token.value, crate::escape::declares_v2(&grammar.settings));
             grammar.tokens.push(ResolvedToken {
                 id,
                 unit,

@@ -77,12 +77,12 @@ pub(super) fn validate(sem: &Semantics) -> Result<(), Vec<AnalysisError>> {
     for t in &sem.tokens {
         match &t.spec {
             TokenSpec::CharRange { min, max }
-                if min > max || *max > 0xffff || (*min <= 0xdfff && *max >= 0xd800) =>
+                if min > max || *max > 0x10ffff || (*min <= 0xdfff && *max >= 0xd800) =>
             {
                 invalid(
                     &mut errors,
                     &t.symbol_id,
-                    "CHAR_RANGE は BMP 非 surrogate の昇順範囲が必要です",
+                    "CHAR_RANGE は非 surrogate の昇順 code point 範囲が必要です",
                 )
             }
             TokenSpec::Builtin { code_points, .. }

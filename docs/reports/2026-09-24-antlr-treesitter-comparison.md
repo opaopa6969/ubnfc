@@ -22,22 +22,34 @@
 **ファイル × 4 実装の全 318 行**（期待値と理由つき）は
 [`examples/json/evidence/jsontestsuite-verdicts.tsv`](../../examples/json/evidence/jsontestsuite-verdicts.tsv) にある。
 
+> **2026-09-24 追記（issue #34 / D-063）**: 下記 A の 3 件は **UBNF v2 に code point クラスを足して解消した**。
+> 現在は ubnfc の 2 backend も `n_` 188/188・`y_` 95/95 で、suite との不一致は 0 件、
+> 実装間で割れるのは `i_` の 2 件（BOM と 500 重ネスト）だけである。
+> この節の表と `examples/json/` の生データは**改訂後の値**になっている。改訂の記録は
+> [`2026-09-24-v2-codepoint-classes.md`](2026-09-24-v2-codepoint-classes.md)。以下の A は
+> **なぜ穴だったか**の記録として残す。
+
 | 実装 | `y_` 受理 / 95 | `n_` 拒否 / 188 | `i_` 受理 | `i_` 拒否 | suite との不一致 |
 |---|---:|---:|---:|---:|---|
-| ubnfc Rust（生成） | **95** | 185 | 20 | 15 | 3 件（下記 A） |
-| ubnfc Java（生成） | **95** | 185 | 20 | 15 | 3 件（下記 A。Rust と 318 件すべて一致） |
+| ubnfc Rust（生成） | **95** | **188**（当初 185） | 20 | 15 | なし（当初 3 件。下記 A） |
+| ubnfc Java（生成） | **95** | **188**（当初 185） | 20 | 15 | なし（Rust と 318 件すべて一致） |
 | ANTLR4 4.13.2 | **95** | **188** | 21 | 14 | なし |
 | tree-sitter 0.25.10 | **95** | **188** | 22 | 13 | なし |
 
-実装間で判定が割れたのは **5 件だけ**（残り 313 件は 4 実装が完全一致）。
+実装間で判定が割れるのは **2 件だけ**（残り 316 件は 4 実装が完全一致。当初は 5 件）。
 
 | file | suite の分類 | ubnfc Rust | ubnfc Java | ANTLR4 | tree-sitter | 理由 |
 |---|---|---|---|---|---|---|
-| `n_string_unescaped_ctrl_char` (`["a<0x00>a"]`) | 拒否必須 | accept | accept | reject | reject | **A**: UBNF に「制御文字を除く code point 集合」を書く手立てが無い |
-| `n_string_unescaped_newline` (`["new<0x0A>line"]`) | 拒否必須 | accept | accept | reject | reject | 同上 |
-| `n_string_unescaped_tab` (`["<0x09>"]`) | 拒否必須 | accept | accept | reject | reject | 同上 |
-| `i_structure_500_nested_arrays` | 実装依存 | reject | reject | accept | accept | **B**: ubnfc の生成ランタイムはネイティブスタック 256 KiB で再帰を止める |
+| `i_structure_500_nested_arrays` | 実装依存 | reject | reject | accept | accept | **B**: ubnfc の生成ランタイムはネイティブスタック 256 KiB で再帰を止める（issue #35） |
 | `i_structure_UTF-8_BOM_empty_object` | 実装依存 | reject | reject | reject | accept | **C**: tree-sitter だけ先頭 BOM を読み飛ばす |
+
+当初（この報告の初版、ubnfc `d257a9b`）は次の 3 件でも割れていた。**D-063 で解消済み**。
+
+| file | suite の分類 | 当初の ubnfc | 現在の ubnfc | 理由 |
+|---|---|---|---|---|
+| `n_string_unescaped_ctrl_char` (`["a<0x00>a"]`) | 拒否必須 | accept | **reject** | **A**: UBNF に「制御文字を除く code point 集合」を書く手立てが無かった |
+| `n_string_unescaped_newline` (`["new<0x0A>line"]`) | 拒否必須 | accept | **reject** | 同上 |
+| `n_string_unescaped_tab` (`["<0x09>"]`) | 拒否必須 | accept | **reject** | 同上 |
 
 **A — UBNF v2 の表現力の穴（3 記法で唯一揃えられなかった点）**
 RFC 8259 §7 は文字列の中に生で置ける文字を「`"` と `\` と U+0000〜U+001F を除く全 Unicode 文字」と
@@ -51,8 +63,10 @@ UBNF では書けない。
   **受理必須の `y_string_utf8` 等 3 件を拒否**してしまう。
 - `REGEX('[^"\\\x00-\x1F]')` は front の正則部分集合パーサが `\x` を拒否し、Rust backend が生成時エラー。
 
-そこで `token SAFE = NEGATION('"\\')` を採り、**制御文字が通ることを受け入れた**。
-文法の書き方の問題ではなく、**UBNF v2 に足りない機能**である（→ §6 の申し送り）。
+そこで当初は `token SAFE = NEGATION('"\\')` を採り、**制御文字が通ることを受け入れた**。
+文法の書き方の問題ではなく、**UBNF v2 に足りない機能**だった。
+→ **2026-09-24 に D-063 で解消**（`CHAR_RANGE` の境界に `\uXXXX` / `\u{X…}` と補助面を許す。
+issue #34、[`2026-09-24-v2-codepoint-classes.md`](2026-09-24-v2-codepoint-classes.md)）。
 
 **B — 入れ子の深さ**。生成ランタイムはスタック番兵（`anchor.abs_diff(address) > 256 * 1024`）で
 `maximum parse depth exceeded` を出す。`ParseOptions.max_depth`（既定 10,000）とは別物で、
@@ -79,6 +93,11 @@ UTF-16 ファイル・overlong 符号化・裸の継続 byte はいずれも「U
 比較が「復号の差」にならないようにしてある。
 
 ### 1.2 JSON の速度
+
+> **2026-09-24 追記**: この節の数字は**初版の文法**（`token SAFE = NEGATION('"\\')`）で測ったもので、
+> D-063 で `SAFE` を 4 本の `CHAR_RANGE` へ置き換えた後には測り直していない。
+> 置き換えで `Char` の選択が 2 候補から 5 候補に増えるので、ubnfc の JSON の速度は動き得る。
+> 速度の比較をやり直すときは §4.4 の手順をそのまま走らせること（他の 3 実装の文法は不変）。
 
 入力は JSONTestSuite の大きめの `y_*` を要素に並べた JSON 配列（§4.2 に sha256）。
 **「木」の意味は実装ごとに違う**ので、モード名にそのまま書いてある。
@@ -327,7 +346,11 @@ benchmarks/scripts/run-external.sh arith            # 速度（§1.3）
 
 ## 6. 申し送り
 
-1. **UBNF v2 に「制御文字を除く code point 集合」を書く手立てを足す**（§1.1 A）。
+1. ~~**UBNF v2 に「制御文字を除く code point 集合」を書く手立てを足す**（§1.1 A）。~~
+   **完了（2026-09-24、issue #34 / D-063）**: 候補 (a)+(b) を採り、`CHAR_RANGE` の境界と
+   `NEGATION` の除外集合に `\uXXXX` / `\u{X…}` を、`CHAR_RANGE` に補助面を許した（v2 限定）。
+   `unlaxer-parser` 側の字句と corpus の `expected` 表記には触れていない（ubnfc が先行実装）。
+   以下は当初の検討メモ。
    候補は (a) `CHAR_RANGE` の補助面対応、(b) `NEGATION` の除外集合に `\uXXXX` を許す、
    (c) リテラルのエスケープに `\uXXXX` を足す。(c) が最も影響範囲が小さそうだが、
    `unlaxer-parser` 側の字句と corpus の `expected` 表記に触れるので別 issue で検討する。

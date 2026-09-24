@@ -25,6 +25,12 @@
 //! `ANY` / `EOF` / `EMPTY` と `UNTIL(…)` / `CI(…)` / `NEGATION(…)` /
 //! `CHAR_RANGE(…)` / `LOOKAHEAD(…)` / `NEGATIVE_LOOKAHEAD(…)` / `REGEX(…)` は
 //! v1 から既に中立な綴りなので、この表には入らない（直すものが無い）。
+//!
+//! v2 の code point クラス（D-063）も**この表を動かさない**。新しい構成子を足さず、
+//! 既にある `CHAR_RANGE(…)` / `NEGATION(…)` の引数に `\uXXXX` / `\u{X…}` を許し、
+//! `CHAR_RANGE` の境界から BMP 制限を外しただけだからである（`crate::escape`）。
+//! 「host 言語の綴りを表層から消す」という D-041 の目的から見ても、
+//! `\u` は Java にも Rust にも寄らない Unicode の綴りなので中立性は保たれる。
 
 /// 中立名 → 旧実装の完全クラス名。`resolve::builtin_class` がこの FQN を分類する。
 ///
