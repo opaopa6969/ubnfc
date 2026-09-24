@@ -177,31 +177,62 @@ fn occurrences(
     (captures, lexical, tokens)
 }
 fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>) {
+    // D-025: `captureOccurrences` は「回復した領域を**自分の値としてそのまま持つ**
+    // capture 出現」。間に AST ノードを作る（あるいは捨てる）規則が入ると、その外側の
+    // capture の値はノードであって回復領域ではないので数えない。node 境界の深さを
+    // 数え、capture と同じ深さにある回復だけを結び付ける。
+    enum Visit {
+        Enter(EventId),
+        CaptureDone { start: usize, depth: u32 },
+        NodeLeave,
+    }
     let mut recoveries: Vec<Recovery> = Vec::new();
+    // 回復ごとの node 境界の深さ（`recoveries` と同じ並び）。
+    let mut recovery_depth: Vec<u32> = Vec::new();
     let mut diagnostics = Vec::new();
-    let mut stack = vec![(root, None)];
+    let mut stack = vec![Visit::Enter(root)];
     let mut capture_order = 0;
-    while let Some((id, done)) = stack.pop() {
+    let mut depth = 0u32;
+    while let Some(visit) = stack.pop() {
+        let id = match visit {
+            Visit::NodeLeave => {
+                depth -= 1;
+                continue;
+            }
+            Visit::CaptureDone { start, depth: at } => {
+                // `capture_occurrence_ids` は出現表を返すかに依らない観測なので、
+                // 番号付けは AST / lexical のときそのまま数える（D-035 の対象外）。
+                if self.options.build_ast || self.options.lexical {
+                    for (r, recovery) in recoveries[start..].iter_mut().enumerate() {
+                        if recovery_depth[start + r] == at {
+                            recovery.capture_occurrence_ids.push(capture_order);
+                        }
+                    }
+                    capture_order += 1;
+                }
+                continue;
+            }
+            Visit::Enter(id) => id,
+        };
         match self.arena[id.0] {
             Event::Join(a, b) => {
-                stack.push((b, None));
-                stack.push((a, None));
+                stack.push(Visit::Enter(b));
+                stack.push(Visit::Enter(a));
             }
-            Event::Rule { child, .. } | Event::Values { child, .. } => stack.push((child, None)),
-            Event::Capture { child, .. } => {
-                if let Some(start) = done {
-                    // `capture_occurrence_ids` は出現表を返すかに依らない観測なので、
-                    // 番号付けは AST / lexical のときそのまま数える（D-035 の対象外）。
-                    if self.options.build_ast || self.options.lexical {
-                        for r in &mut recoveries[start..] {
-                            r.capture_occurrence_ids.push(capture_order);
-                        }
-                        capture_order += 1;
-                    }
-                } else {
-                    stack.push((id, Some(recoveries.len())));
-                    stack.push((child, None));
+            Event::Rule { rule, child, .. } => {
+                if RULE_NODE[rule] {
+                    depth += 1;
+                    stack.push(Visit::NodeLeave);
                 }
+                stack.push(Visit::Enter(child));
+            }
+            Event::Values { child, .. } => stack.push(Visit::Enter(child)),
+            Event::Capture { child, .. } => {
+                stack.push(Visit::CaptureDone {
+                    start: recoveries.len(),
+                    depth,
+                });
+                stack.push(Visit::Enter(child));
             }
             Event::Recovery {
                 rule,
@@ -209,16 +240,24 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
                 span,
                 sync_span,
                 diag,
+                hints,
             } => {
-                let (pos, expected, path) =
-                    self.diag.summary(diag).unwrap_or((span[0], vec![], vec![]));
+                // D-027: 公開する候補は表示語彙（`farthestExpected` と同じ蓄積）で、
+                // 範囲は回復した規則の frame。主診断 DAG の label は Rust 内部の語彙
+                // なので候補には使わず、規則経路の復元にだけ使う（D-020）。
+                let path = self.diag.summary(diag).map_or(vec![], |(_, _, path)| path);
+                let (far, expected) = self
+                    .recovery_hints
+                    .get(hints as usize)
+                    .and_then(Clone::clone)
+                    .unwrap_or((span[0], vec![]));
                 let rule_path: Vec<_> = path.into_iter().map(|r| RULES[r]).collect();
                 let span = self.span(span);
                 diagnostics.push(Diagnostic {
                     kind: DiagnosticKind::Recovery,
                     offset_cp: span[0],
                     length_cp: span[1] - span[0],
-                    farthest_cp: self.cp(pos),
+                    farthest_cp: self.cp(far),
                     expected: expected.clone(),
                     farthest_expected: expected,
                     deepest_rule: rule_path.last().copied(),
@@ -226,6 +265,7 @@ fn recovery_occurrences(&self, root: EventId) -> (Vec<Recovery>, Vec<Diagnostic>
                     message: Some("recovered input".into()),
                     recovery_id: Some(recoveries.len()),
                 });
+                recovery_depth.push(depth);
                 recoveries.push(Recovery {
                     rule_id: RULES[rule],
                     mode,
