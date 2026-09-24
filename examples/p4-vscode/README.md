@@ -2,7 +2,7 @@
 
 `ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json` から
 **パーサと LSP サーバの両方を生成**し、VSIX に梱包する例。issue #28 の段階 2 と 3。
-設計判断は D-060 / D-061、調査と実測は
+設計判断は D-060 / D-062、調査と実測は
 [`docs/reports/2026-09-24-lsp-vsix-stage1.md`](../../docs/reports/2026-09-24-lsp-vsix-stage1.md) と
 [`docs/reports/2026-09-24-lsp-vsix-stage3.md`](../../docs/reports/2026-09-24-lsp-vsix-stage3.md)。
 
@@ -44,7 +44,7 @@ code --install-extension examples/p4-vscode/target/ubnfc-tinyexpression-p4-0.1.0
 `.tiny` を開くと、構文エラー（Error）と未定義シンボル参照（Warning）が波線で出る。
 定義へ移動・参照の一覧・アウトライン・hover・補完・semantic tokens も効く
 （capability の一覧は報告書 §1）。構文エラーのある文書でも、
-**エラーより前の範囲**については宣言・参照・scope 警告（`code: scope-prefix`）が出る（D-061）。
+**エラーより前の範囲**については宣言・参照・scope 警告（`code: scope-prefix`）が出る（D-062）。
 
 ## 中身
 

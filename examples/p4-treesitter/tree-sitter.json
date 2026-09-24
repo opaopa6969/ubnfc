@@ -1,0 +1,17 @@
+{
+  "grammars": [
+    {
+      "name": "tinyexpression_p4",
+      "camelcase": "TinyExpressionP4",
+      "scope": "source.tinyexpression",
+      "path": ".",
+      "file-types": ["tiny"]
+    }
+  ],
+  "metadata": {
+    "version": "0.0.1",
+    "license": "MIT",
+    "description": "ANTLR/tree-sitter comparison port of the tinyexpression P4 grammar (ubnfc issue #27)",
+    "authors": [{ "name": "ubnfc" }]
+  }
+}

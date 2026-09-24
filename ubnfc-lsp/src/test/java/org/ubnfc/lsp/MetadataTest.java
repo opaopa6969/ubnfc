@@ -15,7 +15,7 @@ import org.ubnfc.java.ir.IrReader;
  * {@code {name: "doc", arguments: {text: …}}}）。
  * {@code docs/design/07-annotation-inventory.md} が「無視」と書いているのは
  * <b>両 backend の codegen</b> のことで、IR には最初から入っている。
- * そのため段階 3 では <b>IR スキーマにも front にも手を入れていない</b>（D-061）。
+ * そのため段階 3 では <b>IR スキーマにも front にも手を入れていない</b>（D-062）。
  * <p>{@code doc-demo.ubnf} / {@code doc-demo.ir.json} はそのための最小文法とその IR（{@code ubnfc ir} の実出力）。
  * VSIX を出す 2 文法（P4 と UBNF 自身）はどちらも読み取り専用の sibling repo にあり {@code @doc} を
  * 使っていないので、そちらの hover は {@code @declares(description=…)} と規則名に落ちる。

@@ -3,7 +3,7 @@
 `ir/fixtures/unlaxer-dsl__grammar__ubnf.ubnf.ir.json`（`unlaxer-dsl/grammar/ubnf.ubnf` の IR）から
 **パーサと LSP サーバの両方を生成**し、VSIX に梱包する。`examples/p4-vscode` と**同じ経路**で、
 違うのは IR・パッケージ名・言語 id だけ。issue #28 の段階 4 の前半。
-設計判断は D-060 / D-061、実測とパリティは
+設計判断は D-060 / D-062、実測とパリティは
 [`docs/reports/2026-09-24-lsp-vsix-stage3.md`](../../docs/reports/2026-09-24-lsp-vsix-stage3.md)。
 
 `ubnf.ubnf` は extern token を使わないので、P4 と違って scanner の複製が要らない。

@@ -1,0 +1,137 @@
+# host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64, core=26, runs=7
+# load average (開始): 12.98 14.15 15.87
+## complex (Formula 入口)
+# ubnfc-rust(生成, scope あり)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex,332,認識,3517,7,0.081101,0.070022,0.107495,0.2443,324,31829
+D,ubnfc-rust(生成, scope あり),complex,332,AST,7148,7,0.162408,0.126380,0.175047,0.4892,509,77181
+# ubnfc-rust(生成, scope 無効化 IR)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope 無効化 IR),complex,332,認識,2084,7,0.074137,0.070236,0.080007,0.2233,31,19472
+D,ubnfc-rust(生成, scope 無効化 IR),complex,332,AST,3878,7,0.080595,0.080227,0.087771,0.2428,216,64824
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=20.14 15.77 16.38 7/5256 1707620
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex,recognize-fast,Formula,2000,2000,0.270744,0.169844,0.349763,0.401405,0.179962,0.179962,0.097228,72840
+complex,ast-fast,Formula,2000,2000,0.516262,0.466817,0.728511,0.738439,0.376910,0.466817,0.324546,216592
+# loadavg=18.33 15.58 16.31 7/5235 1708271
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr(two-stage)	complex	332	Formula	recognition	7	10	3	672.1195	503.8534	13.77
+antlr(two-stage)	complex	332	Formula	tree	7	16	3	845.3857	733.8709	11.92
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex	332	recognition(CST)	7	13153	0.04438	0.03767	12.09	235
+tree-sitter	complex	332	tree(CST+walk)	7	12592	0.04617	0.04378	11.76	235
+# load average: 11.76 14.08 15.72
+## complex-x4 (Formula 入口)
+# ubnfc-rust(生成, scope あり)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex-x4,1293,認識,1151,7,0.346339,0.274569,0.539310,0.2679,1211,63470
+D,ubnfc-rust(生成, scope あり),complex-x4,1293,AST,1507,7,0.720904,0.642523,1.261547,0.5575,1928,234276
+# ubnfc-rust(生成, scope 無効化 IR)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope 無効化 IR),complex-x4,1293,認識,1355,7,0.362816,0.304209,0.537010,0.2806,102,21136
+D,ubnfc-rust(生成, scope 無効化 IR),complex-x4,1293,AST,984,7,0.456768,0.410737,0.581011,0.3533,819,191942
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex-x4, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=20.76 16.06 16.34 26/5228 1724153
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex-x4,recognize-fast,Formula,2000,500,1.566193,0.453975,0.535011,0.377729,0.398122,0.398122,0.377729,266672
+complex-x4,ast-fast,Formula,2000,500,2.037775,2.279867,1.475654,1.612976,1.183037,1.475654,1.183024,827176
+# loadavg=18.65 15.99 16.32 11/5139 1731486
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr(two-stage)	complex-x4	1293	Formula	recognition	7	2	3	5007.6419	4064.4228	16.67
+antlr(two-stage)	complex-x4	1293	Formula	tree	7	2	3	5010.8704	3886.8158	17.39
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x4	1293	recognition(CST)	7	3082	0.19386	0.16228	19.60	904
+tree-sitter	complex-x4	1293	tree(CST+walk)	7	2873	0.23473	0.18915	19.95	904
+# load average: 19.95 17.08 16.64
+## complex-x16 (Formula 入口)
+# ubnfc-rust(生成, scope あり)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex-x16,5179,認識,88,7,1.718032,1.432828,1.828648,0.3317,4741,196225
+D,ubnfc-rust(生成, scope あり),complex-x16,5179,AST,271,7,2.088810,1.835990,9.909276,0.4033,7578,867301
+# ubnfc-rust(生成, scope 無効化 IR)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope 無効化 IR),complex-x16,5179,認識,355,7,1.456812,1.283282,1.646388,0.2813,390,28048
+D,ubnfc-rust(生成, scope 無効化 IR),complex-x16,5179,AST,146,7,2.341199,1.851517,3.010738,0.4521,3227,699124
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex-x16, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=23.50 18.04 16.96 21/5408 1777477
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex-x16,recognize-fast,Formula,2000,125,2.435222,2.350972,1.977747,1.901343,2.266308,2.350972,1.901343,1054368
+complex-x16,ast-fast,Formula,2000,125,6.118172,5.411107,6.977748,7.006019,8.954495,7.006019,5.411107,3277760
+# loadavg=23.60 18.51 17.15 17/5341 1782020
+# antlr: complex-x16 は ANTLR_FORMULA_FIXTURES に無いので測らない
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x16	5179	recognition(CST)	7	485	0.80530	0.71209	22.99	3580
+tree-sitter	complex-x16	5179	tree(CST+walk)	7	535	0.79447	0.73397	22.99	3580
+# load average: 22.99 18.47 17.14
+## complex-x64 (Formula 入口)
+# ubnfc-rust(生成, scope あり)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),complex-x64,20923,認識,78,7,7.167646,6.289670,12.860894,0.3426,18836,732673
+D,ubnfc-rust(生成, scope あり),complex-x64,20923,AST,51,7,11.166082,10.029151,14.690083,0.5337,30130,3414725
+# ubnfc-rust(生成, scope 無効化 IR)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope 無効化 IR),complex-x64,20923,認識,169,7,6.646911,3.865989,8.299748,0.3177,1542,55696
+D,ubnfc-rust(生成, scope 無効化 IR),complex-x64,20923,AST,44,7,9.266073,7.661087,16.660464,0.4429,12836,2737748
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=complex-x64, -Dbench.modes=recognize-fast,ast-fast]
+# loadavg=20.88 18.33 17.13 17/5157 1786743
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+complex-x64,recognize-fast,Formula,2000,50,18.712977,21.561138,17.660749,13.510908,15.174520,15.174520,12.479203,4110456
+complex-x64,ast-fast,Formula,2000,50,48.843903,36.373361,29.521493,34.762875,30.893205,32.808142,29.521493,13019152
+# loadavg=20.63 19.38 17.70 20/5262 1828405
+# antlr: complex-x64 は ANTLR_FORMULA_FIXTURES に無いので測らない
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	complex-x64	20923	recognition(CST)	7	221	3.29399	2.80316	20.82	14284
+tree-sitter	complex-x64	20923	tree(CST+walk)	7	81	4.85808	4.34449	20.82	14284
+# load average: 20.82 19.44 17.73
+## comparison-heavy (BooleanExpression 入口)
+# ubnfc-rust(生成, scope あり)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),comparison-heavy,179,認識,587,7,0.056500,0.053347,0.062973,0.3156,22,19208
+D,ubnfc-rust(生成, scope あり),comparison-heavy,179,AST,2605,7,0.087779,0.078585,0.094131,0.4904,435,107335
+# ubnfc-rust(生成, scope 無効化 IR)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope 無効化 IR),comparison-heavy,179,認識,323,7,0.053294,0.043640,0.057950,0.2977,21,19192
+D,ubnfc-rust(生成, scope 無効化 IR),comparison-heavy,179,AST,4106,7,0.089971,0.073360,0.111044,0.5026,434,107319
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=comparison-heavy, -Dbench.modes=recognize-fast,ast-fast, -Dbench.entry=BooleanExpression]
+# loadavg=20.19 19.33 17.70 16/5345 1831259
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+comparison-heavy,recognize-fast,BooleanExpression,2000,2000,0.149256,0.099944,0.135202,0.070212,0.080193,0.080193,0.070212,43400
+comparison-heavy,ast-fast,BooleanExpression,2000,2000,0.419272,0.446153,0.361661,0.292739,0.264885,0.292739,0.221023,232616
+# loadavg=21.93 19.77 17.88 15/5380 1835041
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr(two-stage)	comparison-heavy	179	BooleanExpression	recognition	7	2000	400	1.3279	1.2549	22.30
+antlr(two-stage)	comparison-heavy	179	BooleanExpression	tree	7	2000	509	1.1056	1.0501	21.23
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	comparison-heavy	179	recognition(CST)	7	9516	0.04984	0.03450	21.78	330
+tree-sitter	comparison-heavy	179	tree(CST+walk)	7	12491	0.04218	0.04096	20.51	330
+# load average: 20.51 19.64 17.88
+## comparison-heavy-x64 (BooleanExpression 入口)
+# ubnfc-rust(生成, scope あり)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope あり),comparison-heavy-x64,11456,認識,117,7,3.317847,3.013716,4.148232,0.2896,1030,43400
+D,ubnfc-rust(生成, scope あり),comparison-heavy-x64,11456,AST,63,7,14.647436,10.622465,23.493627,1.2786,26715,5542030
+# ubnfc-rust(生成, scope 無効化 IR)
+family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
+D,ubnfc-rust(生成, scope 無効化 IR),comparison-heavy-x64,11456,認識,206,7,2.889757,2.788571,3.140928,0.2522,1029,43384
+D,ubnfc-rust(生成, scope 無効化 IR),comparison-heavy-x64,11456,AST,44,7,18.385251,12.477576,26.883461,1.6049,26714,5542014
+# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.warmup=2000, -Dbench.runs=7, -Dbench.fixtures=comparison-heavy-x64, -Dbench.modes=recognize-fast,ast-fast, -Dbench.entry=BooleanExpression]
+# loadavg=18.03 19.11 17.75 25/5185 1842524
+fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+comparison-heavy-x64,recognize-fast,BooleanExpression,2000,50,5.830446,9.956341,7.551713,7.503772,6.102828,7.503772,5.830446,2594912
+comparison-heavy-x64,ast-fast,BooleanExpression,2000,50,35.155916,32.195835,28.437535,24.982059,27.237737,28.437535,24.982059,14545416
+# loadavg=21.30 19.84 18.12 19/5391 1854894
+tool	fixture	bytes	entry	mode	runs	warmup	iters	median_ms	min_ms	load1
+antlr(two-stage)	comparison-heavy-x64	11456	BooleanExpression	recognition	7	62	4	80.4856	65.2818	22.81
+antlr(two-stage)	comparison-heavy-x64	11456	BooleanExpression	tree	7	101	7	72.4923	68.5164	25.89
+tool	fixture	bytes	mode	runs	iters	median_ms	min_ms	load1	nodes
+tree-sitter	comparison-heavy-x64	11456	recognition(CST)	7	234	3.14342	2.81283	25.01	21183
+tree-sitter	comparison-heavy-x64	11456	tree(CST+walk)	7	183	3.56387	3.17887	24.13	21183
+# load average: 24.13 20.81 18.52
+# load average (終了): 24.13 20.81 18.52

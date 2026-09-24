@@ -16,7 +16,7 @@ import __API_PACKAGE__.TokenScanner;
  *       <b>失敗したときは主失敗位置で入力を切り、その前半だけを解析し直す</b>。</li>
  * </ul>
  *
- * <p><b>なぜ切って解析し直すのか</b>（段階 2 の唯一のパリティ欠落、D-061）。
+ * <p><b>なぜ切って解析し直すのか</b>（段階 2 の唯一のパリティ欠落、D-062）。
  * 生成パーサの {@code ScopeStore} は失敗した枝を巻き戻すので、入口規則が失敗した文書では
  * {@code declarations()} / {@code references()} / {@code diagnostics()} が<b>全部空</b>になる。
  * 巻き戻しをやめれば観測契約（{@code docs/design/04-cursor-and-diagnostics-contract.md} と

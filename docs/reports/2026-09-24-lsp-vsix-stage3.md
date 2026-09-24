@@ -19,7 +19,7 @@ TextMate 文法の生成 / 解析失敗時の scope 診断 / UBNF 自身の VSIX
 |---|---|---|---|---|
 | diagnostics（構文） | ○ | ○ | ○ | `ParseResult.diagnostics()` の主位置・`expected`・`deepestRule`。`trailing_input` だけ**最遠位置**へ寄せた（§4.1） |
 | diagnostics（未定義参照） | ○ | ○ | ○ | `scope().diagnostics()` |
-| **diagnostics（解析失敗時の scope）** | ○ | **✕** | **○** | 主失敗位置までを別入力として再解析（D-061、§3）。`code` は `scope-prefix` |
+| **diagnostics（解析失敗時の scope）** | ○ | **✕** | **○** | 主失敗位置までを別入力として再解析（D-062、§3）。`code` は `scope-prefix` |
 | **definition** | ○ | ✕ | **○** | `scope().declarations()`。scope 効果が記号表を作らない文法（UBNF の `sameRuleText`）は `lexical()` × IR の capture site（§5.1） |
 | **references** | ○ | ✕ | **○** | `scope().references()` / 同上 |
 | **document symbols** | ○ | ✕ | **○** | `scope().events()` の enter / leave / declare を事象順に積む |
@@ -83,7 +83,7 @@ rollback は cursor と意味的副作用の両方を戻すことになってお
 harness の driver protocol）そのものである。残す側に倒すと corpus の期待値が動く。
 D-025 の「scope mode は宣言どおり」も崩れる。**観測契約を変えずに済む案**を採った。
 
-### 3.2 採った形（D-061）
+### 3.2 採った形（D-062）
 
 全文解析が失敗したら、**主失敗位置で入力を切り、その前半を別の文書として解析し直す**
 （`requireFullInput=false`）。成功したらその観測を scope 診断・definition / references /
@@ -217,7 +217,7 @@ scratch へ複製して動かした（兄弟リポジトリには書いていな
 したがって段階 3 では **IR スキーマにも front にも一切手を入れていない**。
 `ir/schema/grammar-ir.v1.schema.json` は無変更、**`ir/fixtures/` の IR golden は 1 件も動いていない**。
 `semantics.rules[].doc` のような欄を足すと golden 全部に `"doc": null` が増えるだけで、
-得るものが無い（読める情報は同じ）。これが D-061 の 2 つ目の決定。
+得るものが無い（読める情報は同じ）。これが D-062 の 2 つ目の決定。
 
 `ubnfc-lsp` が生成時に `annotations` を読み、規則 → 説明文の表を `Meta.RULE_DOC` として畳み込む。
 

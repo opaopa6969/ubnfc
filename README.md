@@ -125,7 +125,8 @@ annotation keyword の識別子境界、setting block 内の二重引用符、`@
 [`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md) §9.6・追記。
 
 **仕様由来オラクル**: 旧実装の記録された振る舞いとの一致とは別に、`unlaxer-dsl/specs/*.md` の規範文だけから
-期待値を導いた corpus（`corpus/spec/` — UBNF 129 ケース、P4 32 ケース。どの実装の観測値も使っていない）を
+期待値を導いた corpus（`corpus/spec/` — UBNF 129 ケース、P4 32 ケース、JSON 283 ケース。
+どの実装の観測値も使っていない）を
 4 実装（ubnfc 手書き frontend、ubnfc 自己ホスト生成、`unlaxer-ubnf`、Java bootstrap）へ流している
 （PR [#10](https://github.com/opaopa6969/ubnfc/pull/10) が初回計測、PR
 [#23](https://github.com/opaopa6969/ubnfc/pull/23) が `unlaxer-parser` #279 の仕様訂正に追随）。
@@ -144,8 +145,40 @@ ubnfc はこれと直接の比較対象ではないが、旧世代 Rust 生成�
 
 ### 3.2 性能
 
-**比較の基準は旧実装（`unlaxer-parser` + `tinyexpression` P4）だけである。**
-ANTLR / tree-sitter とのベンチマークは**存在しない**（オフライン環境で入手できないため）。
+**この repo での最適化の基準は旧実装（`unlaxer-parser` + `tinyexpression` P4）である。**
+2026-09-24 に **ANTLR4 4.13.2 / tree-sitter 0.25.10 との比較**を加えた
+（[`docs/reports/2026-09-24-antlr-treesitter-comparison.md`](docs/reports/2026-09-24-antlr-treesitter-comparison.md)、
+issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で書き、
+[JSONTestSuite](https://github.com/nst/JSONTestSuite) 318 件と同一入力の速度で突き合わせた結果は:
+
+- **正しさ**: `y_` 95 件は 4 実装すべて受理、`n_` 188 件は ANTLR / tree-sitter が全件拒否、
+  **ubnfc は 185 件**（文字列中の生の制御文字 3 件を受理してしまう。UBNF v2 に
+  「U+0000–U+001F を除く code point 集合」を書く手立てが無いため。文法の書き方の問題ではない）。
+  実装間で判定が割れたのは 318 件中 **5 件だけ**。
+- **速度（JSON 1 MB、認識のみ）**: ANTLR4 11.2 ms（89.6 MB/s）、tree-sitter 47.3 ms（CST 込み）、
+  **ubnfc Rust 234.5 ms（4.3 MB/s）**。ubnfc は入力が大きいほど µs/byte が悪化し、
+  原因は **memo の `defaultSafe` 判定**と特定した（memo を切ると 1 MB が 51 ms・µs/byte が平ら）。
+- **速度（512 atom の算術式、認識のみ）**: ANTLR4 0.045 ms、ubnfc Rust 0.119 ms、tree-sitter 0.403 ms。
+  木込みでは ubnfc Rust の typed AST 0.260 ms が ANTLR4 の parse tree 0.209 ms に近い。
+
+ANTLR4 の適応的予測と**エラー回復**、tree-sitter の**増分解析**はどちらも測っていない
+（ubnfc が目指していないものでもある）。報告の §5 に「何が同条件でないか」を並べてある。
+
+同じ日に **実用文法 P4（119 規則）でも同じ 4 実装を比べた**
+（[`docs/reports/2026-09-24-p4-antlr-treesitter.md`](docs/reports/2026-09-24-p4-antlr-treesitter.md)、
+issue #27。文法は `examples/p4-antlr/TinyExpressionP4.g4` と `examples/p4-treesitter/grammar.js`）:
+
+- **受理**: 16 fixture 中 12 件で 4 実装が完全一致。残り 4 件（`comparison-heavy` 系）は
+  P4 が PEG の順序つき選択で先頭候補にコミットして拒否するのに対し、ALL(\*) と GLR が
+  後続文脈を見て別候補で受理する差。追加の拒否入力 10 件も 4 実装すべてで拒否。
+- **速度（`complex` 332 B、認識のみ）**: tree-sitter 0.0415 ms（CST 込み）、
+  **ubnfc Rust 0.0696 ms**、ubnfc Java 0.257 ms、**ANTLR4 645 ms**。
+  ANTLR が 4 桁遅いのは P4 の型別の順序つき選択（`Expression ::= NumberExpression | BooleanExpression | …`）で
+  ALL(\*) が毎回 LL 全文脈へ落ちるためで、`BooleanExpression` 入口なら同じ parser が 0.99 ms（650 倍速い）。
+- **scope 解決の代金**: ubnfc は `@scopeTree` / `@declares` / `@backref` を常に実行する。
+  その効果を IR から外して生成し直すと認識が 17〜29% 速くなる（確保回数は 10 倍減）。
+  ANTLR と tree-sitter はこの仕事を一切していない。
+
 `examples/handwritten-target` にある手書きパーサは「生成物の目標形」を固定したもので、
 その README 自身が「既存 parser と同一条件の比較計測はしておらず、速度比は主張しない」と書いている。
 
@@ -291,7 +324,7 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   矛盾で未定、3 件は駆動不能（[`docs/reports/2026-09-24-spec-derived-oracle.md`](docs/reports/2026-09-24-spec-derived-oracle.md) §6）。
 - **インクリメンタル解析は無い**。生成物は毎回全文を読み直す 1 回きりの解析器で、
   差分再解析・部分木の再利用は設計にも実装にも無い。
-- **LSP は opt-in の feature**（D-060 / D-061、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
+- **LSP は opt-in の feature**（D-060 / D-062、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
   有効にすると `ubnfc-lsp --emit-lsp` が生成パーサを包む LSP サーバを**別パッケージへ追加**する。
   生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**capability は
   診断 / definition / references / document symbols / semantic tokens / completion / hover と
@@ -303,7 +336,7 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   UBNF 自身（`examples/ubnf-vscode`）の 2 つを `scripts/build-vsix.sh` で組む。
 - `@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
-  `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-061）。
+  `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-062）。
 
 ---
 
@@ -413,13 +446,16 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `crates/ubnfc-rt-template` | 両 backend が写す runtime の原本（input / cursor / scope / memo / diag） |
 | `ir/schema`, `ir/fixtures`, `ir/examples` | Grammar IR v1 の JSON Schema、22 の golden IR、解説用の例 |
 | `corpus/oracle` | 旧実装から採取した独立 oracle 107 ファイル（+ `divergences.json`・採取ツール）。`ubnfc-harness list` の「oracle」107 ファイル / 398 ケース |
-| `corpus/spec` | 規範文書から導いた期待値（UBNF 129 ケース / P4 32 ケース）。実装の観測値を使わない。`corpus/spec/README.md`、issue #5 |
+| `corpus/spec` | 規範文書から導いた期待値（UBNF 129 ケース / P4 32 ケース / JSON 283 ケース）。実装の観測値を使わない。`corpus/spec/README.md`、issue #5・#26 |
 | `scanners/` | Extern token の scanner registry（`first-chars.json` と Java / Rust 実装） |
 | `examples/handwritten-target` | 生成物の**目標形**を手書きで固定した Operators / Power（Java・Rust） |
 | `examples/p4-java`, `examples/p4-rust` | tinyexpression P4（124 規則）の生成物を commit した実行例とベンチ |
 | `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + TextMate 文法 + VSIX）。`scripts/build-vsix.sh p4` |
 | `examples/ubnf-vscode` | UBNF 自身（`ubnf.ubnf`）の VS Code 拡張。同じ経路で組む。`scripts/build-vsix.sh ubnf` |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |
+| `examples/json`, `examples/arith` | 同じ言語を `.ubnf` / ANTLR `.g4` / tree-sitter `grammar.js` の 3 記法で書いたもの（JSON = RFC 8259、算術式 = Operators / Power）。外部比較の材料。issue #26 |
+| `examples/p4-antlr`, `examples/p4-treesitter` | **実用文法** P4（119 規則）を ANTLR `.g4` / tree-sitter `grammar.js` へ移植したもの。規則対応表と逸脱の一覧は `examples/p4-antlr/README.md`。issue #27 |
+| `benchmarks/` | 速度比較のドライバ。`scripts/prepare-external.sh` 以下が ANTLR4 / tree-sitter との比較、`scripts/p4-external.sh` が P4 での同じ比較（取得はどちらも `scripts/fetch-external-tools.sh`） |
 | `docs/` | 設計・決定・報告。下記 |
 
 ## 7. 設計と決定はどこにあるか

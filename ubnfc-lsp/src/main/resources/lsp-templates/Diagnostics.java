@@ -16,7 +16,7 @@ import __RT_PACKAGE__.Severity;
  *   <li>構文エラー — 主位置・{@code expected} 表示ラベル・最深規則</li>
  *   <li>scope 診断 — 未定義参照など（WARNING）</li>
  *   <li>前半だけの scope 診断 — 全文が通らない文書で、主失敗位置までを解析し直して得たもの。
- *       {@code code} を {@code scope-prefix} にして区別できるようにする（D-061）</li>
+ *       {@code code} を {@code scope-prefix} にして区別できるようにする（D-062）</li>
  * </ul>
  */
 public final class Diagnostics {

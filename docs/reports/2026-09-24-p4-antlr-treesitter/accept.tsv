@@ -1,0 +1,101 @@
+# ubnfc Rust（生成）
+# ubnfc-rust(生成, scope あり)
+fixture	bytes	entry	ok	consumed_cp	total_cp
+complex	332	Formula	true	325	325
+complex-x4	1293	Formula	true	1293	1293
+complex-x16	5179	Formula	true	5179	5179
+complex-x64	20923	Formula	true	20923	20923
+flat-arithmetic	1426	Formula	true	1426	1426
+large-match	1380	Formula	true	1380	1380
+valid-basic	6	Formula	true	6	6
+valid-multiline	40	Formula	true	40	40
+valid-unicode	22	Formula	true	9	9
+comparison-heavy	179	Formula	false	0	179
+comparison-heavy	179	BooleanExpression	true	179	179
+comparison-heavy-x4	716	Formula	false	0	716
+comparison-heavy-x4	716	BooleanExpression	true	716	716
+comparison-heavy-x16	2864	Formula	false	0	2864
+comparison-heavy-x16	2864	BooleanExpression	true	2864	2864
+comparison-heavy-x64	11456	Formula	false	0	11456
+comparison-heavy-x64	11456	BooleanExpression	true	11456	11456
+complex-half	169	Formula	false	0	162
+complex-tail	333	Formula	false	0	326
+invalid-syntax	4	Formula	false	0	4
+# ubnfc Java（生成）
+comparison-heavy-x16.tiny	ok=false	consumed=0/2864
+comparison-heavy-x4.tiny	ok=false	consumed=0/716
+comparison-heavy-x64.tiny	ok=false	consumed=0/11456
+comparison-heavy.tiny	ok=false	consumed=0/179
+complex-half.tiny	ok=false	consumed=0/162
+complex-tail.tiny	ok=false	consumed=0/326
+complex-x16.tiny	ok=true	consumed=5179/5179
+complex-x4.tiny	ok=true	consumed=1293/1293
+complex-x64.tiny	ok=true	consumed=20923/20923
+complex.tiny	ok=true	consumed=325/325
+flat-arithmetic.tiny	ok=true	consumed=1426/1426
+invalid-syntax.tiny	ok=false	consumed=0/4
+large-match.tiny	ok=true	consumed=1380/1380
+valid-basic.tiny	ok=true	consumed=6/6
+valid-multiline.tiny	ok=true	consumed=40/40
+valid-unicode.tiny	ok=true	consumed=9/9
+# ubnfc Java（生成, BooleanExpression 入口）
+comparison-heavy-x16.tiny	ok=true	consumed=2864/2864
+comparison-heavy-x4.tiny	ok=true	consumed=716/716
+comparison-heavy-x64.tiny	ok=true	consumed=11456/11456
+comparison-heavy.tiny	ok=true	consumed=179/179
+complex-half.tiny	ok=false	consumed=0/162
+complex-tail.tiny	ok=false	consumed=0/326
+complex-x16.tiny	ok=false	consumed=0/5179
+complex-x4.tiny	ok=false	consumed=0/1293
+complex-x64.tiny	ok=false	consumed=0/20923
+complex.tiny	ok=false	consumed=0/325
+flat-arithmetic.tiny	ok=false	consumed=0/1426
+invalid-syntax.tiny	ok=false	consumed=0/4
+large-match.tiny	ok=false	consumed=0/1380
+valid-basic.tiny	ok=false	consumed=0/6
+valid-multiline.tiny	ok=false	consumed=0/40
+valid-unicode.tiny	ok=false	consumed=0/9
+# ANTLR 4（BailErrorStrategy, SLL→LL 2 段）
+fixture	bytes	entry	antlr_ok	sll_sufficed	detail
+complex	332	Formula	true	false	
+complex-x4	1293	Formula	true	false	
+complex-x16	5179	Formula	true	false	
+complex-x64	20923	Formula	true	false	
+flat-arithmetic	1426	Formula	true	true	
+large-match	1380	Formula	true	true	
+valid-basic	6	Formula	true	true	
+valid-multiline	40	Formula	true	true	
+valid-unicode	22	Formula	true	false	
+comparison-heavy	179	Formula	true	false	
+comparison-heavy	179	BooleanExpression	true	true	
+comparison-heavy-x4	716	Formula	true	false	
+comparison-heavy-x4	716	BooleanExpression	true	true	
+comparison-heavy-x16	2864	Formula	true	false	
+comparison-heavy-x16	2864	BooleanExpression	true	true	
+comparison-heavy-x64	11456	Formula	true	false	
+comparison-heavy-x64	11456	BooleanExpression	true	true	
+complex-half	169	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+complex-tail	333	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+invalid-syntax	4	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+# tree-sitter（Formula 入口, hasError）
+complex	332	true	235
+complex-x4	1293	true	904
+complex-x16	5179	true	3580
+complex-x64	20923	true	14284
+flat-arithmetic	1426	true	1280
+large-match	1380	true	1115
+valid-basic	6	true	10
+valid-multiline	40	true	24
+valid-unicode	22	true	5
+comparison-heavy	179	true	332
+comparison-heavy-x4	716	true	1325
+comparison-heavy-x16	2864	true	5297
+comparison-heavy-x64	11456	true	21185
+complex-half	169	false	107
+complex-tail	333	false	237
+invalid-syntax	4	false	10
+# tree-sitter（BooleanExpression 入口, hasError）
+comparison-heavy	179	true	330
+comparison-heavy-x4	716	true	1323
+comparison-heavy-x16	2864	true	5295
+comparison-heavy-x64	11456	true	21183
