@@ -196,6 +196,77 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
     assert!(unknown.is_empty(), "未登録の差分: {unknown:#?}");
 }
 
+/// UBNF v2 の code point クラス（D-062）を両 backend で突き合わせる。
+/// 3 つの seed は、`NEGATION` の除外集合のエスケープ・`CHAR_RANGE` の**補助面**の範囲・
+/// `CHAR_RANGE` の `\uXXXX` / `\u{X…}` 境界を 1 つずつ含む（生成器の v2 seed 帯）。
+/// 前後 2 つは v1 の綴りと**同じ集合**を別の書き方で表すので、front の展開が狂えば
+/// 両 backend が同時にモデルと食い違う。補助面のほうは Java（UTF-16 の surrogate 対）と
+/// Rust（UTF-8 の 1 scalar）で「1 文字」の読み方が構造的に違う唯一の token なので、
+/// ここで必ず踏ませる。
+#[test]
+fn e_v2_code_point_class_tokens_agree_across_backends() {
+    ubnfc_fuzz::tune_generated_builds();
+    for (offset, feature) in [
+        (3u64, "token:negationEscape"),
+        (24, "token:charRangeSupplementary"),
+        (29, "token:charRangeEscape"),
+    ] {
+        let seed = ubnfc_fuzz::gen::V2_SEED_BASE + offset;
+        let grammar = ubnfc_fuzz::gen::generate(seed);
+        assert!(
+            grammar.features.contains(feature),
+            "seed {seed} に {feature} が無い: {:?}",
+            grammar.features
+        );
+        let scratch = scratch();
+        let summary = campaign::run(&Config {
+            start_seed: seed,
+            seeds: 1,
+            inputs: 12,
+            jobs: 1,
+            budget: Some(Duration::from_secs(600)),
+            findings: None,
+            shrink_builds: 0,
+            driver_timeout: Duration::from_secs(120),
+            workdir: scratch.0.clone(),
+        });
+        assert_eq!(
+            summary.discarded, 0,
+            "front の discard: {:?}",
+            summary.discards
+        );
+        assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
+        assert!(
+            summary.comparisons >= 10 && summary.driver_errors == 0,
+            "seed {seed}: 比較 {} / error {}",
+            summary.comparisons,
+            summary.driver_errors
+        );
+        let unknown: Vec<_> = summary
+            .findings
+            .iter()
+            .filter(|finding| !KNOWN.contains(&finding.signature.as_str()))
+            .map(|finding| format!("{} ({})", finding.signature, finding.slug))
+            .collect();
+        assert!(
+            unknown.is_empty(),
+            "seed {seed} の未登録の差分: {unknown:#?}"
+        );
+        // 受理そのものが食い違うのは、どの seed でも 1 件も出てはならない。
+        let acceptance: Vec<_> = summary
+            .findings
+            .iter()
+            .filter(|f| ACCEPTANCE.iter().any(|p| f.signature.starts_with(p)))
+            .filter(|f| !KNOWN.contains(&f.signature.as_str()))
+            .map(|f| format!("{} ({})", f.signature, f.slug))
+            .collect();
+        assert!(
+            acceptance.is_empty(),
+            "seed {seed} で受理が食い違う: {acceptance:#?}"
+        );
+    }
+}
+
 /// A-1 の回帰試験。seed 269 は `@recovery(AUTO)` の適用範囲が両 backend で食い違い、
 /// 同じ入力の受理・カーソル・capture・AST が変わっていた（13 差分クラス）。
 /// 契約は `docs/design/03-design-v1.md` §3.10 / D-024。

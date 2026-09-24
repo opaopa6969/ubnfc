@@ -136,8 +136,21 @@ pub(super) fn validate(cx: &mut Context<'_>) {
                 );
             }
         }
-        if let TokenValue::CharRange { min, max, .. } = &token.declaration {
-            char_range(&token.name, min, max, cx);
+        let v2 = declares_v2(grammar);
+        match &token.declaration {
+            TokenValue::CharRange {
+                min_raw, max_raw, ..
+            } => {
+                let min = escapes(&token.name, "minimum", min_raw, v2, cx);
+                let max = escapes(&token.name, "maximum", max_raw, v2, cx);
+                if let (Some(min), Some(max)) = (min, max) {
+                    char_range(&token.name, &min, &max, v2, cx);
+                }
+            }
+            TokenValue::Negation { chars_raw, .. } => {
+                escapes(&token.name, "exclusion set", chars_raw, v2, cx);
+            }
+            _ => {}
         }
         if token.unresolved {
             if let TokenValue::ClassRef { dotted, .. } = &token.declaration {
@@ -188,6 +201,58 @@ pub(super) fn validate(cx: &mut Context<'_>) {
     }
 }
 
+/// `CHAR_RANGE` の境界と `NEGATION` の除外集合に書かれた `\uXXXX` / `\u{X…}` の検査（D-062）。
+///
+/// 返すのは**展開後のリテラル**。診断を出したときは `None` を返し、後続の境界検査を
+/// 行わない（同じ 1 つの誤りで 2 つ以上の診断を出さない）。
+///
+/// v1 では `\u` はエスケープではなく「`\` と `u` の 2 文字」であり、それが v1 の
+/// 受理される書き方だった（仕様 `ubnf-syntax.md`「表にないエスケープ列はエラーにしない」）。
+/// v2 で意味が変わるので、v1 側は `E-TOKEN-ESCAPE-V2-ONLY` で**明示的に拒否**する
+/// （D-038 の「v1 は凍結」を守るには、v1 で黙って別の意味に読む道を塞ぐのが確実）。
+/// 実在の v1 文法でこの綴りを使っているものは 1 つも無い（D-062 の調査）。
+fn escapes(name: &str, label: &str, raw: &str, v2: bool, cx: &mut Context<'_>) -> Option<String> {
+    if !crate::escape::has_unicode_escape(raw) {
+        return Some(crate::escape::expand(raw).unwrap_or_else(|_| raw.to_owned()));
+    }
+    if !v2 {
+        cx.add(
+            None,
+            "E-TOKEN-ESCAPE-V2-ONLY",
+            format!(
+                "token {name} uses a \\u escape in its {label} but the grammar does not declare '@ubnf: 2'"
+            ),
+            "Declare '@ubnf: 2' to use \\uXXXX / \\u{X...} escapes in CHAR_RANGE boundaries and NEGATION exclusion sets, or spell the character literally.",
+        );
+        return None;
+    }
+    match crate::escape::expand(raw) {
+        Ok(value) => Some(value),
+        Err(error) => {
+            let (code, hint) = match error.code {
+                crate::escape::EscapeErrorKind::Surrogate => (
+                    error.code.code(),
+                    "A lone surrogate is not a code point; write the character itself or the code point it forms with its pair.",
+                ),
+                crate::escape::EscapeErrorKind::Malformed => (
+                    error.code.code(),
+                    "Write \\uXXXX with exactly four hex digits, or \\u{X...} with one to six hex digits up to 10FFFF.",
+                ),
+            };
+            cx.add(
+                None,
+                code,
+                format!(
+                    "token {name} has an invalid unicode escape in its {label}: {}",
+                    error.text
+                ),
+                hint,
+            );
+            None
+        }
+    }
+}
+
 /// `CHAR_RANGE('min','max')` の境界検査。
 ///
 /// 正本は `unlaxer-parser/unlaxer-dsl/specs/ubnf-syntax.md`
@@ -196,11 +261,16 @@ pub(super) fn validate(cx: &mut Context<'_>) {
 /// と `docs/design/02-facts-tokens-bench-corpus.md` §A（`char` 境界、両端含む）。
 /// 参照実装 `rust/unlaxer-ubnf/src/parser.rs`（`bmp()` と "minimum exceeds maximum"）と
 /// Java bootstrap も同じ 3 条件で拒否する。
-fn char_range(name: &str, min: &str, max: &str, cx: &mut Context<'_>) {
+///
+/// **v2 では BMP 制限だけを外す**（D-062）。`E-TOKEN-CHAR-RANGE-SUPPLEMENTARY` は
+/// v1 専用になり、v2 の境界は U+0000..U+10FFFF の任意の code point 1 個を取れる。
+/// 「エスケープ展開後に 1 個」「`min <= max`」「surrogate 不可」は v1 と同じまま
+/// （surrogate は `crate::escape` が `E-TOKEN-ESCAPE-SURROGATE` で先に落とす）。
+fn char_range(name: &str, min: &str, max: &str, v2: bool, cx: &mut Context<'_>) {
     let boundary = |label: &str, value: &str, cx: &mut Context<'_>| -> Option<u32> {
         let mut chars = value.chars();
         match (chars.next(), chars.next()) {
-            (Some(c), None) if (c as u32) <= 0xffff => Some(c as u32),
+            (Some(c), None) if v2 || (c as u32) <= 0xffff => Some(c as u32),
             (Some(c), None) => {
                 cx.add(
                     None,
@@ -294,12 +364,7 @@ pub(super) const I32_MAX: u64 = i32::MAX as u64;
 
 /// `@ubnf: 2` 以上を宣言しているか（D-038）。
 pub(super) fn declares_v2(grammar: &crate::resolve::Grammar) -> bool {
-    grammar.settings.iter().any(|s| match s {
-        GlobalSetting::String { key, value, .. } if key == "ubnf" => {
-            trim(value).parse::<u64>().is_ok_and(|version| version >= 2)
-        }
-        _ => false,
-    })
+    crate::escape::declares_v2(&grammar.settings)
 }
 
 /// front が意味を与える grammar 設定。ここに無いキーは黙って metadata になる（D-045）。

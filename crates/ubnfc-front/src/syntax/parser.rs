@@ -115,10 +115,17 @@ impl Parser<'_> {
     }
 
     fn string(&mut self) -> ParseResult<String> {
-        if let Kind::String { value, .. } = &self.peek(0).kind {
+        Ok(self.string_with_raw()?.0)
+    }
+
+    /// 字句値と、引用符の内側の原文。原文は v2 の `\uXXXX` 展開（D-062）が使う。
+    fn string_with_raw(&mut self) -> ParseResult<(String, String)> {
+        if let Kind::String { value, raw } = &self.peek(0).kind {
             let value = value.clone();
+            // `raw` は引用符込み。字句が閉じ引用符まで読んだときだけ String になる。
+            let inner = raw[1..raw.len() - 1].to_owned();
             self.cursor += 1;
-            Ok(value)
+            Ok((value, inner))
         } else {
             Err(self.error(&["single-quoted string"]))
         }
@@ -290,14 +297,16 @@ impl Parser<'_> {
                 | "REGEX"
         );
         if constructor && self.consume("(") {
-            let argument = self.string()?;
+            let (argument, argument_raw) = self.string_with_raw()?;
             if dotted == "CHAR_RANGE" {
                 self.require(",")?;
-                let max = self.string()?;
+                let (max, max_raw) = self.string_with_raw()?;
                 self.require(")")?;
                 return Ok(TokenValue::CharRange {
                     min: argument,
                     max,
+                    min_raw: argument_raw,
+                    max_raw,
                     span: self.span_from(start),
                 });
             }
@@ -310,6 +319,7 @@ impl Parser<'_> {
                 },
                 "NEGATION" => TokenValue::Negation {
                     chars: argument,
+                    chars_raw: argument_raw,
                     span,
                 },
                 "LOOKAHEAD" => TokenValue::Lookahead {

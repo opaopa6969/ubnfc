@@ -707,3 +707,58 @@ fn right_associative_rules_with_a_rule_reference_operator_compile() {
         .operator
         .is_none());
 }
+
+// ── §6 code point クラス（D-062） ─────────────────────────────────────────
+
+/// v2 のエスケープは `CHAR_RANGE` の境界と `NEGATION` の除外集合にだけ効く。
+/// **同じ集合を別の綴りで書いた 2 つの文法は、IR が 1 バイトも違わない**。
+#[test]
+fn v2_unicode_escapes_denote_the_same_code_points_as_the_bare_characters() {
+    let spec = |declaration: &str| {
+        let compiled = source(&with_token(Some(2), declaration)).unwrap();
+        serde_json::to_value(&compiled.ir.semantics.tokens[0].spec).unwrap()
+    };
+    assert_eq!(
+        spec("CHAR_RANGE('a','f')"),
+        spec("CHAR_RANGE('\\u0061','\\u{66}')")
+    );
+    assert_eq!(
+        spec("NEGATION('ab\\n')"),
+        spec("NEGATION('\\u0061b\\u{A}')")
+    );
+    // 補助面の境界は v2 でだけ書ける。IR は code point をそのまま持つ。
+    assert_eq!(
+        spec("CHAR_RANGE('\\u{1F600}','\\u{1F607}')"),
+        serde_json::json!({ "kind": "charRange", "min": 0x1f600, "max": 0x1f607 })
+    );
+    assert_eq!(
+        spec("CHAR_RANGE('\\u{E000}','\\u{10FFFF}')"),
+        serde_json::json!({ "kind": "charRange", "min": 0xe000, "max": 0x10ffff })
+    );
+}
+
+/// v1 は 1 bit も動かない: `\u` を含まない宣言は v1 と v2 で同じ spec になり、
+/// v1 で `\u` を書いた文法は `E-TOKEN-ESCAPE-V2-ONLY` で止まる（D-038 の門）。
+#[test]
+fn v1_token_declarations_are_untouched_by_the_code_point_escapes() {
+    for declaration in [
+        "CHAR_RANGE('a','f')",
+        "NEGATION('ab\\n')",
+        "NEGATION('a\\qb')",
+        "CHAR_RANGE('\\t','\\n')",
+    ] {
+        let v1 = source(&with_token(Some(1), declaration)).unwrap();
+        let v2 = source(&with_token(Some(2), declaration)).unwrap();
+        assert_eq!(
+            serde_json::to_value((&v1.ir.semantics, &v1.ir.analysis, &v1.ir.plan)).unwrap(),
+            serde_json::to_value((&v2.ir.semantics, &v2.ir.analysis, &v2.ir.plan)).unwrap(),
+            "{declaration}"
+        );
+    }
+    assert!(
+        codes(&with_token(Some(1), "CHAR_RANGE('\\u0061','\\u0066')"))
+            .contains(&"E-TOKEN-ESCAPE-V2-ONLY".to_owned())
+    );
+    assert!(codes(&with_token(None, "NEGATION('\\u0061')"))
+        .contains(&"E-TOKEN-ESCAPE-V2-ONLY".to_owned()));
+}

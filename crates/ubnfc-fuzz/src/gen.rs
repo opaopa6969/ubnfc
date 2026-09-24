@@ -63,6 +63,9 @@ pub const FEATURES: &[&str] = &[
     "token:neutral",
     "token:extern",
     "template",
+    "token:charRangeEscape",
+    "token:charRangeSupplementary",
+    "token:negationEscape",
 ];
 
 /// UBNF v2（`@ubnf: 2`）を生成する seed の帯。
@@ -87,8 +90,33 @@ fn v2_spelling(seed: u64, declaration: &str) -> Option<(&'static str, &'static s
             ("extern 'SingleQuotedParser'", "token:extern")
         }
         "org.unlaxer.parser.elementary.SingleQuotedParser" => ("SINGLE_QUOTED", "token:neutral"),
+        // v2 の code point クラス（D-062）。同じ述語を別の綴りで書くだけなので
+        // サンプルも乱数も変わらない: `CHAR_RANGE('a','f')` と
+        // `CHAR_RANGE('\u0061','\u{66}')` は同じ集合で、両 backend が
+        // 一致しなければ campaign が落ちる。
+        "CHAR_RANGE('a','f')" if seed % 3 == 0 => {
+            ("CHAR_RANGE('\\u0061','\\u{66}')", "token:charRangeEscape")
+        }
+        "NEGATION('ab\\n')" if seed % 3 != 2 => {
+            ("NEGATION('\\u0061b\\u{A}')", "token:negationEscape")
+        }
         _ => return None,
     })
+}
+
+/// v2 で `CHAR_RANGE` の境界が BMP を越えられること（D-062）を踏む差し替え。
+/// **述語が変わる**ので samples も差し替える。乱数は引かない。
+fn v2_supplementary(
+    seed: u64,
+    declaration: &str,
+) -> Option<(&'static str, &'static [&'static str])> {
+    if declaration != "CHAR_RANGE('a','f')" || seed % 3 != 1 {
+        return None;
+    }
+    Some((
+        "CHAR_RANGE('\\u{1F600}','\\u{1F607}')",
+        &["\u{1f600}", "\u{1f603}", "\u{1f607}"],
+    ))
 }
 
 /// `@enum` の選択肢。variant 名が Java / Rust の識別子になるため、
@@ -365,12 +393,24 @@ pub fn generate(seed: u64) -> Grammar {
 
     for index in 0..builder.rng.between(1, 3) {
         let spec = builder.rng.pick(TOKEN_PALETTE);
-        let (declaration, samples, feature) = (spec.declaration, spec.samples, spec.feature);
+        let (declaration, mut samples, feature) = (spec.declaration, spec.samples, spec.feature);
         builder.mark(feature);
         // 綴りだけ v2 の語彙へ差し替える（述語・サンプル・乱数は同じ）。
         let declaration = match v2.then(|| v2_spelling(seed, declaration)).flatten() {
             Some((spelling, marker)) => {
                 builder.mark(marker);
+                spelling
+            }
+            None => declaration,
+        };
+        // 補助面の CHAR_RANGE（D-062）だけは述語が変わるので samples も入れ替える。
+        let declaration = match v2
+            .then(|| v2_supplementary(seed, spec.declaration))
+            .flatten()
+        {
+            Some((spelling, replacement)) => {
+                builder.mark("token:charRangeSupplementary");
+                samples = replacement;
                 spelling
             }
             None => declaration,

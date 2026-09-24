@@ -168,9 +168,9 @@ n_string_single_doublequote.json	reject	reject	reject	reject	reject	ubnfc-rust=f
 n_string_single_quote.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=bail at 1:1 token '''; tree-sitter=has-error
 n_string_single_string_no_double_quotes.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=1:0 no viable alternative at input 'a'; tree-sitter=has-error
 n_string_start_escape_unclosed.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=bail at 1:1 token '"'; tree-sitter=has-error
-n_string_unescaped_ctrl_char.json	reject	accept	accept	reject	reject	antlr=bail at 1:1 token '"'; tree-sitter=has-error
-n_string_unescaped_newline.json	reject	accept	accept	reject	reject	antlr=bail at 1:1 token '"'; tree-sitter=has-error
-n_string_unescaped_tab.json	reject	accept	accept	reject	reject	antlr=bail at 1:1 token '"'; tree-sitter=has-error
+n_string_unescaped_ctrl_char.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=bail at 1:1 token '"'; tree-sitter=has-error
+n_string_unescaped_newline.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=bail at 1:1 token '"'; tree-sitter=has-error
+n_string_unescaped_tab.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=bail at 1:1 token '"'; tree-sitter=has-error
 n_string_unicode_CapitalU.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=1:0 no viable alternative at input '"'; tree-sitter=has-error
 n_string_with_trailing_garbage.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=bail at 1:2 token 'x'; tree-sitter=has-error
 n_structure_100000_opening_arrays.json	reject	reject	reject	reject	reject	ubnfc-rust=failed at cp 0; ubnfc-java=failed at cp 0; antlr=StackOverflowError:null; tree-sitter=has-error

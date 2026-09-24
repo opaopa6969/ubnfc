@@ -38,3 +38,21 @@ main の親を使い、import が外にあれば全ソースを含む共通親�
 `pipeline_golden.rs` は CLI の再実行による byte 一致、別 cwd・絶対パスとの一致、
 `ir::from_json` の型往復、`ir::validate_references` を検査する。
 JSON Schema validator は使用しない。
+
+## `json-v2.ir.json` — この repository の中にある v2 文法（D-062）
+
+`examples/json/json.ubnf`（RFC 8259 の JSON を UBNF v2 で書いたもの）の canonical JSON 出力。
+sibling repository に依存しない唯一の golden で、**v2 の code point クラス**が IR の
+`TokenSpec.charRange` としてどう落ちるかをここで固定する
+（`SAFE_SP` 32..33 / `SAFE_MID` 35..91 / `SAFE_BMP` 93..55295 / `SAFE_SUPP` 57344..1114111）。
+
+```sh
+# ubnfc リポジトリのルートから実行する。
+cargo run -p ubnfc-front --bin ubnfc -- ir \
+  --grammar examples/json/json.ubnf \
+  --extern-first-chars scanners/first-chars.json \
+  --out ir/examples/json-v2.ir.json
+```
+
+照合は `crates/ubnfc-front/tests/pipeline_golden.rs` の
+`the_json_v2_grammar_matches_its_committed_ir_golden`。

@@ -118,8 +118,19 @@ pub fn builtin_class(class_name: &str) -> Option<BuiltinKind> {
     None
 }
 
-pub(super) fn classify(value: &TokenValue) -> (ResolvedTokenValue, bool) {
+/// `v2` は `@ubnf: 2` 以上を宣言した grammar かどうか（D-038）。v2 のときだけ
+/// `CHAR_RANGE` の境界と `NEGATION` の除外集合で `\uXXXX` / `\u{X…}` を展開する
+/// （D-062、`crate::escape`）。展開に失敗した場合は v1 の字句値をそのまま残し、
+/// validate の `E-TOKEN-ESCAPE-*` が理由を述べる（lower には入らない）。
+pub(super) fn classify(value: &TokenValue, v2: bool) -> (ResolvedTokenValue, bool) {
     use ResolvedTokenValue as R;
+    let expand = |literal: &String, raw: &str| -> String {
+        if v2 {
+            crate::escape::expand(raw).unwrap_or_else(|_| literal.clone())
+        } else {
+            literal.clone()
+        }
+    };
     let value = match value {
         // 中立名は「同じ FQN を書いたとき」と同じ分類器を通す。これで受理範囲が
         // 02-facts §A の表と一致することが構成的に保証される（D-041）。
@@ -168,8 +179,10 @@ pub(super) fn classify(value: &TokenValue) -> (ResolvedTokenValue, bool) {
         TokenValue::Until { terminator, .. } => R::Until {
             terminator: terminator.clone(),
         },
-        TokenValue::Negation { chars, .. } => R::Negation {
-            chars: chars.clone(),
+        TokenValue::Negation {
+            chars, chars_raw, ..
+        } => R::Negation {
+            chars: expand(chars, chars_raw),
         },
         TokenValue::Lookahead { pattern, .. } => R::Lookahead {
             pattern: pattern.clone(),
@@ -177,9 +190,15 @@ pub(super) fn classify(value: &TokenValue) -> (ResolvedTokenValue, bool) {
         TokenValue::NegativeLookahead { pattern, .. } => R::NegativeLookahead {
             pattern: pattern.clone(),
         },
-        TokenValue::CharRange { min, max, .. } => R::CharRange {
-            min: min.clone(),
-            max: max.clone(),
+        TokenValue::CharRange {
+            min,
+            max,
+            min_raw,
+            max_raw,
+            ..
+        } => R::CharRange {
+            min: expand(min, min_raw),
+            max: expand(max, max_raw),
         },
         TokenValue::CaseInsensitive { word, .. } => R::CaseInsensitive { word: word.clone() },
         TokenValue::Regex { pattern, .. } => R::Regex {

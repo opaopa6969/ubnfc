@@ -87,6 +87,10 @@ pub enum TokenValue {
     },
     Negation {
         chars: String,
+        /// 引用符の内側の原文。v2 の `\uXXXX` / `\u{X…}` 展開（D-062）は
+        /// `chars` ではなくこちらを走査する（`\\u0041` と `\u0041` は `chars` では
+        /// 区別できないため。`crate::escape`）。
+        chars_raw: String,
         span: Span,
     },
     Lookahead {
@@ -101,6 +105,10 @@ pub enum TokenValue {
     CharRange {
         min: String,
         max: String,
+        /// 引用符の内側の原文（D-062、`crate::escape`）。
+        min_raw: String,
+        /// 引用符の内側の原文（D-062、`crate::escape`）。
+        max_raw: String,
         span: Span,
     },
     CaseInsensitive {
