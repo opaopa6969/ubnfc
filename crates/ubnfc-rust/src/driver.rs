@@ -130,7 +130,15 @@ fn scanner_hook(ir: &GrammarIr, out: &mut String) {
             1,
         )
         .replacen("let mut scanner=RejectExtern;\n", "", 1)
-        .replace("&mut scanner", "&mut *scanner");
+        .replace("&mut scanner", "&mut *scanner")
+        // issue #35 / D-070: 外部 scanner は状態を持ち得るので thread をまたげない。native
+        // stack 番兵に max_depth より先へ当たったときの専用 thread へのエスカレーションは
+        // この変種では行わない（既知の制約。docs/reports/2026-09-24-runtime-limits.md）。
+        .replacen(
+            "/*STACK_ESCALATION*/parse_entry_escalated(grammar,entry,text,options)/*STACK_ESCALATION*/",
+            "Ok(result)",
+            1,
+        );
     out.push_str("\n#[cfg(feature=\"scanners\")] use ubnfc_generated::{api, ast, rt};\n#[cfg(feature=\"scanners\")] #[path=\"../../runtime.rs\"] #[allow(dead_code)] mod runtime;\n#[cfg(feature=\"scanners\")] mod scanner_parser {\n");
     out.push_str(parser);
     out.push_str(&entry);

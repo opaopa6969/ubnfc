@@ -264,7 +264,35 @@ public final class JavaEmitter {
             .append("        return parseEntryInternal(grammar, entry, source, options, false);\n    }\n")
             .append("    public static ParseResult<").append(ast).append("> parseEntryRollback(String grammar, String entry, CharSequence source, ParseOptions options) {\n")
             .append("        return parseEntryInternal(grammar, entry, source, options, true);\n    }\n")
+            // issue #35 / D-070: 既定呼出しは呼出し元 Thread の既定 -Xss のまま解析する。
+            // Session.parse が DepthLimit ではなく StackOverflowError を捕まえた（＝maxDepth
+            // にはまだ達していない）ときだけ、maxDepth から見積もった十分な stack を持つ
+            // 専用 Thread で 1 度だけ解析し直す（Rust 版 crates/ubnfc-rust の native stack
+            // 番兵エスカレーションと同じ契約。docs/reports/2026-09-24-runtime-limits.md）。
             .append("    private static ParseResult<").append(ast).append("> parseEntryInternal(String grammar, String entry, CharSequence source, ParseOptions options, boolean rollback) {\n")
+            .append("        boolean[] stackFlag = new boolean[1];\n")
+            .append("        ParseResult<").append(ast).append("> result = parseEntryAttempt(grammar, entry, source, options, rollback, stackFlag);\n")
+            // issue #35 / D-070: extern scanner はエスカレーション先 Thread へ安全に渡せない
+            // 保証が無い（任意の実装が状態を持ち得る）ので、scanner を伴う呼出しは対象外にする
+            // （Rust 版 crates/ubnfc-rust の parse_with_scanner と同じ既知の制約）。
+            .append("        if (result.ok() || !stackFlag[0] || !options.scanners().isEmpty()) return result;\n")
+            .append("        return parseEntryEscalated(grammar, entry, source, options, rollback);\n    }\n")
+            .append("    private static ParseResult<").append(ast).append("> parseEntryEscalated(String grammar, String entry, CharSequence source, ParseOptions options, boolean rollback) {\n")
+            .append("        long stackBytes = Session.escalatedStackBytes(options.maxDepth());\n")
+            .append("        var box = new java.util.concurrent.atomic.AtomicReference<ParseResult<").append(ast).append(">>();\n")
+            .append("        var error = new java.util.concurrent.atomic.AtomicReference<Throwable>();\n")
+            .append("        Thread thread = new Thread(null, () -> {\n")
+            .append("            try { box.set(parseEntryAttempt(grammar, entry, source, options, rollback, new boolean[1])); }\n")
+            .append("            catch (Throwable t) { error.set(t); }\n")
+            .append("        }, \"ubnfc-parse-escalated\", stackBytes);\n")
+            .append("        thread.start();\n")
+            .append("        try { thread.join(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new RuntimeException(e); }\n")
+            .append("        Throwable failure = error.get();\n")
+            .append("        if (failure instanceof RuntimeException re) throw re;\n")
+            .append("        if (failure instanceof Error er) throw er;\n")
+            .append("        if (failure != null) throw new RuntimeException(failure);\n")
+            .append("        return box.get();\n    }\n")
+            .append("    private static ParseResult<").append(ast).append("> parseEntryAttempt(String grammar, String entry, CharSequence source, ParseOptions options, boolean rollback, boolean[] stackFlag) {\n")
             .append("        Call entryPoint = switch (grammar) {\n");
         for (var unit : ir.grammarUnits()) {
             var symbols = ir.semantics().symbols().stream().filter(s -> s.grammarId().equals(unit.id()) && rules.containsKey(s.id())).toList();
@@ -283,10 +311,11 @@ public final class JavaEmitter {
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
             .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(", ").append(twoMode()).append(");\n")
             .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
+            .append("        stackFlag[0] = stackFlag[0] || s.stackOverflowTripped;\n")
             .append("        if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }\n")
             .append("        ParseResult<").append(ast).append("> syntax = s.result(f, match, ").append(catalogs()).append(");\n")
             .append("        // D-023: 認識専用の fast path は観測を記録しない。診断を要する結果だけ決定的に再解析する。\n")
-            .append("        if (!syntax.ok() && !s.diag) return parseEntryInternal(grammar, entry, source, options.withDiagnostics(), rollback);\n")
+            .append("        if (!syntax.ok() && !s.diag) return parseEntryAttempt(grammar, entry, source, options.withDiagnostics(), rollback, stackFlag);\n")
             .append("        if (!syntax.ok() || !options.buildAst()) return syntax;\n")
             .append("        if (match.mappingFailure()) throw s.mapping(match.start(), match.end(), \"Recovered input cannot be mapped\", null);\n")
             .append("        if (match.nodes().isEmpty()) return syntax;\n")
