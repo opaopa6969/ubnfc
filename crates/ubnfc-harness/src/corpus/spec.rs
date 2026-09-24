@@ -104,9 +104,7 @@ impl SpecCase {
             |hex| {
                 hex.as_bytes()
                     .chunks(2)
-                    .filter_map(|pair| {
-                        u8::from_str_radix(std::str::from_utf8(pair).ok()?, 16).ok()
-                    })
+                    .filter_map(|pair| u8::from_str_radix(std::str::from_utf8(pair).ok()?, 16).ok())
                     .collect()
             },
         )
@@ -201,16 +199,13 @@ fn check_case(path: &Path, case: &SpecCase) -> Result<(), LoadError> {
     } else if !case.citation.heading.starts_with('#') {
         return fail("heading は見出し行そのものである必要がある".to_owned());
     }
-    match &case.input_hex {
-        Some(hex) => {
-            if !case.input.is_empty() {
-                return fail("input と inputHex は同時に書けない".to_owned());
-            }
-            if hex.len() % 2 != 0 || !hex.bytes().all(|b| b.is_ascii_hexdigit()) {
-                return fail("inputHex は偶数長の 16 進である必要がある".to_owned());
-            }
+    if let Some(hex) = &case.input_hex {
+        if !case.input.is_empty() {
+            return fail("input と inputHex は同時に書けない".to_owned());
         }
-        None => {}
+        if hex.len() % 2 != 0 || !hex.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return fail("inputHex は偶数長の 16 進である必要がある".to_owned());
+        }
     }
     match case.expectation.verdict {
         Verdict::Diagnostic if case.expectation.code.is_none() => {

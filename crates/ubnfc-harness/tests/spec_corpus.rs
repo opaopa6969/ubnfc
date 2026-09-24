@@ -163,7 +163,12 @@ fn json_cases_load_and_cite_rfc8259() {
     let total: usize = files.iter().map(|f| f.cases.len()).sum();
     assert!(total >= 200, "ケースが少なすぎる: {total}");
     for case in files.iter().flat_map(|f| &f.cases) {
-        assert_eq!(case.scope, Scope::Parse, "{}: parse scope であるべき", case.id);
+        assert_eq!(
+            case.scope,
+            Scope::Parse,
+            "{}: parse scope であるべき",
+            case.id
+        );
         assert!(
             matches!(case.expectation.verdict, Verdict::Accept | Verdict::Reject),
             "{}: JSON のケースは accept か reject のどちらか",

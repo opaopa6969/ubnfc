@@ -20,8 +20,17 @@
 |---|---|---|
 | `ubnf/` | `unlaxer-parser/unlaxer-dsl/specs/{ubnf-syntax,annotations,validation}.md` | UBNF 文法族 |
 | `p4/` | `tinyexpression/spec/SPEC.md`、`tinyexpression/specs/language.md`、`tinyexpression/docs/language-guide.md` | P4（TinyExpression）式言語 |
+| `json/` | RFC 8259（`citation.url`。写しは `benchmarks/external/rfc8259.txt`） | 受理/拒否は [JSONTestSuite](https://github.com/nst/JSONTestSuite) の `y_` / `n_` 分類から採る。issue #26 |
 
 引用先は sibling repository なので、無い環境ではテストは skip する（読み取り専用）。
+`json/` の引用先は workspace の外にあるので、`scripts/fetch-external-tools.sh` が取得した
+写しがあるときだけ照合する（無ければ同じく skip）。
+
+### `json/` の期待値の出所
+
+`y_` / `n_` の分類は JSONTestSuite 自身が RFC 8259 から導いたもので、**どの実装の観測値でもない**。
+実装依存の `i_` は、絶対規則 3（仕様が決めていないものは推測で埋めない）に従って取り込んでいない。
+ケースは `benchmarks/scripts/make-json-spec-corpus.py` が決定的に生成する。
 
 ## スキーマ
 
@@ -36,10 +45,14 @@
       "scope": "parse",                // parse | validate | runtime
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",   // workspace 相対
+        // "url": "https://www.rfc-editor.org/rfc/rfc8259.txt", // 外部規範文書のときだけ。
+        //                                                     // その場合 file は写しの置き場所（repo 相対）
         "heading": "## ルール宣言",                    // 実在する見出し行そのもの
         "sentence": "UBNF ファイル自体のコメント構文は …"  // 逐語（空白の畳み込みのみ許す）
       },
       "input": "grammar G { /* no */ R ::= 'x'; }",
+      // "inputHex": "5bff5d",          // UTF-8 として不正な byte 列（input とは排他）
+      // "suiteFile": "n_array_invalid_utf8.json",  // 期待値の出所になった適合性テスト集のファイル名
       "expectation": { "verdict": "reject" },
       "note": "…"                       // 任意
     }
