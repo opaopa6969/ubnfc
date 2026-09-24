@@ -5546,18 +5546,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2131:2159:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2131:2159:body/seq"
+            ],
+            "kind": "unprofitableTerminalScan"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2131:2159:body/seq",
               "expr:examples/json/json.ubnf:2131:2159:body/0/repeat"
@@ -5571,7 +5577,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2133:2157:body/0/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2131:2159:body/seq",
               "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
@@ -5586,7 +5592,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2133:2136:body/0/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2131:2159:body/seq",
               "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
@@ -5602,7 +5608,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2139:2143:body/0/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2131:2159:body/seq",
               "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
@@ -5618,7 +5624,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2146:2150:body/0/0/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2131:2159:body/seq",
               "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
@@ -5634,7 +5640,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2153:2157:body/0/0/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2131:2159:body/seq",
               "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
@@ -5646,18 +5652,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2175:2229:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2175:2229:body/choice"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2175:2181:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2175:2229:body/choice",
               "expr:examples/json/json.ubnf:2175:2181:body/0/ruleRef"
@@ -5671,7 +5683,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2184:2189:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2175:2229:body/choice",
               "expr:examples/json/json.ubnf:2184:2189:body/1/ruleRef"
@@ -5685,7 +5697,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2192:2198:body/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2175:2229:body/choice",
               "expr:examples/json/json.ubnf:2192:2198:body/2/ruleRef"
@@ -5699,7 +5711,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2201:2207:body/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2175:2229:body/choice",
               "expr:examples/json/json.ubnf:2201:2207:body/3/ruleRef"
@@ -5713,7 +5725,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2210:2214:body/4/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2175:2229:body/choice",
               "expr:examples/json/json.ubnf:2210:2214:body/4/ruleRef"
@@ -5727,7 +5739,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2217:2222:body/5/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2175:2229:body/choice",
               "expr:examples/json/json.ubnf:2217:2222:body/5/ruleRef"
@@ -5741,7 +5753,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2225:2229:body/6/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2175:2229:body/choice",
               "expr:examples/json/json.ubnf:2225:2229:body/6/ruleRef"
@@ -5751,18 +5763,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2287:2350:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2287:2350:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2287:2290:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2287:2290:body/0/literal"
@@ -5776,7 +5794,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2291:2293:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2291:2293:body/1/ruleRef"
@@ -5790,7 +5808,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional"
@@ -5804,7 +5822,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2296:2344:body/2/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5819,7 +5837,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2296:2302:body/2/0/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5835,7 +5853,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2312:2341:body/2/0/1/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5851,7 +5869,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2314:2330:body/2/0/1/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5868,7 +5886,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2314:2316:body/2/0/1/0/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5886,7 +5904,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2317:2320:body/2/0/1/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5904,7 +5922,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2321:2323:body/2/0/1/0/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5922,7 +5940,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2324:2330:body/2/0/1/0/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5940,7 +5958,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2342:2344:body/2/0/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
@@ -5956,7 +5974,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2347:2350:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2287:2350:body/seq",
               "expr:examples/json/json.ubnf:2347:2350:body/3/literal"
@@ -5966,18 +5984,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2411:2438:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2411:2438:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2411:2417:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2411:2438:body/seq",
               "expr:examples/json/json.ubnf:2411:2417:body/0/ruleRef"
@@ -5991,7 +6015,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2423:2425:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2411:2438:body/seq",
               "expr:examples/json/json.ubnf:2423:2425:body/1/ruleRef"
@@ -6005,7 +6029,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2426:2429:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2411:2438:body/seq",
               "expr:examples/json/json.ubnf:2426:2429:body/2/literal"
@@ -6019,7 +6043,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2430:2432:body/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2411:2438:body/seq",
               "expr:examples/json/json.ubnf:2430:2432:body/3/ruleRef"
@@ -6033,7 +6057,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2433:2438:body/4/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2411:2438:body/seq",
               "expr:examples/json/json.ubnf:2433:2438:body/4/ruleRef"
@@ -6043,18 +6067,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2499:2556:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2499:2556:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2499:2502:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2499:2502:body/0/literal"
@@ -6068,7 +6098,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2503:2505:body/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2503:2505:body/1/ruleRef"
@@ -6082,7 +6112,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional"
@@ -6096,7 +6126,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2508:2550:body/2/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6111,7 +6141,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2508:2513:body/2/0/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6127,7 +6157,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2521:2547:body/2/0/1/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6143,7 +6173,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2523:2538:body/2/0/1/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6160,7 +6190,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2523:2525:body/2/0/1/0/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6178,7 +6208,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2526:2529:body/2/0/1/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6196,7 +6226,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2530:2532:body/2/0/1/0/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6214,7 +6244,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2533:2538:body/2/0/1/0/3/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6232,7 +6262,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2548:2550:body/2/0/2/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
@@ -6248,7 +6278,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2553:2556:body/3/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2499:2556:body/seq",
               "expr:examples/json/json.ubnf:2553:2556:body/3/literal"
@@ -6258,18 +6288,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2611:2637:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2611:2637:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2611:2614:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2611:2637:body/seq",
               "expr:examples/json/json.ubnf:2611:2614:body/0/literal"
@@ -6283,7 +6319,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2615:2627:body/1/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2611:2637:body/seq",
               "expr:examples/json/json.ubnf:2615:2627:body/1/group"
@@ -6297,7 +6333,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2617:2625:body/1/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2611:2637:body/seq",
               "expr:examples/json/json.ubnf:2615:2627:body/1/group",
@@ -6312,7 +6348,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2617:2625:body/1/0/0/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2611:2637:body/seq",
               "expr:examples/json/json.ubnf:2615:2627:body/1/group",
@@ -6328,7 +6364,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2619:2623:body/1/0/0/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2611:2637:body/seq",
               "expr:examples/json/json.ubnf:2615:2627:body/1/group",
@@ -6345,7 +6381,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2634:2637:body/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2611:2637:body/seq",
               "expr:examples/json/json.ubnf:2634:2637:body/2/literal"
@@ -6355,18 +6391,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2652:2702:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2652:2702:body/choice"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2652:2658:body/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2652:2702:body/choice",
               "expr:examples/json/json.ubnf:2652:2658:body/0/ruleRef"
@@ -6380,7 +6422,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2661:2668:body/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2652:2702:body/choice",
               "expr:examples/json/json.ubnf:2661:2668:body/1/tokenRef"
@@ -6394,7 +6436,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2671:2679:body/2/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2652:2702:body/choice",
               "expr:examples/json/json.ubnf:2671:2679:body/2/tokenRef"
@@ -6408,7 +6450,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2682:2690:body/3/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2652:2702:body/choice",
               "expr:examples/json/json.ubnf:2682:2690:body/3/tokenRef"
@@ -6422,7 +6464,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2693:2702:body/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2652:2702:body/choice",
               "expr:examples/json/json.ubnf:2693:2702:body/4/tokenRef"
@@ -6432,18 +6474,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2776:2856:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2776:2856:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2776:2780:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2776:2780:body/0/literal"
@@ -6457,7 +6505,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2781:2856:body/1/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group"
@@ -6471,7 +6519,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2783:2854:body/1/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6486,7 +6534,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2783:2786:body/1/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6502,7 +6550,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2789:2793:body/1/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6518,7 +6566,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2796:2799:body/1/0/2/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6534,7 +6582,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2802:2807:body/1/0/3/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6550,7 +6598,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2810:2815:body/1/0/4/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6566,7 +6614,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2818:2823:body/1/0/5/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6582,7 +6630,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2826:2831:body/1/0/6/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6598,7 +6646,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2834:2839:body/1/0/7/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6614,7 +6662,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2842:2854:body/1/0/8/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6630,7 +6678,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2842:2847:body/1/0/8/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6647,7 +6695,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2848:2854:body/1/0/8/1/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6664,7 +6712,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2848:2851:body/1/0/8/1/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2776:2856:body/seq",
               "expr:examples/json/json.ubnf:2781:2856:body/1/group",
@@ -6678,18 +6726,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2965:2997:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:2965:2997:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2965:2997:body/0/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group"
@@ -6703,7 +6757,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2967:2995:body/0/0/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6718,7 +6772,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2967:2974:body/0/0/0/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6734,7 +6788,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2969:2972:body/0/0/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6751,7 +6805,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2975:2978:body/0/0/1/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6767,7 +6821,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2979:2987:body/0/0/2/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6783,7 +6837,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2981:2985:body/0/0/2/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6800,7 +6854,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2988:2995:body/0/0/3/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6816,7 +6870,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:2990:2993:body/0/0/3/0/ruleRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:2965:2997:body/seq",
               "expr:examples/json/json.ubnf:2965:2997:body/0/group",
@@ -6829,18 +6883,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3018:3042:body/choice",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:3018:3042:body/choice"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3018:3022:body/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3018:3042:body/choice",
               "expr:examples/json/json.ubnf:3018:3022:body/0/tokenRef"
@@ -6854,7 +6914,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3025:3042:body/1/seq",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3018:3042:body/choice",
               "expr:examples/json/json.ubnf:3025:3042:body/1/seq"
@@ -6868,7 +6928,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3025:3032:body/1/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3018:3042:body/choice",
               "expr:examples/json/json.ubnf:3025:3042:body/1/seq",
@@ -6883,7 +6943,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3033:3042:body/1/1/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3018:3042:body/choice",
               "expr:examples/json/json.ubnf:3025:3042:body/1/seq",
@@ -6898,7 +6958,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3035:3040:body/1/1/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3018:3042:body/choice",
               "expr:examples/json/json.ubnf:3025:3042:body/1/seq",
@@ -6910,18 +6970,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3056:3066:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:3056:3066:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3056:3059:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3056:3066:body/seq",
               "expr:examples/json/json.ubnf:3056:3059:body/0/literal"
@@ -6935,7 +7001,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3060:3066:body/1/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3056:3066:body/seq",
               "expr:examples/json/json.ubnf:3060:3066:body/1/repeat"
@@ -6949,7 +7015,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3060:3065:body/1/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3056:3066:body/seq",
               "expr:examples/json/json.ubnf:3060:3066:body/1/repeat",
@@ -6960,18 +7026,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3080:3122:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:3080:3122:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3080:3101:body/0/group",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3080:3101:body/0/group"
@@ -6985,7 +7057,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3082:3099:body/0/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3080:3101:body/0/group",
@@ -7000,7 +7072,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3082:3089:body/0/0/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3080:3101:body/0/group",
@@ -7016,7 +7088,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3092:3099:body/0/0/1/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3080:3101:body/0/group",
@@ -7032,7 +7104,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3102:3115:body/1/optional",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3102:3115:body/1/optional"
@@ -7046,7 +7118,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3104:3113:body/1/0/choice",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3102:3115:body/1/optional",
@@ -7061,7 +7133,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3104:3107:body/1/0/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3102:3115:body/1/optional",
@@ -7077,7 +7149,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3110:3113:body/1/0/1/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3102:3115:body/1/optional",
@@ -7093,7 +7165,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3116:3122:body/2/repeat",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3116:3122:body/2/repeat"
@@ -7107,7 +7179,7 @@
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3116:3121:body/2/0/tokenRef",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3080:3122:body/seq",
               "expr:examples/json/json.ubnf:3116:3122:body/2/repeat",
@@ -7118,18 +7190,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3158:3164:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:3158:3164:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3158:3164:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3158:3164:body/seq",
               "expr:examples/json/json.ubnf:3158:3164:body/0/literal"
@@ -7139,18 +7217,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3199:3206:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:3199:3206:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3199:3206:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3199:3206:body/seq",
               "expr:examples/json/json.ubnf:3199:3206:body/0/literal"
@@ -7160,18 +7244,24 @@
           "reason": "provedOmission"
         },
         {
-          "cacheFailure": true,
-          "cacheSuccess": true,
+          "cacheFailure": false,
+          "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3241:3247:body/seq",
-          "omissionProof": null,
-          "reason": "defaultSafe"
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/json/json.ubnf:3241:3247:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
         },
         {
           "cacheFailure": false,
           "cacheSuccess": false,
           "exprId": "expr:examples/json/json.ubnf:3241:3247:body/0/literal",
           "omissionProof": {
-            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
             "exprIds": [
               "expr:examples/json/json.ubnf:3241:3247:body/seq",
               "expr:examples/json/json.ubnf:3241:3247:body/0/literal"

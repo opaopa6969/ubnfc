@@ -380,6 +380,9 @@ pub enum ProofKind {
     NoTriviaEffectsRecovery,
     #[serde(rename = "leftRecursionNormalization")]
     LeftRecursionNormalization,
+    /// 同じ位置へ再入し得るが、再導出が終端走査だけで済むので memo が割に合わない。
+    #[serde(rename = "unprofitableTerminalScan")]
+    UnprofitableTerminalScan,
     #[serde(rename = "none")]
     None,
 }

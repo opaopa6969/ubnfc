@@ -237,11 +237,24 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
                 *incoming.entry(cx.index(id)).or_default() += 1;
             }
         }
-        let body_kept = reentrant.contains(&r) || !summaries[root].is_empty();
+        let reentrant_body = reentrant.contains(&r) || !summaries[root].is_empty();
+        // 再入し得ても、本体が**終端走査だけ**（局所木に ruleRef が無く、regex / UNTIL /
+        // Extern のような走査長が未知の token も無い）なら memo は入れない。hit で省けるのは
+        // 同じ位置での終端走査 1 回ぶん（消費する文字数ぶんの比較）で、計算量の階級は変わらない。
+        // 対して保存は**評価のたび**に必ず払い、表は入力長に比例して大きくなる。
+        // 効果（scope / recovery / Extern）を持つ本体は従来どおり保持側に倒す。
+        let profitable = derives_rules(cx, &local) || !summaries[root].is_empty();
+        let body_kept = reentrant_body && profitable;
         if !body_kept {
-            omissions.insert(root, Proof { kind: ProofKind::UnreachableRevisit,
-                expr_ids: vec![cx.sem.expressions[root].id.clone()],
-                explanation: "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。".into() });
+            omissions.insert(root, if reentrant_body {
+                Proof { kind: ProofKind::UnprofitableTerminalScan,
+                    expr_ids: vec![cx.sem.expressions[root].id.clone()],
+                    explanation: "同じ位置へ再入し得るが、本体は終端走査だけで規則呼出しへ到達しない。memo の hit で省けるのは同じ位置の終端走査 1 回ぶん（計算量の階級は変わらない）で、保存は評価のたびに払う。入力長に比例して育つ表の代金に見合わないので入れない。".into() }
+            } else {
+                Proof { kind: ProofKind::UnreachableRevisit,
+                    expr_ids: vec![cx.sem.expressions[root].id.clone()],
+                    explanation: "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。".into() }
+            });
             omitted_rules.insert(r);
         }
         let mut stack = vec![(
@@ -256,6 +269,8 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
             if i != root {
                 omissions.insert(i, Proof { kind, expr_ids: path.clone(), explanation: if body_kept {
                     "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。".into()
+                } else if reentrant_body {
+                    "rule 本体が終端走査だけなので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。".into()
                 } else {
                     "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。".into()
                 } });
@@ -324,4 +339,17 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
         summaries,
         omitted_rules,
     )
+}
+
+/// 本体の局所木が規則呼出しへ到達するか（＝再導出が終端走査だけで終わらないか）。
+/// 走査長が静的に分からない token（regex / UNTIL / Extern）も「終端だけ」には数えない。
+fn derives_rules(cx: &Context<'_>, local: &BTreeSet<usize>) -> bool {
+    local.iter().any(|&i| match &cx.sem.expressions[i].node {
+        ExprNode::RuleRef { .. } => true,
+        ExprNode::TokenRef { symbol_id } => matches!(
+            cx.sem.tokens[cx.tokens[symbol_id]].spec,
+            TokenSpec::Regex { .. } | TokenSpec::Until { .. } | TokenSpec::Extern { .. }
+        ),
+        _ => false,
+    })
 }
