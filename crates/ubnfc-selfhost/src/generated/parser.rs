@@ -5604,7 +5604,7 @@ out
 fn e321_c(&mut self,state:State)->Step {
 let mut out=self.b321_c(state);
 if out.ok {
-} else {self.display_failures(state.consumed.max(state.matched),&["'.'"]);}
+} else {self.display_failures(state.consumed.max(state.matched),&["'.'", "__CaptureSite"]);}
 out
 }
 fn b321_c(&mut self,mut state:State)->Step {
@@ -5612,12 +5612,12 @@ let mut out=Step::yes(state);
 out.state=state.begin();
 let mut count=0usize;loop {let mark=self.mark();let before=out.state;
 let mut child=self.e322_c(out.state);out.diag=self.diag_join(out.diag,child.diag);out.state=child.state;if !child.ok {self.restore(mark);break;}
+child.events=self.event(Event::Capture {site:57,span:[before.consumed,child.state.consumed],child:child.events,token_extent:false});
 out.events=self.join(out.events,child.events);count+=1;
 if before.position::<false>()==out.state.position::<false>() {break;}
-if count>=1 {break;}
 }
 let _=count;
-if count>1 {out.ok=false;out.state=state;let d=self.diag_fail(state.position::<false>(),"expression");out.diag=self.diag_join(out.diag,d);}
+if false {out.ok=false;out.state=state;let d=self.diag_fail(state.position::<false>(),"expression");out.diag=self.diag_join(out.diag,d);}
 out.state=if out.ok {state.commit(out.state)} else {state};
 out
 }
@@ -5643,8 +5643,7 @@ fn e323_c(&mut self,state:State)->Step {
 let mut out=self.b323_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 if let Event::Token{span,text_span,content_span,..}=self.arena[out.events.0] {out.events=self.event(Event::Token{expr:323,rule:55,span,text_span,content_span});}
-out.events=self.event(Event::Capture {site:57,span:[state.consumed,out.state.consumed],child:out.events,token_extent:false});
-} else {self.display_failures(state.consumed.max(state.matched),&["IdentifierParser", "__CaptureSite"]);}
+} else {self.display_failures(state.consumed.max(state.matched),&["IdentifierParser"]);}
 out
 }
 fn b323_c(&mut self,mut state:State)->Step {

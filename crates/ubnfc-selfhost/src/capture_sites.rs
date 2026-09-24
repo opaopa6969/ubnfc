@@ -110,143 +110,143 @@ pub(crate) const CAPTURE_RULES: &[(&str, &str)] = &[
         "UBNF::RuleDecl",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:4946:4956:body/2/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:4949:4959:body/2/tokenRef/capture/0",
         "UBNF::MappingAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:4998:5008:body/3/0/4/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5001:5011:body/3/0/4/tokenRef/capture/0",
         "UBNF::MappingAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5027:5037:body/3/0/5/0/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5030:5040:body/3/0/5/0/1/tokenRef/capture/0",
         "UBNF::MappingAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5151:5163:body/2/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5154:5166:body/2/ruleRef/capture/0",
         "UBNF::EvalAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5179:5191:body/3/0/1/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5182:5194:body/3/0/1/ruleRef/capture/0",
         "UBNF::EvalAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5309:5319:body/1/0/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5312:5322:body/1/0/1/tokenRef/capture/0",
         "UBNF::WhitespaceAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5449:5459:body/4/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5452:5462:body/4/tokenRef/capture/0",
         "UBNF::InterleaveAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5574:5584:body/4/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5577:5587:body/4/tokenRef/capture/0",
         "UBNF::BackrefAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5702:5712:body/4/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5705:5715:body/4/tokenRef/capture/0",
         "UBNF::ScopeTreeAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5844:5854:body/4/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5847:5857:body/4/tokenRef/capture/0",
         "UBNF::DeclaresAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5887:5893:body/5/0/3/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:5890:5896:body/5/0/3/tokenRef/capture/0",
         "UBNF::DeclaresAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6020:6026:body/4/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6023:6029:body/4/tokenRef/capture/0",
         "UBNF::CatalogAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6488:6504:body/4/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6499:6515:body/4/tokenRef/capture/0",
         "UBNF::PrecedenceAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/2/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6605:6611:body/2/tokenRef/capture/0",
         "UBNF::DocAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/2/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6740:6746:body/2/0/0/2/tokenRef/capture/0",
         "UBNF::RecoveryAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6750:6760:body/2/0/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:6761:6771:body/2/0/1/tokenRef/capture/0",
         "UBNF::RecoveryAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7016:7026:body/2/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7027:7037:body/2/tokenRef/capture/0",
         "UBNF::CommonFieldAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7045:7055:body/3/0/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7056:7066:body/3/0/1/tokenRef/capture/0",
         "UBNF::CommonFieldAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7266:7276:body/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7277:7287:body/1/tokenRef/capture/0",
         "UBNF::SimpleAnnotation",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7408:body/0/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7407:7419:body/0/ruleRef/capture/0",
         "UBNF::ChoiceBody",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7429:7441:body/1/0/1/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7440:7452:body/1/0/1/ruleRef/capture/0",
         "UBNF::ChoiceBody",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7543:7563:body/0/repeat/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7554:7574:body/0/repeat/capture/0",
         "UBNF::SequenceBody",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7729:7742:body/0/0/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7740:7753:body/0/0/ruleRef/capture/0",
         "UBNF::AnnotatedElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7770:7783:body/1/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7781:7794:body/1/ruleRef/capture/0",
         "UBNF::AnnotatedElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7887:7897:body/5/0/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:7898:7908:body/5/0/1/tokenRef/capture/0",
         "UBNF::AnnotatedElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8528:8536:body/1/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8539:8547:body/1/ruleRef/capture/0",
         "UBNF::GroupElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8640:8648:body/1/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8651:8659:body/1/ruleRef/capture/0",
         "UBNF::OptionalElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8753:8761:body/1/ruleRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8764:8772:body/1/ruleRef/capture/0",
         "UBNF::RepeatElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8883:8889:body/2/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8894:8900:body/2/tokenRef/capture/0",
         "UBNF::ErrorElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:8997:9003:body/0/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9008:9014:body/0/tokenRef/capture/0",
         "UBNF::TerminalElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9216:9226:body/0/0/0/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9351:9369:body/0/repeat/capture/0",
         "UBNF::QuantifiedRef",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9244:9254:body/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9391:body/1/tokenRef/capture/0",
         "UBNF::QuantifiedRef",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9395:9405:body/2/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9532:9542:body/2/tokenRef/capture/0",
         "UBNF::TypeofElement",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9526:9536:body/0/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9663:9673:body/0/tokenRef/capture/0",
         "UBNF::DottedIdentifier",
     ),
     (
-        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9550:9560:body/1/0/1/tokenRef/capture/0",
+        "expr:unlaxer-dsl/grammar/ubnf.ubnf:9687:9697:body/1/0/1/tokenRef/capture/0",
         "UBNF::DottedIdentifier",
     ),
 ];
