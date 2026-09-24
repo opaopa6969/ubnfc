@@ -668,7 +668,30 @@ public final class JavaEmitter {
                 .map(g -> group(expr.node().alternatives(), g)).collect(Collectors.joining(",")) + "}");
         }
         String tail = groups.equals("null") ? (guards.equals("null") ? "" : "," + guards) : "," + guards + "," + groups;
-        return eofGuard + "return s.choice(f," + calls(expr.node().alternatives()) + "," + longest + "," + eligible + "," + (predict && (plan == null || plan.fallback().equals("fullChoice"))) + tail + ");";
+        return eofGuard + exclusiveMiss(expr, plan) + "return s.choice(f," + calls(expr.node().alternatives()) + "," + longest + "," + eligible + "," + (predict && (plan == null || plan.fallback().equals("fullChoice"))) + tail + ");";
+    }
+    /**
+     * D-066: front が {@code exclusiveCandidates} を証明した選択（{@code strategy=predict} かつ
+     * {@code fallback=none}）で、呼出し位置の文字がどの候補の先頭でもないときに候補を 1 つも呼ばずに
+     * 失敗する短絡。Rust backend の {@code expressions.rs::predict_literals} と同じ条件で、
+     * 診断モードでは {@code Session#exclusiveReady} が偽になるので従来どおり全候補を走らせる。
+     */
+    private String exclusiveMiss(Expr expr, ChoicePlan plan) {
+        if (plan == null || !plan.strategy().equals("predict") || !plan.fallback().equals("none")) return "";
+        if (plan.proof() == null || !plan.proof().kind().equals("exclusiveCandidates")) return "";
+        var firsts = new java.util.TreeSet<Integer>();
+        for (String id : expr.node().alternatives()) {
+            ExprNode alternative = expressions.get(id).node();
+            // 証明の内容（単一 code point・case sensitive）を生成時にもう一度確かめる。
+            if (!alternative.kind().equals("literal") || !Boolean.TRUE.equals(alternative.caseSensitive())) return "";
+            String value = alternative.value();
+            if (value == null || value.codePointCount(0, value.length()) != 1) return "";
+            if (!firsts.add(value.codePointAt(0))) return "";
+        }
+        if (firsts.isEmpty()) return "";
+        return "if (s.exclusiveReady(f) && switch (s.cp(f.c)) { case "
+            + firsts.stream().map(String::valueOf).collect(Collectors.joining(", "))
+            + " -> false; default -> true; }) return s.exclusiveFail(f); ";
     }
     /** 候補除外の条件の同一性（群にできるのは条件が一致する候補だけ）。 */
     private static String guardKey(Prediction.Guard guard) {

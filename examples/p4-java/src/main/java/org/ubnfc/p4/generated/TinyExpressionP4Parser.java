@@ -4880,10 +4880,10 @@ public final class TinyExpressionP4Parser {
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e381M : TinyExpressionP4Parser::e381C, K215, K215, K215, K216, K216, "TinyExpressionP4::AddOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9078:body/choice", false, false, "text", false, K4);
     }
     private static Match e381C(Session s, Frame f) {
-        return s.choice(f,K532,false,new boolean[]{true,true},false);
+        if (s.exclusiveReady(f) && switch (s.cp(f.c)) { case 43, 45 -> false; default -> true; }) return s.exclusiveFail(f); return s.choice(f,K532,false,new boolean[]{true,true},false);
     }
     private static Match e381M(Session s, Frame f) {
-        return s.choice(f,K532,false,new boolean[]{true,true},false);
+        if (s.exclusiveReady(f) && switch (s.cp(f.c)) { case 43, 45 -> false; default -> true; }) return s.exclusiveFail(f); return s.choice(f,K532,false,new boolean[]{true,true},false);
     }
     private static Match e382(Session s, Frame f) {
         if (s.bypassWrap) { Match r = f.matched ? e382M(s, f) : e382C(s, f); s.progress(f); return r; }
@@ -4910,10 +4910,10 @@ public final class TinyExpressionP4Parser {
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e384M : TinyExpressionP4Parser::e384C, K215, K215, K215, K216, K216, "TinyExpressionP4::MulOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9102:body/choice", false, false, "text", false, K4);
     }
     private static Match e384C(Session s, Frame f) {
-        return s.choice(f,K537,false,new boolean[]{true,true},false);
+        if (s.exclusiveReady(f) && switch (s.cp(f.c)) { case 42, 47 -> false; default -> true; }) return s.exclusiveFail(f); return s.choice(f,K537,false,new boolean[]{true,true},false);
     }
     private static Match e384M(Session s, Frame f) {
-        return s.choice(f,K537,false,new boolean[]{true,true},false);
+        if (s.exclusiveReady(f) && switch (s.cp(f.c)) { case 42, 47 -> false; default -> true; }) return s.exclusiveFail(f); return s.choice(f,K537,false,new boolean[]{true,true},false);
     }
     private static Match e385(Session s, Frame f) {
         if (s.bypassWrap) { Match r = f.matched ? e385M(s, f) : e385C(s, f); s.progress(f); return r; }
