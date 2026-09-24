@@ -36,11 +36,21 @@
 | ANTLR4 4.13.2 | **95** | **188** | 21 | 14 | なし |
 | tree-sitter 0.25.10 | **95** | **188** | 22 | 13 | なし |
 
-実装間で判定が割れるのは **2 件だけ**（残り 316 件は 4 実装が完全一致。当初は 5 件）。
+実装間で判定が割れるのは（issue #35 解消後の再検証時点で）**1 件だけ**（C。当初は B を含む 2 件、
+さらにその前は A の 3 件を含む 5 件）。上の表の `i_` 受理/拒否の内訳（20/15）は B 解消前の初回走査の
+値のままで、B の 1 件が reject→accept に変わった分だけ両 backend とも `i_` 受理 21・拒否 14 になる
+（ANTLR4 と同じ内訳。318 件全体を再走査した表の更新は次回の速度比較のやり直し時にまとめて行う）。
 
-| file | suite の分類 | ubnfc Rust | ubnfc Java | ANTLR4 | tree-sitter | 理由 |
+> **2026-09-24 追記（issue #35 / D-070・D-071）**: 下記 B は **native stack 番兵を `max_depth` の
+> 範囲内では大きい専用 thread へエスカレーションするように直して解消した**。現在は ubnfc の
+> 2 backend も `i_structure_500_nested_arrays` を accept し、suite との不一致・実装間の割れは
+> **C（BOM）の 1 件だけ**になった。記録は
+> [`2026-09-24-runtime-limits.md`](2026-09-24-runtime-limits.md)。以下の B は**なぜ穴だったか**の
+> 記録として残す。
+
+| file | suite の分類 | ubnfc Rust（当初） | ubnfc Java（当初） | ANTLR4 | tree-sitter | 理由 |
 |---|---|---|---|---|---|---|
-| `i_structure_500_nested_arrays` | 実装依存 | reject | reject | accept | accept | **B**: ubnfc の生成ランタイムはネイティブスタック 256 KiB で再帰を止める（issue #35） |
+| `i_structure_500_nested_arrays` | 実装依存 | reject → **accept** | reject → **accept** | accept | accept | **B**: ubnfc の生成ランタイムはネイティブスタック 256 KiB で再帰を止めていた（issue #35。D-070 で解消） |
 | `i_structure_UTF-8_BOM_empty_object` | 実装依存 | reject | reject | reject | accept | **C**: tree-sitter だけ先頭 BOM を読み飛ばす |
 
 当初（この報告の初版、ubnfc `d257a9b`）は次の 3 件でも割れていた。**D-063 で解消済み**。
