@@ -154,7 +154,7 @@ issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で�
 - **正しさ**: `y_` 95 件は 4 実装すべて受理、`n_` 188 件も **4 実装すべて拒否**。
   初回の測定では ubnfc だけ 185 件だった（文字列中の生の制御文字 3 件を受理していた。UBNF v2 に
   「U+0000–U+001F を除く code point 集合」を書く手立てが無かったため）が、
-  **v2 に code point クラスを足して解消した**（issue #34 / D-063、
+  **v2 に code point クラスを足して解消した**（issue #34 / D-067、
   [`docs/reports/2026-09-24-v2-codepoint-classes.md`](docs/reports/2026-09-24-v2-codepoint-classes.md)）。
   いま実装間で判定が割れるのは 318 件中 **2 件だけ**で、どちらも `i_`（実装依存）——
   先頭 BOM（tree-sitter だけ受理）と 500 重ネスト（issue #35）。
@@ -248,7 +248,7 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
 | 言語中立な token 語彙（36 名前）＋ 明示 `extern` | 実装済み | D-041 / D-042 |
 | パラメータ化ルール `Name<P1,...,Pn>`（規則本体の雛形。resolve 前にその場で展開、`%inline` 方式） | 実装済み | D-043 / D-044 |
 | アノテーションの統廃合（P1 未知注釈警告・P2 `@backref` 分割・P3 `@interleave` 統合・P5 `@predictiveChoice` 非推奨・P7-1/P7-3） | 実装済み。**P7-2 は誤りと判明**（Java にも上限検査があった）。**P4・P6・P7-4 は未着手** | D-045〜D-049。棚卸し全体は `docs/design/07-annotation-inventory.md`（提案 P1〜P7 のうち実装済みの範囲を明記） |
-| code point クラス（`CHAR_RANGE` の境界と `NEGATION` の除外集合の `\uXXXX` / `\u{X…}`、`CHAR_RANGE` の補助面） | 実装済み | D-063 |
+| code point クラス（`CHAR_RANGE` の境界と `NEGATION` の除外集合の `\uXXXX` / `\u{X…}`、`CHAR_RANGE` の補助面） | 実装済み | D-067 |
 
 意味述語（ANTLR の `{...}?`）は v2 でも**入れない**。終端が「(入力, 位置) の純粋述語」である
 性質に memo・候補除外・字句キャッシュの健全性が乗っているため。文脈依存が要る場面は
