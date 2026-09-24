@@ -1,0 +1,39 @@
+# issue #55 / D-075: 1 parse あたりの Match 生成回数と thread allocated bytes（計時ではない）。
+# Match の正準コンストラクタ（match_alloc）と Match.empty（match_empty）に静的カウンタを入れた複製を
+# 別ディレクトリで組み、同一 JVM の中で Session.plainMatch を反転して 1 parse ずつ数えた（scratch driver）。
+# plainMatch=false が before（参照経路）、true が after（D-075）。p4 は @scope 効果を持つので生成側が
+# plainRecognition=false を渡す（両変種で同じ経路＝参照経路のまま）。
+# 値は master 103842e を merge した最終 build で取り直したもの（merge 前の build と Match 回数は全 cell 一致）。
+grammar,input,bytes,mode,plainMatch,match_alloc,match_empty,alloc_bytes
+json,json-1k.json,1067,認識のみ,false,2840,2453,165672
+json,json-1k.json,1067,認識のみ,true,0,0,6632
+json,json-1k.json,1067,typed AST,false,3423,666,337512
+json,json-1k.json,1067,typed AST,true,3423,666,337512
+json,json-10k.json,10066,認識のみ,false,28678,25429,1642520
+json,json-10k.json,10066,認識のみ,true,0,0,36552
+json,json-10k.json,10066,typed AST,false,35043,6611,3492368
+json,json-10k.json,10066,typed AST,true,35043,6611,3494680
+json,json-100k.json,100039,認識のみ,false,285775,253371,16338328
+json,json-100k.json,100039,認識のみ,true,0,0,347432
+json,json-100k.json,100039,typed AST,false,349571,65525,34837824
+json,json-100k.json,100039,typed AST,true,349571,65525,34706272
+json,json-1m.json,1000112,認識のみ,false,2857582,2533873,163343912
+json,json-1m.json,1000112,認識のみ,true,0,0,3319320
+json,json-1m.json,1000112,typed AST,false,3495665,655269,350851880
+json,json-1m.json,1000112,typed AST,true,3495665,655269,350851880
+operators,operators-atoms-512.txt,1023,認識のみ,false,5632,5632,332856
+operators,operators-atoms-512.txt,1023,認識のみ,true,0,0,17464
+operators,operators-atoms-512.txt,1023,typed AST,false,8192,1023,1473448
+operators,operators-atoms-512.txt,1023,typed AST,true,8192,1023,1473448
+power,power-64.txt,127,認識のみ,false,510,510,32464
+power,power-64.txt,127,認識のみ,true,0,0,3992
+power,power-64.txt,127,typed AST,false,764,127,159776
+power,power-64.txt,127,typed AST,true,764,127,159904
+p4,complex.tiny,332,認識のみ,false,658,603,73864
+p4,complex.tiny,332,認識のみ,true,658,603,73864
+p4,complex.tiny,332,typed AST,false,1070,130,202888
+p4,complex.tiny,332,typed AST,true,1070,130,202672
+p4,complex-x64.tiny,20923,認識のみ,false,39844,36576,4127640
+p4,complex-x64.tiny,20923,認識のみ,true,39844,36576,4127640
+p4,complex-x64.tiny,20923,typed AST,false,65078,7816,12155624
+p4,complex-x64.tiny,20923,typed AST,true,65078,7816,12073512

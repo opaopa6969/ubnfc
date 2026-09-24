@@ -1,0 +1,29 @@
+# issue #55 / D-075: Operators / Power の A/B（AbRunner、同一 JVM で Session.plainMatch を反転）と P4 の非退行（org.ubnfc.p4.Benchmark）。
+# P4 は @scope 効果を持つので plainRecognition=false（両変種が同じ経路）。pre-merge は aee0a21 上（taskset -c 29、load 20〜24）、final は master 103842e を merge 後（taskset -c 28、load 12〜15）。
+section,impl,input,bytes,mode,variant,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,alloc_bytes_per_parse
+pre-merge-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,認識のみ,before,5232,200,11,0.124200,0.101157,0.190586,0.1214,332680
+pre-merge-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,認識のみ,after(D-070),5232,200,11,0.103398,0.087306,0.148235,0.1011,17288
+pre-merge-ab,ubnfc-java(生成),power-64.txt,127,認識のみ,before,11059,200,11,0.014520,0.012480,0.071667,0.1143,32320
+pre-merge-ab,ubnfc-java(生成),power-64.txt,127,認識のみ,after(D-070),11059,200,11,0.012354,0.010552,0.038721,0.0973,3760
+pre-merge-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,typed AST,before,142,200,11,1.178597,1.014480,2.691952,1.1521,1452944
+pre-merge-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,typed AST,after(D-070),142,200,11,1.183939,0.862349,1.738798,1.1573,1452944
+pre-merge-ab,ubnfc-java(生成),power-64.txt,127,typed AST,before,109,200,11,0.603479,0.440026,1.113339,4.7518,154472
+pre-merge-ab,ubnfc-java(生成),power-64.txt,127,typed AST,after(D-070),109,200,11,0.541826,0.388153,0.661078,4.2663,154472
+final-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,認識のみ,before,4836,200,11,0.133610,0.088544,0.290456,0.1306,332704
+final-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,認識のみ,after(D-075),4836,200,11,0.108787,0.081041,0.332661,0.1063,17312
+final-ab,ubnfc-java(生成),power-64.txt,127,認識のみ,before,11119,200,11,0.013998,0.009250,0.047079,0.1102,32344
+final-ab,ubnfc-java(生成),power-64.txt,127,認識のみ,after(D-075),11119,200,11,0.010351,0.006740,0.018629,0.0815,3784
+final-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,typed AST,before,453,200,11,1.094460,0.530670,1.978097,1.0699,1452816
+final-ab,ubnfc-java(生成),operators-atoms-512.txt,1023,typed AST,after(D-075),453,200,11,1.159042,0.512161,2.461832,1.1330,1452816
+final-ab,ubnfc-java(生成),power-64.txt,127,typed AST,before,20,200,11,0.454085,0.177884,2.050288,3.5755,159776
+final-ab,ubnfc-java(生成),power-64.txt,127,typed AST,after(D-075),20,200,11,0.509088,0.318389,2.234975,4.0086,159776
+# P4 final（bench.runs=9。列は Benchmark の出力そのまま）
+# # java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+# # jvm=[-Xms2g, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x64, -Dbench.modes=recognize-fast,ast-fast, -Dbench.runs=9]
+# # loadavg=12.20 14.39 14.39 36/5272 1913094
+# p4 列: fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+p4-final,complex,recognize-fast,Formula,2000,2000,0.202725,0.136890,0.133380,0.156441,0.146660,0.146660,0.123355,136216
+p4-final,complex,ast-fast,Formula,2000,2000,0.354017,0.319805,0.320268,0.282090,0.453786,0.335048,0.267899,264144
+p4-final,complex-x64,recognize-fast,Formula,2000,50,9.465932,10.343085,9.515205,11.590213,12.122773,11.590213,9.465932,3944920
+p4-final,complex-x64,ast-fast,Formula,2000,50,27.847923,23.490453,24.518521,26.411917,24.523687,25.687647,21.771578,11916456
+# # loadavg=11.83 12.76 13.72 12/5010 1931677
