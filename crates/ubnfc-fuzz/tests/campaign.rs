@@ -267,6 +267,53 @@ fn e_v2_code_point_class_tokens_agree_across_backends() {
     }
 }
 
+/// issue #41 の回帰試験。v2 帯の seed 276（= 100276）は `@recovery(SKIP)` を通った解析で
+/// 回復診断の候補（`expected` / `farthestExpected`）と `recoveries[].captureOccurrences` が
+/// 食い違っていた。原因はどちらも Rust 側で、契約は `docs/harness-driver-protocol.md` の
+/// D-025（`captureOccurrences`）と D-027（最遠到達の候補）。
+/// この seed は `KNOWN` の signature も含めて 1 件も差分を出してはならない。
+#[test]
+fn f_v2_recovery_diagnostics_agree_across_backends() {
+    ubnfc_fuzz::tune_generated_builds();
+    let scratch = scratch();
+    let seed = ubnfc_fuzz::gen::V2_SEED_BASE + 276;
+    let grammar = ubnfc_fuzz::gen::generate(seed);
+    assert!(
+        grammar.features.contains("recovery"),
+        "seed {seed} に recovery が無い: {:?}",
+        grammar.features
+    );
+    let summary = campaign::run(&Config {
+        start_seed: seed,
+        seeds: 1,
+        inputs: 12,
+        jobs: 1,
+        budget: Some(Duration::from_secs(600)),
+        findings: None,
+        shrink_builds: 0,
+        driver_timeout: Duration::from_secs(120),
+        workdir: scratch.0.clone(),
+    });
+    assert_eq!(
+        summary.discarded, 0,
+        "front の discard: {:?}",
+        summary.discards
+    );
+    assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
+    assert!(
+        summary.comparisons >= 10 && summary.driver_errors == 0,
+        "seed {seed}: 比較 {} / error {}",
+        summary.comparisons,
+        summary.driver_errors
+    );
+    let found: Vec<_> = summary
+        .findings
+        .iter()
+        .map(|finding| format!("{} ({})", finding.signature, finding.slug))
+        .collect();
+    assert!(found.is_empty(), "seed {seed} の差分: {found:#?}");
+}
+
 /// A-1 の回帰試験。seed 269 は `@recovery(AUTO)` の適用範囲が両 backend で食い違い、
 /// 同じ入力の受理・カーソル・capture・AST が変わっていた（13 差分クラス）。
 /// 契約は `docs/design/03-design-v1.md` §3.10 / D-024。

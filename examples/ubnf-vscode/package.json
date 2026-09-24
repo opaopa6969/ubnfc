@@ -17,7 +17,8 @@
     "Linters"
   ],
   "activationEvents": [
-    "onLanguage:ubnf"
+    "onLanguage:ubnf",
+    "onDebugResolve:ubnf"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -38,6 +39,61 @@
         "language": "ubnf",
         "scopeName": "source.ubnf",
         "path": "./syntaxes/ubnf.tmLanguage.json"
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "ubnf"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "ubnf",
+        "label": "UBNF (ubnfc) grammar debugger",
+        "languages": [
+          "ubnf"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "デバッグする .ubnf ファイル（生成パーサで解析し、型付き AST を前順で歩く）",
+                "default": "${file}"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "根の AST 節点で止まる",
+                "default": true
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "ubnf",
+            "request": "launch",
+            "name": "UBNF (ubnfc) grammar debugger",
+            "program": "${file}",
+            "stopOnEntry": true
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "UBNF (ubnfc): 文法デバッガ",
+            "description": "生成パーサで解析し、型付き AST をステップ実行する（式の値は出ない）",
+            "body": {
+              "type": "ubnf",
+              "request": "launch",
+              "name": "UBNF (ubnfc) grammar debugger",
+              "program": "${file}",
+              "stopOnEntry": true
+            }
+          }
+        ]
       }
     ],
     "configuration": {

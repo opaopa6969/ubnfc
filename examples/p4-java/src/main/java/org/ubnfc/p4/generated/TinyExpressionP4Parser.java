@@ -1019,7 +1019,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e0(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e0M(s, f) : e0C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e0M(s, f) : e0C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e0M : TinyExpressionP4Parser::e0C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:886:1045:body/seq", false, false, "node", true, K4);
     }
     private static Match e0C(Session s, Frame f) {
@@ -1029,7 +1029,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K220, K219);
     }
     private static Match e1(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1M(s, f) : e1C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1M(s, f) : e1C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1M : TinyExpressionP4Parser::e1C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:886:899:body/0/repeat", true, false, "node", true, K221);
     }
     private static Match e1C(Session s, Frame f) {
@@ -1039,7 +1039,7 @@ public final class TinyExpressionP4Parser {
         return s.repeat(f, TinyExpressionP4Parser::e2, 0, Integer.MAX_VALUE, null, Trivia.NONE);
     }
     private static Match e2(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e2M(s, f) : e2C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e2M(s, f) : e2C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e2M : TinyExpressionP4Parser::e2C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:888:897:body/0/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e2C(Session s, Frame f) {
@@ -1049,7 +1049,7 @@ public final class TinyExpressionP4Parser {
         return parseCodeBlock_1(s, f);
     }
     private static Match e3(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e3M(s, f) : e3C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e3M(s, f) : e3C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e3M : TinyExpressionP4Parser::e3C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:900:930:body/1/repeat", true, false, "node", true, K221);
     }
     private static Match e3C(Session s, Frame f) {
@@ -1069,7 +1069,7 @@ public final class TinyExpressionP4Parser {
         return parseImportDeclaration_2(s, f);
     }
     private static Match e5(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e5M(s, f) : e5C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e5M(s, f) : e5C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e5M : TinyExpressionP4Parser::e5C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:931:968:body/2/repeat", true, false, "node", true, K221);
     }
     private static Match e5C(Session s, Frame f) {
@@ -1089,7 +1089,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableDeclaration_4(s, f);
     }
     private static Match e7(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e7M(s, f) : e7C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e7M(s, f) : e7C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e7M : TinyExpressionP4Parser::e7C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:973:987:body/3/repeat", true, false, "node", true, K30);
     }
     private static Match e7C(Session s, Frame f) {
@@ -1099,7 +1099,7 @@ public final class TinyExpressionP4Parser {
         return s.repeat(f, TinyExpressionP4Parser::e8, 0, Integer.MAX_VALUE, null, Trivia.NONE);
     }
     private static Match e8(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e8M(s, f) : e8C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e8M(s, f) : e8C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e8M : TinyExpressionP4Parser::e8C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:975:985:body/3/0/ruleRef", false, false, "node", true, K4);
     }
     private static Match e8C(Session s, Frame f) {
@@ -1119,7 +1119,7 @@ public final class TinyExpressionP4Parser {
         return parseExpression_123(s, f);
     }
     private static Match e10(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e10M(s, f) : e10C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e10M(s, f) : e10C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e10M : TinyExpressionP4Parser::e10C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1011:1041:body/5/repeat", true, false, "node", true, K221);
     }
     private static Match e10C(Session s, Frame f) {
@@ -1139,7 +1139,7 @@ public final class TinyExpressionP4Parser {
         return parseMethodDeclaration_19(s, f);
     }
     private static Match e12(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e12M(s, f) : e12C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e12M(s, f) : e12C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e12M : TinyExpressionP4Parser::e12C, K215, K215, K215, K216, K216, "TinyExpressionP4::Formula", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1042:1045:body/6/tokenRef", false, true, "text", false, K233);
     }
     private static Match e12C(Session s, Frame f) {
@@ -1150,7 +1150,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e13(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e13M(s, f) : e13C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e13M(s, f) : e13C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e13M : TinyExpressionP4Parser::e13C, K215, K215, K215, K216, K216, "TinyExpressionP4::CodeBlock", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1290:1319:body/seq", false, false, "text", false, K4);
     }
     private static Match e13C(Session s, Frame f) {
@@ -1160,7 +1160,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K238, K237);
     }
     private static Match e14(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e14M(s, f) : e14C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e14M(s, f) : e14C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e14M : TinyExpressionP4Parser::e14C, K215, K215, K215, K216, K216, "TinyExpressionP4::CodeBlock", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1290:1300:body/0/tokenRef", false, true, "text", false, K4);
     }
     private static Match e14C(Session s, Frame f) {
@@ -1170,7 +1170,7 @@ public final class TinyExpressionP4Parser {
         return s.external(f,"TinyExpressionP4::CODE_START",0);
     }
     private static Match e15(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e15M(s, f) : e15C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e15M(s, f) : e15C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e15M : TinyExpressionP4Parser::e15C, K215, K215, K215, K216, K216, "TinyExpressionP4::CodeBlock", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1301:1310:body/1/tokenRef", false, true, "text", false, K239);
     }
     private static Match e15C(Session s, Frame f) {
@@ -1180,7 +1180,7 @@ public final class TinyExpressionP4Parser {
         return s.until(f,"```");
     }
     private static Match e16(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e16M(s, f) : e16C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e16M(s, f) : e16C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e16M : TinyExpressionP4Parser::e16C, K215, K215, K215, K216, K216, "TinyExpressionP4::CodeBlock", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1311:1319:body/2/tokenRef", false, true, "text", false, K4);
     }
     private static Match e16C(Session s, Frame f) {
@@ -1191,7 +1191,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e17(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e17M(s, f) : e17C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e17M(s, f) : e17C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e17M : TinyExpressionP4Parser::e17C, K215, K215, K215, K216, K216, "TinyExpressionP4::ImportDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1767:1850:body/seq", false, false, "node", false, K4);
     }
     private static Match e17C(Session s, Frame f) {
@@ -1201,7 +1201,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K242, K241);
     }
     private static Match e18(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e18M(s, f) : e18C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e18M(s, f) : e18C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e18M : TinyExpressionP4Parser::e18C, K215, K215, K215, K216, K216, "TinyExpressionP4::ImportDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1767:1775:body/0/literal", false, true, "text", false, K243);
     }
     private static Match e18C(Session s, Frame f) {
@@ -1221,7 +1221,7 @@ public final class TinyExpressionP4Parser {
         return parseClassName_3(s, f);
     }
     private static Match e20(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e20M(s, f) : e20C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e20M(s, f) : e20C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e20M : TinyExpressionP4Parser::e20C, K215, K215, K215, K216, K216, "TinyExpressionP4::ImportDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1797:1823:body/2/optional", true, false, "text", false, K247);
     }
     private static Match e20C(Session s, Frame f) {
@@ -1232,7 +1232,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e21(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e21M(s, f) : e21C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e21M(s, f) : e21C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e21M : TinyExpressionP4Parser::e21C, K215, K215, K215, K216, K216, "TinyExpressionP4::ImportDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1799:1813:body/2/0/seq", false, false, "text", false, K247);
     }
     private static Match e21C(Session s, Frame f) {
@@ -1242,7 +1242,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K250, K249);
     }
     private static Match e22(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e22M(s, f) : e22C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e22M(s, f) : e22C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e22M : TinyExpressionP4Parser::e22C, K215, K215, K215, K216, K216, "TinyExpressionP4::ImportDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1799:1802:body/2/0/0/literal", false, true, "text", false, K247);
     }
     private static Match e22C(Session s, Frame f) {
@@ -1262,7 +1262,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e24(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e24M(s, f) : e24C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e24M(s, f) : e24C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e24M : TinyExpressionP4Parser::e24C, K215, K215, K215, K216, K216, "TinyExpressionP4::ImportDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1824:1828:body/3/literal", false, true, "text", false, K256);
     }
     private static Match e24C(Session s, Frame f) {
@@ -1282,7 +1282,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e26(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e26M(s, f) : e26C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e26M(s, f) : e26C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e26M : TinyExpressionP4Parser::e26C, K215, K215, K215, K216, K216, "TinyExpressionP4::ImportDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1847:1850:body/5/literal", false, true, "text", false, K260);
     }
     private static Match e26C(Session s, Frame f) {
@@ -1293,7 +1293,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e27(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e27M(s, f) : e27C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e27M(s, f) : e27C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e27M : TinyExpressionP4Parser::e27C, K215, K215, K215, K216, K216, "TinyExpressionP4::ClassName", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1921:1962:body/seq", false, false, "text", false, K4);
     }
     private static Match e27C(Session s, Frame f) {
@@ -1313,7 +1313,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e29(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e29M(s, f) : e29C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e29M(s, f) : e29C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e29M : TinyExpressionP4Parser::e29C, K215, K215, K215, K216, K216, "TinyExpressionP4::ClassName", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1938:1962:body/1/repeat", true, false, "text", false, K265);
     }
     private static Match e29C(Session s, Frame f) {
@@ -1324,7 +1324,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e30(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e30M(s, f) : e30C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e30M(s, f) : e30C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e30M : TinyExpressionP4Parser::e30C, K215, K215, K215, K216, K216, "TinyExpressionP4::ClassName", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1940:1954:body/1/0/seq", false, false, "text", false, K265);
     }
     private static Match e30C(Session s, Frame f) {
@@ -1334,7 +1334,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K266, K249);
     }
     private static Match e31(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e31M(s, f) : e31C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e31M(s, f) : e31C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e31M : TinyExpressionP4Parser::e31C, K215, K215, K215, K216, K216, "TinyExpressionP4::ClassName", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1940:1943:body/1/0/0/literal", false, true, "text", false, K265);
     }
     private static Match e31C(Session s, Frame f) {
@@ -1354,7 +1354,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e33(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e33M(s, f) : e33C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e33M(s, f) : e33C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e33M : TinyExpressionP4Parser::e33C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2113:2235:body/choice", false, false, "node", false, K4);
     }
     private static Match e33C(Session s, Frame f) {
@@ -1364,7 +1364,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K281,false,null,false,K280);
     }
     private static Match e34(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e34M(s, f) : e34C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e34M(s, f) : e34C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e34M : TinyExpressionP4Parser::e34C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2113:2138:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e34C(Session s, Frame f) {
@@ -1374,7 +1374,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberVariableDeclaration_5(s, f);
     }
     private static Match e35(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e35M(s, f) : e35C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e35M(s, f) : e35C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e35M : TinyExpressionP4Parser::e35C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2145:2170:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e35C(Session s, Frame f) {
@@ -1384,7 +1384,7 @@ public final class TinyExpressionP4Parser {
         return parseStringVariableDeclaration_6(s, f);
     }
     private static Match e36(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e36M(s, f) : e36C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e36M(s, f) : e36C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e36M : TinyExpressionP4Parser::e36C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2177:2203:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e36C(Session s, Frame f) {
@@ -1394,7 +1394,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanVariableDeclaration_7(s, f);
     }
     private static Match e37(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e37M(s, f) : e37C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e37M(s, f) : e37C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e37M : TinyExpressionP4Parser::e37C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2210:2235:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e37C(Session s, Frame f) {
@@ -1405,7 +1405,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e38(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e38M(s, f) : e38C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e38M(s, f) : e38C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e38M : TinyExpressionP4Parser::e38C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2408:2584:body/seq", false, false, "node", true, K4);
     }
     private static Match e38C(Session s, Frame f) {
@@ -1415,7 +1415,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K282, K219);
     }
     private static Match e39(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e39M(s, f) : e39C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e39M(s, f) : e39C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e39M : TinyExpressionP4Parser::e39C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2408:2430:body/0/group", false, false, "text", false, K283);
     }
     private static Match e39C(Session s, Frame f) {
@@ -1425,7 +1425,7 @@ public final class TinyExpressionP4Parser {
         return e40(s, f);
     }
     private static Match e40(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e40M(s, f) : e40C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e40M(s, f) : e40C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e40M : TinyExpressionP4Parser::e40C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2410:2428:body/0/0/choice", false, false, "text", false, K283);
     }
     private static Match e40C(Session s, Frame f) {
@@ -1435,7 +1435,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K284,false,null,false);
     }
     private static Match e41(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e41M(s, f) : e41C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e41M(s, f) : e41C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e41M : TinyExpressionP4Parser::e41C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2410:2420:body/0/0/0/literal", false, true, "text", false, K285);
     }
     private static Match e41C(Session s, Frame f) {
@@ -1445,7 +1445,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "variable", true, false, K286);
     }
     private static Match e42(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e42M(s, f) : e42C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e42M(s, f) : e42C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e42M : TinyExpressionP4Parser::e42C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2423:2428:body/0/0/1/literal", false, true, "text", false, K287);
     }
     private static Match e42C(Session s, Frame f) {
@@ -1455,7 +1455,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "var", true, false, K288);
     }
     private static Match e43(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e43M(s, f) : e43C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e43M(s, f) : e43C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e43M : TinyExpressionP4Parser::e43C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2435:2438:body/1/literal", false, true, "text", false, K49);
     }
     private static Match e43C(Session s, Frame f) {
@@ -1474,7 +1474,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e45(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e45M(s, f) : e45C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e45M(s, f) : e45C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e45M : TinyExpressionP4Parser::e45C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2463:2481:body/3/optional", true, false, "text", false, K293);
     }
     private static Match e45C(Session s, Frame f) {
@@ -1484,7 +1484,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e46);
     }
     private static Match e46(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e46M(s, f) : e46C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e46M(s, f) : e46C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e46M : TinyExpressionP4Parser::e46C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2465:2479:body/3/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e46C(Session s, Frame f) {
@@ -1494,7 +1494,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberTypeHint_10(s, f);
     }
     private static Match e47(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e47M(s, f) : e47C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e47M(s, f) : e47C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e47M : TinyExpressionP4Parser::e47C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2486:2550:body/4/optional", true, false, "node", true, K294);
     }
     private static Match e47C(Session s, Frame f) {
@@ -1505,7 +1505,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e48(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e48M(s, f) : e48C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e48M(s, f) : e48C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e48M : TinyExpressionP4Parser::e48C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2488:2541:body/4/0/seq", false, false, "node", true, K294);
     }
     private static Match e48C(Session s, Frame f) {
@@ -1515,7 +1515,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K295, K237);
     }
     private static Match e49(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e49M(s, f) : e49C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e49M(s, f) : e49C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e49M : TinyExpressionP4Parser::e49C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2488:2493:body/4/0/0/literal", false, true, "text", false, K294);
     }
     private static Match e49C(Session s, Frame f) {
@@ -1525,7 +1525,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "set", true, false, K296);
     }
     private static Match e50(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e50M(s, f) : e50C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e50M(s, f) : e50C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e50M : TinyExpressionP4Parser::e50C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2494:2524:body/4/0/1/optional", true, false, "node", false, K293);
     }
     private static Match e50C(Session s, Frame f) {
@@ -1555,7 +1555,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e53(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e53M(s, f) : e53C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e53M(s, f) : e53C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e53M : TinyExpressionP4Parser::e53C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2555:2576:body/5/optional", true, false, "text", false, K293);
     }
     private static Match e53C(Session s, Frame f) {
@@ -1575,7 +1575,7 @@ public final class TinyExpressionP4Parser {
         return parseDescription_15(s, f);
     }
     private static Match e55(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e55M(s, f) : e55C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e55M(s, f) : e55C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e55M : TinyExpressionP4Parser::e55C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2581:2584:body/6/literal", false, true, "text", false, K260);
     }
     private static Match e55C(Session s, Frame f) {
@@ -1586,7 +1586,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e56(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e56M(s, f) : e56C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e56M(s, f) : e56C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e56M : TinyExpressionP4Parser::e56C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2757:2933:body/seq", false, false, "node", true, K4);
     }
     private static Match e56C(Session s, Frame f) {
@@ -1596,7 +1596,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K303, K219);
     }
     private static Match e57(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e57M(s, f) : e57C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e57M(s, f) : e57C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e57M : TinyExpressionP4Parser::e57C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2757:2779:body/0/group", false, false, "text", false, K283);
     }
     private static Match e57C(Session s, Frame f) {
@@ -1606,7 +1606,7 @@ public final class TinyExpressionP4Parser {
         return e58(s, f);
     }
     private static Match e58(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e58M(s, f) : e58C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e58M(s, f) : e58C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e58M : TinyExpressionP4Parser::e58C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2759:2777:body/0/0/choice", false, false, "text", false, K283);
     }
     private static Match e58C(Session s, Frame f) {
@@ -1616,7 +1616,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K304,false,null,false);
     }
     private static Match e59(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e59M(s, f) : e59C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e59M(s, f) : e59C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e59M : TinyExpressionP4Parser::e59C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2759:2769:body/0/0/0/literal", false, true, "text", false, K285);
     }
     private static Match e59C(Session s, Frame f) {
@@ -1626,7 +1626,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "variable", true, false, K286);
     }
     private static Match e60(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e60M(s, f) : e60C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e60M(s, f) : e60C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e60M : TinyExpressionP4Parser::e60C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2772:2777:body/0/0/1/literal", false, true, "text", false, K287);
     }
     private static Match e60C(Session s, Frame f) {
@@ -1636,7 +1636,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "var", true, false, K288);
     }
     private static Match e61(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e61M(s, f) : e61C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e61M(s, f) : e61C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e61M : TinyExpressionP4Parser::e61C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2784:2787:body/1/literal", false, true, "text", false, K49);
     }
     private static Match e61C(Session s, Frame f) {
@@ -1655,7 +1655,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e63(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e63M(s, f) : e63C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e63M(s, f) : e63C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e63M : TinyExpressionP4Parser::e63C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2812:2830:body/3/optional", true, false, "text", false, K293);
     }
     private static Match e63C(Session s, Frame f) {
@@ -1665,7 +1665,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e64);
     }
     private static Match e64(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e64M(s, f) : e64C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e64M(s, f) : e64C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e64M : TinyExpressionP4Parser::e64C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2814:2828:body/3/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e64C(Session s, Frame f) {
@@ -1675,7 +1675,7 @@ public final class TinyExpressionP4Parser {
         return parseStringTypeHint_11(s, f);
     }
     private static Match e65(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e65M(s, f) : e65C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e65M(s, f) : e65C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e65M : TinyExpressionP4Parser::e65C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2835:2899:body/4/optional", true, false, "node", true, K294);
     }
     private static Match e65C(Session s, Frame f) {
@@ -1686,7 +1686,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e66(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e66M(s, f) : e66C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e66M(s, f) : e66C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e66M : TinyExpressionP4Parser::e66C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2837:2890:body/4/0/seq", false, false, "node", true, K294);
     }
     private static Match e66C(Session s, Frame f) {
@@ -1696,7 +1696,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K306, K237);
     }
     private static Match e67(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e67M(s, f) : e67C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e67M(s, f) : e67C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e67M : TinyExpressionP4Parser::e67C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2837:2842:body/4/0/0/literal", false, true, "text", false, K294);
     }
     private static Match e67C(Session s, Frame f) {
@@ -1706,7 +1706,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "set", true, false, K296);
     }
     private static Match e68(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e68M(s, f) : e68C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e68M(s, f) : e68C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e68M : TinyExpressionP4Parser::e68C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2843:2873:body/4/0/1/optional", true, false, "node", false, K293);
     }
     private static Match e68C(Session s, Frame f) {
@@ -1736,7 +1736,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e71(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e71M(s, f) : e71C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e71M(s, f) : e71C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e71M : TinyExpressionP4Parser::e71C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2904:2925:body/5/optional", true, false, "text", false, K293);
     }
     private static Match e71C(Session s, Frame f) {
@@ -1756,7 +1756,7 @@ public final class TinyExpressionP4Parser {
         return parseDescription_15(s, f);
     }
     private static Match e73(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e73M(s, f) : e73C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e73M(s, f) : e73C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e73M : TinyExpressionP4Parser::e73C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:2930:2933:body/6/literal", false, true, "text", false, K260);
     }
     private static Match e73C(Session s, Frame f) {
@@ -1767,7 +1767,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e74(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e74M(s, f) : e74C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e74M(s, f) : e74C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e74M : TinyExpressionP4Parser::e74C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3108:3286:body/seq", false, false, "node", true, K4);
     }
     private static Match e74C(Session s, Frame f) {
@@ -1777,7 +1777,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K310, K219);
     }
     private static Match e75(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e75M(s, f) : e75C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e75M(s, f) : e75C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e75M : TinyExpressionP4Parser::e75C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3108:3130:body/0/group", false, false, "text", false, K283);
     }
     private static Match e75C(Session s, Frame f) {
@@ -1787,7 +1787,7 @@ public final class TinyExpressionP4Parser {
         return e76(s, f);
     }
     private static Match e76(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e76M(s, f) : e76C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e76M(s, f) : e76C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e76M : TinyExpressionP4Parser::e76C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3110:3128:body/0/0/choice", false, false, "text", false, K283);
     }
     private static Match e76C(Session s, Frame f) {
@@ -1797,7 +1797,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K311,false,null,false);
     }
     private static Match e77(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e77M(s, f) : e77C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e77M(s, f) : e77C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e77M : TinyExpressionP4Parser::e77C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3110:3120:body/0/0/0/literal", false, true, "text", false, K285);
     }
     private static Match e77C(Session s, Frame f) {
@@ -1807,7 +1807,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "variable", true, false, K286);
     }
     private static Match e78(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e78M(s, f) : e78C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e78M(s, f) : e78C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e78M : TinyExpressionP4Parser::e78C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3123:3128:body/0/0/1/literal", false, true, "text", false, K287);
     }
     private static Match e78C(Session s, Frame f) {
@@ -1817,7 +1817,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "var", true, false, K288);
     }
     private static Match e79(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e79M(s, f) : e79C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e79M(s, f) : e79C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e79M : TinyExpressionP4Parser::e79C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3135:3138:body/1/literal", false, true, "text", false, K49);
     }
     private static Match e79C(Session s, Frame f) {
@@ -1836,7 +1836,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e81(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e81M(s, f) : e81C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e81M(s, f) : e81C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e81M : TinyExpressionP4Parser::e81C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3163:3182:body/3/optional", true, false, "text", false, K293);
     }
     private static Match e81C(Session s, Frame f) {
@@ -1846,7 +1846,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e82);
     }
     private static Match e82(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e82M(s, f) : e82C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e82M(s, f) : e82C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e82M : TinyExpressionP4Parser::e82C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3165:3180:body/3/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e82C(Session s, Frame f) {
@@ -1856,7 +1856,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanTypeHint_12(s, f);
     }
     private static Match e83(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e83M(s, f) : e83C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e83M(s, f) : e83C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e83M : TinyExpressionP4Parser::e83C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3187:3252:body/4/optional", true, false, "node", true, K294);
     }
     private static Match e83C(Session s, Frame f) {
@@ -1867,7 +1867,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e84(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e84M(s, f) : e84C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e84M(s, f) : e84C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e84M : TinyExpressionP4Parser::e84C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3189:3243:body/4/0/seq", false, false, "node", true, K294);
     }
     private static Match e84C(Session s, Frame f) {
@@ -1877,7 +1877,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K313, K237);
     }
     private static Match e85(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e85M(s, f) : e85C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e85M(s, f) : e85C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e85M : TinyExpressionP4Parser::e85C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3189:3194:body/4/0/0/literal", false, true, "text", false, K294);
     }
     private static Match e85C(Session s, Frame f) {
@@ -1887,7 +1887,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "set", true, false, K296);
     }
     private static Match e86(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e86M(s, f) : e86C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e86M(s, f) : e86C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e86M : TinyExpressionP4Parser::e86C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3195:3225:body/4/0/1/optional", true, false, "node", false, K293);
     }
     private static Match e86C(Session s, Frame f) {
@@ -1917,7 +1917,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e89(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e89M(s, f) : e89C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e89M(s, f) : e89C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e89M : TinyExpressionP4Parser::e89C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3257:3278:body/5/optional", true, false, "text", false, K293);
     }
     private static Match e89C(Session s, Frame f) {
@@ -1937,7 +1937,7 @@ public final class TinyExpressionP4Parser {
         return parseDescription_15(s, f);
     }
     private static Match e91(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e91M(s, f) : e91C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e91M(s, f) : e91C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e91M : TinyExpressionP4Parser::e91C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3283:3286:body/6/literal", false, true, "text", false, K260);
     }
     private static Match e91C(Session s, Frame f) {
@@ -1948,7 +1948,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e92(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e92M(s, f) : e92C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e92M(s, f) : e92C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e92M : TinyExpressionP4Parser::e92C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3459:3635:body/seq", false, false, "node", true, K4);
     }
     private static Match e92C(Session s, Frame f) {
@@ -1958,7 +1958,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K317, K219);
     }
     private static Match e93(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e93M(s, f) : e93C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e93M(s, f) : e93C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e93M : TinyExpressionP4Parser::e93C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3459:3481:body/0/group", false, false, "text", false, K283);
     }
     private static Match e93C(Session s, Frame f) {
@@ -1968,7 +1968,7 @@ public final class TinyExpressionP4Parser {
         return e94(s, f);
     }
     private static Match e94(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e94M(s, f) : e94C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e94M(s, f) : e94C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e94M : TinyExpressionP4Parser::e94C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3461:3479:body/0/0/choice", false, false, "text", false, K283);
     }
     private static Match e94C(Session s, Frame f) {
@@ -1978,7 +1978,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K318,false,null,false);
     }
     private static Match e95(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e95M(s, f) : e95C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e95M(s, f) : e95C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e95M : TinyExpressionP4Parser::e95C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3461:3471:body/0/0/0/literal", false, true, "text", false, K285);
     }
     private static Match e95C(Session s, Frame f) {
@@ -1988,7 +1988,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "variable", true, false, K286);
     }
     private static Match e96(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e96M(s, f) : e96C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e96M(s, f) : e96C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e96M : TinyExpressionP4Parser::e96C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3474:3479:body/0/0/1/literal", false, true, "text", false, K287);
     }
     private static Match e96C(Session s, Frame f) {
@@ -1998,7 +1998,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "var", true, false, K288);
     }
     private static Match e97(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e97M(s, f) : e97C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e97M(s, f) : e97C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e97M : TinyExpressionP4Parser::e97C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3486:3489:body/1/literal", false, true, "text", false, K49);
     }
     private static Match e97C(Session s, Frame f) {
@@ -2017,7 +2017,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e99(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e99M(s, f) : e99C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e99M(s, f) : e99C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e99M : TinyExpressionP4Parser::e99C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3514:3532:body/3/optional", true, false, "text", false, K293);
     }
     private static Match e99C(Session s, Frame f) {
@@ -2027,7 +2027,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e100);
     }
     private static Match e100(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e100M(s, f) : e100C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e100M(s, f) : e100C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e100M : TinyExpressionP4Parser::e100C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3516:3530:body/3/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e100C(Session s, Frame f) {
@@ -2037,7 +2037,7 @@ public final class TinyExpressionP4Parser {
         return parseObjectTypeHint_13(s, f);
     }
     private static Match e101(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e101M(s, f) : e101C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e101M(s, f) : e101C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e101M : TinyExpressionP4Parser::e101C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3537:3601:body/4/optional", true, false, "node", true, K294);
     }
     private static Match e101C(Session s, Frame f) {
@@ -2048,7 +2048,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e102(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e102M(s, f) : e102C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e102M(s, f) : e102C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e102M : TinyExpressionP4Parser::e102C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3539:3592:body/4/0/seq", false, false, "node", true, K294);
     }
     private static Match e102C(Session s, Frame f) {
@@ -2058,7 +2058,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K320, K237);
     }
     private static Match e103(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e103M(s, f) : e103C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e103M(s, f) : e103C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e103M : TinyExpressionP4Parser::e103C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3539:3544:body/4/0/0/literal", false, true, "text", false, K294);
     }
     private static Match e103C(Session s, Frame f) {
@@ -2068,7 +2068,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "set", true, false, K296);
     }
     private static Match e104(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e104M(s, f) : e104C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e104M(s, f) : e104C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e104M : TinyExpressionP4Parser::e104C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3545:3575:body/4/0/1/optional", true, false, "node", false, K293);
     }
     private static Match e104C(Session s, Frame f) {
@@ -2098,7 +2098,7 @@ public final class TinyExpressionP4Parser {
         return parseObjectExpression_105(s, f);
     }
     private static Match e107(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e107M(s, f) : e107C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e107M(s, f) : e107C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e107M : TinyExpressionP4Parser::e107C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3606:3627:body/5/optional", true, false, "text", false, K293);
     }
     private static Match e107C(Session s, Frame f) {
@@ -2118,7 +2118,7 @@ public final class TinyExpressionP4Parser {
         return parseDescription_15(s, f);
     }
     private static Match e109(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e109M(s, f) : e109C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e109M(s, f) : e109C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e109M : TinyExpressionP4Parser::e109C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectVariableDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3632:3635:body/6/literal", false, true, "text", false, K260);
     }
     private static Match e109C(Session s, Frame f) {
@@ -2129,7 +2129,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e110(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e110M(s, f) : e110C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e110M(s, f) : e110C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e110M : TinyExpressionP4Parser::e110C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3654:3758:body/seq", false, false, "text", false, K4);
     }
     private static Match e110C(Session s, Frame f) {
@@ -2139,7 +2139,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K324, K249);
     }
     private static Match e111(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e111M(s, f) : e111C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e111M(s, f) : e111C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e111M : TinyExpressionP4Parser::e111C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3654:3662:body/0/optional", true, false, "text", false, K256);
     }
     private static Match e111C(Session s, Frame f) {
@@ -2149,7 +2149,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e112);
     }
     private static Match e112(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e112M(s, f) : e112C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e112M(s, f) : e112C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e112M : TinyExpressionP4Parser::e112C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3656:3660:body/0/0/literal", false, true, "text", false, K256);
     }
     private static Match e112C(Session s, Frame f) {
@@ -2159,7 +2159,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e113(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e113M(s, f) : e113C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e113M(s, f) : e113C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e113M : TinyExpressionP4Parser::e113C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3663:3758:body/1/group", false, false, "text", false, K325);
     }
     private static Match e113C(Session s, Frame f) {
@@ -2169,7 +2169,7 @@ public final class TinyExpressionP4Parser {
         return e114(s, f);
     }
     private static Match e114(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e114M(s, f) : e114C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e114M(s, f) : e114C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e114M : TinyExpressionP4Parser::e114C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3665:3756:body/1/0/choice", false, false, "text", false, K325);
     }
     private static Match e114C(Session s, Frame f) {
@@ -2179,7 +2179,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K326,false,null,false);
     }
     private static Match e115(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e115M(s, f) : e115C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e115M(s, f) : e115C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e115M : TinyExpressionP4Parser::e115C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3665:3673:body/1/0/0/literal", false, true, "text", false, K327);
     }
     private static Match e115C(Session s, Frame f) {
@@ -2189,7 +2189,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "number", true, false, K328);
     }
     private static Match e116(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e116M(s, f) : e116C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e116M(s, f) : e116C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e116M : TinyExpressionP4Parser::e116C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3676:3684:body/1/0/1/literal", false, true, "text", false, K329);
     }
     private static Match e116C(Session s, Frame f) {
@@ -2199,7 +2199,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "Number", true, false, K330);
     }
     private static Match e117(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e117M(s, f) : e117C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e117M(s, f) : e117C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e117M : TinyExpressionP4Parser::e117C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3687:3695:body/1/0/2/literal", false, true, "text", false, K51);
     }
     private static Match e117C(Session s, Frame f) {
@@ -2209,7 +2209,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "string", true, false, K331);
     }
     private static Match e118(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e118M(s, f) : e118C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e118M(s, f) : e118C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e118M : TinyExpressionP4Parser::e118C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3698:3706:body/1/0/3/literal", false, true, "text", false, K332);
     }
     private static Match e118C(Session s, Frame f) {
@@ -2219,7 +2219,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "String", true, false, K333);
     }
     private static Match e119(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e119M(s, f) : e119C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e119M(s, f) : e119C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e119M : TinyExpressionP4Parser::e119C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3713:3722:body/1/0/4/literal", false, true, "text", false, K52);
     }
     private static Match e119C(Session s, Frame f) {
@@ -2229,7 +2229,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "boolean", true, false, K334);
     }
     private static Match e120(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e120M(s, f) : e120C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e120M(s, f) : e120C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e120M : TinyExpressionP4Parser::e120C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3725:3734:body/1/0/5/literal", false, true, "text", false, K335);
     }
     private static Match e120C(Session s, Frame f) {
@@ -2239,7 +2239,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "Boolean", true, false, K336);
     }
     private static Match e121(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e121M(s, f) : e121C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e121M(s, f) : e121C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e121M : TinyExpressionP4Parser::e121C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3737:3745:body/1/0/6/literal", false, true, "text", false, K53);
     }
     private static Match e121C(Session s, Frame f) {
@@ -2249,7 +2249,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "object", true, false, K337);
     }
     private static Match e122(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e122M(s, f) : e122C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e122M(s, f) : e122C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e122M : TinyExpressionP4Parser::e122C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3748:3756:body/1/0/7/literal", false, true, "text", false, K338);
     }
     private static Match e122C(Session s, Frame f) {
@@ -2260,7 +2260,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e123(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e123M(s, f) : e123C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e123M(s, f) : e123C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e123M : TinyExpressionP4Parser::e123C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3783:3835:body/seq", false, false, "text", false, K4);
     }
     private static Match e123C(Session s, Frame f) {
@@ -2270,7 +2270,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K340, K249);
     }
     private static Match e124(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e124M(s, f) : e124C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e124M(s, f) : e124C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e124M : TinyExpressionP4Parser::e124C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3783:3791:body/0/optional", true, false, "text", false, K256);
     }
     private static Match e124C(Session s, Frame f) {
@@ -2280,7 +2280,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e125);
     }
     private static Match e125(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e125M(s, f) : e125C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e125M(s, f) : e125C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e125M : TinyExpressionP4Parser::e125C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3785:3789:body/0/0/literal", false, true, "text", false, K256);
     }
     private static Match e125C(Session s, Frame f) {
@@ -2290,7 +2290,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e126(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e126M(s, f) : e126C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e126M(s, f) : e126C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e126M : TinyExpressionP4Parser::e126C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3792:3835:body/1/group", false, false, "text", false, K341);
     }
     private static Match e126C(Session s, Frame f) {
@@ -2300,7 +2300,7 @@ public final class TinyExpressionP4Parser {
         return e127(s, f);
     }
     private static Match e127(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e127M(s, f) : e127C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e127M(s, f) : e127C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e127M : TinyExpressionP4Parser::e127C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3794:3833:body/1/0/choice", false, false, "text", false, K341);
     }
     private static Match e127C(Session s, Frame f) {
@@ -2310,7 +2310,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K342,false,null,false);
     }
     private static Match e128(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e128M(s, f) : e128C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e128M(s, f) : e128C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e128M : TinyExpressionP4Parser::e128C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3794:3802:body/1/0/0/literal", false, true, "text", false, K327);
     }
     private static Match e128C(Session s, Frame f) {
@@ -2320,7 +2320,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "number", true, false, K328);
     }
     private static Match e129(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e129M(s, f) : e129C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e129M(s, f) : e129C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e129M : TinyExpressionP4Parser::e129C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3805:3813:body/1/0/1/literal", false, true, "text", false, K329);
     }
     private static Match e129C(Session s, Frame f) {
@@ -2330,7 +2330,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "Number", true, false, K330);
     }
     private static Match e130(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e130M(s, f) : e130C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e130M(s, f) : e130C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e130M : TinyExpressionP4Parser::e130C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3816:3823:body/1/0/2/literal", false, true, "text", false, K343);
     }
     private static Match e130C(Session s, Frame f) {
@@ -2340,7 +2340,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "float", true, false, K344);
     }
     private static Match e131(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e131M(s, f) : e131C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e131M(s, f) : e131C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e131M : TinyExpressionP4Parser::e131C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3826:3833:body/1/0/3/literal", false, true, "text", false, K345);
     }
     private static Match e131C(Session s, Frame f) {
@@ -2351,7 +2351,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e132(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e132M(s, f) : e132C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e132M(s, f) : e132C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e132M : TinyExpressionP4Parser::e132C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3859:3891:body/seq", false, false, "text", false, K4);
     }
     private static Match e132C(Session s, Frame f) {
@@ -2361,7 +2361,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K347, K249);
     }
     private static Match e133(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e133M(s, f) : e133C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e133M(s, f) : e133C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e133M : TinyExpressionP4Parser::e133C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3859:3867:body/0/optional", true, false, "text", false, K256);
     }
     private static Match e133C(Session s, Frame f) {
@@ -2371,7 +2371,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e134);
     }
     private static Match e134(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e134M(s, f) : e134C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e134M(s, f) : e134C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e134M : TinyExpressionP4Parser::e134C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3861:3865:body/0/0/literal", false, true, "text", false, K256);
     }
     private static Match e134C(Session s, Frame f) {
@@ -2381,7 +2381,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e135(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e135M(s, f) : e135C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e135M(s, f) : e135C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e135M : TinyExpressionP4Parser::e135C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3868:3891:body/1/group", false, false, "text", false, K348);
     }
     private static Match e135C(Session s, Frame f) {
@@ -2391,7 +2391,7 @@ public final class TinyExpressionP4Parser {
         return e136(s, f);
     }
     private static Match e136(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e136M(s, f) : e136C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e136M(s, f) : e136C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e136M : TinyExpressionP4Parser::e136C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3870:3889:body/1/0/choice", false, false, "text", false, K348);
     }
     private static Match e136C(Session s, Frame f) {
@@ -2401,7 +2401,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K349,false,null,false);
     }
     private static Match e137(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e137M(s, f) : e137C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e137M(s, f) : e137C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e137M : TinyExpressionP4Parser::e137C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3870:3878:body/1/0/0/literal", false, true, "text", false, K51);
     }
     private static Match e137C(Session s, Frame f) {
@@ -2411,7 +2411,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "string", true, false, K331);
     }
     private static Match e138(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e138M(s, f) : e138C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e138M(s, f) : e138C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e138M : TinyExpressionP4Parser::e138C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3881:3889:body/1/0/1/literal", false, true, "text", false, K332);
     }
     private static Match e138C(Session s, Frame f) {
@@ -2422,7 +2422,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e139(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e139M(s, f) : e139C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e139M(s, f) : e139C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e139M : TinyExpressionP4Parser::e139C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3916:3950:body/seq", false, false, "text", false, K4);
     }
     private static Match e139C(Session s, Frame f) {
@@ -2432,7 +2432,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K350, K249);
     }
     private static Match e140(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e140M(s, f) : e140C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e140M(s, f) : e140C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e140M : TinyExpressionP4Parser::e140C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3916:3924:body/0/optional", true, false, "text", false, K256);
     }
     private static Match e140C(Session s, Frame f) {
@@ -2442,7 +2442,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e141);
     }
     private static Match e141(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e141M(s, f) : e141C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e141M(s, f) : e141C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e141M : TinyExpressionP4Parser::e141C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3918:3922:body/0/0/literal", false, true, "text", false, K256);
     }
     private static Match e141C(Session s, Frame f) {
@@ -2452,7 +2452,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e142(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e142M(s, f) : e142C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e142M(s, f) : e142C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e142M : TinyExpressionP4Parser::e142C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3925:3950:body/1/group", false, false, "text", false, K351);
     }
     private static Match e142C(Session s, Frame f) {
@@ -2462,7 +2462,7 @@ public final class TinyExpressionP4Parser {
         return e143(s, f);
     }
     private static Match e143(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e143M(s, f) : e143C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e143M(s, f) : e143C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e143M : TinyExpressionP4Parser::e143C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3927:3948:body/1/0/choice", false, false, "text", false, K351);
     }
     private static Match e143C(Session s, Frame f) {
@@ -2472,7 +2472,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K352,false,null,false);
     }
     private static Match e144(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e144M(s, f) : e144C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e144M(s, f) : e144C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e144M : TinyExpressionP4Parser::e144C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3927:3936:body/1/0/0/literal", false, true, "text", false, K52);
     }
     private static Match e144C(Session s, Frame f) {
@@ -2482,7 +2482,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "boolean", true, false, K334);
     }
     private static Match e145(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e145M(s, f) : e145C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e145M(s, f) : e145C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e145M : TinyExpressionP4Parser::e145C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3939:3948:body/1/0/1/literal", false, true, "text", false, K335);
     }
     private static Match e145C(Session s, Frame f) {
@@ -2493,7 +2493,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e146(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e146M(s, f) : e146C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e146M(s, f) : e146C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e146M : TinyExpressionP4Parser::e146C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3974:4006:body/seq", false, false, "text", false, K4);
     }
     private static Match e146C(Session s, Frame f) {
@@ -2503,7 +2503,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K353, K249);
     }
     private static Match e147(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e147M(s, f) : e147C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e147M(s, f) : e147C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e147M : TinyExpressionP4Parser::e147C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3974:3982:body/0/optional", true, false, "text", false, K256);
     }
     private static Match e147C(Session s, Frame f) {
@@ -2513,7 +2513,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e148);
     }
     private static Match e148(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e148M(s, f) : e148C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e148M(s, f) : e148C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e148M : TinyExpressionP4Parser::e148C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3976:3980:body/0/0/literal", false, true, "text", false, K256);
     }
     private static Match e148C(Session s, Frame f) {
@@ -2523,7 +2523,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e149(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e149M(s, f) : e149C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e149M(s, f) : e149C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e149M : TinyExpressionP4Parser::e149C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3983:4006:body/1/group", false, false, "text", false, K354);
     }
     private static Match e149C(Session s, Frame f) {
@@ -2533,7 +2533,7 @@ public final class TinyExpressionP4Parser {
         return e150(s, f);
     }
     private static Match e150(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e150M(s, f) : e150C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e150M(s, f) : e150C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e150M : TinyExpressionP4Parser::e150C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3985:4004:body/1/0/choice", false, false, "text", false, K354);
     }
     private static Match e150C(Session s, Frame f) {
@@ -2543,7 +2543,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K355,false,null,false);
     }
     private static Match e151(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e151M(s, f) : e151C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e151M(s, f) : e151C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e151M : TinyExpressionP4Parser::e151C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3985:3993:body/1/0/0/literal", false, true, "text", false, K53);
     }
     private static Match e151C(Session s, Frame f) {
@@ -2553,7 +2553,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "object", true, false, K337);
     }
     private static Match e152(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e152M(s, f) : e152C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e152M(s, f) : e152C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e152M : TinyExpressionP4Parser::e152C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectTypeHint", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3996:4004:body/1/0/1/literal", false, true, "text", false, K338);
     }
     private static Match e152C(Session s, Frame f) {
@@ -2564,7 +2564,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e153(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e153M(s, f) : e153C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e153M(s, f) : e153C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e153M : TinyExpressionP4Parser::e153C, K215, K215, K215, K216, K216, "TinyExpressionP4::OnlyIfAbsent", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4077:body/seq", false, false, "text", false, K4);
     }
     private static Match e153C(Session s, Frame f) {
@@ -2574,7 +2574,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K356, K237);
     }
     private static Match e154(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e154M(s, f) : e154C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e154M(s, f) : e154C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e154M : TinyExpressionP4Parser::e154C, K215, K215, K215, K216, K216, "TinyExpressionP4::OnlyIfAbsent", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4062:body/0/literal", false, true, "text", false, K357);
     }
     private static Match e154C(Session s, Frame f) {
@@ -2584,7 +2584,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "if", true, false, K358);
     }
     private static Match e155(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e155M(s, f) : e155C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e155M(s, f) : e155C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e155M : TinyExpressionP4Parser::e155C, K215, K215, K215, K216, K216, "TinyExpressionP4::OnlyIfAbsent", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4063:4068:body/1/literal", false, true, "text", false, K359);
     }
     private static Match e155C(Session s, Frame f) {
@@ -2594,7 +2594,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "not", true, false, K360);
     }
     private static Match e156(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e156M(s, f) : e156C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e156M(s, f) : e156C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e156M : TinyExpressionP4Parser::e156C, K215, K215, K215, K216, K216, "TinyExpressionP4::OnlyIfAbsent", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4069:4077:body/2/literal", false, true, "text", false, K361);
     }
     private static Match e156C(Session s, Frame f) {
@@ -2605,7 +2605,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e157(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e157M(s, f) : e157C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e157M(s, f) : e157C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e157M : TinyExpressionP4Parser::e157C, K215, K215, K215, K216, K216, "TinyExpressionP4::Description", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4099:4123:body/seq", false, false, "text", false, K4);
     }
     private static Match e157C(Session s, Frame f) {
@@ -2615,7 +2615,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K363, K237);
     }
     private static Match e158(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e158M(s, f) : e158C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e158M(s, f) : e158C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e158M : TinyExpressionP4Parser::e158C, K215, K215, K215, K216, K216, "TinyExpressionP4::Description", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4099:4112:body/0/literal", false, true, "text", false, K364);
     }
     private static Match e158C(Session s, Frame f) {
@@ -2625,7 +2625,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "description", true, false, K365);
     }
     private static Match e159(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e159M(s, f) : e159C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e159M(s, f) : e159C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e159M : TinyExpressionP4Parser::e159C, K215, K215, K215, K216, K216, "TinyExpressionP4::Description", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4113:4116:body/1/literal", false, true, "text", false, K31);
     }
     private static Match e159C(Session s, Frame f) {
@@ -2635,7 +2635,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "=", true, false, K366);
     }
     private static Match e160(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e160M(s, f) : e160C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e160M(s, f) : e160C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e160M : TinyExpressionP4Parser::e160C, K215, K215, K215, K216, K216, "TinyExpressionP4::Description", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4117:4123:body/2/tokenRef", false, true, "text", false, K4);
     }
     private static Match e160C(Session s, Frame f) {
@@ -2646,7 +2646,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e161(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e161M(s, f) : e161C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e161M(s, f) : e161C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e161M : TinyExpressionP4Parser::e161C, K215, K215, K215, K216, K216, "TinyExpressionP4::Annotation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4144:4191:body/seq", false, false, "node", true, K4);
     }
     private static Match e161C(Session s, Frame f) {
@@ -2656,7 +2656,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K369, K368);
     }
     private static Match e162(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e162M(s, f) : e162C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e162M(s, f) : e162C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e162M : TinyExpressionP4Parser::e162C, K215, K215, K215, K216, K216, "TinyExpressionP4::Annotation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4144:4147:body/0/literal", false, true, "text", false, K370);
     }
     private static Match e162C(Session s, Frame f) {
@@ -2666,7 +2666,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "@", true, false, K371);
     }
     private static Match e163(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e163M(s, f) : e163C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e163M(s, f) : e163C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e163M : TinyExpressionP4Parser::e163C, K215, K215, K215, K216, K216, "TinyExpressionP4::Annotation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4148:4158:body/1/tokenRef", false, true, "text", false, K372);
     }
     private static Match e163C(Session s, Frame f) {
@@ -2676,7 +2676,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e164(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e164M(s, f) : e164C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e164M(s, f) : e164C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e164M : TinyExpressionP4Parser::e164C, K215, K215, K215, K216, K216, "TinyExpressionP4::Annotation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4159:4162:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e164C(Session s, Frame f) {
@@ -2686,7 +2686,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e165(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e165M(s, f) : e165C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e165M(s, f) : e165C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e165M : TinyExpressionP4Parser::e165C, K215, K215, K215, K216, K216, "TinyExpressionP4::Annotation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4163:4187:body/3/optional", true, false, "node", true, K293);
     }
     private static Match e165C(Session s, Frame f) {
@@ -2696,7 +2696,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e166);
     }
     private static Match e166(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e166M(s, f) : e166C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e166M(s, f) : e166C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e166M : TinyExpressionP4Parser::e166C, K215, K215, K215, K216, K216, "TinyExpressionP4::Annotation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4165:4185:body/3/0/ruleRef", false, false, "node", true, K4);
     }
     private static Match e166C(Session s, Frame f) {
@@ -2706,7 +2706,7 @@ public final class TinyExpressionP4Parser {
         return parseAnnotationParameters_17(s, f);
     }
     private static Match e167(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e167M(s, f) : e167C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e167M(s, f) : e167C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e167M : TinyExpressionP4Parser::e167C, K215, K215, K215, K216, K216, "TinyExpressionP4::Annotation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4188:4191:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e167C(Session s, Frame f) {
@@ -2717,7 +2717,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e168(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e168M(s, f) : e168C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e168M(s, f) : e168C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e168M : TinyExpressionP4Parser::e168C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4221:4268:body/seq", false, false, "node", true, K4);
     }
     private static Match e168C(Session s, Frame f) {
@@ -2727,7 +2727,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K377, K249);
     }
     private static Match e169(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e169M(s, f) : e169C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e169M(s, f) : e169C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e169M : TinyExpressionP4Parser::e169C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4221:4240:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e169C(Session s, Frame f) {
@@ -2737,7 +2737,7 @@ public final class TinyExpressionP4Parser {
         return parseAnnotationParameter_18(s, f);
     }
     private static Match e170(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e170M(s, f) : e170C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e170M(s, f) : e170C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e170M : TinyExpressionP4Parser::e170C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4241:4268:body/1/repeat", true, false, "node", true, K378);
     }
     private static Match e170C(Session s, Frame f) {
@@ -2748,7 +2748,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e171(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e171M(s, f) : e171C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e171M(s, f) : e171C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e171M : TinyExpressionP4Parser::e171C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4243:4266:body/1/0/seq", false, false, "node", false, K379);
     }
     private static Match e171C(Session s, Frame f) {
@@ -2758,7 +2758,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K380, K249);
     }
     private static Match e172(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e172M(s, f) : e172C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e172M(s, f) : e172C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e172M : TinyExpressionP4Parser::e172C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4243:4246:body/1/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e172C(Session s, Frame f) {
@@ -2768,7 +2768,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ",", true, false, K381);
     }
     private static Match e173(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e173M(s, f) : e173C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e173M(s, f) : e173C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e173M : TinyExpressionP4Parser::e173C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4247:4266:body/1/0/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e173C(Session s, Frame f) {
@@ -2779,7 +2779,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e174(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e174M(s, f) : e174C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e174M(s, f) : e174C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e174M : TinyExpressionP4Parser::e174C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4297:4322:body/seq", false, false, "node", false, K4);
     }
     private static Match e174C(Session s, Frame f) {
@@ -2789,7 +2789,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K382, K237);
     }
     private static Match e175(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e175M(s, f) : e175C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e175M(s, f) : e175C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e175M : TinyExpressionP4Parser::e175C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4297:4307:body/0/tokenRef", false, true, "text", false, K372);
     }
     private static Match e175C(Session s, Frame f) {
@@ -2799,7 +2799,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e176(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e176M(s, f) : e176C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e176M(s, f) : e176C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e176M : TinyExpressionP4Parser::e176C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4308:4311:body/1/literal", false, true, "text", false, K31);
     }
     private static Match e176C(Session s, Frame f) {
@@ -2809,7 +2809,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "=", true, false, K366);
     }
     private static Match e177(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e177M(s, f) : e177C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e177M(s, f) : e177C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e177M : TinyExpressionP4Parser::e177C, K215, K215, K215, K216, K216, "TinyExpressionP4::AnnotationParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4312:4322:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e177C(Session s, Frame f) {
@@ -2819,7 +2819,7 @@ public final class TinyExpressionP4Parser {
         return parseExpression_123(s, f);
     }
     private static Match e178(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e178M(s, f) : e178C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e178M(s, f) : e178C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e178M : TinyExpressionP4Parser::e178C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4356:4470:body/choice", false, false, "node", false, K4);
     }
     private static Match e178C(Session s, Frame f) {
@@ -2829,7 +2829,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K383,false,null,false);
     }
     private static Match e179(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e179M(s, f) : e179C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e179M(s, f) : e179C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e179M : TinyExpressionP4Parser::e179C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4356:4379:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e179C(Session s, Frame f) {
@@ -2839,7 +2839,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberMethodDeclaration_20(s, f);
     }
     private static Match e180(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e180M(s, f) : e180C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e180M(s, f) : e180C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e180M : TinyExpressionP4Parser::e180C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4386:4409:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e180C(Session s, Frame f) {
@@ -2849,7 +2849,7 @@ public final class TinyExpressionP4Parser {
         return parseStringMethodDeclaration_21(s, f);
     }
     private static Match e181(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e181M(s, f) : e181C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e181M(s, f) : e181C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e181M : TinyExpressionP4Parser::e181C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4416:4440:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e181C(Session s, Frame f) {
@@ -2859,7 +2859,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanMethodDeclaration_22(s, f);
     }
     private static Match e182(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e182M(s, f) : e182C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e182M(s, f) : e182C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e182M : TinyExpressionP4Parser::e182C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4447:4470:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e182C(Session s, Frame f) {
@@ -2870,7 +2870,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e183(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e183M(s, f) : e183C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e183M(s, f) : e183C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e183M : TinyExpressionP4Parser::e183C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4651:4796:body/seq", false, false, "node", true, K4);
     }
     private static Match e183C(Session s, Frame f) {
@@ -2880,7 +2880,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K386, K385);
     }
     private static Match e184(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e184M(s, f) : e184C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e184M(s, f) : e184C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e184M : TinyExpressionP4Parser::e184C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4651:4667:body/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e184C(Session s, Frame f) {
@@ -2899,7 +2899,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e186(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e186M(s, f) : e186C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e186M(s, f) : e186C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e186M : TinyExpressionP4Parser::e186C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4695:4698:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e186C(Session s, Frame f) {
@@ -2909,7 +2909,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e187(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e187M(s, f) : e187C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e187M(s, f) : e187C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e187M : TinyExpressionP4Parser::e187C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4705:4737:body/3/optional", true, false, "node", false, K293);
     }
     private static Match e187C(Session s, Frame f) {
@@ -2929,7 +2929,7 @@ public final class TinyExpressionP4Parser {
         return parseMethodParameters_24(s, f);
     }
     private static Match e189(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e189M(s, f) : e189C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e189M(s, f) : e189C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e189M : TinyExpressionP4Parser::e189C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4742:4745:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e189C(Session s, Frame f) {
@@ -2939,7 +2939,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e190(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e190M(s, f) : e190C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e190M(s, f) : e190C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e190M : TinyExpressionP4Parser::e190C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4750:4753:body/5/literal", false, true, "text", false, K391);
     }
     private static Match e190C(Session s, Frame f) {
@@ -2959,7 +2959,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e192(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e192M(s, f) : e192C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e192M(s, f) : e192C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e192M : TinyExpressionP4Parser::e192C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4793:4796:body/7/literal", false, true, "text", false, K394);
     }
     private static Match e192C(Session s, Frame f) {
@@ -2970,7 +2970,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e193(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e193M(s, f) : e193C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e193M(s, f) : e193C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e193M : TinyExpressionP4Parser::e193C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4977:5122:body/seq", false, false, "node", true, K4);
     }
     private static Match e193C(Session s, Frame f) {
@@ -2980,7 +2980,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K396, K385);
     }
     private static Match e194(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e194M(s, f) : e194C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e194M(s, f) : e194C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e194M : TinyExpressionP4Parser::e194C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4977:4993:body/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e194C(Session s, Frame f) {
@@ -2999,7 +2999,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e196(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e196M(s, f) : e196C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e196M(s, f) : e196C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e196M : TinyExpressionP4Parser::e196C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5021:5024:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e196C(Session s, Frame f) {
@@ -3009,7 +3009,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e197(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e197M(s, f) : e197C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e197M(s, f) : e197C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e197M : TinyExpressionP4Parser::e197C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5031:5063:body/3/optional", true, false, "node", false, K293);
     }
     private static Match e197C(Session s, Frame f) {
@@ -3029,7 +3029,7 @@ public final class TinyExpressionP4Parser {
         return parseMethodParameters_24(s, f);
     }
     private static Match e199(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e199M(s, f) : e199C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e199M(s, f) : e199C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e199M : TinyExpressionP4Parser::e199C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5068:5071:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e199C(Session s, Frame f) {
@@ -3039,7 +3039,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e200(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e200M(s, f) : e200C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e200M(s, f) : e200C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e200M : TinyExpressionP4Parser::e200C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5076:5079:body/5/literal", false, true, "text", false, K391);
     }
     private static Match e200C(Session s, Frame f) {
@@ -3059,7 +3059,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e202(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e202M(s, f) : e202C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e202M(s, f) : e202C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e202M : TinyExpressionP4Parser::e202C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5119:5122:body/7/literal", false, true, "text", false, K394);
     }
     private static Match e202C(Session s, Frame f) {
@@ -3070,7 +3070,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e203(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e203M(s, f) : e203C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e203M(s, f) : e203C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e203M : TinyExpressionP4Parser::e203C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5305:5452:body/seq", false, false, "node", true, K4);
     }
     private static Match e203C(Session s, Frame f) {
@@ -3080,7 +3080,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K400, K385);
     }
     private static Match e204(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e204M(s, f) : e204C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e204M(s, f) : e204C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e204M : TinyExpressionP4Parser::e204C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5305:5322:body/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e204C(Session s, Frame f) {
@@ -3099,7 +3099,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e206(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e206M(s, f) : e206C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e206M(s, f) : e206C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e206M : TinyExpressionP4Parser::e206C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5350:5353:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e206C(Session s, Frame f) {
@@ -3109,7 +3109,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e207(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e207M(s, f) : e207C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e207M(s, f) : e207C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e207M : TinyExpressionP4Parser::e207C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5360:5392:body/3/optional", true, false, "node", false, K293);
     }
     private static Match e207C(Session s, Frame f) {
@@ -3129,7 +3129,7 @@ public final class TinyExpressionP4Parser {
         return parseMethodParameters_24(s, f);
     }
     private static Match e209(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e209M(s, f) : e209C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e209M(s, f) : e209C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e209M : TinyExpressionP4Parser::e209C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5397:5400:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e209C(Session s, Frame f) {
@@ -3139,7 +3139,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e210(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e210M(s, f) : e210C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e210M(s, f) : e210C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e210M : TinyExpressionP4Parser::e210C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5405:5408:body/5/literal", false, true, "text", false, K391);
     }
     private static Match e210C(Session s, Frame f) {
@@ -3159,7 +3159,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e212(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e212M(s, f) : e212C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e212M(s, f) : e212C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e212M : TinyExpressionP4Parser::e212C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5449:5452:body/7/literal", false, true, "text", false, K394);
     }
     private static Match e212C(Session s, Frame f) {
@@ -3170,7 +3170,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e213(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e213M(s, f) : e213C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e213M(s, f) : e213C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e213M : TinyExpressionP4Parser::e213C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5633:5778:body/seq", false, false, "node", true, K4);
     }
     private static Match e213C(Session s, Frame f) {
@@ -3180,7 +3180,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K404, K385);
     }
     private static Match e214(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e214M(s, f) : e214C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e214M(s, f) : e214C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e214M : TinyExpressionP4Parser::e214C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5633:5649:body/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e214C(Session s, Frame f) {
@@ -3199,7 +3199,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e216(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e216M(s, f) : e216C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e216M(s, f) : e216C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e216M : TinyExpressionP4Parser::e216C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5677:5680:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e216C(Session s, Frame f) {
@@ -3209,7 +3209,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e217(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e217M(s, f) : e217C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e217M(s, f) : e217C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e217M : TinyExpressionP4Parser::e217C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5687:5719:body/3/optional", true, false, "node", false, K293);
     }
     private static Match e217C(Session s, Frame f) {
@@ -3229,7 +3229,7 @@ public final class TinyExpressionP4Parser {
         return parseMethodParameters_24(s, f);
     }
     private static Match e219(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e219M(s, f) : e219C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e219M(s, f) : e219C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e219M : TinyExpressionP4Parser::e219C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5724:5727:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e219C(Session s, Frame f) {
@@ -3239,7 +3239,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e220(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e220M(s, f) : e220C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e220M(s, f) : e220C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e220M : TinyExpressionP4Parser::e220C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5732:5735:body/5/literal", false, true, "text", false, K391);
     }
     private static Match e220C(Session s, Frame f) {
@@ -3259,7 +3259,7 @@ public final class TinyExpressionP4Parser {
         return parseObjectExpression_105(s, f);
     }
     private static Match e222(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e222M(s, f) : e222C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e222M(s, f) : e222C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e222M : TinyExpressionP4Parser::e222C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectMethodDeclaration", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5775:5778:body/7/literal", false, true, "text", false, K394);
     }
     private static Match e222C(Session s, Frame f) {
@@ -3270,7 +3270,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e223(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e223M(s, f) : e223C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e223M(s, f) : e223C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e223M : TinyExpressionP4Parser::e223C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5855:5910:body/seq", false, false, "node", true, K4);
     }
     private static Match e223C(Session s, Frame f) {
@@ -3290,7 +3290,7 @@ public final class TinyExpressionP4Parser {
         return parseMethodParameter_25(s, f);
     }
     private static Match e225(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e225M(s, f) : e225C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e225M(s, f) : e225C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e225M : TinyExpressionP4Parser::e225C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5879:5910:body/1/repeat", true, false, "node", true, K378);
     }
     private static Match e225C(Session s, Frame f) {
@@ -3301,7 +3301,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e226(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e226M(s, f) : e226C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e226M(s, f) : e226C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e226M : TinyExpressionP4Parser::e226C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5881:5900:body/1/0/seq", false, false, "node", false, K378);
     }
     private static Match e226C(Session s, Frame f) {
@@ -3311,7 +3311,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K411, K249);
     }
     private static Match e227(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e227M(s, f) : e227C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e227M(s, f) : e227C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e227M : TinyExpressionP4Parser::e227C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameters", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5881:5884:body/1/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e227C(Session s, Frame f) {
@@ -3332,7 +3332,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e229(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e229M(s, f) : e229C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e229M(s, f) : e229C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e229M : TinyExpressionP4Parser::e229C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6024:6075:body/seq", false, false, "text", false, K4);
     }
     private static Match e229C(Session s, Frame f) {
@@ -3342,7 +3342,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K413, K237);
     }
     private static Match e230(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e230M(s, f) : e230C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e230M(s, f) : e230C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e230M : TinyExpressionP4Parser::e230C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6024:6027:body/0/literal", false, true, "text", false, K49);
     }
     private static Match e230C(Session s, Frame f) {
@@ -3361,7 +3361,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e232(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e232M(s, f) : e232C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e232M(s, f) : e232C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e232M : TinyExpressionP4Parser::e232C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6050:6075:body/2/optional", true, false, "text", false, K256);
     }
     private static Match e232C(Session s, Frame f) {
@@ -3372,7 +3372,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e233(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e233M(s, f) : e233C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e233M(s, f) : e233C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e233M : TinyExpressionP4Parser::e233C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6052:6067:body/2/0/seq", false, false, "text", false, K256);
     }
     private static Match e233C(Session s, Frame f) {
@@ -3382,7 +3382,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K416, K249);
     }
     private static Match e234(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e234M(s, f) : e234C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e234M(s, f) : e234C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e234M : TinyExpressionP4Parser::e234C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodParameter", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6052:6056:body/2/0/0/literal", false, true, "text", false, K256);
     }
     private static Match e234C(Session s, Frame f) {
@@ -3402,7 +3402,7 @@ public final class TinyExpressionP4Parser {
         return parseReturnType_30(s, f);
     }
     private static Match e236(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e236M(s, f) : e236C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e236M(s, f) : e236C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e236M : TinyExpressionP4Parser::e236C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6120:body/choice", false, false, "text", false, K4);
     }
     private static Match e236C(Session s, Frame f) {
@@ -3412,7 +3412,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K419,false,null,false);
     }
     private static Match e237(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e237M(s, f) : e237C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e237M(s, f) : e237C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e237M : TinyExpressionP4Parser::e237C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6110:body/0/literal", false, true, "text", false, K327);
     }
     private static Match e237C(Session s, Frame f) {
@@ -3422,7 +3422,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "number", true, false, K328);
     }
     private static Match e238(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e238M(s, f) : e238C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e238M(s, f) : e238C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e238M : TinyExpressionP4Parser::e238C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6113:6120:body/1/literal", false, true, "text", false, K343);
     }
     private static Match e238C(Session s, Frame f) {
@@ -3433,7 +3433,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e239(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e239M(s, f) : e239C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e239M(s, f) : e239C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e239M : TinyExpressionP4Parser::e239C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/seq", false, false, "text", false, K4);
     }
     private static Match e239C(Session s, Frame f) {
@@ -3443,7 +3443,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K422, K421);
     }
     private static Match e240(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e240M(s, f) : e240C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e240M(s, f) : e240C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e240M : TinyExpressionP4Parser::e240C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/0/literal", false, true, "text", false, K51);
     }
     private static Match e240C(Session s, Frame f) {
@@ -3454,7 +3454,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e241(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e241M(s, f) : e241C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e241M(s, f) : e241C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e241M : TinyExpressionP4Parser::e241C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/seq", false, false, "text", false, K4);
     }
     private static Match e241C(Session s, Frame f) {
@@ -3464,7 +3464,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K423, K421);
     }
     private static Match e242(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e242M(s, f) : e242C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e242M(s, f) : e242C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e242M : TinyExpressionP4Parser::e242C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/0/literal", false, true, "text", false, K52);
     }
     private static Match e242C(Session s, Frame f) {
@@ -3475,7 +3475,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e243(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e243M(s, f) : e243C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e243M(s, f) : e243C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e243M : TinyExpressionP4Parser::e243C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/seq", false, false, "text", false, K4);
     }
     private static Match e243C(Session s, Frame f) {
@@ -3485,7 +3485,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K424, K421);
     }
     private static Match e244(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e244M(s, f) : e244C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e244M(s, f) : e244C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e244M : TinyExpressionP4Parser::e244C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/0/literal", false, true, "text", false, K53);
     }
     private static Match e244C(Session s, Frame f) {
@@ -3495,7 +3495,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "object", true, false, K337);
     }
     private static Match e245(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e245M(s, f) : e245C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e245M(s, f) : e245C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e245M : TinyExpressionP4Parser::e245C, K215, K215, K215, K216, K216, "TinyExpressionP4::ReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6244:6318:body/choice", false, false, "text", false, K4);
     }
     private static Match e245C(Session s, Frame f) {
@@ -3505,7 +3505,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K441,false,null,false,K440);
     }
     private static Match e246(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e246M(s, f) : e246C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e246M(s, f) : e246C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e246M : TinyExpressionP4Parser::e246C, K215, K215, K215, K216, K216, "TinyExpressionP4::ReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6244:6260:body/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e246C(Session s, Frame f) {
@@ -3515,7 +3515,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberReturnType_26(s, f);
     }
     private static Match e247(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e247M(s, f) : e247C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e247M(s, f) : e247C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e247M : TinyExpressionP4Parser::e247C, K215, K215, K215, K216, K216, "TinyExpressionP4::ReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6263:6279:body/1/ruleRef", false, false, "text", false, K4);
     }
     private static Match e247C(Session s, Frame f) {
@@ -3525,7 +3525,7 @@ public final class TinyExpressionP4Parser {
         return parseStringReturnType_27(s, f);
     }
     private static Match e248(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e248M(s, f) : e248C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e248M(s, f) : e248C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e248M : TinyExpressionP4Parser::e248C, K215, K215, K215, K216, K216, "TinyExpressionP4::ReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6282:6299:body/2/ruleRef", false, false, "text", false, K4);
     }
     private static Match e248C(Session s, Frame f) {
@@ -3535,7 +3535,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanReturnType_28(s, f);
     }
     private static Match e249(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e249M(s, f) : e249C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e249M(s, f) : e249C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e249M : TinyExpressionP4Parser::e249C, K215, K215, K215, K216, K216, "TinyExpressionP4::ReturnType", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6302:6318:body/3/ruleRef", false, false, "text", false, K4);
     }
     private static Match e249C(Session s, Frame f) {
@@ -3546,7 +3546,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e250(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e250M(s, f) : e250C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e250M(s, f) : e250C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e250M : TinyExpressionP4Parser::e250C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6644:6810:body/seq", false, false, "mixed", true, K4);
     }
     private static Match e250C(Session s, Frame f) {
@@ -3556,7 +3556,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K442, K385);
     }
     private static Match e251(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e251M(s, f) : e251C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e251M(s, f) : e251C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e251M : TinyExpressionP4Parser::e251C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6644:6654:body/0/literal", false, true, "text", false, K443);
     }
     private static Match e251C(Session s, Frame f) {
@@ -3566,7 +3566,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "external", true, false, K444);
     }
     private static Match e252(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e252M(s, f) : e252C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e252M(s, f) : e252C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e252M : TinyExpressionP4Parser::e252C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6655:6679:body/1/optional", true, false, "text", false, K445);
     }
     private static Match e252C(Session s, Frame f) {
@@ -3577,7 +3577,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e253(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e253M(s, f) : e253C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e253M(s, f) : e253C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e253M : TinyExpressionP4Parser::e253C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6657:6677:body/1/0/seq", false, false, "text", false, K446);
     }
     private static Match e253C(Session s, Frame f) {
@@ -3587,7 +3587,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K447, K249);
     }
     private static Match e254(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e254M(s, f) : e254C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e254M(s, f) : e254C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e254M : TinyExpressionP4Parser::e254C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6657:6668:body/1/0/0/literal", false, true, "text", false, K445);
     }
     private static Match e254C(Session s, Frame f) {
@@ -3597,7 +3597,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "returning", true, false, K448);
     }
     private static Match e255(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e255M(s, f) : e255C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e255M(s, f) : e255C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e255M : TinyExpressionP4Parser::e255C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6669:6677:body/1/0/1/optional", true, false, "text", false, K256);
     }
     private static Match e255C(Session s, Frame f) {
@@ -3607,7 +3607,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e256);
     }
     private static Match e256(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e256M(s, f) : e256C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e256M(s, f) : e256C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e256M : TinyExpressionP4Parser::e256C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6671:6675:body/1/0/1/0/literal", false, true, "text", false, K256);
     }
     private static Match e256C(Session s, Frame f) {
@@ -3617,7 +3617,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e257(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e257M(s, f) : e257C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e257M(s, f) : e257C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e257M : TinyExpressionP4Parser::e257C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6680:6697:body/2/ruleRef", false, false, "text", false, K4);
     }
     private static Match e257C(Session s, Frame f) {
@@ -3627,7 +3627,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanReturnType_28(s, f);
     }
     private static Match e258(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e258M(s, f) : e258C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e258M(s, f) : e258C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e258M : TinyExpressionP4Parser::e258C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6702:6709:body/3/optional", true, false, "text", false, K449);
     }
     private static Match e258C(Session s, Frame f) {
@@ -3637,7 +3637,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e259);
     }
     private static Match e259(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e259M(s, f) : e259C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e259M(s, f) : e259C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e259M : TinyExpressionP4Parser::e259C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6704:6707:body/3/0/literal", false, true, "text", false, K449);
     }
     private static Match e259C(Session s, Frame f) {
@@ -3647,7 +3647,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e260(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e260M(s, f) : e260C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e260M(s, f) : e260C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e260M : TinyExpressionP4Parser::e260C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6714:6778:body/4/group", false, false, "mixed", false, K247);
     }
     private static Match e260C(Session s, Frame f) {
@@ -3657,7 +3657,7 @@ public final class TinyExpressionP4Parser {
         return e261(s, f);
     }
     private static Match e261(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e261M(s, f) : e261C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e261M(s, f) : e261C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e261M : TinyExpressionP4Parser::e261C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6716:6770:body/4/0/choice", false, false, "mixed", false, K247);
     }
     private static Match e261C(Session s, Frame f) {
@@ -3668,7 +3668,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e262(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e262M(s, f) : e262C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e262M(s, f) : e262C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e262M : TinyExpressionP4Parser::e262C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6716:6751:body/4/0/0/seq", false, false, "node", false, K247);
     }
     private static Match e262C(Session s, Frame f) {
@@ -3688,7 +3688,7 @@ public final class TinyExpressionP4Parser {
         return parseClassName_3(s, f);
     }
     private static Match e264(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e264M(s, f) : e264C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e264M(s, f) : e264C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e264M : TinyExpressionP4Parser::e264C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6737:6740:body/4/0/0/1/literal", false, true, "text", false, K247);
     }
     private static Match e264C(Session s, Frame f) {
@@ -3718,7 +3718,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e267(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e267M(s, f) : e267C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e267M(s, f) : e267C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e267M : TinyExpressionP4Parser::e267C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6783:6786:body/5/literal", false, true, "text", false, K373);
     }
     private static Match e267C(Session s, Frame f) {
@@ -3728,7 +3728,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e268(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e268M(s, f) : e268C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e268M(s, f) : e268C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e268M : TinyExpressionP4Parser::e268C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6787:6806:body/6/optional", true, false, "node", false, K293);
     }
     private static Match e268C(Session s, Frame f) {
@@ -3748,7 +3748,7 @@ public final class TinyExpressionP4Parser {
         return parseArguments_39(s, f);
     }
     private static Match e270(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e270M(s, f) : e270C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e270M(s, f) : e270C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e270M : TinyExpressionP4Parser::e270C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalBooleanInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6807:6810:body/7/literal", false, true, "text", false, K375);
     }
     private static Match e270C(Session s, Frame f) {
@@ -3759,7 +3759,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e271(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e271M(s, f) : e271C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e271M(s, f) : e271C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e271M : TinyExpressionP4Parser::e271C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6922:7101:body/seq", false, false, "mixed", true, K4);
     }
     private static Match e271C(Session s, Frame f) {
@@ -3769,7 +3769,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K459, K241);
     }
     private static Match e272(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e272M(s, f) : e272C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e272M(s, f) : e272C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e272M : TinyExpressionP4Parser::e272C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6922:6932:body/0/literal", false, true, "text", false, K443);
     }
     private static Match e272C(Session s, Frame f) {
@@ -3779,7 +3779,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "external", true, false, K444);
     }
     private static Match e273(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e273M(s, f) : e273C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e273M(s, f) : e273C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e273M : TinyExpressionP4Parser::e273C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6937:7000:body/1/group", false, false, "text", false, K449);
     }
     private static Match e273C(Session s, Frame f) {
@@ -3789,7 +3789,7 @@ public final class TinyExpressionP4Parser {
         return e274(s, f);
     }
     private static Match e274(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e274M(s, f) : e274C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e274M(s, f) : e274C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e274M : TinyExpressionP4Parser::e274C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6939:6998:body/1/0/choice", false, false, "text", false, K449);
     }
     private static Match e274C(Session s, Frame f) {
@@ -3800,7 +3800,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e275(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e275M(s, f) : e275C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e275M(s, f) : e275C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e275M : TinyExpressionP4Parser::e275C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6939:6988:body/1/0/0/seq", false, false, "text", false, K461);
     }
     private static Match e275C(Session s, Frame f) {
@@ -3810,7 +3810,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K462, K237);
     }
     private static Match e276(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e276M(s, f) : e276C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e276M(s, f) : e276C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e276M : TinyExpressionP4Parser::e276C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6939:6963:body/1/0/0/0/optional", true, false, "text", false, K445);
     }
     private static Match e276C(Session s, Frame f) {
@@ -3821,7 +3821,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e277(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e277M(s, f) : e277C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e277M(s, f) : e277C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e277M : TinyExpressionP4Parser::e277C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6941:6961:body/1/0/0/0/0/seq", false, false, "text", false, K446);
     }
     private static Match e277C(Session s, Frame f) {
@@ -3831,7 +3831,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K463, K249);
     }
     private static Match e278(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e278M(s, f) : e278C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e278M(s, f) : e278C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e278M : TinyExpressionP4Parser::e278C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6941:6952:body/1/0/0/0/0/0/literal", false, true, "text", false, K445);
     }
     private static Match e278C(Session s, Frame f) {
@@ -3841,7 +3841,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "returning", true, false, K448);
     }
     private static Match e279(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e279M(s, f) : e279C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e279M(s, f) : e279C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e279M : TinyExpressionP4Parser::e279C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6953:6961:body/1/0/0/0/0/1/optional", true, false, "text", false, K256);
     }
     private static Match e279C(Session s, Frame f) {
@@ -3851,7 +3851,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e280);
     }
     private static Match e280(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e280M(s, f) : e280C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e280M(s, f) : e280C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e280M : TinyExpressionP4Parser::e280C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6955:6959:body/1/0/0/0/0/1/0/literal", false, true, "text", false, K256);
     }
     private static Match e280C(Session s, Frame f) {
@@ -3861,7 +3861,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e281(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e281M(s, f) : e281C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e281M(s, f) : e281C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e281M : TinyExpressionP4Parser::e281C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6964:6980:body/1/0/0/1/ruleRef", false, false, "text", false, K4);
     }
     private static Match e281C(Session s, Frame f) {
@@ -3871,7 +3871,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberReturnType_26(s, f);
     }
     private static Match e282(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e282M(s, f) : e282C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e282M(s, f) : e282C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e282M : TinyExpressionP4Parser::e282C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6981:6988:body/1/0/0/2/optional", true, false, "text", false, K449);
     }
     private static Match e282C(Session s, Frame f) {
@@ -3881,7 +3881,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e283);
     }
     private static Match e283(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e283M(s, f) : e283C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e283M(s, f) : e283C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e283M : TinyExpressionP4Parser::e283C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6983:6986:body/1/0/0/2/0/literal", false, true, "text", false, K449);
     }
     private static Match e283C(Session s, Frame f) {
@@ -3891,7 +3891,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e284(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e284M(s, f) : e284C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e284M(s, f) : e284C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e284M : TinyExpressionP4Parser::e284C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6991:6998:body/1/0/1/optional", true, false, "text", false, K449);
     }
     private static Match e284C(Session s, Frame f) {
@@ -3901,7 +3901,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e285);
     }
     private static Match e285(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e285M(s, f) : e285C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e285M(s, f) : e285C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e285M : TinyExpressionP4Parser::e285C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6993:6996:body/1/0/1/0/literal", false, true, "text", false, K449);
     }
     private static Match e285C(Session s, Frame f) {
@@ -3911,7 +3911,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e286(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e286M(s, f) : e286C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e286M(s, f) : e286C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e286M : TinyExpressionP4Parser::e286C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7005:7069:body/2/group", false, false, "mixed", false, K247);
     }
     private static Match e286C(Session s, Frame f) {
@@ -3921,7 +3921,7 @@ public final class TinyExpressionP4Parser {
         return e287(s, f);
     }
     private static Match e287(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e287M(s, f) : e287C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e287M(s, f) : e287C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e287M : TinyExpressionP4Parser::e287C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7007:7061:body/2/0/choice", false, false, "mixed", false, K247);
     }
     private static Match e287C(Session s, Frame f) {
@@ -3932,7 +3932,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e288(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e288M(s, f) : e288C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e288M(s, f) : e288C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e288M : TinyExpressionP4Parser::e288C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7007:7042:body/2/0/0/seq", false, false, "node", false, K247);
     }
     private static Match e288C(Session s, Frame f) {
@@ -3952,7 +3952,7 @@ public final class TinyExpressionP4Parser {
         return parseClassName_3(s, f);
     }
     private static Match e290(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e290M(s, f) : e290C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e290M(s, f) : e290C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e290M : TinyExpressionP4Parser::e290C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7028:7031:body/2/0/0/1/literal", false, true, "text", false, K247);
     }
     private static Match e290C(Session s, Frame f) {
@@ -3982,7 +3982,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e293(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e293M(s, f) : e293C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e293M(s, f) : e293C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e293M : TinyExpressionP4Parser::e293C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7074:7077:body/3/literal", false, true, "text", false, K373);
     }
     private static Match e293C(Session s, Frame f) {
@@ -3992,7 +3992,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e294(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e294M(s, f) : e294C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e294M(s, f) : e294C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e294M : TinyExpressionP4Parser::e294C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7078:7097:body/4/optional", true, false, "node", false, K293);
     }
     private static Match e294C(Session s, Frame f) {
@@ -4012,7 +4012,7 @@ public final class TinyExpressionP4Parser {
         return parseArguments_39(s, f);
     }
     private static Match e296(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e296M(s, f) : e296C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e296M(s, f) : e296C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e296M : TinyExpressionP4Parser::e296C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalNumberInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7098:7101:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e296C(Session s, Frame f) {
@@ -4023,7 +4023,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e297(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e297M(s, f) : e297C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e297M(s, f) : e297C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e297M : TinyExpressionP4Parser::e297C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7213:7378:body/seq", false, false, "mixed", true, K4);
     }
     private static Match e297C(Session s, Frame f) {
@@ -4033,7 +4033,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K470, K385);
     }
     private static Match e298(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e298M(s, f) : e298C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e298M(s, f) : e298C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e298M : TinyExpressionP4Parser::e298C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7213:7223:body/0/literal", false, true, "text", false, K443);
     }
     private static Match e298C(Session s, Frame f) {
@@ -4043,7 +4043,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "external", true, false, K444);
     }
     private static Match e299(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e299M(s, f) : e299C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e299M(s, f) : e299C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e299M : TinyExpressionP4Parser::e299C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7224:7248:body/1/optional", true, false, "text", false, K445);
     }
     private static Match e299C(Session s, Frame f) {
@@ -4054,7 +4054,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e300(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e300M(s, f) : e300C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e300M(s, f) : e300C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e300M : TinyExpressionP4Parser::e300C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7226:7246:body/1/0/seq", false, false, "text", false, K446);
     }
     private static Match e300C(Session s, Frame f) {
@@ -4064,7 +4064,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K471, K249);
     }
     private static Match e301(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e301M(s, f) : e301C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e301M(s, f) : e301C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e301M : TinyExpressionP4Parser::e301C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7226:7237:body/1/0/0/literal", false, true, "text", false, K445);
     }
     private static Match e301C(Session s, Frame f) {
@@ -4074,7 +4074,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "returning", true, false, K448);
     }
     private static Match e302(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e302M(s, f) : e302C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e302M(s, f) : e302C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e302M : TinyExpressionP4Parser::e302C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7238:7246:body/1/0/1/optional", true, false, "text", false, K256);
     }
     private static Match e302C(Session s, Frame f) {
@@ -4084,7 +4084,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e303);
     }
     private static Match e303(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e303M(s, f) : e303C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e303M(s, f) : e303C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e303M : TinyExpressionP4Parser::e303C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7240:7244:body/1/0/1/0/literal", false, true, "text", false, K256);
     }
     private static Match e303C(Session s, Frame f) {
@@ -4094,7 +4094,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e304(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e304M(s, f) : e304C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e304M(s, f) : e304C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e304M : TinyExpressionP4Parser::e304C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7249:7265:body/2/ruleRef", false, false, "text", false, K4);
     }
     private static Match e304C(Session s, Frame f) {
@@ -4104,7 +4104,7 @@ public final class TinyExpressionP4Parser {
         return parseStringReturnType_27(s, f);
     }
     private static Match e305(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e305M(s, f) : e305C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e305M(s, f) : e305C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e305M : TinyExpressionP4Parser::e305C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7270:7277:body/3/optional", true, false, "text", false, K449);
     }
     private static Match e305C(Session s, Frame f) {
@@ -4114,7 +4114,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e306);
     }
     private static Match e306(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e306M(s, f) : e306C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e306M(s, f) : e306C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e306M : TinyExpressionP4Parser::e306C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7272:7275:body/3/0/literal", false, true, "text", false, K449);
     }
     private static Match e306C(Session s, Frame f) {
@@ -4124,7 +4124,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e307(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e307M(s, f) : e307C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e307M(s, f) : e307C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e307M : TinyExpressionP4Parser::e307C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7282:7346:body/4/group", false, false, "mixed", false, K247);
     }
     private static Match e307C(Session s, Frame f) {
@@ -4134,7 +4134,7 @@ public final class TinyExpressionP4Parser {
         return e308(s, f);
     }
     private static Match e308(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e308M(s, f) : e308C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e308M(s, f) : e308C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e308M : TinyExpressionP4Parser::e308C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7284:7338:body/4/0/choice", false, false, "mixed", false, K247);
     }
     private static Match e308C(Session s, Frame f) {
@@ -4145,7 +4145,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e309(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e309M(s, f) : e309C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e309M(s, f) : e309C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e309M : TinyExpressionP4Parser::e309C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7284:7319:body/4/0/0/seq", false, false, "node", false, K247);
     }
     private static Match e309C(Session s, Frame f) {
@@ -4165,7 +4165,7 @@ public final class TinyExpressionP4Parser {
         return parseClassName_3(s, f);
     }
     private static Match e311(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e311M(s, f) : e311C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e311M(s, f) : e311C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e311M : TinyExpressionP4Parser::e311C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7305:7308:body/4/0/0/1/literal", false, true, "text", false, K247);
     }
     private static Match e311C(Session s, Frame f) {
@@ -4195,7 +4195,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e314(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e314M(s, f) : e314C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e314M(s, f) : e314C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e314M : TinyExpressionP4Parser::e314C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7351:7354:body/5/literal", false, true, "text", false, K373);
     }
     private static Match e314C(Session s, Frame f) {
@@ -4205,7 +4205,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e315(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e315M(s, f) : e315C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e315M(s, f) : e315C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e315M : TinyExpressionP4Parser::e315C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7355:7374:body/6/optional", true, false, "node", false, K293);
     }
     private static Match e315C(Session s, Frame f) {
@@ -4225,7 +4225,7 @@ public final class TinyExpressionP4Parser {
         return parseArguments_39(s, f);
     }
     private static Match e317(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e317M(s, f) : e317C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e317M(s, f) : e317C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e317M : TinyExpressionP4Parser::e317C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalStringInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7375:7378:body/7/literal", false, true, "text", false, K375);
     }
     private static Match e317C(Session s, Frame f) {
@@ -4236,7 +4236,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e318(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e318M(s, f) : e318C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e318M(s, f) : e318C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e318M : TinyExpressionP4Parser::e318C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7490:7655:body/seq", false, false, "mixed", true, K4);
     }
     private static Match e318C(Session s, Frame f) {
@@ -4246,7 +4246,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K478, K385);
     }
     private static Match e319(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e319M(s, f) : e319C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e319M(s, f) : e319C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e319M : TinyExpressionP4Parser::e319C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7490:7500:body/0/literal", false, true, "text", false, K443);
     }
     private static Match e319C(Session s, Frame f) {
@@ -4256,7 +4256,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "external", true, false, K444);
     }
     private static Match e320(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e320M(s, f) : e320C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e320M(s, f) : e320C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e320M : TinyExpressionP4Parser::e320C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7501:7525:body/1/optional", true, false, "text", false, K445);
     }
     private static Match e320C(Session s, Frame f) {
@@ -4267,7 +4267,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e321(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e321M(s, f) : e321C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e321M(s, f) : e321C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e321M : TinyExpressionP4Parser::e321C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7503:7523:body/1/0/seq", false, false, "text", false, K446);
     }
     private static Match e321C(Session s, Frame f) {
@@ -4277,7 +4277,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K479, K249);
     }
     private static Match e322(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e322M(s, f) : e322C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e322M(s, f) : e322C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e322M : TinyExpressionP4Parser::e322C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7503:7514:body/1/0/0/literal", false, true, "text", false, K445);
     }
     private static Match e322C(Session s, Frame f) {
@@ -4287,7 +4287,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "returning", true, false, K448);
     }
     private static Match e323(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e323M(s, f) : e323C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e323M(s, f) : e323C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e323M : TinyExpressionP4Parser::e323C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7515:7523:body/1/0/1/optional", true, false, "text", false, K256);
     }
     private static Match e323C(Session s, Frame f) {
@@ -4297,7 +4297,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e324);
     }
     private static Match e324(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e324M(s, f) : e324C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e324M(s, f) : e324C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e324M : TinyExpressionP4Parser::e324C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7517:7521:body/1/0/1/0/literal", false, true, "text", false, K256);
     }
     private static Match e324C(Session s, Frame f) {
@@ -4307,7 +4307,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e325(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e325M(s, f) : e325C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e325M(s, f) : e325C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e325M : TinyExpressionP4Parser::e325C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7526:7542:body/2/ruleRef", false, false, "text", false, K4);
     }
     private static Match e325C(Session s, Frame f) {
@@ -4317,7 +4317,7 @@ public final class TinyExpressionP4Parser {
         return parseObjectReturnType_29(s, f);
     }
     private static Match e326(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e326M(s, f) : e326C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e326M(s, f) : e326C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e326M : TinyExpressionP4Parser::e326C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7547:7554:body/3/optional", true, false, "text", false, K449);
     }
     private static Match e326C(Session s, Frame f) {
@@ -4327,7 +4327,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e327);
     }
     private static Match e327(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e327M(s, f) : e327C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e327M(s, f) : e327C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e327M : TinyExpressionP4Parser::e327C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7549:7552:body/3/0/literal", false, true, "text", false, K449);
     }
     private static Match e327C(Session s, Frame f) {
@@ -4337,7 +4337,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e328(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e328M(s, f) : e328C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e328M(s, f) : e328C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e328M : TinyExpressionP4Parser::e328C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7559:7623:body/4/group", false, false, "mixed", false, K247);
     }
     private static Match e328C(Session s, Frame f) {
@@ -4347,7 +4347,7 @@ public final class TinyExpressionP4Parser {
         return e329(s, f);
     }
     private static Match e329(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e329M(s, f) : e329C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e329M(s, f) : e329C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e329M : TinyExpressionP4Parser::e329C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7561:7615:body/4/0/choice", false, false, "mixed", false, K247);
     }
     private static Match e329C(Session s, Frame f) {
@@ -4358,7 +4358,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e330(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e330M(s, f) : e330C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e330M(s, f) : e330C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e330M : TinyExpressionP4Parser::e330C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7561:7596:body/4/0/0/seq", false, false, "node", false, K247);
     }
     private static Match e330C(Session s, Frame f) {
@@ -4378,7 +4378,7 @@ public final class TinyExpressionP4Parser {
         return parseClassName_3(s, f);
     }
     private static Match e332(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e332M(s, f) : e332C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e332M(s, f) : e332C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e332M : TinyExpressionP4Parser::e332C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7582:7585:body/4/0/0/1/literal", false, true, "text", false, K247);
     }
     private static Match e332C(Session s, Frame f) {
@@ -4408,7 +4408,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e335(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e335M(s, f) : e335C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e335M(s, f) : e335C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e335M : TinyExpressionP4Parser::e335C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7628:7631:body/5/literal", false, true, "text", false, K373);
     }
     private static Match e335C(Session s, Frame f) {
@@ -4418,7 +4418,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e336(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e336M(s, f) : e336C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e336M(s, f) : e336C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e336M : TinyExpressionP4Parser::e336C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7632:7651:body/6/optional", true, false, "node", false, K293);
     }
     private static Match e336C(Session s, Frame f) {
@@ -4438,7 +4438,7 @@ public final class TinyExpressionP4Parser {
         return parseArguments_39(s, f);
     }
     private static Match e338(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e338M(s, f) : e338C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e338M(s, f) : e338C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e338M : TinyExpressionP4Parser::e338C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExternalObjectInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7652:7655:body/7/literal", false, true, "text", false, K375);
     }
     private static Match e338C(Session s, Frame f) {
@@ -4448,7 +4448,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e339(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e339M(s, f) : e339C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e339M(s, f) : e339C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e339M : TinyExpressionP4Parser::e339C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocationHeader", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7894:body/choice", false, false, "text", false, K4);
     }
     private static Match e339C(Session s, Frame f) {
@@ -4459,7 +4459,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e340(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e340M(s, f) : e340C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e340M(s, f) : e340C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e340M : TinyExpressionP4Parser::e340C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocationHeader", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7881:body/0/seq", false, false, "text", false, K63);
     }
     private static Match e340C(Session s, Frame f) {
@@ -4469,7 +4469,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K491, K249);
     }
     private static Match e341(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e341M(s, f) : e341C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e341M(s, f) : e341C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e341M : TinyExpressionP4Parser::e341C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocationHeader", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7866:body/0/0/literal", false, true, "text", false, K492);
     }
     private static Match e341C(Session s, Frame f) {
@@ -4479,7 +4479,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "call", true, false, K493);
     }
     private static Match e342(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e342M(s, f) : e342C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e342M(s, f) : e342C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e342M : TinyExpressionP4Parser::e342C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocationHeader", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7867:7881:body/0/1/optional", true, false, "text", false, K494);
     }
     private static Match e342C(Session s, Frame f) {
@@ -4489,7 +4489,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e343);
     }
     private static Match e343(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e343M(s, f) : e343C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e343M(s, f) : e343C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e343M : TinyExpressionP4Parser::e343C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocationHeader", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7869:7879:body/0/1/0/literal", false, true, "text", false, K494);
     }
     private static Match e343C(Session s, Frame f) {
@@ -4499,7 +4499,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "internal", true, false, K495);
     }
     private static Match e344(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e344M(s, f) : e344C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e344M(s, f) : e344C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e344M : TinyExpressionP4Parser::e344C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocationHeader", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7884:7894:body/1/literal", false, true, "text", false, K494);
     }
     private static Match e344C(Session s, Frame f) {
@@ -4510,7 +4510,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e345(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e345M(s, f) : e345C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e345M(s, f) : e345C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e345M : TinyExpressionP4Parser::e345C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7997:8064:body/seq", false, false, "node", false, K4);
     }
     private static Match e345C(Session s, Frame f) {
@@ -4520,7 +4520,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K496, K368);
     }
     private static Match e346(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e346M(s, f) : e346C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e346M(s, f) : e346C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e346M : TinyExpressionP4Parser::e346C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7997:8019:body/0/ruleRef", false, false, "text", false, K4);
     }
     private static Match e346C(Session s, Frame f) {
@@ -4539,7 +4539,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e348(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e348M(s, f) : e348C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e348M(s, f) : e348C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e348M : TinyExpressionP4Parser::e348C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8037:8040:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e348C(Session s, Frame f) {
@@ -4549,7 +4549,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e349(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e349M(s, f) : e349C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e349M(s, f) : e349C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e349M : TinyExpressionP4Parser::e349C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8041:8060:body/3/optional", true, false, "node", false, K293);
     }
     private static Match e349C(Session s, Frame f) {
@@ -4569,7 +4569,7 @@ public final class TinyExpressionP4Parser {
         return parseArguments_39(s, f);
     }
     private static Match e351(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e351M(s, f) : e351C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e351M(s, f) : e351C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e351M : TinyExpressionP4Parser::e351C, K215, K215, K215, K216, K216, "TinyExpressionP4::MethodInvocation", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8061:8064:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e351C(Session s, Frame f) {
@@ -4580,7 +4580,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e352(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e352M(s, f) : e352C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e352M(s, f) : e352C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e352M : TinyExpressionP4Parser::e352C, K215, K215, K215, K216, K216, "TinyExpressionP4::ArgumentTernary", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8231:8311:body/seq", false, false, "node", true, K4);
     }
     private static Match e352C(Session s, Frame f) {
@@ -4600,7 +4600,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e354(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e354M(s, f) : e354C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e354M(s, f) : e354C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e354M : TinyExpressionP4Parser::e354C, K215, K215, K215, K216, K216, "TinyExpressionP4::ArgumentTernary", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8260:8263:body/1/literal", false, true, "text", false, K502);
     }
     private static Match e354C(Session s, Frame f) {
@@ -4620,7 +4620,7 @@ public final class TinyExpressionP4Parser {
         return parseBranchExpression_107(s, f);
     }
     private static Match e356(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e356M(s, f) : e356C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e356M(s, f) : e356C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e356M : TinyExpressionP4Parser::e356C, K215, K215, K215, K216, K216, "TinyExpressionP4::ArgumentTernary", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8291:8294:body/3/literal", false, true, "text", false, K449);
     }
     private static Match e356C(Session s, Frame f) {
@@ -4640,7 +4640,7 @@ public final class TinyExpressionP4Parser {
         return parseBranchExpression_107(s, f);
     }
     private static Match e358(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e358M(s, f) : e358C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e358M(s, f) : e358C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e358M : TinyExpressionP4Parser::e358C, K215, K215, K215, K216, K216, "TinyExpressionP4::ArgumentExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8407:8520:body/choice", false, false, "node", false, K4);
     }
     private static Match e358C(Session s, Frame f) {
@@ -4691,7 +4691,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e363(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e363M(s, f) : e363C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e363M(s, f) : e363C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e363M : TinyExpressionP4Parser::e363C, K215, K215, K215, K216, K216, "TinyExpressionP4::Arguments", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8590:8651:body/seq", false, false, "node", true, K4);
     }
     private static Match e363C(Session s, Frame f) {
@@ -4711,7 +4711,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e365(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e365M(s, f) : e365C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e365M(s, f) : e365C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e365M : TinyExpressionP4Parser::e365C, K215, K215, K215, K216, K216, "TinyExpressionP4::Arguments", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8617:8651:body/1/repeat", true, false, "node", true, K378);
     }
     private static Match e365C(Session s, Frame f) {
@@ -4722,7 +4722,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e366(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e366M(s, f) : e366C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e366M(s, f) : e366C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e366M : TinyExpressionP4Parser::e366C, K215, K215, K215, K216, K216, "TinyExpressionP4::Arguments", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8619:8641:body/1/0/seq", false, false, "node", false, K378);
     }
     private static Match e366C(Session s, Frame f) {
@@ -4732,7 +4732,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K515, K249);
     }
     private static Match e367(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e367M(s, f) : e367C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e367M(s, f) : e367C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e367M : TinyExpressionP4Parser::e367C, K215, K215, K215, K216, K216, "TinyExpressionP4::Arguments", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8619:8622:body/1/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e367C(Session s, Frame f) {
@@ -4753,7 +4753,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e369(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e369M(s, f) : e369C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e369M(s, f) : e369C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e369M : TinyExpressionP4Parser::e369C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8846:8894:body/seq", false, false, "node", true, K4);
     }
     private static Match e369C(Session s, Frame f) {
@@ -4773,7 +4773,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberTerm_41(s, f);
     }
     private static Match e371(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e371M(s, f) : e371C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e371M(s, f) : e371C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e371M : TinyExpressionP4Parser::e371C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8863:8894:body/1/repeat", true, false, "node", true, K221);
     }
     private static Match e371C(Session s, Frame f) {
@@ -4784,7 +4784,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e372(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e372M(s, f) : e372C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e372M(s, f) : e372C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e372M : TinyExpressionP4Parser::e372C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8865:8885:body/1/0/seq", false, false, "node", false, K520);
     }
     private static Match e372C(Session s, Frame f) {
@@ -4815,7 +4815,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e375(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e375M(s, f) : e375C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e375M(s, f) : e375C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e375M : TinyExpressionP4Parser::e375C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9001:9053:body/seq", false, false, "mixed", true, K4);
     }
     private static Match e375C(Session s, Frame f) {
@@ -4835,7 +4835,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberFactor_60(s, f);
     }
     private static Match e377(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e377M(s, f) : e377C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e377M(s, f) : e377C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e377M : TinyExpressionP4Parser::e377C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9020:9053:body/1/repeat", true, false, "mixed", true, K221);
     }
     private static Match e377C(Session s, Frame f) {
@@ -4846,7 +4846,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e378(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e378M(s, f) : e378C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e378M(s, f) : e378C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e378M : TinyExpressionP4Parser::e378C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9022:9044:body/1/0/seq", false, false, "mixed", false, K528);
     }
     private static Match e378C(Session s, Frame f) {
@@ -4876,7 +4876,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberFactor_60(s, f);
     }
     private static Match e381(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e381M(s, f) : e381C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e381M(s, f) : e381C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e381M : TinyExpressionP4Parser::e381C, K215, K215, K215, K216, K216, "TinyExpressionP4::AddOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9078:body/choice", false, false, "text", false, K4);
     }
     private static Match e381C(Session s, Frame f) {
@@ -4886,7 +4886,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K532,false,new boolean[]{true,true},false);
     }
     private static Match e382(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e382M(s, f) : e382C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e382M(s, f) : e382C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e382M : TinyExpressionP4Parser::e382C, K215, K215, K215, K216, K216, "TinyExpressionP4::AddOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9072:body/0/literal", false, true, "text", false, K533);
     }
     private static Match e382C(Session s, Frame f) {
@@ -4896,7 +4896,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "+", true, false, K534);
     }
     private static Match e383(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e383M(s, f) : e383C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e383M(s, f) : e383C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e383M : TinyExpressionP4Parser::e383C, K215, K215, K215, K216, K216, "TinyExpressionP4::AddOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9075:9078:body/1/literal", false, true, "text", false, K535);
     }
     private static Match e383C(Session s, Frame f) {
@@ -4906,7 +4906,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "-", true, false, K536);
     }
     private static Match e384(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e384M(s, f) : e384C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e384M(s, f) : e384C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e384M : TinyExpressionP4Parser::e384C, K215, K215, K215, K216, K216, "TinyExpressionP4::MulOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9102:body/choice", false, false, "text", false, K4);
     }
     private static Match e384C(Session s, Frame f) {
@@ -4916,7 +4916,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K537,false,new boolean[]{true,true},false);
     }
     private static Match e385(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e385M(s, f) : e385C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e385M(s, f) : e385C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e385M : TinyExpressionP4Parser::e385C, K215, K215, K215, K216, K216, "TinyExpressionP4::MulOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9096:body/0/literal", false, true, "text", false, K538);
     }
     private static Match e385C(Session s, Frame f) {
@@ -4926,7 +4926,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "*", true, false, K539);
     }
     private static Match e386(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e386M(s, f) : e386C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e386M(s, f) : e386C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e386M : TinyExpressionP4Parser::e386C, K215, K215, K215, K216, K216, "TinyExpressionP4::MulOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9099:9102:body/1/literal", false, true, "text", false, K540);
     }
     private static Match e386C(Session s, Frame f) {
@@ -4936,7 +4936,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "/", true, false, K541);
     }
     private static Match e387(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e387M(s, f) : e387C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e387M(s, f) : e387C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e387M : TinyExpressionP4Parser::e387C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9210:9464:body/choice", false, false, "node", false, K4);
     }
     private static Match e387C(Session s, Frame f) {
@@ -4946,7 +4946,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K593,false,null,false,K592);
     }
     private static Match e388(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e388M(s, f) : e388C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e388M(s, f) : e388C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e388M : TinyExpressionP4Parser::e388C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9210:9221:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e388C(Session s, Frame f) {
@@ -4956,7 +4956,7 @@ public final class TinyExpressionP4Parser {
         return parseSinFunction_45(s, f);
     }
     private static Match e389(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e389M(s, f) : e389C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e389M(s, f) : e389C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e389M : TinyExpressionP4Parser::e389C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9228:9239:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e389C(Session s, Frame f) {
@@ -4966,7 +4966,7 @@ public final class TinyExpressionP4Parser {
         return parseCosFunction_46(s, f);
     }
     private static Match e390(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e390M(s, f) : e390C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e390M(s, f) : e390C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e390M : TinyExpressionP4Parser::e390C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9246:9257:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e390C(Session s, Frame f) {
@@ -4976,7 +4976,7 @@ public final class TinyExpressionP4Parser {
         return parseTanFunction_47(s, f);
     }
     private static Match e391(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e391M(s, f) : e391C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e391M(s, f) : e391C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e391M : TinyExpressionP4Parser::e391C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9264:9276:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e391C(Session s, Frame f) {
@@ -4986,7 +4986,7 @@ public final class TinyExpressionP4Parser {
         return parseSqrtFunction_48(s, f);
     }
     private static Match e392(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e392M(s, f) : e392C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e392M(s, f) : e392C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e392M : TinyExpressionP4Parser::e392C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9283:9294:body/4/ruleRef", false, false, "node", false, K4);
     }
     private static Match e392C(Session s, Frame f) {
@@ -4996,7 +4996,7 @@ public final class TinyExpressionP4Parser {
         return parseMinFunction_49(s, f);
     }
     private static Match e393(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e393M(s, f) : e393C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e393M(s, f) : e393C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e393M : TinyExpressionP4Parser::e393C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9301:9312:body/5/ruleRef", false, false, "node", false, K4);
     }
     private static Match e393C(Session s, Frame f) {
@@ -5006,7 +5006,7 @@ public final class TinyExpressionP4Parser {
         return parseMaxFunction_50(s, f);
     }
     private static Match e394(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e394M(s, f) : e394C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e394M(s, f) : e394C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e394M : TinyExpressionP4Parser::e394C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9319:9333:body/6/ruleRef", false, false, "node", false, K4);
     }
     private static Match e394C(Session s, Frame f) {
@@ -5016,7 +5016,7 @@ public final class TinyExpressionP4Parser {
         return parseRandomFunction_51(s, f);
     }
     private static Match e395(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e395M(s, f) : e395C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e395M(s, f) : e395C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e395M : TinyExpressionP4Parser::e395C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9340:9351:body/7/ruleRef", false, false, "node", false, K4);
     }
     private static Match e395C(Session s, Frame f) {
@@ -5026,7 +5026,7 @@ public final class TinyExpressionP4Parser {
         return parseAbsFunction_52(s, f);
     }
     private static Match e396(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e396M(s, f) : e396C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e396M(s, f) : e396C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e396M : TinyExpressionP4Parser::e396C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9358:9371:body/8/ruleRef", false, false, "node", false, K4);
     }
     private static Match e396C(Session s, Frame f) {
@@ -5036,7 +5036,7 @@ public final class TinyExpressionP4Parser {
         return parseRoundFunction_53(s, f);
     }
     private static Match e397(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e397M(s, f) : e397C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e397M(s, f) : e397C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e397M : TinyExpressionP4Parser::e397C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9378:9390:body/9/ruleRef", false, false, "node", false, K4);
     }
     private static Match e397C(Session s, Frame f) {
@@ -5046,7 +5046,7 @@ public final class TinyExpressionP4Parser {
         return parseCeilFunction_54(s, f);
     }
     private static Match e398(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e398M(s, f) : e398C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e398M(s, f) : e398C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e398M : TinyExpressionP4Parser::e398C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9397:9410:body/10/ruleRef", false, false, "node", false, K4);
     }
     private static Match e398C(Session s, Frame f) {
@@ -5056,7 +5056,7 @@ public final class TinyExpressionP4Parser {
         return parseFloorFunction_55(s, f);
     }
     private static Match e399(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e399M(s, f) : e399C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e399M(s, f) : e399C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e399M : TinyExpressionP4Parser::e399C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9417:9428:body/11/ruleRef", false, false, "node", false, K4);
     }
     private static Match e399C(Session s, Frame f) {
@@ -5066,7 +5066,7 @@ public final class TinyExpressionP4Parser {
         return parsePowFunction_56(s, f);
     }
     private static Match e400(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e400M(s, f) : e400C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e400M(s, f) : e400C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e400M : TinyExpressionP4Parser::e400C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9435:9446:body/12/ruleRef", false, false, "node", false, K4);
     }
     private static Match e400C(Session s, Frame f) {
@@ -5076,7 +5076,7 @@ public final class TinyExpressionP4Parser {
         return parseLogFunction_57(s, f);
     }
     private static Match e401(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e401M(s, f) : e401C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e401M(s, f) : e401C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e401M : TinyExpressionP4Parser::e401C, K215, K215, K215, K216, K216, "TinyExpressionP4::MathFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9453:9464:body/13/ruleRef", false, false, "node", false, K4);
     }
     private static Match e401C(Session s, Frame f) {
@@ -5087,7 +5087,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e402(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e402M(s, f) : e402C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e402M(s, f) : e402C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e402M : TinyExpressionP4Parser::e402C, K215, K215, K215, K216, K216, "TinyExpressionP4::SinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9520:9557:body/seq", false, false, "node", false, K4);
     }
     private static Match e402C(Session s, Frame f) {
@@ -5097,7 +5097,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K596, K595);
     }
     private static Match e403(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e403M(s, f) : e403C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e403M(s, f) : e403C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e403M : TinyExpressionP4Parser::e403C, K215, K215, K215, K216, K216, "TinyExpressionP4::SinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9520:9525:body/0/literal", false, true, "text", false, K597);
     }
     private static Match e403C(Session s, Frame f) {
@@ -5107,7 +5107,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "sin", true, false, K598);
     }
     private static Match e404(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e404M(s, f) : e404C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e404M(s, f) : e404C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e404M : TinyExpressionP4Parser::e404C, K215, K215, K215, K216, K216, "TinyExpressionP4::SinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9526:9529:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e404C(Session s, Frame f) {
@@ -5127,7 +5127,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e406(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e406M(s, f) : e406C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e406M(s, f) : e406C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e406M : TinyExpressionP4Parser::e406C, K215, K215, K215, K216, K216, "TinyExpressionP4::SinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9554:9557:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e406C(Session s, Frame f) {
@@ -5138,7 +5138,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e407(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e407M(s, f) : e407C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e407M(s, f) : e407C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e407M : TinyExpressionP4Parser::e407C, K215, K215, K215, K216, K216, "TinyExpressionP4::CosFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9613:9650:body/seq", false, false, "node", false, K4);
     }
     private static Match e407C(Session s, Frame f) {
@@ -5148,7 +5148,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K601, K595);
     }
     private static Match e408(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e408M(s, f) : e408C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e408M(s, f) : e408C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e408M : TinyExpressionP4Parser::e408C, K215, K215, K215, K216, K216, "TinyExpressionP4::CosFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9613:9618:body/0/literal", false, true, "text", false, K602);
     }
     private static Match e408C(Session s, Frame f) {
@@ -5158,7 +5158,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "cos", true, false, K603);
     }
     private static Match e409(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e409M(s, f) : e409C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e409M(s, f) : e409C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e409M : TinyExpressionP4Parser::e409C, K215, K215, K215, K216, K216, "TinyExpressionP4::CosFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9619:9622:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e409C(Session s, Frame f) {
@@ -5178,7 +5178,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e411(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e411M(s, f) : e411C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e411M(s, f) : e411C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e411M : TinyExpressionP4Parser::e411C, K215, K215, K215, K216, K216, "TinyExpressionP4::CosFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9647:9650:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e411C(Session s, Frame f) {
@@ -5189,7 +5189,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e412(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e412M(s, f) : e412C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e412M(s, f) : e412C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e412M : TinyExpressionP4Parser::e412C, K215, K215, K215, K216, K216, "TinyExpressionP4::TanFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9706:9743:body/seq", false, false, "node", false, K4);
     }
     private static Match e412C(Session s, Frame f) {
@@ -5199,7 +5199,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K605, K595);
     }
     private static Match e413(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e413M(s, f) : e413C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e413M(s, f) : e413C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e413M : TinyExpressionP4Parser::e413C, K215, K215, K215, K216, K216, "TinyExpressionP4::TanFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9706:9711:body/0/literal", false, true, "text", false, K606);
     }
     private static Match e413C(Session s, Frame f) {
@@ -5209,7 +5209,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "tan", true, false, K607);
     }
     private static Match e414(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e414M(s, f) : e414C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e414M(s, f) : e414C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e414M : TinyExpressionP4Parser::e414C, K215, K215, K215, K216, K216, "TinyExpressionP4::TanFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9712:9715:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e414C(Session s, Frame f) {
@@ -5229,7 +5229,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e416(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e416M(s, f) : e416C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e416M(s, f) : e416C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e416M : TinyExpressionP4Parser::e416C, K215, K215, K215, K216, K216, "TinyExpressionP4::TanFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9740:9743:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e416C(Session s, Frame f) {
@@ -5240,7 +5240,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e417(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e417M(s, f) : e417C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e417M(s, f) : e417C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e417M : TinyExpressionP4Parser::e417C, K215, K215, K215, K216, K216, "TinyExpressionP4::SqrtFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9801:9839:body/seq", false, false, "node", false, K4);
     }
     private static Match e417C(Session s, Frame f) {
@@ -5250,7 +5250,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K609, K595);
     }
     private static Match e418(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e418M(s, f) : e418C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e418M(s, f) : e418C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e418M : TinyExpressionP4Parser::e418C, K215, K215, K215, K216, K216, "TinyExpressionP4::SqrtFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9801:9807:body/0/literal", false, true, "text", false, K610);
     }
     private static Match e418C(Session s, Frame f) {
@@ -5260,7 +5260,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "sqrt", true, false, K611);
     }
     private static Match e419(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e419M(s, f) : e419C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e419M(s, f) : e419C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e419M : TinyExpressionP4Parser::e419C, K215, K215, K215, K216, K216, "TinyExpressionP4::SqrtFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9808:9811:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e419C(Session s, Frame f) {
@@ -5280,7 +5280,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e421(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e421M(s, f) : e421C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e421M(s, f) : e421C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e421M : TinyExpressionP4Parser::e421C, K215, K215, K215, K216, K216, "TinyExpressionP4::SqrtFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9836:9839:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e421C(Session s, Frame f) {
@@ -5291,7 +5291,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e422(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e422M(s, f) : e422C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e422M(s, f) : e422C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e422M : TinyExpressionP4Parser::e422C, K215, K215, K215, K216, K216, "TinyExpressionP4::MinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9903:9975:body/seq", false, false, "node", true, K4);
     }
     private static Match e422C(Session s, Frame f) {
@@ -5301,7 +5301,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K613, K368);
     }
     private static Match e423(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e423M(s, f) : e423C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e423M(s, f) : e423C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e423M : TinyExpressionP4Parser::e423C, K215, K215, K215, K216, K216, "TinyExpressionP4::MinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9903:9908:body/0/literal", false, true, "text", false, K614);
     }
     private static Match e423C(Session s, Frame f) {
@@ -5311,7 +5311,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "min", true, false, K615);
     }
     private static Match e424(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e424M(s, f) : e424C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e424M(s, f) : e424C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e424M : TinyExpressionP4Parser::e424C, K215, K215, K215, K216, K216, "TinyExpressionP4::MinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9909:9912:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e424C(Session s, Frame f) {
@@ -5331,7 +5331,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e426(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e426M(s, f) : e426C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e426M(s, f) : e426C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e426M : TinyExpressionP4Parser::e426C, K215, K215, K215, K216, K216, "TinyExpressionP4::MinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9939:9971:body/3/repeat", true, false, "node", true, K378);
     }
     private static Match e426C(Session s, Frame f) {
@@ -5342,7 +5342,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e427(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e427M(s, f) : e427C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e427M(s, f) : e427C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e427M : TinyExpressionP4Parser::e427C, K215, K215, K215, K216, K216, "TinyExpressionP4::MinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9941:9963:body/3/0/seq", false, false, "node", false, K378);
     }
     private static Match e427C(Session s, Frame f) {
@@ -5352,7 +5352,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K618, K249);
     }
     private static Match e428(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e428M(s, f) : e428C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e428M(s, f) : e428C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e428M : TinyExpressionP4Parser::e428C, K215, K215, K215, K216, K216, "TinyExpressionP4::MinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9941:9944:body/3/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e428C(Session s, Frame f) {
@@ -5372,7 +5372,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e430(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e430M(s, f) : e430C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e430M(s, f) : e430C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e430M : TinyExpressionP4Parser::e430C, K215, K215, K215, K216, K216, "TinyExpressionP4::MinFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9972:9975:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e430C(Session s, Frame f) {
@@ -5383,7 +5383,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e431(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e431M(s, f) : e431C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e431M(s, f) : e431C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e431M : TinyExpressionP4Parser::e431C, K215, K215, K215, K216, K216, "TinyExpressionP4::MaxFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10039:10111:body/seq", false, false, "node", true, K4);
     }
     private static Match e431C(Session s, Frame f) {
@@ -5393,7 +5393,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K621, K368);
     }
     private static Match e432(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e432M(s, f) : e432C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e432M(s, f) : e432C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e432M : TinyExpressionP4Parser::e432C, K215, K215, K215, K216, K216, "TinyExpressionP4::MaxFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10039:10044:body/0/literal", false, true, "text", false, K622);
     }
     private static Match e432C(Session s, Frame f) {
@@ -5403,7 +5403,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "max", true, false, K623);
     }
     private static Match e433(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e433M(s, f) : e433C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e433M(s, f) : e433C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e433M : TinyExpressionP4Parser::e433C, K215, K215, K215, K216, K216, "TinyExpressionP4::MaxFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10045:10048:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e433C(Session s, Frame f) {
@@ -5423,7 +5423,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e435(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e435M(s, f) : e435C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e435M(s, f) : e435C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e435M : TinyExpressionP4Parser::e435C, K215, K215, K215, K216, K216, "TinyExpressionP4::MaxFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10075:10107:body/3/repeat", true, false, "node", true, K378);
     }
     private static Match e435C(Session s, Frame f) {
@@ -5434,7 +5434,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e436(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e436M(s, f) : e436C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e436M(s, f) : e436C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e436M : TinyExpressionP4Parser::e436C, K215, K215, K215, K216, K216, "TinyExpressionP4::MaxFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10077:10099:body/3/0/seq", false, false, "node", false, K378);
     }
     private static Match e436C(Session s, Frame f) {
@@ -5444,7 +5444,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K625, K249);
     }
     private static Match e437(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e437M(s, f) : e437C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e437M(s, f) : e437C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e437M : TinyExpressionP4Parser::e437C, K215, K215, K215, K216, K216, "TinyExpressionP4::MaxFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10077:10080:body/3/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e437C(Session s, Frame f) {
@@ -5464,7 +5464,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e439(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e439M(s, f) : e439C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e439M(s, f) : e439C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e439M : TinyExpressionP4Parser::e439C, K215, K215, K215, K216, K216, "TinyExpressionP4::MaxFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10108:10111:body/4/literal", false, true, "text", false, K375);
     }
     private static Match e439C(Session s, Frame f) {
@@ -5475,7 +5475,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e440(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e440M(s, f) : e440C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e440M(s, f) : e440C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e440M : TinyExpressionP4Parser::e440C, K215, K215, K215, K216, K216, "TinyExpressionP4::RandomFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10175:body/seq", false, false, "text", false, K4);
     }
     private static Match e440C(Session s, Frame f) {
@@ -5485,7 +5485,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K627, K237);
     }
     private static Match e441(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e441M(s, f) : e441C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e441M(s, f) : e441C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e441M : TinyExpressionP4Parser::e441C, K215, K215, K215, K216, K216, "TinyExpressionP4::RandomFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10167:body/0/literal", false, true, "text", false, K628);
     }
     private static Match e441C(Session s, Frame f) {
@@ -5495,7 +5495,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "random", true, false, K629);
     }
     private static Match e442(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e442M(s, f) : e442C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e442M(s, f) : e442C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e442M : TinyExpressionP4Parser::e442C, K215, K215, K215, K216, K216, "TinyExpressionP4::RandomFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10168:10171:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e442C(Session s, Frame f) {
@@ -5505,7 +5505,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e443(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e443M(s, f) : e443C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e443M(s, f) : e443C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e443M : TinyExpressionP4Parser::e443C, K215, K215, K215, K216, K216, "TinyExpressionP4::RandomFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10172:10175:body/2/literal", false, true, "text", false, K375);
     }
     private static Match e443C(Session s, Frame f) {
@@ -5516,7 +5516,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e444(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e444M(s, f) : e444C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e444M(s, f) : e444C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e444M : TinyExpressionP4Parser::e444C, K215, K215, K215, K216, K216, "TinyExpressionP4::AbsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10231:10268:body/seq", false, false, "node", false, K4);
     }
     private static Match e444C(Session s, Frame f) {
@@ -5526,7 +5526,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K630, K595);
     }
     private static Match e445(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e445M(s, f) : e445C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e445M(s, f) : e445C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e445M : TinyExpressionP4Parser::e445C, K215, K215, K215, K216, K216, "TinyExpressionP4::AbsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10231:10236:body/0/literal", false, true, "text", false, K631);
     }
     private static Match e445C(Session s, Frame f) {
@@ -5536,7 +5536,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "abs", true, false, K632);
     }
     private static Match e446(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e446M(s, f) : e446C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e446M(s, f) : e446C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e446M : TinyExpressionP4Parser::e446C, K215, K215, K215, K216, K216, "TinyExpressionP4::AbsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10237:10240:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e446C(Session s, Frame f) {
@@ -5556,7 +5556,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e448(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e448M(s, f) : e448C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e448M(s, f) : e448C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e448M : TinyExpressionP4Parser::e448C, K215, K215, K215, K216, K216, "TinyExpressionP4::AbsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10265:10268:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e448C(Session s, Frame f) {
@@ -5567,7 +5567,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e449(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e449M(s, f) : e449C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e449M(s, f) : e449C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e449M : TinyExpressionP4Parser::e449C, K215, K215, K215, K216, K216, "TinyExpressionP4::RoundFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10328:10367:body/seq", false, false, "node", false, K4);
     }
     private static Match e449C(Session s, Frame f) {
@@ -5577,7 +5577,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K634, K595);
     }
     private static Match e450(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e450M(s, f) : e450C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e450M(s, f) : e450C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e450M : TinyExpressionP4Parser::e450C, K215, K215, K215, K216, K216, "TinyExpressionP4::RoundFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10328:10335:body/0/literal", false, true, "text", false, K635);
     }
     private static Match e450C(Session s, Frame f) {
@@ -5587,7 +5587,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "round", true, false, K636);
     }
     private static Match e451(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e451M(s, f) : e451C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e451M(s, f) : e451C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e451M : TinyExpressionP4Parser::e451C, K215, K215, K215, K216, K216, "TinyExpressionP4::RoundFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10336:10339:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e451C(Session s, Frame f) {
@@ -5607,7 +5607,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e453(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e453M(s, f) : e453C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e453M(s, f) : e453C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e453M : TinyExpressionP4Parser::e453C, K215, K215, K215, K216, K216, "TinyExpressionP4::RoundFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10364:10367:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e453C(Session s, Frame f) {
@@ -5618,7 +5618,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e454(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e454M(s, f) : e454C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e454M(s, f) : e454C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e454M : TinyExpressionP4Parser::e454C, K215, K215, K215, K216, K216, "TinyExpressionP4::CeilFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10425:10463:body/seq", false, false, "node", false, K4);
     }
     private static Match e454C(Session s, Frame f) {
@@ -5628,7 +5628,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K638, K595);
     }
     private static Match e455(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e455M(s, f) : e455C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e455M(s, f) : e455C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e455M : TinyExpressionP4Parser::e455C, K215, K215, K215, K216, K216, "TinyExpressionP4::CeilFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10425:10431:body/0/literal", false, true, "text", false, K639);
     }
     private static Match e455C(Session s, Frame f) {
@@ -5638,7 +5638,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "ceil", true, false, K640);
     }
     private static Match e456(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e456M(s, f) : e456C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e456M(s, f) : e456C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e456M : TinyExpressionP4Parser::e456C, K215, K215, K215, K216, K216, "TinyExpressionP4::CeilFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10432:10435:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e456C(Session s, Frame f) {
@@ -5658,7 +5658,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e458(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e458M(s, f) : e458C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e458M(s, f) : e458C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e458M : TinyExpressionP4Parser::e458C, K215, K215, K215, K216, K216, "TinyExpressionP4::CeilFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10460:10463:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e458C(Session s, Frame f) {
@@ -5669,7 +5669,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e459(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e459M(s, f) : e459C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e459M(s, f) : e459C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e459M : TinyExpressionP4Parser::e459C, K215, K215, K215, K216, K216, "TinyExpressionP4::FloorFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10523:10562:body/seq", false, false, "node", false, K4);
     }
     private static Match e459C(Session s, Frame f) {
@@ -5679,7 +5679,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K642, K595);
     }
     private static Match e460(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e460M(s, f) : e460C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e460M(s, f) : e460C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e460M : TinyExpressionP4Parser::e460C, K215, K215, K215, K216, K216, "TinyExpressionP4::FloorFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10523:10530:body/0/literal", false, true, "text", false, K643);
     }
     private static Match e460C(Session s, Frame f) {
@@ -5689,7 +5689,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "floor", true, false, K644);
     }
     private static Match e461(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e461M(s, f) : e461C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e461M(s, f) : e461C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e461M : TinyExpressionP4Parser::e461C, K215, K215, K215, K216, K216, "TinyExpressionP4::FloorFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10531:10534:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e461C(Session s, Frame f) {
@@ -5709,7 +5709,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e463(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e463M(s, f) : e463C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e463M(s, f) : e463C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e463M : TinyExpressionP4Parser::e463C, K215, K215, K215, K216, K216, "TinyExpressionP4::FloorFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10559:10562:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e463C(Session s, Frame f) {
@@ -5720,7 +5720,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e464(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e464M(s, f) : e464C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e464M(s, f) : e464C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e464M : TinyExpressionP4Parser::e464C, K215, K215, K215, K216, K216, "TinyExpressionP4::PowFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10629:10700:body/seq", false, false, "node", true, K4);
     }
     private static Match e464C(Session s, Frame f) {
@@ -5730,7 +5730,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K646, K241);
     }
     private static Match e465(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e465M(s, f) : e465C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e465M(s, f) : e465C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e465M : TinyExpressionP4Parser::e465C, K215, K215, K215, K216, K216, "TinyExpressionP4::PowFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10629:10634:body/0/literal", false, true, "text", false, K647);
     }
     private static Match e465C(Session s, Frame f) {
@@ -5740,7 +5740,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "pow", true, false, K648);
     }
     private static Match e466(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e466M(s, f) : e466C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e466M(s, f) : e466C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e466M : TinyExpressionP4Parser::e466C, K215, K215, K215, K216, K216, "TinyExpressionP4::PowFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10635:10638:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e466C(Session s, Frame f) {
@@ -5760,7 +5760,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e468(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e468M(s, f) : e468C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e468M(s, f) : e468C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e468M : TinyExpressionP4Parser::e468C, K215, K215, K215, K216, K216, "TinyExpressionP4::PowFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10664:10667:body/3/literal", false, true, "text", false, K378);
     }
     private static Match e468C(Session s, Frame f) {
@@ -5780,7 +5780,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e470(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e470M(s, f) : e470C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e470M(s, f) : e470C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e470M : TinyExpressionP4Parser::e470C, K215, K215, K215, K216, K216, "TinyExpressionP4::PowFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10697:10700:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e470C(Session s, Frame f) {
@@ -5791,7 +5791,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e471(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e471M(s, f) : e471C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e471M(s, f) : e471C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e471M : TinyExpressionP4Parser::e471C, K215, K215, K215, K216, K216, "TinyExpressionP4::LogFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10756:10793:body/seq", false, false, "node", false, K4);
     }
     private static Match e471C(Session s, Frame f) {
@@ -5801,7 +5801,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K653, K595);
     }
     private static Match e472(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e472M(s, f) : e472C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e472M(s, f) : e472C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e472M : TinyExpressionP4Parser::e472C, K215, K215, K215, K216, K216, "TinyExpressionP4::LogFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10756:10761:body/0/literal", false, true, "text", false, K654);
     }
     private static Match e472C(Session s, Frame f) {
@@ -5811,7 +5811,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "log", true, false, K655);
     }
     private static Match e473(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e473M(s, f) : e473C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e473M(s, f) : e473C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e473M : TinyExpressionP4Parser::e473C, K215, K215, K215, K216, K216, "TinyExpressionP4::LogFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10762:10765:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e473C(Session s, Frame f) {
@@ -5831,7 +5831,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e475(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e475M(s, f) : e475C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e475M(s, f) : e475C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e475M : TinyExpressionP4Parser::e475C, K215, K215, K215, K216, K216, "TinyExpressionP4::LogFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10790:10793:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e475C(Session s, Frame f) {
@@ -5842,7 +5842,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e476(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e476M(s, f) : e476C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e476M(s, f) : e476C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e476M : TinyExpressionP4Parser::e476C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExpFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10849:10886:body/seq", false, false, "node", false, K4);
     }
     private static Match e476C(Session s, Frame f) {
@@ -5852,7 +5852,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K657, K595);
     }
     private static Match e477(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e477M(s, f) : e477C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e477M(s, f) : e477C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e477M : TinyExpressionP4Parser::e477C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExpFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10849:10854:body/0/literal", false, true, "text", false, K658);
     }
     private static Match e477C(Session s, Frame f) {
@@ -5862,7 +5862,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "exp", true, false, K659);
     }
     private static Match e478(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e478M(s, f) : e478C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e478M(s, f) : e478C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e478M : TinyExpressionP4Parser::e478C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExpFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10855:10858:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e478C(Session s, Frame f) {
@@ -5882,7 +5882,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e480(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e480M(s, f) : e480C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e480M(s, f) : e480C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e480M : TinyExpressionP4Parser::e480C, K215, K215, K215, K216, K216, "TinyExpressionP4::ExpFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10883:10886:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e480C(Session s, Frame f) {
@@ -5893,7 +5893,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e481(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e481M(s, f) : e481C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e481M(s, f) : e481C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e481M : TinyExpressionP4Parser::e481C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToNumFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11040:11116:body/seq", false, false, "node", true, K4);
     }
     private static Match e481C(Session s, Frame f) {
@@ -5903,7 +5903,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K661, K241);
     }
     private static Match e482(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e482M(s, f) : e482C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e482M(s, f) : e482C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e482M : TinyExpressionP4Parser::e482C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToNumFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11040:11047:body/0/literal", false, true, "text", false, K662);
     }
     private static Match e482C(Session s, Frame f) {
@@ -5913,7 +5913,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "toNum", true, false, K663);
     }
     private static Match e483(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e483M(s, f) : e483C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e483M(s, f) : e483C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e483M : TinyExpressionP4Parser::e483C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToNumFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11048:11051:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e483C(Session s, Frame f) {
@@ -5933,7 +5933,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e485(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e485M(s, f) : e485C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e485M(s, f) : e485C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e485M : TinyExpressionP4Parser::e485C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToNumFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11076:11079:body/3/literal", false, true, "text", false, K378);
     }
     private static Match e485C(Session s, Frame f) {
@@ -5953,7 +5953,7 @@ public final class TinyExpressionP4Parser {
         return parseArgumentExpression_38(s, f);
     }
     private static Match e487(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e487M(s, f) : e487C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e487M(s, f) : e487C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e487M : TinyExpressionP4Parser::e487C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToNumFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11113:11116:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e487C(Session s, Frame f) {
@@ -5963,7 +5963,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e488(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e488M(s, f) : e488C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e488M(s, f) : e488C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e488M : TinyExpressionP4Parser::e488C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11145:11425:body/choice", false, false, "mixed", false, K4);
     }
     private static Match e488C(Session s, Frame f) {
@@ -5973,7 +5973,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K708,false,null,false,K707);
     }
     private static Match e489(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e489M(s, f) : e489C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e489M(s, f) : e489C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e489M : TinyExpressionP4Parser::e489C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11145:11162:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e489C(Session s, Frame f) {
@@ -5983,7 +5983,7 @@ public final class TinyExpressionP4Parser {
         return parseTernaryExpression_108(s, f);
     }
     private static Match e490(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e490M(s, f) : e490C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e490M(s, f) : e490C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e490M : TinyExpressionP4Parser::e490C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11169:11190:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e490C(Session s, Frame f) {
@@ -5993,7 +5993,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberMatchExpression_109(s, f);
     }
     private static Match e491(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e491M(s, f) : e491C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e491M(s, f) : e491C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e491M : TinyExpressionP4Parser::e491C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11197:11209:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e491C(Session s, Frame f) {
@@ -6003,7 +6003,7 @@ public final class TinyExpressionP4Parser {
         return parseIfExpression_106(s, f);
     }
     private static Match e492(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e492M(s, f) : e492C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e492M(s, f) : e492C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e492M : TinyExpressionP4Parser::e492C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11216:11228:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e492C(Session s, Frame f) {
@@ -6013,7 +6013,7 @@ public final class TinyExpressionP4Parser {
         return parseMathFunction_44(s, f);
     }
     private static Match e493(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e493M(s, f) : e493C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e493M(s, f) : e493C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e493M : TinyExpressionP4Parser::e493C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11235:11248:body/4/ruleRef", false, false, "node", false, K4);
     }
     private static Match e493C(Session s, Frame f) {
@@ -6023,7 +6023,7 @@ public final class TinyExpressionP4Parser {
         return parseToNumFunction_59(s, f);
     }
     private static Match e494(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e494M(s, f) : e494C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e494M(s, f) : e494C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e494M : TinyExpressionP4Parser::e494C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11255:11270:body/5/ruleRef", false, false, "node", false, K4);
     }
     private static Match e494C(Session s, Frame f) {
@@ -6033,7 +6033,7 @@ public final class TinyExpressionP4Parser {
         return parseLengthDotMethod_69(s, f);
     }
     private static Match e495(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e495M(s, f) : e495C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e495M(s, f) : e495C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e495M : TinyExpressionP4Parser::e495C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11277:11288:body/6/ruleRef", false, false, "node", false, K4);
     }
     private static Match e495C(Session s, Frame f) {
@@ -6043,7 +6043,7 @@ public final class TinyExpressionP4Parser {
         return parseLenFunction_65(s, f);
     }
     private static Match e496(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e496M(s, f) : e496C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e496M(s, f) : e496C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e496M : TinyExpressionP4Parser::e496C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11295:11309:body/7/ruleRef", false, false, "node", false, K4);
     }
     private static Match e496C(Session s, Frame f) {
@@ -6053,7 +6053,7 @@ public final class TinyExpressionP4Parser {
         return parseLengthFunction_64(s, f);
     }
     private static Match e497(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e497M(s, f) : e497C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e497M(s, f) : e497C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e497M : TinyExpressionP4Parser::e497C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11316:11340:body/8/ruleRef", false, false, "node", false, K4);
     }
     private static Match e497C(Session s, Frame f) {
@@ -6063,7 +6063,7 @@ public final class TinyExpressionP4Parser {
         return parseExternalNumberInvocation_32(s, f);
     }
     private static Match e498(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e498M(s, f) : e498C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e498M(s, f) : e498C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e498M : TinyExpressionP4Parser::e498C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11347:11353:body/9/tokenRef", false, true, "text", false, K709);
     }
     private static Match e498C(Session s, Frame f) {
@@ -6073,7 +6073,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Number",K234,K710);
     }
     private static Match e499(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e499M(s, f) : e499C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e499M(s, f) : e499C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e499M : TinyExpressionP4Parser::e499C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11360:11371:body/10/ruleRef", false, false, "node", false, K4);
     }
     private static Match e499C(Session s, Frame f) {
@@ -6083,7 +6083,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e500(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e500M(s, f) : e500C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e500M(s, f) : e500C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e500M : TinyExpressionP4Parser::e500C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11378:11394:body/11/ruleRef", false, false, "node", false, K4);
     }
     private static Match e500C(Session s, Frame f) {
@@ -6094,7 +6094,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e501(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e501M(s, f) : e501C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e501M(s, f) : e501C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e501M : TinyExpressionP4Parser::e501C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11401:11425:body/12/seq", false, false, "node", false, K160);
     }
     private static Match e501C(Session s, Frame f) {
@@ -6104,7 +6104,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K711, K237);
     }
     private static Match e502(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e502M(s, f) : e502C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e502M(s, f) : e502C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e502M : TinyExpressionP4Parser::e502C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11401:11404:body/12/0/literal", false, true, "text", false, K373);
     }
     private static Match e502C(Session s, Frame f) {
@@ -6114,7 +6114,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e503(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e503M(s, f) : e503C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e503M(s, f) : e503C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e503M : TinyExpressionP4Parser::e503C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11405:11421:body/12/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e503C(Session s, Frame f) {
@@ -6124,7 +6124,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e504(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e504M(s, f) : e504C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e504M(s, f) : e504C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e504M : TinyExpressionP4Parser::e504C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11422:11425:body/12/2/literal", false, true, "text", false, K375);
     }
     private static Match e504C(Session s, Frame f) {
@@ -6135,7 +6135,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e505(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e505M(s, f) : e505C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e505M(s, f) : e505C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e505M : TinyExpressionP4Parser::e505C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11578:11623:body/seq", false, false, "node", false, K4);
     }
     private static Match e505C(Session s, Frame f) {
@@ -6145,7 +6145,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K712, K595);
     }
     private static Match e506(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e506M(s, f) : e506C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e506M(s, f) : e506C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e506M : TinyExpressionP4Parser::e506C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11578:11591:body/0/literal", false, true, "text", false, K713);
     }
     private static Match e506C(Session s, Frame f) {
@@ -6155,7 +6155,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "toUpperCase", true, false, K714);
     }
     private static Match e507(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e507M(s, f) : e507C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e507M(s, f) : e507C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e507M : TinyExpressionP4Parser::e507C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11592:11595:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e507C(Session s, Frame f) {
@@ -6175,7 +6175,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e509(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e509M(s, f) : e509C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e509M(s, f) : e509C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e509M : TinyExpressionP4Parser::e509C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11620:11623:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e509C(Session s, Frame f) {
@@ -6186,7 +6186,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e510(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e510M(s, f) : e510C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e510M(s, f) : e510C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e510M : TinyExpressionP4Parser::e510C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11697:11742:body/seq", false, false, "node", false, K4);
     }
     private static Match e510C(Session s, Frame f) {
@@ -6196,7 +6196,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K716, K595);
     }
     private static Match e511(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e511M(s, f) : e511C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e511M(s, f) : e511C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e511M : TinyExpressionP4Parser::e511C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11697:11710:body/0/literal", false, true, "text", false, K717);
     }
     private static Match e511C(Session s, Frame f) {
@@ -6206,7 +6206,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "toLowerCase", true, false, K718);
     }
     private static Match e512(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e512M(s, f) : e512C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e512M(s, f) : e512C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e512M : TinyExpressionP4Parser::e512C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11711:11714:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e512C(Session s, Frame f) {
@@ -6226,7 +6226,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e514(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e514M(s, f) : e514C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e514M(s, f) : e514C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e514M : TinyExpressionP4Parser::e514C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11739:11742:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e514C(Session s, Frame f) {
@@ -6237,7 +6237,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e515(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e515M(s, f) : e515C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e515M(s, f) : e515C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e515M : TinyExpressionP4Parser::e515C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11802:11840:body/seq", false, false, "node", false, K4);
     }
     private static Match e515C(Session s, Frame f) {
@@ -6247,7 +6247,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K720, K595);
     }
     private static Match e516(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e516M(s, f) : e516C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e516M(s, f) : e516C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e516M : TinyExpressionP4Parser::e516C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11802:11808:body/0/literal", false, true, "text", false, K721);
     }
     private static Match e516C(Session s, Frame f) {
@@ -6257,7 +6257,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "trim", true, false, K722);
     }
     private static Match e517(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e517M(s, f) : e517C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e517M(s, f) : e517C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e517M : TinyExpressionP4Parser::e517C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11809:11812:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e517C(Session s, Frame f) {
@@ -6277,7 +6277,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e519(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e519M(s, f) : e519C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e519M(s, f) : e519C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e519M : TinyExpressionP4Parser::e519C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11837:11840:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e519C(Session s, Frame f) {
@@ -6288,7 +6288,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e520(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e520M(s, f) : e520C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e520M(s, f) : e520C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e520M : TinyExpressionP4Parser::e520C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11904:11944:body/seq", false, false, "node", false, K4);
     }
     private static Match e520C(Session s, Frame f) {
@@ -6298,7 +6298,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K724, K595);
     }
     private static Match e521(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e521M(s, f) : e521C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e521M(s, f) : e521C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e521M : TinyExpressionP4Parser::e521C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11904:11912:body/0/literal", false, true, "text", false, K725);
     }
     private static Match e521C(Session s, Frame f) {
@@ -6308,7 +6308,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "length", true, false, K726);
     }
     private static Match e522(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e522M(s, f) : e522C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e522M(s, f) : e522C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e522M : TinyExpressionP4Parser::e522C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11913:11916:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e522C(Session s, Frame f) {
@@ -6328,7 +6328,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e524(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e524M(s, f) : e524C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e524M(s, f) : e524C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e524M : TinyExpressionP4Parser::e524C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11941:11944:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e524C(Session s, Frame f) {
@@ -6339,7 +6339,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e525(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e525M(s, f) : e525C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e525M(s, f) : e525C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e525M : TinyExpressionP4Parser::e525C, K215, K215, K215, K216, K216, "TinyExpressionP4::LenFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12005:12042:body/seq", false, false, "node", false, K4);
     }
     private static Match e525C(Session s, Frame f) {
@@ -6349,7 +6349,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K728, K595);
     }
     private static Match e526(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e526M(s, f) : e526C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e526M(s, f) : e526C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e526M : TinyExpressionP4Parser::e526C, K215, K215, K215, K216, K216, "TinyExpressionP4::LenFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12005:12010:body/0/literal", false, true, "text", false, K729);
     }
     private static Match e526C(Session s, Frame f) {
@@ -6359,7 +6359,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "len", true, false, K730);
     }
     private static Match e527(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e527M(s, f) : e527C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e527M(s, f) : e527C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e527M : TinyExpressionP4Parser::e527C, K215, K215, K215, K216, K216, "TinyExpressionP4::LenFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12011:12014:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e527C(Session s, Frame f) {
@@ -6379,7 +6379,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e529(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e529M(s, f) : e529C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e529M(s, f) : e529C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e529M : TinyExpressionP4Parser::e529C, K215, K215, K215, K216, K216, "TinyExpressionP4::LenFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12039:12042:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e529C(Session s, Frame f) {
@@ -6390,7 +6390,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e530(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e530M(s, f) : e530C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e530M(s, f) : e530C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e530M : TinyExpressionP4Parser::e530C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12367:12408:body/seq", false, false, "node", false, K4);
     }
     private static Match e530C(Session s, Frame f) {
@@ -6410,7 +6410,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e532(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e532M(s, f) : e532C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e532M(s, f) : e532C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e532M : TinyExpressionP4Parser::e532C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12386:12400:body/1/literal", false, true, "text", false, K734);
     }
     private static Match e532C(Session s, Frame f) {
@@ -6420,7 +6420,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".toUpperCase", true, false, K735);
     }
     private static Match e533(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e533M(s, f) : e533C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e533M(s, f) : e533C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e533M : TinyExpressionP4Parser::e533C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12401:12404:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e533C(Session s, Frame f) {
@@ -6430,7 +6430,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e534(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e534M(s, f) : e534C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e534M(s, f) : e534C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e534M : TinyExpressionP4Parser::e534C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToUpperCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12405:12408:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e534C(Session s, Frame f) {
@@ -6441,7 +6441,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e535(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e535M(s, f) : e535C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e535M(s, f) : e535C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e535M : TinyExpressionP4Parser::e535C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12486:12527:body/seq", false, false, "node", false, K4);
     }
     private static Match e535C(Session s, Frame f) {
@@ -6461,7 +6461,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e537(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e537M(s, f) : e537C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e537M(s, f) : e537C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e537M : TinyExpressionP4Parser::e537C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12505:12519:body/1/literal", false, true, "text", false, K738);
     }
     private static Match e537C(Session s, Frame f) {
@@ -6471,7 +6471,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".toLowerCase", true, false, K739);
     }
     private static Match e538(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e538M(s, f) : e538C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e538M(s, f) : e538C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e538M : TinyExpressionP4Parser::e538C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12520:12523:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e538C(Session s, Frame f) {
@@ -6481,7 +6481,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e539(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e539M(s, f) : e539C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e539M(s, f) : e539C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e539M : TinyExpressionP4Parser::e539C, K215, K215, K215, K216, K216, "TinyExpressionP4::ToLowerCaseDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12524:12527:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e539C(Session s, Frame f) {
@@ -6492,7 +6492,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e540(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e540M(s, f) : e540C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e540M(s, f) : e540C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e540M : TinyExpressionP4Parser::e540C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12591:12625:body/seq", false, false, "node", false, K4);
     }
     private static Match e540C(Session s, Frame f) {
@@ -6512,7 +6512,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e542(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e542M(s, f) : e542C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e542M(s, f) : e542C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e542M : TinyExpressionP4Parser::e542C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12610:12617:body/1/literal", false, true, "text", false, K742);
     }
     private static Match e542C(Session s, Frame f) {
@@ -6522,7 +6522,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".trim", true, false, K743);
     }
     private static Match e543(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e543M(s, f) : e543C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e543M(s, f) : e543C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e543M : TinyExpressionP4Parser::e543C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12618:12621:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e543C(Session s, Frame f) {
@@ -6532,7 +6532,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e544(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e544M(s, f) : e544C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e544M(s, f) : e544C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e544M : TinyExpressionP4Parser::e544C, K215, K215, K215, K216, K216, "TinyExpressionP4::TrimDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12622:12625:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e544C(Session s, Frame f) {
@@ -6543,7 +6543,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e545(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e545M(s, f) : e545C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e545M(s, f) : e545C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e545M : TinyExpressionP4Parser::e545C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12693:12729:body/seq", false, false, "node", false, K4);
     }
     private static Match e545C(Session s, Frame f) {
@@ -6563,7 +6563,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e547(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e547M(s, f) : e547C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e547M(s, f) : e547C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e547M : TinyExpressionP4Parser::e547C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12712:12721:body/1/literal", false, true, "text", false, K746);
     }
     private static Match e547C(Session s, Frame f) {
@@ -6573,7 +6573,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".length", true, false, K747);
     }
     private static Match e548(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e548M(s, f) : e548C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e548M(s, f) : e548C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e548M : TinyExpressionP4Parser::e548C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12722:12725:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e548C(Session s, Frame f) {
@@ -6583,7 +6583,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e549(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e549M(s, f) : e549C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e549M(s, f) : e549C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e549M : TinyExpressionP4Parser::e549C, K215, K215, K215, K216, K216, "TinyExpressionP4::LengthDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12726:12729:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e549C(Session s, Frame f) {
@@ -6594,7 +6594,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e550(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e550M(s, f) : e550C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e550M(s, f) : e550C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e550M : TinyExpressionP4Parser::e550C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12949:13063:body/seq", false, false, "node", true, K4);
     }
     private static Match e550C(Session s, Frame f) {
@@ -6604,7 +6604,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K748, K219);
     }
     private static Match e551(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e551M(s, f) : e551C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e551M(s, f) : e551C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e551M : TinyExpressionP4Parser::e551C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12949:12961:body/0/literal", false, true, "text", false, K749);
     }
     private static Match e551C(Session s, Frame f) {
@@ -6614,7 +6614,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "startsWith", true, false, K750);
     }
     private static Match e552(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e552M(s, f) : e552C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e552M(s, f) : e552C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e552M : TinyExpressionP4Parser::e552C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12962:12965:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e552C(Session s, Frame f) {
@@ -6634,7 +6634,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e554(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e554M(s, f) : e554C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e554M(s, f) : e554C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e554M : TinyExpressionP4Parser::e554C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12990:12993:body/3/literal", false, true, "text", false, K378);
     }
     private static Match e554C(Session s, Frame f) {
@@ -6654,7 +6654,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e556(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e556M(s, f) : e556C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e556M(s, f) : e556C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e556M : TinyExpressionP4Parser::e556C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13025:13059:body/5/repeat", true, false, "node", true, K378);
     }
     private static Match e556C(Session s, Frame f) {
@@ -6665,7 +6665,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e557(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e557M(s, f) : e557C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e557M(s, f) : e557C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e557M : TinyExpressionP4Parser::e557C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13027:13047:body/5/0/seq", false, false, "node", false, K378);
     }
     private static Match e557C(Session s, Frame f) {
@@ -6675,7 +6675,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K754, K249);
     }
     private static Match e558(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e558M(s, f) : e558C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e558M(s, f) : e558C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e558M : TinyExpressionP4Parser::e558C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13027:13030:body/5/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e558C(Session s, Frame f) {
@@ -6695,7 +6695,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e560(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e560M(s, f) : e560C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e560M(s, f) : e560C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e560M : TinyExpressionP4Parser::e560C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13060:13063:body/6/literal", false, true, "text", false, K375);
     }
     private static Match e560C(Session s, Frame f) {
@@ -6706,7 +6706,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e561(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e561M(s, f) : e561C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e561M(s, f) : e561C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e561M : TinyExpressionP4Parser::e561C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13141:13253:body/seq", false, false, "node", true, K4);
     }
     private static Match e561C(Session s, Frame f) {
@@ -6716,7 +6716,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K756, K219);
     }
     private static Match e562(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e562M(s, f) : e562C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e562M(s, f) : e562C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e562M : TinyExpressionP4Parser::e562C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13141:13151:body/0/literal", false, true, "text", false, K757);
     }
     private static Match e562C(Session s, Frame f) {
@@ -6726,7 +6726,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "endsWith", true, false, K758);
     }
     private static Match e563(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e563M(s, f) : e563C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e563M(s, f) : e563C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e563M : TinyExpressionP4Parser::e563C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13152:13155:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e563C(Session s, Frame f) {
@@ -6746,7 +6746,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e565(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e565M(s, f) : e565C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e565M(s, f) : e565C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e565M : TinyExpressionP4Parser::e565C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13180:13183:body/3/literal", false, true, "text", false, K378);
     }
     private static Match e565C(Session s, Frame f) {
@@ -6766,7 +6766,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e567(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e567M(s, f) : e567C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e567M(s, f) : e567C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e567M : TinyExpressionP4Parser::e567C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13215:13249:body/5/repeat", true, false, "node", true, K378);
     }
     private static Match e567C(Session s, Frame f) {
@@ -6777,7 +6777,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e568(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e568M(s, f) : e568C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e568M(s, f) : e568C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e568M : TinyExpressionP4Parser::e568C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13217:13237:body/5/0/seq", false, false, "node", false, K378);
     }
     private static Match e568C(Session s, Frame f) {
@@ -6787,7 +6787,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K761, K249);
     }
     private static Match e569(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e569M(s, f) : e569C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e569M(s, f) : e569C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e569M : TinyExpressionP4Parser::e569C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13217:13220:body/5/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e569C(Session s, Frame f) {
@@ -6807,7 +6807,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e571(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e571M(s, f) : e571C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e571M(s, f) : e571C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e571M : TinyExpressionP4Parser::e571C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13250:13253:body/6/literal", false, true, "text", false, K375);
     }
     private static Match e571C(Session s, Frame f) {
@@ -6818,7 +6818,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e572(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e572M(s, f) : e572C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e572M(s, f) : e572C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e572M : TinyExpressionP4Parser::e572C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13331:13443:body/seq", false, false, "node", true, K4);
     }
     private static Match e572C(Session s, Frame f) {
@@ -6828,7 +6828,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K763, K219);
     }
     private static Match e573(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e573M(s, f) : e573C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e573M(s, f) : e573C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e573M : TinyExpressionP4Parser::e573C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13331:13341:body/0/literal", false, true, "text", false, K764);
     }
     private static Match e573C(Session s, Frame f) {
@@ -6838,7 +6838,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "contains", true, false, K765);
     }
     private static Match e574(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e574M(s, f) : e574C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e574M(s, f) : e574C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e574M : TinyExpressionP4Parser::e574C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13342:13345:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e574C(Session s, Frame f) {
@@ -6858,7 +6858,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e576(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e576M(s, f) : e576C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e576M(s, f) : e576C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e576M : TinyExpressionP4Parser::e576C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13370:13373:body/3/literal", false, true, "text", false, K378);
     }
     private static Match e576C(Session s, Frame f) {
@@ -6878,7 +6878,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e578(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e578M(s, f) : e578C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e578M(s, f) : e578C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e578M : TinyExpressionP4Parser::e578C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13405:13439:body/5/repeat", true, false, "node", true, K378);
     }
     private static Match e578C(Session s, Frame f) {
@@ -6889,7 +6889,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e579(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e579M(s, f) : e579C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e579M(s, f) : e579C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e579M : TinyExpressionP4Parser::e579C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13407:13427:body/5/0/seq", false, false, "node", false, K378);
     }
     private static Match e579C(Session s, Frame f) {
@@ -6899,7 +6899,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K768, K249);
     }
     private static Match e580(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e580M(s, f) : e580C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e580M(s, f) : e580C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e580M : TinyExpressionP4Parser::e580C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13407:13410:body/5/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e580C(Session s, Frame f) {
@@ -6919,7 +6919,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e582(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e582M(s, f) : e582C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e582M(s, f) : e582C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e582M : TinyExpressionP4Parser::e582C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13440:13443:body/6/literal", false, true, "text", false, K375);
     }
     private static Match e582C(Session s, Frame f) {
@@ -6930,7 +6930,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e583(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e583M(s, f) : e583C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e583M(s, f) : e583C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e583M : TinyExpressionP4Parser::e583C, K215, K215, K215, K216, K216, "TinyExpressionP4::InMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13509:13612:body/seq", false, false, "node", true, K4);
     }
     private static Match e583C(Session s, Frame f) {
@@ -6950,7 +6950,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e585(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e585M(s, f) : e585C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e585M(s, f) : e585C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e585M : TinyExpressionP4Parser::e585C, K215, K215, K215, K216, K216, "TinyExpressionP4::InMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13533:13538:body/1/literal", false, true, "text", false, K772);
     }
     private static Match e585C(Session s, Frame f) {
@@ -6960,7 +6960,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".in", true, false, K773);
     }
     private static Match e586(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e586M(s, f) : e586C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e586M(s, f) : e586C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e586M : TinyExpressionP4Parser::e586C, K215, K215, K215, K216, K216, "TinyExpressionP4::InMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13539:13542:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e586C(Session s, Frame f) {
@@ -6980,7 +6980,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e588(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e588M(s, f) : e588C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e588M(s, f) : e588C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e588M : TinyExpressionP4Parser::e588C, K215, K215, K215, K216, K216, "TinyExpressionP4::InMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13572:13608:body/4/repeat", true, false, "node", true, K378);
     }
     private static Match e588C(Session s, Frame f) {
@@ -6991,7 +6991,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e589(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e589M(s, f) : e589C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e589M(s, f) : e589C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e589M : TinyExpressionP4Parser::e589C, K215, K215, K215, K216, K216, "TinyExpressionP4::InMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13574:13594:body/4/0/seq", false, false, "node", false, K378);
     }
     private static Match e589C(Session s, Frame f) {
@@ -7001,7 +7001,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K776, K249);
     }
     private static Match e590(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e590M(s, f) : e590C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e590M(s, f) : e590C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e590M : TinyExpressionP4Parser::e590C, K215, K215, K215, K216, K216, "TinyExpressionP4::InMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13574:13577:body/4/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e590C(Session s, Frame f) {
@@ -7021,7 +7021,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e592(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e592M(s, f) : e592C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e592M(s, f) : e592C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e592M : TinyExpressionP4Parser::e592C, K215, K215, K215, K216, K216, "TinyExpressionP4::InMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13609:13612:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e592C(Session s, Frame f) {
@@ -7032,7 +7032,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e593(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e593M(s, f) : e593C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e593M(s, f) : e593C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e593M : TinyExpressionP4Parser::e593C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13777:13895:body/seq", false, false, "node", true, K4);
     }
     private static Match e593C(Session s, Frame f) {
@@ -7052,7 +7052,7 @@ public final class TinyExpressionP4Parser {
         return parseStringPredicateReceiver_77(s, f);
     }
     private static Match e595(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e595M(s, f) : e595C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e595M(s, f) : e595C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e595M : TinyExpressionP4Parser::e595C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13808:13821:body/1/literal", false, true, "text", false, K780);
     }
     private static Match e595C(Session s, Frame f) {
@@ -7062,7 +7062,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".startsWith", true, false, K781);
     }
     private static Match e596(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e596M(s, f) : e596C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e596M(s, f) : e596C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e596M : TinyExpressionP4Parser::e596C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13822:13825:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e596C(Session s, Frame f) {
@@ -7082,7 +7082,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e598(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e598M(s, f) : e598C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e598M(s, f) : e598C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e598M : TinyExpressionP4Parser::e598C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13857:13891:body/4/repeat", true, false, "node", true, K378);
     }
     private static Match e598C(Session s, Frame f) {
@@ -7093,7 +7093,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e599(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e599M(s, f) : e599C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e599M(s, f) : e599C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e599M : TinyExpressionP4Parser::e599C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13859:13879:body/4/0/seq", false, false, "node", false, K378);
     }
     private static Match e599C(Session s, Frame f) {
@@ -7103,7 +7103,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K783, K249);
     }
     private static Match e600(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e600M(s, f) : e600C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e600M(s, f) : e600C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e600M : TinyExpressionP4Parser::e600C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13859:13862:body/4/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e600C(Session s, Frame f) {
@@ -7123,7 +7123,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e602(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e602M(s, f) : e602C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e602M(s, f) : e602C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e602M : TinyExpressionP4Parser::e602C, K215, K215, K215, K216, K216, "TinyExpressionP4::StartsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13892:13895:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e602C(Session s, Frame f) {
@@ -7134,7 +7134,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e603(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e603M(s, f) : e603C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e603M(s, f) : e603C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e603M : TinyExpressionP4Parser::e603C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13977:14093:body/seq", false, false, "node", true, K4);
     }
     private static Match e603C(Session s, Frame f) {
@@ -7154,7 +7154,7 @@ public final class TinyExpressionP4Parser {
         return parseStringPredicateReceiver_77(s, f);
     }
     private static Match e605(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e605M(s, f) : e605C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e605M(s, f) : e605C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e605M : TinyExpressionP4Parser::e605C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14008:14019:body/1/literal", false, true, "text", false, K787);
     }
     private static Match e605C(Session s, Frame f) {
@@ -7164,7 +7164,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".endsWith", true, false, K788);
     }
     private static Match e606(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e606M(s, f) : e606C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e606M(s, f) : e606C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e606M : TinyExpressionP4Parser::e606C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14020:14023:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e606C(Session s, Frame f) {
@@ -7184,7 +7184,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e608(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e608M(s, f) : e608C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e608M(s, f) : e608C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e608M : TinyExpressionP4Parser::e608C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14055:14089:body/4/repeat", true, false, "node", true, K378);
     }
     private static Match e608C(Session s, Frame f) {
@@ -7195,7 +7195,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e609(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e609M(s, f) : e609C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e609M(s, f) : e609C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e609M : TinyExpressionP4Parser::e609C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14057:14077:body/4/0/seq", false, false, "node", false, K378);
     }
     private static Match e609C(Session s, Frame f) {
@@ -7205,7 +7205,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K790, K249);
     }
     private static Match e610(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e610M(s, f) : e610C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e610M(s, f) : e610C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e610M : TinyExpressionP4Parser::e610C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14057:14060:body/4/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e610C(Session s, Frame f) {
@@ -7225,7 +7225,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e612(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e612M(s, f) : e612C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e612M(s, f) : e612C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e612M : TinyExpressionP4Parser::e612C, K215, K215, K215, K216, K216, "TinyExpressionP4::EndsWithDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14090:14093:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e612C(Session s, Frame f) {
@@ -7236,7 +7236,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e613(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e613M(s, f) : e613C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e613M(s, f) : e613C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e613M : TinyExpressionP4Parser::e613C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14175:14291:body/seq", false, false, "node", true, K4);
     }
     private static Match e613C(Session s, Frame f) {
@@ -7256,7 +7256,7 @@ public final class TinyExpressionP4Parser {
         return parseStringPredicateReceiver_77(s, f);
     }
     private static Match e615(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e615M(s, f) : e615C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e615M(s, f) : e615C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e615M : TinyExpressionP4Parser::e615C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14206:14217:body/1/literal", false, true, "text", false, K794);
     }
     private static Match e615C(Session s, Frame f) {
@@ -7266,7 +7266,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ".contains", true, false, K795);
     }
     private static Match e616(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e616M(s, f) : e616C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e616M(s, f) : e616C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e616M : TinyExpressionP4Parser::e616C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14218:14221:body/2/literal", false, true, "text", false, K373);
     }
     private static Match e616C(Session s, Frame f) {
@@ -7286,7 +7286,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e618(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e618M(s, f) : e618C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e618M(s, f) : e618C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e618M : TinyExpressionP4Parser::e618C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14253:14287:body/4/repeat", true, false, "node", true, K378);
     }
     private static Match e618C(Session s, Frame f) {
@@ -7297,7 +7297,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e619(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e619M(s, f) : e619C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e619M(s, f) : e619C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e619M : TinyExpressionP4Parser::e619C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14255:14275:body/4/0/seq", false, false, "node", false, K378);
     }
     private static Match e619C(Session s, Frame f) {
@@ -7307,7 +7307,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K797, K249);
     }
     private static Match e620(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e620M(s, f) : e620C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e620M(s, f) : e620C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e620M : TinyExpressionP4Parser::e620C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14255:14258:body/4/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e620C(Session s, Frame f) {
@@ -7327,7 +7327,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e622(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e622M(s, f) : e622C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e622M(s, f) : e622C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e622M : TinyExpressionP4Parser::e622C, K215, K215, K215, K216, K216, "TinyExpressionP4::ContainsDotMethod", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14288:14291:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e622C(Session s, Frame f) {
@@ -7337,7 +7337,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e623(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e623M(s, f) : e623C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e623M(s, f) : e623C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e623M : TinyExpressionP4Parser::e623C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringPredicateReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14325:14395:body/choice", false, false, "node", false, K4);
     }
     private static Match e623C(Session s, Frame f) {
@@ -7347,7 +7347,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K809,false,null,false,K808);
     }
     private static Match e624(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e624M(s, f) : e624C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e624M(s, f) : e624C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e624M : TinyExpressionP4Parser::e624C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringPredicateReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14325:14344:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e624C(Session s, Frame f) {
@@ -7357,7 +7357,7 @@ public final class TinyExpressionP4Parser {
         return parseToLowerCaseFunction_62(s, f);
     }
     private static Match e625(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e625M(s, f) : e625C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e625M(s, f) : e625C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e625M : TinyExpressionP4Parser::e625C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringPredicateReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14347:14366:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e625C(Session s, Frame f) {
@@ -7367,7 +7367,7 @@ public final class TinyExpressionP4Parser {
         return parseToUpperCaseFunction_61(s, f);
     }
     private static Match e626(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e626M(s, f) : e626C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e626M(s, f) : e626C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e626M : TinyExpressionP4Parser::e626C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringPredicateReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14369:14381:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e626C(Session s, Frame f) {
@@ -7377,7 +7377,7 @@ public final class TinyExpressionP4Parser {
         return parseTrimFunction_63(s, f);
     }
     private static Match e627(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e627M(s, f) : e627C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e627M(s, f) : e627C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e627M : TinyExpressionP4Parser::e627C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringPredicateReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14384:14395:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e627C(Session s, Frame f) {
@@ -7388,7 +7388,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e628(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e628M(s, f) : e628C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e628M(s, f) : e628C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e628M : TinyExpressionP4Parser::e628C, K215, K215, K215, K216, K216, "TinyExpressionP4::IsPresentFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14544:14582:body/seq", false, false, "node", false, K4);
     }
     private static Match e628C(Session s, Frame f) {
@@ -7398,7 +7398,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K810, K595);
     }
     private static Match e629(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e629M(s, f) : e629C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e629M(s, f) : e629C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e629M : TinyExpressionP4Parser::e629C, K215, K215, K215, K216, K216, "TinyExpressionP4::IsPresentFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14544:14555:body/0/literal", false, true, "text", false, K811);
     }
     private static Match e629C(Session s, Frame f) {
@@ -7408,7 +7408,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "isPresent", true, false, K812);
     }
     private static Match e630(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e630M(s, f) : e630C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e630M(s, f) : e630C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e630M : TinyExpressionP4Parser::e630C, K215, K215, K215, K216, K216, "TinyExpressionP4::IsPresentFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14556:14559:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e630C(Session s, Frame f) {
@@ -7428,7 +7428,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e632(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e632M(s, f) : e632C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e632M(s, f) : e632C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e632M : TinyExpressionP4Parser::e632C, K215, K215, K215, K216, K216, "TinyExpressionP4::IsPresentFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14579:14582:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e632C(Session s, Frame f) {
@@ -7439,7 +7439,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e633(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e633M(s, f) : e633C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e633M(s, f) : e633C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e633M : TinyExpressionP4Parser::e633C, K215, K215, K215, K216, K216, "TinyExpressionP4::InTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14746:14825:body/seq", false, false, "node", true, K4);
     }
     private static Match e633C(Session s, Frame f) {
@@ -7449,7 +7449,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K814, K241);
     }
     private static Match e634(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e634M(s, f) : e634C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e634M(s, f) : e634C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e634M : TinyExpressionP4Parser::e634C, K215, K215, K215, K216, K216, "TinyExpressionP4::InTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14746:14759:body/0/literal", false, true, "text", false, K815);
     }
     private static Match e634C(Session s, Frame f) {
@@ -7459,7 +7459,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "inTimeRange", true, false, K816);
     }
     private static Match e635(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e635M(s, f) : e635C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e635M(s, f) : e635C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e635M : TinyExpressionP4Parser::e635C, K215, K215, K215, K216, K216, "TinyExpressionP4::InTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14760:14763:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e635C(Session s, Frame f) {
@@ -7479,7 +7479,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e637(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e637M(s, f) : e637C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e637M(s, f) : e637C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e637M : TinyExpressionP4Parser::e637C, K215, K215, K215, K216, K216, "TinyExpressionP4::InTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14792:14795:body/3/literal", false, true, "text", false, K378);
     }
     private static Match e637C(Session s, Frame f) {
@@ -7499,7 +7499,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e639(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e639M(s, f) : e639C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e639M(s, f) : e639C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e639M : TinyExpressionP4Parser::e639C, K215, K215, K215, K216, K216, "TinyExpressionP4::InTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14822:14825:body/5/literal", false, true, "text", false, K375);
     }
     private static Match e639C(Session s, Frame f) {
@@ -7510,7 +7510,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e640(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e640M(s, f) : e640C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e640M(s, f) : e640C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e640M : TinyExpressionP4Parser::e640C, K215, K215, K215, K216, K216, "TinyExpressionP4::InDayTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14936:15064:body/seq", false, false, "node", true, K4);
     }
     private static Match e640C(Session s, Frame f) {
@@ -7520,7 +7520,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K823, K822);
     }
     private static Match e641(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e641M(s, f) : e641C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e641M(s, f) : e641C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e641M : TinyExpressionP4Parser::e641C, K215, K215, K215, K216, K216, "TinyExpressionP4::InDayTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14936:14952:body/0/literal", false, true, "text", false, K824);
     }
     private static Match e641C(Session s, Frame f) {
@@ -7530,7 +7530,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "inDayTimeRange", true, false, K825);
     }
     private static Match e642(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e642M(s, f) : e642C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e642M(s, f) : e642C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e642M : TinyExpressionP4Parser::e642C, K215, K215, K215, K216, K216, "TinyExpressionP4::InDayTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14953:14956:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e642C(Session s, Frame f) {
@@ -7550,7 +7550,7 @@ public final class TinyExpressionP4Parser {
         return parseDayOfWeek_81(s, f);
     }
     private static Match e644(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e644M(s, f) : e644C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e644M(s, f) : e644C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e644M : TinyExpressionP4Parser::e644C, K215, K215, K215, K216, K216, "TinyExpressionP4::InDayTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14977:14980:body/3/literal", false, true, "text", false, K378);
     }
     private static Match e644C(Session s, Frame f) {
@@ -7570,7 +7570,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e646(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e646M(s, f) : e646C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e646M(s, f) : e646C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e646M : TinyExpressionP4Parser::e646C, K215, K215, K215, K216, K216, "TinyExpressionP4::InDayTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15009:15012:body/5/literal", false, true, "text", false, K378);
     }
     private static Match e646C(Session s, Frame f) {
@@ -7590,7 +7590,7 @@ public final class TinyExpressionP4Parser {
         return parseDayOfWeek_81(s, f);
     }
     private static Match e648(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e648M(s, f) : e648C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e648M(s, f) : e648C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e648M : TinyExpressionP4Parser::e648C, K215, K215, K215, K216, K216, "TinyExpressionP4::InDayTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15031:15034:body/7/literal", false, true, "text", false, K378);
     }
     private static Match e648C(Session s, Frame f) {
@@ -7610,7 +7610,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e650(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e650M(s, f) : e650C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e650M(s, f) : e650C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e650M : TinyExpressionP4Parser::e650C, K215, K215, K215, K216, K216, "TinyExpressionP4::InDayTimeRangeFunction", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15061:15064:body/9/literal", false, true, "text", false, K375);
     }
     private static Match e650C(Session s, Frame f) {
@@ -7620,7 +7620,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e651(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e651M(s, f) : e651C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e651M(s, f) : e651C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e651M : TinyExpressionP4Parser::e651C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15166:body/choice", false, false, "text", false, K4);
     }
     private static Match e651C(Session s, Frame f) {
@@ -7630,7 +7630,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K832,false,null,false);
     }
     private static Match e652(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e652M(s, f) : e652C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e652M(s, f) : e652C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e652M : TinyExpressionP4Parser::e652C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15092:body/0/literal", false, true, "text", false, K833);
     }
     private static Match e652C(Session s, Frame f) {
@@ -7640,7 +7640,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "MONDAY", true, false, K834);
     }
     private static Match e653(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e653M(s, f) : e653C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e653M(s, f) : e653C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e653M : TinyExpressionP4Parser::e653C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15095:15104:body/1/literal", false, true, "text", false, K835);
     }
     private static Match e653C(Session s, Frame f) {
@@ -7650,7 +7650,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "TUESDAY", true, false, K836);
     }
     private static Match e654(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e654M(s, f) : e654C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e654M(s, f) : e654C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e654M : TinyExpressionP4Parser::e654C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15107:15118:body/2/literal", false, true, "text", false, K837);
     }
     private static Match e654C(Session s, Frame f) {
@@ -7660,7 +7660,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "WEDNESDAY", true, false, K838);
     }
     private static Match e655(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e655M(s, f) : e655C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e655M(s, f) : e655C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e655M : TinyExpressionP4Parser::e655C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15121:15131:body/3/literal", false, true, "text", false, K839);
     }
     private static Match e655C(Session s, Frame f) {
@@ -7670,7 +7670,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "THURSDAY", true, false, K840);
     }
     private static Match e656(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e656M(s, f) : e656C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e656M(s, f) : e656C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e656M : TinyExpressionP4Parser::e656C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15134:15142:body/4/literal", false, true, "text", false, K841);
     }
     private static Match e656C(Session s, Frame f) {
@@ -7680,7 +7680,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "FRIDAY", true, false, K842);
     }
     private static Match e657(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e657M(s, f) : e657C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e657M(s, f) : e657C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e657M : TinyExpressionP4Parser::e657C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15145:15155:body/5/literal", false, true, "text", false, K843);
     }
     private static Match e657C(Session s, Frame f) {
@@ -7690,7 +7690,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "SATURDAY", true, false, K844);
     }
     private static Match e658(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e658M(s, f) : e658C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e658M(s, f) : e658C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e658M : TinyExpressionP4Parser::e658C, K215, K215, K215, K216, K216, "TinyExpressionP4::DayOfWeek", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15158:15166:body/6/literal", false, true, "text", false, K845);
     }
     private static Match e658C(Session s, Frame f) {
@@ -7700,7 +7700,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "SUNDAY", true, false, K846);
     }
     private static Match e659(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e659M(s, f) : e659C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e659M(s, f) : e659C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e659M : TinyExpressionP4Parser::e659C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15334:15603:body/choice", false, false, "mixed", false, K4);
     }
     private static Match e659C(Session s, Frame f) {
@@ -7710,7 +7710,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K864,false,null,false,K863);
     }
     private static Match e660(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e660M(s, f) : e660C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e660M(s, f) : e660C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e660M : TinyExpressionP4Parser::e660C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15334:15358:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e660C(Session s, Frame f) {
@@ -7721,7 +7721,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e661(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e661M(s, f) : e661C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e661M(s, f) : e661C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e661M : TinyExpressionP4Parser::e661C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15365:15384:body/1/seq", false, false, "node", false, K865);
     }
     private static Match e661C(Session s, Frame f) {
@@ -7731,7 +7731,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K866, K237);
     }
     private static Match e662(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e662M(s, f) : e662C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e662M(s, f) : e662C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e662M : TinyExpressionP4Parser::e662C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15365:15368:body/1/0/literal", false, true, "text", false, K373);
     }
     private static Match e662C(Session s, Frame f) {
@@ -7741,7 +7741,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e663(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e663M(s, f) : e663C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e663M(s, f) : e663C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e663M : TinyExpressionP4Parser::e663C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15369:15380:body/1/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e663C(Session s, Frame f) {
@@ -7751,7 +7751,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e664(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e664M(s, f) : e664C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e664M(s, f) : e664C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e664M : TinyExpressionP4Parser::e664C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15381:15384:body/1/2/literal", false, true, "text", false, K375);
     }
     private static Match e664C(Session s, Frame f) {
@@ -7761,7 +7761,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e665(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e665M(s, f) : e665C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e665M(s, f) : e665C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e665M : TinyExpressionP4Parser::e665C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15391:15420:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e665C(Session s, Frame f) {
@@ -7771,7 +7771,7 @@ public final class TinyExpressionP4Parser {
         return parseParenthesizedStringExpression_90(s, f);
     }
     private static Match e666(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e666M(s, f) : e666C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e666M(s, f) : e666C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e666M : TinyExpressionP4Parser::e666C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15427:15446:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e666C(Session s, Frame f) {
@@ -7781,7 +7781,7 @@ public final class TinyExpressionP4Parser {
         return parseToUpperCaseFunction_61(s, f);
     }
     private static Match e667(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e667M(s, f) : e667C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e667M(s, f) : e667C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e667M : TinyExpressionP4Parser::e667C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15449:15468:body/4/ruleRef", false, false, "node", false, K4);
     }
     private static Match e667C(Session s, Frame f) {
@@ -7791,7 +7791,7 @@ public final class TinyExpressionP4Parser {
         return parseToLowerCaseFunction_62(s, f);
     }
     private static Match e668(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e668M(s, f) : e668C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e668M(s, f) : e668C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e668M : TinyExpressionP4Parser::e668C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15471:15483:body/5/ruleRef", false, false, "node", false, K4);
     }
     private static Match e668C(Session s, Frame f) {
@@ -7801,7 +7801,7 @@ public final class TinyExpressionP4Parser {
         return parseTrimFunction_63(s, f);
     }
     private static Match e669(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e669M(s, f) : e669C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e669M(s, f) : e669C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e669M : TinyExpressionP4Parser::e669C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15490:15510:body/6/ruleRef", false, false, "node", false, K4);
     }
     private static Match e669C(Session s, Frame f) {
@@ -7811,7 +7811,7 @@ public final class TinyExpressionP4Parser {
         return parseToUpperCaseDotMethod_66(s, f);
     }
     private static Match e670(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e670M(s, f) : e670C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e670M(s, f) : e670C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e670M : TinyExpressionP4Parser::e670C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15513:15533:body/7/ruleRef", false, false, "node", false, K4);
     }
     private static Match e670C(Session s, Frame f) {
@@ -7821,7 +7821,7 @@ public final class TinyExpressionP4Parser {
         return parseToLowerCaseDotMethod_67(s, f);
     }
     private static Match e671(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e671M(s, f) : e671C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e671M(s, f) : e671C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e671M : TinyExpressionP4Parser::e671C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15536:15549:body/8/ruleRef", false, false, "node", false, K4);
     }
     private static Match e671C(Session s, Frame f) {
@@ -7831,7 +7831,7 @@ public final class TinyExpressionP4Parser {
         return parseTrimDotMethod_68(s, f);
     }
     private static Match e672(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e672M(s, f) : e672C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e672M(s, f) : e672C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e672M : TinyExpressionP4Parser::e672C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15556:15562:body/9/tokenRef", false, true, "text", false, K4);
     }
     private static Match e672C(Session s, Frame f) {
@@ -7841,7 +7841,7 @@ public final class TinyExpressionP4Parser {
         return s.external(f,"TinyExpressionP4::STRING",2);
     }
     private static Match e673(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e673M(s, f) : e673C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e673M(s, f) : e673C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e673M : TinyExpressionP4Parser::e673C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15569:15580:body/10/ruleRef", false, false, "node", false, K4);
     }
     private static Match e673C(Session s, Frame f) {
@@ -7851,7 +7851,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e674(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e674M(s, f) : e674C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e674M(s, f) : e674C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e674M : TinyExpressionP4Parser::e674C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseReceiver", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15587:15603:body/11/ruleRef", false, false, "node", false, K4);
     }
     private static Match e674C(Session s, Frame f) {
@@ -7862,7 +7862,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e675(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e675M(s, f) : e675C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e675M(s, f) : e675C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e675M : TinyExpressionP4Parser::e675C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceStartIndex", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16119:16135:body/seq", false, false, "node", false, K4);
     }
     private static Match e675C(Session s, Frame f) {
@@ -7872,7 +7872,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K867, K421);
     }
     private static Match e676(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e676M(s, f) : e676C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e676M(s, f) : e676C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e676M : TinyExpressionP4Parser::e676C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceStartIndex", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16119:16135:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e676C(Session s, Frame f) {
@@ -7883,7 +7883,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e677(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e677M(s, f) : e677C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e677M(s, f) : e677C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e677M : TinyExpressionP4Parser::e677C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceEndIndex", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16160:16176:body/seq", false, false, "node", false, K4);
     }
     private static Match e677C(Session s, Frame f) {
@@ -7893,7 +7893,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K868, K421);
     }
     private static Match e678(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e678M(s, f) : e678C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e678M(s, f) : e678C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e678M : TinyExpressionP4Parser::e678C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceEndIndex", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16160:16176:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e678C(Session s, Frame f) {
@@ -7904,7 +7904,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e679(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e679M(s, f) : e679C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e679M(s, f) : e679C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e679M : TinyExpressionP4Parser::e679C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceStepIndex", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16201:16217:body/seq", false, false, "node", false, K4);
     }
     private static Match e679C(Session s, Frame f) {
@@ -7914,7 +7914,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K869, K421);
     }
     private static Match e680(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e680M(s, f) : e680C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e680M(s, f) : e680C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e680M : TinyExpressionP4Parser::e680C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceStepIndex", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16201:16217:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e680C(Session s, Frame f) {
@@ -7924,7 +7924,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e681(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e681M(s, f) : e681C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e681M(s, f) : e681C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e681M : TinyExpressionP4Parser::e681C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16309:16914:body/choice", false, false, "mixed", true, K4);
     }
     private static Match e681C(Session s, Frame f) {
@@ -7935,7 +7935,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e682(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e682M(s, f) : e682C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e682M(s, f) : e682C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e682M : TinyExpressionP4Parser::e682C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16309:16412:body/0/seq", false, false, "mixed", true, K155);
     }
     private static Match e682C(Session s, Frame f) {
@@ -7955,7 +7955,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e684(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e684M(s, f) : e684C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e684M(s, f) : e684C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e684M : TinyExpressionP4Parser::e684C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16334:16337:body/0/1/literal", false, true, "text", false, K897);
     }
     private static Match e684C(Session s, Frame f) {
@@ -7975,7 +7975,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e686(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e686M(s, f) : e686C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e686M(s, f) : e686C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e686M : TinyExpressionP4Parser::e686C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16361:16364:body/0/3/literal", false, true, "text", false, K449);
     }
     private static Match e686C(Session s, Frame f) {
@@ -7995,7 +7995,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e688(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e688M(s, f) : e688C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e688M(s, f) : e688C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e688M : TinyExpressionP4Parser::e688C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16384:16387:body/0/5/literal", false, true, "text", false, K449);
     }
     private static Match e688C(Session s, Frame f) {
@@ -8015,7 +8015,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e690(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e690M(s, f) : e690C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e690M(s, f) : e690C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e690M : TinyExpressionP4Parser::e690C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16409:16412:body/0/7/literal", false, true, "text", false, K905);
     }
     private static Match e690C(Session s, Frame f) {
@@ -8026,7 +8026,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e691(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e691M(s, f) : e691C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e691M(s, f) : e691C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e691M : TinyExpressionP4Parser::e691C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16419:16497:body/1/seq", false, false, "mixed", true, K155);
     }
     private static Match e691C(Session s, Frame f) {
@@ -8046,7 +8046,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e693(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e693M(s, f) : e693C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e693M(s, f) : e693C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e693M : TinyExpressionP4Parser::e693C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16444:16447:body/1/1/literal", false, true, "text", false, K897);
     }
     private static Match e693C(Session s, Frame f) {
@@ -8066,7 +8066,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e695(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e695M(s, f) : e695C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e695M(s, f) : e695C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e695M : TinyExpressionP4Parser::e695C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16471:16474:body/1/3/literal", false, true, "text", false, K449);
     }
     private static Match e695C(Session s, Frame f) {
@@ -8086,7 +8086,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e697(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e697M(s, f) : e697C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e697M(s, f) : e697C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e697M : TinyExpressionP4Parser::e697C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16494:16497:body/1/5/literal", false, true, "text", false, K905);
     }
     private static Match e697C(Session s, Frame f) {
@@ -8097,7 +8097,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e698(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e698M(s, f) : e698C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e698M(s, f) : e698C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e698M : TinyExpressionP4Parser::e698C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16504:16588:body/2/seq", false, false, "mixed", true, K155);
     }
     private static Match e698C(Session s, Frame f) {
@@ -8117,7 +8117,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e700(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e700M(s, f) : e700C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e700M(s, f) : e700C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e700M : TinyExpressionP4Parser::e700C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16529:16532:body/2/1/literal", false, true, "text", false, K897);
     }
     private static Match e700C(Session s, Frame f) {
@@ -8137,7 +8137,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e702(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e702M(s, f) : e702C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e702M(s, f) : e702C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e702M : TinyExpressionP4Parser::e702C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16556:16559:body/2/3/literal", false, true, "text", false, K449);
     }
     private static Match e702C(Session s, Frame f) {
@@ -8147,7 +8147,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e703(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e703M(s, f) : e703C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e703M(s, f) : e703C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e703M : TinyExpressionP4Parser::e703C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16560:16563:body/2/4/literal", false, true, "text", false, K449);
     }
     private static Match e703C(Session s, Frame f) {
@@ -8167,7 +8167,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e705(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e705M(s, f) : e705C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e705M(s, f) : e705C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e705M : TinyExpressionP4Parser::e705C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16585:16588:body/2/6/literal", false, true, "text", false, K905);
     }
     private static Match e705C(Session s, Frame f) {
@@ -8178,7 +8178,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e706(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e706M(s, f) : e706C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e706M(s, f) : e706C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e706M : TinyExpressionP4Parser::e706C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16595:16654:body/3/seq", false, false, "mixed", true, K155);
     }
     private static Match e706C(Session s, Frame f) {
@@ -8198,7 +8198,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e708(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e708M(s, f) : e708C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e708M(s, f) : e708C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e708M : TinyExpressionP4Parser::e708C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16620:16623:body/3/1/literal", false, true, "text", false, K897);
     }
     private static Match e708C(Session s, Frame f) {
@@ -8218,7 +8218,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e710(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e710M(s, f) : e710C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e710M(s, f) : e710C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e710M : TinyExpressionP4Parser::e710C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16647:16650:body/3/3/literal", false, true, "text", false, K449);
     }
     private static Match e710C(Session s, Frame f) {
@@ -8228,7 +8228,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e711(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e711M(s, f) : e711C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e711M(s, f) : e711C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e711M : TinyExpressionP4Parser::e711C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16651:16654:body/3/4/literal", false, true, "text", false, K905);
     }
     private static Match e711C(Session s, Frame f) {
@@ -8239,7 +8239,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e712(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e712M(s, f) : e712C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e712M(s, f) : e712C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e712M : TinyExpressionP4Parser::e712C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16661:16741:body/4/seq", false, false, "mixed", true, K155);
     }
     private static Match e712C(Session s, Frame f) {
@@ -8259,7 +8259,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e714(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e714M(s, f) : e714C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e714M(s, f) : e714C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e714M : TinyExpressionP4Parser::e714C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16686:16689:body/4/1/literal", false, true, "text", false, K897);
     }
     private static Match e714C(Session s, Frame f) {
@@ -8269,7 +8269,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e715(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e715M(s, f) : e715C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e715M(s, f) : e715C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e715M : TinyExpressionP4Parser::e715C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16690:16693:body/4/2/literal", false, true, "text", false, K449);
     }
     private static Match e715C(Session s, Frame f) {
@@ -8289,7 +8289,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e717(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e717M(s, f) : e717C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e717M(s, f) : e717C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e717M : TinyExpressionP4Parser::e717C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16713:16716:body/4/4/literal", false, true, "text", false, K449);
     }
     private static Match e717C(Session s, Frame f) {
@@ -8309,7 +8309,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e719(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e719M(s, f) : e719C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e719M(s, f) : e719C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e719M : TinyExpressionP4Parser::e719C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16738:16741:body/4/6/literal", false, true, "text", false, K905);
     }
     private static Match e719C(Session s, Frame f) {
@@ -8320,7 +8320,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e720(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e720M(s, f) : e720C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e720M(s, f) : e720C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e720M : TinyExpressionP4Parser::e720C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16748:16803:body/5/seq", false, false, "mixed", true, K155);
     }
     private static Match e720C(Session s, Frame f) {
@@ -8340,7 +8340,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e722(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e722M(s, f) : e722C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e722M(s, f) : e722C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e722M : TinyExpressionP4Parser::e722C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16773:16776:body/5/1/literal", false, true, "text", false, K897);
     }
     private static Match e722C(Session s, Frame f) {
@@ -8350,7 +8350,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e723(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e723M(s, f) : e723C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e723M(s, f) : e723C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e723M : TinyExpressionP4Parser::e723C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16777:16780:body/5/2/literal", false, true, "text", false, K449);
     }
     private static Match e723C(Session s, Frame f) {
@@ -8370,7 +8370,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e725(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e725M(s, f) : e725C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e725M(s, f) : e725C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e725M : TinyExpressionP4Parser::e725C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16800:16803:body/5/4/literal", false, true, "text", false, K905);
     }
     private static Match e725C(Session s, Frame f) {
@@ -8381,7 +8381,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e726(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e726M(s, f) : e726C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e726M(s, f) : e726C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e726M : TinyExpressionP4Parser::e726C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16810:16871:body/6/seq", false, false, "mixed", true, K155);
     }
     private static Match e726C(Session s, Frame f) {
@@ -8401,7 +8401,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e728(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e728M(s, f) : e728C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e728M(s, f) : e728C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e728M : TinyExpressionP4Parser::e728C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16835:16838:body/6/1/literal", false, true, "text", false, K897);
     }
     private static Match e728C(Session s, Frame f) {
@@ -8411,7 +8411,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e729(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e729M(s, f) : e729C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e729M(s, f) : e729C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e729M : TinyExpressionP4Parser::e729C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16839:16842:body/6/2/literal", false, true, "text", false, K449);
     }
     private static Match e729C(Session s, Frame f) {
@@ -8421,7 +8421,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e730(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e730M(s, f) : e730C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e730M(s, f) : e730C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e730M : TinyExpressionP4Parser::e730C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16843:16846:body/6/3/literal", false, true, "text", false, K449);
     }
     private static Match e730C(Session s, Frame f) {
@@ -8441,7 +8441,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e732(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e732M(s, f) : e732C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e732M(s, f) : e732C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e732M : TinyExpressionP4Parser::e732C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16868:16871:body/6/5/literal", false, true, "text", false, K905);
     }
     private static Match e732C(Session s, Frame f) {
@@ -8452,7 +8452,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e733(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e733M(s, f) : e733C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e733M(s, f) : e733C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e733M : TinyExpressionP4Parser::e733C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16878:16914:body/7/seq", false, false, "mixed", false, K155);
     }
     private static Match e733C(Session s, Frame f) {
@@ -8472,7 +8472,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseReceiver_82(s, f);
     }
     private static Match e735(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e735M(s, f) : e735C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e735M(s, f) : e735C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e735M : TinyExpressionP4Parser::e735C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16903:16906:body/7/1/literal", false, true, "text", false, K897);
     }
     private static Match e735C(Session s, Frame f) {
@@ -8482,7 +8482,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e736(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e736M(s, f) : e736C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e736M(s, f) : e736C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e736M : TinyExpressionP4Parser::e736C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16907:16910:body/7/2/literal", false, true, "text", false, K449);
     }
     private static Match e736C(Session s, Frame f) {
@@ -8492,7 +8492,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e737(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e737M(s, f) : e737C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e737M(s, f) : e737C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e737M : TinyExpressionP4Parser::e737C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16911:16914:body/7/3/literal", false, true, "text", false, K905);
     }
     private static Match e737C(Session s, Frame f) {
@@ -8502,7 +8502,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "]", true, false, K906);
     }
     private static Match e738(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e738M(s, f) : e738C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e738M(s, f) : e738C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e738M : TinyExpressionP4Parser::e738C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17008:17629:body/choice", false, false, "node", true, K4);
     }
     private static Match e738C(Session s, Frame f) {
@@ -8513,7 +8513,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e739(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e739M(s, f) : e739C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e739M(s, f) : e739C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e739M : TinyExpressionP4Parser::e739C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17008:17113:body/0/seq", false, false, "node", true, K155);
     }
     private static Match e739C(Session s, Frame f) {
@@ -8533,7 +8533,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e741(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e741M(s, f) : e741C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e741M(s, f) : e741C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e741M : TinyExpressionP4Parser::e741C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17035:17038:body/0/1/literal", false, true, "text", false, K897);
     }
     private static Match e741C(Session s, Frame f) {
@@ -8553,7 +8553,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e743(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e743M(s, f) : e743C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e743M(s, f) : e743C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e743M : TinyExpressionP4Parser::e743C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17062:17065:body/0/3/literal", false, true, "text", false, K449);
     }
     private static Match e743C(Session s, Frame f) {
@@ -8573,7 +8573,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e745(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e745M(s, f) : e745C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e745M(s, f) : e745C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e745M : TinyExpressionP4Parser::e745C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17085:17088:body/0/5/literal", false, true, "text", false, K449);
     }
     private static Match e745C(Session s, Frame f) {
@@ -8593,7 +8593,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e747(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e747M(s, f) : e747C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e747M(s, f) : e747C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e747M : TinyExpressionP4Parser::e747C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17110:17113:body/0/7/literal", false, true, "text", false, K905);
     }
     private static Match e747C(Session s, Frame f) {
@@ -8604,7 +8604,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e748(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e748M(s, f) : e748C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e748M(s, f) : e748C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e748M : TinyExpressionP4Parser::e748C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17120:17200:body/1/seq", false, false, "node", true, K155);
     }
     private static Match e748C(Session s, Frame f) {
@@ -8624,7 +8624,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e750(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e750M(s, f) : e750C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e750M(s, f) : e750C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e750M : TinyExpressionP4Parser::e750C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17147:17150:body/1/1/literal", false, true, "text", false, K897);
     }
     private static Match e750C(Session s, Frame f) {
@@ -8644,7 +8644,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e752(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e752M(s, f) : e752C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e752M(s, f) : e752C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e752M : TinyExpressionP4Parser::e752C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17174:17177:body/1/3/literal", false, true, "text", false, K449);
     }
     private static Match e752C(Session s, Frame f) {
@@ -8664,7 +8664,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e754(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e754M(s, f) : e754C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e754M(s, f) : e754C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e754M : TinyExpressionP4Parser::e754C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17197:17200:body/1/5/literal", false, true, "text", false, K905);
     }
     private static Match e754C(Session s, Frame f) {
@@ -8675,7 +8675,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e755(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e755M(s, f) : e755C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e755M(s, f) : e755C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e755M : TinyExpressionP4Parser::e755C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17207:17293:body/2/seq", false, false, "node", true, K155);
     }
     private static Match e755C(Session s, Frame f) {
@@ -8695,7 +8695,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e757(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e757M(s, f) : e757C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e757M(s, f) : e757C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e757M : TinyExpressionP4Parser::e757C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17234:17237:body/2/1/literal", false, true, "text", false, K897);
     }
     private static Match e757C(Session s, Frame f) {
@@ -8715,7 +8715,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e759(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e759M(s, f) : e759C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e759M(s, f) : e759C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e759M : TinyExpressionP4Parser::e759C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17261:17264:body/2/3/literal", false, true, "text", false, K449);
     }
     private static Match e759C(Session s, Frame f) {
@@ -8725,7 +8725,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e760(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e760M(s, f) : e760C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e760M(s, f) : e760C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e760M : TinyExpressionP4Parser::e760C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17265:17268:body/2/4/literal", false, true, "text", false, K449);
     }
     private static Match e760C(Session s, Frame f) {
@@ -8745,7 +8745,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e762(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e762M(s, f) : e762C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e762M(s, f) : e762C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e762M : TinyExpressionP4Parser::e762C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17290:17293:body/2/6/literal", false, true, "text", false, K905);
     }
     private static Match e762C(Session s, Frame f) {
@@ -8756,7 +8756,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e763(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e763M(s, f) : e763C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e763M(s, f) : e763C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e763M : TinyExpressionP4Parser::e763C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17300:17361:body/3/seq", false, false, "node", true, K155);
     }
     private static Match e763C(Session s, Frame f) {
@@ -8776,7 +8776,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e765(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e765M(s, f) : e765C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e765M(s, f) : e765C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e765M : TinyExpressionP4Parser::e765C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17327:17330:body/3/1/literal", false, true, "text", false, K897);
     }
     private static Match e765C(Session s, Frame f) {
@@ -8796,7 +8796,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStartIndex_83(s, f);
     }
     private static Match e767(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e767M(s, f) : e767C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e767M(s, f) : e767C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e767M : TinyExpressionP4Parser::e767C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17354:17357:body/3/3/literal", false, true, "text", false, K449);
     }
     private static Match e767C(Session s, Frame f) {
@@ -8806,7 +8806,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e768(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e768M(s, f) : e768C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e768M(s, f) : e768C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e768M : TinyExpressionP4Parser::e768C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17358:17361:body/3/4/literal", false, true, "text", false, K905);
     }
     private static Match e768C(Session s, Frame f) {
@@ -8817,7 +8817,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e769(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e769M(s, f) : e769C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e769M(s, f) : e769C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e769M : TinyExpressionP4Parser::e769C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17368:17450:body/4/seq", false, false, "node", true, K155);
     }
     private static Match e769C(Session s, Frame f) {
@@ -8837,7 +8837,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e771(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e771M(s, f) : e771C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e771M(s, f) : e771C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e771M : TinyExpressionP4Parser::e771C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17395:17398:body/4/1/literal", false, true, "text", false, K897);
     }
     private static Match e771C(Session s, Frame f) {
@@ -8847,7 +8847,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e772(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e772M(s, f) : e772C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e772M(s, f) : e772C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e772M : TinyExpressionP4Parser::e772C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17399:17402:body/4/2/literal", false, true, "text", false, K449);
     }
     private static Match e772C(Session s, Frame f) {
@@ -8867,7 +8867,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e774(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e774M(s, f) : e774C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e774M(s, f) : e774C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e774M : TinyExpressionP4Parser::e774C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17422:17425:body/4/4/literal", false, true, "text", false, K449);
     }
     private static Match e774C(Session s, Frame f) {
@@ -8887,7 +8887,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e776(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e776M(s, f) : e776C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e776M(s, f) : e776C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e776M : TinyExpressionP4Parser::e776C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17447:17450:body/4/6/literal", false, true, "text", false, K905);
     }
     private static Match e776C(Session s, Frame f) {
@@ -8898,7 +8898,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e777(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e777M(s, f) : e777C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e777M(s, f) : e777C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e777M : TinyExpressionP4Parser::e777C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17457:17514:body/5/seq", false, false, "node", true, K155);
     }
     private static Match e777C(Session s, Frame f) {
@@ -8918,7 +8918,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e779(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e779M(s, f) : e779C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e779M(s, f) : e779C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e779M : TinyExpressionP4Parser::e779C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17484:17487:body/5/1/literal", false, true, "text", false, K897);
     }
     private static Match e779C(Session s, Frame f) {
@@ -8928,7 +8928,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e780(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e780M(s, f) : e780C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e780M(s, f) : e780C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e780M : TinyExpressionP4Parser::e780C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17488:17491:body/5/2/literal", false, true, "text", false, K449);
     }
     private static Match e780C(Session s, Frame f) {
@@ -8948,7 +8948,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceEndIndex_84(s, f);
     }
     private static Match e782(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e782M(s, f) : e782C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e782M(s, f) : e782C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e782M : TinyExpressionP4Parser::e782C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17511:17514:body/5/4/literal", false, true, "text", false, K905);
     }
     private static Match e782C(Session s, Frame f) {
@@ -8959,7 +8959,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e783(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e783M(s, f) : e783C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e783M(s, f) : e783C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e783M : TinyExpressionP4Parser::e783C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17521:17584:body/6/seq", false, false, "node", true, K155);
     }
     private static Match e783C(Session s, Frame f) {
@@ -8979,7 +8979,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e785(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e785M(s, f) : e785C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e785M(s, f) : e785C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e785M : TinyExpressionP4Parser::e785C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17548:17551:body/6/1/literal", false, true, "text", false, K897);
     }
     private static Match e785C(Session s, Frame f) {
@@ -8989,7 +8989,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e786(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e786M(s, f) : e786C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e786M(s, f) : e786C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e786M : TinyExpressionP4Parser::e786C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17552:17555:body/6/2/literal", false, true, "text", false, K449);
     }
     private static Match e786C(Session s, Frame f) {
@@ -8999,7 +8999,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e787(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e787M(s, f) : e787C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e787M(s, f) : e787C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e787M : TinyExpressionP4Parser::e787C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17556:17559:body/6/3/literal", false, true, "text", false, K449);
     }
     private static Match e787C(Session s, Frame f) {
@@ -9019,7 +9019,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceStepIndex_85(s, f);
     }
     private static Match e789(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e789M(s, f) : e789C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e789M(s, f) : e789C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e789M : TinyExpressionP4Parser::e789C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17581:17584:body/6/5/literal", false, true, "text", false, K905);
     }
     private static Match e789C(Session s, Frame f) {
@@ -9030,7 +9030,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e790(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e790M(s, f) : e790C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e790M(s, f) : e790C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e790M : TinyExpressionP4Parser::e790C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17591:17629:body/7/seq", false, false, "node", false, K155);
     }
     private static Match e790C(Session s, Frame f) {
@@ -9050,7 +9050,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceBaseExpression_86(s, f);
     }
     private static Match e792(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e792M(s, f) : e792C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e792M(s, f) : e792C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e792M : TinyExpressionP4Parser::e792C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17618:17621:body/7/1/literal", false, true, "text", false, K897);
     }
     private static Match e792C(Session s, Frame f) {
@@ -9060,7 +9060,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "[", true, false, K898);
     }
     private static Match e793(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e793M(s, f) : e793C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e793M(s, f) : e793C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e793M : TinyExpressionP4Parser::e793C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17622:17625:body/7/2/literal", false, true, "text", false, K449);
     }
     private static Match e793C(Session s, Frame f) {
@@ -9070,7 +9070,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ":", true, false, K450);
     }
     private static Match e794(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e794M(s, f) : e794C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e794M(s, f) : e794C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e794M : TinyExpressionP4Parser::e794C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17626:17629:body/7/3/literal", false, true, "text", false, K905);
     }
     private static Match e794C(Session s, Frame f) {
@@ -9080,7 +9080,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "]", true, false, K906);
     }
     private static Match e795(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e795M(s, f) : e795C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e795M(s, f) : e795C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e795M : TinyExpressionP4Parser::e795C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17655:17698:body/choice", false, false, "node", false, K4);
     }
     private static Match e795C(Session s, Frame f) {
@@ -9090,7 +9090,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K983,false,null,false);
     }
     private static Match e796(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e796M(s, f) : e796C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e796M(s, f) : e796C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e796M : TinyExpressionP4Parser::e796C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17655:17676:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e796C(Session s, Frame f) {
@@ -9100,7 +9100,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceNestedExpression_87(s, f);
     }
     private static Match e797(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e797M(s, f) : e797C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e797M(s, f) : e797C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e797M : TinyExpressionP4Parser::e797C, K215, K215, K215, K216, K216, "TinyExpressionP4::SliceExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17679:17698:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e797C(Session s, Frame f) {
@@ -9111,7 +9111,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e798(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e798M(s, f) : e798C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e798M(s, f) : e798C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e798M : TinyExpressionP4Parser::e798C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17899:17945:body/seq", false, false, "mixed", true, K4);
     }
     private static Match e798C(Session s, Frame f) {
@@ -9131,7 +9131,7 @@ public final class TinyExpressionP4Parser {
         return parseStringTerm_91(s, f);
     }
     private static Match e800(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e800M(s, f) : e800C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e800M(s, f) : e800C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e800M : TinyExpressionP4Parser::e800C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17916:17945:body/1/repeat", true, false, "mixed", true, K221);
     }
     private static Match e800C(Session s, Frame f) {
@@ -9142,7 +9142,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e801(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e801M(s, f) : e801C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e801M(s, f) : e801C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e801M : TinyExpressionP4Parser::e801C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17918:17936:body/1/0/seq", false, false, "mixed", false, K533);
     }
     private static Match e801C(Session s, Frame f) {
@@ -9173,7 +9173,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e804(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e804M(s, f) : e804C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e804M(s, f) : e804C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e804M : TinyExpressionP4Parser::e804C, K215, K215, K215, K216, K216, "TinyExpressionP4::ParenthesizedStringExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17985:18009:body/seq", false, false, "node", false, K4);
     }
     private static Match e804C(Session s, Frame f) {
@@ -9183,7 +9183,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K989, K237);
     }
     private static Match e805(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e805M(s, f) : e805C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e805M(s, f) : e805C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e805M : TinyExpressionP4Parser::e805C, K215, K215, K215, K216, K216, "TinyExpressionP4::ParenthesizedStringExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17985:17988:body/0/literal", false, true, "text", false, K373);
     }
     private static Match e805C(Session s, Frame f) {
@@ -9193,7 +9193,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e806(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e806M(s, f) : e806C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e806M(s, f) : e806C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e806M : TinyExpressionP4Parser::e806C, K215, K215, K215, K216, K216, "TinyExpressionP4::ParenthesizedStringExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17989:18005:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e806C(Session s, Frame f) {
@@ -9203,7 +9203,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e807(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e807M(s, f) : e807C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e807M(s, f) : e807C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e807M : TinyExpressionP4Parser::e807C, K215, K215, K215, K216, K216, "TinyExpressionP4::ParenthesizedStringExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18006:18009:body/2/literal", false, true, "text", false, K375);
     }
     private static Match e807C(Session s, Frame f) {
@@ -9213,7 +9213,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e808(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e808M(s, f) : e808C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e808M(s, f) : e808C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e808M : TinyExpressionP4Parser::e808C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18216:18579:body/choice", false, false, "mixed", false, K4);
     }
     private static Match e808C(Session s, Frame f) {
@@ -9223,7 +9223,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K999,false,null,false,K998);
     }
     private static Match e809(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e809M(s, f) : e809C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e809M(s, f) : e809C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e809M : TinyExpressionP4Parser::e809C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18216:18237:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e809C(Session s, Frame f) {
@@ -9233,7 +9233,7 @@ public final class TinyExpressionP4Parser {
         return parseStringMatchExpression_113(s, f);
     }
     private static Match e810(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e810M(s, f) : e810C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e810M(s, f) : e810C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e810M : TinyExpressionP4Parser::e810C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18244:18256:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e810C(Session s, Frame f) {
@@ -9243,7 +9243,7 @@ public final class TinyExpressionP4Parser {
         return parseIfExpression_106(s, f);
     }
     private static Match e811(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e811M(s, f) : e811C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e811M(s, f) : e811C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e811M : TinyExpressionP4Parser::e811C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18263:18281:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e811C(Session s, Frame f) {
@@ -9253,7 +9253,7 @@ public final class TinyExpressionP4Parser {
         return parseStringCastVariable_92(s, f);
     }
     private static Match e812(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e812M(s, f) : e812C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e812M(s, f) : e812C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e812M : TinyExpressionP4Parser::e812C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18288:18307:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e812C(Session s, Frame f) {
@@ -9263,7 +9263,7 @@ public final class TinyExpressionP4Parser {
         return parseStringTypedVariable_93(s, f);
     }
     private static Match e813(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e813M(s, f) : e813C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e813M(s, f) : e813C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e813M : TinyExpressionP4Parser::e813C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18314:18329:body/4/ruleRef", false, false, "node", false, K4);
     }
     private static Match e813C(Session s, Frame f) {
@@ -9273,7 +9273,7 @@ public final class TinyExpressionP4Parser {
         return parseSliceExpression_88(s, f);
     }
     private static Match e814(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e814M(s, f) : e814C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e814M(s, f) : e814C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e814M : TinyExpressionP4Parser::e814C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18336:18365:body/5/ruleRef", false, false, "node", false, K4);
     }
     private static Match e814C(Session s, Frame f) {
@@ -9283,7 +9283,7 @@ public final class TinyExpressionP4Parser {
         return parseParenthesizedStringExpression_90(s, f);
     }
     private static Match e815(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e815M(s, f) : e815C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e815M(s, f) : e815C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e815M : TinyExpressionP4Parser::e815C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18372:18396:body/6/ruleRef", false, false, "node", false, K4);
     }
     private static Match e815C(Session s, Frame f) {
@@ -9293,7 +9293,7 @@ public final class TinyExpressionP4Parser {
         return parseExternalStringInvocation_33(s, f);
     }
     private static Match e816(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e816M(s, f) : e816C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e816M(s, f) : e816C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e816M : TinyExpressionP4Parser::e816C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18403:18422:body/7/ruleRef", false, false, "node", false, K4);
     }
     private static Match e816C(Session s, Frame f) {
@@ -9303,7 +9303,7 @@ public final class TinyExpressionP4Parser {
         return parseToUpperCaseFunction_61(s, f);
     }
     private static Match e817(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e817M(s, f) : e817C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e817M(s, f) : e817C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e817M : TinyExpressionP4Parser::e817C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18425:18444:body/8/ruleRef", false, false, "node", false, K4);
     }
     private static Match e817C(Session s, Frame f) {
@@ -9313,7 +9313,7 @@ public final class TinyExpressionP4Parser {
         return parseToLowerCaseFunction_62(s, f);
     }
     private static Match e818(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e818M(s, f) : e818C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e818M(s, f) : e818C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e818M : TinyExpressionP4Parser::e818C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18447:18459:body/9/ruleRef", false, false, "node", false, K4);
     }
     private static Match e818C(Session s, Frame f) {
@@ -9323,7 +9323,7 @@ public final class TinyExpressionP4Parser {
         return parseTrimFunction_63(s, f);
     }
     private static Match e819(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e819M(s, f) : e819C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e819M(s, f) : e819C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e819M : TinyExpressionP4Parser::e819C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18466:18486:body/10/ruleRef", false, false, "node", false, K4);
     }
     private static Match e819C(Session s, Frame f) {
@@ -9333,7 +9333,7 @@ public final class TinyExpressionP4Parser {
         return parseToUpperCaseDotMethod_66(s, f);
     }
     private static Match e820(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e820M(s, f) : e820C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e820M(s, f) : e820C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e820M : TinyExpressionP4Parser::e820C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18489:18509:body/11/ruleRef", false, false, "node", false, K4);
     }
     private static Match e820C(Session s, Frame f) {
@@ -9343,7 +9343,7 @@ public final class TinyExpressionP4Parser {
         return parseToLowerCaseDotMethod_67(s, f);
     }
     private static Match e821(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e821M(s, f) : e821C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e821M(s, f) : e821C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e821M : TinyExpressionP4Parser::e821C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18512:18525:body/12/ruleRef", false, false, "node", false, K4);
     }
     private static Match e821C(Session s, Frame f) {
@@ -9353,7 +9353,7 @@ public final class TinyExpressionP4Parser {
         return parseTrimDotMethod_68(s, f);
     }
     private static Match e822(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e822M(s, f) : e822C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e822M(s, f) : e822C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e822M : TinyExpressionP4Parser::e822C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18532:18538:body/13/tokenRef", false, true, "text", false, K4);
     }
     private static Match e822C(Session s, Frame f) {
@@ -9363,7 +9363,7 @@ public final class TinyExpressionP4Parser {
         return s.external(f,"TinyExpressionP4::STRING",2);
     }
     private static Match e823(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e823M(s, f) : e823C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e823M(s, f) : e823C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e823M : TinyExpressionP4Parser::e823C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18545:18556:body/14/ruleRef", false, false, "node", false, K4);
     }
     private static Match e823C(Session s, Frame f) {
@@ -9373,7 +9373,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e824(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e824M(s, f) : e824C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e824M(s, f) : e824C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e824M : TinyExpressionP4Parser::e824C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTerm", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18563:18579:body/15/ruleRef", false, false, "node", false, K4);
     }
     private static Match e824C(Session s, Frame f) {
@@ -9384,7 +9384,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e825(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e825M(s, f) : e825C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e825M(s, f) : e825C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e825M : TinyExpressionP4Parser::e825C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18707:body/seq", false, false, "text", false, K4);
     }
     private static Match e825C(Session s, Frame f) {
@@ -9394,7 +9394,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1000, K368);
     }
     private static Match e826(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e826M(s, f) : e826C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e826M(s, f) : e826C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e826M : TinyExpressionP4Parser::e826C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18664:body/0/literal", false, true, "text", false, K373);
     }
     private static Match e826C(Session s, Frame f) {
@@ -9404,7 +9404,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e827(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e827M(s, f) : e827C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e827M(s, f) : e827C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e827M : TinyExpressionP4Parser::e827C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18665:18688:body/1/group", false, false, "text", false, K348);
     }
     private static Match e827C(Session s, Frame f) {
@@ -9414,7 +9414,7 @@ public final class TinyExpressionP4Parser {
         return e828(s, f);
     }
     private static Match e828(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e828M(s, f) : e828C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e828M(s, f) : e828C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e828M : TinyExpressionP4Parser::e828C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18667:18686:body/1/0/choice", false, false, "text", false, K348);
     }
     private static Match e828C(Session s, Frame f) {
@@ -9424,7 +9424,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K1001,false,null,false);
     }
     private static Match e829(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e829M(s, f) : e829C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e829M(s, f) : e829C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e829M : TinyExpressionP4Parser::e829C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18667:18675:body/1/0/0/literal", false, true, "text", false, K51);
     }
     private static Match e829C(Session s, Frame f) {
@@ -9434,7 +9434,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "string", true, false, K331);
     }
     private static Match e830(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e830M(s, f) : e830C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e830M(s, f) : e830C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e830M : TinyExpressionP4Parser::e830C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18678:18686:body/1/0/1/literal", false, true, "text", false, K332);
     }
     private static Match e830C(Session s, Frame f) {
@@ -9444,7 +9444,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "String", true, false, K333);
     }
     private static Match e831(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e831M(s, f) : e831C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e831M(s, f) : e831C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e831M : TinyExpressionP4Parser::e831C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18689:18692:body/2/literal", false, true, "text", false, K375);
     }
     private static Match e831C(Session s, Frame f) {
@@ -9454,7 +9454,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e832(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e832M(s, f) : e832C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e832M(s, f) : e832C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e832M : TinyExpressionP4Parser::e832C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCastVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18693:18696:body/3/literal", false, true, "text", false, K49);
     }
     private static Match e832C(Session s, Frame f) {
@@ -9475,7 +9475,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e834(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e834M(s, f) : e834C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e834M(s, f) : e834C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e834M : TinyExpressionP4Parser::e834C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypedVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18846:body/seq", false, false, "text", false, K4);
     }
     private static Match e834C(Session s, Frame f) {
@@ -9485,7 +9485,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1003, K595);
     }
     private static Match e835(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e835M(s, f) : e835C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e835M(s, f) : e835C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e835M : TinyExpressionP4Parser::e835C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypedVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18800:body/0/literal", false, true, "text", false, K49);
     }
     private static Match e835C(Session s, Frame f) {
@@ -9505,7 +9505,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e837(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e837M(s, f) : e837C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e837M(s, f) : e837C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e837M : TinyExpressionP4Parser::e837C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypedVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18818:18822:body/2/literal", false, true, "text", false, K256);
     }
     private static Match e837C(Session s, Frame f) {
@@ -9515,7 +9515,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "as", true, false, K257);
     }
     private static Match e838(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e838M(s, f) : e838C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e838M(s, f) : e838C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e838M : TinyExpressionP4Parser::e838C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypedVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18823:18846:body/3/group", false, false, "text", false, K348);
     }
     private static Match e838C(Session s, Frame f) {
@@ -9525,7 +9525,7 @@ public final class TinyExpressionP4Parser {
         return e839(s, f);
     }
     private static Match e839(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e839M(s, f) : e839C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e839M(s, f) : e839C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e839M : TinyExpressionP4Parser::e839C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypedVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18825:18844:body/3/0/choice", false, false, "text", false, K348);
     }
     private static Match e839C(Session s, Frame f) {
@@ -9535,7 +9535,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K1005,false,null,false);
     }
     private static Match e840(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e840M(s, f) : e840C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e840M(s, f) : e840C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e840M : TinyExpressionP4Parser::e840C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypedVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18825:18833:body/3/0/0/literal", false, true, "text", false, K51);
     }
     private static Match e840C(Session s, Frame f) {
@@ -9545,7 +9545,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "string", true, false, K331);
     }
     private static Match e841(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e841M(s, f) : e841C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e841M(s, f) : e841C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e841M : TinyExpressionP4Parser::e841C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringTypedVariable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18836:18844:body/3/0/1/literal", false, true, "text", false, K332);
     }
     private static Match e841C(Session s, Frame f) {
@@ -9556,7 +9556,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e842(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e842M(s, f) : e842C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e842M(s, f) : e842C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e842M : TinyExpressionP4Parser::e842C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19077:19143:body/seq", false, false, "node", true, K4);
     }
     private static Match e842C(Session s, Frame f) {
@@ -9576,7 +9576,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanAndExpression_95(s, f);
     }
     private static Match e844(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e844M(s, f) : e844C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e844M(s, f) : e844C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e844M : TinyExpressionP4Parser::e844C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19104:19143:body/1/repeat", true, false, "node", true, K221);
     }
     private static Match e844C(Session s, Frame f) {
@@ -9587,7 +9587,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e845(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e845M(s, f) : e845C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e845M(s, f) : e845C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e845M : TinyExpressionP4Parser::e845C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19106:19134:body/1/0/seq", false, false, "node", false, K1008);
     }
     private static Match e845C(Session s, Frame f) {
@@ -9618,7 +9618,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e848(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e848M(s, f) : e848C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e848M(s, f) : e848C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e848M : TinyExpressionP4Parser::e848C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanAndExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19280:19346:body/seq", false, false, "node", true, K4);
     }
     private static Match e848C(Session s, Frame f) {
@@ -9638,7 +9638,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanXorExpression_96(s, f);
     }
     private static Match e850(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e850M(s, f) : e850C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e850M(s, f) : e850C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e850M : TinyExpressionP4Parser::e850C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanAndExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19307:19346:body/1/repeat", true, false, "node", true, K221);
     }
     private static Match e850C(Session s, Frame f) {
@@ -9649,7 +9649,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e851(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e851M(s, f) : e851C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e851M(s, f) : e851C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e851M : TinyExpressionP4Parser::e851C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanAndExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19309:19337:body/1/0/seq", false, false, "node", false, K1015);
     }
     private static Match e851C(Session s, Frame f) {
@@ -9680,7 +9680,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e854(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e854M(s, f) : e854C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e854M(s, f) : e854C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e854M : TinyExpressionP4Parser::e854C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanXorExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19483:19535:body/seq", false, false, "node", true, K4);
     }
     private static Match e854C(Session s, Frame f) {
@@ -9700,7 +9700,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanFactor_100(s, f);
     }
     private static Match e856(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e856M(s, f) : e856C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e856M(s, f) : e856C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e856M : TinyExpressionP4Parser::e856C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanXorExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19503:19535:body/1/repeat", true, false, "node", true, K221);
     }
     private static Match e856C(Session s, Frame f) {
@@ -9711,7 +9711,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e857(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e857M(s, f) : e857C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e857M(s, f) : e857C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e857M : TinyExpressionP4Parser::e857C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanXorExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19505:19526:body/1/0/seq", false, false, "node", false, K1022);
     }
     private static Match e857C(Session s, Frame f) {
@@ -9742,7 +9742,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e860(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e860M(s, f) : e860C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e860M(s, f) : e860C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e860M : TinyExpressionP4Parser::e860C, K215, K215, K215, K216, K216, "TinyExpressionP4::NotExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19673:19711:body/seq", false, false, "node", false, K4);
     }
     private static Match e860C(Session s, Frame f) {
@@ -9752,7 +9752,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1027, K595);
     }
     private static Match e861(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e861M(s, f) : e861C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e861M(s, f) : e861C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e861M : TinyExpressionP4Parser::e861C, K215, K215, K215, K216, K216, "TinyExpressionP4::NotExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19673:19678:body/0/literal", false, true, "text", false, K359);
     }
     private static Match e861C(Session s, Frame f) {
@@ -9762,7 +9762,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "not", true, false, K360);
     }
     private static Match e862(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e862M(s, f) : e862C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e862M(s, f) : e862C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e862M : TinyExpressionP4Parser::e862C, K215, K215, K215, K216, K216, "TinyExpressionP4::NotExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19679:19682:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e862C(Session s, Frame f) {
@@ -9782,7 +9782,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e864(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e864M(s, f) : e864C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e864M(s, f) : e864C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e864M : TinyExpressionP4Parser::e864C, K215, K215, K215, K216, K216, "TinyExpressionP4::NotExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19708:19711:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e864C(Session s, Frame f) {
@@ -9792,7 +9792,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e865(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e865M(s, f) : e865C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e865M(s, f) : e865C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e865M : TinyExpressionP4Parser::e865C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19745:20177:body/choice", false, false, "mixed", false, K4);
     }
     private static Match e865C(Session s, Frame f) {
@@ -9802,7 +9802,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K1067,false,null,false,K1066);
     }
     private static Match e866(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e866M(s, f) : e866C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e866M(s, f) : e866C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e866M : TinyExpressionP4Parser::e866C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19745:19758:body/0/ruleRef", false, false, "node", false, K4);
     }
     private static Match e866C(Session s, Frame f) {
@@ -9812,7 +9812,7 @@ public final class TinyExpressionP4Parser {
         return parseNotExpression_97(s, f);
     }
     private static Match e867(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e867M(s, f) : e867C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e867M(s, f) : e867C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e867M : TinyExpressionP4Parser::e867C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19765:19777:body/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e867C(Session s, Frame f) {
@@ -9822,7 +9822,7 @@ public final class TinyExpressionP4Parser {
         return parseIfExpression_106(s, f);
     }
     private static Match e868(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e868M(s, f) : e868C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e868M(s, f) : e868C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e868M : TinyExpressionP4Parser::e868C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19784:19806:body/2/ruleRef", false, false, "node", false, K4);
     }
     private static Match e868C(Session s, Frame f) {
@@ -9832,7 +9832,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanMatchExpression_117(s, f);
     }
     private static Match e869(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e869M(s, f) : e869C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e869M(s, f) : e869C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e869M : TinyExpressionP4Parser::e869C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19813:19838:body/3/ruleRef", false, false, "node", false, K4);
     }
     private static Match e869C(Session s, Frame f) {
@@ -9842,7 +9842,7 @@ public final class TinyExpressionP4Parser {
         return parseExternalBooleanInvocation_31(s, f);
     }
     private static Match e870(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e870M(s, f) : e870C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e870M(s, f) : e870C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e870M : TinyExpressionP4Parser::e870C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19845:19853:body/4/ruleRef", false, false, "node", false, K4);
     }
     private static Match e870C(Session s, Frame f) {
@@ -9852,7 +9852,7 @@ public final class TinyExpressionP4Parser {
         return parseInMethod_73(s, f);
     }
     private static Match e871(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e871M(s, f) : e871C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e871M(s, f) : e871C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e871M : TinyExpressionP4Parser::e871C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19860:19879:body/5/ruleRef", false, false, "node", false, K4);
     }
     private static Match e871C(Session s, Frame f) {
@@ -9862,7 +9862,7 @@ public final class TinyExpressionP4Parser {
         return parseStartsWithDotMethod_74(s, f);
     }
     private static Match e872(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e872M(s, f) : e872C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e872M(s, f) : e872C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e872M : TinyExpressionP4Parser::e872C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19886:19903:body/6/ruleRef", false, false, "node", false, K4);
     }
     private static Match e872C(Session s, Frame f) {
@@ -9872,7 +9872,7 @@ public final class TinyExpressionP4Parser {
         return parseEndsWithDotMethod_75(s, f);
     }
     private static Match e873(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e873M(s, f) : e873C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e873M(s, f) : e873C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e873M : TinyExpressionP4Parser::e873C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19910:19927:body/7/ruleRef", false, false, "node", false, K4);
     }
     private static Match e873C(Session s, Frame f) {
@@ -9882,7 +9882,7 @@ public final class TinyExpressionP4Parser {
         return parseContainsDotMethod_76(s, f);
     }
     private static Match e874(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e874M(s, f) : e874C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e874M(s, f) : e874C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e874M : TinyExpressionP4Parser::e874C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19934:19952:body/8/ruleRef", false, false, "node", false, K4);
     }
     private static Match e874C(Session s, Frame f) {
@@ -9892,7 +9892,7 @@ public final class TinyExpressionP4Parser {
         return parseStartsWithFunction_70(s, f);
     }
     private static Match e875(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e875M(s, f) : e875C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e875M(s, f) : e875C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e875M : TinyExpressionP4Parser::e875C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19959:19975:body/9/ruleRef", false, false, "node", false, K4);
     }
     private static Match e875C(Session s, Frame f) {
@@ -9902,7 +9902,7 @@ public final class TinyExpressionP4Parser {
         return parseEndsWithFunction_71(s, f);
     }
     private static Match e876(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e876M(s, f) : e876C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e876M(s, f) : e876C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e876M : TinyExpressionP4Parser::e876C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19982:19998:body/10/ruleRef", false, false, "node", false, K4);
     }
     private static Match e876C(Session s, Frame f) {
@@ -9912,7 +9912,7 @@ public final class TinyExpressionP4Parser {
         return parseContainsFunction_72(s, f);
     }
     private static Match e877(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e877M(s, f) : e877C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e877M(s, f) : e877C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e877M : TinyExpressionP4Parser::e877C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20005:20022:body/11/ruleRef", false, false, "node", false, K4);
     }
     private static Match e877C(Session s, Frame f) {
@@ -9922,7 +9922,7 @@ public final class TinyExpressionP4Parser {
         return parseIsPresentFunction_78(s, f);
     }
     private static Match e878(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e878M(s, f) : e878C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e878M(s, f) : e878C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e878M : TinyExpressionP4Parser::e878C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20029:20048:body/12/ruleRef", false, false, "node", false, K4);
     }
     private static Match e878C(Session s, Frame f) {
@@ -9932,7 +9932,7 @@ public final class TinyExpressionP4Parser {
         return parseInTimeRangeFunction_79(s, f);
     }
     private static Match e879(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e879M(s, f) : e879C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e879M(s, f) : e879C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e879M : TinyExpressionP4Parser::e879C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20055:20077:body/13/ruleRef", false, false, "node", false, K4);
     }
     private static Match e879C(Session s, Frame f) {
@@ -9942,7 +9942,7 @@ public final class TinyExpressionP4Parser {
         return parseInDayTimeRangeFunction_80(s, f);
     }
     private static Match e880(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e880M(s, f) : e880C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e880M(s, f) : e880C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e880M : TinyExpressionP4Parser::e880C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20084:20090:body/14/literal", false, true, "text", false, K1068);
     }
     private static Match e880C(Session s, Frame f) {
@@ -9952,7 +9952,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "true", true, false, K1069);
     }
     private static Match e881(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e881M(s, f) : e881C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e881M(s, f) : e881C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e881M : TinyExpressionP4Parser::e881C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20097:20104:body/15/literal", false, true, "text", false, K1070);
     }
     private static Match e881C(Session s, Frame f) {
@@ -9962,7 +9962,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "false", true, false, K1071);
     }
     private static Match e882(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e882M(s, f) : e882C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e882M(s, f) : e882C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e882M : TinyExpressionP4Parser::e882C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20111:20122:body/16/ruleRef", false, false, "node", false, K4);
     }
     private static Match e882C(Session s, Frame f) {
@@ -9972,7 +9972,7 @@ public final class TinyExpressionP4Parser {
         return parseVariableRef_121(s, f);
     }
     private static Match e883(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e883M(s, f) : e883C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e883M(s, f) : e883C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e883M : TinyExpressionP4Parser::e883C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20129:20145:body/17/ruleRef", false, false, "node", false, K4);
     }
     private static Match e883C(Session s, Frame f) {
@@ -9983,7 +9983,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e884(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e884M(s, f) : e884C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e884M(s, f) : e884C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e884M : TinyExpressionP4Parser::e884C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20152:20177:body/18/seq", false, false, "node", false, K160);
     }
     private static Match e884C(Session s, Frame f) {
@@ -9993,7 +9993,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1072, K237);
     }
     private static Match e885(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e885M(s, f) : e885C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e885M(s, f) : e885C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e885M : TinyExpressionP4Parser::e885C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20152:20155:body/18/0/literal", false, true, "text", false, K373);
     }
     private static Match e885C(Session s, Frame f) {
@@ -10003,7 +10003,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "(", true, false, K374);
     }
     private static Match e886(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e886M(s, f) : e886C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e886M(s, f) : e886C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e886M : TinyExpressionP4Parser::e886C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20156:20173:body/18/1/ruleRef", false, false, "node", false, K4);
     }
     private static Match e886C(Session s, Frame f) {
@@ -10013,7 +10013,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e887(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e887M(s, f) : e887C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e887M(s, f) : e887C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e887M : TinyExpressionP4Parser::e887C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanComparable", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20174:20177:body/18/2/literal", false, true, "text", false, K375);
     }
     private static Match e887C(Session s, Frame f) {
@@ -10024,7 +10024,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e888(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e888M(s, f) : e888C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e888M(s, f) : e888C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e888M : TinyExpressionP4Parser::e888C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanEqualityExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20271:20327:body/seq", false, false, "mixed", true, K4);
     }
     private static Match e888C(Session s, Frame f) {
@@ -10064,7 +10064,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanComparable_98(s, f);
     }
     private static Match e892(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e892M(s, f) : e892C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e892M(s, f) : e892C(s, f); s.progress(f); return s.tree ? s.project(r, true) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e892M : TinyExpressionP4Parser::e892C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanFactor", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20410:20540:body/choice", false, false, "mixed", false, K4);
     }
     private static Match e892C(Session s, Frame f) {
@@ -10115,7 +10115,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e897(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e897M(s, f) : e897C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e897M(s, f) : e897C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e897M : TinyExpressionP4Parser::e897C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringComparisonExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20804:20858:body/seq", false, false, "node", true, K4);
     }
     private static Match e897C(Session s, Frame f) {
@@ -10155,7 +10155,7 @@ public final class TinyExpressionP4Parser {
         return parseStringExpression_89(s, f);
     }
     private static Match e901(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e901M(s, f) : e901C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e901M(s, f) : e901C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e901M : TinyExpressionP4Parser::e901C, K215, K215, K215, K216, K216, "TinyExpressionP4::EqualityOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20896:body/choice", false, false, "text", false, K4);
     }
     private static Match e901C(Session s, Frame f) {
@@ -10165,7 +10165,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K1087,false,null,false);
     }
     private static Match e902(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e902M(s, f) : e902C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e902M(s, f) : e902C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e902M : TinyExpressionP4Parser::e902C, K215, K215, K215, K216, K216, "TinyExpressionP4::EqualityOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20889:body/0/literal", false, true, "text", false, K1088);
     }
     private static Match e902C(Session s, Frame f) {
@@ -10175,7 +10175,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "==", true, false, K1089);
     }
     private static Match e903(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e903M(s, f) : e903C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e903M(s, f) : e903C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e903M : TinyExpressionP4Parser::e903C, K215, K215, K215, K216, K216, "TinyExpressionP4::EqualityOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20892:20896:body/1/literal", false, true, "text", false, K1090);
     }
     private static Match e903C(Session s, Frame f) {
@@ -10186,7 +10186,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e904(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e904M(s, f) : e904C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e904M(s, f) : e904C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e904M : TinyExpressionP4Parser::e904C, K215, K215, K215, K216, K216, "TinyExpressionP4::ComparisonExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20980:21033:body/seq", false, false, "node", true, K4);
     }
     private static Match e904C(Session s, Frame f) {
@@ -10226,7 +10226,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberExpression_40(s, f);
     }
     private static Match e908(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e908M(s, f) : e908C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e908M(s, f) : e908C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e908M : TinyExpressionP4Parser::e908C, K215, K215, K215, K216, K216, "TinyExpressionP4::CompareOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21096:body/choice", false, false, "text", false, K4);
     }
     private static Match e908C(Session s, Frame f) {
@@ -10236,7 +10236,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K1096,false,null,false);
     }
     private static Match e909(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e909M(s, f) : e909C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e909M(s, f) : e909C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e909M : TinyExpressionP4Parser::e909C, K215, K215, K215, K216, K216, "TinyExpressionP4::CompareOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21063:body/0/literal", false, true, "text", false, K1088);
     }
     private static Match e909C(Session s, Frame f) {
@@ -10246,7 +10246,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "==", true, false, K1089);
     }
     private static Match e910(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e910M(s, f) : e910C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e910M(s, f) : e910C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e910M : TinyExpressionP4Parser::e910C, K215, K215, K215, K216, K216, "TinyExpressionP4::CompareOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21066:21070:body/1/literal", false, true, "text", false, K1090);
     }
     private static Match e910C(Session s, Frame f) {
@@ -10256,7 +10256,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "!=", true, false, K1091);
     }
     private static Match e911(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e911M(s, f) : e911C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e911M(s, f) : e911C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e911M : TinyExpressionP4Parser::e911C, K215, K215, K215, K216, K216, "TinyExpressionP4::CompareOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21073:21077:body/2/literal", false, true, "text", false, K1097);
     }
     private static Match e911C(Session s, Frame f) {
@@ -10266,7 +10266,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "<=", true, false, K1098);
     }
     private static Match e912(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e912M(s, f) : e912C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e912M(s, f) : e912C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e912M : TinyExpressionP4Parser::e912C, K215, K215, K215, K216, K216, "TinyExpressionP4::CompareOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21080:21084:body/3/literal", false, true, "text", false, K1099);
     }
     private static Match e912C(Session s, Frame f) {
@@ -10276,7 +10276,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ">=", true, false, K1100);
     }
     private static Match e913(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e913M(s, f) : e913C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e913M(s, f) : e913C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e913M : TinyExpressionP4Parser::e913C, K215, K215, K215, K216, K216, "TinyExpressionP4::CompareOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21087:21090:body/4/literal", false, true, "text", false, K1101);
     }
     private static Match e913C(Session s, Frame f) {
@@ -10286,7 +10286,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "<", true, false, K1102);
     }
     private static Match e914(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e914M(s, f) : e914C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e914M(s, f) : e914C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e914M : TinyExpressionP4Parser::e914C, K215, K215, K215, K216, K216, "TinyExpressionP4::CompareOp", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21093:21096:body/5/literal", false, true, "text", false, K1103);
     }
     private static Match e914C(Session s, Frame f) {
@@ -10296,7 +10296,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ">", true, false, K1104);
     }
     private static Match e915(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e915M(s, f) : e915C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e915M(s, f) : e915C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e915M : TinyExpressionP4Parser::e915C, K215, K215, K215, K216, K216, "TinyExpressionP4::ObjectExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21250:21420:body/choice", false, false, "node", false, K4);
     }
     private static Match e915C(Session s, Frame f) {
@@ -10367,7 +10367,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e922(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e922M(s, f) : e922C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e922M(s, f) : e922C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e922M : TinyExpressionP4Parser::e922C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21595:21725:body/seq", false, false, "node", true, K4);
     }
     private static Match e922C(Session s, Frame f) {
@@ -10377,7 +10377,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1118, K1117);
     }
     private static Match e923(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e923M(s, f) : e923C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e923M(s, f) : e923C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e923M : TinyExpressionP4Parser::e923C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21595:21599:body/0/literal", false, true, "text", false, K357);
     }
     private static Match e923C(Session s, Frame f) {
@@ -10387,7 +10387,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "if", true, false, K358);
     }
     private static Match e924(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e924M(s, f) : e924C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e924M(s, f) : e924C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e924M : TinyExpressionP4Parser::e924C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21600:21603:body/1/literal", false, true, "text", false, K373);
     }
     private static Match e924C(Session s, Frame f) {
@@ -10407,7 +10407,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e926(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e926M(s, f) : e926C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e926M(s, f) : e926C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e926M : TinyExpressionP4Parser::e926C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21633:21636:body/3/literal", false, true, "text", false, K375);
     }
     private static Match e926C(Session s, Frame f) {
@@ -10417,7 +10417,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, ")", true, false, K376);
     }
     private static Match e927(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e927M(s, f) : e927C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e927M(s, f) : e927C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e927M : TinyExpressionP4Parser::e927C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21641:21644:body/4/literal", false, true, "text", false, K391);
     }
     private static Match e927C(Session s, Frame f) {
@@ -10437,7 +10437,7 @@ public final class TinyExpressionP4Parser {
         return parseBranchExpression_107(s, f);
     }
     private static Match e929(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e929M(s, f) : e929C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e929M(s, f) : e929C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e929M : TinyExpressionP4Parser::e929C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21672:21675:body/6/literal", false, true, "text", false, K394);
     }
     private static Match e929C(Session s, Frame f) {
@@ -10447,7 +10447,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "}", true, false, K395);
     }
     private static Match e930(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e930M(s, f) : e930C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e930M(s, f) : e930C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e930M : TinyExpressionP4Parser::e930C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21680:21686:body/7/literal", false, true, "text", false, K1121);
     }
     private static Match e930C(Session s, Frame f) {
@@ -10457,7 +10457,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "else", true, false, K1122);
     }
     private static Match e931(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e931M(s, f) : e931C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e931M(s, f) : e931C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e931M : TinyExpressionP4Parser::e931C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21691:21694:body/8/literal", false, true, "text", false, K391);
     }
     private static Match e931C(Session s, Frame f) {
@@ -10477,7 +10477,7 @@ public final class TinyExpressionP4Parser {
         return parseBranchExpression_107(s, f);
     }
     private static Match e933(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e933M(s, f) : e933C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e933M(s, f) : e933C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e933M : TinyExpressionP4Parser::e933C, K215, K215, K215, K216, K216, "TinyExpressionP4::IfExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21722:21725:body/10/literal", false, true, "text", false, K394);
     }
     private static Match e933C(Session s, Frame f) {
@@ -10487,7 +10487,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "}", true, false, K395);
     }
     private static Match e934(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e934M(s, f) : e934C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e934M(s, f) : e934C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e934M : TinyExpressionP4Parser::e934C, K215, K215, K215, K216, K216, "TinyExpressionP4::BranchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21807:22057:body/choice", false, false, "node", false, K4);
     }
     private static Match e934C(Session s, Frame f) {
@@ -10578,7 +10578,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e943(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e943M(s, f) : e943C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e943M(s, f) : e943C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e943M : TinyExpressionP4Parser::e943C, K215, K215, K215, K216, K216, "TinyExpressionP4::TernaryExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22232:22330:body/seq", false, false, "node", true, K4);
     }
     private static Match e943C(Session s, Frame f) {
@@ -10588,7 +10588,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1134, K219);
     }
     private static Match e944(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e944M(s, f) : e944C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e944M(s, f) : e944C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e944M : TinyExpressionP4Parser::e944C, K215, K215, K215, K216, K216, "TinyExpressionP4::TernaryExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22232:22235:body/0/literal", false, true, "text", false, K373);
     }
     private static Match e944C(Session s, Frame f) {
@@ -10608,7 +10608,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e946(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e946M(s, f) : e946C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e946M(s, f) : e946C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e946M : TinyExpressionP4Parser::e946C, K215, K215, K215, K216, K216, "TinyExpressionP4::TernaryExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22265:22268:body/2/literal", false, true, "text", false, K502);
     }
     private static Match e946C(Session s, Frame f) {
@@ -10628,7 +10628,7 @@ public final class TinyExpressionP4Parser {
         return parseBranchExpression_107(s, f);
     }
     private static Match e948(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e948M(s, f) : e948C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e948M(s, f) : e948C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e948M : TinyExpressionP4Parser::e948C, K215, K215, K215, K216, K216, "TinyExpressionP4::TernaryExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22296:22299:body/4/literal", false, true, "text", false, K449);
     }
     private static Match e948C(Session s, Frame f) {
@@ -10648,7 +10648,7 @@ public final class TinyExpressionP4Parser {
         return parseBranchExpression_107(s, f);
     }
     private static Match e950(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e950M(s, f) : e950C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e950M(s, f) : e950C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e950M : TinyExpressionP4Parser::e950C, K215, K215, K215, K216, K216, "TinyExpressionP4::TernaryExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22327:22330:body/6/literal", false, true, "text", false, K375);
     }
     private static Match e950C(Session s, Frame f) {
@@ -10659,7 +10659,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e951(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e951M(s, f) : e951C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e951M(s, f) : e951C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e951M : TinyExpressionP4Parser::e951C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22520:22638:body/seq", false, false, "node", true, K4);
     }
     private static Match e951C(Session s, Frame f) {
@@ -10669,7 +10669,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1138, K219);
     }
     private static Match e952(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e952M(s, f) : e952C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e952M(s, f) : e952C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e952M : TinyExpressionP4Parser::e952C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22520:22527:body/0/literal", false, true, "text", false, K1139);
     }
     private static Match e952C(Session s, Frame f) {
@@ -10679,7 +10679,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "match", true, false, K1140);
     }
     private static Match e953(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e953M(s, f) : e953C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e953M(s, f) : e953C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e953M : TinyExpressionP4Parser::e953C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22528:22531:body/1/literal", false, true, "text", false, K391);
     }
     private static Match e953C(Session s, Frame f) {
@@ -10699,7 +10699,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberCase_110(s, f);
     }
     private static Match e955(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e955M(s, f) : e955C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e955M(s, f) : e955C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e955M : TinyExpressionP4Parser::e955C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22560:22589:body/3/repeat", true, false, "node", true, K378);
     }
     private static Match e955C(Session s, Frame f) {
@@ -10710,7 +10710,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e956(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e956M(s, f) : e956C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e956M(s, f) : e956C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e956M : TinyExpressionP4Parser::e956C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22562:22576:body/3/0/seq", false, false, "node", false, K378);
     }
     private static Match e956C(Session s, Frame f) {
@@ -10720,7 +10720,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1143, K249);
     }
     private static Match e957(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e957M(s, f) : e957C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e957M(s, f) : e957C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e957M : TinyExpressionP4Parser::e957C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22562:22565:body/3/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e957C(Session s, Frame f) {
@@ -10740,7 +10740,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberCase_110(s, f);
     }
     private static Match e959(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e959M(s, f) : e959C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e959M(s, f) : e959C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e959M : TinyExpressionP4Parser::e959C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22596:22599:body/4/literal", false, true, "text", false, K378);
     }
     private static Match e959C(Session s, Frame f) {
@@ -10760,7 +10760,7 @@ public final class TinyExpressionP4Parser {
         return parseNumberDefaultCase_111(s, f);
     }
     private static Match e961(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e961M(s, f) : e961C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e961M(s, f) : e961C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e961M : TinyExpressionP4Parser::e961C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22635:22638:body/6/literal", false, true, "text", false, K394);
     }
     private static Match e961C(Session s, Frame f) {
@@ -10771,7 +10771,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e962(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e962M(s, f) : e962C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e962M(s, f) : e962C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e962M : TinyExpressionP4Parser::e962C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22713:22762:body/seq", false, false, "node", true, K4);
     }
     private static Match e962C(Session s, Frame f) {
@@ -10791,7 +10791,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e964(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e964M(s, f) : e964C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e964M(s, f) : e964C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e964M : TinyExpressionP4Parser::e964C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22742:22746:body/1/literal", false, true, "text", false, K196);
     }
     private static Match e964C(Session s, Frame f) {
@@ -10812,7 +10812,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e966(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e966M(s, f) : e966C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e966M(s, f) : e966C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e966M : TinyExpressionP4Parser::e966C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22846:22876:body/seq", false, false, "node", false, K4);
     }
     private static Match e966C(Session s, Frame f) {
@@ -10822,7 +10822,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1152, K237);
     }
     private static Match e967(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e967M(s, f) : e967C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e967M(s, f) : e967C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e967M : TinyExpressionP4Parser::e967C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22846:22855:body/0/literal", false, true, "text", false, K1153);
     }
     private static Match e967C(Session s, Frame f) {
@@ -10832,7 +10832,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "default", true, false, K1154);
     }
     private static Match e968(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e968M(s, f) : e968C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e968M(s, f) : e968C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e968M : TinyExpressionP4Parser::e968C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22856:22860:body/1/literal", false, true, "text", false, K196);
     }
     private static Match e968C(Session s, Frame f) {
@@ -10853,7 +10853,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e970(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e970M(s, f) : e970C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e970M(s, f) : e970C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e970M : TinyExpressionP4Parser::e970C, K215, K215, K215, K216, K216, "TinyExpressionP4::NumberCaseValue", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22956:22972:body/seq", false, false, "node", false, K4);
     }
     private static Match e970C(Session s, Frame f) {
@@ -10874,7 +10874,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e972(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e972M(s, f) : e972C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e972M(s, f) : e972C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e972M : TinyExpressionP4Parser::e972C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23087:23205:body/seq", false, false, "node", true, K4);
     }
     private static Match e972C(Session s, Frame f) {
@@ -10884,7 +10884,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1158, K219);
     }
     private static Match e973(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e973M(s, f) : e973C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e973M(s, f) : e973C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e973M : TinyExpressionP4Parser::e973C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23087:23094:body/0/literal", false, true, "text", false, K1139);
     }
     private static Match e973C(Session s, Frame f) {
@@ -10894,7 +10894,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "match", true, false, K1140);
     }
     private static Match e974(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e974M(s, f) : e974C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e974M(s, f) : e974C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e974M : TinyExpressionP4Parser::e974C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23095:23098:body/1/literal", false, true, "text", false, K391);
     }
     private static Match e974C(Session s, Frame f) {
@@ -10914,7 +10914,7 @@ public final class TinyExpressionP4Parser {
         return parseStringCase_114(s, f);
     }
     private static Match e976(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e976M(s, f) : e976C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e976M(s, f) : e976C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e976M : TinyExpressionP4Parser::e976C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23127:23156:body/3/repeat", true, false, "node", true, K378);
     }
     private static Match e976C(Session s, Frame f) {
@@ -10925,7 +10925,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e977(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e977M(s, f) : e977C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e977M(s, f) : e977C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e977M : TinyExpressionP4Parser::e977C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23129:23143:body/3/0/seq", false, false, "node", false, K378);
     }
     private static Match e977C(Session s, Frame f) {
@@ -10935,7 +10935,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1160, K249);
     }
     private static Match e978(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e978M(s, f) : e978C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e978M(s, f) : e978C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e978M : TinyExpressionP4Parser::e978C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23129:23132:body/3/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e978C(Session s, Frame f) {
@@ -10955,7 +10955,7 @@ public final class TinyExpressionP4Parser {
         return parseStringCase_114(s, f);
     }
     private static Match e980(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e980M(s, f) : e980C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e980M(s, f) : e980C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e980M : TinyExpressionP4Parser::e980C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23163:23166:body/4/literal", false, true, "text", false, K378);
     }
     private static Match e980C(Session s, Frame f) {
@@ -10975,7 +10975,7 @@ public final class TinyExpressionP4Parser {
         return parseStringDefaultCase_115(s, f);
     }
     private static Match e982(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e982M(s, f) : e982C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e982M(s, f) : e982C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e982M : TinyExpressionP4Parser::e982C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23202:23205:body/6/literal", false, true, "text", false, K394);
     }
     private static Match e982C(Session s, Frame f) {
@@ -10986,7 +10986,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e983(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e983M(s, f) : e983C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e983M(s, f) : e983C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e983M : TinyExpressionP4Parser::e983C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23280:23329:body/seq", false, false, "node", true, K4);
     }
     private static Match e983C(Session s, Frame f) {
@@ -11006,7 +11006,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e985(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e985M(s, f) : e985C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e985M(s, f) : e985C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e985M : TinyExpressionP4Parser::e985C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23309:23313:body/1/literal", false, true, "text", false, K196);
     }
     private static Match e985C(Session s, Frame f) {
@@ -11027,7 +11027,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e987(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e987M(s, f) : e987C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e987M(s, f) : e987C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e987M : TinyExpressionP4Parser::e987C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23413:23443:body/seq", false, false, "node", false, K4);
     }
     private static Match e987C(Session s, Frame f) {
@@ -11037,7 +11037,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1166, K237);
     }
     private static Match e988(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e988M(s, f) : e988C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e988M(s, f) : e988C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e988M : TinyExpressionP4Parser::e988C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23413:23422:body/0/literal", false, true, "text", false, K1153);
     }
     private static Match e988C(Session s, Frame f) {
@@ -11047,7 +11047,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "default", true, false, K1154);
     }
     private static Match e989(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e989M(s, f) : e989C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e989M(s, f) : e989C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e989M : TinyExpressionP4Parser::e989C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23423:23427:body/1/literal", false, true, "text", false, K196);
     }
     private static Match e989C(Session s, Frame f) {
@@ -11068,7 +11068,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e991(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e991M(s, f) : e991C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e991M(s, f) : e991C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e991M : TinyExpressionP4Parser::e991C, K215, K215, K215, K216, K216, "TinyExpressionP4::StringCaseValue", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23523:23539:body/seq", false, false, "node", false, K4);
     }
     private static Match e991C(Session s, Frame f) {
@@ -11089,7 +11089,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e993(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e993M(s, f) : e993C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e993M(s, f) : e993C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e993M : TinyExpressionP4Parser::e993C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23656:23777:body/seq", false, false, "node", true, K4);
     }
     private static Match e993C(Session s, Frame f) {
@@ -11099,7 +11099,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1170, K219);
     }
     private static Match e994(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e994M(s, f) : e994C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e994M(s, f) : e994C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e994M : TinyExpressionP4Parser::e994C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23656:23663:body/0/literal", false, true, "text", false, K1139);
     }
     private static Match e994C(Session s, Frame f) {
@@ -11109,7 +11109,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "match", true, false, K1140);
     }
     private static Match e995(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e995M(s, f) : e995C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e995M(s, f) : e995C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e995M : TinyExpressionP4Parser::e995C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23664:23667:body/1/literal", false, true, "text", false, K391);
     }
     private static Match e995C(Session s, Frame f) {
@@ -11129,7 +11129,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanCase_118(s, f);
     }
     private static Match e997(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e997M(s, f) : e997C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e997M(s, f) : e997C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e997M : TinyExpressionP4Parser::e997C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23697:23727:body/3/repeat", true, false, "node", true, K378);
     }
     private static Match e997C(Session s, Frame f) {
@@ -11140,7 +11140,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e998(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e998M(s, f) : e998C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e998M(s, f) : e998C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e998M : TinyExpressionP4Parser::e998C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23699:23714:body/3/0/seq", false, false, "node", false, K378);
     }
     private static Match e998C(Session s, Frame f) {
@@ -11150,7 +11150,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1172, K249);
     }
     private static Match e999(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e999M(s, f) : e999C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e999M(s, f) : e999C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e999M : TinyExpressionP4Parser::e999C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23699:23702:body/3/0/0/literal", false, true, "text", false, K378);
     }
     private static Match e999C(Session s, Frame f) {
@@ -11170,7 +11170,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanCase_118(s, f);
     }
     private static Match e1001(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1001M(s, f) : e1001C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1001M(s, f) : e1001C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1001M : TinyExpressionP4Parser::e1001C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23734:23737:body/4/literal", false, true, "text", false, K378);
     }
     private static Match e1001C(Session s, Frame f) {
@@ -11190,7 +11190,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanDefaultCase_119(s, f);
     }
     private static Match e1003(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1003M(s, f) : e1003C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1003M(s, f) : e1003C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1003M : TinyExpressionP4Parser::e1003C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanMatchExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23774:23777:body/6/literal", false, true, "text", false, K394);
     }
     private static Match e1003C(Session s, Frame f) {
@@ -11201,7 +11201,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e1004(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e1004M(s, f) : e1004C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1004M(s, f) : e1004C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1004M : TinyExpressionP4Parser::e1004C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23854:23904:body/seq", false, false, "node", true, K4);
     }
     private static Match e1004C(Session s, Frame f) {
@@ -11221,7 +11221,7 @@ public final class TinyExpressionP4Parser {
         return parseBooleanExpression_94(s, f);
     }
     private static Match e1006(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1006M(s, f) : e1006C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1006M(s, f) : e1006C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1006M : TinyExpressionP4Parser::e1006C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23883:23887:body/1/literal", false, true, "text", false, K196);
     }
     private static Match e1006C(Session s, Frame f) {
@@ -11242,7 +11242,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e1008(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e1008M(s, f) : e1008C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1008M(s, f) : e1008C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1008M : TinyExpressionP4Parser::e1008C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23990:24021:body/seq", false, false, "node", false, K4);
     }
     private static Match e1008C(Session s, Frame f) {
@@ -11252,7 +11252,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1178, K237);
     }
     private static Match e1009(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1009M(s, f) : e1009C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1009M(s, f) : e1009C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1009M : TinyExpressionP4Parser::e1009C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23990:23999:body/0/literal", false, true, "text", false, K1153);
     }
     private static Match e1009C(Session s, Frame f) {
@@ -11262,7 +11262,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "default", true, false, K1154);
     }
     private static Match e1010(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1010M(s, f) : e1010C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1010M(s, f) : e1010C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1010M : TinyExpressionP4Parser::e1010C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanDefaultCase", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24000:24004:body/1/literal", false, true, "text", false, K196);
     }
     private static Match e1010C(Session s, Frame f) {
@@ -11283,7 +11283,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e1012(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e1012M(s, f) : e1012C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1012M(s, f) : e1012C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1012M : TinyExpressionP4Parser::e1012C, K215, K215, K215, K216, K216, "TinyExpressionP4::BooleanCaseValue", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24103:24120:body/seq", false, false, "node", false, K4);
     }
     private static Match e1012C(Session s, Frame f) {
@@ -11304,7 +11304,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e1014(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e1014M(s, f) : e1014C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1014M(s, f) : e1014C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1014M : TinyExpressionP4Parser::e1014C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableRef", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24333:24384:body/seq", false, false, "text", false, K4);
     }
     private static Match e1014C(Session s, Frame f) {
@@ -11314,7 +11314,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1182, K237);
     }
     private static Match e1015(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1015M(s, f) : e1015C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1015M(s, f) : e1015C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1015M : TinyExpressionP4Parser::e1015C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableRef", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24333:24336:body/0/literal", false, true, "text", false, K49);
     }
     private static Match e1015C(Session s, Frame f) {
@@ -11333,7 +11333,7 @@ public final class TinyExpressionP4Parser {
         return s.builtin(f,"Identifier",K234,K255);
     }
     private static Match e1017(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1017M(s, f) : e1017C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1017M(s, f) : e1017C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1017M : TinyExpressionP4Parser::e1017C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableRef", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24354:24384:body/2/optional", true, false, "text", false, K293);
     }
     private static Match e1017C(Session s, Frame f) {
@@ -11344,7 +11344,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e1018(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e1018M(s, f) : e1018C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1018M(s, f) : e1018C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1018M : TinyExpressionP4Parser::e1018C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableRef", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24356:24376:body/2/0/seq", false, false, "text", false, K256);
     }
     private static Match e1018C(Session s, Frame f) {
@@ -11354,7 +11354,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1184, K249);
     }
     private static Match e1019(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1019M(s, f) : e1019C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1019M(s, f) : e1019C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1019M : TinyExpressionP4Parser::e1019C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableRef", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24356:24364:body/2/0/0/optional", true, false, "text", false, K256);
     }
     private static Match e1019C(Session s, Frame f) {
@@ -11364,7 +11364,7 @@ public final class TinyExpressionP4Parser {
         return s.optional(f, TinyExpressionP4Parser::e1020);
     }
     private static Match e1020(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1020M(s, f) : e1020C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1020M(s, f) : e1020C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1020M : TinyExpressionP4Parser::e1020C, K215, K215, K215, K216, K216, "TinyExpressionP4::VariableRef", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24358:24362:body/2/0/0/0/literal", false, true, "text", false, K256);
     }
     private static Match e1020C(Session s, Frame f) {
@@ -11384,7 +11384,7 @@ public final class TinyExpressionP4Parser {
         return parseTypeKeyword_122(s, f);
     }
     private static Match e1022(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1022M(s, f) : e1022C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1022M(s, f) : e1022C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1022M : TinyExpressionP4Parser::e1022C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice", false, false, "text", false, K4);
     }
     private static Match e1022C(Session s, Frame f) {
@@ -11394,7 +11394,7 @@ public final class TinyExpressionP4Parser {
         return s.choice(f,K1186,false,null,false);
     }
     private static Match e1023(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1023M(s, f) : e1023C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1023M(s, f) : e1023C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1023M : TinyExpressionP4Parser::e1023C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24414:body/0/literal", false, true, "text", false, K327);
     }
     private static Match e1023C(Session s, Frame f) {
@@ -11404,7 +11404,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "number", true, false, K328);
     }
     private static Match e1024(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1024M(s, f) : e1024C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1024M(s, f) : e1024C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1024M : TinyExpressionP4Parser::e1024C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24417:24425:body/1/literal", false, true, "text", false, K329);
     }
     private static Match e1024C(Session s, Frame f) {
@@ -11414,7 +11414,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "Number", true, false, K330);
     }
     private static Match e1025(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1025M(s, f) : e1025C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1025M(s, f) : e1025C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1025M : TinyExpressionP4Parser::e1025C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24428:24435:body/2/literal", false, true, "text", false, K343);
     }
     private static Match e1025C(Session s, Frame f) {
@@ -11424,7 +11424,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "float", true, false, K344);
     }
     private static Match e1026(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1026M(s, f) : e1026C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1026M(s, f) : e1026C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1026M : TinyExpressionP4Parser::e1026C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24438:24445:body/3/literal", false, true, "text", false, K345);
     }
     private static Match e1026C(Session s, Frame f) {
@@ -11434,7 +11434,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "Float", true, false, K346);
     }
     private static Match e1027(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1027M(s, f) : e1027C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1027M(s, f) : e1027C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1027M : TinyExpressionP4Parser::e1027C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24452:24460:body/4/literal", false, true, "text", false, K51);
     }
     private static Match e1027C(Session s, Frame f) {
@@ -11444,7 +11444,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "string", true, false, K331);
     }
     private static Match e1028(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1028M(s, f) : e1028C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1028M(s, f) : e1028C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1028M : TinyExpressionP4Parser::e1028C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24463:24471:body/5/literal", false, true, "text", false, K332);
     }
     private static Match e1028C(Session s, Frame f) {
@@ -11454,7 +11454,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "String", true, false, K333);
     }
     private static Match e1029(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1029M(s, f) : e1029C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1029M(s, f) : e1029C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1029M : TinyExpressionP4Parser::e1029C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24474:24483:body/6/literal", false, true, "text", false, K52);
     }
     private static Match e1029C(Session s, Frame f) {
@@ -11464,7 +11464,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "boolean", true, false, K334);
     }
     private static Match e1030(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1030M(s, f) : e1030C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1030M(s, f) : e1030C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1030M : TinyExpressionP4Parser::e1030C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24486:24495:body/7/literal", false, true, "text", false, K335);
     }
     private static Match e1030C(Session s, Frame f) {
@@ -11474,7 +11474,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "Boolean", true, false, K336);
     }
     private static Match e1031(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1031M(s, f) : e1031C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1031M(s, f) : e1031C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1031M : TinyExpressionP4Parser::e1031C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24498:24506:body/8/literal", false, true, "text", false, K53);
     }
     private static Match e1031C(Session s, Frame f) {
@@ -11484,7 +11484,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "object", true, false, K337);
     }
     private static Match e1032(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1032M(s, f) : e1032C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1032M(s, f) : e1032C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1032M : TinyExpressionP4Parser::e1032C, K215, K215, K215, K216, K216, "TinyExpressionP4::TypeKeyword", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24509:24517:body/9/literal", false, true, "text", false, K338);
     }
     private static Match e1032C(Session s, Frame f) {
@@ -11494,7 +11494,7 @@ public final class TinyExpressionP4Parser {
         return s.literal(f, "Object", true, false, K339);
     }
     private static Match e1033(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1033M(s, f) : e1033C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1033M(s, f) : e1033C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1033M : TinyExpressionP4Parser::e1033C, K215, K215, K215, K216, K216, "TinyExpressionP4::Expression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24836:25012:body/choice", false, false, "node", false, K4);
     }
     private static Match e1033C(Session s, Frame f) {
@@ -11555,7 +11555,7 @@ public final class TinyExpressionP4Parser {
     }
     private static Match e1039(Session s, Frame f) {
         f.reset = false;
-        if (s.bypassCapture) { Match r = f.matched ? e1039M(s, f) : e1039C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1039M(s, f) : e1039C(s, f); s.progress(f); return s.tree ? s.project(r, false) : r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1039M : TinyExpressionP4Parser::e1039C, K215, K215, K215, K216, K216, "TinyExpressionP4::Expression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24987:25012:body/5/seq", false, false, "node", false, K160);
     }
     private static Match e1039C(Session s, Frame f) {
@@ -11565,7 +11565,7 @@ public final class TinyExpressionP4Parser {
         return s.sequence(f, K1194, K237);
     }
     private static Match e1040(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1040M(s, f) : e1040C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1040M(s, f) : e1040C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1040M : TinyExpressionP4Parser::e1040C, K215, K215, K215, K216, K216, "TinyExpressionP4::Expression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24987:24990:body/5/0/literal", false, true, "text", false, K373);
     }
     private static Match e1040C(Session s, Frame f) {
@@ -11585,7 +11585,7 @@ public final class TinyExpressionP4Parser {
         return parseExpression_123(s, f);
     }
     private static Match e1042(Session s, Frame f) {
-        if (s.bypassCapture) { Match r = f.matched ? e1042M(s, f) : e1042C(s, f); s.progress(f); return r; }
+        if (s.bypassWrap) { Match r = f.matched ? e1042M(s, f) : e1042C(s, f); s.progress(f); return r; }
         return s.capture(f, f.matched ? TinyExpressionP4Parser::e1042M : TinyExpressionP4Parser::e1042C, K215, K215, K215, K216, K216, "TinyExpressionP4::Expression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:25009:25012:body/5/2/literal", false, true, "text", false, K375);
     }
     private static Match e1042C(Session s, Frame f) {
@@ -12465,27 +12465,27 @@ public final class TinyExpressionP4Parser {
     private static final Call[] K868 = new Call[]{TinyExpressionP4Parser::e678};
     private static final Call[] K869 = new Call[]{TinyExpressionP4Parser::e680};
     private static final Call[] K870 = new Call[]{TinyExpressionP4Parser::e688,TinyExpressionP4Parser::e689,TinyExpressionP4Parser::e690};
-    private static final Cap K871 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16309:16412:body/0/seq", false, false, "mixed", true, K155,true);
+    private static final Cap K871 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16309:16412:body/0/seq", false, false, "mixed", true, K155,true,true);
     private static final Call[] K872 = new Call[]{TinyExpressionP4Parser::e697};
-    private static final Cap K873 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16419:16497:body/1/seq", false, false, "mixed", true, K155,true);
+    private static final Cap K873 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16419:16497:body/1/seq", false, false, "mixed", true, K155,true,true);
     private static final String[] K874 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16419:16436:body/1/0/ruleRef/capture/0","value",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16448:16463:body/1/2/ruleRef/capture/0","start",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16475:16488:body/1/4/ruleRef/capture/0","end"};
     private static final Call[] K875 = new Call[]{TinyExpressionP4Parser::e703,TinyExpressionP4Parser::e704,TinyExpressionP4Parser::e705};
-    private static final Cap K876 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16504:16588:body/2/seq", false, false, "mixed", true, K155,true);
+    private static final Cap K876 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16504:16588:body/2/seq", false, false, "mixed", true, K155,true,true);
     private static final String[] K877 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16504:16521:body/2/0/ruleRef/capture/0","value",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16533:16548:body/2/2/ruleRef/capture/0","start",null,null};
     private static final Call[] K878 = new Call[]{TinyExpressionP4Parser::e711};
-    private static final Cap K879 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16595:16654:body/3/seq", false, false, "mixed", true, K155,true);
+    private static final Cap K879 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16595:16654:body/3/seq", false, false, "mixed", true, K155,true,true);
     private static final String[] K880 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16595:16612:body/3/0/ruleRef/capture/0","value",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16624:16639:body/3/2/ruleRef/capture/0","start",null,null};
     private static final Call[] K881 = new Call[]{TinyExpressionP4Parser::e717,TinyExpressionP4Parser::e718,TinyExpressionP4Parser::e719};
-    private static final Cap K882 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16661:16741:body/4/seq", false, false, "mixed", true, K155,true);
+    private static final Cap K882 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16661:16741:body/4/seq", false, false, "mixed", true, K155,true,true);
     private static final String[] K883 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16661:16678:body/4/0/ruleRef/capture/0","value",null,null,null,null,null,null};
     private static final Call[] K884 = new Call[]{TinyExpressionP4Parser::e725};
-    private static final Cap K885 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16748:16803:body/5/seq", false, false, "mixed", true, K155,true);
+    private static final Cap K885 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16748:16803:body/5/seq", false, false, "mixed", true, K155,true,true);
     private static final String[] K886 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16748:16765:body/5/0/ruleRef/capture/0","value",null,null,null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16781:16794:body/5/3/ruleRef/capture/0","end"};
     private static final Call[] K887 = new Call[]{TinyExpressionP4Parser::e730,TinyExpressionP4Parser::e731,TinyExpressionP4Parser::e732};
-    private static final Cap K888 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16810:16871:body/6/seq", false, false, "mixed", true, K155,true);
+    private static final Cap K888 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16810:16871:body/6/seq", false, false, "mixed", true, K155,true,true);
     private static final String[] K889 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16810:16827:body/6/0/ruleRef/capture/0","value",null,null,null,null};
     private static final Call[] K890 = new Call[]{TinyExpressionP4Parser::e737};
-    private static final Cap K891 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16878:16914:body/7/seq", false, false, "mixed", false, K155,true);
+    private static final Cap K891 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceBaseExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16878:16914:body/7/seq", false, false, "mixed", false, K155,true,true);
     private static final String[] K892 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16878:16895:body/7/0/ruleRef/capture/0","value",null,null,null,null};
     private static final Group[] K893 = new Group[]{new Group(0,8,true,K385,8,new Level(TinyExpressionP4Parser::e683,K385,0,new Branch(new Level(TinyExpressionP4Parser::e684,K385,1,new Branch(new Level(TinyExpressionP4Parser::e685,K385,2,new Branch(new Level(TinyExpressionP4Parser::e686,K385,3,new Branch(new Level(TinyExpressionP4Parser::e687,K385,4,new Branch(K870,K385,5,K871,null),new Branch(K872,K241,5,K873,K874))),new Branch(K875,K219,4,K876,K877),new Branch(K878,K368,4,K879,K880))))),new Branch(new Level(TinyExpressionP4Parser::e715,K219,2,new Branch(new Level(TinyExpressionP4Parser::e716,K219,3,new Branch(K881,K219,4,K882,K883),new Branch(K884,K368,4,K885,K886))),new Branch(K887,K241,3,K888,K889),new Branch(K890,K595,3,K891,K892)))))))};
     private static final Call[] K894 = new Call[]{TinyExpressionP4Parser::e682,TinyExpressionP4Parser::e691,TinyExpressionP4Parser::e698,TinyExpressionP4Parser::e706,TinyExpressionP4Parser::e712,TinyExpressionP4Parser::e720,TinyExpressionP4Parser::e726,TinyExpressionP4Parser::e733};
@@ -12525,27 +12525,27 @@ public final class TinyExpressionP4Parser {
     private static final Call[] K928 = new Call[]{TinyExpressionP4Parser::e734,TinyExpressionP4Parser::e735,TinyExpressionP4Parser::e736,TinyExpressionP4Parser::e737};
     private static final String[] K929 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16878:16895:body/7/0/ruleRef/capture/0"};
     private static final Call[] K930 = new Call[]{TinyExpressionP4Parser::e745,TinyExpressionP4Parser::e746,TinyExpressionP4Parser::e747};
-    private static final Cap K931 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17008:17113:body/0/seq", false, false, "node", true, K155,true);
+    private static final Cap K931 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17008:17113:body/0/seq", false, false, "node", true, K155,true,true);
     private static final Call[] K932 = new Call[]{TinyExpressionP4Parser::e754};
-    private static final Cap K933 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17120:17200:body/1/seq", false, false, "node", true, K155,true);
+    private static final Cap K933 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17120:17200:body/1/seq", false, false, "node", true, K155,true,true);
     private static final String[] K934 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17120:17139:body/1/0/ruleRef/capture/0","value",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17151:17166:body/1/2/ruleRef/capture/0","start",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17178:17191:body/1/4/ruleRef/capture/0","end"};
     private static final Call[] K935 = new Call[]{TinyExpressionP4Parser::e760,TinyExpressionP4Parser::e761,TinyExpressionP4Parser::e762};
-    private static final Cap K936 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17207:17293:body/2/seq", false, false, "node", true, K155,true);
+    private static final Cap K936 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17207:17293:body/2/seq", false, false, "node", true, K155,true,true);
     private static final String[] K937 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17207:17226:body/2/0/ruleRef/capture/0","value",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17238:17253:body/2/2/ruleRef/capture/0","start",null,null};
     private static final Call[] K938 = new Call[]{TinyExpressionP4Parser::e768};
-    private static final Cap K939 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17300:17361:body/3/seq", false, false, "node", true, K155,true);
+    private static final Cap K939 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17300:17361:body/3/seq", false, false, "node", true, K155,true,true);
     private static final String[] K940 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17300:17319:body/3/0/ruleRef/capture/0","value",null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17331:17346:body/3/2/ruleRef/capture/0","start",null,null};
     private static final Call[] K941 = new Call[]{TinyExpressionP4Parser::e774,TinyExpressionP4Parser::e775,TinyExpressionP4Parser::e776};
-    private static final Cap K942 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17368:17450:body/4/seq", false, false, "node", true, K155,true);
+    private static final Cap K942 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17368:17450:body/4/seq", false, false, "node", true, K155,true,true);
     private static final String[] K943 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17368:17387:body/4/0/ruleRef/capture/0","value",null,null,null,null,null,null};
     private static final Call[] K944 = new Call[]{TinyExpressionP4Parser::e782};
-    private static final Cap K945 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17457:17514:body/5/seq", false, false, "node", true, K155,true);
+    private static final Cap K945 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17457:17514:body/5/seq", false, false, "node", true, K155,true,true);
     private static final String[] K946 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17457:17476:body/5/0/ruleRef/capture/0","value",null,null,null,null,"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17492:17505:body/5/3/ruleRef/capture/0","end"};
     private static final Call[] K947 = new Call[]{TinyExpressionP4Parser::e787,TinyExpressionP4Parser::e788,TinyExpressionP4Parser::e789};
-    private static final Cap K948 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17521:17584:body/6/seq", false, false, "node", true, K155,true);
+    private static final Cap K948 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17521:17584:body/6/seq", false, false, "node", true, K155,true,true);
     private static final String[] K949 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17521:17540:body/6/0/ruleRef/capture/0","value",null,null,null,null};
     private static final Call[] K950 = new Call[]{TinyExpressionP4Parser::e794};
-    private static final Cap K951 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17591:17629:body/7/seq", false, false, "node", false, K155,true);
+    private static final Cap K951 = new Cap(K215, K215, K215, K216, K216, "TinyExpressionP4::SliceNestedExpression", "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17591:17629:body/7/seq", false, false, "node", false, K155,true,true);
     private static final String[] K952 = new String[]{"expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17591:17610:body/7/0/ruleRef/capture/0","value",null,null,null,null};
     private static final Group[] K953 = new Group[]{new Group(0,8,true,K385,8,new Level(TinyExpressionP4Parser::e740,K385,0,new Branch(new Level(TinyExpressionP4Parser::e741,K385,1,new Branch(new Level(TinyExpressionP4Parser::e742,K385,2,new Branch(new Level(TinyExpressionP4Parser::e743,K385,3,new Branch(new Level(TinyExpressionP4Parser::e744,K385,4,new Branch(K930,K385,5,K931,null),new Branch(K932,K241,5,K933,K934))),new Branch(K935,K219,4,K936,K937),new Branch(K938,K368,4,K939,K940))))),new Branch(new Level(TinyExpressionP4Parser::e772,K219,2,new Branch(new Level(TinyExpressionP4Parser::e773,K219,3,new Branch(K941,K219,4,K942,K943),new Branch(K944,K368,4,K945,K946))),new Branch(K947,K241,3,K948,K949),new Branch(K950,K595,3,K951,K952)))))))};
     private static final Call[] K954 = new Call[]{TinyExpressionP4Parser::e739,TinyExpressionP4Parser::e748,TinyExpressionP4Parser::e755,TinyExpressionP4Parser::e763,TinyExpressionP4Parser::e769,TinyExpressionP4Parser::e777,TinyExpressionP4Parser::e783,TinyExpressionP4Parser::e790};

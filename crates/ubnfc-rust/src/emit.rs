@@ -405,7 +405,19 @@ impl<const DIAG: bool> Session<'_, DIAG> {\n",
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {
                 continue;
             }
+            let recovery = ir
+                .semantics
+                .recovery
+                .iter()
+                .find(|r| r.rule_id == rule.symbol_id);
             writeln!(p,"fn r{i}_{}(&mut self,state:State)->Step {{ if let Some(limit)=self.enter_rule(state) {{return limit;}}self.statistics.rule_evaluations+=1;let mark=self.mark();",suffix(mode)).unwrap();
+            if recovery.is_some() {
+                // D-027: 回復診断の公開候補は「この規則の解析」に属するものだけなので、
+                // 本体を表示診断の frame で囲む（Java `Session.recover` の enterExpression /
+                // leaveRule と同じ範囲）。回復つきの規則は fast mode の対象外なので、
+                // 診断を記録しない解析では `display_enter` / `display_leave` とも空になる。
+                p.push_str("self.display_enter(state.consumed.max(state.matched));\n");
+            }
             p.push_str(&crate::expressions::scope_events(
                 &g,
                 i,
@@ -443,18 +455,30 @@ impl<const DIAG: bool> Session<'_, DIAG> {\n",
                 p.push_str("let end=out.state.consumed;\n");
             }
             writeln!(p,"out.events=self.event(Event::Rule {{rule:{i},span:[state.consumed,end],child:out.events,caps:(0,0)}});\n}} else {{ self.restore(mark); }}").unwrap();
+            if let Some(recovery) = recovery {
+                // 回復つき規則が自分の開始位置で失敗したときは、同期文字列も「そこで
+                // 受け付けられたはずの候補」として載せる（Java `Session.rule` の
+                // recoveryHints。旧実装の観測を `corpus/oracle/recovery-auto.json` が固定）。
+                let sync: Vec<String> = recovery
+                    .resolved_sync_patterns
+                    .iter()
+                    .map(|pattern| format!("'{pattern}'"))
+                    .collect();
+                if !sync.is_empty() {
+                    writeln!(
+                        p,
+                        "if !out.ok && self.display_local_far()==Some(state.consumed.max(state.matched)) {{self.display_failures(state.consumed.max(state.matched),&{sync:?});}}"
+                    )
+                    .unwrap();
+                }
+            }
             writeln!(
                 p,
                 "if !out.ok {{self.display_failures(state.consumed.max(state.matched),&{:?});}}",
                 g.display.rule(rule.symbol_id.as_str())
             )
             .unwrap();
-            if let Some(recovery) = ir
-                .semantics
-                .recovery
-                .iter()
-                .find(|r| r.rule_id == rule.symbol_id)
-            {
+            if let Some(recovery) = recovery {
                 let mode_name = match recovery.mode {
                     RecoveryMode::Sync => "SYNC",
                     RecoveryMode::Auto => "AUTO",
@@ -469,7 +493,7 @@ impl<const DIAG: bool> Session<'_, DIAG> {\n",
                 };
                 writeln!(
                     p,
-                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?},{},{no_sync:?});}}self.display_reach(out.state.consumed.max(out.state.matched));",
+                    "if !out.ok {{out=self.recover::<{mode}>(state,out,{i},{mode_name:?},&{:?},{},{no_sync:?});}}self.display_leave();self.display_reach(out.state.consumed.max(out.state.matched));",
                     recovery.resolved_sync_patterns, recovery.consume_sync
                 )
                 .unwrap();

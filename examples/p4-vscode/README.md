@@ -54,6 +54,8 @@ code --install-extension examples/p4-vscode/target/ubnfc-tinyexpression-p4-0.1.0
 | `src/extension.ts` | `vscode-languageclient` で `java -jar <server.jar>` を stdio 起動 |
 | `server/pom.xml` | **生成ソースだけ**をコンパイルする（`sourceDirectory` は `target/generated-sources/ubnfc`）。依存は lsp4j 0.23.1 のみ |
 | `server/src/test/**` | 台本 LSP クライアント（`ScriptedClient`）、診断 golden、capability golden（`probes/<fixture>.txt` の位置ごとに definition / references / hover / completion）、`Positions` の単体テスト |
+| `server/src/test/java/**/dap/` | 台本 DAP クライアント（`ScriptedDebugClient`）と 1 セッション golden（`-Pdap` のときだけコンパイル・実行する） |
+| `server/src/test/resources/dap/` | fixture ごとのブレークポイント行（1 起点） |
 | `../../scripts/lsp-probe.py` | 新旧どちらのサーバにも同じ手順で話す台本クライアント（パリティ計測に使う） |
 | `evidence/parity-{old,new}.json` | 16 fixture × 新旧サーバの診断（段階 1 §5・段階 3 §3.4 の元データ） |
 
@@ -71,3 +73,26 @@ python3 scripts/lsp-probe.py --jar "$scratch/legacy.jar" \
   --language-id tinyexpressionP4 --jvm-arg=--enable-preview --jvm-arg=-Xss16m \
   --fixtures examples/p4-java/src/test/resources/fixtures --out evidence/parity-old.json
 ```
+
+## 文法デバッガ（DAP、opt-in）
+
+```sh
+scripts/build-vsix.sh --with-dap p4
+```
+
+`--with-dap` を付けて組んだ VSIX だけがデバッガを持つ（`DapMain` が jar に入る）。
+付けずに組むと `contributes.debuggers` は残るがクラスが無いので、デバッグ開始で落ちる。
+
+`launch.json`:
+
+```json
+{ "type": "tinyexpression-p4", "request": "launch", "name": "grammar debugger",
+  "program": "${file}", "stopOnEntry": true }
+```
+
+入力を生成パーサに掛け、**型付き AST を前順（親 → 子）で歩く**。
+`stepIn` が木を降り、`next` が部分木を飛ばし、`stepOut` が親へ戻り、
+`continue` が「その行から始まる AST 節点」のブレークポイントまで走る。
+`stackTrace` は根から現在の節点までの鎖、`variables` は節点の欄と（scope を持つ文法なら）可視の宣言。
+**式の値は出ない**——値が要るなら生成される `EvaluatorBridge` を実装して `DebugAdapter` に渡す。
+詳しくは [`docs/reports/2026-09-24-dap-stage4.md`](../../docs/reports/2026-09-24-dap-stage4.md)。

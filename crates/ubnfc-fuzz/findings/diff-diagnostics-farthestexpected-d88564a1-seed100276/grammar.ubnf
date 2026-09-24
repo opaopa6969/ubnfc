@@ -1,0 +1,11 @@
+grammar Fuzz {
+  @ubnf: 2
+  token T0 = LOOKAHEAD('a')
+  token T1 = NEGATION('\u0061b\u{A}')
+  token T2 = UNTIL('#')
+  L0 ::= ERROR('fuzz error');
+  @mapping(C0) @recovery(SKIP) M0 ::= 'あ';
+  @whitespace(none) @longestChoice M1 ::= '='* @v5 'int'{2,3} ERROR('fuzz error') | T1 { ERROR('fuzz error')+ T2 }? ( [ 'ab'? ] T2? @v6 [ 'let' @v7 'b' T2 ] | 'ab' { 'x'{1,} @v8 }+ L0{2,3} ) | { { ','+ % '\n' } @v9 } 'if';
+  @mapping(TplExpr, params=[head, tail]) TplWrap ::= '(' M0 @head { ',' M0 @tail } ')' | M0 @head { ';' M0 @tail };
+  @root @mapping(Top, params=[head, tail]) Root ::= TplWrap @head ( ',' @tail '😀' )* @tail;
+}

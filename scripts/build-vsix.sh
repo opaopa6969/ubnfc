@@ -4,19 +4,34 @@
 #   1. 生成器を組む（LSP は opt-in の Maven profile `lsp`。既定ビルドには入らない）
 #   2. ubnfc-java でパーサを生成（LSP feature とは無関係。出力はこの手順で変わらない）
 #   3. ubnfc-lsp --emit-lsp で LSP 包みを別パッケージへ生成し、--emit-tmlanguage で TextMate 文法も出す
+#      （--with-dap を付けると --emit-dap も渡して文法デバッガ（DAP）を <lsp-package>.dap へ足す）
 #   4. extern token scanner を複製（P4 のみ。読むだけ。編集しない）
 #   5. サーバ fat jar（golden テストもここで走る）
 #   6. npm ci + vsce package → examples/<target>-vscode/target/*.vsix
 #
-# 使い方: scripts/build-vsix.sh [p4|ubnf|all]（既定 all）
+# 使い方: scripts/build-vsix.sh [--with-dap] [p4|ubnf|all]（既定 all）
+#   --with-dap: DAP（文法デバッガ）も生成し、server の -Pdap で lsp4j.debug を引いて
+#               golden DAP テストも走らせる。付けないと生成物も jar も従来どおり（opt-in、D-067）。
 # 環境変数: MVN（既定 mvn）、MAVEN_FLAGS（既定 -o。依存が未取得なら空にする）、SKIP_VSIX=1 で 6 を飛ばす。
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/.." && pwd)
 mvn_bin=${MVN:-mvn}
 mvn_flags=${MAVEN_FLAGS--o}
 version=0.1.0-SNAPSHOT
-targets=${1:-all}
+with_dap=0
+positional=()
+for argument in "$@"; do
+  case "$argument" in
+    --with-dap) with_dap=1 ;;
+    -*) echo "不明な引数: $argument" >&2; exit 2 ;;
+    *) positional+=("$argument") ;;
+  esac
+done
+targets=${positional[0]:-all}
 [[ "$targets" == "all" ]] && targets="p4 ubnf"
+dap_emit=()
+dap_profile=()
+if [[ "$with_dap" == "1" ]]; then dap_emit=(--emit-dap); dap_profile=(-Pdap); fi
 
 echo "[1/6] 生成器（-Plsp）"
 "$mvn_bin" $mvn_flags -q -f "$repo/pom.xml" -Plsp -DskipTests package
@@ -66,7 +81,7 @@ build_one() {
   java -cp "$repo/ubnfc-lsp/target/ubnfc-lsp-$version.jar:$repo/ubnfc-java/target/ubnfc-java-$version.jar" \
     org.ubnfc.lsp.Main --emit-lsp --ir "$ir" --out "$generated" \
     --package "$lsp_package" --parser-package "$parser_package" \
-    --language-id "$language_id" "${scanner_option[@]}" \
+    --language-id "$language_id" "${scanner_option[@]}" "${dap_emit[@]}" \
     --server-name "$server_name" --server-version 0.1.0 \
     --emit-tmlanguage "$example/syntaxes/$language_id.tmLanguage.json"
 
@@ -79,7 +94,7 @@ build_one() {
   fi
 
   echo "[5/6] サーバ jar（golden テストを含む）"
-  "$mvn_bin" $mvn_flags -q -f "$server/pom.xml" package
+  "$mvn_bin" $mvn_flags -q -f "$server/pom.xml" "${dap_profile[@]}" package
   mkdir -p "$example/server-dist"
   cp "$server/target/$jar.jar" "$example/server-dist/$jar.jar"
 

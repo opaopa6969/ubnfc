@@ -62,6 +62,29 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             .collect::<Vec<_>>()
     )
     .unwrap();
+    // D-025: 自分の AST ノードを作る（または捨てる）規則。この境界より外側の capture は
+    // 回復領域そのものではなくノードを値に持つので `captureOccurrences` に数えない
+    // （Java `Session.rule` の nodes 置換条件と同じ）。
+    writeln!(
+        s,
+        "const RULE_NODE:&[bool]=&{:?};",
+        g.ir.semantics
+            .rules
+            .iter()
+            .map(|r| {
+                r.skip
+                    || g.ir
+                        .semantics
+                        .recipes
+                        .iter()
+                        .find(|recipe| recipe.rule_id == r.symbol_id)
+                        .is_some_and(|recipe| {
+                            !matches!(recipe.kind, RecipeKind::Transparent | RecipeKind::Text)
+                        })
+            })
+            .collect::<Vec<_>>()
+    )
+    .unwrap();
     writeln!(
         s,
         "const SITES:&[(&str,&str)]=&{:?};",

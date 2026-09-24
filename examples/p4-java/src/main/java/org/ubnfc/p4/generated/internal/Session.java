@@ -277,10 +277,18 @@ public final class Session {
      */
     public final boolean bypassCapture;
     /**
+     * D-068: 公開出現表も診断も lexical trace も要求しない解析。読まれない capture site しか
+     * 持たない式は、包みが意味値の射影だけになるので生成側が包みを飛ばせる。
+     * {@code !tree} は {@code !occ} かつ {@code !lexical} を含むので、D-059 の条件を包含する。
+     */
+    public final boolean bypassWrap;
+    /**
      * 左因数分解（D-061）の無効化スイッチ。既定は有効で、参照経路（候補ごとに接頭辞を評価し直す）
      * との差分検証と計測のためだけに false にする（system property {@code -Dubnfc.factor=false} でも切れる）。
      */
     public static boolean factoring = !"false".equals(System.getProperty("ubnfc.factor"));
+    /** D-068 の A/B 用。{@code -Dubnfc.astwrap=false} で AST 経路だけ参照経路（包みを通る）に戻す。 */
+    public static boolean astBypass = !"false".equals(System.getProperty("ubnfc.astwrap"));
     /**
      * この解析で左因数分解を使ってよいか。診断を記録する経路（主診断 DAG / display frame を組む）と
      * lexical trace を要求する経路では、呼ばれない wrapper の記録と共有要素の trace の付け替えが
@@ -294,6 +302,8 @@ public final class Session {
         this.occ = !twoMode || options.occurrences();
         this.diag = !twoMode || options.diagnostics();
         this.bypassCapture = !this.tree && !this.diag;
+        // 認識専用経路（!tree）の迂回は D-059 のまま常に有効。toggle は AST 経路だけを戻す。
+        this.bypassWrap = !this.occ && !this.diag && !options.lexical() && (astBypass || !this.tree);
         this.factor = factoring && !this.diag && !options.lexical();
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         // diag=false の経路は診断を 1 件も記録しない（書込みは全て diag で囲ってある）ので、
@@ -657,6 +667,20 @@ public final class Session {
         return new Match(result.nodes(), local, captures, traces, result.start(), result.end(),
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
     }
+    /**
+     * {@link #wrap} の意味値射影だけを行う（D-068）。読まれる site を持たない式の迂回で使う。
+     * {@code projected} と同じ結果を返し、値列が変わらなければ {@code Match} を作らない。
+     */
+    public Match project(Match result, boolean mixedScalar) {
+        if (result == null || !tree) return result;
+        List<Value> values = result.values();
+        if (values == null) values = List.of(new Value(result.start(), result.end(), result.nodes(), result.text()));
+        if (mixedScalar && !values.isEmpty() && allLeaves(values))
+            values = List.of(new Value(result.start(), result.end(), List.of(), result.text()));
+        if (values == result.values()) return result;
+        return new Match(result.nodes(), result.local(), result.captures(), result.traces(), result.start(), result.end(),
+            result.mappingFailure(), result.recoveries(), result.items(), result.text(), values);
+    }
     private Match captured(Match result, int start, int end, String site, String name, boolean skip) {
         if (skip) return result;
         var occurrence = new Occurrence(site, name, new Value(start, end, result.nodes(), result.text(), result.values()));
@@ -827,12 +851,16 @@ public final class Session {
     public static final class Cap {
         final String[] sites, names, spanRules; final boolean[] skips, scoped;
         final String rule, expr, semanticKind; final boolean quantified, terminal, semanticMany, bypass;
+        final boolean treeBypass, textKind, mixedScalar;
         final Label[] failureHints;
         public Cap(String[] sites, String[] names, String[] spanRules, boolean[] skips, boolean[] scoped, String rule, String expr,
-                   boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints, boolean bypass) {
+                   boolean quantified, boolean terminal, String semanticKind, boolean semanticMany, Label[] failureHints,
+                   boolean bypass, boolean treeBypass) {
             this.sites = sites; this.names = names; this.spanRules = spanRules; this.skips = skips; this.scoped = scoped;
             this.rule = rule; this.expr = expr; this.quantified = quantified; this.terminal = terminal;
             this.semanticKind = semanticKind; this.semanticMany = semanticMany; this.failureHints = failureHints; this.bypass = bypass;
+            this.treeBypass = treeBypass; this.textKind = semanticKind.equals("text");
+            this.mixedScalar = semanticKind.equals("mixed") && !semanticMany;
         }
     }
     /** 群の 1 段: 共有要素を 1 回評価してから、次の段の枝を宣言順に試す。 */
@@ -908,6 +936,7 @@ public final class Session {
         else { var items = new Match[n]; System.arraycopy(buf, 0, items, 0, n); seq = combine(Arrays.asList(items), start, f.c); }
         progress(f);
         Cap k = b.cap;
+        if (k.treeBypass && bypassWrap) return k.textKind || !tree ? seq : project(seq, k.mixedScalar);
         if (k.bypass && bypassCapture) return seq;
         return wrap(f, c, m, seq, k.sites, k.names, k.spanRules, k.skips, k.scoped, k.rule, k.expr,
             k.quantified, k.terminal, k.semanticKind, k.semanticMany, k.failureHints);

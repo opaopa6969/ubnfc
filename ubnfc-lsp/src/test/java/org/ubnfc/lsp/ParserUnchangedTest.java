@@ -67,10 +67,64 @@ class ParserUnchangedTest {
         assertTrue(error.getMessage().contains("--emit-lsp"), error.getMessage());
     }
 
-    @Test void dapIsNotImplementedYet(@TempDir Path out) {
+    @Test void dapRequiresLsp(@TempDir Path out) {
         var error = assertThrows(IllegalArgumentException.class, () -> Main.main(new String[]{
             "--emit-dap", "--ir", IR.toString(), "--out", out.toString()}));
         assertTrue(error.getMessage().contains("--emit-dap"), error.getMessage());
+    }
+
+    /**
+     * DAP は opt-in（D-067）。{@code --emit-dap} を足しても
+     * <b>パーサも LSP の 11 ファイルも 1 byte も変わらず</b>、
+     * {@code <lsp-package>.dap} にファイルが増えるだけ。
+     */
+    @Test void dapEmissionOnlyAddsFiles(@TempDir Path out) throws Exception {
+        String[] parser = {"--ir", IR.toString(), "--out", out.toString(),
+            "--package", "org.ubnfc.p4.generated", "--no-emit-driver"};
+        String[] lsp = {"--emit-lsp", "--ir", IR.toString(), "--out", out.toString(),
+            "--package", "org.ubnfc.p4.lsp", "--parser-package", "org.ubnfc.p4.generated",
+            "--language-id", "tinyexpression-p4", "--scanner-class", "org.ubnfc.p4.P4Scanners"};
+
+        org.ubnfc.java.Main.main(parser);
+        Main.main(lsp);
+        Map<Path, byte[]> before = snapshot(out);
+
+        var withDap = new java.util.ArrayList<String>(java.util.List.of(lsp));
+        withDap.add("--emit-dap");
+        Main.main(withDap.toArray(new String[0]));
+        Map<Path, byte[]> after = snapshot(out);
+
+        for (var entry : before.entrySet())
+            assertArrayEquals(entry.getValue(), after.get(entry.getKey()),
+                "DAP 生成でパーサ／LSP 側が変わった: " + entry.getKey());
+        assertTrue(after.size() > before.size(), "DAP のファイルが増えていない");
+        for (Path path : after.keySet())
+            if (!before.containsKey(path))
+                assertTrue(path.toString().replace('\\', '/').startsWith("org/ubnfc/p4/lsp/dap/"),
+                    "DAP の出力が別パッケージへ漏れている: " + path);
+    }
+
+    @Test void dapTemplatesHaveNoLeftoverPlaceholders() throws IOException {
+        var lsp = new LspEmitter(org.ubnfc.java.ir.IrReader.read(IR), "org.ubnfc.p4.lsp",
+            "org.ubnfc.p4.generated", "tinyexpression-p4", "org.ubnfc.p4.P4Scanners", null, null);
+        var dap = new DapEmitter(lsp, null);
+        var sources = dap.sources();
+        assertEquals(5, sources.size());
+        assertEquals("org.ubnfc.p4.lsp.dap", dap.packageName());
+        assertEquals("org.ubnfc.p4.lsp.dap.DapMain", dap.mainClass());
+        for (var entry : sources.entrySet()) {
+            assertFalse(entry.getValue().contains("__"), entry.getKey() + " に未置換の placeholder がある");
+            assertTrue(entry.getValue().startsWith("package org.ubnfc.p4.lsp.dap;"), entry.getKey());
+        }
+        // 反射ではなく IR から畳み込んだ switch であること（旧スタックとの違い）。
+        String walk = sources.get("org/ubnfc/p4/lsp/dap/AstWalk.java");
+        assertFalse(walk.contains("java.lang.reflect"), "AstWalk が反射 API を使っている");
+        assertEquals(86, dap.recordTypes().size());
+        for (String type : dap.recordTypes())
+            assertTrue(walk.contains("case " + type + " "), "AstWalk に case が無い: " + type);
+        assertEquals(java.util.List.of("org.ubnfc.p4.generated.TinyExpressionP4AST"), dap.unionTypes());
+        assertEquals("TinyExpressionP4::Formula",
+            dap.ruleIds().get("TinyExpressionP4AST.FormulaExpr"));
     }
 
     @Test void templatesHaveNoLeftoverPlaceholders() throws IOException {
