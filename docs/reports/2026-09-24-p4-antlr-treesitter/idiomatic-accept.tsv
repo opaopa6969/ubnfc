@@ -1,0 +1,66 @@
+# ANTLR 流（BailErrorStrategy, SLL→LL 2 段）
+fixture	bytes	entry	antlr_ok	sll_sufficed	detail
+complex	332	Formula	true	true	
+complex-x4	1293	Formula	true	true	
+complex-x16	5179	Formula	true	true	
+complex-x64	20923	Formula	true	true	
+flat-arithmetic	1426	Formula	true	true	
+large-match	1380	Formula	true	true	
+valid-basic	6	Formula	true	true	
+valid-multiline	40	Formula	true	true	
+valid-unicode	22	Formula	true	true	
+comparison-heavy	179	Formula	true	true	
+comparison-heavy	179	BooleanExpression	true	true	
+comparison-heavy-x4	716	Formula	true	true	
+comparison-heavy-x4	716	BooleanExpression	true	true	
+comparison-heavy-x16	2864	Formula	true	true	
+comparison-heavy-x16	2864	BooleanExpression	true	true	
+comparison-heavy-x64	11456	Formula	true	true	
+comparison-heavy-x64	11456	BooleanExpression	true	true	
+complex-half	169	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+complex-tail	333	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+invalid-syntax	4	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+# ANTLR 流（SLL のみ）
+fixture	bytes	entry	antlr_ok	sll_sufficed	detail
+complex	332	Formula	true	true	
+complex-x4	1293	Formula	true	true	
+complex-x16	5179	Formula	true	true	
+complex-x64	20923	Formula	true	true	
+flat-arithmetic	1426	Formula	true	true	
+large-match	1380	Formula	true	true	
+valid-basic	6	Formula	true	true	
+valid-multiline	40	Formula	true	true	
+valid-unicode	22	Formula	true	true	
+comparison-heavy	179	Formula	true	true	
+comparison-heavy	179	BooleanExpression	true	true	
+comparison-heavy-x4	716	Formula	true	true	
+comparison-heavy-x4	716	BooleanExpression	true	true	
+comparison-heavy-x16	2864	Formula	true	true	
+comparison-heavy-x16	2864	BooleanExpression	true	true	
+comparison-heavy-x64	11456	Formula	true	true	
+comparison-heavy-x64	11456	BooleanExpression	true	true	
+complex-half	169	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+complex-tail	333	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+invalid-syntax	4	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+# tree-sitter 流（Formula 入口, hasError）
+complex	332	true	217
+complex-x4	1293	true	838
+complex-x16	5179	true	3322
+complex-x64	20923	true	13258
+flat-arithmetic	1426	true	1535
+large-match	1380	true	1051
+valid-basic	6	true	11
+valid-multiline	40	true	25
+valid-unicode	22	true	4
+comparison-heavy	179	true	362
+comparison-heavy-x4	716	true	1448
+comparison-heavy-x16	2864	true	5792
+comparison-heavy-x64	11456	true	23168
+complex-half	169	false	102
+complex-tail	333	false	219
+invalid-syntax	4	false	10
+# tree-sitter 流（Expression 入口, hasError）
+comparison-heavy	179	true	361
+comparison-heavy-x4	716	true	1447
+comparison-heavy-x16	2864	true	5791
+comparison-heavy-x64	11456	true	23167

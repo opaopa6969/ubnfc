@@ -55,6 +55,31 @@ scripts/ubnf-parity.sh
 | `src/extension.ts` | `vscode-languageclient` で `java -jar <server.jar>` を stdio 起動 |
 | `server/pom.xml` | **生成ソースだけ**をコンパイルする。依存は lsp4j 0.23.1 のみ |
 | `server/src/test/**` | 台本 LSP クライアント、診断 golden、capability golden、`Positions` の単体テスト |
+| `server/src/test/java/**/dap/` | 台本 DAP クライアントと 1 セッション golden（`-Pdap` のときだけコンパイル・実行する） |
+| `server/src/test/resources/dap/` | fixture ごとのブレークポイント行（1 起点） |
 | `evidence/` | 24 文法 × 新旧サーバの診断（報告書 §5.2 の元データ） |
 
 **リポジトリに入れないもの**: `node_modules/`、`out/`、`target/`、`server-dist/`、`syntaxes/`、`*.vsix`。
+
+## 文法デバッガ（DAP、opt-in）
+
+```sh
+scripts/build-vsix.sh --with-dap ubnf
+```
+
+`--with-dap` を付けて組んだ VSIX だけがデバッガを持つ（`DapMain` が jar に入る）。
+付けずに組むと `contributes.debuggers` は残るがクラスが無いので、デバッグ開始で落ちる。
+
+`launch.json`:
+
+```json
+{ "type": "ubnf", "request": "launch", "name": "grammar debugger",
+  "program": "${file}", "stopOnEntry": true }
+```
+
+入力を生成パーサに掛け、**型付き AST を前順（親 → 子）で歩く**。
+`stepIn` が木を降り、`next` が部分木を飛ばし、`stepOut` が親へ戻り、
+`continue` が「その行から始まる AST 節点」のブレークポイントまで走る。
+`stackTrace` は根から現在の節点までの鎖、`variables` は節点の欄と（scope を持つ文法なら）可視の宣言。
+**式の値は出ない**——値が要るなら生成される `EvaluatorBridge` を実装して `DebugAdapter` に渡す。
+詳しくは [`docs/reports/2026-09-24-dap-stage4.md`](../../docs/reports/2026-09-24-dap-stage4.md)。

@@ -632,7 +632,7 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 2, 1045, false, false, TinyExpressionP4Parser::e17, "recipe:ImportDeclaration", null, "construct", K9, K7, false, K4, false, K10);
     }
     private static Match parseClassName_3(Session s, Frame f) {
-        return s.rule(f, 3, 1046, true, true, TinyExpressionP4Parser::e27, "recipe:ClassName", null, "construct", K11, K7, false, K4, false, K12);
+        return s.rule(f, 3, 1046, false, false, TinyExpressionP4Parser::e27, "recipe:ClassName", null, "construct", K11, K7, false, K4, false, K12);
     }
     private static Match parseVariableDeclaration_4(Session s, Frame f) {
         return s.rule(f, 4, 1047, true, true, TinyExpressionP4Parser::e33, null, null, null, K6, K7, false, K4, false, K13);
@@ -665,7 +665,7 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 13, 1056, false, false, TinyExpressionP4Parser::e146, null, null, null, K6, K7, false, K4, false, K27);
     }
     private static Match parseOnlyIfAbsent_14(Session s, Frame f) {
-        return s.rule(f, 14, 1057, true, true, TinyExpressionP4Parser::e153, "recipe:OnlyIfAbsent", null, "construct", K6, K7, false, K4, false, K28);
+        return s.rule(f, 14, 1057, false, false, TinyExpressionP4Parser::e153, "recipe:OnlyIfAbsent", null, "construct", K6, K7, false, K4, false, K28);
     }
     private static Match parseDescription_15(Session s, Frame f) {
         return s.rule(f, 15, 1058, true, true, TinyExpressionP4Parser::e157, null, null, null, K6, K7, false, K4, false, K29);
@@ -701,16 +701,16 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 25, 1068, true, true, TinyExpressionP4Parser::e229, "recipe:MethodParameter", null, "construct", K47, K48, false, K4, false, K49);
     }
     private static Match parseNumberReturnType_26(Session s, Frame f) {
-        return s.rule(f, 26, 1069, true, true, TinyExpressionP4Parser::e236, null, null, null, K6, K7, false, K4, false, K50);
+        return s.rule(f, 26, 1069, false, false, TinyExpressionP4Parser::e236, null, null, null, K6, K7, false, K4, false, K50);
     }
     private static Match parseStringReturnType_27(Session s, Frame f) {
-        return s.rule(f, 27, 1070, true, true, TinyExpressionP4Parser::e239, null, null, null, K6, K7, false, K4, false, K51);
+        return s.rule(f, 27, 1070, false, false, TinyExpressionP4Parser::e239, null, null, null, K6, K7, false, K4, false, K51);
     }
     private static Match parseBooleanReturnType_28(Session s, Frame f) {
-        return s.rule(f, 28, 1071, true, true, TinyExpressionP4Parser::e241, null, null, null, K6, K7, false, K4, false, K52);
+        return s.rule(f, 28, 1071, false, false, TinyExpressionP4Parser::e241, null, null, null, K6, K7, false, K4, false, K52);
     }
     private static Match parseObjectReturnType_29(Session s, Frame f) {
-        return s.rule(f, 29, 1072, true, true, TinyExpressionP4Parser::e243, null, null, null, K6, K7, false, K4, false, K53);
+        return s.rule(f, 29, 1072, false, false, TinyExpressionP4Parser::e243, null, null, null, K6, K7, false, K4, false, K53);
     }
     private static Match parseReturnType_30(Session s, Frame f) {
         return s.rule(f, 30, 1073, true, true, TinyExpressionP4Parser::e245, null, null, null, K6, K7, false, K4, false, K54);
@@ -728,7 +728,7 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 34, 1077, true, true, TinyExpressionP4Parser::e318, "recipe:ExternalObjectInvocation", null, "construct", K61, K7, false, K4, false, K62);
     }
     private static Match parseMethodInvocationHeader_35(Session s, Frame f) {
-        return s.rule(f, 35, 1078, true, true, TinyExpressionP4Parser::e339, null, null, null, K6, K7, false, K4, false, K63);
+        return s.rule(f, 35, 1078, false, false, TinyExpressionP4Parser::e339, null, null, null, K6, K7, false, K4, false, K63);
     }
     private static Match parseMethodInvocation_36(Session s, Frame f) {
         return s.rule(f, 36, 1079, true, true, TinyExpressionP4Parser::e345, "recipe:MethodInvocation", null, "construct", K64, K65, false, K4, false, K66);
@@ -749,10 +749,10 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 41, 1084, true, true, TinyExpressionP4Parser::e375, "recipe:NumberTerm", "TinyExpressionP4AST.BinaryExpr", "assocLists", K75, K7, false, K4, false, K76);
     }
     private static Match parseAddOp_42(Session s, Frame f) {
-        return s.rule(f, 42, 1085, true, true, TinyExpressionP4Parser::e381, null, null, null, K6, K7, false, K4, false, K77);
+        return s.rule(f, 42, 1085, false, false, TinyExpressionP4Parser::e381, null, null, null, K6, K7, false, K4, false, K77);
     }
     private static Match parseMulOp_43(Session s, Frame f) {
-        return s.rule(f, 43, 1086, true, true, TinyExpressionP4Parser::e384, null, null, null, K6, K7, false, K4, false, K78);
+        return s.rule(f, 43, 1086, false, false, TinyExpressionP4Parser::e384, null, null, null, K6, K7, false, K4, false, K78);
     }
     private static Match parseMathFunction_44(Session s, Frame f) {
         return s.rule(f, 44, 1087, true, true, TinyExpressionP4Parser::e387, null, null, null, K6, K7, false, K4, false, K79);
@@ -776,7 +776,7 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 50, 1093, true, true, TinyExpressionP4Parser::e431, "recipe:MaxFunction", null, "construct", K90, K7, false, K4, false, K91);
     }
     private static Match parseRandomFunction_51(Session s, Frame f) {
-        return s.rule(f, 51, 1094, true, true, TinyExpressionP4Parser::e440, "recipe:RandomFunction", null, "construct", K6, K7, false, K4, false, K92);
+        return s.rule(f, 51, 1094, false, false, TinyExpressionP4Parser::e440, "recipe:RandomFunction", null, "construct", K6, K7, false, K4, false, K92);
     }
     private static Match parseAbsFunction_52(Session s, Frame f) {
         return s.rule(f, 52, 1095, true, true, TinyExpressionP4Parser::e444, "recipe:AbsFunction", null, "construct", K93, K7, false, K4, false, K94);
@@ -866,7 +866,7 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 80, 1123, true, true, TinyExpressionP4Parser::e640, "recipe:InDayTimeRangeFunction", null, "construct", K147, K7, false, K4, false, K148);
     }
     private static Match parseDayOfWeek_81(Session s, Frame f) {
-        return s.rule(f, 81, 1124, true, true, TinyExpressionP4Parser::e651, null, null, null, K6, K7, false, K4, false, K149);
+        return s.rule(f, 81, 1124, false, false, TinyExpressionP4Parser::e651, null, null, null, K6, K7, false, K4, false, K149);
     }
     private static Match parseSliceBaseReceiver_82(Session s, Frame f) {
         return s.rule(f, 82, 1125, true, true, TinyExpressionP4Parser::e659, null, null, null, K6, K7, false, K4, false, K150);
@@ -899,10 +899,10 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 91, 1134, true, true, TinyExpressionP4Parser::e808, null, null, null, K6, K7, false, K4, false, K161);
     }
     private static Match parseStringCastVariable_92(Session s, Frame f) {
-        return s.rule(f, 92, 1135, true, true, TinyExpressionP4Parser::e825, "recipe:StringCastVariable", null, "construct", K162, K7, false, K4, false, K163);
+        return s.rule(f, 92, 1135, false, false, TinyExpressionP4Parser::e825, "recipe:StringCastVariable", null, "construct", K162, K7, false, K4, false, K163);
     }
     private static Match parseStringTypedVariable_93(Session s, Frame f) {
-        return s.rule(f, 93, 1136, true, true, TinyExpressionP4Parser::e834, "recipe:StringTypedVariable", null, "construct", K164, K7, false, K4, false, K165);
+        return s.rule(f, 93, 1136, false, false, TinyExpressionP4Parser::e834, "recipe:StringTypedVariable", null, "construct", K164, K7, false, K4, false, K165);
     }
     private static Match parseBooleanExpression_94(Session s, Frame f) {
         return s.rule(f, 94, 1137, true, true, TinyExpressionP4Parser::e842, "recipe:BooleanExpression", null, "assocLists", K166, K7, false, K4, false, K167);
@@ -929,13 +929,13 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 101, 1144, true, true, TinyExpressionP4Parser::e897, "recipe:StringComparisonExpression", null, "construct", K179, K7, false, K4, false, K180);
     }
     private static Match parseEqualityOp_102(Session s, Frame f) {
-        return s.rule(f, 102, 1145, true, true, TinyExpressionP4Parser::e901, null, null, null, K6, K7, false, K4, false, K181);
+        return s.rule(f, 102, 1145, false, false, TinyExpressionP4Parser::e901, null, null, null, K6, K7, false, K4, false, K181);
     }
     private static Match parseComparisonExpression_103(Session s, Frame f) {
         return s.rule(f, 103, 1146, true, true, TinyExpressionP4Parser::e904, "recipe:ComparisonExpression", null, "construct", K182, K7, false, K4, false, K183);
     }
     private static Match parseCompareOp_104(Session s, Frame f) {
-        return s.rule(f, 104, 1147, true, true, TinyExpressionP4Parser::e908, null, null, null, K6, K7, false, K4, false, K184);
+        return s.rule(f, 104, 1147, false, false, TinyExpressionP4Parser::e908, null, null, null, K6, K7, false, K4, false, K184);
     }
     private static Match parseObjectExpression_105(Session s, Frame f) {
         return s.rule(f, 105, 1148, true, true, TinyExpressionP4Parser::e915, "recipe:ObjectExpression", null, "construct", K185, K7, false, K4, false, K186);
@@ -989,7 +989,7 @@ public final class TinyExpressionP4Parser {
         return s.rule(f, 121, 1164, true, true, TinyExpressionP4Parser::e1014, "recipe:VariableRef", null, "construct", K211, K212, false, K4, false, K49);
     }
     private static Match parseTypeKeyword_122(Session s, Frame f) {
-        return s.rule(f, 122, 1165, true, true, TinyExpressionP4Parser::e1022, null, null, null, K6, K7, false, K4, false, K213);
+        return s.rule(f, 122, 1165, false, false, TinyExpressionP4Parser::e1022, null, null, null, K6, K7, false, K4, false, K213);
     }
     private static Match parseExpression_123(Session s, Frame f) {
         return s.rule(f, 123, 1166, true, true, TinyExpressionP4Parser::e1033, "recipe:Expression", null, "construct", K214, K7, false, K4, false, K160);

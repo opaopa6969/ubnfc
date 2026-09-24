@@ -1196,12 +1196,9 @@ if !out.ok {self.display_fail(state.consumed.max(state.matched),"'}'");}
 out
 }
 fn e36_c(&mut self,state:State)->Step {
-let mark=self.mark();
-let key=Key {expression:36,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
-self.display_enter(state.consumed.max(state.matched));let mut out=self.b36_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
+let mut out=self.b36_c(state);
 if out.ok {
-} else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+} else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
 fn b36_c(&mut self,mut state:State)->Step {
@@ -4749,12 +4746,9 @@ out=self.token_0::<false>(out.state,"IDENTIFIER","IdentifierParser");
 out
 }
 fn e274_c(&mut self,state:State)->Step {
-let mark=self.mark();
-let key=Key {expression:274,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
-self.display_enter(state.consumed.max(state.matched));let mut out=self.b274_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
+let mut out=self.b274_c(state);
 if out.ok {
-} else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+} else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
 fn b274_c(&mut self,mut state:State)->Step {
@@ -4768,7 +4762,9 @@ _=>usize::MAX,};let candidate=match predicted {
 0=>Some(self.e275_c(out.state.begin())),
 1=>Some(self.e276_c(out.state.begin())),
 2=>Some(self.e277_c(out.state.begin())),
-_=>None,};if let Some(mut child)=candidate {if child.ok {
+_=>None,};
+if !DIAG && self.options.predict && predicted==usize::MAX {self.restore(mark);out.ok=false;out.diag=diagnostic;break 'choice out;}
+if let Some(mut child)=candidate {if child.ok {
 if predicted>0 {let d=self.diag_fail(out.state.begin().position::<false>(),"+");diagnostic=self.diag_join(diagnostic,d);}
 if predicted>1 {let d=self.diag_fail(out.state.begin().position::<false>(),"?");diagnostic=self.diag_join(diagnostic,d);}
 if predicted>2 {let d=self.diag_fail(out.state.begin().position::<false>(),"*");diagnostic=self.diag_join(diagnostic,d);}
@@ -5013,12 +5009,9 @@ if !out.ok {self.display_fail(state.consumed.max(state.matched),"'}'");}
 out
 }
 fn e290_c(&mut self,state:State)->Step {
-let mark=self.mark();
-let key=Key {expression:290,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
-self.display_enter(state.consumed.max(state.matched));let mut out=self.b290_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
+let mut out=self.b290_c(state);
 if out.ok {
-} else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+} else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
 fn b290_c(&mut self,mut state:State)->Step {
@@ -5358,12 +5351,9 @@ if !out.ok {self.display_fail(state.consumed.max(state.matched),"'}'");}
 out
 }
 fn e313_c(&mut self,state:State)->Step {
-let mark=self.mark();
-let key=Key {expression:313,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
-self.display_enter(state.consumed.max(state.matched));let mut out=self.b313_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
+let mut out=self.b313_c(state);
 if out.ok {
-} else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+} else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
 fn b313_c(&mut self,mut state:State)->Step {
@@ -5435,12 +5425,9 @@ if !out.ok {self.display_fail(state.consumed.max(state.matched),"')'");}
 out
 }
 fn e318_c(&mut self,state:State)->Step {
-let mark=self.mark();
-let key=Key {expression:318,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
-self.display_enter(state.consumed.max(state.matched));let mut out=self.b318_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
+let mut out=self.b318_c(state);
 if out.ok {
-} else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+} else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
 fn b318_c(&mut self,mut state:State)->Step {
@@ -5564,12 +5551,9 @@ out=self.token_0::<false>(out.state,"IDENTIFIER","IdentifierParser");
 out
 }
 fn e326_c(&mut self,state:State)->Step {
-let mark=self.mark();
-let key=Key {expression:326,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
-self.display_enter(state.consumed.max(state.matched));let mut out=self.b326_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
+let mut out=self.b326_c(state);
 if out.ok {
-} else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+} else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
 fn b326_c(&mut self,mut state:State)->Step {
@@ -5641,12 +5625,9 @@ if !out.ok {self.display_fail(state.consumed.max(state.matched),"')'");}
 out
 }
 fn e331_c(&mut self,state:State)->Step {
-let mark=self.mark();
-let key=Key {expression:331,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
-self.display_enter(state.consumed.max(state.matched));let mut out=self.b331_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
+let mut out=self.b331_c(state);
 if out.ok {
-} else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+} else {self.display_failures(state.consumed.max(state.matched),&[]);}
 out
 }
 fn b331_c(&mut self,mut state:State)->Step {

@@ -142,8 +142,13 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
                 .filter(|o| !o.is_empty())
                 .unwrap_or(alternatives);
             s.push_str("out='choice: {let mark=self.mark();let mut diagnostic=Diag::NONE;let mut best:Option<(Step,[usize;2])>=None;\n");
+            // 予測が外れたときに候補を 1 つも試さずに失敗できるのは、plan が
+            // 「fallback 無しの Predict」＝ exclusiveCandidates を証明したときだけ。
+            let exclusive = plan.is_some_and(|p| {
+                p.strategy == ChoicePlanStrategy::Predict && p.fallback == ChoicePlanFallback::None
+            });
             if predict && !longest {
-                s.push_str(&predict_literals(g, order, child_mode));
+                s.push_str(&predict_literals(g, order, child_mode, exclusive));
             }
             // §3.4: 先頭文字で失敗を証明できる候補は呼ばず、失敗経路の再生関数を呼ぶ（predict.rs）。
             let (guarded, policy) = crate::predict::guarded_alternatives(g, order, longest);
@@ -526,7 +531,7 @@ pub(crate) fn scope_events(
 
 // 失敗位置と効果が静的に確定する literal Choice を分岐する。
 // 複合候補は診断を失わない保守経路。共通接頭辞は full fallback。
-fn predict_literals(g: &Generator<'_>, order: &[ExprId], mode: bool) -> String {
+fn predict_literals(g: &Generator<'_>, order: &[ExprId], mode: bool, exclusive: bool) -> String {
     let mut literals = Vec::new();
     let mut firsts = std::collections::BTreeSet::new();
     for id in order {
@@ -573,7 +578,18 @@ fn predict_literals(g: &Generator<'_>, order: &[ExprId], mode: bool) -> String {
     for (i, (id, _, _)) in literals.iter().enumerate() {
         writeln!(s, "{i}=>Some({}),", g.call(id, mode, "out.state.begin()")).unwrap();
     }
-    s.push_str("_=>None,};if let Some(mut child)=candidate {if child.ok {\n");
+    s.push_str("_=>None,};\n");
+    if exclusive {
+        // 候補はすべて 1 文字の case-sensitive literal で先頭文字が互いに素（front の
+        // `exclusiveCandidates`）。予測が外れた＝この位置の文字はどの候補の先頭でもない
+        // ので、元順で全候補を試しても入口で失敗して選択全体が失敗する。fast mode
+        // （D-023、`Session::<false>`）は display も主診断 DAG も記録しないため、その
+        // 走行が残す観測は無く、失敗そのものだけが結果に効く。だから候補を 1 つも
+        // 呼ばずに同じ失敗を返せる。診断モードは従来どおり元順で全候補を走らせる
+        // （観測は構成上 byte 一致）。`options.predict` で参照経路へ戻せる。
+        s.push_str("if !DIAG && self.options.predict && predicted==usize::MAX {self.restore(mark);out.ok=false;out.diag=diagnostic;break 'choice out;}\n");
+    }
+    s.push_str("if let Some(mut child)=candidate {if child.ok {\n");
     for (i, (_, _, label)) in literals.iter().enumerate() {
         writeln!(s,"if predicted>{i} {{let d=self.diag_fail(out.state.begin().position::<{mode}>(),{label:?});diagnostic=self.diag_join(diagnostic,d);}}").unwrap();
     }

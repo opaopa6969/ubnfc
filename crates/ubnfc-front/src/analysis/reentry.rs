@@ -187,6 +187,20 @@ fn rules_at(cx: &Context<'_>, start: (usize, Kind), budget: &mut u64) -> Option<
     Some(out)
 }
 
+/// 同じ開始位置から評価される 2 つの兄弟が、**開始位置より後の同じ位置**で同じ規則を
+/// 踏み直し得るか。入力は 1 本なので、両方が開始位置より先へ進むには**同じ 1 文字目を
+/// 消費する**しかない。`mayStart`（`Facts::chars`、必要条件の**上界**）が交わらなければ、
+/// 片方が 1 文字でも消費できる入力では他方は開始位置から 1 文字も動けない（動くには
+/// その文字を消費する終端が要る）。したがって `Pos∩Pos` の衝突は起こらない。
+/// 上界なので「交わらない」は実際に交わらないことを含意する。判定不能
+/// （Extern / recovery / regex）は `chars` が全 code point になるので、交わる側に倒れる。
+fn may_share_prefix(cx: &Context<'_>, a: usize, b: usize) -> bool {
+    let (fa, fb) = (&cx.facts[a], &cx.facts[b]);
+    fa.certainty == MayStartCertainty::Unknown
+        || fb.certainty == MayStartCertainty::Unknown
+        || !fa.chars.disjoint(&fb.chars)
+}
+
 fn backtracking_choice(cx: &Context<'_>, i: usize, choices: &[ChoicePlan]) -> bool {
     let id = &cx.sem.expressions[i].id;
     // Predict が fallback 無しで確定するなら候補は 1 つしか評価されない。
@@ -267,7 +281,11 @@ pub(super) fn reentrant_rules(cx: &Context<'_>, choices: &[ChoicePlan]) -> BTree
     for pair in &pairs {
         let kinds: Vec<(usize, Kind, usize, Kind)> = match *pair {
             Pair::SameStart(a, b) => {
-                vec![(a, Kind::Zero, b, Kind::Zero), (a, Kind::Pos, b, Kind::Pos)]
+                let mut kinds = vec![(a, Kind::Zero, b, Kind::Zero)];
+                if may_share_prefix(cx, a, b) {
+                    kinds.push((a, Kind::Pos, b, Kind::Pos));
+                }
+                kinds
             }
             Pair::Boundary(a, b) => vec![(a, Kind::Tail, b, Kind::Zero)],
         };

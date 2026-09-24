@@ -1,0 +1,62 @@
+# ANTLR 1:1 移植（すべて拒否になるはず）
+fixture	bytes	entry	antlr_ok	sll_sufficed	detail
+num-plus-bool	8	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+str-times-num	7	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+chained-compare	11	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bare-ternary	10	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+pow-arity	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+min-zero-args	5	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+mixed-match	37	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+dot-on-number	14	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+slice-trailing-colon	8	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+not-number	6	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+decl-type-mismatch	31	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+tonum-number-arg	11	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+startswith-number	16	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+bool-times-bool	12	Formula	false	false	org.antlr.v4.runtime.misc.ParseCancellationException
+# ANTLR 流（すべて受理になるはず）
+fixture	bytes	entry	antlr_ok	sll_sufficed	detail
+num-plus-bool	8	Formula	true	true	
+str-times-num	7	Formula	true	true	
+chained-compare	11	Formula	true	true	
+bare-ternary	10	Formula	true	true	
+pow-arity	6	Formula	true	true	
+min-zero-args	5	Formula	true	true	
+mixed-match	37	Formula	true	true	
+dot-on-number	14	Formula	true	true	
+slice-trailing-colon	8	Formula	true	true	
+not-number	6	Formula	true	true	
+decl-type-mismatch	31	Formula	true	true	
+tonum-number-arg	11	Formula	true	true	
+startswith-number	16	Formula	true	true	
+bool-times-bool	12	Formula	true	true	
+# tree-sitter 1:1 移植
+num-plus-bool	8	false	9
+str-times-num	7	false	9
+chained-compare	11	false	17
+bare-ternary	10	false	12
+pow-arity	6	false	8
+min-zero-args	5	false	15
+mixed-match	37	false	24
+dot-on-number	14	false	23
+slice-trailing-colon	8	false	21
+not-number	6	false	6
+decl-type-mismatch	31	false	19
+tonum-number-arg	11	false	7
+startswith-number	16	false	9
+bool-times-bool	12	false	16
+# tree-sitter 流
+num-plus-bool	8	true	10
+str-times-num	7	true	10
+chained-compare	11	true	17
+bare-ternary	10	true	15
+pow-arity	6	true	12
+min-zero-args	5	true	8
+mixed-match	37	true	28
+dot-on-number	14	true	19
+slice-trailing-colon	8	true	17
+not-number	6	true	10
+decl-type-mismatch	31	true	18
+tonum-number-arg	11	true	16
+startswith-number	16	true	15
+bool-times-bool	12	true	15
