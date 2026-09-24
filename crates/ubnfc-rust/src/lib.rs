@@ -10,6 +10,7 @@ mod lexical;
 mod mapping;
 mod metadata;
 mod predict;
+mod scan;
 mod tokens;
 mod validate;
 

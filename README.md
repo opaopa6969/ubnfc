@@ -169,6 +169,12 @@ issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で�
   issue の目標「ANTLR の 2 倍以内」は未達で、残差は単価ではなく**回数**
   （ubnfc は 1 byte あたり式評価 4.52 回 + cursor 更新 6.58 回、ANTLR は字句 DFA 遷移 1.00 回 +
   token 0.204 + 規則 0.137）。
+  **2026-09-24 追記（issue #48、`docs/reports/2026-09-24-bulk-scan.md`）**: その「回数」を減らした。
+  front が「終端だけでできていて観測を 1 つも要求しない領域」を証明して `plan.scans` に載せ、
+  backend がそこを parser の機構を通さない 1 本の走査へ畳む（文字クラスの反復は ASCII bitset の
+  内側ループ）。**JSON 1 MB 認識は 0.0364 → 0.0137 µs/byte（2.7 倍）、ANTLR4 比は 2.7 倍 → 1.35 倍**
+  で、**issue の目標 ≤0.022 µs/byte を達成**した（D-072）。1 byte あたりの式評価は 5.08 → 1.25、
+  cursor 更新は 7.70 → 1.67 回。typed AST は 0.477 → 0.181 µs/byte。
 - **速度（512 atom の算術式、認識のみ）**: ANTLR4 0.045 ms、ubnfc Rust 0.119 ms、tree-sitter 0.403 ms。
   木込みでは ubnfc Rust の typed AST 0.260 ms が ANTLR4 の parse tree 0.209 ms に近い。
 
@@ -245,9 +251,10 @@ issue #27。文法は `examples/p4-antlr/TinyExpressionP4.g4` と `examples/p4-t
 | PR #21（issue #19） | AST 経路にも観測の opt-in を広げる（出現表を作る条件を Match 木の条件から分離） | **Operators 512 atom AST 0.631 ms（issue の目標 0.693 ms を達成、手書き 0.560 ms の 1.13 倍）**。P4 complex AST 0.564→0.309 ms、x64 AST 50.0→28.0 ms。**M5 の AST 目標（complex ≤0.2 ms / x64 ≤15 ms）は未達**——同条件の認識専用が complex 0.220 ms / x64 17.5 ms なので、AST 層を 0 円にしても届かない | `2026-09-24-java-ast-path.md`（D-057） |
 | PR #24（issue #17） | rule 本体の memo を「同じ位置へ再入し得る」規則だけに絞る（Operators は全 rule で外れ、P4 の塔は残る） | Operators 512 atom 認識専用 0.204→0.160 ms、割当 465,664→350,168 B。**Rust も同判定で 0.176→0.115 ms、P4 complex-x64 認識 5.67→4.68 ms（最小値）**。P4 は両 backend で悪化なし | `2026-09-24-memo-plan.md`（D-058） |
 | PR #46（issue #33。**front と Rust backend**。Java backend の D-066 相当は別 issue） | 再入判定に mayStart の素性を足し（D-064）、終端走査だけの規則には memo を入れず（D-065）、排他 predict が外れたら候補を試さない（D-066） | **JSON 1 MB 認識 214.8→30.5 ms（最小値）、µs/byte がサイズで平らに（3.53→1.05 倍）、ANTLR4 比 21→2.7 倍**。P4 は悪化なし（complex-x64 認識 6.06→4.90 ms、最小値） | `2026-09-24-json-perf.md`（D-064 / D-065 / D-066） |
+| issue #48（**front と Rust backend**。Java の走査は #49） | 観測を要求しない終端領域を 1 本の走査へ畳む（D-072。文字クラスの反復は ASCII bitset の内側ループ） | **JSON 1 MB 認識 36.4→13.8 ms（最小値）、0.0364→0.0137 µs/byte で目標 ≤0.022 を達成、ANTLR4 比 2.7→1.35 倍**。typed AST 477→181 ms。P4 / Operators / Power は `plan.scans` が付かず生成 `parser.rs` が byte 一致 | `2026-09-24-bulk-scan.md`（D-072） |
 
-corpus（Java Pass 1,310 / Rust Pass 1,292、Fail 0）はこの 5 ラウンドいずれでも系統別表が既存報告と
-byte 一致、IR golden も `plan.memo.entries` 以外は不変。**結論**: Java backend の性能目標は
+corpus（Java Pass 1,310 / Rust Pass 1,292、Fail 0）はこの 6 ラウンドいずれでも系統別表が既存報告と
+byte 一致、IR golden も `plan.memo.entries` / `plan.scans` 以外は不変。**結論**: Java backend の性能目標は
 「認識は達成、AST は未達」であり、§4 の記載もこれに合わせて分けてある。
 
 ### 3.3 言語の進化（UBNF v2）
@@ -354,7 +361,7 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   打鍵ごとに全文を再解析する（同報告 §8 に実測。P4 の 325 code point で 0.29 ms、20,923 code point で 6.6 ms、
   解析に失敗する文書は前半の再解析ぶん最大 2.8 倍）。VSIX は P4（`examples/p4-vscode`）と
   UBNF 自身（`examples/ubnf-vscode`）の 2 つを `scripts/build-vsix.sh` で組む。
-- **DAP も opt-in の feature**（D-067、issue #28 段階 4）。`ubnfc-lsp --emit-dap`（`--emit-lsp` と併用）が
+- **DAP も opt-in の feature**（D-072、issue #28 段階 4）。`ubnfc-lsp --emit-dap`（`--emit-lsp` と併用）が
   **文法デバッガ**を `<lsp-package>.dap` へ追加する。入力を生成パーサに掛け、**型付き AST を前順で歩く**
   ステップ実行（`stepIn` / `next` / `stepOut` / `continue` / 行ブレークポイント / `stackTrace` は根までの鎖 /
   `variables` は AST の欄と可視の宣言）を出す。**式の値は計算しない**——評価器は言語作者が
