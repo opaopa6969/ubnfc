@@ -37,6 +37,9 @@ cargo build --offline --bin ubnfc --bin ubnfc-rust
 
 `ubnfc-java/target/ubnfc-java-0.1.0-SNAPSHOT.jar` ができる。`ubnfc gen --target java` は
 これを自動で探す（`UBNFC_JAVA_JAR` で明示指定も可能）。
+`ubnfc gen --target java` は生成 Java を package `target` に置く。jar を直接
+`java -cp … org.unlaxer.ubnfc.java.Main --ir … --out … [--package x.y]` で呼ぶ場合、`--package` を省くと
+文法の package、それも無ければ `org.unlaxer.ubnfc.generated.<文法名小文字>` になる（D-076）。
 
 > **`ubnfc-java/` を編集したら必ずこの `mvn package` をやり直すこと。**
 > driver テンプレートと emitter は jar の resource なので、古い jar のまま走らせると

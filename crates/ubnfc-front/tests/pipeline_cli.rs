@@ -391,7 +391,7 @@ fn gen_invokes_both_backends_and_propagates_failure() {
             let mut expected = Vec::new();
             let jar = dir.0.join("generator jar.jar");
             if target == "java" {
-                expected.extend(["-cp", jar.to_str().unwrap(), "org.ubnfc.java.Main"]);
+                expected.extend(["-cp", jar.to_str().unwrap(), "org.unlaxer.ubnfc.java.Main"]);
             }
             expected.extend(["--ir", "generated sources/grammar.ir.json", "--out"]);
             if target == "java" {

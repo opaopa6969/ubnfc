@@ -42,11 +42,11 @@ build_one() {
     p4)
       ir="$repo/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
       example="$repo/examples/p4-vscode"
-      parser_package=org.ubnfc.p4.generated
-      lsp_package=org.ubnfc.p4.lsp
+      parser_package=org.unlaxer.ubnfc.examples.p4.generated
+      lsp_package=org.unlaxer.ubnfc.examples.p4.lsp
       language_id=tinyexpression-p4
-      scanner_class=org.ubnfc.p4.P4Scanners
-      scanner_source="$repo/examples/p4-java/src/main/java/org/ubnfc/p4/P4Scanners.java"
+      scanner_class=org.unlaxer.ubnfc.examples.p4.P4Scanners
+      scanner_source="$repo/examples/p4-java/src/main/java/org/unlaxer/ubnfc/examples/p4/P4Scanners.java"
       server_name="TinyExpression P4 (ubnfc)"
       jar=ubnfc-p4-lsp-server
       vsix=ubnfc-tinyexpression-p4-0.1.0.vsix
@@ -54,8 +54,8 @@ build_one() {
     ubnf)
       ir="$repo/ir/fixtures/unlaxer-dsl__grammar__ubnf.ubnf.ir.json"
       example="$repo/examples/ubnf-vscode"
-      parser_package=org.ubnfc.ubnf.generated
-      lsp_package=org.ubnfc.ubnf.lsp
+      parser_package=org.unlaxer.ubnfc.examples.ubnf.generated
+      lsp_package=org.unlaxer.ubnfc.examples.ubnf.lsp
       language_id=ubnf
       scanner_class=""
       scanner_source=""
@@ -71,7 +71,7 @@ build_one() {
   echo "[2/6] パーサ生成（$target）"
   rm -rf "$generated"
   mkdir -p "$generated"
-  java -cp "$repo/ubnfc-java/target/ubnfc-java-$version.jar" org.ubnfc.java.Main \
+  java -cp "$repo/ubnfc-java/target/ubnfc-java-$version.jar" org.unlaxer.ubnfc.java.Main \
     --ir "$ir" --out "$generated" --package "$parser_package" --no-emit-driver
 
   echo "[3/6] LSP 包み + TextMate 文法（opt-in: --emit-lsp）"
@@ -79,7 +79,7 @@ build_one() {
   local scanner_option=()
   [[ -n "$scanner_class" ]] && scanner_option=(--scanner-class "$scanner_class")
   java -cp "$repo/ubnfc-lsp/target/ubnfc-lsp-$version.jar:$repo/ubnfc-java/target/ubnfc-java-$version.jar" \
-    org.ubnfc.lsp.Main --emit-lsp --ir "$ir" --out "$generated" \
+    org.unlaxer.ubnfc.lsp.Main --emit-lsp --ir "$ir" --out "$generated" \
     --package "$lsp_package" --parser-package "$parser_package" \
     --language-id "$language_id" "${scanner_option[@]}" "${dap_emit[@]}" \
     --server-name "$server_name" --server-version 0.1.0 \
@@ -87,8 +87,8 @@ build_one() {
 
   echo "[4/6] extern token scanner"
   if [[ -n "$scanner_source" ]]; then
-    mkdir -p "$generated/org/ubnfc/p4"
-    cp "$scanner_source" "$generated/org/ubnfc/p4/P4Scanners.java"
+    mkdir -p "$generated/org/unlaxer/ubnfc/examples/p4"
+    cp "$scanner_source" "$generated/org/unlaxer/ubnfc/examples/p4/P4Scanners.java"
   else
     echo "  （この文法は extern token を使わない）"
   fi

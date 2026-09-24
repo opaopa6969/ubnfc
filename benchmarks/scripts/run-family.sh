@@ -24,11 +24,11 @@ a)
   # ubnfc Java（生成）。comparison-heavy 系は入口が別なので分ける。
   "${pin[@]}" java "${jvm[@]}" -Dbench.warmup=2000 -Dbench.runs=7 \
     -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64 \
-    -cp "$ubnfc/examples/p4-java/target/classes" org.ubnfc.p4.Benchmark "$fixtures" \
+    -cp "$ubnfc/examples/p4-java/target/classes" org.unlaxer.ubnfc.examples.p4.Benchmark "$fixtures" \
     | tee "$out/family-a-java-ubnfc.csv"
   "${pin[@]}" java "${jvm[@]}" -Dbench.warmup=2000 -Dbench.runs=7 \
     -Dbench.fixtures=comparison-heavy,comparison-heavy-x64 -Dbench.entry=BooleanExpression \
-    -cp "$ubnfc/examples/p4-java/target/classes" org.ubnfc.p4.Benchmark "$fixtures" \
+    -cp "$ubnfc/examples/p4-java/target/classes" org.unlaxer.ubnfc.examples.p4.Benchmark "$fixtures" \
     | tee -a "$out/family-a-java-ubnfc.csv"
   # 旧 Java（tinyexpression 生成物 + unlaxer combinator runtime）。
   # 構成は docs/reports/2026-09-23-legacy-baseline.md §4 の B3（private m2 + tiny-first + SAFE_FAILURES）。

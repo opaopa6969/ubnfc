@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import org.ubnfc.p4.generated.api.Json;
+import org.unlaxer.ubnfc.examples.p4.generated.api.Json;
 import org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4AST;
 import org.unlaxer.tinyexpression.p4.P4SourceText;
 

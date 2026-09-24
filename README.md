@@ -400,6 +400,11 @@ export PATH="$PWD/target/debug:$PATH"   # 以下 `ubnfc` を直に呼ぶ
 `ubnfc gen --target java` は `ubnfc-java/target/ubnfc-java-*.jar` を自動で探す
 （`UBNFC_JAVA_JAR` / `UBNFC_RUST_BIN` で明示指定も可能）。
 
+Java 側の Maven 座標は `org.unlaxer:ubnfc-java` / `org.unlaxer:ubnfc-lsp`、Java package は
+`org.unlaxer.ubnfc.*`（D-076。owner が Central で持つ namespace は `org.unlaxer` だけ）。
+`ubnfc-java` を直接呼ぶときの生成 package は `--package` > 文法の package >
+`org.unlaxer.ubnfc.generated.<文法名小文字>` の順で決まる。
+
 > **D-033**: Java backend の driver テンプレートと emitter は **jar の resource** なので、
 > `ubnfc-java/` を触ったら必ず `mvn -o -q -DskipTests package` をやり直すこと。
 > 古い jar のまま差分ファジングを回すと「Java だけが契約を破っている」ようにしか見えない

@@ -52,7 +52,7 @@ for pair in operators:associative__Operators power:right-associative__Power; do
   rm -rf "$work/gen/$name"
   (cd "$ubnfc" && cargo run -q --offline --release -p ubnfc-rust --bin ubnfc-rust -- --ir "$ir" --out "$work/gen/$name" --no-emit-driver)
   sed -i "s/^name = \"ubnfc-generated\"/name = \"gen-$name\"/" "$work/gen/$name/Cargo.toml"
-  java -cp "$jar" org.ubnfc.java.Main --ir "$ir" --out "$work/genjava/src" --package "gen.$name" --no-emit-driver
+  java -cp "$jar" org.unlaxer.ubnfc.java.Main --ir "$ir" --out "$work/genjava/src" --package "gen.$name" --no-emit-driver
 done
 javac -nowarn -d "$work/genjava/classes" $(find "$work/genjava/src" -name '*.java')
 
