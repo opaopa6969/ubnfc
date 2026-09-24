@@ -18,6 +18,9 @@ pub(crate) enum Event {
         span: Span,
         sync_span: Option<Span>,
         diag: Diag,
+        /// `Session::recovery_hints` の添字。回復した規則の frame に属する公開候補
+        /// （D-027 の表示語彙）を回復時に取っておく（診断は後段の走査で組み立てる）。
+        hints: u32,
     },
     Join(EventId, EventId),
     Values {
@@ -234,6 +237,8 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     effect_bytes: usize,
     mapping_depth: usize,
     mapping_anchor: Option<usize>,
+    /// 回復ごとの公開候補（最遠位置 byte, label）。`Event::Recovery::hints` が索く。
+    recovery_hints: Vec<Option<(usize, Vec<&'static str>)>>,
 }
 impl<'a, const DIAG: bool> Session<'a, DIAG> {
     // 診断の配管は `const DIAG` で単相化する（D-036）。fast mode（`ParseOptions::diagnostics ==
@@ -281,6 +286,14 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
     pub fn display_fail(&mut self, pos: usize, label: &'static str) {
         if DIAG {
             self.display.fail(pos, label);
+        }
+    }
+    #[inline(always)]
+    pub fn display_local_far(&self) -> Option<usize> {
+        if DIAG {
+            self.display.local_far()
+        } else {
+            None
         }
     }
     #[inline(always)]
@@ -457,6 +470,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             effect_bytes: 0,
             mapping_depth: 0,
             mapping_anchor: None,
+            recovery_hints: Vec::new(),
         }
     }
     /// 大きな buffer を thread の pool へ返す（`finish` の最後）。
@@ -1343,12 +1357,18 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         let mut child = state.begin();
         child.advance::<MATCH>(end - start);
         let diag = self.diag_rule(rule, failed.diag);
+        // D-027: 公開候補は表示語彙で、回復した規則の frame に属するものだけ
+        // （生成側が回復つき規則の本体を `display_enter` / `display_leave` で囲う）。
+        let hints = u32::try_from(self.recovery_hints.len()).unwrap_or(u32::MAX);
+        self.recovery_hints
+            .push(if DIAG { self.display.local_summary() } else { None });
         let events = self.event(Event::Recovery {
             rule,
             mode,
             span: [start, end],
             sync_span,
             diag,
+            hints,
         });
         Step {
             ok: true,

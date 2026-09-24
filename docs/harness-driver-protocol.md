@@ -41,7 +41,7 @@ runner は生成器を呼ばず、指定済み artifact のコンパイル・実
 - `options.scope`: scope の宣言・参照の採取を有効にする。false なら
   `declarations`/`references` を省略する。いずれも解析する文法を変更しない。
   CLI は両方 true。手書き目標の二文法には scope annotation がないため空列を返す。
-- `options.scan`（任意、Rust 生成 driver のみ）: D-067 の一括走査（`plan.scans`）を
+- `options.scan`（任意、Rust 生成 driver のみ）: D-070 の一括走査（`plan.scans`）を
   切り替える **A/B 用の穴**。このキーがあるときは、走査が効く条件そのもので測るために
   **fast mode** で解析する（`diagnostics: false`、`lexical` は false 扱い）。したがって
   `hints` は「fast mode が失敗して診断モードへ上がったとき」だけ出る。キーが無ければ
@@ -342,8 +342,17 @@ farthestExpected` の比較は維持する（D-014）。Extern の失敗候補�
 `{ruleId, mode, span, syncPattern, skippedSpan, syncSpan, captureOccurrences}`。
 位置は code point の半開区間。`syncPattern` は同期文字列、見つからなければ `null`。
 `skippedSpan` は `mode=="SKIP"` または `syncSpan==null` なら `span`、それ以外は
-`[span[0], min(span[1], syncSpan[0])]`。`captureOccurrences` は回復領域に属する capture 出現の
-添字列。
+`[span[0], min(span[1], syncSpan[0])]`。
+
+`captureOccurrences` は `captures` の添字のうち、**回復領域を自分の値としてそのまま持つ**
+出現だけを並べたもの（D-069）。回復と capture の間に AST ノードを作る（または捨てる）規則が
+入ると、その外側の capture の値はノードであって回復領域ではないので数えない。
+規則が透過（`@mapping` が無い / `transparent` / `text`）なら、その外側の capture も数える。
+
+`kind: "recovery"` の診断は、回復の引き金になった失敗を表す。`expected` /
+`farthestExpected` は `farthestOffset` と同じ**公開（表示）語彙**で（D-027）、
+範囲は**回復した規則の解析**に限る（外側の、回復が位置を進めた後の失敗は入らない）。
+回復つき規則が自分の開始位置で失敗したときは、その規則の同期文字列も候補に載る。
 
 ### `scope`（D-025）
 

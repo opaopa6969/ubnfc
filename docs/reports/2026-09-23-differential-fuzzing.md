@@ -410,3 +410,14 @@ seed から文法・入力を完全に再現する。`--start-seed N --dump 1` �
 - `@import` は 2 ファイル・1 規則の最小形のみ。alias 衝突や循環は front の拒否契約なので対象外。
 - 入力は 1 文法あたり 24 件・数十 code point 規模で、大きな入力での性能差・memo の差は見ていない。
 - `entry` は常に `@root`。任意 entry での差は未検証。
+
+## 追記（2026-09-24、issue #41 / D-069）
+
+v2 seed 帯 100276 が、この campaign の帯（seed 1..320）が踏んでいなかった
+`@recovery` の観測差を 2 つ出した（`diff:/diagnostics/*/expected/*` と
+`diff:/recoveries/*/captureOccurrences/*`）。いずれも Rust backend の欠陥で、
+同じ原因が同 seed の `diff:/diagnostics/*/farthestExpected/*`（§4 A-6 の残り）も説明する。
+triage と修正は [`2026-09-24-fuzz-recovery-observations.md`](2026-09-24-fuzz-recovery-observations.md)。
+
+`diff:/diagnostics/*/farthestExpected/*` は**クラスとしては `KNOWN` に残る**
+（`@leftAssoc` の静的失敗ヒント計画と Extern token の表示名という別原因が seed 34 / 4001 に残る）。

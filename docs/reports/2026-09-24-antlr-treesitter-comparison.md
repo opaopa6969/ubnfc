@@ -239,7 +239,7 @@ tree-sitter と typed AST の列、算術式（§1.3）、正しさ（§1.1）�
 issue [#48](https://github.com/opaopa6969/ubnfc/issues/48)（[`2026-09-24-bulk-scan.md`](2026-09-24-bulk-scan.md)）で
 §1.4 が指摘した「残差は回数」を減らした。front が「終端だけでできていて観測を 1 つも要求しない領域」を
 証明して `plan.scans` に載せ、backend がそこを parser の機構（Step / 事象 / 診断 / mark / transaction /
-memo）を通さない 1 本の走査へ畳む（D-067）。以下は別セッションの測り直しで、
+memo）を通さない 1 本の走査へ畳む（D-070）。以下は別セッションの測り直しで、
 `benchmarks/scripts/run-external.sh json` が入力ごとに 4 実装を交互に回したもの。
 `taskset -c 30`、7 run、load average 開始 21.16 / 18.91 / 21.08 → 終了 14.55 / 16.99 / 19.97。
 生データは [`examples/json/evidence/speed-scan-48-external.csv`](../../examples/json/evidence/speed-scan-48-external.csv)。

@@ -98,7 +98,7 @@ let mut parser=Session::<true>::new(text,options,&mut scanner);
 let step=entry_step(&mut parser,grammar,entry)?;
 Ok(parser.finish(step))}
 impl<const DIAG: bool> Session<'_, DIAG> {
-/// D-067: 観測を残さない終端領域の走査。消費 byte 数を返す。
+/// D-070: 観測を残さない終端領域の走査。消費 byte 数を返す。
 #[allow(unused_mut)]
 fn s292(&self,mut p:usize)->Option<usize> {
 let start=p;
@@ -108,7 +108,7 @@ else {let Some((c,n))=self.input.cp_at(p) else {break;};if !{let cp=c as u32;if 
 }
 Some(p-start)
 }
-/// D-067: 観測を残さない終端領域の走査。消費 byte 数を返す。
+/// D-070: 観測を残さない終端領域の走査。消費 byte 数を返す。
 #[allow(unused_mut)]
 fn s293(&self,mut p:usize)->Option<usize> {
 match self.input.cp_at(p) {Some((c,n)) if {c.is_ascii_digit()}=>Some(n),_=>None}

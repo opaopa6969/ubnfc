@@ -1,4 +1,4 @@
-//! D-067 — `plan.scans` の領域を parser の機構を通さない走査関数へ落とす。
+//! D-070 — `plan.scans` の領域を parser の機構を通さない走査関数へ落とす。
 //!
 //! front が「領域は終端だけでできていて観測を 1 つも残さない」ことを証明している
 //! （`crates/ubnfc-front/src/analysis/scan.rs`）。ここで生成するのは
@@ -279,7 +279,7 @@ pub(crate) fn generate(g: &Generator<'_>, scans: &mut Scans) -> String {
         }
         writeln!(
             s,
-            "/// D-067: 観測を残さない終端領域の走査。消費 byte 数を返す。\n#[allow(unused_mut)]\nfn s{i}(&self,mut p:usize)->Option<usize> {{\n{text}\n}}"
+            "/// D-070: 観測を残さない終端領域の走査。消費 byte 数を返す。\n#[allow(unused_mut)]\nfn s{i}(&self,mut p:usize)->Option<usize> {{\n{text}\n}}"
         )
         .unwrap();
     }

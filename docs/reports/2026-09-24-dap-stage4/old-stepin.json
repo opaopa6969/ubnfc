@@ -1,0 +1,86 @@
+{
+ "initialize": {
+  "supportsConfigurationDoneRequest": true
+ },
+ "launch": true,
+ "setBreakpoints": {
+  "breakpoints": [
+   {
+    "verified": true,
+    "line": 2
+   }
+  ]
+ },
+ "threads": {
+  "threads": [
+   {
+    "id": 1,
+    "name": "main"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "after": "configurationDone",
+   "frames": [
+    {
+     "id": 0,
+     "name": "TinyCalcProgram (1/8)",
+     "line": 1,
+     "column": 1,
+     "endLine": null,
+     "endColumn": null
+    }
+   ],
+   "scopes": [
+    {
+     "name": "Current AST Node",
+     "variables": [
+      {
+       "name": "TinyCalcProgram",
+       "value": "\"var x set 2;\n1 + 2 * 3\"",
+       "type": "ASTNode"
+      },
+      {
+       "name": "runtimeMode",
+       "value": "ast",
+       "type": "String"
+      },
+      {
+       "name": "astNodeCount",
+       "value": "8",
+       "type": "int"
+      },
+      {
+       "name": "astCurrentNode",
+       "value": "TinyCalcProgram",
+       "type": "String"
+      },
+      {
+       "name": "steppingMode",
+       "value": "ast",
+       "type": "String"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "after": "stepIn1",
+   "error": "Internal error."
+  }
+ ],
+ "evaluate": {
+  "type": "response",
+  "seq": 12,
+  "request_seq": 10,
+  "command": "evaluate",
+  "success": false,
+  "message": "Internal error.",
+  "body": "java.lang.UnsupportedOperationException\n\tat org.eclipse.lsp4j.debug.services.IDebugProtocolServer.evaluate(IDebugProtocolServer.java:601)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)\n\tat org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.request(GenericEndpoint.java:128)\n\tat org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleRequest(RemoteEndpoint.java:271)\n\tat org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:201)\n\tat org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)\n\tat org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)\n\tat org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)\n"
+ },
+ "events": [
+  "initialized",
+  "stopped:entry"
+ ]
+}

@@ -1,6 +1,6 @@
 {
   "backend": "rust",
-  "generator_sha256": "f73bb6facd690926704263ba2fb79180b715922c280523a9af04d611ad5d3c57",
+  "generator_sha256": "da4ba401ad2f1f540a2e6b23bdd25d63495e1d976509b400a64f974c235af118",
   "front_sha256": "b1cf181e994f10ae435bf1c4075e5b26ae1e029fd6c3cae1e394c7f495695945",
   "jobs": 4,
   "rust_build": {
@@ -9,8 +9,8 @@
     "unique_crates": 228,
     "cache_hits": 0,
     "cargo_invocations": 1,
-    "initial_build_seconds": 175.093759863,
-    "total_build_seconds": 175.093759863
+    "initial_build_seconds": 130.073865622,
+    "total_build_seconds": 130.073865622
   },
   "corpus_files": 127,
   "grammar_variants": 279,
@@ -172476,10 +172476,12 @@
           {
             "deepestRule": "Probe::Stmt",
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",
@@ -172698,17 +172700,12 @@
         {
           "path": "/diagnostics/0/expected/0",
           "expected": "end of input",
-          "actual": "ok"
+          "actual": "';'"
         },
         {
-          "path": "/diagnostics/0/farthestExpected/0",
-          "expected": "';'",
-          "actual": "ok"
-        },
-        {
-          "path": "/diagnostics/0/farthestExpected/1",
-          "expected": "'ok'",
-          "actual": null
+          "path": "/diagnostics/0/expected/1",
+          "expected": null,
+          "actual": "'ok'"
         },
         {
           "path": "/diagnostics/0/farthestExpected/2",
@@ -172961,10 +172958,12 @@
           {
             "deepestRule": "Probe::Root",
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",
@@ -173050,26 +173049,6 @@
           "path": "/consumed",
           "expected": 0,
           "actual": 4
-        },
-        {
-          "path": "/diagnostics/0/expected/0",
-          "expected": "';'",
-          "actual": "ok"
-        },
-        {
-          "path": "/diagnostics/0/expected/1",
-          "expected": "'ok'",
-          "actual": null
-        },
-        {
-          "path": "/diagnostics/0/farthestExpected/0",
-          "expected": "';'",
-          "actual": "ok"
-        },
-        {
-          "path": "/diagnostics/0/farthestExpected/1",
-          "expected": "'ok'",
-          "actual": null
         },
         {
           "path": "/diagnostics/0/kind",
@@ -173456,10 +173435,12 @@
           {
             "deepestRule": "Probe::Stmt",
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",
@@ -173664,10 +173645,12 @@
           {
             "deepestRule": "Probe::Stmt",
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",
@@ -173918,10 +173901,12 @@
           {
             "deepestRule": "Probe::Stmt",
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",
@@ -174071,10 +174056,12 @@
           "expected": null,
           "actual": {
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",
@@ -174301,10 +174288,12 @@
           {
             "deepestRule": "Probe::Stmt",
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",
@@ -174455,10 +174444,12 @@
           "expected": null,
           "actual": {
             "expected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestExpected": [
-              "ok"
+              "';'",
+              "'ok'"
             ],
             "farthestOffset": 0,
             "kind": "recovery",

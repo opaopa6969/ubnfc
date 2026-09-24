@@ -173,7 +173,7 @@ issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で�
   front が「終端だけでできていて観測を 1 つも要求しない領域」を証明して `plan.scans` に載せ、
   backend がそこを parser の機構を通さない 1 本の走査へ畳む（文字クラスの反復は ASCII bitset の
   内側ループ）。**JSON 1 MB 認識は 0.0364 → 0.0137 µs/byte（2.7 倍）、ANTLR4 比は 2.7 倍 → 1.35 倍**
-  で、**issue の目標 ≤0.022 µs/byte を達成**した（D-067）。1 byte あたりの式評価は 5.08 → 1.25、
+  で、**issue の目標 ≤0.022 µs/byte を達成**した（D-070）。1 byte あたりの式評価は 5.08 → 1.25、
   cursor 更新は 7.70 → 1.67 回。typed AST は 0.477 → 0.181 µs/byte。
 - **速度（512 atom の算術式、認識のみ）**: ANTLR4 0.045 ms、ubnfc Rust 0.119 ms、tree-sitter 0.403 ms。
   木込みでは ubnfc Rust の typed AST 0.260 ms が ANTLR4 の parse tree 0.209 ms に近い。
@@ -251,7 +251,7 @@ issue #27。文法は `examples/p4-antlr/TinyExpressionP4.g4` と `examples/p4-t
 | PR #21（issue #19） | AST 経路にも観測の opt-in を広げる（出現表を作る条件を Match 木の条件から分離） | **Operators 512 atom AST 0.631 ms（issue の目標 0.693 ms を達成、手書き 0.560 ms の 1.13 倍）**。P4 complex AST 0.564→0.309 ms、x64 AST 50.0→28.0 ms。**M5 の AST 目標（complex ≤0.2 ms / x64 ≤15 ms）は未達**——同条件の認識専用が complex 0.220 ms / x64 17.5 ms なので、AST 層を 0 円にしても届かない | `2026-09-24-java-ast-path.md`（D-057） |
 | PR #24（issue #17） | rule 本体の memo を「同じ位置へ再入し得る」規則だけに絞る（Operators は全 rule で外れ、P4 の塔は残る） | Operators 512 atom 認識専用 0.204→0.160 ms、割当 465,664→350,168 B。**Rust も同判定で 0.176→0.115 ms、P4 complex-x64 認識 5.67→4.68 ms（最小値）**。P4 は両 backend で悪化なし | `2026-09-24-memo-plan.md`（D-058） |
 | PR #46（issue #33。**front と Rust backend**。Java backend の D-066 相当は別 issue） | 再入判定に mayStart の素性を足し（D-064）、終端走査だけの規則には memo を入れず（D-065）、排他 predict が外れたら候補を試さない（D-066） | **JSON 1 MB 認識 214.8→30.5 ms（最小値）、µs/byte がサイズで平らに（3.53→1.05 倍）、ANTLR4 比 21→2.7 倍**。P4 は悪化なし（complex-x64 認識 6.06→4.90 ms、最小値） | `2026-09-24-json-perf.md`（D-064 / D-065 / D-066） |
-| issue #48（**front と Rust backend**。Java の走査は #49） | 観測を要求しない終端領域を 1 本の走査へ畳む（D-067。文字クラスの反復は ASCII bitset の内側ループ） | **JSON 1 MB 認識 36.4→13.8 ms（最小値）、0.0364→0.0137 µs/byte で目標 ≤0.022 を達成、ANTLR4 比 2.7→1.35 倍**。typed AST 477→181 ms。P4 / Operators / Power は `plan.scans` が付かず生成 `parser.rs` が byte 一致 | `2026-09-24-bulk-scan.md`（D-067） |
+| issue #48（**front と Rust backend**。Java の走査は #49） | 観測を要求しない終端領域を 1 本の走査へ畳む（D-070。文字クラスの反復は ASCII bitset の内側ループ） | **JSON 1 MB 認識 36.4→13.8 ms（最小値）、0.0364→0.0137 µs/byte で目標 ≤0.022 を達成、ANTLR4 比 2.7→1.35 倍**。typed AST 477→181 ms。P4 / Operators / Power は `plan.scans` が付かず生成 `parser.rs` が byte 一致 | `2026-09-24-bulk-scan.md`（D-070） |
 
 corpus（Java Pass 1,310 / Rust Pass 1,292、Fail 0）はこの 6 ラウンドいずれでも系統別表が既存報告と
 byte 一致、IR golden も `plan.memo.entries` / `plan.scans` 以外は不変。**結論**: Java backend の性能目標は
@@ -356,11 +356,18 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**capability は
   診断 / definition / references / document symbols / semantic tokens / completion / hover と
   TextMate 文法の生成**（[`docs/reports/2026-09-24-lsp-vsix-stage3.md`](docs/reports/2026-09-24-lsp-vsix-stage3.md) §1 の表）。
-  **無いもの**: DAP、増分解析、rename、文法の意味検査（`GrammarValidator` 相当。ubnfc では front が持つ）、
+  **無いもの**: 増分解析、rename、文法の意味検査（`GrammarValidator` 相当。ubnfc では front が持つ）、
   外部カタログの照合、folding / inlay hints / signature help / formatting / code actions。
   打鍵ごとに全文を再解析する（同報告 §8 に実測。P4 の 325 code point で 0.29 ms、20,923 code point で 6.6 ms、
   解析に失敗する文書は前半の再解析ぶん最大 2.8 倍）。VSIX は P4（`examples/p4-vscode`）と
   UBNF 自身（`examples/ubnf-vscode`）の 2 つを `scripts/build-vsix.sh` で組む。
+- **DAP も opt-in の feature**（D-070、issue #28 段階 4）。`ubnfc-lsp --emit-dap`（`--emit-lsp` と併用）が
+  **文法デバッガ**を `<lsp-package>.dap` へ追加する。入力を生成パーサに掛け、**型付き AST を前順で歩く**
+  ステップ実行（`stepIn` / `next` / `stepOut` / `continue` / 行ブレークポイント / `stackTrace` は根までの鎖 /
+  `variables` は AST の欄と可視の宣言）を出す。**式の値は計算しない**——評価器は言語作者が
+  生成される `EvaluatorBridge`（interface + no-op 既定）に差し込む契約で、`evaluate` / `setVariable` は
+  既定では「未対応」を明示的に返す（[`docs/reports/2026-09-24-dap-stage4.md`](docs/reports/2026-09-24-dap-stage4.md)）。
+  VSIX に入れるには `scripts/build-vsix.sh --with-dap`。
 - `@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
   `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-062）。
@@ -467,7 +474,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `crates/ubnfc-rust` | IR → Rust ソース。`ubnfc-rust` CLI |
 | `ubnfc-java` | IR → Java ソース。Maven モジュール。runtime テンプレートと driver テンプレートを resource に持つ |
 | `crates/ubnfc-harness` | corpus loader、生成 → build → 実行 → 比較の runner、canonical 差分 |
-| `ubnfc-lsp` | IR → 生成パーサを包む LSP サーバのソース。**opt-in**（root `pom.xml` の Maven profile `lsp`）。`--emit-lsp` を明示したときだけ出す（D-060） |
+| `ubnfc-lsp` | IR → 生成パーサを包む LSP サーバ／DAP（文法デバッガ）のソース。**opt-in**（root `pom.xml` の Maven profile `lsp`。module 名は段階 1 からのまま）。`--emit-lsp` / `--emit-dap` を明示したときだけ出す（D-060 / D-064） |
 | `crates/ubnfc-fuzz` | 2 backend の差分ファジング。`findings/` に最小再現 |
 | `crates/ubnfc-selfhost` | 生成 Rust frontend による self-host 経路と固定点テスト。`src/generated/` は生成物を commit |
 | `crates/ubnfc-rt-template` | 両 backend が写す runtime の原本（input / cursor / scope / memo / diag） |

@@ -19,7 +19,7 @@ pub struct ParseOptions {
     /// are tried in declaration order. false is the reference path that evaluates
     /// every alternative from its start; both produce the same result and diagnostics.
     pub factor: bool,
-    /// Bulk scan of terminal-only regions (design v1 §3.4, D-067): a region the front
+    /// Bulk scan of terminal-only regions (design v1 §3.4, D-070): a region the front
     /// proved to be built from terminals alone and to leave no observation behind
     /// (`plan.scans`) is consumed by one generated scanning function instead of walking
     /// the grammar expression by expression. It runs only in fast mode (`diagnostics:

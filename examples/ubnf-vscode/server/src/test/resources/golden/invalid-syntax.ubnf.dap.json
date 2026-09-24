@@ -1,0 +1,18 @@
+{
+  "capabilities": {"supportsConfigurationDoneRequest": true, "supportsEvaluateForHovers": false, "supportsSetVariable": false, "supportsStepBack": false},
+  "breakpoints": [{"line": 2, "verified": false, "message": "この行から始まる AST 節点がありません（文法デバッガは節点の開始行で止まります）"}],
+  "threads": [{"id": 1, "name": "UBNF parse"}],
+  "stops": [
+    {"after": "configurationDone", "reason": null, "terminated": true, "stackTrace": []},
+    {"after": "stepIn", "reason": null, "terminated": true, "stackTrace": []},
+    {"after": "stepIn", "reason": null, "terminated": true, "stackTrace": []},
+    {"after": "next", "reason": null, "terminated": true, "stackTrace": []},
+    {"after": "next", "reason": null, "terminated": true, "stackTrace": []},
+    {"after": "next", "reason": null, "terminated": true, "stackTrace": []},
+    {"after": "stepOut", "reason": null, "terminated": true, "stackTrace": []},
+    {"after": "continue", "reason": null, "terminated": true, "stackTrace": []}
+  ],
+  "evaluate": "error: evaluate は文法デバッガでは未対応です（値を計算する評価器を持っていません）。言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください（生成された EvaluatorBridge.java の Javadoc に例があります）。",
+  "setVariable": "error: setVariable は文法デバッガでは未対応です（値を計算する評価器を持っていません）。言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください（生成された EvaluatorBridge.java の Javadoc に例があります）。",
+  "events": ["initialized", "output:stderr:<program>:3:1: Error: 構文エラー（余分な入力）: ' ' | '%' | '(' | ')' | '*' | '*/' | '+' | '.' ほか 20 件 を期待しました", "output:stdout:Completed: <program>", "terminated", "exited:0"]
+}

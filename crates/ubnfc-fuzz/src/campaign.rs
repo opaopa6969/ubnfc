@@ -64,7 +64,7 @@ pub struct Finding {
     pub shrink_rounds: usize,
 }
 
-/// D-067 の in-backend A/B で見つけた差。`on` / `off` は同じ Rust backend を
+/// D-070 の in-backend A/B で見つけた差。`on` / `off` は同じ Rust backend を
 /// `options.scan` だけ変えて走らせた観測。
 #[derive(Clone, Debug, Serialize)]
 pub struct ScanFinding {
@@ -97,7 +97,7 @@ pub struct Summary {
     pub driver_timeouts: usize,
     pub violation_counts: BTreeMap<String, usize>,
     pub findings: Vec<Finding>,
-    /// D-067: 一括走査 on / off を同じ Rust backend で比べた回数と、その差。
+    /// D-070: 一括走査 on / off を同じ Rust backend で比べた回数と、その差。
     pub scan_comparisons: usize,
     pub scan_findings: Vec<ScanFinding>,
     pub elapsed_seconds: f64,
@@ -349,7 +349,7 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
     let inputs = input::generate(&grammar, &mut rng, config.inputs);
     let texts: Vec<String> = inputs.iter().map(|i| i.text.clone()).collect();
     let pairs = run_pair(engine, &built, &texts);
-    // D-067: 同じ Rust backend を `options.scan` だけ変えて 2 度走らせる。走査は
+    // D-070: 同じ Rust backend を `options.scan` だけ変えて 2 度走らせる。走査は
     // fast mode でだけ効くので、driver はこのキーがあるとき診断・出現表を外す。
     // 失敗した解析は D-023 の再解析で参照経路の観測へ戻るので、ここで比べているのは
     // 「fast session が成功したまま返した観測」——走査が変え得る全部である。

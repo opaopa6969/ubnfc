@@ -81,6 +81,10 @@ public final class LspEmitter {
     }
 
     public String packageName() { return pkg; }
+    /** 生成パーサのパッケージ（{@code org.ubnfc.java.Main} の {@code --package}）。 */
+    public String parserPackage() { return parserPackage; }
+    /** 生成パーサの入口クラス（FQCN）。 */
+    public String parserClass() { return parserClass; }
     public String languageId() { return languageId; }
     public String grammar() { return grammar; }
     public String entry() { return entry; }

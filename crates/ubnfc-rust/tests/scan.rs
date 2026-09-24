@@ -1,4 +1,4 @@
-//! D-067: `plan.scans` が front で何を証明し、Rust backend がそれをどう畳むか。
+//! D-070: `plan.scans` が front で何を証明し、Rust backend がそれをどう畳むか。
 //!
 //! 実行時の同値（走査 on / off で観測が一致すること）は差分ファジングの
 //! in-backend A/B（`crates/ubnfc-fuzz`、`options.scan`）が担う。ここでは
