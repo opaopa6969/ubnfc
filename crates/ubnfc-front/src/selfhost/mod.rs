@@ -216,6 +216,18 @@ impl<'a> SourceOffsets<'a> {
         })
     }
 }
+
+/// 境界 trivia を除いた `IDENTIFIER '.'` の原文から識別子だけを取る。
+/// IDENTIFIER は C 識別子（`[A-Za-z_][A-Za-z0-9_]*`。手書き lexer の
+/// `syntax::lexer` と同じ文字集合）なので、先頭からの識別子文字の連なりが
+/// そのまま成分で、続く trivia と `'.'` は落ちる。
+fn leading_identifier(raw: &str) -> &str {
+    let end = raw
+        .find(|c: char| !(c.is_ascii_alphanumeric() || c == '_'))
+        .unwrap_or(raw.len());
+    &raw[..end]
+}
+
 fn is_space(byte: u8) -> bool {
     matches!(byte, b' ' | b'\t' | b'\r' | b'\n' | 0x0b | 0x0c)
 }
@@ -636,6 +648,25 @@ impl<'a> Converter<'a> {
             _ => Err(self.optional_error(i, field)),
         })
     }
+    /// `QuantifiedRef ::= { IDENTIFIER '.' } @namespace IDENTIFIER @name` の
+    /// `@namespace` は反復 1 回ぶんずつの capture（`IDENTIFIER '.'`）の並びなので、
+    /// 各成分の識別子を取り出して `.` で連結し、手書き frontend と同じ
+    /// `namespace` 文字列（`a.b`）にする。0 個なら namespace 無し、1 個なら `a`。
+    /// 連結先の `String` は一つだけで、成分ごとの中間 `String` は作らない。
+    fn namespace(&self, i: usize) -> Result<Option<String>> {
+        let mut joined: Option<String> = None;
+        for value in self.capture_values(i, "namespace", true) {
+            let segment = leading_identifier(value?);
+            match &mut joined {
+                None => joined = Some(segment.to_owned()),
+                Some(out) => {
+                    out.push('.');
+                    out.push_str(segment);
+                }
+            }
+        }
+        Ok(joined)
+    }
     fn strings(&self, i: usize, field: &str) -> Result<Vec<String>> {
         self.with_values(i, field, |values| {
             let mut out = Vec::new();
@@ -1028,7 +1059,7 @@ impl<'a> Converter<'a> {
                 span,
             },
             "QuantifiedRef" => Atom::Ref {
-                namespace: self.optional(j, "namespace")?,
+                namespace: self.namespace(j)?,
                 name: self.value(j, "name")?,
                 span,
             },

@@ -101,7 +101,6 @@ const KNOWN_REJECTIONS: &[(&str, usize)] = &[
         "rust/unlaxer-ubnf/tests/fixtures/known/keyword-boundary.ubnf",
         24,
     ),
-    ("rust/unlaxer-ubnf/tests/fixtures/known/namespace.ubnf", 28),
     ("unlaxer-dsl/examples/tinycalc.ubnf", 276),
     (P4, 2595),
 ];
@@ -136,7 +135,7 @@ fn fixture_acceptance_and_ast_parity() {
             accepted.push(file);
         }
     }
-    assert_eq!(accepted.len(), 19);
+    assert_eq!(accepted.len(), 20);
     assert_eq!(rejected.len(), KNOWN_REJECTIONS.len());
 }
 
@@ -173,6 +172,42 @@ fn block_comments_are_rejected_by_both_frontends() {
     }
 }
 
+/// 段数上限のない dotted ルール参照（`a.b.Value`）。unlaxer-parser #285 で
+/// `QuantifiedRef ::= { IDENTIFIER '.' } @namespace IDENTIFIER @name` になり、
+/// `@namespace` は反復ごとの capture（`list<text>`）になった。手書き frontend と
+/// 同じ `namespace` / `name` に投影できていることを、0〜3 成分で固定する。
+#[test]
+fn chained_dotted_rule_references_match_the_handwritten_frontend() {
+    let cases = [
+        ("grammar G { R ::= Value; }", None, "Value"),
+        ("grammar G { R ::= a.Value; }", Some("a"), "Value"),
+        ("grammar G { R ::= a.b.Value; }", Some("a.b"), "Value"),
+        ("grammar G { R ::= a.b.c.Value; }", Some("a.b.c"), "Value"),
+        // trivia（空白・行コメント）を挟んでも成分は識別子だけ。
+        (
+            "grammar G { R ::= a . b // c\n . Value; }",
+            Some("a.b"),
+            "Value",
+        ),
+    ];
+    for (source, expected_namespace, expected_name) in cases {
+        same(source);
+        let file = ubnfc_selfhost::parse_file(source).unwrap();
+        let syntax::ast::Atom::Ref {
+            namespace, name, ..
+        } = first_atom(&file)
+        else {
+            panic!("ルール参照ではありません: {source:?}");
+        };
+        assert_eq!(namespace.as_deref(), expected_namespace, "{source:?}");
+        assert_eq!(name, expected_name, "{source:?}");
+    }
+}
+
+fn first_atom(file: &syntax::ast::UbnfFile) -> &syntax::ast::Atom {
+    &file.grammars[0].rules[0].body.alternatives()[0].elements[0].atom
+}
+
 #[test]
 fn syntax_error_positions() {
     for source in [
@@ -198,9 +233,11 @@ fn three_validation_error_golden_sources_have_fixed_parse_outcomes() {
             "rust/unlaxer-ubnf/tests/fixtures/positive/all-tokens.ubnf",
             None,
         ),
+        // unlaxer-parser #285 で `QuantifiedRef` が chained dot 対応になり、
+        // 3 成分の `a.b.Value` は両 frontend が受理する（validate の診断は golden のまま）。
         (
             "rust/unlaxer-ubnf/tests/fixtures/known/namespace.ubnf",
-            Some(28),
+            None,
         ),
     ];
     for (file, rejected_at) in cases {
