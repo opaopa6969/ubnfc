@@ -19,6 +19,8 @@
 ### 1.1 JSONTestSuite（正しさ）
 
 318 件（`y_` 95 / `n_` 188 / `i_` 35）。`y_` は受理必須、`n_` は拒否必須、`i_` は実装依存。
+**ファイル × 4 実装の全 318 行**（期待値と理由つき）は
+[`examples/json/evidence/jsontestsuite-verdicts.tsv`](../../examples/json/evidence/jsontestsuite-verdicts.tsv) にある。
 
 | 実装 | `y_` 受理 / 95 | `n_` 拒否 / 188 | `i_` 受理 | `i_` 拒否 | suite との不一致 |
 |---|---:|---:|---:|---:|---|
@@ -113,6 +115,10 @@ UTF-16 ファイル・overlong 符号化・裸の継続 byte はいずれも「U
 **読み方**: ANTLR4 の µs/byte は 1 KB→1 MB でほぼ一定（0.011 前後）、tree-sitter は 1.6 倍に増える程度、
 **ubnfc は 4 倍に悪化する**。1 MB の認識で ANTLR4 の **21 倍遅い**。原因は §3 で特定してある。
 
+**注**: tree-sitter の 100 KB は「CST+走査」（4.861 ms）が「CST 構築」（5.507 ms）より速く出ていて
+順序が逆転している。反復数が 99 / 53 と少なく、最小値では 3.436 / 4.312 と正しい順序なので、
+ホスト負荷の揺れである。この 2 セルは差を読まないこと。
+
 #### 1 parse あたりの割当 byte
 
 | 実装 / モード | 1 KB | 10 KB | 100 KB | 1 MB |
@@ -124,6 +130,11 @@ UTF-16 ファイル・overlong 符号化・裸の継続 byte はいずれも「U
 | ubnfc Rust / typed AST | 119,965 | 1,003,987 | **118,627,057** | **1,543,850,645** |
 | ubnfc Java / 認識のみ | 180,160 | 1,780,016 | 17,688,512 | 277,523,240 |
 | ubnfc Java / typed AST | 346,344 | 3,568,144 | 35,601,960 | 460,486,600 |
+
+**注**: ubnfc Rust の割当は計時とは別に 1 回だけ走らせた parse で数えている（§4.1）。
+`reuse_buffers` が効くので**サイズ間で素直には比べられない**（認識のみの 100 KB が 35 KB、
+1 MB が 76.5 MB と桁で飛ぶのはこのため。どちらが「1 parse の実費」かはこの測り方では分けられない）。
+tree-sitter は C なので同じ仕掛けを入れておらず、測っていない。
 
 ubnfc Rust の typed AST は **1 MB の入力に 1.5 GB を確保する**（割当**回数**は 23 回なので、
 巨大なバッファを数本取っている）。既定の `ResourceLimits.arena_entries = 2,000,000` では
@@ -340,3 +351,4 @@ benchmarks/scripts/run-external.sh arith            # 速度（§1.3）
 | 判定・計測のドライバ | `benchmarks/{c/ts_runner.c, java/AntlrRunner.java, java/UbnfcRunner.java, src/family_ext.rs}` |
 | 実行スクリプト | `benchmarks/scripts/{prepare-external,run-external,check-jsontestsuite}.sh`、`merge-verdicts.py`、`make-json-inputs.py`、`make-json-spec-corpus.py` |
 | JSONTestSuite 由来の仕様ケース 283 件 | [`corpus/spec/json/`](../../corpus/spec/json/)（引用は RFC 8259。`crates/ubnfc-harness/tests/spec_corpus.rs` が照合） |
+| **この報告の生データ** | [`examples/json/evidence/`](../../examples/json/evidence/)（318 件 × 4 実装の判定 `jsontestsuite-verdicts.tsv`、要約、速度 CSV、入力の sha256）、[`examples/arith/evidence/`](../../examples/arith/evidence/) |
