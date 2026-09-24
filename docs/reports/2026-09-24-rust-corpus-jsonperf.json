@@ -9,8 +9,8 @@
     "unique_crates": 228,
     "cache_hits": 0,
     "cargo_invocations": 1,
-    "initial_build_seconds": 139.970723639,
-    "total_build_seconds": 139.970723639
+    "initial_build_seconds": 164.499361889,
+    "total_build_seconds": 164.499361889
   },
   "corpus_files": 127,
   "grammar_variants": 279,

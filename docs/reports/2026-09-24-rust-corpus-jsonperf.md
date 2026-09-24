@@ -8,7 +8,7 @@ Rust generator SHA-256: `a0b263a39a6b9622d4f907f23ea54a2baffc8056ca9143259a5083c
 
 front SHA-256: `29ae4714e3c8f914e420c1cb2e49ab8bbc1635e6324e6d55fd795b02167538fb`
 
-Rust 一括 cargo build --release --offline --workspace: 139.971 秒。個別切り分け込み: 139.971 秒、cargo 起動 1 回。生成 228 crate、生成物 hash 重複除去後 228 crate、既存 cache hit 0 件。
+Rust 一括 cargo build --release --offline --workspace: 164.499 秒。個別切り分け込み: 164.499 秒、cargo 起動 1 回。生成 228 crate、生成物 hash 重複除去後 228 crate、既存 cache hit 0 件。
 
 JSON の build_failure / builds[].cargo は Rust、javac_failure / builds[].javac は Java の build 段階。表の build 失敗は両者の合計。比較規則は共通で、診断 offset と数値字句は backend ごとの既存 oracle を使う。
 
