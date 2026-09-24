@@ -29,6 +29,9 @@ issue #3 の指示どおり Rust backend の最適化を推測で移植するこ
   (a) 同一 JVM 内で baseline / step1 / 本 PR / 手書きを 1 run ごとに巡回して測る A/B と
   (b) baseline binary と step1 binary を交互に 3 周走らせた値だけを載せる。
   作業終盤は他エージェントのベンチが重なって load average が 44 まで上がったので、その区間の時間は採らない。
+- P4 の A/B は `origin/master` の issue #1 修正（`P4Scanners` が単引用符の value span を 1 単位内側へ寄せる）を
+  取り込む**前**の binary で測った。この修正は STRING token 1 件あたり定数時間の span 補正だけで、
+  rule 評価・memo 操作・確保の回数を変えない（本 PR はそれを取り込んだうえで検証を通している）。
 - ドライバは `benchmarks/`（family B）と `examples/p4-java` の `Benchmark`（P4）。生成物は
   `mktemp -d` 配下に baseline（`origin/master` の jar で生成）・step1・本 PR の 3 系統を作り、
   package を分けて同じ JVM に載せた。
@@ -215,10 +218,12 @@ step 2 と合わせて **−1.9%** に反転させている（後掲 P4 表）�
 | `Session.rule` | 20.6% | ある（`begin`/`end` + memo）。ただし生成側は recipe・field list・scope effect の分岐を持つ |
 | `Session.result` | 12.9% | **無い**。生成 parser は認識モードでも capture 出現（512 atom で約 2,500 件）と span を必ず作る。手書き側は `buildAst=false` のとき `Events` を作らないので `List.of()` を返す |
 | `Session.capture` | 10.3% | **無い**（同上。`project` が意味値 `Value` を毎回作る） |
-| `ImmutableCollections.listCopy` | 7.2% | 無い |
+| `ImmutableCollections.listCopy` | 7.2% | 無い。**この分は step 2 が落とした**（`Recipe.Value` の防御的複製） |
 | `Diagnostics.leaveRule` | 6.1% | ある（snapshot を memo payload に入れる） |
 | `Session.trivia` | 5.9% | ある |
 | `combine` / `join` / `captured` / `Match.empty` / `sequence` | 21.5% | **無い**（手書きは Match 木を作らず、capture は O(1) の cons list） |
+
+（step 1 後の binary で採った profile。step 2 は `listCopy` の行を消すだけで他の順位は変えない。）
 
 つまり**残りの約 2 倍は「認識モードでも Match 木と capture 出現を必ず作る」ことに由来する**。
 これは M5 報告の「残り 3（Match 木の廃止 = event arena 化）」と D-023 の二段構えそのもので、
@@ -230,7 +235,26 @@ step 2 と合わせて **−1.9%** に反転させている（後掲 P4 表）�
 
 ## 同値性の検証
 
-EQUIVALENCE
+- `examples/p4-java` の `PredictEquivalenceTest`（全 16 fixture × 切り詰め・1 文字破壊 884 入力 ×
+  入口 3 種 × AST 有無 = **5,304 件**）の `Session.predict` on/off 比較が緑。
+- **corpus**: `cargo run -q --offline --bin ubnfc-harness -- run-all --backend java`
+  → **Java Pass 1,310 / 期待拒否 Pass 28 / Known 28 / Fail 0 / 未観測 59**
+  （`docs/reports/2026-09-24-java-corpus-perf3.{md,json}`）。系統別の表は
+  `2026-09-23-java-corpus-contract.md` および直近の `2026-09-23-java-corpus-crosscheckfix.md` と
+  **1 行も違わない**（`diff` で確認）。
+- **IR golden 不変**: `crates/ubnfc-front` を変更していないので IR も self-host も動かない
+  （`cargo test --workspace --offline` が golden を照合して緑）。
+- **差分ファジング**: `cargo test -p ubnfc-fuzz --offline` が固定 seed キャンペーン
+  （`a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_divergence` ほか 4 件）、
+  `choice_reachability` 2 件、`right_assoc_span` 1 件、unit 22 件すべて緑。
+- **1 parse の計数が完全に一致**（Operators 512 atom、認識・AST とも
+  rule 2,561 / memo hit 0 / memo store 2,561 / fail 12,810 / trivia 5,633 / combine 2,561 /
+  capture append 2,047）。確保の仕方だけを変えたことの直接の証拠。
+- `ubnfc-java` / `ubnfc-java/runtime-template` / `examples/p4-java` の maven test 緑、
+  `examples/p4-java/scripts/generate.sh --check` 差分なし、`cargo fmt --check` と
+  `cargo clippy --workspace --all-targets -- -D warnings` 緑。
+- `origin/master`（issue #1 の `P4Scanners` 引用符修正、D-050〜D-053 を含む）を取り込んだ上での結果。
+  本 PR の D 行は **D-054**。
 
 ## 残り（次のラウンドの順序）
 
