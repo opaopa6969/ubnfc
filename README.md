@@ -361,6 +361,10 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   生成される `EvaluatorBridge`（interface + no-op 既定）に差し込む契約で、`evaluate` / `setVariable` は
   既定では「未対応」を明示的に返す（[`docs/reports/2026-09-24-dap-stage4.md`](docs/reports/2026-09-24-dap-stage4.md)）。
   VSIX に入れるには `scripts/build-vsix.sh --with-dap`。
+- **既存実装への差し込みも opt-in の形にできる**。`examples/p4-java-facade` は tinyexpression の
+  `P4PreferredAstMapper` と同じ公開面を持つ facade を生成パーサで組み直したもので、同 FQN の
+  classpath shadow だけで `FormulaInfo` → Java 生成 → javac → 実行 の経路が丸ごと入れ替わる
+  （tinyexpression は無変更。[`docs/reports/2026-09-24-te-facade.md`](docs/reports/2026-09-24-te-facade.md)）。
 - `@precedence` の `level` 値、`@leftAssoc`/`@rightAssoc` の `associativity` 値は
   front が IR に載せるが**どちらの backend も読まない**（`07-annotation-inventory.md`）。
   `@doc` も backend の codegen は読まないが、**IR には載っているので LSP の hover が使う**（D-062）。
@@ -477,6 +481,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | `scanners/` | Extern token の scanner registry（`first-chars.json` と Java / Rust 実装） |
 | `examples/handwritten-target` | 生成物の**目標形**を手書きで固定した Operators / Power（Java・Rust） |
 | `examples/p4-java`, `examples/p4-rust` | tinyexpression P4（124 規則）の生成物を commit した実行例とベンチ |
+| `examples/p4-java-facade` | tinyexpression の `P4PreferredAstMapper` 互換 facade（中身は `examples/p4-java` の生成パーサ）。パリティ・経路実証・段別計測のドライバ付き |
 | `examples/p4-vscode` | P4 の VS Code 拡張（生成パーサ + 生成 LSP サーバ + TextMate 文法 + VSIX）。`scripts/build-vsix.sh p4` |
 | `examples/ubnf-vscode` | UBNF 自身（`ubnf.ubnf`）の VS Code 拡張。同じ経路で組む。`scripts/build-vsix.sh ubnf` |
 | `examples/p4-v2` | P4 を UBNF v2（左再帰ルール + 中立 token 語彙）で書き直したもの。124 → 119 規則、式の塔 8 → 3 |

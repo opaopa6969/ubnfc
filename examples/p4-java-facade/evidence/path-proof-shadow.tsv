@@ -1,0 +1,15 @@
+test_class	tests	succeeded	failed	aborted	skipped	millis
+org.unlaxer.tinyexpression.evaluator.p4.P4DslJavaCodeCalculatorTest	47	47	0	0	2	108999
+org.unlaxer.tinyexpression.p4.P4BackendParityTest	19	19	0	0	0	2709
+org.unlaxer.tinyexpression.evaluator.javacode.DslGeneratedAstJavaEmitterTest	4	4	0	0	0	1160
+org.unlaxer.tinyexpression.evaluator.javacode.P4OptionalExternalQualifierTest	3	3	0	0	0	444
+org.unlaxer.tinyexpression.evaluator.ast.ThreeExecutionBackendParityTest	2	2	0	0	0	7412
+org.unlaxer.tinyexpression.evaluator.javacode.DslJavaCodeGenerationParityTest	1	1	0	0	0	685
+org.unlaxer.tinyexpression.evaluator.javacode.DslJavaCodeGenerationExtractedParityTest	1	1	0	0	0	5644
+org.unlaxer.tinyexpression.evaluator.ast.ThreeExecutionBackendExtractedCorpusParityTest	1	1	0	0	0	4656
+org.unlaxer.tinyexpression.evaluator.ast.AstEvaluatorBackendParityTest	5	5	0	0	0	573
+org.unlaxer.tinyexpression.loader.FormulaInfoParserTest	1	1	0	0	0	575
+org.unlaxer.tinyexpression.loader.FormulaInfoExecutionBackendSelectionTest	6	6	0	0	0	151
+org.unlaxer.tinyexpression.loader.FormulaInfoStoredByteCodePolicyTest	2	2	0	0	0	79
+org.unlaxer.tinyexpression.p4.P4PreferredAstMapperPrecedenceTest	13	13	0	0	0	4
+org.unlaxer.tinyexpression.evaluator.javacode.JavaCodeCalculatorV3Test	47	47	0	0	2	106403
