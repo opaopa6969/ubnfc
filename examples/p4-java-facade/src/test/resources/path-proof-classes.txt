@@ -1,0 +1,16 @@
+# FormulaInfo -> DslGeneratedAstJavaEmitter -> JavaCodeCalculatorV3 -> CompileContext.compile -> 実行
+# を通る tinyexpression 自身のテスト。ここに挙げたクラスをそのまま（無変更で）走らせる。
+org.unlaxer.tinyexpression.evaluator.p4.P4DslJavaCodeCalculatorTest
+org.unlaxer.tinyexpression.p4.P4BackendParityTest
+org.unlaxer.tinyexpression.evaluator.javacode.DslGeneratedAstJavaEmitterTest
+org.unlaxer.tinyexpression.evaluator.javacode.P4OptionalExternalQualifierTest
+org.unlaxer.tinyexpression.evaluator.ast.ThreeExecutionBackendParityTest
+org.unlaxer.tinyexpression.evaluator.javacode.DslJavaCodeGenerationParityTest
+org.unlaxer.tinyexpression.evaluator.javacode.DslJavaCodeGenerationExtractedParityTest
+org.unlaxer.tinyexpression.evaluator.ast.ThreeExecutionBackendExtractedCorpusParityTest
+org.unlaxer.tinyexpression.evaluator.ast.AstEvaluatorBackendParityTest
+org.unlaxer.tinyexpression.loader.FormulaInfoParserTest
+org.unlaxer.tinyexpression.loader.FormulaInfoExecutionBackendSelectionTest
+org.unlaxer.tinyexpression.loader.FormulaInfoStoredByteCodePolicyTest
+org.unlaxer.tinyexpression.p4.P4PreferredAstMapperPrecedenceTest
+org.unlaxer.tinyexpression.evaluator.javacode.JavaCodeCalculatorV3Test
