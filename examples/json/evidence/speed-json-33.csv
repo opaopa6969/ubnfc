@@ -1,5 +1,5 @@
 # issue #33。認識のみ、taskset -c 30、1 run=0.5 秒ぶんの反復 x 7 run、入力ごとに変種を交互、2 周。
-# base=origin/master 75dec71 / cand=D-061 / candb=D-061+D-062 / candc=D-061+D-062+D-063(本 PR)
+# base=origin/master 75dec71 / cand=D-061 / candb=D-061+D-062 / candc=D-061+D-062+D-064(本 PR)
 # load average 開始 16.05/22.00/26.60 終了 13.38/19.36/25.24
 family,impl,input,bytes,mode,iterations,runs,median_ms,min_ms,max_ms,us_per_byte,allocs_per_parse,alloc_bytes_per_parse
 json,base,json-1k.json,1067,認識,2233,7,0.069621,0.065507,0.083717,0.0652,5,18776

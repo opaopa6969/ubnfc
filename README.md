@@ -159,8 +159,8 @@ issue #26）。同じ言語を 3 記法（`.ubnf` / `.g4` / `grammar.js`）で�
   ubnfc Rust 234.5 ms（4.3 MB/s）。ubnfc は入力が大きいほど µs/byte が悪化し、
   原因は **memo の `defaultSafe` 判定**と特定した（memo を切ると 1 MB が 51 ms・µs/byte が平ら）。
   **2026-09-24 追記（issue #33、`docs/reports/2026-09-24-json-perf.md`）**: その 15 式を
-  再入判定の精密化（D-063）と「終端走査だけの規則に memo は入れない」（D-064）で落とし、
-  併せて排他 predict の空振り（1 byte あたり literal 照合 1.0 回）を消した（D-065）。
+  再入判定の精密化（D-064）と「終端走査だけの規則に memo は入れない」（D-065）で落とし、
+  併せて排他 predict の空振り（1 byte あたり literal 照合 1.0 回）を消した（D-066）。
   **JSON 1 MB 認識は 214.8 → 30.5 ms（最小値、7.0 倍）、µs/byte は 1 KB→1 MB で平ら
   （0.0291 → 0.0305、1.05 倍）、ANTLR4 比は 21 倍 → 2.7 倍**。
   issue の目標「ANTLR の 2 倍以内」は未達で、残差は単価ではなく**回数**
@@ -234,7 +234,7 @@ issue #27。文法は `examples/p4-antlr/TinyExpressionP4.g4` と `examples/p4-t
 | PR #18（issue #15） | 認識専用経路で Match 木・出現表・診断観測を作らない | **Operators 512 atom 認識 0.207 ms（手書き目標形 0.350 ms の 0.59 倍、目標 ≤0.4 ms 達成）**。**P4 complex-x64 認識 13.71 ms（目標 ≤15 ms 達成）**。complex 認識 0.213 ms（目標 0.2 ms に 6% 届かず） | `2026-09-24-java-two-mode.md`（D-056） |
 | PR #21（issue #19） | AST 経路にも観測の opt-in を広げる（出現表を作る条件を Match 木の条件から分離） | **Operators 512 atom AST 0.631 ms（issue の目標 0.693 ms を達成、手書き 0.560 ms の 1.13 倍）**。P4 complex AST 0.564→0.309 ms、x64 AST 50.0→28.0 ms。**M5 の AST 目標（complex ≤0.2 ms / x64 ≤15 ms）は未達**——同条件の認識専用が complex 0.220 ms / x64 17.5 ms なので、AST 層を 0 円にしても届かない | `2026-09-24-java-ast-path.md`（D-057） |
 | PR #24（issue #17） | rule 本体の memo を「同じ位置へ再入し得る」規則だけに絞る（Operators は全 rule で外れ、P4 の塔は残る） | Operators 512 atom 認識専用 0.204→0.160 ms、割当 465,664→350,168 B。**Rust も同判定で 0.176→0.115 ms、P4 complex-x64 認識 5.67→4.68 ms（最小値）**。P4 は両 backend で悪化なし | `2026-09-24-memo-plan.md`（D-058） |
-| PR #46（issue #33。**front と Rust backend**。Java backend の D-065 相当は別 issue） | 再入判定に mayStart の素性を足し（D-063）、終端走査だけの規則には memo を入れず（D-064）、排他 predict が外れたら候補を試さない（D-065） | **JSON 1 MB 認識 214.8→30.5 ms（最小値）、µs/byte がサイズで平らに（3.53→1.05 倍）、ANTLR4 比 21→2.7 倍**。P4 は悪化なし（complex-x64 認識 6.06→4.90 ms、最小値） | `2026-09-24-json-perf.md`（D-063 / D-064 / D-065） |
+| PR #46（issue #33。**front と Rust backend**。Java backend の D-066 相当は別 issue） | 再入判定に mayStart の素性を足し（D-064）、終端走査だけの規則には memo を入れず（D-065）、排他 predict が外れたら候補を試さない（D-066） | **JSON 1 MB 認識 214.8→30.5 ms（最小値）、µs/byte がサイズで平らに（3.53→1.05 倍）、ANTLR4 比 21→2.7 倍**。P4 は悪化なし（complex-x64 認識 6.06→4.90 ms、最小値） | `2026-09-24-json-perf.md`（D-064 / D-065 / D-066） |
 
 corpus（Java Pass 1,310 / Rust Pass 1,292、Fail 0）はこの 5 ラウンドいずれでも系統別表が既存報告と
 byte 一致、IR golden も `plan.memo.entries` 以外は不変。**結論**: Java backend の性能目標は
@@ -471,7 +471,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 
 | 文書 | 内容 |
 |---|---|
-| [`docs/design/03-design-v1.md`](docs/design/03-design-v1.md) | **正本**。全体構成、実行意味論、IR 契約、結果 API、マイルストーン、**§8 の決定表 D-001 … D-065**（本 commit 時点で 64 行。D-034 は採番の欠番。行は増え続けている） |
+| [`docs/design/03-design-v1.md`](docs/design/03-design-v1.md) | **正本**。全体構成、実行意味論、IR 契約、結果 API、マイルストーン、**§8 の決定表 D-001 … D-066**（本 commit 時点で 64 行。D-034 は採番の欠番。行は増え続けている） |
 | [`docs/design/04-cursor-and-diagnostics-contract.md`](docs/design/04-cursor-and-diagnostics-contract.md) | 二重カーソルの遷移表、診断の主位置、self-host、左再帰、IR スキーマの要点 |
 | [`docs/design/05-selfhost.md`](docs/design/05-selfhost.md) | self-host 経路と固定点、既知の 5 差分 + ブロックコメントの字句の門 |
 | [`docs/design/06-ubnf-v2.md`](docs/design/06-ubnf-v2.md) | 言語の弱点と v2 の計画・実装状況 |
