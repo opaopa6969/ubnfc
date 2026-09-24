@@ -5,3 +5,4 @@ target/
 /scratch/
 examples/*/out/
 examples/*/out-spec/
+benchmarks/external/
