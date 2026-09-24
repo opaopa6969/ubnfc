@@ -196,6 +196,11 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
     }).collect();
     let mut omissions = BTreeMap::<usize, Proof>::new();
     let mut omitted_rules = BTreeSet::new();
+    // rule 本体 memo の要否。memo が当たるのは同じ (rule, position) が 2 回試されたときだけで、
+    // 位置が戻るのは巻戻しのときだけなので、「確定した経路上で同じ位置に再入し得ない」規則は
+    // 保存するだけで一度も当たらない（Operators 512 atom で rule 呼出し 2,561 件すべて miss）。
+    // scope / recovery / Extern を伴う本体は判断材料が増えるので保持側に倒す。
+    let reentrant = super::reentry::reentrant_rules(cx, choices);
     // 省略の根拠: rule 本体の memo（成功・失敗）を保持したまま、本体の局所木で単一所有
     // （incoming == 1、Expr 木は tree）の部分式は、本体 1 回の評価内で同じ key
     // (consumed, matched, mode, stateVersion) で 2 度評価されない。
@@ -232,6 +237,13 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
                 *incoming.entry(cx.index(id)).or_default() += 1;
             }
         }
+        let body_kept = reentrant.contains(&r) || !summaries[root].is_empty();
+        if !body_kept {
+            omissions.insert(root, Proof { kind: ProofKind::UnreachableRevisit,
+                expr_ids: vec![cx.sem.expressions[root].id.clone()],
+                explanation: "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。".into() });
+            omitted_rules.insert(r);
+        }
         let mut stack = vec![(
             root,
             ProofKind::SingleExecutionPath,
@@ -242,8 +254,11 @@ pub(super) fn memo(cx: &Context<'_>, choices: &[ChoicePlan]) -> MemoResult {
                 continue;
             }
             if i != root {
-                omissions.insert(i, Proof { kind, expr_ids: path.clone(), explanation:
-                    "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。".into() });
+                omissions.insert(i, Proof { kind, expr_ids: path.clone(), explanation: if body_kept {
+                    "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。".into()
+                } else {
+                    "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。".into()
+                } });
                 omitted_rules.insert(r);
             }
             let (next, next_kind): (Vec<&ExprId>, ProofKind) = match &cx.sem.expressions[i].node {
