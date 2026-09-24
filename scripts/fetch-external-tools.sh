@@ -10,6 +10,7 @@
 #   TREE_SITTER_BIN=<tree-sitter CLI の絶対パス>
 #   TREE_SITTER_SRC=<tree-sitter C ランタイムのチェックアウト（lib/src, lib/include を含む）>
 #   JSON_TEST_SUITE=<JSONTestSuite のチェックアウト>
+#   RFC8259_TXT=<RFC 8259 の本文（corpus/spec/json の引用照合に使う）>
 #
 # 取得先とバージョンは全て固定してある（下の PIN 群）。ネットワークが無い環境では
 # 「何が足りないか」を述べて非 0 で終わる（黙って別物を使うことはしない）。
@@ -28,6 +29,11 @@ TREE_SITTER_REPO=https://github.com/tree-sitter/tree-sitter
 
 JSON_TEST_SUITE_COMMIT=1ef36fa01286573e846ac449e8683f8833c5b26a
 JSON_TEST_SUITE_REPO=https://github.com/nst/JSONTestSuite
+
+# 規範文書そのもの。corpus/spec/json/*.json の citation が逐語で載っているかを
+# crates/ubnfc-harness/tests/spec_corpus.rs が照合する。
+RFC8259_URL=https://www.rfc-editor.org/rfc/rfc8259.txt
+RFC8259_SHA256=61a5378f4255c720beb2a4b4a63b29540147c140f36988bf086291989b4cd2d7
 # ---------------------------------------------------------------------------------
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -36,6 +42,7 @@ ANTLR_JAR="$EXTERNAL/antlr-${ANTLR_VERSION}-complete.jar"
 TREE_SITTER_BIN="$EXTERNAL/node_modules/.bin/tree-sitter"
 TREE_SITTER_SRC="$EXTERNAL/tree-sitter-${TREE_SITTER_VERSION}"
 JSON_TEST_SUITE="$EXTERNAL/JSONTestSuite"
+RFC8259_TXT="$EXTERNAL/rfc8259.txt"
 
 CHECK_ONLY=0
 [ "${1:-}" = "--check" ] && CHECK_ONLY=1
@@ -50,12 +57,14 @@ emit() {
   echo "TREE_SITTER_BIN=$TREE_SITTER_BIN"
   echo "TREE_SITTER_SRC=$TREE_SITTER_SRC"
   echo "JSON_TEST_SUITE=$JSON_TEST_SUITE"
+  echo "RFC8259_TXT=$RFC8259_TXT"
 }
 
 have_all() {
   [ -f "$ANTLR_JAR" ] && [ -x "$TREE_SITTER_BIN" ] \
     && [ -f "$TREE_SITTER_SRC/lib/src/lib.c" ] \
-    && [ -d "$JSON_TEST_SUITE/test_parsing" ]
+    && [ -d "$JSON_TEST_SUITE/test_parsing" ] \
+    && [ -f "$RFC8259_TXT" ]
 }
 
 if [ "$CHECK_ONLY" = 1 ]; then
@@ -65,6 +74,7 @@ if [ "$CHECK_ONLY" = 1 ]; then
   [ -x "$TREE_SITTER_BIN" ] || missing+=("tree-sitter CLI ($TREE_SITTER_BIN)")
   [ -f "$TREE_SITTER_SRC/lib/src/lib.c" ] || missing+=("tree-sitter C runtime ($TREE_SITTER_SRC)")
   [ -d "$JSON_TEST_SUITE/test_parsing" ] || missing+=("JSONTestSuite ($JSON_TEST_SUITE)")
+  [ -f "$RFC8259_TXT" ] || missing+=("RFC 8259 ($RFC8259_TXT)")
   die "未取得: ${missing[*]} — ネットワークのある環境で scripts/fetch-external-tools.sh を実行すること"
 fi
 
@@ -133,6 +143,19 @@ else
   mv "$JSON_TEST_SUITE.part" "$JSON_TEST_SUITE"
 fi
 [ -d "$JSON_TEST_SUITE/test_parsing" ] || die "JSONTestSuite の test_parsing が無い: $JSON_TEST_SUITE"
+
+# --- RFC 8259 本文（sha256 固定） ------------------------------------------------
+if [ -f "$RFC8259_TXT" ] && [ "$(sha256sum <"$RFC8259_TXT" | cut -d' ' -f1)" = "$RFC8259_SHA256" ]; then
+  log "RFC 8259: 取得済み"
+else
+  log "RFC 8259: $RFC8259_URL"
+  tmp="$RFC8259_TXT.part"
+  curl -fsSL --retry 2 --connect-timeout 20 -o "$tmp" "$RFC8259_URL" \
+    || die "RFC 8259 を取得できない（ネットワーク不通か URL 変更）: $RFC8259_URL"
+  got=$(sha256sum <"$tmp" | cut -d' ' -f1)
+  [ "$got" = "$RFC8259_SHA256" ] || { rm -f "$tmp"; die "RFC 8259 の sha256 不一致: expected $RFC8259_SHA256 got $got"; }
+  mv "$tmp" "$RFC8259_TXT"
+fi
 
 log "完了。以下のパスを使う:"
 emit

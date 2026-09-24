@@ -1,0 +1,17 @@
+{
+  "grammars": [
+    {
+      "name": "json",
+      "camelcase": "Json",
+      "scope": "source.json",
+      "path": ".",
+      "file-types": ["json"]
+    }
+  ],
+  "metadata": {
+    "version": "0.0.1",
+    "license": "MIT",
+    "description": "RFC 8259 JSON grammar (ubnfc issue #26 の 3 記法比較用)",
+    "authors": [{ "name": "ubnfc" }]
+  }
+}
