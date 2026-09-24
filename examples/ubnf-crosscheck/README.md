@@ -54,3 +54,24 @@ Java 側の正準化は `RustUbnfFrontendConformanceTest.canonical()` と同じ�
 
 `evidence/report.md`（2026-09-23 実行）。要点は
 `docs/reports/2026-09-23-parser-feature-correctness-comparison.md` の Part 3.1。
+
+## 仕様由来ケース（issue #5）
+
+`corpus/spec/ubnf/*.json` の 129 ケースを同じ 4 実装へ流す別ドライバがある。
+上の 48 件が「実在ファイル + 既存の不正入力」なのに対し、こちらは
+**`unlaxer-dsl/specs/*.md` の規範文から期待値を導いた**ケース集で、
+どの実装の観測値も期待値に使っていない。
+
+```bash
+bash scripts/run-spec.sh [OUT_DIR]      # 既定 OUT_DIR は ./out-spec
+```
+
+- `scripts/spec_cases.py` が各ケースの入力を 1 ファイルへ展開する。
+- A/B は上と同じ `ubnf-crosscheck` バイナリ、C は `inspect`、D は `UbnfProbe`。
+  `validate` scope のケースだけ `ubnfc validate --format json` と
+  `UbnfProbe --validate`（旧 Java `GrammarValidator`）も走らせる。
+- `scripts/compare-spec.py` が期待値と突き合わせ、
+  一致 / 違反 / 別コード / 未定 / 駆動不能の 5 値で表にする。
+
+実行済みの結果は `evidence/spec-report.md`、分析は
+`docs/reports/2026-09-24-spec-derived-oracle.md`。

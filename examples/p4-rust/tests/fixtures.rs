@@ -643,3 +643,28 @@ fn predict_matches_reference_path_on_truncated_and_corrupted_inputs() {
     }
     assert!(compared > 3000, "{compared}");
 }
+
+/// 深い入れ子の**入力**に対する契約（design v1 §6「再帰深度は `ParseOptions.maxDepth`
+/// （既定 10,000）で制限し、超過は `syntax` 失敗として報告する」）を P4 で確かめる。
+/// 生成 parser は再帰下降なので、上限が無ければ深い `((((…))))` でプロセスごと落ちる。
+/// 入れ子 1 段で P4 は 200 段超の rule 呼出しを積むので、20 段は通り 50 段で上限に当たる。
+/// `examples/p4-java` の `scripts/depth.sh` が Java 側で同じことを見る（`evidence/depth.log`）。
+#[test]
+fn deeply_nested_input_reports_a_depth_diagnostic_instead_of_crashing() {
+    for depth in [1usize, 20] {
+        let text = format!("{}1{}", "(".repeat(depth), ")".repeat(depth));
+        let result = parse_formula(&text, ParseOptions::default());
+        assert!(result.ok, "depth {depth}: {:?}", result.diagnostics);
+    }
+    for depth in [50usize, 1_000, 10_000] {
+        let text = format!("{}1{}", "(".repeat(depth), ")".repeat(depth));
+        let result = parse_formula(&text, ParseOptions::default());
+        assert!(!result.ok, "depth {depth} は上限に当たるはず");
+        let diagnostic = result.diagnostics.first().expect("診断が 1 件は出る");
+        assert_eq!(
+            diagnostic.expected,
+            vec!["maximum parse depth exceeded".to_owned()],
+            "depth {depth}"
+        );
+    }
+}

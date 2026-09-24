@@ -1,0 +1,49 @@
+{
+  "family": "ubnf",
+  "section": "予約語",
+  "summary": "予約語一覧から導ける問い。",
+  "cases": [
+    {
+      "id": "reserved/rule-named-token",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 予約語",
+        "sentence": "以下は UBNF で特別な意味を持つ単語です："
+      },
+      "input": "grammar G { token ::= 'x'; }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "予約語一覧は「特別な意味を持つ単語」と述べるだけで、それらをルール名・トークン名に使えないとは書いていない。"
+      }
+    },
+    {
+      "id": "reserved/rule-named-error",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 予約語",
+        "sentence": "以下は UBNF で特別な意味を持つ単語です："
+      },
+      "input": "grammar G { ERROR ::= 'x'; R ::= ERROR; }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "`ERROR` は予約語だが、`ERROR('...')` 以外の位置での参照が禁じられているとは書かれていない。"
+      }
+    },
+    {
+      "id": "reserved/token-named-any",
+      "scope": "parse",
+      "citation": {
+        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
+        "heading": "## 予約語",
+        "sentence": "以下は UBNF で特別な意味を持つ単語です："
+      },
+      "input": "grammar G { token ANY=EMPTY R ::= ANY; }",
+      "expectation": {
+        "verdict": "undetermined",
+        "question": "トークンキーワードと同名のトークン宣言に関する規範文が無い。"
+      }
+    }
+  ]
+}
