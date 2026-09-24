@@ -292,3 +292,124 @@ bash examples/p4-crosscheck/scripts/run-spec.sh
 ```
 
 既存 corpus は不変・不退行（Java Pass 1310 / Fail 0、Rust Pass 1292 / Fail 0）。
+
+## 9. 追記（2026-09-24 その2、issue #11 — unlaxer-parser #279 への追随）
+
+unlaxer-parser #277（PR #279、`4754a3c` で merge 済み）が UBNF 仕様書の欠陥を訂正し、
+本報告 §4 の存在しない診断コード3件と §5 の未定14件のうち多くに決定を書いた。
+ここではその訂正を `corpus/spec/ubnf/**` に反映し、4実装クロスチェックを取り直す。
+
+### 9.1 引用文が変わった3件
+
+`validation.md` のコード名訂正に追随し、`citation.sentence` と `expectation.code` を更新した。
+検出条件（両実装が出す実際のコード）は変わっていない。
+
+| ケース | 旧コード名 → 新コード名 |
+|---|---|
+| `annotation/mapping-extra-capture` | `E-MAPPING-EXTRA-CAPTURE` → `E-MAPPING-UNLISTED-CAPTURE` |
+| `annotation/precedence-without-assoc` | `E-PRECEDENCE-WITHOUT-ASSOC` → `E-PRECEDENCE-NO-ASSOC` |
+| `annotation/assoc-without-precedence` | `E-ASSOC-WITHOUT-PRECEDENCE` → `E-ASSOC-NO-PRECEDENCE` |
+
+`cargo test -q -p ubnfc-harness --test spec_corpus --offline`（`UNLAXER_PARSER_DIR` を
+unlaxer-parser `931c919` へ向けて実行）は3件とも緑。
+
+### 9.2 リネーム2件の突き合わせ（ubnfc 側の変更は無し）
+
+`E-RIGHTASSOC-NON-CANONICAL` → `E-RIGHTASSOC-NONCANONICAL`、
+`E-PRECEDENCE-MIXED-LEVEL` → `E-PRECEDENCE-MIXED-ASSOC` の2件は、
+`grep -rn "E-RIGHTASSOC\|E-PRECEDENCE-MIXED" crates/ubnfc-front/src` で確認したところ
+`crates/ubnfc-front/src/validate/operators.rs` が新コード名（`E-RIGHTASSOC-NONCANONICAL` /
+`E-PRECEDENCE-MIXED-ASSOC`）をそのまま出しており、**訂正後の仕様と一致**。
+ubnfc 側の corpus にもこの2件に該当するケースが無いため、追随作業は不要だった。
+
+### 9.3 未定14件の昇格
+
+11件を `accept` / `diagnostic` へ昇格し、3件は runtime scope のまま `undetermined` に残した
+（理由は下記9.4）。すべて `examples/ubnf-crosscheck` の CLI（`ubnfc validate --format json`）で
+実測してから昇格しており、期待値を実装に合わせて書き換えてはいない
+（4実装クロスチェックが独立に一致を確認している）。
+
+| ケース | 新しい期待値 | 根拠 |
+|---|---|---|
+| `rule/lowercase-name` | `accept` | 「大文字始まり」は命名規約でMUSTではない |
+| `rule/dotted-reference-three-segments` | `accept` | 3段以上の dotted 参照も1個の IDENTIFIER として受理 |
+| `escape/unknown-sequence` | `accept` | 表にないエスケープはエラーにしない（展開結果の文字は実装依存のため未検証） |
+| `quantifier/reversed-bounds` | `diagnostic` / `E-BOUNDED-INVALID` | 構文層は受理、バリデーション層で拒否 |
+| `quantifier/huge-bound` | `diagnostic` / `E-BOUNDED-OVERFLOW` | INTEGER は Java 32bit 符号付き整数 |
+| `error/element-needs-string` | `diagnostic` / `E-RULE-UNDEFINED` | `ERROR(msg)` は `ErrorElement` にならず `RuleRefElement` として解決、`ERROR` 未定義で拒否 |
+| `annotation/root-two-rules` | `accept` | `@root` の SHOULD 違反は検出・警告しない |
+| `reserved/rule-named-token` | `accept` | 予約語は表の位置以外では通常の識別子 |
+| `reserved/rule-named-error` | `accept` | 同上 |
+| `reserved/token-named-any` | `accept` | 同上 |
+| `spec-contradiction/minilang-leftassoc` | `diagnostic` / `E-ASSOC-NO-PRECEDENCE`（scope を `validate` へ変更） | MiniLang 例の修正で矛盾解消。`@precedence` を伴わない `@leftAssoc` は annotations.md の MUST 違反 |
+
+### 9.4 残した undetermined 3件
+
+いずれも `scope: runtime`。仕様は「観測できない」と明記したが、これは**この corpus 形式が
+4実装の構文木・診断の比較でしか判定できない**という性質そのものであり、
+accept/reject/diagnostic のいずれにも決められない。既存の `scope: runtime` ケース
+（`char-range/inclusive-bounds` を含め本報告作成時から一貫して）はすべて `undetermined` として
+残す規約になっており、それを踏襲した。
+
+| ケース | 仕様の文言 |
+|---|---|
+| `char-range/inclusive-bounds` | 「両端を含む判定は…UBNF を読む処理系自体の入出力からは観測できない（`scope: runtime`）」 |
+| `separator/expansion` | 「`elem (sep elem)*` への展開は…UBNF ファイルを読む処理系自体の入出力からは観測できない（`scope: runtime`）」 |
+| `error/hint-is-last-alternative` | 「ヒントメッセージが…UBNF を読む処理系自体の入出力や構文木の比較では観測できない（`scope: runtime`）」 |
+
+### 9.5 昇格後の4実装クロスチェック（再実測）
+
+`unlaxer-parser` は `931c919`（PR #280 “fix(ubnf): accept empty grammar body, reject trailing
+input in Java bootstrap” 併合後）で実行した。共有 `~/.m2/repository` の `unlaxer-dsl-3.0.15.jar`
+は PR #280 前のビルドのままだったため、`~/.m2/repository` を隔離コピーへ複製し
+（`cp -a ~/.m2/repository $ISO/repository`）、`mvn -o -Dgpg.skip=true
+-Dmaven.repo.local=$ISO/repository -pl unlaxer-common,unlaxer-dsl -am -DskipTests install`
+で `931c919` のソースから jar を作り直してから `MAVEN_REPO=$ISO/repository
+bash examples/ubnf-crosscheck/scripts/run-spec.sh` を実行した（共有 `~/.m2` は汚していない）。
+
+| 実装 | 一致 | 一致(validate) | 違反 | 別コード | 未定 | 駆動不能 |
+|---|---:|---:|---:|---:|---:|---:|
+| A ubnfc 手書き frontend | 108 | 8 | **10** | 0 | 0 | 3 |
+| B ubnfc 自己ホスト生成 | 89 | 0 | **11** | 0 | 0 | 29 |
+| C unlaxer-ubnf（手書き Rust） | 108 | 0 | **0** | 0 | 0 | 21 |
+| D Java bootstrap | 122 | 0 | **0** | 0 | 0 | 4 |
+
+§2 の初回計測（issue #1 反映後）との差分:
+
+- **別コード 3→0**（A・D とも）: §4 の3コード名訂正を corpus に反映した結果。
+- **C の違反 1→0**、**D の違反 3→0**: `grammar/empty-block`・`file/trailing-garbage-rejected`・
+  `comment/block-unclosed-rejected` が unlaxer-parser #278（PR #280）で修正され、3件とも一致に変わった。
+- **未定 11→0**（駆動不能に吸収された3件を除く）: 11件の昇格による。
+- **B の違反 10→11**: 新たに `rule/dotted-reference-three-segments` が違反に加わった（§9.6）。
+- A の違反10件（D-052 空構文8件 + D-053 量指定子併記2件）は既存の意図的な差のままで変化なし。
+
+### 9.6 新たな発見: ubnfc-selfhost が3段以上の dotted 参照を拒否する
+
+`rule/dotted-reference-three-segments`（`accept` へ昇格）を4実装へ流したところ、
+ubnfc 自己ホスト生成 frontend（B、`crates/ubnfc-front/src/selfhost/**` +
+`crates/ubnfc-selfhost/**`）だけが最小入力 `grammar G { R ::= a.b.Value; }` を拒否した
+（`構文エラー (bytes 21..22): expected + or ? or * or { or % or @ or @typeof or ( or [ or ERROR
+or STRING or IDENTIFIER or | or ;`）。2段の `a.B` は A/B とも受理するため、chained dot が
+3段以上になったときだけ selfhost の生成規則が対応していない。
+
+A（手書き frontend）・C（unlaxer-ubnf Rust）・D（Java bootstrap）はいずれも受理する。
+selfhost の文法/生成規則は issue #4 の作業範囲（`crates/ubnfc-front/src/selfhost/**` /
+`crates/ubnfc-selfhost/**`）のため、本 branch では修正せず
+**[opaopa6969/ubnfc#12](https://github.com/opaopa6969/ubnfc/issues/12)** を立てた。
+
+### 9.7 再現手順（追記分）
+
+```bash
+# corpus の形と引用の検査
+UNLAXER_PARSER_DIR=/path/to/unlaxer-parser \
+  cargo test -q -p ubnfc-harness --test spec_corpus --offline
+
+# 4実装クロスチェック（jar を隔離 ~/.m2 で作り直してから）
+ISO=$(mktemp -d) && cp -a ~/.m2/repository "$ISO/repository"
+(cd /path/to/unlaxer-parser && mvn -o -q -Dgpg.skip=true \
+  -Dmaven.repo.local="$ISO/repository" -pl unlaxer-common,unlaxer-dsl -am -DskipTests install)
+UNLAXER_PARSER_DIR=/path/to/unlaxer-parser MAVEN_REPO="$ISO/repository" \
+  bash examples/ubnf-crosscheck/scripts/run-spec.sh
+```
+
+既存 corpus は不変・不退行（Java Pass 1310 / Fail 0、Rust Pass 1292 / Fail 0、下記参照）。

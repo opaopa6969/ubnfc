@@ -48,13 +48,13 @@
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",
         "heading": "## ルール宣言",
-        "sentence": "- 左辺はルール名（大文字始まりの識別子）"
+        "sentence": "「大文字始まりの識別子」は命名規約であり、形式的な文法定義の `RuleDecl` は 大文字・小文字を制約しない（MUST ではない）。小文字始まりのルール名 （例 `r ::= 'x';`）は構文としても検証としても受理する。"
       },
       "input": "grammar G { r ::= 'x'; }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "本文は「大文字始まりの識別子」と書くが、形式的な文法定義の `RuleDecl ::= { Annotation } IDENTIFIER '::=' RuleBody ';'` は大小を制約しない。小文字始まりのルール名を拒否すべきか、警告すべきか、許すかが仕様から決まらない。"
-      }
+        "verdict": "accept"
+      },
+      "note": "unlaxer-parser #279 の決定: 大文字始まりは命名規約(SHOULD相当)でMUSTではない。小文字始まりのルール名も受理する。"
     },
     {
       "id": "rule/two-refs-are-two-elements",
@@ -142,13 +142,13 @@
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",
         "heading": "## ルール宣言",
-        "sentence": "`namespace.Rule` のドットや FQN の区切りは、外側の文法が処理します。"
+        "sentence": "3段以上の dotted 参照（例 `a.b.Value`）でも同様に外側の文法が処理し、 UBNF 自体は `a.b.Value` 全体を1個の `IDENTIFIER` として扱う（namespace が `a.b` か `a` かは外側の文法の解釈に委ねられ、UBNF の形式文法は分割しない）。"
       },
       "input": "grammar G { R ::= a.b.Value; }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "ドットを外側の文法が処理するとしか書かれておらず、namespace が何段まで許されるか、`a.b.Value` の namespace が `a.b` か `a` かが仕様から決まらない。"
-      }
+        "verdict": "accept"
+      },
+      "note": "unlaxer-parser #279 の決定: 3段以上の dotted 参照も1個の IDENTIFIER として受理する。namespace の段数解釈は外側の文法に委ねられ UBNF は分割しないため、具体的な AST 分割形は canonicalContains で固定しない。"
     }
   ]
 }

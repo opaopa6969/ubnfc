@@ -22,13 +22,13 @@
       "citation": {
         "file": "unlaxer-dsl/specs/annotations.md",
         "heading": "## @root",
-        "sentence": "- 1つの grammar ブロック内で最大1つのルールに付与すべき（SHOULD）"
+        "sentence": "SHOULD 違反（同一 grammar 内で2つ以上のルールに `@root` が付与された場合）を 現在の実装は検出・警告しない。構文としてもバリデーションとしても受理する （エントリポイントとして実際にどのルールが使われるかはジェネレータ実装依存）。"
       },
       "input": "grammar G { @root A ::= 'a'; @root B ::= 'b'; }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "SHOULD なので違反時に受理するか警告するかエラーにするかが定まらない。"
-      }
+        "verdict": "accept"
+      },
+      "note": "unlaxer-parser #279 の決定: SHOULD 違反は検出・警告せず受理する。"
     },
     {
       "id": "annotation/mapping-class-only",
@@ -90,12 +90,12 @@
       "citation": {
         "file": "unlaxer-dsl/specs/validation.md",
         "heading": "### MAPPING エラー",
-        "sentence": "| `E-MAPPING-EXTRA-CAPTURE` | ルール本体のキャプチャ名が `@mapping` の `params` に含まれていない |"
+        "sentence": "| `E-MAPPING-UNLISTED-CAPTURE` | ルール本体のキャプチャ名が `@mapping` の `params` に含まれていない |"
       },
       "input": "grammar G { @mapping(Item, params=[name]) Part ::= 'a' @name 'b' @other; }",
       "expectation": {
         "verdict": "diagnostic",
-        "code": "E-MAPPING-EXTRA-CAPTURE"
+        "code": "E-MAPPING-UNLISTED-CAPTURE"
       }
     },
     {
@@ -240,12 +240,12 @@
       "citation": {
         "file": "unlaxer-dsl/specs/validation.md",
         "heading": "### PRECEDENCE エラー",
-        "sentence": "| `E-PRECEDENCE-WITHOUT-ASSOC` | `@precedence` が `@leftAssoc` / `@rightAssoc` なしで使用されている |"
+        "sentence": "| `E-PRECEDENCE-NO-ASSOC` | `@precedence` が `@leftAssoc` / `@rightAssoc` なしで使用されている |"
       },
       "input": "grammar G { @precedence(level=1) R ::= 'x'; }",
       "expectation": {
         "verdict": "diagnostic",
-        "code": "E-PRECEDENCE-WITHOUT-ASSOC"
+        "code": "E-PRECEDENCE-NO-ASSOC"
       }
     },
     {
@@ -254,12 +254,12 @@
       "citation": {
         "file": "unlaxer-dsl/specs/validation.md",
         "heading": "### ASSOCIATIVITY エラー",
-        "sentence": "| `E-ASSOC-WITHOUT-PRECEDENCE` | `@leftAssoc` / `@rightAssoc` が `@precedence` なしで使用されている |"
+        "sentence": "| `E-ASSOC-NO-PRECEDENCE` | `@leftAssoc` / `@rightAssoc` が `@precedence` なしで使用されている |"
       },
       "input": "grammar G { @leftAssoc R ::= 'x'; }",
       "expectation": {
         "verdict": "diagnostic",
-        "code": "E-ASSOC-WITHOUT-PRECEDENCE"
+        "code": "E-ASSOC-NO-PRECEDENCE"
       }
     },
     {
@@ -425,17 +425,18 @@
     },
     {
       "id": "spec-contradiction/minilang-leftassoc",
-      "scope": "parse",
+      "scope": "validate",
       "citation": {
-        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
-        "heading": "## MiniLang の完全な文法",
-        "sentence": "@leftAssoc AddExpr ::= MulExpr @left { ('+' @op | '-' @op) MulExpr @right } ;"
+        "file": "unlaxer-dsl/specs/annotations.md",
+        "heading": "## @leftAssoc",
+        "sentence": "1. `@leftAssoc` を使用するルールは `@precedence` も宣言する（MUST）"
       },
       "input": "grammar G { MulExpr ::= 'm'; @mapping(BinaryExpr, params=[left, op, right]) @leftAssoc AddExpr ::= MulExpr @left { ('+' @op | '-' @op) MulExpr @right } ; }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "ubnf-syntax.md の完全版 MiniLang 文法は `@leftAssoc` を `@precedence` 無しで使うが、annotations.md は「`@leftAssoc` を使用するルールは `@precedence` も宣言する（MUST）」、validation.md は E-ASSOC-WITHOUT-PRECEDENCE と書く。仕様内で矛盾している。"
-      }
+        "verdict": "diagnostic",
+        "code": "E-ASSOC-NO-PRECEDENCE"
+      },
+      "note": "unlaxer-parser #279 で解消: ubnf-syntax.md の完全版 MiniLang 文法に `@precedence(level=...)` を追加し、annotations.md の MUST と矛盾しない形にした。この入力のように `@precedence` を伴わない `@leftAssoc` は MUST 違反として E-ASSOC-NO-PRECEDENCE を出す（旧コード名 E-ASSOC-WITHOUT-PRECEDENCE）。"
     }
   ]
 }

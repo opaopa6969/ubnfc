@@ -273,17 +273,18 @@
     },
     {
       "id": "error/element-needs-string",
-      "scope": "parse",
+      "scope": "validate",
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",
-        "heading": "## 形式的な文法定義",
-        "sentence": "ErrorElement ::= 'ERROR' '(' STRING ')'"
+        "heading": "## ERROR 要素 — エラーメッセージのヒント",
+        "sentence": "`ERROR('message')` の形式（`ErrorElement ::= 'ERROR' '(' STRING ')'`）に一致しない `ERROR` の出現（例えば `ERROR(msg)` のように引数が STRING リテラルでない場合）は `ErrorElement` にならない。この場合 `ERROR` は予約語ではなく通常の `RuleRefElement` （ルール参照）として扱われ、`msg` は参照先ルール `ERROR` 本体内のグループ要素として 解釈される。`ERROR` という名前のルールが定義されていなければ、他の未定義ルール参照と 同様にバリデーション層で拒否される（`E-RULE-UNDEFINED`）。"
       },
       "input": "grammar G { R ::= 'a' | ERROR(msg); }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "`ErrorElement ::= 'ERROR' '(' STRING ')'` は満たさないが、同じ形式文法の `RuleRefElement ::= IDENTIFIER` と `GroupElement ::= '(' RuleBody ')'` で `ERROR` + `(msg)` として導出できてしまう。予約語 `ERROR` を規則参照位置で 使えるかを仕様が決めていない。"
-      }
+        "verdict": "diagnostic",
+        "code": "E-RULE-UNDEFINED"
+      },
+      "note": "unlaxer-parser #279 の決定: `ERROR(msg)` は `ErrorElement` にならず、`ERROR` は通常の `RuleRefElement` として解決される。`ERROR` ルールが未定義なので `E-RULE-UNDEFINED`（ubnfc は `msg` も未定義参照として同時に報告する）。"
     },
     {
       "id": "error/element-needs-argument",
@@ -304,12 +305,12 @@
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",
         "heading": "## ERROR 要素 — エラーメッセージのヒント",
-        "sentence": "`ERROR('message')` を選択肢の最後に置くと、 パースが失敗したときに表示されるエラーメッセージを指定できます："
+        "sentence": "ヒントメッセージが実際に診断情報へ現れることは生成されたパーサーの実行時挙動であり、 UBNF を読む処理系（構文解析・バリデーション）自体の入出力や構文木の比較では観測できない （`scope: runtime`）。"
       },
       "input": "grammar G { R ::= 'a' | ERROR('m'); }",
       "expectation": {
         "verdict": "undetermined",
-        "question": "ヒントが診断に現れることは生成パーサの実行時挙動で、構文木の比較では観測できない。"
+        "question": "unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。char-range/inclusive-bounds と同じ理由で、この corpus 形式は runtime scope を accept/reject/diagnostic に決められないため undetermined のまま残す。"
       }
     }
   ]

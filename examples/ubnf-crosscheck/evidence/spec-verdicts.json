@@ -24,14 +24,13 @@
     "section": "annotations",
     "scope": "parse",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "SHOULD なので違反時に受理するか警告するかエラーにするかが定まらない。"
+      "verdict": "accept"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
@@ -127,13 +126,13 @@
     "scope": "validate",
     "expectation": {
       "verdict": "diagnostic",
-      "code": "E-MAPPING-EXTRA-CAPTURE"
+      "code": "E-MAPPING-UNLISTED-CAPTURE"
     },
     "verdicts": {
-      "A": "別コード",
+      "A": "一致",
       "B": "駆動不能",
       "C": "駆動不能",
-      "D": "別コード"
+      "D": "一致"
     },
     "observed": {
       "A": "W-GENERAL-NO-ROOT,E-MAPPING-UNLISTED-CAPTURE",
@@ -352,13 +351,13 @@
     "scope": "validate",
     "expectation": {
       "verdict": "diagnostic",
-      "code": "E-PRECEDENCE-WITHOUT-ASSOC"
+      "code": "E-PRECEDENCE-NO-ASSOC"
     },
     "verdicts": {
-      "A": "別コード",
+      "A": "一致",
       "B": "駆動不能",
       "C": "駆動不能",
-      "D": "別コード"
+      "D": "一致"
     },
     "observed": {
       "A": "W-GENERAL-NO-ROOT,E-PRECEDENCE-NO-ASSOC",
@@ -373,13 +372,13 @@
     "scope": "validate",
     "expectation": {
       "verdict": "diagnostic",
-      "code": "E-ASSOC-WITHOUT-PRECEDENCE"
+      "code": "E-ASSOC-NO-PRECEDENCE"
     },
     "verdicts": {
-      "A": "別コード",
+      "A": "一致",
       "B": "駆動不能",
       "C": "駆動不能",
-      "D": "別コード"
+      "D": "一致"
     },
     "observed": {
       "A": "W-GENERAL-NO-ROOT,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-MISSING-CAPTURE,E-ASSOC-NO-MAPPING,E-ASSOC-NO-PRECEDENCE,E-ASSOC-NO-REPEAT",
@@ -634,22 +633,22 @@
   {
     "id": "spec-contradiction/minilang-leftassoc",
     "section": "annotations",
-    "scope": "parse",
+    "scope": "validate",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "ubnf-syntax.md の完全版 MiniLang 文法は `@leftAssoc` を `@precedence` 無しで使うが、annotations.md は「`@leftAssoc` を使用するルールは `@precedence` も宣言する（MUST）」、validation.md は E-ASSOC-WITHOUT-PRECEDENCE と書く。仕様内で矛盾している。"
+      "verdict": "diagnostic",
+      "code": "E-ASSOC-NO-PRECEDENCE"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
-      "C": "受理",
-      "D": "受理"
+      "A": "W-GENERAL-NO-ROOT,E-ASSOC-NO-PRECEDENCE",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-ASSOC-NO-PRECEDENCE"
     }
   },
   {
@@ -858,7 +857,7 @@
     "scope": "runtime",
     "expectation": {
       "verdict": "undetermined",
-      "question": "両端を含むことは生成パーサの実行時挙動であり、UBNF を読む 4 実装では観測できない。"
+      "question": "unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。ただしこれは runtime scope の性質そのものであり、この corpus 形式が4実装の構文木・診断の比較でしか判定できない以上、accept/reject/diagnostic のいずれにも決められない。他の runtime scope ケースと同じ扱いとして undetermined のまま残す。"
     },
     "verdicts": {
       "A": "駆動不能",
@@ -964,13 +963,13 @@
       "A": "一致",
       "B": "一致",
       "C": "一致",
-      "D": "違反"
+      "D": "一致"
     },
     "observed": {
       "A": "拒否",
       "B": "拒否",
       "C": "拒否",
-      "D": "受理"
+      "D": "拒否"
     }
   },
   {
@@ -1064,13 +1063,13 @@
       "A": "一致",
       "B": "一致",
       "C": "一致",
-      "D": "違反"
+      "D": "一致"
     },
     "observed": {
       "A": "拒否",
       "B": "拒否",
       "C": "拒否",
-      "D": "受理"
+      "D": "拒否"
     }
   },
   {
@@ -1083,14 +1082,14 @@
     "verdicts": {
       "A": "一致",
       "B": "一致",
-      "C": "違反",
-      "D": "違反"
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
       "B": "受理",
-      "C": "拒否: grammar requires at least one rule",
-      "D": "拒否: java.lang.IllegalArgumentException: UBNF パース失敗: grammar G { }"
+      "C": "受理",
+      "D": "受理"
     }
   },
   {
@@ -1376,22 +1375,22 @@
   {
     "id": "error/element-needs-string",
     "section": "formal-grammar",
-    "scope": "parse",
+    "scope": "validate",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "`ErrorElement ::= 'ERROR' '(' STRING ')'` は満たさないが、同じ形式文法の `RuleRefElement ::= IDENTIFIER` と `GroupElement ::= '(' RuleBody ')'` で `ERROR` + `(msg)` として導出できてしまう。予約語 `ERROR` を規則参照位置で 使えるかを仕様が決めていない。"
+      "verdict": "diagnostic",
+      "code": "E-RULE-UNDEFINED"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
-      "C": "受理",
-      "D": "受理"
+      "A": "E-RULE-UNDEFINED,E-RULE-UNDEFINED",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-RULE-UNDEFINED,E-RULE-UNDEFINED"
     }
   },
   {
@@ -1420,7 +1419,7 @@
     "scope": "runtime",
     "expectation": {
       "verdict": "undetermined",
-      "question": "ヒントが診断に現れることは生成パーサの実行時挙動で、構文木の比較では観測できない。"
+      "question": "unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。char-range/inclusive-bounds と同じ理由で、この corpus 形式は runtime scope を accept/reject/diagnostic に決められないため undetermined のまま残す。"
     },
     "verdicts": {
       "A": "駆動不能",
@@ -1801,14 +1800,13 @@
     "section": "literals-escapes",
     "scope": "parse",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "表は `\\n` `\\t` `\\r` `\\\\` `\\'` の 5 つだけを挙げ、表に無いエスケープ （例 `\\q`）を拒否するのか、バックスラッシュごと残すのか、`q` にするのかを述べていない。"
+      "verdict": "accept"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
@@ -2082,43 +2080,43 @@
   {
     "id": "quantifier/reversed-bounds",
     "section": "quantifiers",
-    "scope": "parse",
+    "scope": "validate",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "`Quantifier ::= … '{' INTEGER ',' [INTEGER] '}'` は n <= m を要求していない。CHAR_RANGE と違って逆順の反復に関する規範文が無い。"
+      "verdict": "diagnostic",
+      "code": "E-BOUNDED-INVALID"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "一致"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
-      "C": "受理",
-      "D": "受理"
+      "A": "W-GENERAL-NO-ROOT,E-BOUNDED-INVALID",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "W-GENERAL-NO-ROOT,E-BOUNDED-INVALID"
     }
   },
   {
     "id": "quantifier/huge-bound",
     "section": "quantifiers",
-    "scope": "parse",
+    "scope": "validate",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "INTEGER の表現範囲（32bit か否か）を仕様が定めていない。"
+      "verdict": "diagnostic",
+      "code": "E-BOUNDED-OVERFLOW"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "駆動不能",
+      "C": "駆動不能",
+      "D": "駆動不能"
     },
     "observed": {
-      "A": "受理",
-      "B": "受理",
-      "C": "拒否",
-      "D": "拒否"
+      "A": "W-GENERAL-NO-ROOT,E-BOUNDED-OVERFLOW",
+      "B": "独立した validator を持たない",
+      "C": "独立した validator を持たない",
+      "D": "構文解析で落ちた"
     }
   },
   {
@@ -2147,7 +2145,7 @@
     "scope": "runtime",
     "expectation": {
       "verdict": "undetermined",
-      "question": "`elem (sep elem)*` への展開は生成パーサの構造であり、構文木の比較では観測できない。"
+      "question": "unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。char-range/inclusive-bounds と同じ理由で、この corpus 形式は runtime scope を accept/reject/diagnostic に決められないため undetermined のまま残す。"
     },
     "verdicts": {
       "A": "駆動不能",
@@ -2167,14 +2165,13 @@
     "section": "reserved-words",
     "scope": "parse",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "予約語一覧は「特別な意味を持つ単語」と述べるだけで、それらをルール名・トークン名に使えないとは書いていない。"
+      "verdict": "accept"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
@@ -2188,14 +2185,13 @@
     "section": "reserved-words",
     "scope": "parse",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "`ERROR` は予約語だが、`ERROR('...')` 以外の位置での参照が禁じられているとは書かれていない。"
+      "verdict": "accept"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
@@ -2209,14 +2205,13 @@
     "section": "reserved-words",
     "scope": "parse",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "トークンキーワードと同名のトークン宣言に関する規範文が無い。"
+      "verdict": "accept"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
@@ -2290,14 +2285,13 @@
     "section": "rule-declaration",
     "scope": "parse",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "本文は「大文字始まりの識別子」と書くが、形式的な文法定義の `RuleDecl ::= { Annotation } IDENTIFIER '::=' RuleBody ';'` は大小を制約しない。小文字始まりのルール名を拒否すべきか、警告すべきか、許すかが仕様から決まらない。"
+      "verdict": "accept"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "一致",
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
@@ -2423,18 +2417,17 @@
     "section": "rule-declaration",
     "scope": "parse",
     "expectation": {
-      "verdict": "undetermined",
-      "question": "ドットを外側の文法が処理するとしか書かれておらず、namespace が何段まで許されるか、`a.b.Value` の namespace が `a.b` か `a` かが仕様から決まらない。"
+      "verdict": "accept"
     },
     "verdicts": {
-      "A": "未定",
-      "B": "未定",
-      "C": "未定",
-      "D": "未定"
+      "A": "一致",
+      "B": "違反",
+      "C": "一致",
+      "D": "一致"
     },
     "observed": {
       "A": "受理",
-      "B": "拒否",
+      "B": "拒否: 構文エラー (bytes 21..22): expected + or ? or * or { or % or @ or @typeof or ( or [ o",
       "C": "受理",
       "D": "受理"
     }

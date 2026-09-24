@@ -167,31 +167,33 @@
     },
     {
       "id": "quantifier/reversed-bounds",
-      "scope": "parse",
+      "scope": "validate",
       "citation": {
-        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
-        "heading": "## 形式的な文法定義",
-        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+        "file": "unlaxer-dsl/specs/validation.md",
+        "heading": "### BOUNDED エラー（量指定子 `{n}` / `{n,m}` / `{n,}`）",
+        "sentence": "| `E-BOUNDED-INVALID` | `{min,max}` の `min > max`（逆順） |"
       },
       "input": "grammar G { token V=ANY R ::= V{9,2}; }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "`Quantifier ::= … '{' INTEGER ',' [INTEGER] '}'` は n <= m を要求していない。CHAR_RANGE と違って逆順の反復に関する規範文が無い。"
-      }
+        "verdict": "diagnostic",
+        "code": "E-BOUNDED-INVALID"
+      },
+      "note": "unlaxer-parser #279 の決定: 構文層は min>max を制約せず受理し、バリデーション層で E-BOUNDED-INVALID を出す。両実装が一致する挙動をそのまま仕様に昇格した。"
     },
     {
       "id": "quantifier/huge-bound",
-      "scope": "parse",
+      "scope": "validate",
       "citation": {
-        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
-        "heading": "## 形式的な文法定義",
-        "sentence": "Quantifier ::= '+' | '?' | '*' | '{' INTEGER '}' | '{' INTEGER ',' [INTEGER] '}'"
+        "file": "unlaxer-dsl/specs/validation.md",
+        "heading": "### BOUNDED エラー（量指定子 `{n}` / `{n,m}` / `{n,}`）",
+        "sentence": "| `E-BOUNDED-OVERFLOW` | `min` / `max` が 32bit 符号付き整数の範囲外 |"
       },
       "input": "grammar G { R ::= 'x'{2147483648}; }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "INTEGER の表現範囲（32bit か否か）を仕様が定めていない。"
-      }
+        "verdict": "diagnostic",
+        "code": "E-BOUNDED-OVERFLOW"
+      },
+      "note": "unlaxer-parser #279 の決定: INTEGER は Java 32bit 符号付き整数。構文層では拒否せず、バリデーション層で E-BOUNDED-OVERFLOW を出す。"
     },
     {
       "id": "separator/rule-reference",
@@ -212,12 +214,12 @@
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",
         "heading": "### `elem % sep` — セパレータ区切りリスト（1個以上）",
-        "sentence": "`elem (sep elem)*` と展開されます："
+        "sentence": "`elem (sep elem)*` への展開は生成されたパーサーの実行時構造であり、UBNF ファイルを 読む処理系（構文解析・バリデーション）自体の入出力からは観測できない（`scope: runtime`）。"
       },
       "input": "grammar G { token C=ANY Expr ::= 'e'; ExprList ::= Expr % C; }",
       "expectation": {
         "verdict": "undetermined",
-        "question": "`elem (sep elem)*` への展開は生成パーサの構造であり、構文木の比較では観測できない。"
+        "question": "unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。char-range/inclusive-bounds と同じ理由で、この corpus 形式は runtime scope を accept/reject/diagnostic に決められないため undetermined のまま残す。"
       }
     }
   ]
