@@ -17,7 +17,8 @@
     "Linters"
   ],
   "activationEvents": [
-    "onLanguage:tinyexpression-p4"
+    "onLanguage:tinyexpression-p4",
+    "onDebugResolve:tinyexpression-p4"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -38,6 +39,61 @@
         "language": "tinyexpression-p4",
         "scopeName": "source.tinyexpression-p4",
         "path": "./syntaxes/tinyexpression-p4.tmLanguage.json"
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "tinyexpression-p4"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "tinyexpression-p4",
+        "label": "TinyExpression P4 (ubnfc) grammar debugger",
+        "languages": [
+          "tinyexpression-p4"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "デバッグする .tiny ファイル（生成パーサで解析し、型付き AST を前順で歩く）",
+                "default": "${file}"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "根の AST 節点で止まる",
+                "default": true
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "tinyexpression-p4",
+            "request": "launch",
+            "name": "TinyExpression P4 (ubnfc) grammar debugger",
+            "program": "${file}",
+            "stopOnEntry": true
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "TinyExpression P4 (ubnfc): 文法デバッガ",
+            "description": "生成パーサで解析し、型付き AST をステップ実行する（式の値は出ない）",
+            "body": {
+              "type": "tinyexpression-p4",
+              "request": "launch",
+              "name": "TinyExpression P4 (ubnfc) grammar debugger",
+              "program": "${file}",
+              "stopOnEntry": true
+            }
+          }
+        ]
       }
     ],
     "configuration": {
