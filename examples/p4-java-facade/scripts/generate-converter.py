@@ -11,7 +11,7 @@ tinyexpression 側で Optional<Object> に広がっているだけ）。よっ�
 """
 import argparse, os, re, subprocess, sys, tempfile
 
-UB = "org.ubnfc.p4.generated.TinyExpressionP4AST"
+UB = "org.unlaxer.ubnfc.examples.p4.generated.TinyExpressionP4AST"
 TE = "org.unlaxer.tinyexpression.generated.p4.TinyExpressionP4AST"
 
 def split_params(s):
@@ -98,7 +98,7 @@ def generate(ub, te):
     a("import java.util.HashMap;")
     a("import java.util.IdentityHashMap;")
     a("import java.util.Map;")
-    a("import org.ubnfc.p4.generated.api.Span;")
+    a("import org.unlaxer.ubnfc.examples.p4.generated.api.Span;")
     a("import %s;" % TE)
     a("")
     a("/**")
@@ -185,7 +185,7 @@ def main():
     module = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     te_jar = args.te_jar or os.path.join(module, "target/te/tinyExpression-worktree.jar")
     ub_ast = args.ub_ast or os.path.join(
-        module, "../p4-java/src/main/java/org/ubnfc/p4/generated/TinyExpressionP4AST.java")
+        module, "../p4-java/src/main/java/org/unlaxer/ubnfc/examples/p4/generated/TinyExpressionP4AST.java")
     out = args.out or os.path.join(
         module, "src/main/java/org/unlaxer/tinyexpression/p4/ubnfc/UbnfcAstConverter.java")
     ub = ub_records(ub_ast)

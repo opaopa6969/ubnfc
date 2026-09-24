@@ -29,7 +29,7 @@ driver 自身の JSON reader/writer は std のみで動き、任意の JSON `id
 `ubnfc gen --grammar X.ubnf --target rust --out DIR` は IR を書いて `ubnfc-rust` を呼ぶ。
 隣接するバイナリや `target/{debug,release}` を探索し、`UBNFC_RUST_BIN` で明示指定できる。
 `--target java` は `UBNFC_JAVA_JAR` または `ubnfc-java/target/ubnfc-java-*.jar` を使い、
-`java -cp ... org.ubnfc.java.Main` で `DIR/src/main/java` へ出力する。
+`java -cp ... org.unlaxer.ubnfc.java.Main` で `DIR/src/main/java` へ出力する。
 明示指定が存在しない場合も含め、生成器が見つからなければ探索パスを表示し exit 3。
 生成器の失敗終了は終了コードをそのまま返す。
 

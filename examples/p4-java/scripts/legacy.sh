@@ -14,4 +14,4 @@ dsl="$repo/org/unlaxer/unlaxer-dsl/$version/unlaxer-dsl-$version.jar"
 # jar を先に置き、tinyexpression が持つコアクラスの shadow を避ける。
 exec timeout 45s java -Xmx1g -Xss16m -Dtinyexpression.p4.memoize=true \
   --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED \
-  -cp "$module/target/classes:$common:$dsl:$tiny/target/classes" org.ubnfc.p4.LegacyProbe "$@"
+  -cp "$module/target/classes:$common:$dsl:$tiny/target/classes" org.unlaxer.ubnfc.examples.p4.LegacyProbe "$@"

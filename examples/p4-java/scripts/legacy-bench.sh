@@ -24,4 +24,4 @@ esac
 exec timeout "${BENCH_TIMEOUT:-600}s" java -Xms512m -Xmx2g -Xss16m -Dtinyexpression.p4.memoize=true \
   -Dtinyexpression.p4.parse.timeout.millis="${LEGACY_TIMEOUT_MS:-0}" ${BENCH_JVM_OPTS:-} \
   --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED \
-  -cp "$cp" org.ubnfc.p4.LegacyBenchmark "$kind" "$module/src/test/resources/fixtures" "$fixtures"
+  -cp "$cp" org.unlaxer.ubnfc.examples.p4.LegacyBenchmark "$kind" "$module/src/test/resources/fixtures" "$fixtures"

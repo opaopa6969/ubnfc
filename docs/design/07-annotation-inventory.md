@@ -320,7 +320,7 @@ Java backend に相当する検査が見当たらず、D-038 の「両 backend �
    それは規則局所 trivia があるとき（＝Rust も補正するとき）に限られる。回帰テストは
    `crates/ubnfc-fuzz/tests/right_assoc_span.rs`（4 形 × 15 入力の Java/Rust 差分）。
 2. **[誤]** **`languageVersion` の上限検査が Java backend に無い** — **これは棚卸しの誤り**。
-   `ubnfc-java/src/main/java/org/ubnfc/java/ir/Validation.java:43-46` に
+   `ubnfc-java/src/main/java/org/unlaxer/ubnfc/java/ir/Validation.java:43-46` に
    `MAX_LANGUAGE_VERSION = 2` と `unsupported("languageVersion:" + language)` がある（D-038 どおり）。
 3. **[済（半分）]** **`@precedence` + `@rightAssoc` が `operator` を作らない** — **前提が誤り**。
    分かれ目は結合性ではなく**演算子 atom の種類**で、`@leftAssoc` + リテラル演算子も

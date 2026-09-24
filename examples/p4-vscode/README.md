@@ -15,8 +15,8 @@ scripts/build-vsix.sh p4         # リポジトリ root から。p4 / ubnf / all
 6 段階を通す。
 
 1. 生成器を組む（`mvn -Plsp package`。**LSP は opt-in なので profile 無しでは入らない**）
-2. `ubnfc-java --ir … --package org.ubnfc.p4.generated --no-emit-driver` でパーサ生成
-3. `ubnfc-lsp --emit-lsp --ir … --package org.ubnfc.p4.lsp --parser-package org.ubnfc.p4.generated
+2. `ubnfc-java --ir … --package org.unlaxer.ubnfc.examples.p4.generated --no-emit-driver` でパーサ生成
+3. `ubnfc-lsp --emit-lsp --ir … --package org.unlaxer.ubnfc.examples.p4.lsp --parser-package org.unlaxer.ubnfc.examples.p4.generated
    --emit-tmlanguage syntaxes/tinyexpression-p4.tmLanguage.json`
    で LSP サーバと TextMate 文法を生成（**別パッケージへ追加するだけ**。2 の出力は 1 byte も変わらない）
 4. extern token scanner（`P4Scanners`）を `examples/p4-java` から複製（読むだけ）

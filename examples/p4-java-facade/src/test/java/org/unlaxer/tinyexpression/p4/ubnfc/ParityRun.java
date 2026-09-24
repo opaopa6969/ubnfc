@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.ubnfc.p4.generated.api.Json;
+import org.unlaxer.ubnfc.examples.p4.generated.api.Json;
 import org.unlaxer.tinyexpression.p4.P4PreferredAstMapper;
 import org.unlaxer.tinyexpression.parser.ExpressionType;
 import org.unlaxer.tinyexpression.parser.ExpressionTypes;

@@ -592,7 +592,7 @@ fn execute(work: &Work, config: &Config, directory: &Path) -> (BuildResult, Vec<
         Command::new("java")
             .arg("-cp")
             .arg(&config.java_generator)
-            .args(["org.ubnfc.java.Main", "--ir"])
+            .args(["org.unlaxer.ubnfc.java.Main", "--ir"])
             .arg(&ir_path)
             .arg("--out")
             .arg(artifact.join("src/main/java"))

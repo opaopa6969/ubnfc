@@ -340,7 +340,7 @@ impl Runner {
                 let output = Command::new("java")
                     .arg("-cp")
                     .arg(generator.canonicalize()?)
-                    .args(["org.ubnfc.java.Main", "--ir"])
+                    .args(["org.unlaxer.ubnfc.java.Main", "--ir"])
                     .arg(ir_path)
                     .arg("--out")
                     .arg(sources.0.join("src/main/java"))

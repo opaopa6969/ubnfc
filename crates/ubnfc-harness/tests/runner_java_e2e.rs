@@ -34,7 +34,7 @@ fn generator() -> &'static Path {
         }
         let project = root().join("ubnfc-java");
         let classes = project.join("target/classes");
-        if !classes.join("org/ubnfc/java/Main.class").is_file() {
+        if !classes.join("org/unlaxer/ubnfc/java/Main.class").is_file() {
             let output = Command::new("mvn")
                 .current_dir(&project)
                 .args(["-o", "-q", "-DskipTests", "package"])

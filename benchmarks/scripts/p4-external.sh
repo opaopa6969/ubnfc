@@ -122,7 +122,7 @@ negatives() {
   "$work/bench-d-scope" accept "$d" "${NEGATIVES[@]}"
   echo "# ubnfc Java（生成）"
   java -Xss16m -cp "$ubnfc/examples/p4-java/target/classes" \
-    org.ubnfc.p4.FixtureProbe "$d" 2>/dev/null | cut -f1-3
+    org.unlaxer.ubnfc.examples.p4.FixtureProbe "$d" 2>/dev/null | cut -f1-3
   echo "# ANTLR 4"
   java -cp "$(antlr_jar):$work/antlr/classes" p4antlr.P4AntlrDriver accept "$d" "${NEGATIVES[@]}"
   echo "# tree-sitter"
@@ -134,13 +134,13 @@ accept() {
   "$work/bench-d-scope" accept "$fixtures" "${ACCEPTED[@]}" "${REJECTED[@]}"
   echo "# ubnfc Java（生成）"
   java -Xss16m -cp "$ubnfc/examples/p4-java/target/classes" \
-    org.ubnfc.p4.FixtureProbe "$fixtures" 2>/dev/null | cut -f1-3
+    org.unlaxer.ubnfc.examples.p4.FixtureProbe "$fixtures" 2>/dev/null | cut -f1-3
   echo "# ubnfc Java（生成, BooleanExpression 入口）"
   # FixtureProbe は「入力 / 出力 / 入口」の順。出力を空文字にすると cwd へ JSON を書くので、
   # 捨てる先を $work に作って渡す。
   mkdir -p "$work/probe-out"
   java -Xss16m -cp "$ubnfc/examples/p4-java/target/classes" \
-    org.ubnfc.p4.FixtureProbe "$fixtures" "$work/probe-out" BooleanExpression 2>/dev/null | cut -f1-3
+    org.unlaxer.ubnfc.examples.p4.FixtureProbe "$fixtures" "$work/probe-out" BooleanExpression 2>/dev/null | cut -f1-3
   echo "# ANTLR 4（BailErrorStrategy, SLL→LL 2 段）"
   java -cp "$(antlr_jar):$work/antlr/classes" p4antlr.P4AntlrDriver accept "$fixtures"
   echo "# tree-sitter（Formula 入口, hasError）"
@@ -170,7 +170,7 @@ bench_ubnfc_java() {  # <fixture> [entry]
   "${pin[@]}" java -Xms2g -Xmx2g -Xss16m -Dbench.warmup="${JAVA_WARMUP:-2000}" -Dbench.runs="$runs" \
     -Dbench.fixtures="$1" -Dbench.modes=recognize-fast,ast-fast \
     ${entry:+-Dbench.entry=$entry} \
-    -cp "$ubnfc/examples/p4-java/target/classes" org.ubnfc.p4.Benchmark "$fixtures" 2>/dev/null
+    -cp "$ubnfc/examples/p4-java/target/classes" org.unlaxer.ubnfc.examples.p4.Benchmark "$fixtures" 2>/dev/null
 }
 bench_antlr() {  # <fixture> [entry]
   local spec=$1; [[ -n ${2:-} ]] && spec="$1:$2"

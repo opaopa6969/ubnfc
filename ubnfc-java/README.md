@@ -7,20 +7,22 @@ Grammar IR v1 から、JDK 21 だけでコンパイル・実行できる Java �
 cd ubnfc-java
 mvn -o -q test
 mvn -o -q package
-java -cp target/ubnfc-java-0.1.0-SNAPSHOT.jar org.ubnfc.java.Main \
+java -cp target/ubnfc-java-0.1.0-SNAPSHOT.jar org.unlaxer.ubnfc.java.Main \
   --ir ../ir/examples/tinycalc.ir.json --out /path/to/output --package example.calc
 ```
 
 `--package` を省略すると entry grammar の package を使う。未設定なら
-`generated.<grammar名の小文字>`。検証と全ソースの組み立てを済ませてから出力する。
+`org.unlaxer.ubnfc.generated.<grammar名の小文字>`（issue #82 / D-076。owner が Maven Central で持つ
+namespace `org.unlaxer` の下に置く）。生成パーサを自分のプロジェクトへ vendor するときは、自分の package を
+`--package` で渡す（例: tinyexpression は `org.unlaxer.tinyexpression.p4.ubnfc.generated`）。検証と全ソースの組み立てを済ませてから出力する。
 生成物に IR JSON、生成器クラス、外部ライブラリは不要。
 
 ## 構成
 
-- `src/main/java/org/ubnfc/java/ir/`: JSON reader、当該 schema の検証器、型付き IR、参照・対応範囲の検証。
+- `src/main/java/org/unlaxer/ubnfc/java/ir/`: JSON reader、当該 schema の検証器、型付き IR、参照・対応範囲の検証。
   JSON の重複キー、不正 escape、不正数値、末尾の余分な値を拒否する。未知 object キーは型への読み込み時に捨てる。
   未知・未対応 `requiredFeatures` と `analysisVersion` は出力前に拒否する。
-- `src/main/java/org/ubnfc/java/emit/JavaEmitter.java`: AST と直接呼出しの parser ソースを生成する。
+- `src/main/java/org/unlaxer/ubnfc/java/emit/JavaEmitter.java`: AST と直接呼出しの parser ソースを生成する。
   rule ごとの静的関数、式ごとの consumed / matchOnly 関数を出力する。実行時 IR interpreter は持たない。
 - `src/main/resources/templates/api/`: `ParseResult`, `Capture`, `Diagnostic`, `Span`,
   `MappingException`, `TokenScanner`, `ParseOptions`, canonical JSON。
