@@ -11,24 +11,24 @@
 |---|---:|---:|---:|---:|---:|
 | `annotations` (アノテーション) | 32 | 0 | 0 | 0 | 0 |
 | `char-range` (CHAR_RANGE('min','max')) | 11 | 0 | 0 | 0 | 0 |
-| `comments` (コメント) | 5 | 0 | 0 | 0 | 1 |
-| `formal-grammar` (形式的な文法定義) | 23 | 8 | 8 | 1 | 2 |
+| `comments` (コメント) | 5 | 0 | 0 | 0 | 0 |
+| `formal-grammar` (形式的な文法定義) | 23 | 8 | 8 | 0 | 0 |
 | `global-settings` (グローバル設定) | 10 | 0 | 0 | 0 | 0 |
 | `literals-escapes` (ルール本体の書き方 / リテラル) | 9 | 0 | 0 | 0 | 0 |
 | `quantifiers` (量指定子とセパレータ) | 16 | 2 | 2 | 0 | 0 |
 | `reserved-words` (予約語) | 3 | 0 | 0 | 0 | 0 |
-| `rule-declaration` (ルール宣言) | 10 | 0 | 0 | 0 | 0 |
+| `rule-declaration` (ルール宣言) | 10 | 0 | 1 | 0 | 0 |
 | `token-declarations` (トークン宣言（token）) | 10 | 0 | 0 | 0 | 0 |
-| **合計** | **129** | **10** | **10** | **1** | **3** |
+| **合計** | **129** | **10** | **11** | **0** | **0** |
 
 ## 2. 判定の内訳
 
 | 実装 | 一致 | 一致(validate) | 違反 | 別コード | 未定 | 駆動不能 |
 |---|---:|---:|---:|---:|---:|---:|
-| ubnfc-front(手書き) | 94 | 8 | 10 | 3 | 11 | 3 |
-| ubnfc-selfhost(生成) | 83 | 0 | 10 | 0 | 11 | 25 |
-| unlaxer-ubnf(Rust) | 100 | 0 | 1 | 0 | 11 | 17 |
-| Java bootstrap | 109 | 0 | 3 | 3 | 11 | 3 |
+| ubnfc-front(手書き) | 108 | 8 | 10 | 0 | 0 | 3 |
+| ubnfc-selfhost(生成) | 89 | 0 | 11 | 0 | 0 | 29 |
+| unlaxer-ubnf(Rust) | 108 | 0 | 0 | 0 | 0 | 21 |
+| Java bootstrap | 125 | 0 | 0 | 0 | 0 | 4 |
 
 `一致(validate)` は構文解析では受理するが同じ道具の validate 段が ERROR で拒否する場合。
 仕様は「拒否する」としか書いておらず、どの層で拒否するかは定めていない。
@@ -39,12 +39,12 @@
 | ケース | scope | 期待 | ubnfc-front(手書き) | ubnfc-selfhost(生成) | unlaxer-ubnf(Rust) | Java bootstrap |
 |---|---|---|---|---|---|---|
 | `annotation/root` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `annotation/root-two-rules` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `annotation/root-two-rules` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `annotation/mapping-class-only` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `annotation/mapping-params` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `annotation/mapping-empty-params` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `annotation/mapping-missing-capture` | validate | E-MAPPING-MISSING-CAPTURE | 一致 | 駆動不能 | 駆動不能 | 一致 |
-| `annotation/mapping-extra-capture` | validate | E-MAPPING-EXTRA-CAPTURE | 別コード | 駆動不能 | 駆動不能 | 別コード |
+| `annotation/mapping-extra-capture` | validate | E-MAPPING-UNLISTED-CAPTURE | 一致 | 駆動不能 | 駆動不能 | 一致 |
 | `annotation/mapping-duplicate-param` | validate | E-MAPPING-DUPLICATE-PARAM | 一致 | 駆動不能 | 駆動不能 | 一致 |
 | `annotation/whitespace-bare` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `annotation/whitespace-none` | parse | accept | 一致 | 一致 | 一致 | 一致 |
@@ -55,8 +55,8 @@
 | `annotation/precedence-missing-level-keyword` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `annotation/precedence-negative` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `annotation/precedence-duplicate` | validate | E-PRECEDENCE-DUPLICATE | 一致 | 駆動不能 | 駆動不能 | 一致 |
-| `annotation/precedence-without-assoc` | validate | E-PRECEDENCE-WITHOUT-ASSOC | 別コード | 駆動不能 | 駆動不能 | 別コード |
-| `annotation/assoc-without-precedence` | validate | E-ASSOC-WITHOUT-PRECEDENCE | 別コード | 駆動不能 | 駆動不能 | 別コード |
+| `annotation/precedence-without-assoc` | validate | E-PRECEDENCE-NO-ASSOC | 一致 | 駆動不能 | 駆動不能 | 一致 |
+| `annotation/assoc-without-precedence` | validate | E-ASSOC-NO-PRECEDENCE | 一致 | 駆動不能 | 駆動不能 | 一致 |
 | `annotation/assoc-both` | validate | E-ASSOC-BOTH | 一致 | 駆動不能 | 駆動不能 | 一致 |
 | `annotation/interleave-profile` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `annotation/interleave-missing-keyword` | parse | reject | 一致 | 一致 | 一致 | 一致 |
@@ -69,7 +69,7 @@
 | `annotation/skip` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `annotation/simple-catch-all` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `annotation/simple-with-arguments-rejected` | parse | reject | 一致 | 一致 | 一致 | 一致 |
-| `spec-contradiction/minilang-leftassoc` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `spec-contradiction/minilang-leftassoc` | validate | E-ASSOC-NO-PRECEDENCE | 一致 | 駆動不能 | 駆動不能 | 一致 |
 | `char-range/valid` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `char-range/equal-bounds` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `char-range/empty-min` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
@@ -85,13 +85,13 @@
 | `comment/line-inside-body` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `comment/block-rejected` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `comment/block-in-body-rejected` | parse | reject | 一致 | 一致 | 一致 | 一致 |
-| `comment/block-unclosed-rejected` | parse | reject | 一致 | 一致 | 一致 | 違反 |
+| `comment/block-unclosed-rejected` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `file/empty-rejected` | parse | reject | 違反 | 違反 | 一致 | 一致 |
 | `file/only-comments-rejected` | parse | reject | 違反 | 違反 | 一致 | 一致 |
 | `file/two-grammars` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `file/leading-comment-then-grammar` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `file/trailing-garbage-rejected` | parse | reject | 一致 | 一致 | 一致 | 違反 |
-| `grammar/empty-block` | parse | accept | 一致 | 一致 | 違反 | 違反 |
+| `file/trailing-garbage-rejected` | parse | reject | 一致 | 一致 | 一致 | 一致 |
+| `grammar/empty-block` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `grammar/keyword-required` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `grammar/name-required` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `grammar/unclosed` | parse | reject | 一致 | 一致 | 一致 | 一致 |
@@ -106,7 +106,7 @@
 | `body/choice-and-group` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `element/typeof-prefix` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `error/element` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `error/element-needs-string` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `error/element-needs-string` | validate | E-RULE-UNDEFINED | 一致 | 駆動不能 | 駆動不能 | 一致 |
 | `error/element-needs-argument` | parse | reject | 一致(validate) | 駆動不能 | 一致 | 一致 |
 | `error/hint-is-last-alternative` | runtime | undetermined | 駆動不能 | 駆動不能 | 駆動不能 | 駆動不能 |
 | `setting/package` | parse | accept | 一致 | 一致 | 一致 | 一致 |
@@ -126,7 +126,7 @@
 | `escape/carriage-return` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `escape/backslash` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `escape/single-quote` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `escape/unknown-sequence` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `escape/unknown-sequence` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `escape/unterminated-literal` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `quantifier/plus` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `quantifier/bracket-optional` | parse | accept | 一致 | 一致 | 一致 | 一致 |
@@ -140,23 +140,23 @@
 | `quantifier/three-bounds` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `quantifier/two-quantifiers` | parse | reject | 違反 | 違反 | 一致 | 一致 |
 | `quantifier/quantifier-and-separator` | parse | reject | 違反 | 違反 | 一致 | 一致 |
-| `quantifier/reversed-bounds` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
-| `quantifier/huge-bound` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `quantifier/reversed-bounds` | validate | E-BOUNDED-INVALID | 一致 | 駆動不能 | 駆動不能 | 一致 |
+| `quantifier/huge-bound` | validate | E-BOUNDED-OVERFLOW | 一致 | 駆動不能 | 駆動不能 | 駆動不能 |
 | `separator/rule-reference` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `separator/expansion` | runtime | undetermined | 駆動不能 | 駆動不能 | 駆動不能 | 駆動不能 |
-| `reserved/rule-named-token` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
-| `reserved/rule-named-error` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
-| `reserved/token-named-any` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `reserved/rule-named-token` | parse | accept | 一致 | 一致 | 一致 | 一致 |
+| `reserved/rule-named-error` | parse | accept | 一致 | 一致 | 一致 | 一致 |
+| `reserved/token-named-any` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `rule/semicolon-required` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `rule/semicolon-present` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `rule/assign-token-required` | parse | reject | 一致 | 一致 | 一致 | 一致 |
-| `rule/lowercase-name` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `rule/lowercase-name` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `rule/two-refs-are-two-elements` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `rule/comment-is-identifier-boundary` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `rule/captures-kept-separately` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `rule/space-inside-identifier` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `rule/dotted-reference` | parse | accept | 一致 | 一致 | 一致 | 一致 |
-| `rule/dotted-reference-three-segments` | parse | undetermined | 未定 | 未定 | 未定 | 未定 |
+| `rule/dotted-reference-three-segments` | parse | accept | 一致 | 違反 | 一致 | 一致 |
 | `token/class-reference` | parse | accept | 一致 | 一致 | 一致 | 一致 |
 | `token/equals-required` | parse | reject | 一致 | 一致 | 一致 | 一致 |
 | `token/unknown-keyword-with-arguments` | parse | reject | 一致 | 一致 | 一致 | 一致 |
@@ -185,7 +185,7 @@
 | `quantifier/two-quantifiers` | `grammar G { token V=ANY R ::= V+{2,3}; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `quantifier/quantifier-and-separator` | `grammar G { token V=ANY token S=ANY R ::= V+ % S; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 
-### ubnfc-selfhost(生成) — 10 件
+### ubnfc-selfhost(生成) — 11 件
 
 | ケース | 入力 | 期待 | 実測 | 引用 |
 |---|---|---|---|---|
@@ -199,36 +199,20 @@
 | `body/empty-repeat-rejected` | `grammar G { R ::= { }; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `quantifier/two-quantifiers` | `grammar G { token V=ANY R ::= V+{2,3}; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
 | `quantifier/quantifier-and-separator` | `grammar G { token V=ANY token S=ANY R ::= V+ % S; }` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
+| `rule/dotted-reference-three-segments` | `grammar G { R ::= a.b.Value; }` | accept | 拒否: 構文エラー (bytes 21..22): expected + or ? or * or { or % or @ or @typeof or ( or [ o | ubnf-syntax.md ## ルール宣言 |
 
-### unlaxer-ubnf(Rust) — 1 件
+### unlaxer-ubnf(Rust) — 0 件
 
-| ケース | 入力 | 期待 | 実測 | 引用 |
-|---|---|---|---|---|
-| `grammar/empty-block` | `grammar G { }` | accept | 拒否: grammar requires at least one rule | ubnf-syntax.md ## 形式的な文法定義 |
+なし
 
-### Java bootstrap — 3 件
+### Java bootstrap — 0 件
 
-| ケース | 入力 | 期待 | 実測 | 引用 |
-|---|---|---|---|---|
-| `comment/block-unclosed-rejected` | `grammar G { R ::= 'x'; } /* dangling` | reject | 受理 | ubnf-syntax.md ## ルール宣言 |
-| `file/trailing-garbage-rejected` | `grammar G { R ::= 'x'; } garbage` | reject | 受理 | ubnf-syntax.md ## 形式的な文法定義 |
-| `grammar/empty-block` | `grammar G { }` | accept | 拒否: java.lang.IllegalArgumentException: UBNF パース失敗: grammar G { } | ubnf-syntax.md ## 形式的な文法定義 |
+なし
 
-## 5. 未定（仕様が沈黙・矛盾） 14 件
+## 5. 未定（仕様が沈黙・矛盾） 3 件
 
 | ケース | 問い | ubnfc-front(手書き) | ubnfc-selfhost(生成) | unlaxer-ubnf(Rust) | Java bootstrap |
 |---|---|---|---|---|---|
-| `annotation/root-two-rules` | SHOULD なので違反時に受理するか警告するかエラーにするかが定まらない。 | 受理 | 受理 | 受理 | 受理 |
-| `spec-contradiction/minilang-leftassoc` | ubnf-syntax.md の完全版 MiniLang 文法は `@leftAssoc` を `@precedence` 無しで使うが、annotations.md は「`@leftAssoc` を使用するルールは `@precedence` も宣言する（MUST）」、validation.md は E-ASSOC-WITHOUT-PRECEDENCE と書く。仕様内で矛盾している。 | 受理 | 受理 | 受理 | 受理 |
-| `char-range/inclusive-bounds` | 両端を含むことは生成パーサの実行時挙動であり、UBNF を読む 4 実装では観測できない。 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 |
-| `error/element-needs-string` | `ErrorElement ::= 'ERROR' '(' STRING ')'` は満たさないが、同じ形式文法の `RuleRefElement ::= IDENTIFIER` と `GroupElement ::= '(' RuleBody ')'` で `ERROR` + `(msg)` として導出できてしまう。予約語 `ERROR` を規則参照位置で 使えるかを仕様が決めていない。 | 受理 | 受理 | 受理 | 受理 |
-| `error/hint-is-last-alternative` | ヒントが診断に現れることは生成パーサの実行時挙動で、構文木の比較では観測できない。 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 |
-| `escape/unknown-sequence` | 表は `\n` `\t` `\r` `\\` `\'` の 5 つだけを挙げ、表に無いエスケープ （例 `\q`）を拒否するのか、バックスラッシュごと残すのか、`q` にするのかを述べていない。 | 受理 | 受理 | 受理 | 受理 |
-| `quantifier/reversed-bounds` | `Quantifier ::= … '{' INTEGER ',' [INTEGER] '}'` は n <= m を要求していない。CHAR_RANGE と違って逆順の反復に関する規範文が無い。 | 受理 | 受理 | 受理 | 受理 |
-| `quantifier/huge-bound` | INTEGER の表現範囲（32bit か否か）を仕様が定めていない。 | 受理 | 受理 | 拒否 | 拒否 |
-| `separator/expansion` | `elem (sep elem)*` への展開は生成パーサの構造であり、構文木の比較では観測できない。 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 |
-| `reserved/rule-named-token` | 予約語一覧は「特別な意味を持つ単語」と述べるだけで、それらをルール名・トークン名に使えないとは書いていない。 | 受理 | 受理 | 受理 | 受理 |
-| `reserved/rule-named-error` | `ERROR` は予約語だが、`ERROR('...')` 以外の位置での参照が禁じられているとは書かれていない。 | 受理 | 受理 | 受理 | 受理 |
-| `reserved/token-named-any` | トークンキーワードと同名のトークン宣言に関する規範文が無い。 | 受理 | 受理 | 受理 | 受理 |
-| `rule/lowercase-name` | 本文は「大文字始まりの識別子」と書くが、形式的な文法定義の `RuleDecl ::= { Annotation } IDENTIFIER '::=' RuleBody ';'` は大小を制約しない。小文字始まりのルール名を拒否すべきか、警告すべきか、許すかが仕様から決まらない。 | 受理 | 受理 | 受理 | 受理 |
-| `rule/dotted-reference-three-segments` | ドットを外側の文法が処理するとしか書かれておらず、namespace が何段まで許されるか、`a.b.Value` の namespace が `a.b` か `a` かが仕様から決まらない。 | 受理 | 拒否 | 受理 | 受理 |
+| `char-range/inclusive-bounds` | unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。ただしこれは runtime scope の性質そのものであり、この corpus 形式が4実装の構文木・診断の比較でしか判定できない以上、accept/reject/diagnostic のいずれにも決められない。他の runtime scope ケースと同じ扱いとして undetermined のまま残す。 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 |
+| `error/hint-is-last-alternative` | unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。char-range/inclusive-bounds と同じ理由で、この corpus 形式は runtime scope を accept/reject/diagnostic に決められないため undetermined のまま残す。 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 |
+| `separator/expansion` | unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。char-range/inclusive-bounds と同じ理由で、この corpus 形式は runtime scope を accept/reject/diagnostic に決められないため undetermined のまま残す。 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 | 生成パーサの実行時挙動 |

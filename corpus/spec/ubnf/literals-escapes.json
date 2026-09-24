@@ -119,13 +119,13 @@
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",
         "heading": "## ルール本体の書き方",
-        "sentence": "**エスケープシーケンス** も使えます："
+        "sentence": "表にないエスケープ列（例 `'\\q'`）はエラーにしない（構文としてもバリデーションとしても 受理する）。展開結果の具体的な文字（バックスラッシュを保持するか、除去して `q` のみに するか）は未定義とし、実装依存とする。"
       },
       "input": "grammar G { R ::= '\\q'; }",
       "expectation": {
-        "verdict": "undetermined",
-        "question": "表は `\\n` `\\t` `\\r` `\\\\` `\\'` の 5 つだけを挙げ、表に無いエスケープ （例 `\\q`）を拒否するのか、バックスラッシュごと残すのか、`q` にするのかを述べていない。"
-      }
+        "verdict": "accept"
+      },
+      "note": "unlaxer-parser #279 の決定: 表に無いエスケープはエラーにしない。展開結果の具体的な文字は未定義・実装依存なので canonicalContains では確認しない。"
     },
     {
       "id": "escape/unterminated-literal",

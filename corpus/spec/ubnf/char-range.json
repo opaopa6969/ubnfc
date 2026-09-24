@@ -145,12 +145,12 @@
       "citation": {
         "file": "unlaxer-dsl/specs/ubnf-syntax.md",
         "heading": "#### `CHAR_RANGE('min','max')` — 文字の範囲",
-        "sentence": "境界は両端を含む。補助文字の範囲指定は、この `char` API とは別の将来対応である。"
+        "sentence": "両端を含む判定は生成されたパーサーの実行時契約であり、UBNF を読む処理系 （構文解析・バリデーション）自体の入出力からは観測できない（`scope: runtime`）。"
       },
       "input": "grammar G { token D=CHAR_RANGE('0','9') @root R ::= D; }",
       "expectation": {
         "verdict": "undetermined",
-        "question": "両端を含むことは生成パーサの実行時挙動であり、UBNF を読む 4 実装では観測できない。"
+        "question": "unlaxer-parser #279 で仕様書は「観測できない（scope: runtime）」と明記した。ただしこれは runtime scope の性質そのものであり、この corpus 形式が4実装の構文木・診断の比較でしか判定できない以上、accept/reject/diagnostic のいずれにも決められない。他の runtime scope ケースと同じ扱いとして undetermined のまま残す。"
       }
     }
   ]
