@@ -128,11 +128,11 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
 // その場合は pool から stack を借りずに降りる。
 loop {match self.ev(root) {
 Event::Capture{child,..}=>root=child,
-Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}return Ok(());},
+Event::Values{child,span,wrap,text}=>{let start=out.len();if !text {self.value_region+=1;}let built=self.build_values_into(child,out);if !text {self.value_region-=1;}built?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}return Ok(());},
 Event::Rule{rule,span,child,caps}=>return self.build_rule(rule,caps,span,child,out),
 Event::Join(..)=>break,
 _=>return Ok(()),}}
-let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.ev(id) {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}\nfn leaf(&mut self,ty:usize,span:Span,text:u32)->Result<u32,String> {let span=self.span(span);self.tree.set_extent(text,span);match ty {\n");
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.ev(id) {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();if !text {self.value_region+=1;}let built=self.build_values_into(child,out);if !text {self.value_region-=1;}built?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}\nfn leaf(&mut self,ty:usize,span:Span,text:u32)->Result<u32,String> {let span=self.span(span);self.tree.set_extent(text,span);match ty {\n");
     let mut leaves = std::collections::BTreeSet::new();
     for recipe in &g.ir.semantics.recipes {
         if let Some(leaf) = &recipe.leaf_fallback {
@@ -180,8 +180,14 @@ let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=
     } else {
         s.push_str("_=>{let _=(span,text);Err(format!(\"unknown leaf type {ty}\"))}}}\nfn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);match rule {\n");
     }
-    for i in 0..g.ir.semantics.rules.len() {
-        writeln!(s, "{i}=>self.map_rule_{i}(caps,span,child,out),").unwrap();
+    for (i, rule) in g.ir.semantics.rules.iter().enumerate() {
+        if opens_value_scope(g, rule) {
+            // #86: 写像される規則の本体は新しい値の文脈。外側の値域の中にいても、
+            // 自分の field（capture の子）は text 規則の字句を値にしてよい。
+            writeln!(s, "{i}=>{{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_{i}(caps,span,child,out);self.value_region=outer;built}},").unwrap();
+        } else {
+            writeln!(s, "{i}=>self.map_rule_{i}(caps,span,child,out),").unwrap();
+        }
     }
     s.push_str("_=>Err(format!(\"unknown rule {rule}\"))}}\n");
     for (i, rule) in g.ir.semantics.rules.iter().enumerate() {
@@ -199,6 +205,30 @@ let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=
     Ok(s)
 }
 
+/// #86: 意味値を持たない（text だけの）写像されない規則。`semantic_shape` が `None` のもの。
+fn text_only_rule(g: &Generator<'_>, rule: &Rule) -> bool {
+    !rule.skip
+        && rule.mapping_type_id.is_none()
+        && crate::expressions::semantic_shape_of(g, &rule.body).is_none()
+}
+
+/// #86: 本体の写像が新しい値の文脈を開く規則（recipe を持ち、透過でも text でもないもの）。
+fn opens_value_scope(g: &Generator<'_>, rule: &Rule) -> bool {
+    if rule.skip {
+        return false;
+    }
+    g.ir.semantics
+        .recipes
+        .iter()
+        .find(|r| r.rule_id == rule.symbol_id)
+        .is_some_and(|r| {
+            !matches!(
+                r.kind,
+                RecipeKind::Skip | RecipeKind::Transparent | RecipeKind::Text
+            )
+        })
+}
+
 fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, EmitError> {
     let mut s = String::new();
     let recipe =
@@ -211,6 +241,14 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
         return Ok(s);
     }
     let Some(recipe) = recipe else {
+        if text_only_rule(g, rule) {
+            // #86: 意味値を持たない（text だけの）規則への参照は、意味値の領域
+            // （`Values{text:false}`）の中では区切りで値を作らない（D-032）。Java の
+            // `combine` は null（plain text）の項目を値の列へ数えない。領域の外（capture の
+            // 直下など）では従来どおり一致範囲の字句を値にする。
+            writeln!(s,"{i}=>{{if self.value_region>0 {{return Ok(());}}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {{let text=self.semantic_text(child,span);out.push(text);}}Ok(())}},").unwrap();
+            return Ok(s);
+        }
         writeln!(s,"{i}=>{{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {{let text=self.semantic_text(child,span);out.push(text);}}Ok(())}},").unwrap();
         return Ok(s);
     };
