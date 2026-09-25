@@ -456,6 +456,9 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     effect_bytes: usize,
     mapping_depth: usize,
     mapping_anchor: Option<usize>,
+    /// #86: いま値を組み立てている意味値の領域（`Values{text:false}`）の入れ子の深さ。
+    /// 写像される規則の本体に入るたびに 0 から数え直す。
+    value_region: u32,
     /// 回復ごとの公開候補（最遠位置 byte, label）。`Event::Recovery::hints` が索く。
     recovery_hints: Vec<Option<(usize, Vec<&'static str>)>>,
 }
@@ -700,6 +703,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             effect_bytes: 0,
             mapping_depth: 0,
             mapping_anchor: None,
+            value_region: 0,
             recovery_hints: Vec::new(),
             recovery_events: Vec::new(),
         }

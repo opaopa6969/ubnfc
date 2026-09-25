@@ -1,0 +1,15 @@
+grammar Fuzz {
+  @import imp from 'imported.ubnf'
+  token T0 = EMPTY
+  token T1 = org.unlaxer.parser.clang.IdentifierParser
+  token DN = NumberParser
+  token DI = org.unlaxer.parser.clang.IdentifierParser
+  token DS = org.unlaxer.parser.elementary.SingleQuotedParser
+  L0 ::= ;
+  @enum L1 ::= 'gamma';
+  M0 ::= L1? @v3 imp.Piece+ % '\n' @v4 | 'c' @v5 '😀' @v6;
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= M0 @left { '*' @op M0 @right };
+  @mapping(Bin1, params=[left, op, right]) @leftAssoc @precedence(level=80) Op1 ::= Op0 @left { '-' @op Op0 @right };
+  @mapping(Direct, params=[dn, dg, di, dl, ds]) Direct ::= DN @dn ':' ( DN ) @dg [ DI @di ] { ',' DN @dl } DS @ds;
+  @root @mapping(Top, params=[head, tail, v7, direct]) Root ::= Op1 @head ( ',' @tail ( M0{2,} % '(' ')' @v7 | M0 L0 ) )* @tail Direct @direct;
+}

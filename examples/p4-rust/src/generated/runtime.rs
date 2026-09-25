@@ -456,6 +456,9 @@ pub(crate) struct Session<'a, const DIAG: bool> {
     effect_bytes: usize,
     mapping_depth: usize,
     mapping_anchor: Option<usize>,
+    /// #86: いま値を組み立てている意味値の領域（`Values{text:false}`）の入れ子の深さ。
+    /// 写像される規則の本体に入るたびに 0 から数え直す。
+    value_region: u32,
     /// 回復ごとの公開候補（最遠位置 byte, label）。`Event::Recovery::hints` が索く。
     recovery_hints: Vec<Option<(usize, Vec<&'static str>)>>,
 }
@@ -700,6 +703,7 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
             effect_bytes: 0,
             mapping_depth: 0,
             mapping_anchor: None,
+            value_region: 0,
             recovery_hints: Vec::new(),
             recovery_events: Vec::new(),
         }
@@ -3118,139 +3122,139 @@ fn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<u32>)->Result<(),S
 // その場合は pool から stack を借りずに降りる。
 loop {match self.ev(root) {
 Event::Capture{child,..}=>root=child,
-Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}return Ok(());},
+Event::Values{child,span,wrap,text}=>{let start=out.len();if !text {self.value_region+=1;}let built=self.build_values_into(child,out);if !text {self.value_region-=1;}built?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}return Ok(());},
 Event::Rule{rule,span,child,caps}=>return self.build_rule(rule,caps,span,child,out),
 Event::Join(..)=>break,
 _=>return Ok(()),}}
-let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.ev(id) {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.ev(id) {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();if !text {self.value_region+=1;}let built=self.build_values_into(child,out);if !text {self.value_region-=1;}built?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
 fn leaf(&mut self,ty:usize,span:Span,text:u32)->Result<u32,String> {let span=self.span(span);self.tree.set_extent(text,span);match ty {
 24=>{let op=self.tree.list(&[text]);let right=self.tree.list(&[]);Ok(self.tree.record(tree::K_g_TinyExpressionP4AST_2e_BinaryExpr,40,span,&[tree::NONE,op[0],op[1],right[0],right[1]]))},
 _=>{let _=(span,text);Err(format!("unknown leaf type {ty}"))}}}
 fn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);match rule {
-0=>self.map_rule_0(caps,span,child,out),
-1=>self.map_rule_1(caps,span,child,out),
-2=>self.map_rule_2(caps,span,child,out),
-3=>self.map_rule_3(caps,span,child,out),
+0=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_0(caps,span,child,out);self.value_region=outer;built},
+1=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_1(caps,span,child,out);self.value_region=outer;built},
+2=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_2(caps,span,child,out);self.value_region=outer;built},
+3=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_3(caps,span,child,out);self.value_region=outer;built},
 4=>self.map_rule_4(caps,span,child,out),
-5=>self.map_rule_5(caps,span,child,out),
-6=>self.map_rule_6(caps,span,child,out),
-7=>self.map_rule_7(caps,span,child,out),
-8=>self.map_rule_8(caps,span,child,out),
+5=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_5(caps,span,child,out);self.value_region=outer;built},
+6=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_6(caps,span,child,out);self.value_region=outer;built},
+7=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_7(caps,span,child,out);self.value_region=outer;built},
+8=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_8(caps,span,child,out);self.value_region=outer;built},
 9=>self.map_rule_9(caps,span,child,out),
 10=>self.map_rule_10(caps,span,child,out),
 11=>self.map_rule_11(caps,span,child,out),
 12=>self.map_rule_12(caps,span,child,out),
 13=>self.map_rule_13(caps,span,child,out),
-14=>self.map_rule_14(caps,span,child,out),
+14=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_14(caps,span,child,out);self.value_region=outer;built},
 15=>self.map_rule_15(caps,span,child,out),
 16=>self.map_rule_16(caps,span,child,out),
 17=>self.map_rule_17(caps,span,child,out),
 18=>self.map_rule_18(caps,span,child,out),
 19=>self.map_rule_19(caps,span,child,out),
-20=>self.map_rule_20(caps,span,child,out),
-21=>self.map_rule_21(caps,span,child,out),
-22=>self.map_rule_22(caps,span,child,out),
-23=>self.map_rule_23(caps,span,child,out),
-24=>self.map_rule_24(caps,span,child,out),
-25=>self.map_rule_25(caps,span,child,out),
+20=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_20(caps,span,child,out);self.value_region=outer;built},
+21=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_21(caps,span,child,out);self.value_region=outer;built},
+22=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_22(caps,span,child,out);self.value_region=outer;built},
+23=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_23(caps,span,child,out);self.value_region=outer;built},
+24=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_24(caps,span,child,out);self.value_region=outer;built},
+25=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_25(caps,span,child,out);self.value_region=outer;built},
 26=>self.map_rule_26(caps,span,child,out),
 27=>self.map_rule_27(caps,span,child,out),
 28=>self.map_rule_28(caps,span,child,out),
 29=>self.map_rule_29(caps,span,child,out),
 30=>self.map_rule_30(caps,span,child,out),
-31=>self.map_rule_31(caps,span,child,out),
-32=>self.map_rule_32(caps,span,child,out),
-33=>self.map_rule_33(caps,span,child,out),
-34=>self.map_rule_34(caps,span,child,out),
+31=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_31(caps,span,child,out);self.value_region=outer;built},
+32=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_32(caps,span,child,out);self.value_region=outer;built},
+33=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_33(caps,span,child,out);self.value_region=outer;built},
+34=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_34(caps,span,child,out);self.value_region=outer;built},
 35=>self.map_rule_35(caps,span,child,out),
-36=>self.map_rule_36(caps,span,child,out),
-37=>self.map_rule_37(caps,span,child,out),
-38=>self.map_rule_38(caps,span,child,out),
-39=>self.map_rule_39(caps,span,child,out),
-40=>self.map_rule_40(caps,span,child,out),
-41=>self.map_rule_41(caps,span,child,out),
+36=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_36(caps,span,child,out);self.value_region=outer;built},
+37=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_37(caps,span,child,out);self.value_region=outer;built},
+38=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_38(caps,span,child,out);self.value_region=outer;built},
+39=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_39(caps,span,child,out);self.value_region=outer;built},
+40=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_40(caps,span,child,out);self.value_region=outer;built},
+41=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_41(caps,span,child,out);self.value_region=outer;built},
 42=>self.map_rule_42(caps,span,child,out),
 43=>self.map_rule_43(caps,span,child,out),
 44=>self.map_rule_44(caps,span,child,out),
-45=>self.map_rule_45(caps,span,child,out),
-46=>self.map_rule_46(caps,span,child,out),
-47=>self.map_rule_47(caps,span,child,out),
-48=>self.map_rule_48(caps,span,child,out),
-49=>self.map_rule_49(caps,span,child,out),
-50=>self.map_rule_50(caps,span,child,out),
-51=>self.map_rule_51(caps,span,child,out),
-52=>self.map_rule_52(caps,span,child,out),
-53=>self.map_rule_53(caps,span,child,out),
-54=>self.map_rule_54(caps,span,child,out),
-55=>self.map_rule_55(caps,span,child,out),
-56=>self.map_rule_56(caps,span,child,out),
-57=>self.map_rule_57(caps,span,child,out),
-58=>self.map_rule_58(caps,span,child,out),
-59=>self.map_rule_59(caps,span,child,out),
+45=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_45(caps,span,child,out);self.value_region=outer;built},
+46=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_46(caps,span,child,out);self.value_region=outer;built},
+47=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_47(caps,span,child,out);self.value_region=outer;built},
+48=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_48(caps,span,child,out);self.value_region=outer;built},
+49=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_49(caps,span,child,out);self.value_region=outer;built},
+50=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_50(caps,span,child,out);self.value_region=outer;built},
+51=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_51(caps,span,child,out);self.value_region=outer;built},
+52=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_52(caps,span,child,out);self.value_region=outer;built},
+53=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_53(caps,span,child,out);self.value_region=outer;built},
+54=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_54(caps,span,child,out);self.value_region=outer;built},
+55=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_55(caps,span,child,out);self.value_region=outer;built},
+56=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_56(caps,span,child,out);self.value_region=outer;built},
+57=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_57(caps,span,child,out);self.value_region=outer;built},
+58=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_58(caps,span,child,out);self.value_region=outer;built},
+59=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_59(caps,span,child,out);self.value_region=outer;built},
 60=>self.map_rule_60(caps,span,child,out),
-61=>self.map_rule_61(caps,span,child,out),
-62=>self.map_rule_62(caps,span,child,out),
-63=>self.map_rule_63(caps,span,child,out),
-64=>self.map_rule_64(caps,span,child,out),
-65=>self.map_rule_65(caps,span,child,out),
-66=>self.map_rule_66(caps,span,child,out),
-67=>self.map_rule_67(caps,span,child,out),
-68=>self.map_rule_68(caps,span,child,out),
-69=>self.map_rule_69(caps,span,child,out),
-70=>self.map_rule_70(caps,span,child,out),
-71=>self.map_rule_71(caps,span,child,out),
-72=>self.map_rule_72(caps,span,child,out),
-73=>self.map_rule_73(caps,span,child,out),
-74=>self.map_rule_74(caps,span,child,out),
-75=>self.map_rule_75(caps,span,child,out),
-76=>self.map_rule_76(caps,span,child,out),
+61=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_61(caps,span,child,out);self.value_region=outer;built},
+62=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_62(caps,span,child,out);self.value_region=outer;built},
+63=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_63(caps,span,child,out);self.value_region=outer;built},
+64=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_64(caps,span,child,out);self.value_region=outer;built},
+65=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_65(caps,span,child,out);self.value_region=outer;built},
+66=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_66(caps,span,child,out);self.value_region=outer;built},
+67=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_67(caps,span,child,out);self.value_region=outer;built},
+68=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_68(caps,span,child,out);self.value_region=outer;built},
+69=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_69(caps,span,child,out);self.value_region=outer;built},
+70=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_70(caps,span,child,out);self.value_region=outer;built},
+71=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_71(caps,span,child,out);self.value_region=outer;built},
+72=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_72(caps,span,child,out);self.value_region=outer;built},
+73=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_73(caps,span,child,out);self.value_region=outer;built},
+74=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_74(caps,span,child,out);self.value_region=outer;built},
+75=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_75(caps,span,child,out);self.value_region=outer;built},
+76=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_76(caps,span,child,out);self.value_region=outer;built},
 77=>self.map_rule_77(caps,span,child,out),
-78=>self.map_rule_78(caps,span,child,out),
-79=>self.map_rule_79(caps,span,child,out),
-80=>self.map_rule_80(caps,span,child,out),
+78=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_78(caps,span,child,out);self.value_region=outer;built},
+79=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_79(caps,span,child,out);self.value_region=outer;built},
+80=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_80(caps,span,child,out);self.value_region=outer;built},
 81=>self.map_rule_81(caps,span,child,out),
 82=>self.map_rule_82(caps,span,child,out),
 83=>self.map_rule_83(caps,span,child,out),
 84=>self.map_rule_84(caps,span,child,out),
 85=>self.map_rule_85(caps,span,child,out),
-86=>self.map_rule_86(caps,span,child,out),
-87=>self.map_rule_87(caps,span,child,out),
+86=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_86(caps,span,child,out);self.value_region=outer;built},
+87=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_87(caps,span,child,out);self.value_region=outer;built},
 88=>self.map_rule_88(caps,span,child,out),
-89=>self.map_rule_89(caps,span,child,out),
+89=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_89(caps,span,child,out);self.value_region=outer;built},
 90=>self.map_rule_90(caps,span,child,out),
 91=>self.map_rule_91(caps,span,child,out),
-92=>self.map_rule_92(caps,span,child,out),
-93=>self.map_rule_93(caps,span,child,out),
-94=>self.map_rule_94(caps,span,child,out),
-95=>self.map_rule_95(caps,span,child,out),
-96=>self.map_rule_96(caps,span,child,out),
-97=>self.map_rule_97(caps,span,child,out),
+92=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_92(caps,span,child,out);self.value_region=outer;built},
+93=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_93(caps,span,child,out);self.value_region=outer;built},
+94=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_94(caps,span,child,out);self.value_region=outer;built},
+95=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_95(caps,span,child,out);self.value_region=outer;built},
+96=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_96(caps,span,child,out);self.value_region=outer;built},
+97=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_97(caps,span,child,out);self.value_region=outer;built},
 98=>self.map_rule_98(caps,span,child,out),
-99=>self.map_rule_99(caps,span,child,out),
-100=>self.map_rule_100(caps,span,child,out),
-101=>self.map_rule_101(caps,span,child,out),
+99=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_99(caps,span,child,out);self.value_region=outer;built},
+100=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_100(caps,span,child,out);self.value_region=outer;built},
+101=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_101(caps,span,child,out);self.value_region=outer;built},
 102=>self.map_rule_102(caps,span,child,out),
-103=>self.map_rule_103(caps,span,child,out),
+103=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_103(caps,span,child,out);self.value_region=outer;built},
 104=>self.map_rule_104(caps,span,child,out),
-105=>self.map_rule_105(caps,span,child,out),
-106=>self.map_rule_106(caps,span,child,out),
-107=>self.map_rule_107(caps,span,child,out),
-108=>self.map_rule_108(caps,span,child,out),
-109=>self.map_rule_109(caps,span,child,out),
-110=>self.map_rule_110(caps,span,child,out),
-111=>self.map_rule_111(caps,span,child,out),
-112=>self.map_rule_112(caps,span,child,out),
-113=>self.map_rule_113(caps,span,child,out),
-114=>self.map_rule_114(caps,span,child,out),
-115=>self.map_rule_115(caps,span,child,out),
-116=>self.map_rule_116(caps,span,child,out),
-117=>self.map_rule_117(caps,span,child,out),
-118=>self.map_rule_118(caps,span,child,out),
-119=>self.map_rule_119(caps,span,child,out),
-120=>self.map_rule_120(caps,span,child,out),
-121=>self.map_rule_121(caps,span,child,out),
+105=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_105(caps,span,child,out);self.value_region=outer;built},
+106=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_106(caps,span,child,out);self.value_region=outer;built},
+107=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_107(caps,span,child,out);self.value_region=outer;built},
+108=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_108(caps,span,child,out);self.value_region=outer;built},
+109=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_109(caps,span,child,out);self.value_region=outer;built},
+110=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_110(caps,span,child,out);self.value_region=outer;built},
+111=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_111(caps,span,child,out);self.value_region=outer;built},
+112=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_112(caps,span,child,out);self.value_region=outer;built},
+113=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_113(caps,span,child,out);self.value_region=outer;built},
+114=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_114(caps,span,child,out);self.value_region=outer;built},
+115=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_115(caps,span,child,out);self.value_region=outer;built},
+116=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_116(caps,span,child,out);self.value_region=outer;built},
+117=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_117(caps,span,child,out);self.value_region=outer;built},
+118=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_118(caps,span,child,out);self.value_region=outer;built},
+119=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_119(caps,span,child,out);self.value_region=outer;built},
+120=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_120(caps,span,child,out);self.value_region=outer;built},
+121=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_121(caps,span,child,out);self.value_region=outer;built},
 122=>self.map_rule_122(caps,span,child,out),
-123=>self.map_rule_123(caps,span,child,out),
+123=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_123(caps,span,child,out);self.value_region=outer;built},
 _=>Err(format!("unknown rule {rule}"))}}
 fn map_rule_0(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=self.take_values();self.node_values(&caps,&[0],None,&mut f0)?;
@@ -3350,14 +3354,14 @@ let f2:Option<u32>=f2;
 let mut t3=self.take_values();self.text_values(&caps,&[24],&mut t3);if t3.len()>1 {return Err("desc requires at most one value".into());}let f3=t3.pop();self.give_values(t3);
 let f3:Option<u32>=f3;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_ObjectVariableDeclarationExpr,8,span,&[f0,f1.unwrap_or(tree::NONE),f2.unwrap_or(tree::NONE),f3.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_9(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_10(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_11(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_12(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_13(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_9(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_10(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_11(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_12(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_13(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_14(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr,14,span,&[]);out.push(node);Ok(())}}
-fn map_rule_15(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_15(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_16(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_17(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_18(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
@@ -3430,11 +3434,11 @@ let f0:u32=f0;
 let mut t1=self.take_values();self.text_values(&caps,&[40],&mut t1);if t1.len()>1 {return Err("type requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
 let f1:Option<u32>=f1;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_MethodParameterExpr,25,span,&[f0,f1.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_26(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_27(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_28(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_29(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_30(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_26(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_27(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_28(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_29(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_30(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_31(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[41],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_TinyExpressionP4AST_2e_QualifiedNameExpr}) {return Err("className: mapped value type mismatch".into());}
@@ -3487,7 +3491,7 @@ if !v2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_TinyExpressi
 if v2.len()>1 {return Err("args requires at most one node".into());}let f2=v2.pop();self.give_values(v2);
 let f2:Option<u32>=f2;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr,34,span,&[f0.unwrap_or(tree::NONE),f1,f2.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_35(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_35(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_36(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_values();self.text_values(&caps,&[57],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[57]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
@@ -3548,8 +3552,8 @@ let mut f2=self.take_values();self.node_values(&caps,&[73],Some(24),&mut f2)?;
 if !f2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_TinyExpressionP4AST_2e_AbsExpr || k==tree::K_g_TinyExpressionP4AST_2e_ArgumentExpressionExpr || k==tree::K_g_TinyExpressionP4AST_2e_ArgumentsExpr || k==tree::K_g_TinyExpressionP4AST_2e_BinaryExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanAndExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanCaseValueExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanDefaultCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanEqualityExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanFactorExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanMatchExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanMethodDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanOrExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanVariableDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanXorExpr || k==tree::K_g_TinyExpressionP4AST_2e_BranchExpressionExpr || k==tree::K_g_TinyExpressionP4AST_2e_CeilExpr || k==tree::K_g_TinyExpressionP4AST_2e_CodeBlockExpr || k==tree::K_g_TinyExpressionP4AST_2e_ComparisonExpr || k==tree::K_g_TinyExpressionP4AST_2e_ContainsDotExpr || k==tree::K_g_TinyExpressionP4AST_2e_ContainsExpr || k==tree::K_g_TinyExpressionP4AST_2e_CosExpr || k==tree::K_g_TinyExpressionP4AST_2e_EndsWithDotExpr || k==tree::K_g_TinyExpressionP4AST_2e_EndsWithExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExpExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExpressionExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExternalBooleanInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExternalNumberInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExternalStringInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_FloorExpr || k==tree::K_g_TinyExpressionP4AST_2e_FormulaExpr || k==tree::K_g_TinyExpressionP4AST_2e_IfExpr || k==tree::K_g_TinyExpressionP4AST_2e_ImportDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_InDayTimeRangeExpr || k==tree::K_g_TinyExpressionP4AST_2e_InExpr || k==tree::K_g_TinyExpressionP4AST_2e_InTimeRangeExpr || k==tree::K_g_TinyExpressionP4AST_2e_IsPresentExpr || k==tree::K_g_TinyExpressionP4AST_2e_LengthDotExpr || k==tree::K_g_TinyExpressionP4AST_2e_LengthExpr || k==tree::K_g_TinyExpressionP4AST_2e_LogExpr || k==tree::K_g_TinyExpressionP4AST_2e_MaxExpr || k==tree::K_g_TinyExpressionP4AST_2e_MethodInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_MethodParameterExpr || k==tree::K_g_TinyExpressionP4AST_2e_MethodParametersExpr || k==tree::K_g_TinyExpressionP4AST_2e_MinExpr || k==tree::K_g_TinyExpressionP4AST_2e_NotExpr || k==tree::K_g_TinyExpressionP4AST_2e_NumberCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_NumberCaseValueExpr || k==tree::K_g_TinyExpressionP4AST_2e_NumberDefaultCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_NumberMatchExpr || k==tree::K_g_TinyExpressionP4AST_2e_NumberMethodDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_NumberVariableDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_ObjectExpr || k==tree::K_g_TinyExpressionP4AST_2e_ObjectMethodDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_ObjectVariableDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_OnlyIfAbsentExpr || k==tree::K_g_TinyExpressionP4AST_2e_PowExpr || k==tree::K_g_TinyExpressionP4AST_2e_QualifiedNameExpr || k==tree::K_g_TinyExpressionP4AST_2e_RandomExpr || k==tree::K_g_TinyExpressionP4AST_2e_RoundExpr || k==tree::K_g_TinyExpressionP4AST_2e_SinExpr || k==tree::K_g_TinyExpressionP4AST_2e_SliceExpr || k==tree::K_g_TinyExpressionP4AST_2e_SqrtExpr || k==tree::K_g_TinyExpressionP4AST_2e_StartsWithDotExpr || k==tree::K_g_TinyExpressionP4AST_2e_StartsWithExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringCaseValueExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringCastVariableRefExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringComparisonExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringConcatExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringDefaultCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringMatchExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringMethodDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringTypedVariableRefExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringVariableDeclarationExpr || k==tree::K_g_TinyExpressionP4AST_2e_TanExpr || k==tree::K_g_TinyExpressionP4AST_2e_TernaryExpr || k==tree::K_g_TinyExpressionP4AST_2e_ToLowerCaseDotExpr || k==tree::K_g_TinyExpressionP4AST_2e_ToLowerCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_ToNumExpr || k==tree::K_g_TinyExpressionP4AST_2e_ToUpperCaseDotExpr || k==tree::K_g_TinyExpressionP4AST_2e_ToUpperCaseExpr || k==tree::K_g_TinyExpressionP4AST_2e_TrimDotExpr || k==tree::K_g_TinyExpressionP4AST_2e_TrimExpr || k==tree::K_g_TinyExpressionP4AST_2e_VariableRefExpr}) {return Err("right: mapped value type mismatch".into());}
 let f2:Vec<u32>=f2;
 self.give_captures(caps);let span=self.span(span);let l1=self.tree.list(&f1);self.give_values(f1);let l2=self.tree.list(&f2);self.give_values(f2);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_BinaryExpr,41,span,&[f0.unwrap_or(tree::NONE),l1[0],l1[1],l2[0],l2[1]]);out.push(node);Ok(())}}
-fn map_rule_42(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_43(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_42(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_43(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_44(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_45(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[74],None,&mut v0)?;
@@ -3839,7 +3843,7 @@ if v3.is_empty() && self.missing_field(&caps,&[128]) {return Ok(());}
 if v3.len()!=1 {return Err("endHour requires one node".into());}let f3=v3.pop().unwrap();self.give_values(v3);
 let f3:u32=f3;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_InDayTimeRangeExpr,80,span,&[f0,f1,f2,f3]);out.push(node);Ok(())}}
-fn map_rule_81(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_81(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_82(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_83(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_84(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
@@ -3988,7 +3992,7 @@ if v2.is_empty() && self.missing_field(&caps,&[193]) {return Ok(());}
 if v2.len()!=1 {return Err("right requires one node".into());}let f2=v2.pop().unwrap();self.give_values(v2);
 let f2:u32=f2;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_StringComparisonExpr,101,span,&[f0,f1,f2]);out.push(node);Ok(())}}
-fn map_rule_102(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_102(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_103(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[194],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_TinyExpressionP4AST_2e_BinaryExpr}) {return Err("left: mapped value type mismatch".into());}
@@ -4004,7 +4008,7 @@ if v2.is_empty() && self.missing_field(&caps,&[196]) {return Ok(());}
 if v2.len()!=1 {return Err("right requires one node".into());}let f2=v2.pop().unwrap();self.give_values(v2);
 let f2:u32=f2;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_ComparisonExpr,103,span,&[f0,f1,f2]);out.push(node);Ok(())}}
-fn map_rule_104(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_104(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_105(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[197, 198, 199, 200, 201, 202],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_TinyExpressionP4AST_2e_BinaryExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanOrExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExternalObjectInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_MethodInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringConcatExpr || k==tree::K_g_TinyExpressionP4AST_2e_VariableRefExpr}) {return Err("value: mapped value type mismatch".into());}
@@ -4183,7 +4187,7 @@ let f0:u32=f0;
 let mut t1=self.take_values();self.text_values(&caps,&[239],&mut t1);if t1.len()>1 {return Err("type requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
 let f1:Option<u32>=f1;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_TinyExpressionP4AST_2e_VariableRefExpr,121,span,&[f0,f1.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_122(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_122(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_123(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut v0=self.take_values();self.node_values(&caps,&[240, 241, 242, 243, 244, 245],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_TinyExpressionP4AST_2e_BinaryExpr || k==tree::K_g_TinyExpressionP4AST_2e_BooleanOrExpr || k==tree::K_g_TinyExpressionP4AST_2e_ExpressionExpr || k==tree::K_g_TinyExpressionP4AST_2e_MethodInvocationExpr || k==tree::K_g_TinyExpressionP4AST_2e_ObjectExpr || k==tree::K_g_TinyExpressionP4AST_2e_StringConcatExpr}) {return Err("value: mapped value type mismatch".into());}
