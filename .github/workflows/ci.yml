@@ -5,16 +5,27 @@ on:
     branches: [master]
   pull_request:
 
+# Both jobs run on the repository-scoped self-hosted runner (labels: ubnfc-ci). This
+# repository is private, so GitHub-hosted runners are billed and have never started a job
+# here ("recent account payments have failed or your spending limit needs to be
+# increased" — every run since the repository was created failed in 2 s). The runner
+# lives on the same machine as the sibling unlaxer-parser checkout, so the native job's
+# fixtures resolve via UNLAXER_PARSER_DIR and the job is merge-blocking again.
+env:
+  UNLAXER_PARSER_DIR: /home/opa/work/unlaxer-workspace/unlaxer-parser
+  CARGO_TERM_COLOR: always
+
 jobs:
   wasm32:
     name: wasm32-unknown-unknown build (issue #65 / D-070)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ubnfc-ci]
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - uses: Swatinem/rust-cache@v2
+      - name: toolchain versions (rustup, JDK and Maven are preinstalled on the runner)
+        run: |
+          rustc --version && cargo --version
+          rustup target list --installed | grep -q wasm32-unknown-unknown
+          java -version 2>&1 | head -1 && mvn -v | head -1
 
       - name: build ubnfc / ubnfc-rust CLI (host)
         run: cargo build --release --bin ubnfc --bin ubnfc-rust
@@ -40,29 +51,20 @@ jobs:
 
   native:
     name: native workspace tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ubnfc-ci]
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
+      - name: toolchain versions (rustup, JDK and Maven are preinstalled on the runner)
+        run: |
+          rustc --version && cargo --version
+          rustup target list --installed | grep -q wasm32-unknown-unknown
+          java -version 2>&1 | head -1 && mvn -v | head -1
 
       - name: build ubnfc-java jar (needed by Rust<->Java cross-backend tests)
         run: cd ubnfc-java && mvn -q -DskipTests package
 
-      # A number of tests default to a sibling checkout ../../../unlaxer-parser
-      # (front fixtures, self-host parity, corpus spec citations; see UNLAXER_PARSER_DIR
-      # in crates/ubnfc-front/tests, crates/ubnfc-selfhost/tests, crates/ubnfc-harness).
-      # unlaxer-parser is a separate private repo; wiring its checkout into this workflow
-      # needs a cross-repo token that is not set up yet, and issue #65 is scoped to the
-      # wasm32 build only. Tracked as a follow-up rather than blocking this fix, so this
-      # job is informational for now: the merge-blocking gate is the wasm32 job above.
-      # Full native/corpus regression for this change (Java Pass 1,310 / Rust Pass 1,292,
-      # Fail 0; clippy -D warnings; fmt) was verified locally — see
-      # docs/reports/2026-09-24-wasm32-build.md.
+      # Tests that default to the sibling checkout ../../../unlaxer-parser (front fixtures,
+      # self-host parity, corpus spec citations) read UNLAXER_PARSER_DIR (set above), which
+      # points at the checkout on the runner's machine. This job is merge-blocking.
       - name: cargo test --workspace
-        continue-on-error: true
         run: cargo test --workspace --no-fail-fast
