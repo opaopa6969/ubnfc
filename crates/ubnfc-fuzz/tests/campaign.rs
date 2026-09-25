@@ -63,6 +63,7 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
         // 0 は縮小なし。CI では最小化まではやらない。
         shrink_builds: 0,
         driver_timeout: Duration::from_secs(120),
+        timeout_retries: 2,
         workdir: scratch.0.clone(),
     });
     // front が自分の IR / 解析の契約で自分の出力を拒否したら discard になる
@@ -138,6 +139,7 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
         findings: None,
         shrink_builds: 0,
         driver_timeout: Duration::from_secs(120),
+        timeout_retries: 2,
         workdir: scratch.0.clone(),
     });
     assert_eq!(
@@ -203,6 +205,7 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
         findings: None,
         shrink_builds: 0,
         driver_timeout: Duration::from_secs(120),
+        timeout_retries: 2,
         workdir: scratch.0.clone(),
     });
     assert_eq!(
@@ -273,6 +276,7 @@ fn e_v2_code_point_class_tokens_agree_across_backends() {
             findings: None,
             shrink_builds: 0,
             driver_timeout: Duration::from_secs(120),
+            timeout_retries: 2,
             workdir: scratch.0.clone(),
         });
         assert_eq!(
@@ -352,6 +356,7 @@ fn f_v2_recovery_diagnostics_agree_across_backends() {
         findings: None,
         shrink_builds: 0,
         driver_timeout: Duration::from_secs(120),
+        timeout_retries: 2,
         workdir: scratch.0.clone(),
     });
     assert_eq!(
@@ -390,6 +395,7 @@ fn b_recovery_auto_keeps_acceptance_identical_across_backends() {
         findings: None,
         shrink_builds: 0,
         driver_timeout: Duration::from_secs(120),
+        timeout_retries: 2,
         workdir: scratch.0.clone(),
     });
     assert_eq!(summary.compiled, 1, "seed 269 が build できていない");
@@ -441,6 +447,7 @@ fn g_direct_token_captures_agree_across_backends() {
             findings: None,
             shrink_builds: 0,
             driver_timeout: Duration::from_secs(120),
+            timeout_retries: 2,
             workdir: scratch.0.clone(),
         });
         assert_eq!(
@@ -509,6 +516,7 @@ fn h_text_group_captures_agree_across_backends() {
             findings: None,
             shrink_builds: 0,
             driver_timeout: Duration::from_secs(120),
+            timeout_retries: 2,
             workdir: scratch.0.clone(),
         });
         assert_eq!(

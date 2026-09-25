@@ -393,3 +393,43 @@ farthestExpected` の比較は維持する（D-014）。Extern の失敗候補�
   生成器が互換の文字列を組み立てる。
 - `value` は driver が評価した結果があるときだけキーを置く。全入力解析が成功して AST が無い
   ときは**キーごと出さない**（未観測）。観測済みの `null` は評価結果としての null。
+
+## 負荷に応じた driver タイムアウトと未観測の扱い（issue #73）
+
+`cargo test --workspace` を共有機の高負荷（load average 30〜60、並行 agent 8 本）で回すと、
+`ubnfc-fuzz` の driver 交換が散発的に壁時計タイムアウトへ落ちる（`docs/reports/2026-09-23-differential-fuzzing.md`
+の観測、`docs/reports/2026-09-24-load-aware-timeouts.md` の再現試行）。これは driver 自体の
+バグではなく、`javac` / `cargo build --release` と JVM 起動がホストの他プロセスと CPU を奪い
+合って**基準タイムアウト（既定 90 秒）の中で終わらなくなる**ことが原因である。
+
+### タイムアウトの倍率（`crates/ubnfc-fuzz/src/load.rs`）
+
+- `/proc/loadavg` の 1 分平均を `std::thread::available_parallelism()`（オンライン CPU 数の
+  見積もり）で割り、「1 CPU あたりの負荷」を倍率にする。
+- 倍率は `[1.0, 4.0]` にクランプする。**無負荷（1 CPU あたり 1 未満）では倍率 1 で、
+  基準タイムアウトそのまま**（既定動作は変えない）。上限 4 倍を超えて伸ばさないのは、
+  恒常的な高負荷ホストでも「driver が本当に停止した」の検知が無限に遅れないようにするため。
+- `/proc/loadavg` が読めない環境（Linux 以外）では倍率 1 のまま動く。
+- 倍率は `Engine::run` が driver を起動するたびに**その時点の負荷**から計算し直す
+  （campaign 開始時の 1 回きりではない）。`Engine.timeout` は基準タイムアウト、実際に
+  `exchange` へ渡すのは `base.mul_f64(factor)`。
+
+### `driver_timeout` は「失敗」ではなく「未観測」
+
+- タイムアウトで打ち切られた応答には `{"error": "...", "kind": "driver_timeout"}` の印が付く
+  （`ubnfc_fuzz::engine::is_driver_timeout`）。本物の driver エラー（異常終了・不正 JSON・
+  未知/重複 id など）とはこの印の有無で区別する。
+- `ubnfc_fuzz::campaign` は `driver_timeout` になった比較だけを、**該当 backend だけ**新しい
+  プロセスで最大 `Config::timeout_retries`（既定 2）回再試行する（`run_pair_with_retries`）。
+  同じバッチの他の入力は巻き込まない。
+- 再試行を使い切ってもなお `driver_timeout` の比較は `Summary.unobserved_timeouts` に数え、
+  `driver_errors` にも `findings`（差分）にも入れない。片側だけ応答が欠けたことを「両バック
+  エンドの観測差」として登録しない、という corpus 側の未観測の扱い（本書冒頭）と同じ考え方を
+  driver 交換そのものにも広げたもの。build discard（`build:java` / `build:rust` など）も
+  同じ意味で「未観測」であり、`Summary.discards` に理由コード別で残る。
+- `Summary` は `retried_comparisons` / `retry_attempts` / `unobserved_timeouts` /
+  `max_load_factor`（campaign 中に観測した負荷率の最大）を JSON レポートに残す。
+
+固定 seed campaign（`crates/ubnfc-fuzz/tests/campaign.rs`）の `summary.driver_errors == 0` は
+「本物の driver エラーが無い」ことの主張のまま変えていない。無負荷なら `unobserved_timeouts`
+も 0 のはずなので、この変更は無負荷時の green を壊さない。
