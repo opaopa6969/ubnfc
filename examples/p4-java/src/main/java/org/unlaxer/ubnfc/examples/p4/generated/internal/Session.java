@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.unlaxer.ubnfc.examples.p4.generated.api.Capture;
 import org.unlaxer.ubnfc.examples.p4.generated.api.Diagnostic;
@@ -274,8 +273,12 @@ public final class Session {
     private int reached;
     private ParseResult<?> syntax;
     private long nextCaptureCompletion;
-    public final IdentityHashMap<Object, Span> spans = new IdentityHashMap<>();
-    private final IdentityHashMap<Recipe, Object> built = new IdentityHashMap<>();
+    /**
+     * AST ノード・字句値の span 表。D-079: 構築（{@link #remember} / {@link #text}）が始まってから、
+     * この解析が作った recipe の数で大きさを決めて 1 度だけ確保する（既定の 32 から倍々に育て直さない）。
+     */
+    private IdentityHashMap<Object, Span> spans;
+    private int recipeCount;
     /**
      * D-056 の二段構え。{@code tree} が false の認識経路は Match 木・capture 出現・Recipe を作らず、
      * {@code diag} が false の経路は診断観測を記録しない（主位置 {@code reached} だけ残す）。
@@ -508,12 +511,12 @@ public final class Session {
                 applyEffects(scopeEffects, "successAfterLeave", result);
                 applyEffects(scopeEffects, "afterDeclarations", result);
             }
-            List<Recipe> nodes = result.nodes();
+            List<Recipe> nodes = result.nodes(); Recipe made = null;
             boolean skipped = skip || "skip".equals(recipeKind);
             if (!tree) nodes = List.of();
             else if (skipped) nodes = List.of();
             else if (recipe != null && !"transparent".equals(recipeKind) && !"text".equals(recipeKind)) {
-                Field[] items = fields.items; List<Value>[] lists = Recipe.lists(items.length);
+                Field[] items = fields.items; List<Value>[] lists = Recipe.lists(items.length); recipeCount++;
                 List<Occurrence> local = result.local();
                 int localCount = local.size();
                 for (int fi = 0; fi < items.length; fi++) {
@@ -530,12 +533,10 @@ public final class Session {
                             captures.addAll(elements);
                         } else if (nodeLike && list && !v.nodes().isEmpty()) {
                             List<Recipe> children = v.nodes();
-                            if (captures == null && children.size() == 1 && single == null) {
-                                Recipe node = children.getFirst(); single = new Value(node.start(), node.end(), children);
-                                continue;
-                            }
+                            // D-079: 要素ごとの Value(start, end, List.of(node)) は recipe が 1 度だけ持つ。
+                            if (captures == null && children.size() == 1 && single == null) { single = children.getFirst().value(); continue; }
                             if (captures == null) { captures = new ArrayList<>(children.size() + 1); if (single != null) { captures.add(single); single = null; } }
-                            for (int ni = 0, nn = children.size(); ni < nn; ni++) { Recipe node = children.get(ni); captures.add(new Value(node.start(), node.end(), List.of(node))); }
+                            for (int ni = 0, nn = children.size(); ni < nn; ni++) captures.add(children.get(ni).value());
                         } else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) {
                             if (captures != null) captures.add(v);
                             else if (single == null) single = v;
@@ -550,7 +551,8 @@ public final class Session {
                     for (List<Value> list : lists) for (int k = 0; k < list.size(); k++) max = Math.max(max, list.get(k).end());
                     if (max != Integer.MIN_VALUE) nodeEnd = max;
                 }
-                nodes = List.of(new Recipe(recipe, c, nodeEnd, fields.names, lists, fallback));
+                made = new Recipe(recipe, c, nodeEnd, fields.names, lists, fallback);
+                nodes = made.self();
             }
             List<Occurrence> completed = result.local();
             for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
@@ -558,10 +560,13 @@ public final class Session {
             else {
                 List<Value> values = result.values();
                 if (skipped || nodes != result.nodes()) {
-                    values = nodes.isEmpty() ? List.of() : List.of(new Value(nodes.getFirst().start(), nodes.getFirst().end(), nodes));
+                    values = made != null ? made.values() : nodes.isEmpty() ? List.of() : List.of(new Value(nodes.getFirst().start(), nodes.getFirst().end(), nodes));
                 }
-                result = new Match(nodes, List.of(), result.captures(), result.traces(), c, f.c,
-                    result.mappingFailure(), result.recoveries(), List.of(), result.text(), values);
+                // D-079: 包み直しても内容が変わらない結果（局所出現・項目が空で区間も同じ）はそのまま返す。
+                if (nodes != result.nodes() || values != result.values() || !result.local().isEmpty() || !result.items().isEmpty()
+                    || result.start() != c || result.end() != f.c)
+                    result = new Match(nodes, List.of(), result.captures(), result.traces(), c, f.c,
+                        result.mappingFailure(), result.recoveries(), List.of(), result.text(), values);
             }
         } else {
             if (diag) {
@@ -1367,7 +1372,7 @@ public final class Session {
             hints, failure.deepestRule() < 0 ? null : ruleNames[failure.deepestRule()],
             Arrays.stream(failure.ruleStack()).mapToObj(i -> ruleNames[i]).toList(), hints, "ERROR", input.cpLength(start, end), "recovery");
         String id = projection.equals("explicitRecipe") ? recipe : "#recovery";
-        Recipe marker = new Recipe(id, start, end, Map.of(), null);
+        Recipe marker = Recipe.leaf(id, start, end);
         var recovery = new RecoveryEvent(rule, mode, start, end, selected, syncStart, syncStart < 0 ? -1 : syncStart + syncLength, diagnostic, marker);
         return new Match(List.of(marker), List.of(), List.of(), List.of(), start, end,
             projection.equals("mappingFailure"), List.of(recovery));
@@ -1451,8 +1456,23 @@ public final class Session {
         out.add(new ParseResult.Lexical(id, parent, trace.rule(), trace.expr(), span(trace.start(), trace.end()), counter[1]++, trace.token()));
     }
     public String text(Value value) {
-        String text = new String(value.text() == null ? source.substring(value.start(), value.end()).strip() : value.text());
-        spans.put(text, span(value.start(), value.end())); return text;
+        String text;
+        if (value.text() != null) text = new String(value.text());
+        else {
+            // D-079: source.substring(...).strip() と同じ範囲を先に求め、確保を 1 回にする。
+            // 識別子で span を引くので、共有され得る文字列（入力全体・空文字列）だけは複製する。
+            int start = value.start(), end = value.end();
+            while (start < end) { int cp = source.codePointAt(start); if (!Character.isWhitespace(cp)) break; start += Character.charCount(cp); }
+            while (end > start) { int cp = source.codePointBefore(end); if (!Character.isWhitespace(cp)) break; end -= Character.charCount(cp); }
+            text = start == end || start == 0 && end == source.length() ? new String(source.substring(start, end)) : source.substring(start, end);
+        }
+        spans().put(text, span(value.start(), value.end())); return text;
+    }
+    /** 構築が登録した span 表（構築が 1 度も登録しなければ空）。 */
+    public IdentityHashMap<Object, Span> spans() {
+        IdentityHashMap<Object, Span> result = spans;
+        if (result == null) spans = result = new IdentityHashMap<>(Math.max(32, recipeCount + (recipeCount >> 1)));
+        return result;
     }
     public int number(Value value) {
         try { return Integer.parseInt(text(value)); }
@@ -1461,27 +1481,38 @@ public final class Session {
     public Recipe node(Value value, Recipe owner) {
         if (value.nodes().size() > 1) throw mapping(value.start(), value.end(), "Scalar capture has multiple mapped nodes", null);
         if (!value.nodes().isEmpty()) return value.nodes().getFirst();
-        if (owner.fallback() != null) return new Recipe("#leaf:" + owner.fallback(), value.start(), value.end(), Map.of(), null);
+        if (owner.fallback() != null) return Recipe.leaf(leafId(owner.fallback()), value.start(), value.end());
         throw mapping(value.start(), value.end(), "Missing mapped node", null);
     }
-    // field は生成時に確定した添字で引く（名前の線形走査は 1 AST ノードにつき field 数回になる）。
-    public <T> T scalar(Recipe recipe, int index, String field, Function<Value, T> conversion) {
+    private static final java.util.concurrent.ConcurrentHashMap<String, String> LEAF_IDS = new java.util.concurrent.ConcurrentHashMap<>();
+    /** {@code "#leaf:" + fallback} を 1 度だけ作る（毎回の連結と hash 計算をしない）。 */
+    private static String leafId(String fallback) {
+        String id = LEAF_IDS.get(fallback);
+        if (id == null) { id = "#leaf:" + fallback; String prior = LEAF_IDS.putIfAbsent(fallback, id); if (prior != null) id = prior; }
+        return id;
+    }
+    // D-079: 生成される recipe ごとの構築 method が field を添字で直に読む（lambda を渡さない）。
+    /** scalar field の値。無ければ従来の {@code scalar} と同じ mapping 失敗。 */
+    public Value scalarValue(Recipe recipe, int index, String field) {
         List<Value> values = recipe.fieldValues(index);
         if (values.isEmpty()) throw mapping(recipe.start(), recipe.end(), "Missing scalar capture: " + field, null);
-        T value = conversion.apply(values.getFirst());
-        if (value == null && !values.getFirst().nodes().isEmpty()) throw new RecoveredNodeMissing();
-        return value;
+        return values.getFirst();
     }
-    public <T> Optional<T> optional(Recipe recipe, int index, String field, Function<Value, T> conversion) {
-        List<Value> values = recipe.fieldValues(index);
-        return values.isEmpty() ? Optional.empty() : Optional.ofNullable(conversion.apply(values.getFirst()));
+    /** scalar の変換結果の検査。回復で落ちた node を指す値は親ごと省く（{@link RecoveredNodeMissing}）。 */
+    public <T> T present(T converted, Value value) {
+        if (converted == null && !value.nodes().isEmpty()) throw new RecoveredNodeMissing();
+        return converted;
     }
-    public <T> List<T> list(Recipe recipe, int index, String field, Function<Value, T> conversion) {
+    /** optional field の先頭値（無ければ null）。 */
+    public Value firstValue(Recipe recipe, int index) {
         List<Value> values = recipe.fieldValues(index);
-        if (values.isEmpty()) return List.of();
-        var result = new ArrayList<T>(values.size());
-        for (int k = 0, n = values.size(); k < n; k++) { T converted = conversion.apply(values.get(k)); if (converted != null) result.add(converted); }
-        return List.copyOf(result);
+        return values.isEmpty() ? null : values.getFirst();
+    }
+    /** list field の変換結果（先頭 {@code kept} 件、null は生成側で落としてある）を不変 list にする。 */
+    @SuppressWarnings("unchecked")
+    public <T> List<T> listOf(Object[] converted, int kept) {
+        if (converted == null || kept == 0) return List.of();
+        return (List<T>) (kept == converted.length ? List.of(converted) : List.of(Arrays.copyOf(converted, kept)));
     }
     public MappingException mapping(int start, int end, String message, Throwable cause) { return new MappingException(syntax, span(start, end), message, cause); }
     /** A missing recovered scalar omits its parent; optional/list callers absorb that absence. */
@@ -1497,7 +1528,7 @@ public final class Session {
             throw mapping(recipe.start(), recipe.end(), message, new IllegalArgumentException(message));
         }
     }
-    public boolean hasBuilt(Recipe recipe) { return built.containsKey(recipe); }
-    public Object built(Recipe recipe) { return built.get(recipe); }
-    public Object remember(Recipe recipe, Object object) { built.put(recipe, object); if (object != null) spans.put(object, span(recipe.start(), recipe.end())); return object; }
+    public boolean hasBuilt(Recipe recipe) { return recipe.built != Recipe.UNBUILT; }
+    public Object built(Recipe recipe) { Object object = recipe.built; return object == Recipe.UNBUILT ? null : object; }
+    public Object remember(Recipe recipe, Object object) { recipe.built = object; if (object != null) spans().put(object, span(recipe.start(), recipe.end())); return object; }
 }
