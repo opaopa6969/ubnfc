@@ -13,6 +13,8 @@ on:
 # fixtures resolve via UNLAXER_PARSER_DIR and the job is merge-blocking again.
 env:
   UNLAXER_PARSER_DIR: /home/opa/work/unlaxer-workspace/unlaxer-parser
+  UNLAXER_PARSER_ROOT: /home/opa/work/unlaxer-workspace/unlaxer-parser
+  TINYEXPRESSION_DIR: /home/opa/work/unlaxer-workspace/tinyexpression
   CARGO_TERM_COLOR: always
 
 jobs:
@@ -60,11 +62,22 @@ jobs:
           rustup target list --installed | grep -q wasm32-unknown-unknown
           java -version 2>&1 | head -1 && mvn -v | head -1
 
+      # Several tests and the handwritten-target example hard-code the sibling layout
+      # ../../../unlaxer-parser and ../../../tinyexpression relative to their crate (no env
+      # override), so give the runner's _work/ubnfc/ the same siblings as the developer's
+      # workspace. ln -sfn is idempotent; actions/checkout only cleans $GITHUB_WORKSPACE.
+      - name: link sibling checkouts next to the workspace
+        run: |
+          ln -sfn "$UNLAXER_PARSER_DIR" "$GITHUB_WORKSPACE/../unlaxer-parser"
+          ln -sfn "$TINYEXPRESSION_DIR" "$GITHUB_WORKSPACE/../tinyexpression"
+          ls -l "$GITHUB_WORKSPACE/.."
+
       - name: build ubnfc-java jar (needed by Rust<->Java cross-backend tests)
         run: cd ubnfc-java && mvn -q -DskipTests package
 
-      # Tests that default to the sibling checkout ../../../unlaxer-parser (front fixtures,
-      # self-host parity, corpus spec citations) read UNLAXER_PARSER_DIR (set above), which
-      # points at the checkout on the runner's machine. This job is merge-blocking.
+      # Fixture-driven tests read UNLAXER_PARSER_DIR / TINYEXPRESSION_DIR (set above) or the
+      # sibling links created earlier. Those checkouts are the developer working trees on the
+      # runner's machine (usually master; may be ahead of what the PR was written against).
+      # This job is merge-blocking.
       - name: cargo test --workspace
         run: cargo test --workspace --no-fail-fast
