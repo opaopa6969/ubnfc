@@ -1449,11 +1449,13 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
         self.text_values(caps, sites, out);
     }
     /// node 変換の field 値。出現ごとに子の値を構築し、値が無く空でない出現は字句 Text にする。
+    /// `text_sites` は中身が text だけの site で、出現 1 つが一致範囲の字句 1 つになる（#89、D-032）。
     /// `fallback` は leaf 型（Text を leaf node に昇格する recipe）。
     pub fn node_values(
         &mut self,
         caps: &[Cap],
         sites: &[usize],
+        text_sites: &[usize],
         fallback: Option<usize>,
         out: &mut Vec<u32>,
     ) -> Result<(), String> {
@@ -1462,7 +1464,12 @@ impl<'a, const DIAG: bool> Session<'a, DIAG> {
                 continue;
             }
             let start = out.len();
-            self.build_values_into(child, out)?;
+            if text_sites.contains(&site) && span[0] != span[1] && !self.has_recovery(child) {
+                let text = self.semantic_text(child, span);
+                out.push(text);
+            } else {
+                self.build_values_into(child, out)?;
+            }
             if out.len() == start
                 && span[0] != span[1]
                 && !self.has_recovery(child)

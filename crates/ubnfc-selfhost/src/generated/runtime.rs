@@ -1450,11 +1450,13 @@ if name.is_empty()
         self.text_values(caps, sites, out);
     }
     /// node 変換の field 値。出現ごとに子の値を構築し、値が無く空でない出現は字句 Text にする。
+    /// `text_sites` は中身が text だけの site で、出現 1 つが一致範囲の字句 1 つになる（#89、D-032）。
     /// `fallback` は leaf 型（Text を leaf node に昇格する recipe）。
     pub fn node_values(
         &mut self,
         caps: &[Cap],
         sites: &[usize],
+        text_sites: &[usize],
         fallback: Option<usize>,
         out: &mut Vec<u32>,
     ) -> Result<(), String> {
@@ -1463,7 +1465,12 @@ if name.is_empty()
                 continue;
             }
             let start = out.len();
-            self.build_values_into(child, out)?;
+            if text_sites.contains(&site) && span[0] != span[1] && !self.has_recovery(child) {
+                let text = self.semantic_text(child, span);
+                out.push(text);
+            } else {
+                self.build_values_into(child, out)?;
+            }
             if out.len() == start
                 && span[0] != span[1]
                 && !self.has_recovery(child)
@@ -2935,7 +2942,7 @@ fn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&m
 58=>self.map_rule_58(caps,span,child,out),
 _=>Err(format!("unknown rule {rule}"))}}
 fn map_rule_0(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[0],None,&mut f0)?;
+let mut f0=self.take_values();self.node_values(&caps,&[0],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_GrammarDecl}) {return Err("grammars: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
 self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_UBNFFile,0,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
@@ -2951,16 +2958,16 @@ fn map_rule_2(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>
 let mut t0=self.take_values();self.text_values(&caps,&[3],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[3]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-let mut f1=self.take_values();self.node_values(&caps,&[4],None,&mut f1)?;
+let mut f1=self.take_values();self.node_values(&caps,&[4],&[],None,&mut f1)?;
 if !f1.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ImportDecl}) {return Err("imports: mapped value type mismatch".into());}
 let f1:Vec<u32>=f1;
-let mut f2=self.take_values();self.node_values(&caps,&[5],None,&mut f2)?;
+let mut f2=self.take_values();self.node_values(&caps,&[5],&[],None,&mut f2)?;
 if !f2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_GlobalSetting}) {return Err("settings: mapped value type mismatch".into());}
 let f2:Vec<u32>=f2;
-let mut f3=self.take_values();self.node_values(&caps,&[6],None,&mut f3)?;
+let mut f3=self.take_values();self.node_values(&caps,&[6],&[],None,&mut f3)?;
 if !f3.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_TokenDecl}) {return Err("tokens: mapped value type mismatch".into());}
 let f3:Vec<u32>=f3;
-let mut f4=self.take_values();self.node_values(&caps,&[7],None,&mut f4)?;
+let mut f4=self.take_values();self.node_values(&caps,&[7],&[],None,&mut f4)?;
 if !f4.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_RuleDecl}) {return Err("rules: mapped value type mismatch".into());}
 let f4:Vec<u32>=f4;
 self.give_captures(caps);let span=self.span(span);let l1=self.tree.list(&f1);self.give_values(f1);let l2=self.tree.list(&f2);self.give_values(f2);let l3=self.tree.list(&f3);self.give_values(f3);let l4=self.tree.list(&f4);self.give_values(f4);let node=self.tree.record(tree::K_g_UBNFAST_2e_GrammarDecl,2,span,&[f0,l1[0],l1[1],l2[0],l2[1],l3[0],l3[1],l4[0],l4[1]]);out.push(node);Ok(())}}
@@ -2968,7 +2975,7 @@ fn map_rule_3(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>
 let mut t0=self.take_values();self.text_values(&caps,&[8],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[8]) {return Ok(());}
 if t0.len()!=1 {return Err("key requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-let mut v1=self.take_values();self.node_values(&caps,&[9],None,&mut v1)?;
+let mut v1=self.take_values();self.node_values(&caps,&[9],&[],None,&mut v1)?;
 if !v1.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_BlockSettingValue || k==tree::K_g_UBNFAST_2e_StringSettingValue}) {return Err("value: mapped value type mismatch".into());}
 if v1.is_empty() && self.missing_field(&caps,&[9]) {return Ok(());}
 if v1.len()!=1 {return Err("value requires one node".into());}let f1=v1.pop().unwrap();self.give_values(v1);
@@ -2976,14 +2983,14 @@ let f1:u32=f1;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_GlobalSetting,3,span,&[f0,f1]);out.push(node);Ok(())}}
 fn map_rule_4(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_5(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[10],None,&mut v0)?;
+let mut v0=self.take_values();self.node_values(&caps,&[10],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_DottedIdentifier}) {return Err("value: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[10]) {return Ok(());}
 if v0.len()!=1 {return Err("value requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_StringSettingValue,5,span,&[f0]);out.push(node);Ok(())}}
 fn map_rule_6(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[11],None,&mut f0)?;
+let mut f0=self.take_values();self.node_values(&caps,&[11],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_KeyValuePair}) {return Err("entries: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
 self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_BlockSettingValue,6,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
@@ -2999,7 +3006,7 @@ fn map_rule_8(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>
 let mut t0=self.take_values();self.text_values(&caps,&[14],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[14]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-let mut v1=self.take_values();self.node_values(&caps,&[15],None,&mut v1)?;
+let mut v1=self.take_values();self.node_values(&caps,&[15],&[],None,&mut v1)?;
 if !v1.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_AnyExpression || k==tree::K_g_UBNFAST_2e_CIExpression || k==tree::K_g_UBNFAST_2e_CharRangeExpression || k==tree::K_g_UBNFAST_2e_DottedIdentifier || k==tree::K_g_UBNFAST_2e_EmptyExpression || k==tree::K_g_UBNFAST_2e_EofExpression || k==tree::K_g_UBNFAST_2e_LookaheadExpression || k==tree::K_g_UBNFAST_2e_NegationExpression || k==tree::K_g_UBNFAST_2e_NegativeLookaheadExpression || k==tree::K_g_UBNFAST_2e_RegexExpression || k==tree::K_g_UBNFAST_2e_UntilExpression}) {return Err("value: mapped value type mismatch".into());}
 if v1.is_empty() && self.missing_field(&caps,&[15]) {return Ok(());}
 if v1.len()!=1 {return Err("value requires one node".into());}let f1=v1.pop().unwrap();self.give_values(v1);
@@ -3051,13 +3058,13 @@ self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree
 fn map_rule_19(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_EmptyExpression,19,span,&[]);out.push(node);Ok(())}}
 fn map_rule_20(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[24],None,&mut f0)?;
+let mut f0=self.take_values();self.node_values(&caps,&[24],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_BackrefAnnotation || k==tree::K_g_UBNFAST_2e_CatalogAnnotation || k==tree::K_g_UBNFAST_2e_CommonFieldAnnotation || k==tree::K_g_UBNFAST_2e_DeclaresAnnotation || k==tree::K_g_UBNFAST_2e_DocAnnotation || k==tree::K_g_UBNFAST_2e_EnumAnnotation || k==tree::K_g_UBNFAST_2e_EvalAnnotation || k==tree::K_g_UBNFAST_2e_InterleaveAnnotation || k==tree::K_g_UBNFAST_2e_LeftAssocAnnotation || k==tree::K_g_UBNFAST_2e_LongestChoiceAnnotation || k==tree::K_g_UBNFAST_2e_MappingAnnotation || k==tree::K_g_UBNFAST_2e_PrecedenceAnnotation || k==tree::K_g_UBNFAST_2e_PredictiveChoiceAnnotation || k==tree::K_g_UBNFAST_2e_RecoveryAnnotation || k==tree::K_g_UBNFAST_2e_RightAssocAnnotation || k==tree::K_g_UBNFAST_2e_RootAnnotation || k==tree::K_g_UBNFAST_2e_ScopeTreeAnnotation || k==tree::K_g_UBNFAST_2e_SimpleAnnotation || k==tree::K_g_UBNFAST_2e_SkipAnnotation || k==tree::K_g_UBNFAST_2e_WhitespaceAnnotation}) {return Err("annotations: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
 let mut t1=self.take_values();self.text_values(&caps,&[25],&mut t1);if t1.is_empty() && self.missing_field(&caps,&[25]) {return Ok(());}
 if t1.len()!=1 {return Err("name requires one value".into());}let f1=t1.pop().unwrap();self.give_values(t1);
 let f1:u32=f1;
-let mut v2=self.take_values();self.node_values(&caps,&[26],None,&mut v2)?;
+let mut v2=self.take_values();self.node_values(&caps,&[26],&[],None,&mut v2)?;
 if !v2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
 if v2.is_empty() && self.missing_field(&caps,&[26]) {return Ok(());}
 if v2.len()!=1 {return Err("body requires one node".into());}let f2=v2.pop().unwrap();self.give_values(v2);
@@ -3074,7 +3081,7 @@ let mut f1=self.take_values();self.text_values(&caps,&[28, 29],&mut f1);
 let f1:Vec<u32>=f1;
 self.give_captures(caps);let span=self.span(span);let l1=self.tree.list(&f1);self.give_values(f1);let node=self.tree.record(tree::K_g_UBNFAST_2e_MappingAnnotation,23,span,&[f0,l1[0],l1[1]]);out.push(node);Ok(())}}
 fn map_rule_24(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[30, 31],None,&mut f0)?;
+let mut f0=self.take_values();self.node_values(&caps,&[30, 31],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_KeyValuePair}) {return Err("entries: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
 self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_EvalAnnotation,24,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
@@ -3147,24 +3154,24 @@ if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().un
 let f0:u32=f0;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_SimpleAnnotation,41,span,&[f0]);out.push(node);Ok(())}}
 fn map_rule_42(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[46, 47],None,&mut f0)?;
+let mut f0=self.take_values();self.node_values(&caps,&[46, 47],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_SequenceBody}) {return Err("alternatives: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
 self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_ChoiceBody,42,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
 fn map_rule_43(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[48],None,&mut f0)?;
+let mut f0=self.take_values();self.node_values(&caps,&[48],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_AnnotatedElement}) {return Err("elements: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
 self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_SequenceBody,43,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
 fn map_rule_44(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[50],None,&mut v0)?;
+let mut v0=self.take_values();self.node_values(&caps,&[50],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::KIND_TEXT || k==tree::K_g_UBNFAST_2e_ErrorElement || k==tree::K_g_UBNFAST_2e_GroupElement || k==tree::K_g_UBNFAST_2e_OptionalElement || k==tree::K_g_UBNFAST_2e_RepeatElement || k==tree::K_g_UBNFAST_2e_TerminalElement}) {return Err("element: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[50]) {return Ok(());}
 if v0.len()!=1 {return Err("element requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
 let mut t1=self.take_values();self.text_values(&caps,&[51],&mut t1);if t1.len()>1 {return Err("captureName requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
 let f1:Option<u32>=f1;
-let mut v2=self.take_values();self.node_values(&caps,&[49],None,&mut v2)?;
+let mut v2=self.take_values();self.node_values(&caps,&[49],&[],None,&mut v2)?;
 if !v2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_TypeofElement}) {return Err("typeofConstraint: mapped value type mismatch".into());}
 if v2.len()>1 {return Err("typeofConstraint requires at most one node".into());}let f2=v2.pop();self.give_values(v2);
 let f2:Option<u32>=f2;
@@ -3175,21 +3182,21 @@ fn map_rule_47(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32
 fn map_rule_48(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_49(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 fn map_rule_50(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[52],None,&mut v0)?;
+let mut v0=self.take_values();self.node_values(&caps,&[52],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[52]) {return Ok(());}
 if v0.len()!=1 {return Err("body requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_GroupElement,50,span,&[f0]);out.push(node);Ok(())}}
 fn map_rule_51(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[53],None,&mut v0)?;
+let mut v0=self.take_values();self.node_values(&caps,&[53],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[53]) {return Ok(());}
 if v0.len()!=1 {return Err("body requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_OptionalElement,51,span,&[f0]);out.push(node);Ok(())}}
 fn map_rule_52(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[54],None,&mut v0)?;
+let mut v0=self.take_values();self.node_values(&caps,&[54],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
 if v0.is_empty() && self.missing_field(&caps,&[54]) {return Ok(());}
 if v0.len()!=1 {return Err("body requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
