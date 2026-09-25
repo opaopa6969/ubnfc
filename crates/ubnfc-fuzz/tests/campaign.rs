@@ -477,3 +477,71 @@ fn g_direct_token_captures_agree_across_backends() {
     // 全入力受理が無ければ `Direct` の AST を比較できていない。
     assert!(accepted > 0, "直接 capture の帯で受理が 0 件");
 }
+
+/// #93 の回帰試験（固定 seed campaign）。text group の帯（`gen::TEXT_GROUP_SEED_BASE`）は
+/// 乱数を引かずに `TextGroup` を足し、根の `@mapping` の field に載せる。3 つの形は
+/// いずれも修正前の Rust では出現の値が Java と食い違っていた:
+/// (a) issue #89（`text_group_capture_value.rs`）: `( TgP TgP ) @ga TgLeaf @ga` の
+/// plain / `?`（`gao`）/ `*`（`gas`）variant。写像なし text 規則だけの group を、
+/// node 型の field（`TgLeaf`）と同じ名前で capture する。
+/// (b) issue #86（`text_rule_value_region.rs`）: `( TgL? TgP+ | 'c' 'd' )+ @gb`。
+/// 意味値の領域の中の text だけの規則（`TgP+`）は区切り。
+/// (c) issue #78 / D-078（`mixed_choice_text_value.rs`）: `( ',' @gc ( TgLeaf+ @gd1 | '=' @gd2 )? )* @gc`。
+/// 省略可能な mixed choice の text 候補は字句 1 つ。
+/// v1 帯・v2 帯とも 3 seed。現 master ではどの seed も 1 件も差分を出してはならない。
+#[test]
+fn h_text_group_captures_agree_across_backends() {
+    ubnfc_fuzz::tune_generated_builds();
+    let base = ubnfc_fuzz::gen::TEXT_GROUP_SEED_BASE;
+    let v2 = base + ubnfc_fuzz::gen::V2_SEED_BASE;
+    let mut accepted = 0usize;
+    for seed in [base + 1, base + 2, base + 3, v2 + 1, v2 + 2, v2 + 3] {
+        let grammar = ubnfc_fuzz::gen::generate(seed);
+        assert!(
+            grammar.features.contains("textGroup"),
+            "seed {seed}: {:?}",
+            grammar.features
+        );
+        let scratch = scratch();
+        // 48 入力: pre-fix の 3 コミット（7dbcdec / 4c1c543 / cefdbd7）へ
+        // `UBNFC_RUST_GENERATOR` を差し替えて確かめたとき、seed 2000002（`base + 2`）の
+        // D-078 の形（`gc`）は 12 入力では踏めず 48 入力で踏めた
+        // （`docs/reports/2026-09-25-fuzz-93.md`）。
+        let summary = campaign::run(&Config {
+            start_seed: seed,
+            seeds: 1,
+            inputs: 48,
+            jobs: 1,
+            budget: Some(Duration::from_secs(600)),
+            findings: None,
+            shrink_builds: 0,
+            driver_timeout: Duration::from_secs(120),
+            workdir: scratch.0.clone(),
+        });
+        assert_eq!(
+            summary.discarded, 0,
+            "front の discard: {:?}",
+            summary.discards
+        );
+        assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
+        assert!(
+            summary.comparisons >= 10 && summary.driver_errors == 0,
+            "seed {seed}: 比較 {} / error {}",
+            summary.comparisons,
+            summary.driver_errors
+        );
+        accepted += summary.accepted_all;
+        let unknown: Vec<_> = summary
+            .findings
+            .iter()
+            .filter(|finding| !KNOWN.contains(&finding.signature.as_str()))
+            .map(|finding| format!("{} ({})", finding.signature, finding.slug))
+            .collect();
+        assert!(
+            unknown.is_empty(),
+            "seed {seed} の未登録の差分: {unknown:#?}"
+        );
+    }
+    // 全入力受理が無ければ `TextGroup` の AST を比較できていない。
+    assert!(accepted > 0, "text group の帯で受理が 0 件");
+}

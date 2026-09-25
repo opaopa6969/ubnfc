@@ -67,6 +67,7 @@ pub const FEATURES: &[&str] = &[
     "token:charRangeSupplementary",
     "token:negationEscape",
     "capture:directToken",
+    "textGroup",
 ];
 
 /// UBNF v2（`@ubnf: 2`）を生成する seed の帯。
@@ -89,9 +90,26 @@ pub const V2_SEED_BASE: u64 = 100_000;
 /// 生成物は 1 バイトも変わらない。
 pub const DIRECT_CAPTURE_SEED_BASE: u64 = 1_000_000;
 
-/// seed が v2（`@ubnf: 2`）の帯か。直接 capture の帯でも同じ区切りで v1 / v2 を分ける。
+/// text だけの規則が絡む 3 つの capture 形を必ず含める seed の帯（#93）。
+///
+/// #89（node 変換の field で、写像なし text 規則だけの group を node 型の field と
+/// 同じ名前で capture する）・#86（意味値の領域の中の text だけの規則は区切り）・
+/// D-078（意味値を持つ選択の text だけの候補は字句 1 つ）はいずれも手で縮めた文法か
+/// 偶然当たった乱択 seed でしか固定できていなかった。直接 capture の帯（#75）と
+/// 同じ方式で、乱数を 1 つも追加で引かずに `TextGroup` 規則を足し、根から必ず通す。
+/// `direct` の帯とは排他（`direct` はこの帯より下の範囲だけを見る）。
+/// 帯の中の版は `seed - TEXT_GROUP_SEED_BASE` を既存の規則で読む:
+/// `TEXT_GROUP_SEED_BASE + n`（n < `V2_SEED_BASE`）は v1、
+/// `TEXT_GROUP_SEED_BASE + V2_SEED_BASE + n` は v2。
+/// 既存の帯（v1 / v2 / 直接 capture v1 / v2）の生成物は 1 バイトも変わらない。
+pub const TEXT_GROUP_SEED_BASE: u64 = 2_000_000;
+
+/// seed が v2（`@ubnf: 2`）の帯か。直接 capture・text group の帯でも同じ区切りで
+/// v1 / v2 を分ける。
 pub fn is_v2_seed(seed: u64) -> bool {
-    if seed >= DIRECT_CAPTURE_SEED_BASE {
+    if seed >= TEXT_GROUP_SEED_BASE {
+        seed - TEXT_GROUP_SEED_BASE >= V2_SEED_BASE
+    } else if seed >= DIRECT_CAPTURE_SEED_BASE {
         seed - DIRECT_CAPTURE_SEED_BASE >= V2_SEED_BASE
     } else {
         seed >= V2_SEED_BASE
@@ -379,7 +397,8 @@ pub fn generate(seed: u64) -> Grammar {
     let mut rng = Rng::new(seed);
     // v2 は乱数を消費せずに seed だけで決める（既存 seed の生成物を保つため）。
     let v2 = is_v2_seed(seed);
-    let direct = seed >= DIRECT_CAPTURE_SEED_BASE;
+    let direct = (DIRECT_CAPTURE_SEED_BASE..TEXT_GROUP_SEED_BASE).contains(&seed);
+    let text_group = seed >= TEXT_GROUP_SEED_BASE;
     let mut builder = Builder {
         rng: &mut rng,
         features: BTreeSet::new(),
@@ -846,11 +865,168 @@ pub fn generate(seed: u64) -> Grammar {
         ));
         root_elements.push(Element::captured(reference("Direct"), "direct"));
     }
+    // text だけの規則が絡む 3 つの capture 形の帯（#93）: 乱数を追加で引かずに
+    // `TextGroup` 規則を足し、根から必ず通す。
+    if text_group {
+        builder.mark("textGroup");
+        let tg_token = match v2
+            .then(|| v2_spelling(seed, "org.unlaxer.parser.clang.IdentifierParser"))
+            .flatten()
+        {
+            Some((spelling, marker)) => {
+                builder.mark(marker);
+                spelling
+            }
+            None => "org.unlaxer.parser.clang.IdentifierParser",
+        };
+        builder.tokens.push(Token {
+            name: "TG".into(),
+            declaration: tg_token.to_owned(),
+            samples: vec!["p".into(), "q".into(), "x".into()],
+            feature: "token:identifier",
+        });
+        let reference = |name: &str| Atom::Ref(name.to_owned());
+        let literal = |text: &str| Atom::Literal(text.to_owned());
+        let make = |atom: Atom, quant: Option<Quant>, capture: &str| Element {
+            lead: Vec::new(),
+            typeof_capture: None,
+            atom,
+            quant,
+            separator: None,
+            capture: Some(capture.to_owned()),
+        };
+
+        // 写像なし・text だけの規則（`P ::= 'p' | 'q'`。#89 / #86 の `P`）。
+        rules.push(Rule::plain(
+            Vec::new(),
+            "TgP".into(),
+            Body {
+                alternatives: vec![
+                    vec![Element::new(literal("p"))],
+                    vec![Element::new(literal("q"))],
+                ],
+            },
+        ));
+        // 値を持つ enum（#86 の `L`: 省略可能な値の後ろに text 規則の反復を置く形で使う）。
+        rules.push(Rule::plain(
+            vec!["@enum".to_owned()],
+            "TgL".into(),
+            Body {
+                alternatives: vec![
+                    vec![Element::new(literal("gamma"))],
+                    vec![Element::new(literal("delta"))],
+                ],
+            },
+        ));
+        // node 型の field（#89 / #86 の `Leaf ::= T @v`）。
+        rules.push(Rule::plain(
+            vec!["@mapping(TgLeaf, params=[v])".to_owned()],
+            "TgLeaf".into(),
+            Body::single(vec![Element::captured(reference("TG"), "v")]),
+        ));
+
+        let pair = || {
+            Atom::Group(Body::single(vec![
+                Element::new(reference("TgP")),
+                Element::new(reference("TgP")),
+            ]))
+        };
+
+        // (a) issue #89: node 変換の field で、写像なし text 規則だけの group を
+        // node 型の field と同じ名前で capture する（`( TgP TgP ) @ga TgLeaf @ga`）。
+        // `?` / `*` variant は別 field（`gao` / `gas`）で同じ形を繰り返す。
+        let shape_a = vec![
+            Element::new(literal("{")),
+            make(pair(), None, "ga"),
+            Element::captured(reference("TgLeaf"), "ga"),
+            Element::new(literal("}")),
+            Element::new(literal("[")),
+            make(pair(), Some(Quant::Question), "gao"),
+            Element::captured(reference("TgLeaf"), "gao"),
+            Element::new(literal("]")),
+            Element::new(literal("<")),
+            make(pair(), Some(Quant::Star), "gas"),
+            Element::captured(reference("TgLeaf"), "gas"),
+            Element::new(literal(">")),
+        ];
+
+        // capture を持たない量指定子付き要素（site より内側。D-032 の「意味値だけを
+        // 増やす」側）。
+        let quant_only = |atom: Atom, quant: Quant| Element {
+            lead: Vec::new(),
+            typeof_capture: None,
+            atom,
+            quant: Some(quant),
+            separator: None,
+            capture: None,
+        };
+
+        // (b) issue #86: 意味値の領域（`TgL?` の値が有り得る）の中にある text だけの
+        // 規則の反復（`TgP+`）は区切りで、値は enum の分しか増えない。text だけの候補
+        // （`'c' 'd'`）は全体で 1 つの字句。
+        let shape_b = vec![
+            Element::new(literal("(")),
+            make(
+                Atom::Group(Body {
+                    alternatives: vec![
+                        vec![
+                            quant_only(reference("TgL"), Quant::Question),
+                            quant_only(reference("TgP"), Quant::Plus),
+                        ],
+                        vec![Element::new(literal("c")), Element::new(literal("d"))],
+                    ],
+                }),
+                Some(Quant::Plus),
+                "gb",
+            ),
+            Element::new(literal(")")),
+        ];
+
+        // (c) D-078: 意味値を持つ選択（node 候補 `TgLeaf+` / text だけの候補 `'='`）が
+        // 省略可能（`?`）なとき、採用された text 候補は一致範囲の字句 1 つとして外側の
+        // capture（`gc`）へ渡る。区切りの `,` も同じ名前 `gc` で capture する
+        // （D-078 の回帰試験 `MixedTail` と同じ形）。
+        let shape_c = vec![
+            Element::new(literal("|")),
+            make(
+                Atom::Group(Body::single(vec![
+                    Element::captured(literal(","), "gc"),
+                    quant_only(
+                        Atom::Group(Body {
+                            alternatives: vec![
+                                vec![make(reference("TgLeaf"), Some(Quant::Plus), "gd1")],
+                                vec![Element::captured(literal("="), "gd2")],
+                            ],
+                        }),
+                        Quant::Question,
+                    ),
+                ])),
+                Some(Quant::Star),
+                "gc",
+            ),
+            Element::new(literal("|")),
+        ];
+
+        let mut tg_body = shape_a;
+        tg_body.extend(shape_b);
+        tg_body.extend(shape_c);
+        let tg_params = capture_names(&Body::single(tg_body.clone()));
+        rules.push(Rule::plain(
+            vec![format!(
+                "@mapping(TextGroup, params=[{}])",
+                tg_params.join(", ")
+            )],
+            "TextGroup".into(),
+            Body::single(tg_body),
+        ));
+        root_elements.push(Element::captured(reference("TextGroup"), "tg"));
+    }
     let root_captures = capture_names(&Body::single(root_elements.clone()));
     let mut root_annotations = vec!["@root".to_owned()];
-    // 直接 capture の帯は根を必ず `@mapping` にして、`Direct` の node を field に載せる
-    // （根が transparent だと entry が複数の AST 値を返す別の差になる）。乱数は同じだけ引く。
-    if builder.rng.chance(60) || direct {
+    // 直接 capture・text group の帯は根を必ず `@mapping` にして、追加した node を
+    // field に載せる（根が transparent だと entry が複数の AST 値を返す別の差になる）。
+    // 乱数は同じだけ引く。
+    if builder.rng.chance(60) || direct || text_group {
         builder.mark("mapping");
         root_annotations.push(format!(
             "@mapping(Top, params=[{}])",
@@ -1094,6 +1270,7 @@ mod tests {
         for seed in (0..800u64)
             .chain(V2_SEED_BASE..V2_SEED_BASE + 800)
             .chain(DIRECT_CAPTURE_SEED_BASE..DIRECT_CAPTURE_SEED_BASE + 4)
+            .chain(TEXT_GROUP_SEED_BASE..TEXT_GROUP_SEED_BASE + 4)
         {
             seen.extend(generate(seed).features);
         }
@@ -1103,5 +1280,125 @@ mod tests {
             .copied()
             .collect();
         assert!(missing.is_empty(), "未到達の機能: {missing:?}");
+    }
+
+    /// #93: text group の帯は v1 / v2 の両方にあり、既存の帯（v1 / v2 / 直接 capture）
+    /// には `TextGroup` が現れない（追加は乱数を引かないので、既存の帯の生成物は不変）。
+    /// 帯そのものは 3 つの形（#89 / #86 / D-078）を必ず含む。
+    #[test]
+    fn text_group_captures_appear_only_in_their_own_band_for_both_versions() {
+        for seed in (0..200u64)
+            .chain(V2_SEED_BASE..V2_SEED_BASE + 200)
+            .chain(DIRECT_CAPTURE_SEED_BASE..DIRECT_CAPTURE_SEED_BASE + 200)
+            .chain(
+                DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE
+                    ..DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE + 200,
+            )
+        {
+            let grammar = generate(seed);
+            assert!(!grammar.features.contains("textGroup"), "seed {seed}");
+            assert!(!grammar.render().contains("TextGroup"), "seed {seed}");
+        }
+        for (base, v2) in [
+            (TEXT_GROUP_SEED_BASE, false),
+            (TEXT_GROUP_SEED_BASE + V2_SEED_BASE, true),
+        ] {
+            for seed in base..base + 20 {
+                let grammar = generate(seed);
+                let text = grammar.render();
+                assert!(grammar.features.contains("textGroup"), "seed {seed}");
+                assert!(
+                    !grammar.features.contains("capture:directToken"),
+                    "seed {seed}"
+                );
+                assert_eq!(grammar.features.contains("ubnf2"), v2, "seed {seed}");
+                // (a) #89: 写像なし text 規則だけの group を node 型の field と同じ
+                // 名前で capture する。plain / `?` / `*` の 3 variant。
+                assert!(
+                    text.contains("( TgP TgP ) @ga TgLeaf @ga"),
+                    "seed {seed}\n{text}"
+                );
+                assert!(
+                    text.contains("( TgP TgP )? @gao TgLeaf @gao"),
+                    "seed {seed}\n{text}"
+                );
+                assert!(
+                    text.contains("( TgP TgP )* @gas TgLeaf @gas"),
+                    "seed {seed}\n{text}"
+                );
+                // (b) #86: 意味値の領域の中の text だけの規則は区切り。
+                assert!(
+                    text.contains("TgL? TgP+") || text.contains("TgL ? TgP +"),
+                    "seed {seed}\n{text}"
+                );
+                // (c) D-078: 省略可能な mixed choice の text 候補。
+                assert!(text.contains("TgLeaf+ @gd1"), "seed {seed}\n{text}");
+                assert!(
+                    text.contains("'=' @gd2") || text.contains("\"=\" @gd2"),
+                    "seed {seed}\n{text}"
+                );
+                assert!(text.contains("TextGroup @tg"), "seed {seed}\n{text}");
+            }
+        }
+    }
+
+    /// #93 の新帯（`TEXT_GROUP_SEED_BASE`）を足す前に固定した基準値。既存 4 帯（v1 /
+    /// v2 / 直接 capture v1 / v2）の最初の 3 seed は 1 バイトも変わってはならない
+    /// （新帯は乱数を追加で引かず、`text_group` が false の経路には触れない）。
+    #[test]
+    fn existing_bands_are_byte_identical_after_adding_the_text_group_band() {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let bands: &[(&str, u64, u64)] = &[
+            ("v1", 1, 15498457733359450682),
+            ("v2", V2_SEED_BASE + 1, 12184984436867770407),
+            (
+                "direct_v1",
+                DIRECT_CAPTURE_SEED_BASE + 1,
+                4722087748666389233,
+            ),
+            (
+                "direct_v2",
+                DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE + 1,
+                16963680381784801846,
+            ),
+        ];
+        // 2 番目・3 番目の seed のハッシュ（基準値は `docs/reports/2026-09-25-fuzz-93.md`）。
+        let extra: &[(&str, u64, u64)] = &[
+            ("v1", 2, 3475429925919466428),
+            ("v1", 3, 12357343032048492943),
+            ("v2", V2_SEED_BASE + 2, 2771283491683961510),
+            ("v2", V2_SEED_BASE + 3, 18334198890524835990),
+            (
+                "direct_v1",
+                DIRECT_CAPTURE_SEED_BASE + 2,
+                10390676821158765469,
+            ),
+            (
+                "direct_v1",
+                DIRECT_CAPTURE_SEED_BASE + 3,
+                6622820717352015716,
+            ),
+            (
+                "direct_v2",
+                DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE + 2,
+                2006330041958162193,
+            ),
+            (
+                "direct_v2",
+                DIRECT_CAPTURE_SEED_BASE + V2_SEED_BASE + 3,
+                814492594228250534,
+            ),
+        ];
+        for (label, seed, expected) in bands.iter().copied().chain(extra.iter().copied()) {
+            let text = generate(seed).render();
+            let mut hasher = DefaultHasher::new();
+            text.hash(&mut hasher);
+            assert_eq!(
+                hasher.finish(),
+                expected,
+                "{label} seed={seed} の生成物が変わった:\n{text}"
+            );
+        }
     }
 }
