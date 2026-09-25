@@ -41,7 +41,11 @@ public record GrammarIr(Analysis analysis, String analysisVersion, GrammarIrEntr
     public record OccurrenceContract(List<String> captureFields, Boolean diagnostics, List<String> lexicalFields, String lexicalOutput, Boolean nodeSpans, Boolean scopeEvents, String selfHostTransform) {}
     public record Operator(String associativity, String baseRuleId, String canonicalForm, String leftSiteId, String opSiteId, String operatorRuleId, Integer precedence, String rightSiteId) {}
     public record OperatorPlan(List<String> boundaryExprIds, List<String> liftRecipeIds, Proof proof, List<String> ruleIds, String strategy) {}
-    public record Plan(List<ChoicePlan> choices, List<LexicalPlan> lexical, MemoPlan memo, List<OperatorPlan> operators, String profile, PlanTriviaCache triviaCache) {}
+    public record Plan(List<ChoicePlan> choices, List<LexicalPlan> lexical, MemoPlan memo, List<OperatorPlan> operators, String profile, List<ScanPlan> scans, PlanTriviaCache triviaCache) {}
+    /** D-072: 観測を要求しない終端領域（{@code plan.scans}、任意キー。無ければ空）。 */
+    public record ScanPlan(ScanClass class_, String exprId, String kind, Proof proof, Boolean root, List<String> ruleIds) {}
+    /** 反復の一括走査表。bitset は u64 なので {@code BigDecimal} のまま受けて 2 の補数の {@code long} へ落とす。 */
+    public record ScanClass(java.math.BigDecimal asciiHigh, java.math.BigDecimal asciiLow, Boolean complete, List<CharRange> ranges) {}
     public record PlanTriviaCache(Boolean enabled, List<String> key) {}
     public record PrefixTrie(String id, Integer maxDepth, List<PrefixTrieNodesItem> nodes) {}
     public record PrefixTrieNodesItem(Boolean acceptsEof, List<String> candidateExprIds, List<String> completedCandidateExprIds, List<PrefixTrieNodesItemEdgesItem> edges, Integer index, List<String> unknownCandidateExprIds) {}

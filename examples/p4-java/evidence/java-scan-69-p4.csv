@@ -1,0 +1,104 @@
+S1,base,r1,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S1,base,r1,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S1,base,r1,# loadavg=5.44 12.55 13.16 3/4994 2445434
+S1,base,r1,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S1,base,r1,complex,ast-fast,Formula,1000,2000,0.180412,0.173079,0.157085,0.242599,0.154858,0.157085,0.128298,248056
+S1,base,r1,complex,recognize-fast,Formula,1000,2000,0.097735,0.081245,0.090723,0.091026,0.086545,0.086545,0.076312,135592
+S1,base,r1,complex-x4,ast-fast,Formula,1000,500,0.638590,0.647834,1.144508,0.656567,0.643561,0.643561,0.485432,952024
+S1,base,r1,complex-x4,recognize-fast,Formula,1000,500,0.398854,0.346631,0.369058,0.363150,0.336213,0.346631,0.289122,513928
+S1,base,r1,complex-x16,ast-fast,Formula,1000,125,1.872250,2.102049,3.886836,2.979038,2.108327,2.102049,1.872250,2728696
+S1,base,r1,complex-x16,recognize-fast,Formula,1000,125,1.061641,1.128132,1.631505,1.437879,1.094671,1.094671,1.029182,991664
+S1,base,r1,complex-x64,ast-fast,Formula,1000,50,9.374113,9.773171,13.712920,12.365045,11.089228,11.189941,9.374113,10877224
+S1,base,r1,complex-x64,recognize-fast,Formula,1000,50,4.730906,5.788338,14.689422,4.928864,5.565355,5.151895,4.730906,3944296
+S1,base,r1,# loadavg=4.47 11.32 12.71 5/5003 2452627
+S1,after,r1,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S1,after,r1,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S1,after,r1,# loadavg=4.47 11.32 12.71 2/5002 2452648
+S1,after,r1,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S1,after,r1,complex,ast-fast,Formula,1000,2000,0.146727,0.136667,0.130557,0.145024,0.136878,0.136878,0.130128,247976
+S1,after,r1,complex,recognize-fast,Formula,1000,2000,0.093155,0.076310,0.078925,0.081933,0.077603,0.078925,0.076310,135512
+S1,after,r1,complex-x4,ast-fast,Formula,1000,500,0.496752,0.510917,0.662193,0.569873,0.543190,0.569873,0.496752,951944
+S1,after,r1,complex-x4,recognize-fast,Formula,1000,500,0.324406,0.295600,0.390469,0.334383,0.297394,0.334383,0.295600,513848
+S1,after,r1,complex-x16,ast-fast,Formula,1000,125,1.953889,1.805779,2.682036,2.265037,1.853351,1.982955,1.805779,2728616
+S1,after,r1,complex-x16,recognize-fast,Formula,1000,125,1.090994,1.065112,1.326333,1.132075,1.053055,1.105026,1.053055,991584
+S1,after,r1,complex-x64,ast-fast,Formula,1000,50,12.008676,12.065390,16.652972,13.616052,11.214791,12.876700,11.214791,10877144
+S1,after,r1,complex-x64,recognize-fast,Formula,1000,50,7.612231,6.243210,8.009140,5.954337,5.975145,6.243210,5.381802,3944216
+S1,after,r1,# loadavg=5.15 10.64 12.43 7/5187 2459964
+S1,base,r2,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S1,base,r2,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S1,base,r2,# loadavg=5.15 10.64 12.43 8/5191 2459989
+S1,base,r2,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S1,base,r2,complex,ast-fast,Formula,1000,2000,0.167062,0.158751,0.136010,0.134599,0.124985,0.134599,0.124985,248032
+S1,base,r2,complex,recognize-fast,Formula,1000,2000,0.140410,0.083924,0.077381,0.077446,0.079178,0.077446,0.075761,135568
+S1,base,r2,complex-x4,ast-fast,Formula,1000,500,0.900063,0.668378,0.468293,0.464994,0.463929,0.464994,0.453319,952000
+S1,base,r2,complex-x4,recognize-fast,Formula,1000,500,0.856838,0.433527,0.284726,0.280891,0.277890,0.284726,0.274152,513904
+S1,base,r2,complex-x16,ast-fast,Formula,1000,125,4.856166,2.372841,1.767534,1.713477,1.926019,1.926019,1.713477,2728672
+S1,base,r2,complex-x16,recognize-fast,Formula,1000,125,4.527738,1.072176,1.092525,1.060144,1.093881,1.092525,1.046670,991640
+S1,base,r2,complex-x64,ast-fast,Formula,1000,50,23.430354,12.389914,10.880703,11.464322,11.506490,11.464322,10.281025,10877200
+S1,base,r2,complex-x64,recognize-fast,Formula,1000,50,7.491529,7.086320,6.404827,4.799904,4.840761,6.404827,4.799904,3944272
+S1,base,r2,# loadavg=7.78 10.60 12.32 8/4933 2469194
+S1,after,r2,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S1,after,r2,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S1,after,r2,# loadavg=7.78 10.60 12.32 6/4965 2469263
+S1,after,r2,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S1,after,r2,complex,ast-fast,Formula,1000,2000,0.177876,0.130174,0.128046,0.138849,0.171441,0.138849,0.123776,249352
+S1,after,r2,complex,recognize-fast,Formula,1000,2000,0.112072,0.076719,0.077297,0.078197,0.125920,0.078197,0.076222,136888
+S1,after,r2,complex-x4,ast-fast,Formula,1000,500,0.449509,0.472605,0.454278,0.455878,0.547636,0.472605,0.449509,957160
+S1,after,r2,complex-x4,recognize-fast,Formula,1000,500,0.535517,0.283417,0.277705,0.297502,0.331083,0.297502,0.277705,519064
+S1,after,r2,complex-x16,ast-fast,Formula,1000,125,1.776844,1.801043,1.748101,2.474250,3.249799,1.807420,1.748101,2749192
+S1,after,r2,complex-x16,recognize-fast,Formula,1000,125,1.029849,1.034182,1.034399,1.192115,3.064662,1.093310,1.029849,1012160
+S1,after,r2,complex-x64,ast-fast,Formula,1000,50,10.379425,10.316815,10.120876,15.255831,22.948500,10.379425,10.120876,10959160
+S1,after,r2,complex-x64,recognize-fast,Formula,1000,50,5.362353,5.241640,4.713253,8.649917,15.006033,5.362353,4.713253,4026232
+S1,after,r2,# loadavg=7.05 9.99 12.03 6/4949 2475599
+S2,after,r1,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S2,after,r1,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S2,after,r1,# loadavg=5.64 8.43 11.10 1/4737 2510407
+S2,after,r1,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S2,after,r1,complex,ast-fast,Formula,1000,2000,0.175821,0.127100,0.129220,0.123445,0.123969,0.127100,0.123445,249352
+S2,after,r1,complex,recognize-fast,Formula,1000,2000,0.119815,0.074160,0.075462,0.077227,0.074716,0.075462,0.074160,136888
+S2,after,r1,complex-x4,ast-fast,Formula,1000,500,0.525609,0.460482,0.470214,0.454829,0.479919,0.470214,0.454829,957160
+S2,after,r1,complex-x4,recognize-fast,Formula,1000,500,0.303553,0.289880,0.292486,0.282721,0.286312,0.292486,0.282721,519064
+S2,after,r1,complex-x16,ast-fast,Formula,1000,125,1.832955,1.763199,1.813427,2.407773,1.752136,1.832955,1.752136,2749192
+S2,after,r1,complex-x16,recognize-fast,Formula,1000,125,1.043566,1.047620,1.029438,1.169475,1.049264,1.049264,1.029438,1012160
+S2,after,r1,complex-x64,ast-fast,Formula,1000,50,12.819953,10.688112,9.765934,9.807006,9.678209,10.688112,9.678209,10959160
+S2,after,r1,complex-x64,recognize-fast,Formula,1000,50,5.793532,5.831641,4.347358,4.268320,4.336809,4.756411,4.268320,4026232
+S2,after,r1,# loadavg=6.01 8.14 10.88 5/4780 2514459
+S2,base,r1,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S2,base,r1,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S2,base,r1,# loadavg=6.01 8.14 10.88 2/4775 2514474
+S2,base,r1,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S2,base,r1,complex,ast-fast,Formula,1000,2000,0.153738,0.129821,0.124420,0.125661,0.125753,0.127756,0.124420,248032
+S2,base,r1,complex,recognize-fast,Formula,1000,2000,0.105443,0.073402,0.073033,0.073770,0.076516,0.074725,0.073033,135568
+S2,base,r1,complex-x4,ast-fast,Formula,1000,500,0.476509,0.466885,0.457630,0.451121,0.453489,0.457630,0.451121,952000
+S2,base,r1,complex-x4,recognize-fast,Formula,1000,500,0.272322,0.281669,0.275819,0.275976,0.281759,0.281669,0.272322,513904
+S2,base,r1,complex-x16,ast-fast,Formula,1000,125,1.752991,1.703787,1.725902,1.700990,2.589292,1.725902,1.682147,2728672
+S2,base,r1,complex-x16,recognize-fast,Formula,1000,125,1.028581,1.033184,1.016234,1.023776,1.059006,1.028581,1.016234,991640
+S2,base,r1,complex-x64,ast-fast,Formula,1000,50,8.563147,9.113757,8.887535,9.177253,8.777793,9.113757,8.563147,10877200
+S2,base,r1,complex-x64,recognize-fast,Formula,1000,50,4.267133,4.380956,3.964436,4.481483,4.489018,4.396574,3.964436,3944272
+S2,base,r1,# loadavg=4.50 7.54 10.58 3/4732 2517218
+S2,after,r2,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S2,after,r2,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S2,after,r2,# loadavg=4.50 7.54 10.58 2/4732 2517233
+S2,after,r2,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S2,after,r2,complex,ast-fast,Formula,1000,2000,0.173701,0.127092,0.123849,0.125668,0.123559,0.124021,0.123157,249352
+S2,after,r2,complex,recognize-fast,Formula,1000,2000,0.109034,0.075408,0.074554,0.073700,0.074138,0.074554,0.073700,136888
+S2,after,r2,complex-x4,ast-fast,Formula,1000,500,0.469044,0.443930,0.448365,0.451836,0.511719,0.450462,0.443930,957160
+S2,after,r2,complex-x4,recognize-fast,Formula,1000,500,0.281306,0.279982,0.274167,0.282176,0.278690,0.279982,0.274167,519064
+S2,after,r2,complex-x16,ast-fast,Formula,1000,125,1.679967,1.764419,1.674161,1.679057,1.671516,1.679210,1.671516,2749192
+S2,after,r2,complex-x16,recognize-fast,Formula,1000,125,1.036417,1.048406,1.009732,1.019247,1.034757,1.031364,1.009732,1012160
+S2,after,r2,complex-x64,ast-fast,Formula,1000,50,8.219058,8.518415,8.366325,8.796155,9.064272,8.796155,8.219058,10959160
+S2,after,r2,complex-x64,recognize-fast,Formula,1000,50,4.477082,4.027300,4.041621,4.014233,4.023695,4.041621,4.014233,4026232
+S2,after,r2,# loadavg=3.77 7.01 10.28 4/4742 2520496
+S2,base,r2,# java=21.0.9 vm=Java HotSpot(TM) 64-Bit Server VM
+S2,base,r2,# jvm=[-Xms512m, -Xmx2g, -Xss16m, -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64, -Dbench.modes=ast-fast,recognize-fast, -Dbench.warmup=1000, -Dbench.runs=7]
+S2,base,r2,# loadavg=3.77 7.01 10.28 4/4741 2520527
+S2,base,r2,fixture,mode,entry,warmup,iterations,run1_ms,run2_ms,run3_ms,run4_ms,run5_ms,median_ms,min_ms,alloc_bytes_per_parse
+S2,base,r2,complex,ast-fast,Formula,1000,2000,0.170622,0.125773,0.127015,0.129545,0.123351,0.125825,0.121501,248056
+S2,base,r2,complex,recognize-fast,Formula,1000,2000,0.157209,0.077181,0.075511,0.087666,0.075057,0.075511,0.074484,135592
+S2,base,r2,complex-x4,ast-fast,Formula,1000,500,0.593261,0.477436,0.473910,0.508914,0.502603,0.502603,0.473910,952024
+S2,base,r2,complex-x4,recognize-fast,Formula,1000,500,0.285990,0.286637,0.287245,0.305372,0.320483,0.288238,0.285990,513928
+S2,base,r2,complex-x16,ast-fast,Formula,1000,125,1.770686,1.684275,1.716892,1.876310,2.278619,1.831341,1.684275,2728696
+S2,base,r2,complex-x16,recognize-fast,Formula,1000,125,1.072511,1.023417,1.035231,1.047285,1.034407,1.039509,1.023417,991664
+S2,base,r2,complex-x64,ast-fast,Formula,1000,50,9.124010,10.560582,10.420149,8.942361,8.650010,10.420149,8.650010,10877224
+S2,base,r2,complex-x64,recognize-fast,Formula,1000,50,4.419657,6.891894,4.610908,4.124028,4.070441,4.469635,4.070441,3944296
+S2,base,r2,# loadavg=3.15 6.53 9.99 7/4831 2524298

@@ -64,10 +64,12 @@ pub struct Finding {
     pub shrink_rounds: usize,
 }
 
-/// D-072 の in-backend A/B で見つけた差。`on` / `off` は同じ Rust backend を
+/// D-072 の in-backend A/B で見つけた差。`on` / `off` は同じ backend を
 /// `options.scan` だけ変えて走らせた観測。
 #[derive(Clone, Debug, Serialize)]
 pub struct ScanFinding {
+    /// `"rust"`（D-072）か `"java"`（D-080）。
+    pub backend: &'static str,
     pub seed: u64,
     pub grammar: String,
     pub input: String,
@@ -97,8 +99,10 @@ pub struct Summary {
     pub driver_timeouts: usize,
     pub violation_counts: BTreeMap<String, usize>,
     pub findings: Vec<Finding>,
-    /// D-072: 一括走査 on / off を同じ Rust backend で比べた回数と、その差。
+    /// D-072: 一括走査 on / off を同じ backend で比べた回数（Rust と Java の合計）と、その差。
     pub scan_comparisons: usize,
+    /// そのうち Java backend（D-080）で比べた回数。
+    pub java_scan_comparisons: usize,
     pub scan_findings: Vec<ScanFinding>,
     pub elapsed_seconds: f64,
 }
@@ -349,19 +353,23 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
     let inputs = input::generate(&grammar, &mut rng, config.inputs);
     let texts: Vec<String> = inputs.iter().map(|i| i.text.clone()).collect();
     let pairs = run_pair(engine, &built, &texts);
-    // D-072: 同じ Rust backend を `options.scan` だけ変えて 2 度走らせる。走査は
-    // fast mode でだけ効くので、driver はこのキーがあるとき診断・出現表を外す。
+    // D-072 / D-080: 同じ backend を `options.scan` だけ変えて 2 度走らせる（Rust と Java の両方）。
+    // 走査は fast mode でだけ効くので、driver はこのキーがあるとき診断・出現表を外す。
     // 失敗した解析は D-023 の再解析で参照経路の観測へ戻るので、ここで比べているのは
     // 「fast session が成功したまま返した観測」——走査が変え得る全部である。
-    let scan_on = engine.run_scan(&built, &texts, true);
-    let scan_off = engine.run_scan(&built, &texts, false);
-    {
+    for (backend, label) in [(Backend::Rust, "rust"), (Backend::Java, "java")] {
+        let scan_on = engine.run_scan(&built, backend, &texts, true);
+        let scan_off = engine.run_scan(&built, backend, &texts, false);
         let mut summary = shared.summary.lock().expect("summary");
         summary.scan_comparisons += texts.len();
+        if label == "java" {
+            summary.java_scan_comparisons += texts.len();
+        }
         for ((text, on), off) in texts.iter().zip(scan_on).zip(scan_off) {
             let difference = differences(&on, &off);
             if !difference.is_empty() {
                 summary.scan_findings.push(ScanFinding {
+                    backend: label,
                     seed,
                     grammar: grammar.render(),
                     input: text.clone(),

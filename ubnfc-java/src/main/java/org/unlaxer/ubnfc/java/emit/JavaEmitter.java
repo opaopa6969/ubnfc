@@ -38,6 +38,8 @@ public final class JavaEmitter {
     private final DiagnosticPlan diagnosticPlan;
     private final Prediction prediction;
     private final Factoring factoring;
+    /** D-080: {@code plan.scans} の根ごとの走査関数（D-072 の Java 版）。 */
+    private final Scanning scanning;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
     /** Generated constants (arrays of boundaries, fields, hints, ...) hoisted to static finals: expression text -> field name. */
     private final Map<String, String> constants = new LinkedHashMap<>();
@@ -78,6 +80,7 @@ public final class JavaEmitter {
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
         prediction = new Prediction(ir, expressions, rules, tokens, ruleIds, diagnosticPlan, this::labelText);
         factoring = new Factoring(ir, expressions, rules, captures, semanticShapes, diagnosticPlan, this::labelText, id -> scopeSites().contains(id));
+        scanning = new Scanning(ir, expressions, rules, tokens, recipes, exprIds, this::constant);
     }
     public Map<String, String> sources() throws IOException {
         var result = new TreeMap<String, String>(); String prefix = pkg.replace('.', '/') + "/";
@@ -103,7 +106,7 @@ public final class JavaEmitter {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
-    private static String q(String value) {
+    static String q(String value) {
         if (value == null) return "null";
         // Java source strings: avoid raw control characters and source-level Unicode escapes.
         var out = new StringBuilder("\"");
@@ -335,6 +338,9 @@ public final class JavaEmitter {
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
             .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(", ").append(twoMode()).append(", ").append(plainRecognition()).append(");\n")
+            // D-080: rollback の結果は再解析されずに fast session の到達位置（reached）を診断位置として返すので、
+            // 走査（reached を更新しない）を切って参照経路と同じ位置を返す。
+            .append(scanning.roots.isEmpty() ? "" : "        if (rollback) s.scan = false;\n")
             .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
             .append("        stackFlag[0] = stackFlag[0] || s.stackOverflowTripped;\n")
             .append("        if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }\n")
@@ -348,6 +354,7 @@ public final class JavaEmitter {
         emitBuild(out);
         for (Rule rule : rules.values()) emitRule(out, rule);
         for (Expr expr : expressions.values()) emitExpr(out, expr);
+        out.append(scanning.functions());
         for (var constant : constants.entrySet()) {
             int split = constant.getKey().indexOf(' ');
             out.append("    private static final ").append(constant.getKey(), 0, split).append(' ').append(constant.getValue()).append(" = ").append(constant.getKey().substring(split + 1)).append(";\n");
@@ -493,7 +500,9 @@ public final class JavaEmitter {
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(capArgs(expr)).append(");\n    }\n");
         String body = expression(expr);
-        for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
+        // D-080: 走査は consumed mode（C）だけ。matchOnly mode（M）は参照経路のまま。
+        for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ")
+            .append(mode.equals("C") ? scanning.fastPath(expr.id()) : "").append(body).append("\n    }\n");
     }
     /** {@code Session.capture} / {@code Session.Cap} が共有する 12 引数（site 表・span 規則・意味形・失敗 hint）。 */
     private String capArgs(Expr expr) {
