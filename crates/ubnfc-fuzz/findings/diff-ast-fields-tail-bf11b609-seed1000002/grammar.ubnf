@@ -1,0 +1,15 @@
+grammar Fuzz {
+  @import imp from 'imported.ubnf'
+  token T0 = org.unlaxer.parser.clang.IdentifierParser
+  token DN = NumberParser
+  token DI = org.unlaxer.parser.clang.IdentifierParser
+  token DS = org.unlaxer.parser.elementary.SingleQuotedParser
+  L0 ::= ;
+  L1 ::= ;
+  M0 ::= ;
+  @mapping(C1, params=[v4, v5, v6, v7]) @scopeTree(mode=dynamic) @declares(symbol=v4) @backref(name=v6) M1 ::= ( { '+' @v4 T0 @v5 }{2,4} ( L1* ':' ) | L0 @v6 { T0{0,} '😀'+ M0* % '+' } )* L0{0,} @typeof(v4) ')' @v7;
+  @mapping(C2, params=[v8, v9, v13, v10, v11, v12]) @doc('fuzz 😀') M2 ::= '\n' 'ab' @v8 ( [ '-'{2,4} imp.Piece '(' @v9 ] )? % '=' @typeof(v8) ':' @v13 | ')' @v10 ';' @v11 | L1{1,} @v12 '+'{0,} % ',';
+  @mapping(Bin0, params=[left, op, right]) @leftAssoc @precedence(level=90) Op0 ::= imp.Piece @left { '*' @op imp.Piece @right };
+  @mapping(Direct, params=[dn, dg, di, dl, ds]) Direct ::= DN @dn ':' ( DN ) @dg [ DI @di ] { ',' DN @dl } DS @ds;
+  @root @mapping(Top, params=[head, tail, v14, v15, direct]) Root ::= Op0 @head 'あ' @head ( ',' @tail ( M1+ @v14 | '=' @v15 )? )* @tail Direct @direct;
+}

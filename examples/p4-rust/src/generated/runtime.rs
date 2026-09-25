@@ -68,6 +68,8 @@ pub(crate) enum Event {
         span: Span,
         child: EventId,
         wrap: bool,
+        /// D-078: 意味値を持つ選択の text だけの候補。一致範囲の字句（空でも）を 1 つの値にする。
+        text: bool,
     },
     Capture {
         token_extent: bool,
@@ -161,9 +163,14 @@ impl PackedEvent {
                 p.w[0] = w32(a.0);
                 p.w[1] = w32(b.0);
             }
-            Event::Values { span, child, wrap } => {
+            Event::Values {
+                span,
+                child,
+                wrap,
+                text,
+            } => {
                 p.tag = EV_VALUES;
-                p.flags = wrap as u8;
+                p.flags = wrap as u8 | (text as u8) << 1;
                 p.w[..3].copy_from_slice(&[w32(span[0]), w32(span[1]), w32(child.0)]);
             }
             Event::Capture {
@@ -236,7 +243,8 @@ impl PackedEvent {
             EV_VALUES => Event::Values {
                 span: span(0),
                 child: EventId(w[2] as usize),
-                wrap: self.flags != 0,
+                wrap: self.flags & 1 != 0,
+                text: self.flags & 2 != 0,
             },
             EV_CAPTURE => Event::Capture {
                 token_extent: self.flags != 0,
@@ -3110,11 +3118,11 @@ fn build_values_inner(&mut self,mut root:EventId,out:&mut Vec<u32>)->Result<(),S
 // その場合は pool から stack を借りずに降りる。
 loop {match self.ev(root) {
 Event::Capture{child,..}=>root=child,
-Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}return Ok(());},
+Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}return Ok(());},
 Event::Rule{rule,span,child,caps}=>return self.build_rule(rule,caps,span,child,out),
 Event::Join(..)=>break,
 _=>return Ok(()),}}
-let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.ev(id) {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap}=>{let start=out.len();self.build_values_into(child,out)?;if wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
+let mut stack=self.take_stack();stack.push((root,false));while let Some((id,_))=stack.pop() {match self.ev(id) {Event::Join(a,b)=>{stack.push((b,false));stack.push((a,false));},Event::Capture{child,..}=>stack.push((child,false)),Event::Values{child,span,wrap,text}=>{let start=out.len();self.build_values_into(child,out)?;if text || wrap && ((out.len()==start+1 && self.tree.kind(out[start])==tree::KIND_TEXT) || (out.len()==start && span[0]!=span[1] && !self.has_recovery(child) && !self.has_value_group(child))) {let text=self.semantic_text(child,span);out.truncate(start);out.push(text);}},Event::Rule{rule,span,child,caps}=>self.build_rule(rule,caps,span,child,out)?,_=>{}}}self.give_stack(stack);Ok(())}
 fn leaf(&mut self,ty:usize,span:Span,text:u32)->Result<u32,String> {let span=self.span(span);self.tree.set_extent(text,span);match ty {
 24=>{let op=self.tree.list(&[text]);let right=self.tree.list(&[]);Ok(self.tree.record(tree::K_g_TinyExpressionP4AST_2e_BinaryExpr,40,span,&[tree::NONE,op[0],op[1],right[0],right[1]]))},
 _=>{let _=(span,text);Err(format!("unknown leaf type {ty}"))}}}

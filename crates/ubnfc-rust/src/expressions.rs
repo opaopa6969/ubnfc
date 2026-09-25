@@ -76,8 +76,12 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             // group whose delimiters belong to a scalar text value.
             let wrap =
                 count != Cardinality::List && !expr.id.as_str().ends_with("/lower/separated/2");
-            writeln!(s,"out.events=self.event(Event::Values{{span:[state.consumed,out.state.consumed],child:out.events,wrap:{wrap}}});").unwrap();
+            writeln!(s,"out.events=self.event(Event::Values{{span:[state.consumed,out.state.consumed],child:out.events,wrap:{wrap},text:false}});").unwrap();
+        } else if g.text_alternatives.contains(&i) {
+            s.push_str(TEXT_ALTERNATIVE_VALUES);
         }
+    } else if g.text_alternatives.contains(&i) {
+        s.push_str(TEXT_ALTERNATIVE_VALUES);
     }
     if !matches!(
         expr.node,
@@ -633,6 +637,39 @@ pub(crate) fn capture_events(g: &Generator<'_>, expr: &Expr, state: &str, out: &
     }
     s.replace("out.", &format!("{out}."))
         .replace("[state.", &format!("[{state}."))
+}
+
+/// D-078: 意味値を持たない選択候補が採用されたときの値。一致範囲の字句 1 つ（空の一致でも）。
+pub(crate) const TEXT_ALTERNATIVE_VALUES: &str = "out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:true});\n";
+
+/// D-078: 意味値を持つ選択の、意味値を持たない候補の index。旧実装は mixed な選択の
+/// text だけの候補に `#semantic:text` を束縛し、その字句を意味値にした
+/// （`CaptureBindingPlan.markSemanticValues`）。Rust の `semantic_shape` は text を数えないので、
+/// ここで補う。Java は `JavaEmitter.textAlternatives`（同じ規則）。
+pub(crate) fn text_alternatives(g: &Generator<'_>) -> std::collections::BTreeSet<usize> {
+    let mut out = std::collections::BTreeSet::new();
+    for expr in &g.ir.semantics.expressions {
+        let ExprNode::Choice { alternatives, .. } = &expr.node else {
+            continue;
+        };
+        if semantic_shape_of(g, &expr.id).is_none() {
+            continue;
+        }
+        for alt in alternatives {
+            if semantic_shape_of(g, alt).is_none() && !skipped(g, alt) {
+                out.insert(g.expr[alt.as_str()]);
+            }
+        }
+    }
+    out
+}
+
+/// `@skip` 規則への参照（値を作らない。text 候補として数えない）。
+fn skipped(g: &Generator<'_>, id: &ExprId) -> bool {
+    match &g.ir.semantics.expressions[g.expr[id.as_str()]].node {
+        ExprNode::RuleRef { symbol_id } => g.ir.semantics.rules[g.rules[symbol_id.as_str()]].skip,
+        _ => false,
+    }
 }
 
 pub(crate) fn semantic_shape_of(g: &Generator<'_>, id: &ExprId) -> Option<Cardinality> {

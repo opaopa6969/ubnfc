@@ -68,6 +68,8 @@ pub(crate) enum Event {
         span: Span,
         child: EventId,
         wrap: bool,
+        /// D-078: 意味値を持つ選択の text だけの候補。一致範囲の字句（空でも）を 1 つの値にする。
+        text: bool,
     },
     Capture {
         token_extent: bool,
@@ -161,9 +163,14 @@ impl PackedEvent {
                 p.w[0] = w32(a.0);
                 p.w[1] = w32(b.0);
             }
-            Event::Values { span, child, wrap } => {
+            Event::Values {
+                span,
+                child,
+                wrap,
+                text,
+            } => {
                 p.tag = EV_VALUES;
-                p.flags = wrap as u8;
+                p.flags = wrap as u8 | (text as u8) << 1;
                 p.w[..3].copy_from_slice(&[w32(span[0]), w32(span[1]), w32(child.0)]);
             }
             Event::Capture {
@@ -236,7 +243,8 @@ impl PackedEvent {
             EV_VALUES => Event::Values {
                 span: span(0),
                 child: EventId(w[2] as usize),
-                wrap: self.flags != 0,
+                wrap: self.flags & 1 != 0,
+                text: self.flags & 2 != 0,
             },
             EV_CAPTURE => Event::Capture {
                 token_extent: self.flags != 0,

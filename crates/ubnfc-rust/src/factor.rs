@@ -304,7 +304,13 @@ impl Emit<'_, '_> {
         if let Some(count) = semantic_shape_of(g, &seq.id) {
             let wrap =
                 count != Cardinality::List && !seq.id.as_str().ends_with("/lower/separated/2");
-            writeln!(self.code,"cur.events=self.event(Event::Values{{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:{wrap}}});").unwrap();
+            writeln!(self.code,"cur.events=self.event(Event::Values{{span:[entry.consumed,cur.state.consumed],child:cur.events,wrap:{wrap},text:false}});").unwrap();
+        } else if g.text_alternatives.contains(&self.cands[k]) {
+            self.code.push_str(
+                &crate::expressions::TEXT_ALTERNATIVE_VALUES
+                    .replace("out.", "cur.")
+                    .replace("[state.", "[entry."),
+            );
         }
         self.code.push_str(&capture_events(g, seq, "entry", "cur"));
         let items = items(g, self.cands[k]).unwrap();

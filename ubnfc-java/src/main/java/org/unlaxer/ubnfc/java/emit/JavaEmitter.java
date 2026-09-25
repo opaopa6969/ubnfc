@@ -28,6 +28,13 @@ public final class JavaEmitter {
     private final Map<String, Token> tokens;
     private final Map<String, Recipe> recipes;
     private final SemanticShape semanticShapes;
+    /**
+     * D-078: 意味値を持つ選択の、text だけの候補（{@code @skip} 規則への参照を除く）。採用されたら
+     * 一致範囲の字句 1 つを意味値にする（旧実装の {@code #semantic:text}）。内側の空反復が残す
+     * 「値なし」（空の values）で字句を消さないよう、包みで values を plain text に戻す（{@code Session.textAlternative}）。
+     * Rust は {@code Generator.text_alternatives}。
+     */
+    private final Set<String> textAlternatives = new java.util.HashSet<>();
     private final DiagnosticPlan diagnosticPlan;
     private final Prediction prediction;
     private final Factoring factoring;
@@ -58,6 +65,14 @@ public final class JavaEmitter {
         tokens = Validation.index(ir.semantics().tokens(), Token::symbolId);
         recipes = Validation.index(ir.semantics().recipes(), Recipe::ruleId);
         semanticShapes = new SemanticShape(expressions, rules);
+        for (Expr expr : expressions.values()) {
+            if (!expr.node().kind().equals("choice") || semanticShapes.of(expr.id()).kind().equals("text")) continue;
+            for (String alternative : expr.node().alternatives()) {
+                var node = expressions.get(alternative).node();
+                boolean skipped = node.kind().equals("ruleRef") && Boolean.TRUE.equals(rules.get(node.symbolId()).skip());
+                if (!skipped && semanticShapes.of(alternative).kind().equals("text")) textAlternatives.add(alternative);
+            }
+        }
         diagnosticPlan = new DiagnosticPlan(ir);
         for (String id : expressions.keySet()) exprIds.put(id, exprIds.size());
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
@@ -489,7 +504,7 @@ public final class JavaEmitter {
             + ", " + q(expr.ruleId()) + ", " + q(expr.id())
             + ", " + Set.of("repeat", "optional", "separated").contains(expr.node().kind())
             + ", " + Set.of("literal", "tokenRef", "any", "eof", "empty").contains(expr.node().kind())
-            + ", " + q(semanticShapes.of(expr.id()).kind())
+            + ", " + q(textAlternatives.contains(expr.id()) ? "textAlternative" : semanticShapes.of(expr.id()).kind())
             + ", " + (semanticShapes.of(expr.id()).many() || expr.id().contains("/lower/separated/"))
             + ", " + kLabels(diagnosticPlan.expression(expr.id()));
     }
@@ -513,6 +528,7 @@ public final class JavaEmitter {
         var shape = semanticShapes.of(expr.id());
         boolean many = shape.many() || expr.id().contains("/lower/separated/");
         // 認識専用経路（tree=false）では射影そのものが無いので、呼出しを出さずに畳む。
+        if (textAlternatives.contains(expr.id())) return "return s.tree ? s.textAlternative(r) : r;";
         return shape.kind().equals("text") ? "return r;"
             : "return s.tree ? s.project(r, " + (shape.kind().equals("mixed") && !many) + ") : r;";
     }
