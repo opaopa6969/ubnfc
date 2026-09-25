@@ -14,6 +14,7 @@ ubnfc-fuzz — Java / Rust バックエンドの差分 fuzzing
 
     ubnfc-fuzz [--seeds N] [--start-seed N] [--inputs N] [--jobs N]
                [--minutes M] [--shrink-builds N] [--driver-timeout SEC]
+               [--timeout-retries N]
                [--findings DIR] [--report FILE] [--json FILE]
 
   --seeds N           生成する文法の数（既定 64）
@@ -22,7 +23,10 @@ ubnfc-fuzz — Java / Rust バックエンドの差分 fuzzing
   --jobs N            並列 worker 数（既定 2）
   --minutes M         全体の制限時間。超えたら残り seed を打ち切る
   --shrink-builds N   1 所見の縮小で許す build 回数（既定 30）
-  --driver-timeout S  driver 1 バッチの制限時間（秒、既定 90）
+  --driver-timeout S  driver 1 バッチの無負荷時の基準制限時間（秒、既定 90）。
+                      実際に使うのはホスト負荷（/proc/loadavg）で 1〜4 倍した値
+  --timeout-retries N driver_timeout になった比較だけを該当 backend で再試行する
+                      回数の上限（既定 2）。使い切っても未観測として扱い、差分にはしない
   --findings DIR      最小再現例の出力先（既定 crates/ubnfc-fuzz/findings）
   --report FILE       Markdown 要約の出力先
   --json FILE         集計 JSON の出力先
@@ -79,6 +83,7 @@ fn run(arguments: &[String]) -> Result<ExitCode, String> {
             "--driver-timeout" => {
                 config.driver_timeout = Duration::from_secs(number("--driver-timeout")?)
             }
+            "--timeout-retries" => config.timeout_retries = number("--timeout-retries")? as usize,
             "--minutes" => {
                 let minutes: f64 = value
                     .parse()
