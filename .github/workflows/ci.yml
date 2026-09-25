@@ -79,5 +79,12 @@ jobs:
       # sibling links created earlier. Those checkouts are the developer working trees on the
       # runner's machine (usually master; may be ahead of what the PR was written against).
       # This job is merge-blocking.
+      #
+      # Test threads / timeouts (issue #73, docs/harness-driver-protocol.md "CI での方針"):
+      # --test-threads is left at cargo's default (one per CPU); the runner is a single
+      # self-hosted machine shared with other work, so instead of pinning a thread count the
+      # fuzz driver timeouts scale with /proc/loadavg (x1..x4 of the 90 s base) and a
+      # driver_timeout is retried (max 2) and then counted as unobserved, never as a failure.
+      # If a run still goes red only on driver_timeout, rerun the failed job once.
       - name: cargo test --workspace
         run: cargo test --workspace --no-fail-fast

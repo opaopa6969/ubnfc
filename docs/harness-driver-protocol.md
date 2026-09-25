@@ -433,3 +433,12 @@ farthestExpected` の比較は維持する（D-014）。Extern の失敗候補�
 固定 seed campaign（`crates/ubnfc-fuzz/tests/campaign.rs`）の `summary.driver_errors == 0` は
 「本物の driver エラーが無い」ことの主張のまま変えていない。無負荷なら `unobserved_timeouts`
 も 0 のはずなので、この変更は無負荷時の green を壊さない。
+
+### CI での方針（`.github/workflows/ci.yml` の `native` job）
+
+- `--test-threads` は固定しない（cargo の既定 = CPU 数）。runner は他の作業と共有する
+  self-hosted 1 台で、空き CPU が時間ごとに変わるため、スレッド数を絞る代わりに上記の
+  負荷倍率（基準 90 秒 × 1〜4 倍）と再試行・未観測扱いで吸収する。
+- job 全体の timeout は GitHub Actions の既定のまま（native は通常 15 分前後）。
+- それでも `driver_timeout` だけで赤くなった場合は、失敗した job を 1 回だけ再実行する
+  （`gh run rerun <id> --failed`）。2 回続けて落ちるなら負荷ではなく本物の不具合として調べる。
