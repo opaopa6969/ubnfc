@@ -12,7 +12,7 @@ front の計画は共有なので `crates/ubnfc-front/**` と Rust backend は�
 - **P4 は `plan.scans` が付かないので生成 `Parser.java` は byte 一致**（再生成差分は `Session` / `Driver` / `Input` の template だけ）。
   complex / x4 / x16 / x64 の ast-fast / recognize-fast は 4 周とも雑音帯の中（§3.2）。
 - 観測は動いていない: `ScanEquivalenceTest` 9,885 件（走査 on / off × 認識 / AST × 出現表 × 診断 × lexical、
-  rollback 解析を含む）、ubnfc-java 全 10,786 件、corpus **Java Pass 1,310 / Fail 0**、`cargo test --workspace` 546 件、
+  rollback 解析を含む）、ubnfc-java 全 10,786 件、corpus **Java Pass 1,310 / Fail 0**、`cargo test --workspace` 554 件（#73 merge 後）、
   Rust ⇔ Java cross-backend fuzz campaign（今回から **Java の in-backend 走査 A/B** も回る）。
 
 ## 0. 計測環境
@@ -138,5 +138,5 @@ field 2 個（`boolean` と入力配列の参照、確保なし）なので、JI
 - `examples/p4-java/scripts/generate.sh --write` で再生成し、`cd examples/p4-java && mvn -o -q package`（テスト込み）緑。
 - corpus: `cargo run -q --offline --bin ubnfc-harness -- run-all --backend java --jobs 8` → **Java Pass 1,310 / 期待拒否 Pass 27 /
   Known 29 / Fail 0 / 未観測 59**（D-079 の報告と同じ合計）。
-- `cargo test --workspace --no-fail-fast`（546 件、fuzz campaign の Rust ⇔ Java 差分と Java の走査 A/B を含む）/
+- `cargo test --workspace --no-fail-fast`（#73 の merge 後 554 件、fuzz campaign の Rust ⇔ Java 差分と Java の走査 A/B を含む）/
   `cargo clippy --workspace --all-targets -- -D warnings` / `cargo fmt --check`: 緑。
