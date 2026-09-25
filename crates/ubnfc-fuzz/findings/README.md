@@ -37,6 +37,7 @@ campaign が出した 92 クラスのうち、**A-2（入れ子ノード span �
 | 回復の観測（issue #41 / D-069、`docs/reports/2026-09-24-fuzz-recovery-observations.md`） | `diff-diagnostics-expected-438fbb32-seed100276`、`diff-recoveries-captureoccurrences-cbee9ef9-seed100276`、`diff-diagnostics-farthestexpected-d88564a1-seed100276` |
 | mixed な選択の text 候補を Rust が意味値にしない（issue #78 / D-078、`docs/reports/2026-09-24-nested-capture-78.md`） | `diff-ast-fields-tail-bf11b609-seed1000002` |
 | 意味値の領域の中の text だけの規則を Rust が字句の値にする（issue #86、`docs/reports/2026-09-25-fuzz-86.md`） | `diff-ast-fields-tail-bf11b609-seed1000189` |
+| node 変換の field で text だけの group の capture を Rust が規則ごとの字句に割る（issue #89、`docs/reports/2026-09-25-fuzz-89.md`。手で縮めた形で seed なし） | `diff-ast-fields-x-issue89` |
 | C-1 / B-1 / A-5 / A-8 / A-9 観測契約の一本化（D-024 〜 D-029、`docs/reports/2026-09-23-observation-contract.md`） | `diff-catalogs-dd4854a9-seed1`、`diff-diagnostics-988b1c0e-seed1`、`diff-recoveries-7906c206-seed1`、`diff-scope-declarations-67b97a59-seed1`、`diff-scope-depth-2be9dc99-seed1`、`diff-scope-diagnostics-463a9328-seed1`、`diff-scope-references-3daa5d3e-seed1`、`diff-mappingerror-present-1278776d-seed1`、`diff-value-1e979fc2-seed1` |
 
 seed 1 を元の recipe（`--seeds 1 --inputs 24 --shrink-builds 10`）で回すと、残るのは

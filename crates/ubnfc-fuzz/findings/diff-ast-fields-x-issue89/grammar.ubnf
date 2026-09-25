@@ -1,0 +1,8 @@
+grammar Fuzz {
+  @package: fuzz.generated
+  token T = org.unlaxer.parser.clang.IdentifierParser
+  @enum L ::= 'gamma';
+  P ::= 'i' | 'j';
+  @mapping(Leaf, params=[v]) Leaf ::= T @v;
+  @root @mapping(Top, params=[x]) Root ::= '[' ( P P ) @x Leaf @x ']';
+}

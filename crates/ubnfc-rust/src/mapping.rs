@@ -212,6 +212,18 @@ fn text_only_rule(g: &Generator<'_>, rule: &Rule) -> bool {
         && crate::expressions::semantic_shape_of(g, &rule.body).is_none()
 }
 
+/// #89: capture site の 1 出現の中身が意味値を持たない（text だけの）とき真。
+/// Optional / Repeat に付いた site は要素ごとに出現するので、要素の式で判定する。
+fn text_only_site(g: &Generator<'_>, site: usize) -> bool {
+    let capture = &g.ir.semantics.captures[site];
+    let expr = &g.ir.semantics.expressions[g.expr[capture.expr_id.as_str()]];
+    let occurrence = match &expr.node {
+        ExprNode::Optional { child } | ExprNode::Repeat { child, .. } => child,
+        _ => &expr.id,
+    };
+    crate::expressions::semantic_shape_of(g, occurrence).is_none()
+}
+
 /// #86: 本体の写像が新しい値の文脈を開く規則（recipe を持ち、透過でも text でもないもの）。
 fn opens_value_scope(g: &Generator<'_>, rule: &Rule) -> bool {
     if rule.skip {
@@ -337,9 +349,17 @@ fn rule_mapping(g: &Generator<'_>, i: usize, rule: &Rule) -> Result<String, Emit
                     if matches!(rf.conversion, Conversion::Text | Conversion::Number) {
                         writeln!(s, "self.text_nodes(&caps,&{sites:?},&mut {var});").unwrap();
                     } else {
+                        // #89: 出現の中身が text だけ（意味形 None）の site は、出現 1 つにつき
+                        // 一致範囲の字句 1 つを値にする（D-032）。
+                        let text_sites = rf
+                            .site_ids
+                            .iter()
+                            .map(|id| g.sites[id.as_str()])
+                            .filter(|&i| text_only_site(g, i))
+                            .collect::<Vec<_>>();
                         writeln!(
                             s,
-                            "self.node_values(&caps,&{sites:?},{fallback:?},&mut {var})?;"
+                            "self.node_values(&caps,&{sites:?},&{text_sites:?},{fallback:?},&mut {var})?;"
                         )
                         .unwrap();
                     }
