@@ -10,6 +10,7 @@ pub mod campaign;
 pub mod engine;
 pub mod gen;
 pub mod input;
+pub mod load;
 pub mod model;
 pub mod observe;
 pub mod rng;

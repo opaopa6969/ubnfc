@@ -34,8 +34,13 @@ pub struct Engine {
     rust: Runner,
     cache: BTreeMap<String, std::rc::Rc<Built>>,
     pub builds: usize,
+    /// `exchange` が壁時計タイムアウトで打ち切った回数（再試行も含む生の回数）。
     pub timeouts: usize,
+    /// 基準タイムアウト（無負荷時にそのまま使う値）。実際に使うのは
+    /// `crate::load::scale` で現在の負荷率を掛けた値（issue #73）。
     pub timeout: Duration,
+    /// campaign 中に観測した負荷率の最大値。report で「どれだけ伸ばしたか」を示すため。
+    pub max_load_factor: f64,
 }
 
 impl Engine {
@@ -55,6 +60,7 @@ impl Engine {
             builds: 0,
             timeouts: 0,
             timeout: Duration::from_secs(90),
+            max_load_factor: 0.0,
         }
     }
 
@@ -174,7 +180,12 @@ impl Engine {
             .enumerate()
             .map(|(id, input)| request(id, &built.grammar_name, input, scan))
             .collect();
-        match exchange(executable, &requests, self.timeout) {
+        let factor = crate::load::factor();
+        if factor > self.max_load_factor {
+            self.max_load_factor = factor;
+        }
+        let effective_timeout = self.timeout.mul_f64(factor);
+        match exchange(executable, &requests, effective_timeout) {
             Ok(mut rows) => (0..inputs.len())
                 .map(|id| {
                     rows.remove(&id)
@@ -182,16 +193,31 @@ impl Engine {
                 })
                 .collect(),
             Err(error) => {
-                if error.starts_with("timeout") {
+                let timed_out = error.starts_with("timeout");
+                if timed_out {
                     self.timeouts += 1;
                 }
                 inputs
                     .iter()
-                    .map(|_| json!({ "error": error.clone() }))
+                    .map(|_| {
+                        let mut value = json!({ "error": error.clone() });
+                        // campaign 側が「未観測（driver_timeout）」と「本物の driver
+                        // エラー」を区別できるように、機械可読な印を添える。
+                        if timed_out {
+                            value["kind"] = json!("driver_timeout");
+                        }
+                        value
+                    })
                     .collect()
             }
         }
     }
+}
+
+/// 応答が `run_with` の付けた `driver_timeout` の印を持つか。
+/// campaign はこれを「失敗」ではなく「未観測」として扱う（issue #73）。
+pub fn is_driver_timeout(value: &Value) -> bool {
+    value.get("kind").and_then(Value::as_str) == Some("driver_timeout")
 }
 
 /// `docs/harness-driver-protocol.md` のリクエスト 1 行。
