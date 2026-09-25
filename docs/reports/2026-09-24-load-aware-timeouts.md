@@ -137,9 +137,26 @@ pub fn scale(base: Duration) -> Duration {
 
 ## 5. 検証
 
-- `cargo test --workspace --offline --no-fail-fast`: <!-- TODO: 実行後に埋める -->
-- `cargo clippy --workspace --offline --all-targets -- -D warnings`: <!-- TODO -->
-- `cargo fmt --check`: <!-- TODO -->
-- 固定 seed campaign（無負荷）: <!-- TODO -->
-- corpus 無退行（`cd ubnfc-java && mvn -o -q -DskipTests package` 後）: Java Pass 1310 /
-  Rust Pass 1292、Fail 0: <!-- TODO -->
+origin/master（e1547ee、#93 の `h_text_group_captures_agree_across_backends` 追加を含む）を
+merge した状態で、無負荷（他 agent の並行ビルドはあるがこのホストとしては通常時）に確認した。
+
+- `cargo test --workspace --offline --no-fail-fast`: 全 crate green（0 failed）。
+  `ubnfc-fuzz` の unittests は 33 passed（本 issue の 4 本 `campaign::tests::
+  a_timed_out_comparison_is_retried_and_stops_being_unobserved_once_it_recovers` /
+  `a_comparison_that_never_recovers_stays_unobserved_after_retries_are_exhausted` /
+  `zero_retries_reports_the_timeout_without_attempting_any_retry` /
+  `a_lingering_timeout_is_not_treated_as_a_hard_driver_error` を含む）。
+  merge で新たに来た `tests/campaign.rs` の
+  `h_text_group_captures_agree_across_backends`（#93）は `Config` リテラルに
+  `timeout_retries` フィールドが無く非 fast-forward merge のまま conflict なく
+  取り込まれていたので、`timeout_retries: 2` を足して他の統合テストと揃えた。
+- `cargo clippy --workspace --offline --all-targets -- -D warnings`: warning 0。
+- `cargo fmt --check`: 差分なし。
+- 固定 seed campaign（無負荷、`tests/campaign.rs` 全 8 テスト）: green
+  （`a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_divergence` ほか）。
+  無負荷時は `unobserved_timeouts` も 0 になるはずという §3 の想定どおり、
+  既存の `driver_errors == 0` の assertion は変更なしで通っている。
+- corpus 無退行（`cd ubnfc-java && mvn -o -q -DskipTests package` 後、
+  `ubnfc-harness run-all --backend java|rust`）: **Java Pass 1310 / Fail 0**、
+  **Rust Pass 1292 / Fail 0**（未観測 59 / 75、Known 29/29 も含め master 実測値と一致、
+  差分なし）。

@@ -516,6 +516,7 @@ fn h_text_group_captures_agree_across_backends() {
             findings: None,
             shrink_builds: 0,
             driver_timeout: Duration::from_secs(120),
+            timeout_retries: 2,
             workdir: scratch.0.clone(),
         });
         assert_eq!(
