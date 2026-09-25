@@ -1,0 +1,60 @@
+S1,base,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S1,base,ubnfc-java(生成),json-1k.json,1067,認識のみ,4953,200,7,0.045645,0.041295,0.128984,0.0428,23.38,5888
+S1,base,ubnfc-java(生成),json-10k.json,10066,認識のみ,1320,200,7,0.393833,0.387356,0.425993,0.0391,25.56,35808
+S1,base,ubnfc-java(生成),json-100k.json,100039,認識のみ,133,200,7,3.857708,3.758253,4.170740,0.0386,25.93,334184
+S1,base,ubnfc-java(生成),json-1m.json,1000112,認識のみ,12,200,7,38.592706,37.146306,43.448776,0.0386,25.91,3318576
+S1,on,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S1,on,ubnfc-java(生成),json-1k.json,1067,認識のみ,7739,200,7,0.011059,0.009333,0.046613,0.0104,96.48,4624
+S1,on,ubnfc-java(生成),json-10k.json,10066,認識のみ,5559,200,7,0.092265,0.090368,0.102428,0.0092,109.10,22472
+S1,on,ubnfc-java(生成),json-100k.json,100039,認識のみ,485,200,7,0.910889,0.893655,1.065248,0.0091,109.83,200992
+S1,on,ubnfc-java(生成),json-1m.json,1000112,認識のみ,55,200,7,9.151955,8.904273,9.693636,0.0092,109.28,1986872
+S1,off,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S1,off,ubnfc-java(生成),json-1k.json,1067,認識のみ,4642,200,7,0.044054,0.039578,0.131888,0.0413,24.22,5896
+S1,off,ubnfc-java(生成),json-10k.json,10066,認識のみ,1325,200,7,0.465705,0.406595,0.547379,0.0463,21.61,35816
+S1,off,ubnfc-java(生成),json-100k.json,100039,認識のみ,129,200,7,3.940945,3.813485,4.512452,0.0394,25.38,334192
+S1,off,ubnfc-java(生成),json-1m.json,1000112,認識のみ,13,200,7,38.622005,38.123043,41.663815,0.0386,25.89,3318584
+S1,base,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S1,base,ubnfc-java(生成),json-1k.json,1067,typed AST,1205,200,7,0.131033,0.113041,0.459700,0.1228,8.14,300224
+S1,base,ubnfc-java(生成),json-10k.json,10066,typed AST,463,200,7,1.157074,1.110872,1.382408,0.1149,8.70,3140264
+S1,base,ubnfc-java(生成),json-100k.json,100039,typed AST,37,200,7,14.890231,14.344747,16.144207,0.1488,6.72,31247408
+S1,base,ubnfc-java(生成),json-1m.json,1000112,typed AST,3,57,7,359.854258,326.277624,372.399840,0.3598,2.78,315734928
+S1,on,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S1,on,ubnfc-java(生成),json-1k.json,1067,typed AST,1619,200,7,0.077506,0.054823,0.276698,0.0726,13.77,145904
+S1,on,ubnfc-java(生成),json-10k.json,10066,typed AST,1092,200,7,0.532675,0.504056,0.556846,0.0529,18.90,1589800
+S1,on,ubnfc-java(生成),json-100k.json,100039,typed AST,59,200,7,7.590652,6.780209,9.816936,0.0759,13.18,15782304
+S1,on,ubnfc-java(生成),json-1m.json,1000112,typed AST,3,113,7,173.613085,113.781649,232.081528,0.1736,5.76,161118776
+S1,off,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S1,off,ubnfc-java(生成),json-1k.json,1067,typed AST,77,200,7,0.645903,0.335892,0.954861,0.6053,1.65,300232
+S1,off,ubnfc-java(生成),json-10k.json,10066,typed AST,344,200,7,1.176097,1.109866,1.401141,0.1168,8.56,3140392
+S1,off,ubnfc-java(生成),json-100k.json,100039,typed AST,27,200,7,14.331633,14.015177,15.512797,0.1433,6.98,31247536
+S1,off,ubnfc-java(生成),json-1m.json,1000112,typed AST,3,61,7,326.651440,279.762635,400.466560,0.3266,3.06,315735056
+S2,off,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S2,off,ubnfc-java(生成),json-1k.json,1067,認識のみ,4839,200,7,0.049247,0.038993,0.114248,0.0462,21.67,5896
+S2,off,ubnfc-java(生成),json-10k.json,10066,認識のみ,1351,200,7,0.388887,0.383587,0.440392,0.0386,25.88,35816
+S2,off,ubnfc-java(生成),json-100k.json,100039,認識のみ,131,200,7,5.151409,4.370481,6.149001,0.0515,19.42,334192
+S2,off,ubnfc-java(生成),json-1m.json,1000112,認識のみ,13,200,7,38.243675,37.764274,42.868759,0.0382,26.15,3318584
+S2,on,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S2,on,ubnfc-java(生成),json-1k.json,1067,認識のみ,9462,200,7,0.009864,0.009217,0.049307,0.0092,108.17,4592
+S2,on,ubnfc-java(生成),json-10k.json,10066,認識のみ,4432,200,7,0.102919,0.094616,0.110504,0.0102,97.80,22440
+S2,on,ubnfc-java(生成),json-100k.json,100039,認識のみ,580,200,7,0.968640,0.934013,1.059995,0.0097,103.28,200960
+S2,on,ubnfc-java(生成),json-1m.json,1000112,認識のみ,52,200,7,9.822212,9.668743,11.147860,0.0098,101.82,1986840
+S2,base,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S2,base,ubnfc-java(生成),json-1k.json,1067,認識のみ,4823,200,7,0.042328,0.038388,0.116623,0.0397,25.21,5888
+S2,base,ubnfc-java(生成),json-10k.json,10066,認識のみ,1306,200,7,0.392736,0.388541,0.438140,0.0390,25.63,35808
+S2,base,ubnfc-java(生成),json-100k.json,100039,認識のみ,132,200,7,4.486027,3.848353,6.006754,0.0448,22.30,334184
+S2,base,ubnfc-java(生成),json-1m.json,1000112,認識のみ,13,200,7,37.985365,37.311887,41.988922,0.0380,26.33,3318576
+S2,off,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S2,off,ubnfc-java(生成),json-1k.json,1067,typed AST,357,200,7,0.310856,0.126006,1.167318,0.2913,3.43,300232
+S2,off,ubnfc-java(生成),json-10k.json,10066,typed AST,378,200,7,1.279943,1.173641,1.448032,0.1272,7.86,3140392
+S2,off,ubnfc-java(生成),json-100k.json,100039,typed AST,35,200,7,14.637051,14.139727,16.351432,0.1463,6.83,31247448
+S2,off,ubnfc-java(生成),json-1m.json,1000112,typed AST,3,55,7,393.995201,320.456126,416.087757,0.3940,2.54,315734968
+S2,on,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S2,on,ubnfc-java(生成),json-1k.json,1067,typed AST,1969,200,7,0.076456,0.044927,0.243160,0.0717,13.96,145904
+S2,on,ubnfc-java(生成),json-10k.json,10066,typed AST,1056,200,7,0.483031,0.477168,0.510477,0.0480,20.84,1589800
+S2,on,ubnfc-java(生成),json-100k.json,100039,typed AST,60,200,7,6.993494,6.648976,8.513560,0.0699,14.30,15782304
+S2,on,ubnfc-java(生成),json-1m.json,1000112,typed AST,4,120,7,168.089675,117.421552,233.025638,0.1681,5.95,161118776
+S2,base,impl,input,bytes,mode,iterations,warmup,runs,median_ms,min_ms,max_ms,us_per_byte,mb_per_s,alloc_bytes_per_parse
+S2,base,ubnfc-java(生成),json-1k.json,1067,typed AST,1245,200,7,0.131011,0.112059,0.459283,0.1228,8.14,300104
+S2,base,ubnfc-java(生成),json-10k.json,10066,typed AST,422,200,7,1.163301,1.096820,1.350511,0.1156,8.65,3140264
+S2,base,ubnfc-java(生成),json-100k.json,100039,typed AST,34,200,7,14.189544,13.518443,14.822636,0.1418,7.05,31247408
+S2,base,ubnfc-java(生成),json-1m.json,1000112,typed AST,3,53,7,336.381295,310.760455,360.937491,0.3363,2.97,315734928

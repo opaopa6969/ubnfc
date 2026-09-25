@@ -28,6 +28,8 @@ public final class Driver {
 
     private static final Map<String, String> EXTERN_CLASSES = __EXTERN_CLASSES__;
     private static Map<String, TokenScanner> scanners = Map.of();
+    /** D-080: 起動時の走査スイッチ（{@code -Dubnfc.scan}）。{@code options.scan} の無い要求はこれに戻す。 */
+    private static final boolean SCAN_DEFAULT = generated.internal.Session.scanning;
     private static java.net.URLClassLoader scannerLoader;
 
     // registry は対象生成物の api.TokenScanner でコンパイルする。クラス名から論理 ID に結び直す。
@@ -94,13 +96,22 @@ public final class Driver {
         String entry = request.get("entry") == null ? null : string(request, "entry");
         Map<String, Object> options = Json.object(request.get("options"));
         boolean lexical = flag(options, "lexical"), scope = flag(options, "scope");
+        // D-072 / D-080 の A/B 用の任意キー（Rust 生成 driver と同じ意味）。`options.scan` があるときは
+        // 「fast mode（診断・出現表なし、lexical は false 扱い）で走らせて一括走査だけを切り替える」。
+        // 走査は fast mode でしか効かないので、同じ条件で 2 度測る。キーが無ければ従来どおり。
+        boolean scanAb = options.containsKey("scan");
+        generated.internal.Session.scanning = scanAb ? flag(options, "scan") : SCAN_DEFAULT;
+        if (scanAb) lexical = false;
         Map<String, Object> observations = request.get("observations") instanceof Map<?, ?> ? Json.object(request.get("observations")) : Map.of();
         int maxDepth = options.get("maxDepth") instanceof Number number ? new java.math.BigDecimal(number.toString()).intValueExact() : ParseOptions.DEFAULT_MAX_DEPTH;
-        var prefix = __PARSER__.parseEntry(grammar, entry, input, new ParseOptions(false, false, lexical, true, scanners, maxDepth));
+        var prefixOptions = new ParseOptions(false, false, lexical, true, scanners, maxDepth);
+        var fullOptions = new ParseOptions(true, true, lexical, true, scanners, maxDepth);
+        if (scanAb) { prefixOptions = prefixOptions.withObservations(false, false); fullOptions = fullOptions.withObservations(false, false); }
+        var prefix = __PARSER__.parseEntry(grammar, entry, input, prefixOptions);
         ParseResult<?> result;
         String mapping = null, mappingKind = null, mappingMessage = null;
         try {
-            result = __PARSER__.parseEntry(grammar, entry, input, new ParseOptions(true, true, lexical, true, scanners, maxDepth));
+            result = __PARSER__.parseEntry(grammar, entry, input, fullOptions);
         } catch (MappingException error) {
             result = error.syntax();
             mapping = error.getCause() == null ? error.getMessage() : error.getCause().toString();

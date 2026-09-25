@@ -92,11 +92,16 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
         summary.partial,
         summary.rejected
     );
-    // D-072: 同じ Rust backend を `options.scan` だけ変えた in-backend A/B。
+    // D-072 / D-080: 同じ backend を `options.scan` だけ変えた in-backend A/B（Rust と Java）。
     assert!(
         summary.scan_comparisons >= 30,
         "走査 A/B が回っていない: {}",
         summary.scan_comparisons
+    );
+    assert!(
+        summary.java_scan_comparisons >= 15,
+        "Java の走査 A/B が回っていない: {}",
+        summary.java_scan_comparisons
     );
     assert!(
         summary.scan_findings.is_empty(),
@@ -104,7 +109,7 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
         summary
             .scan_findings
             .iter()
-            .map(|f| (f.seed, f.input.clone(), f.differences.clone()))
+            .map(|f| (f.backend, f.seed, f.input.clone(), f.differences.clone()))
             .collect::<Vec<_>>()
     );
     let unknown: Vec<_> = summary
@@ -166,7 +171,7 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
         summary
             .scan_findings
             .iter()
-            .map(|f| (f.seed, f.input.clone(), f.differences.clone()))
+            .map(|f| (f.backend, f.seed, f.input.clone(), f.differences.clone()))
             .collect::<Vec<_>>()
     );
     let unknown: Vec<_> = summary
@@ -232,7 +237,7 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
         summary
             .scan_findings
             .iter()
-            .map(|f| (f.seed, f.input.clone(), f.differences.clone()))
+            .map(|f| (f.backend, f.seed, f.input.clone(), f.differences.clone()))
             .collect::<Vec<_>>()
     );
     let unknown: Vec<_> = summary

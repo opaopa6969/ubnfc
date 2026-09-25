@@ -146,11 +146,17 @@ impl Engine {
         Ok(built)
     }
 
-    /// D-072 の in-backend A/B。Rust backend だけを `options.scan` 付きで走らせる。
+    /// D-072 の in-backend A/B。1 つの backend を `options.scan` 付きで走らせる。
     /// driver はこのキーがあるとき fast mode（診断・出現表なし）で解析するので、
-    /// 一括走査が効く条件そのもので on / off を比べられる。
-    pub fn run_scan(&mut self, built: &Built, inputs: &[String], scan: bool) -> Vec<Value> {
-        self.run_with(built, Backend::Rust, inputs, Some(scan))
+    /// 一括走査が効く条件そのもので on / off を比べられる（Java driver は D-080 から受ける）。
+    pub fn run_scan(
+        &mut self,
+        built: &Built,
+        backend: Backend,
+        inputs: &[String],
+        scan: bool,
+    ) -> Vec<Value> {
+        self.run_with(built, backend, inputs, Some(scan))
     }
 
     /// 全入力を 1 プロセスに流す。応答は入力順に返り、欠落は error 応答になる。

@@ -195,6 +195,13 @@ public final class Session {
      */
     public static boolean plainMatch = !"false".equals(System.getProperty("ubnfc.plainmatch"));
     /**
+     * D-072（観測を要求しない終端領域を 1 本の走査へ畳む。Java 版は D-080）の無効化スイッチ。既定は有効で、
+     * 参照経路（式ごとに {@code Session} を通る経路）との差分検証と計測のためだけに false にする
+     * （{@code -Dubnfc.scan=false}）。走査は {@link #scan} が立つ解析でしか走らないので、
+     * 公開される観測は両経路で等しい（唯一の差は資源上限で、走査は減らす方向にしか動かない）。
+     */
+    public static boolean scanning = !"false".equals(System.getProperty("ubnfc.scan"));
+    /**
      * 認識専用経路の「成功したが情報を持たない」ことだけを表す共有実例（D-075）。
      * 列は全て空・{@code text} と {@code values} は null で、{@code start} / {@code end} は
      * 読まれない（読む側は {@link #plain} の条件で存在しないことが生成時に確かめてある）。
@@ -325,6 +332,17 @@ public final class Session {
      * 再解析されるので、公開される診断は参照経路のものと一致する。
      */
     public final boolean factor;
+    /**
+     * D-080: この解析で生成走査関数（{@code scanN}）を使ってよいか。Rust の
+     * {@code options.scan && !DIAG && !lexical && !occurrences} と同じ 4 条件で、残りの
+     * {@code !invert} と「記録位置と読み取り位置が一致する（{@code f.c == f.m}）」は呼出し位置で見る。
+     * 診断を記録しない経路だけなので、失敗・末尾入力は D-023 により参照経路で再解析される。
+     * 再解析されない rollback 解析（{@code parseEntryRollback}）は到達位置 {@code reached} を診断位置として
+     * 返すので、生成 parser が解析前にこれを false にする（走査は {@code reached} を更新しない）。
+     */
+    public boolean scan;
+    /** 入力の UTF-16 列（{@link Input#chars()} と同じ実体）。生成走査関数が直に読む。書き換えない。 */
+    public final char[] chars;
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false, false); }
     public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode) { this(source, options, ruleNames, twoMode, false); }
     public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode, boolean plainRecognition) {
@@ -336,7 +354,9 @@ public final class Session {
         this.bypassWrap = !this.occ && !this.diag && !options.lexical() && (astBypass || !this.tree);
         this.factor = factoring && !this.diag && !options.lexical();
         this.plain = plainMatch && plainRecognition && !this.tree;
+        this.scan = scanning && !this.diag && !this.occ && !options.lexical();
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
+        this.chars = input.chars();
         // diag=false の経路は診断を 1 件も記録しない（書込みは全て diag で囲ってある）ので、
         // 読み出し専用の空実例を共有する。実例 1 個で 1 parse あたり約 9 KB の確保が消える。
         diagnostics = diag ? new Diagnostics(Label.count(), 1024) : DISABLED;
@@ -430,6 +450,39 @@ public final class Session {
     private void progressAt(int at) { if (at > reached) reached = at; if (diag) diagnostics.reach(at); }
     /** 成功の返り値。認識専用経路（{@link #plain}）では区間が読まれないので共有実例を返す。 */
     private Match success(int start, int end) { return plain ? OK : Match.empty(start, end); }
+    /**
+     * D-080: 生成走査関数の結果を参照経路と同じ {@code Match} にする。{@code r} は
+     * {@code (終了位置 << 1) | 値なし}、失敗は負。失敗では frame に触れない（参照経路の領域も
+     * 失敗したら入口の {@code c} / {@code m} へ戻す）。consumed mode で {@code c == m} から入った
+     * 領域は終端の {@code advance} が常に {@code m = c} を保つので、成功後も {@code c == m}。
+     *
+     * <p>AST を作る経路で読まれ得るのは区間と意味値の有無だけである: 領域は mapping・capture・
+     * 非 text の意味形を持たないので、参照経路の値列は「plain text（null）」か「値なし（空列）」の
+     * どちらかしかなく、空の反復・省略された optional を 1 つでも通れば後者になる（{@code combine}）。
+     * 走査関数はその 1 bit を下位 bit で返す。
+     */
+    public Match scanned(Frame f, long r) {
+        if (r < 0) return null;
+        int start = f.c, end = (int) (r >>> 1);
+        f.c = end; f.m = end;
+        if (!tree) return success(start, end);
+        return (r & 1) == 0 ? Match.empty(start, end) : new Match(List.of(), List.of(), List.of(), List.of(), start, end, false, List.of(), List.of(), null, List.of());
+    }
+    /** D-080: {@link Input#codePointAt} と同じ読み（孤立 surrogate はその UTF-16 値）。{@code p} は範囲内。 */
+    public static int cpAt(char[] t, int p) {
+        char c = t[p];
+        if (Character.isHighSurrogate(c) && p + 1 < t.length) {
+            char d = t[p + 1];
+            if (Character.isLowSurrogate(d)) return Character.toCodePoint(c, d);
+        }
+        return c;
+    }
+    /** D-080: {@link Input#startsWith} と同じ判定（空でない literal だけが来る）。 */
+    public static boolean startsWith(char[] t, int p, String word) {
+        if (p > t.length - word.length()) return false;
+        for (int i = 0; i < word.length(); i++) if (t[p + i] != word.charAt(i)) return false;
+        return true;
+    }
     private void fail(int at, String label) { if (!diag) { if (at > reached) reached = at; return; } fail(at, Label.of(label).id, at, at); }
     private void fail(int at, Label label) { fail(at, label.id, at, at); }
     private void fail(Frame frame, Label label) { fail(Math.max(frame.c, frame.m), label.id, frame.c, frame.m); }
