@@ -428,7 +428,7 @@ fn the_formula_info_grammar_validates_strictly_clean() {
     );
 }
 
-/// `examples/formula-info/samples/` の 45 本と `samples/expected.json` が 1 対 1 で
+/// `examples/formula-info/samples/` の 53 本と `samples/expected.json` が 1 対 1 で
 /// 対応すること。受理・canonical AST の突き合わせ自体は backend の生成を伴うので
 /// `scripts/crosscheck.sh` が行う。
 #[test]
@@ -450,5 +450,5 @@ fn the_formula_info_samples_all_have_an_expected_verdict() {
     listed.sort();
     found.sort();
     assert_eq!(listed, found, "expected.json と samples/*.fi が食い違う");
-    assert_eq!(found.len(), 45, "サンプルは 45 本");
+    assert_eq!(found.len(), 53, "サンプルは 53 本");
 }

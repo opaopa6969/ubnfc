@@ -13,8 +13,11 @@ formula:
 **出典と更新の向き**: この文法は tinyexpression 側で先に書かれたもの
 （[opaopa6969/tinyexpression](https://github.com/opaopa6969/tinyexpression) issue #180、
 PR [#191](https://github.com/opaopa6969/tinyexpression/pull/191)、
-commit `3389b056d6de095cc89c645cca34d5ddfe25593b` の `grammar/formula-info.ubnf`）を
-そのまま取り込んだもの。**tinyexpression → ubnfc** の一方向で、ubnfc 側からは変更しない
+直近では issue [#211](https://github.com/opaopa6969/tinyexpression/issues/211) / PR
+[#213](https://github.com/opaopa6969/tinyexpression/pull/213)（END_OF_PART 行の行末空白・
+後続文字・calculatorName 重複）、commit `63945e02bdb9a87bb0832259f5e40a3789f61c03` の
+`grammar/formula-info.ubnf`）をそのまま取り込んだもの。
+**tinyexpression → ubnfc** の一方向で、ubnfc 側からは変更しない
 （差分が要るときは tinyexpression 側で直してから再取込みする）。tinyexpression では
 これを Rust backend で生成して vendoring し、薄い変換層（`formula_info::load`）で
 値の意味検査・実行 backend の解決・評価まで通している。ubnfc 側のこのディレクトリは
@@ -23,8 +26,8 @@ commit `3389b056d6de095cc89c645cca34d5ddfe25593b` の `grammar/formula-info.ubnf
 | ファイル | 中身 |
 |---|---|
 | [`formula-info.ubnf`](formula-info.ubnf) | UBNF v2 の文法（tinyexpression からの取込み、無改変） |
-| [`samples/`](samples/) | サンプル 45 本と [`samples/expected.json`](samples/expected.json)（期待判定） |
-| [`scripts/crosscheck.sh`](scripts/crosscheck.sh) | 検証 → 両 backend 生成 → 45 本を突き合わせ |
+| [`samples/`](samples/) | サンプル 53 本と [`samples/expected.json`](samples/expected.json)（期待判定） |
+| [`scripts/crosscheck.sh`](scripts/crosscheck.sh) | 検証 → 両 backend 生成 → 53 本を突き合わせ |
 | `ir/examples/formula-info.ir.json` | commit した Grammar IR の golden（repository ルート） |
 
 生成物は commit しない（`examples/json` / `examples/stax` と同じ方針）。
@@ -41,7 +44,7 @@ cargo run -q --offline --bin ubnfc -- validate --grammar examples/formula-info/f
 # 2. Grammar IR を見る（commit してある golden と byte 一致する）
 cargo run -q --offline --bin ubnfc -- ir --grammar examples/formula-info/formula-info.ubnf --out - | head -40
 
-# 3. 検証 → Rust / Java 両 backend を生成 → サンプル 45 本を突き合わせる
+# 3. 検証 → Rust / Java 両 backend を生成 → サンプル 53 本を突き合わせる
 bash examples/formula-info/scripts/crosscheck.sh
 ```
 
@@ -51,7 +54,7 @@ bash examples/formula-info/scripts/crosscheck.sh
 回帰は `cargo test --offline -p ubnfc-front --test pipeline_golden` の 3 本が見ている
 （IR golden の byte 一致 / `--strict` 警告ゼロ / サンプルと `expected.json` の対応）。
 
-## サンプル 45 本
+## サンプル 53 本
 
 `samples/expected.json` が期待判定を持つ。判定はこの文法（**構文層**だけ）の期待値で、
 `FormulaInfoBlocksParser` を全文消費で実行した旧 Java 実装
@@ -59,11 +62,11 @@ bash examples/formula-info/scripts/crosscheck.sh
 
 | 本数 | 内容 |
 |---:|---|
-| 34 | **構文受理**。最小形 / 末尾改行なし / 終端マーク無し（EOF で閉じる）/ CRLF / CR のみ / 先頭コメント・空白行 / 値の先頭空白保持 / 終端マーク類似行 / ヘッダ類似行（`a.b`、`a b:c`、`1a:b`、`$x:y`、日本語）/ dotted key / コメントのみのブロック / 空文書 / 空白行のみ / VT・FF / Unicode / 既知キー・dependsOn・backend 別名・型名 / 空の値 / 既存 fixture 3 本（実データ） |
-| — うち 9 | 構文は受理するが、旧 Java **loader**（意味検査: `formula` 必須・`byteCode` の hex 検査・`resultType`/`dependsOn` の解決）はここで拒否する（`expected.json` の `loaderReject: true`）。この文法はそこまで見ないので、構文層では accept のまま |
-| 11 | **構文拒否**。終端マークで始まる / 終端マーク 2 連続 / 先頭のゴミ行 / 字下げされた key・コメント / `key :` / ブロック後のゴミ / 非 ASCII・数字・`$` 始まりの key / `---END_OF_PART--- `（末尾空白） |
+| 38 | **構文受理**。最小形 / 末尾改行なし / 終端マーク無し（EOF で閉じる）/ CRLF / CR のみ / 先頭コメント・空白行 / 値の先頭空白保持 / 終端マーク類似行 / ヘッダ類似行（`a.b`、`a b:c`、`1a:b`、`$x:y`、日本語）/ dotted key / コメントのみのブロック / 空文書 / 空白行のみ / VT・FF / Unicode / 既知キー・dependsOn・backend 別名・型名 / 空の値 / 既存 fixture 3 本（実データ）/ 終端マークの後ろの空白・タブ（issue #211、LF・CRLF） |
+| — うち 11 | 構文は受理するが、旧 Java **loader**（意味検査: `formula` 必須・`byteCode` の hex 検査・`resultType`/`dependsOn` の解決・issue #211 で加わった「1 ブロック内の calculatorName 重複」検査）はここで拒否する（`expected.json` の `loaderReject: true`）。この文法はそこまで見ないので、構文層では accept のまま |
+| 15 | **構文拒否**。終端マークで始まる / 終端マーク 2 連続 / 先頭のゴミ行 / 字下げされた key・コメント / `key :` / ブロック後のゴミ / 非 ASCII・数字・`$` 始まりの key / `---END_OF_PART--- `（末尾空白）/ 終端マークの後ろに空白以外の文字・VT（issue #211、4 本） |
 
-`crosscheck.sh` は 45 本すべてについて、**受理（accepted / allConsumed）・canonical AST**
+`crosscheck.sh` は 53 本すべてについて、**受理（accepted / allConsumed）・canonical AST**
 が Rust backend と Java backend で一致することを検査する。この文法に scope 注釈は無い。
 
 ## この文法が使っている UBNF の機能

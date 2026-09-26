@@ -80,8 +80,8 @@ cargo run -p ubnfc-front --bin ubnfc -- ir \
 ## `formula-info.ir.json` — 行指向の FormulaInfo 文書（issue #83）
 
 `examples/formula-info/formula-info.ubnf`（tinyexpression の FormulaInfo 文書を UBNF v2 で
-書いたもの。出典は tinyexpression issue #180 / PR #191、commit
-`3389b056d6de095cc89c645cca34d5ddfe25593b`。tinyexpression → ubnfc の一方向で取込み、
+書いたもの。出典は tinyexpression issue #180 / PR #191、直近では issue #211 / PR #213、
+commit `63945e02bdb9a87bb0832259f5e40a3789f61c03`。tinyexpression → ubnfc の一方向で取込み、
 ubnfc 側からは変更しない）の canonical JSON 出力。sibling repository に依存しない 3 本目の
 golden で、**`@whitespace: none` の行指向文法**と、規則レベルの否定先読みが無い UBNF で
 補集合を書くパターン（`NEGATION` 3 箇所、`NEGATIVE_LOOKAHEAD` 1 箇所、`LOOKAHEAD` 2 箇所）
@@ -98,4 +98,4 @@ cargo run -p ubnfc-front --bin ubnfc -- ir \
 `the_formula_info_grammar_matches_its_committed_ir_golden`。
 同じファイルの `the_formula_info_grammar_validates_strictly_clean` が `--strict` 警告ゼロを、
 `the_formula_info_samples_all_have_an_expected_verdict` が `examples/formula-info/samples/`
-の 45 本と `expected.json` の対応を固定する。
+の 53 本と `expected.json` の対応を固定する。
