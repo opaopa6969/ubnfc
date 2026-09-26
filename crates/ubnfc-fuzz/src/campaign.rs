@@ -1,7 +1,7 @@
 //! campaign の進行。seed ごとに 文法 → 入力 → 両バックエンド実行 → 比較 を行い、
 //! 差分を見つけたら入力・文法の順に縮小して再現最小例を書き出す。
 
-use crate::engine::{Built, Discard, Engine};
+use crate::engine::{is_driver_timeout, Built, Discard, Engine};
 use crate::model::Grammar;
 use crate::observe::{differences, invariants, Violation};
 use crate::{gen, input, model};
@@ -27,7 +27,13 @@ pub struct Config {
     pub findings: Option<PathBuf>,
     /// 1 件の縮小で許す build 回数の上限（javac / cargo が支配的なので必ず要る）。
     pub shrink_builds: usize,
+    /// 無負荷時の基準タイムアウト。実際に driver へ適用されるのは
+    /// `crate::load::scale` で現在のホスト負荷を掛けた値（issue #73）。
     pub driver_timeout: Duration,
+    /// `driver_timeout`（負荷率を掛けた後）で打ち切られた比較を、該当 backend だけ
+    /// 再実行する回数の上限。0 回目の実行を含まない（=既定 2 なら最大 3 回試す）。
+    /// 打ち切りは「失敗」ではなく「未観測」なので、使い切っても差分検出には使わない。
+    pub timeout_retries: usize,
     pub workdir: PathBuf,
 }
 
@@ -42,6 +48,7 @@ impl Default for Config {
             findings: None,
             shrink_builds: 30,
             driver_timeout: Duration::from_secs(90),
+            timeout_retries: 2,
             workdir: PathBuf::from("."),
         }
     }
@@ -64,10 +71,12 @@ pub struct Finding {
     pub shrink_rounds: usize,
 }
 
-/// D-072 の in-backend A/B で見つけた差。`on` / `off` は同じ Rust backend を
+/// D-072 の in-backend A/B で見つけた差。`on` / `off` は同じ backend を
 /// `options.scan` だけ変えて走らせた観測。
 #[derive(Clone, Debug, Serialize)]
 pub struct ScanFinding {
+    /// `"rust"`（D-072）か `"java"`（D-080）。
+    pub backend: &'static str,
     pub seed: u64,
     pub grammar: String,
     pub input: String,
@@ -92,13 +101,26 @@ pub struct Summary {
     pub accepted_all: usize,
     pub rejected: usize,
     pub partial: usize,
+    /// 本物の driver エラー（timeout 以外: 異常終了・不正 JSON・未知 id など）の比較数。
     pub driver_errors: usize,
     pub builds: usize,
+    /// `exchange` が壁時計タイムアウトで打ち切った生の回数（再試行の分も含む）。
     pub driver_timeouts: usize,
+    /// 再試行を使い切っても driver_timeout のままだった比較数。
+    /// 「失敗」ではなく「未観測」として集計し、`findings` / `driver_errors` に混ぜない（issue #73）。
+    pub unobserved_timeouts: usize,
+    /// 1 回以上再試行した比較の数（元は driver_timeout だったが再試行対象になったもの）。
+    pub retried_comparisons: usize,
+    /// 実際に発行した再試行バッチの回数（1 回で複数比較をまとめて再試行することがある）。
+    pub retry_attempts: usize,
+    /// campaign 中に観測した負荷率の最大値（1.0 = 無負荷、上限 4.0）。report の説明用。
+    pub max_load_factor: f64,
     pub violation_counts: BTreeMap<String, usize>,
     pub findings: Vec<Finding>,
-    /// D-072: 一括走査 on / off を同じ Rust backend で比べた回数と、その差。
+    /// D-072: 一括走査 on / off を同じ backend で比べた回数（Rust と Java の合計）と、その差。
     pub scan_comparisons: usize,
+    /// そのうち Java backend（D-080）で比べた回数。
+    pub java_scan_comparisons: usize,
     pub scan_findings: Vec<ScanFinding>,
     pub elapsed_seconds: f64,
 }
@@ -171,6 +193,79 @@ fn run_pair(engine: &mut Engine, built: &Built, inputs: &[String]) -> Vec<(Value
     let java = engine.run(built, Backend::Java, inputs);
     let rust = engine.run(built, Backend::Rust, inputs);
     java.into_iter().zip(rust).collect()
+}
+
+#[derive(Default)]
+struct RetryStats {
+    /// 1 回以上再試行した比較の数（初回で driver_timeout になったもの）。
+    retried_comparisons: usize,
+    /// 実際に発行した再試行バッチの回数。
+    attempts: usize,
+    /// 再試行を使い切っても driver_timeout のままだった比較の数。
+    still_timeout: usize,
+}
+
+fn timeout_indices(rows: &[Value]) -> Vec<usize> {
+    rows.iter()
+        .enumerate()
+        .filter(|(_, value)| is_driver_timeout(value))
+        .map(|(index, _)| index)
+        .collect()
+}
+
+/// `run_pair` のうち driver_timeout になった比較だけを、該当 backend で
+/// 最大 `max_retries` 回再試行する（issue #73）。一度も timeout が起きなければ
+/// 通常の `run_pair` と同じ 1 回きりの実行のまま返る。
+///
+/// 再試行は「その比較を発行したのと同じ backend・同じ入力」だけを新しいプロセスで
+/// 再実行する。timeout はプロセス丸ごとの停止から来るので、同じバッチに含まれていた
+/// 他の入力を巻き込まずに切り出せる。
+fn run_pair_with_retries(
+    engine: &mut Engine,
+    built: &Built,
+    texts: &[String],
+    max_retries: usize,
+) -> (Vec<(Value, Value)>, RetryStats) {
+    let mut java = engine.run(built, Backend::Java, texts);
+    let mut rust = engine.run(built, Backend::Rust, texts);
+    let mut stats = RetryStats::default();
+    let initial: BTreeSet<usize> = timeout_indices(&java)
+        .into_iter()
+        .chain(timeout_indices(&rust))
+        .collect();
+    if initial.is_empty() || max_retries == 0 {
+        stats.still_timeout = initial.len();
+        return (java.into_iter().zip(rust).collect(), stats);
+    }
+    stats.retried_comparisons = initial.len();
+    for _ in 0..max_retries {
+        let java_idx = timeout_indices(&java);
+        let rust_idx = timeout_indices(&rust);
+        if java_idx.is_empty() && rust_idx.is_empty() {
+            break;
+        }
+        stats.attempts += 1;
+        if !java_idx.is_empty() {
+            let subset: Vec<String> = java_idx.iter().map(|&i| texts[i].clone()).collect();
+            let redone = engine.run(built, Backend::Java, &subset);
+            for (slot, value) in java_idx.into_iter().zip(redone) {
+                java[slot] = value;
+            }
+        }
+        if !rust_idx.is_empty() {
+            let subset: Vec<String> = rust_idx.iter().map(|&i| texts[i].clone()).collect();
+            let redone = engine.run(built, Backend::Rust, &subset);
+            for (slot, value) in rust_idx.into_iter().zip(redone) {
+                rust[slot] = value;
+            }
+        }
+    }
+    stats.still_timeout = timeout_indices(&java)
+        .into_iter()
+        .chain(timeout_indices(&rust))
+        .collect::<BTreeSet<_>>()
+        .len();
+    (java.into_iter().zip(rust).collect(), stats)
 }
 
 /// 1 つの (文法, 入力) の差分が保たれる範囲で、入力 → 文法 → 入力 の順に縮小する。
@@ -348,20 +443,34 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
     let mut rng = crate::rng::Rng::new(seed ^ 0xF00D_BEEF);
     let inputs = input::generate(&grammar, &mut rng, config.inputs);
     let texts: Vec<String> = inputs.iter().map(|i| i.text.clone()).collect();
-    let pairs = run_pair(engine, &built, &texts);
-    // D-072: 同じ Rust backend を `options.scan` だけ変えて 2 度走らせる。走査は
-    // fast mode でだけ効くので、driver はこのキーがあるとき診断・出現表を外す。
-    // 失敗した解析は D-023 の再解析で参照経路の観測へ戻るので、ここで比べているのは
-    // 「fast session が成功したまま返した観測」——走査が変え得る全部である。
-    let scan_on = engine.run_scan(&built, &texts, true);
-    let scan_off = engine.run_scan(&built, &texts, false);
+    let (pairs, retry_stats) =
+        run_pair_with_retries(engine, &built, &texts, config.timeout_retries);
     {
         let mut summary = shared.summary.lock().expect("summary");
+        summary.retried_comparisons += retry_stats.retried_comparisons;
+        summary.retry_attempts += retry_stats.attempts;
+        summary.unobserved_timeouts += retry_stats.still_timeout;
+        if engine.max_load_factor > summary.max_load_factor {
+            summary.max_load_factor = engine.max_load_factor;
+        }
+    }
+    // D-072 / D-080: 同じ backend を `options.scan` だけ変えて 2 度走らせる（Rust と Java の両方）。
+    // 走査は fast mode でだけ効くので、driver はこのキーがあるとき診断・出現表を外す。
+    // 失敗した解析は D-023 の再解析で参照経路の観測へ戻るので、ここで比べているのは
+    // 「fast session が成功したまま返した観測」——走査が変え得る全部である。
+    for (backend, label) in [(Backend::Rust, "rust"), (Backend::Java, "java")] {
+        let scan_on = engine.run_scan(&built, backend, &texts, true);
+        let scan_off = engine.run_scan(&built, backend, &texts, false);
+        let mut summary = shared.summary.lock().expect("summary");
         summary.scan_comparisons += texts.len();
+        if label == "java" {
+            summary.java_scan_comparisons += texts.len();
+        }
         for ((text, on), off) in texts.iter().zip(scan_on).zip(scan_off) {
             let difference = differences(&on, &off);
             if !difference.is_empty() {
                 summary.scan_findings.push(ScanFinding {
+                    backend: label,
                     seed,
                     grammar: grammar.render(),
                     input: text.clone(),
@@ -374,12 +483,22 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
     }
     let mut new_findings = Vec::new();
     for (text, (java, rust)) in texts.iter().zip(pairs) {
-        let observed = observe(text, &java, &rust);
+        // 再試行を使い切ってもなお driver_timeout の比較は「未観測」であって、
+        // 片側だけの応答欠落を差分として登録しない（issue #73）。本物のエラー
+        // （異常終了・不正 JSON 等）はこれまで通り差分・driver_errors の対象にする。
+        let java_timeout = is_driver_timeout(&java);
+        let rust_timeout = is_driver_timeout(&rust);
+        let java_hard_error = java.get("error").is_some() && !java_timeout;
+        let rust_hard_error = rust.get("error").is_some() && !rust_timeout;
+        let unobserved = (java_timeout || rust_timeout) && !java_hard_error && !rust_hard_error;
         {
             let mut summary = shared.summary.lock().expect("summary");
             summary.inputs += 1;
             summary.comparisons += 1;
-            if java.get("error").is_some() || rust.get("error").is_some() {
+            if unobserved {
+                // すでに retry_stats.still_timeout で数えている。ここでは
+                // accepted/partial/rejected の分類にも driver_errors にも入れない。
+            } else if java_hard_error || rust_hard_error {
                 summary.driver_errors += 1;
             } else if java["allConsumed"] == json!(true) {
                 summary.accepted_all += 1;
@@ -388,6 +507,13 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
             } else {
                 summary.rejected += 1;
             }
+        }
+        if unobserved {
+            continue;
+        }
+        let observed = observe(text, &java, &rust);
+        {
+            let mut summary = shared.summary.lock().expect("summary");
             for violation in observed
                 .java_violations
                 .iter()
@@ -530,12 +656,23 @@ pub fn markdown(summary: &Summary) -> String {
         ("全入力受理", summary.accepted_all),
         ("prefix のみ受理（部分消費）", summary.partial),
         ("不受理", summary.rejected),
-        ("driver error / timeout 応答", summary.driver_errors),
-        ("driver の制限時間超過", summary.driver_timeouts),
+        ("driver error（timeout 以外）", summary.driver_errors),
+        ("driver の制限時間超過（延べ回数）", summary.driver_timeouts),
+        ("再試行した比較", summary.retried_comparisons),
+        ("再試行バッチの発行回数", summary.retry_attempts),
+        (
+            "再試行後も未観測（driver_timeout）",
+            summary.unobserved_timeouts,
+        ),
         ("最小化済みの所見", summary.findings.len()),
     ] {
         let _ = writeln!(out, "| {label} | {value} |");
     }
+    let _ = writeln!(
+        out,
+        "| 観測した負荷率の最大（1.0=無負荷、上限4.0） | {:.2} |",
+        summary.max_load_factor
+    );
     let _ = writeln!(out, "| 所要 | {:.1} 秒 |", summary.elapsed_seconds);
     let _ = writeln!(out, "\n## 機能別の被覆と discard 率\n");
     let _ = writeln!(
@@ -635,5 +772,180 @@ mod tests {
             assert!(text.contains(&format!("`{feature}`")), "{feature}");
         }
         assert!(text.contains("差分・不変条件違反はいずれも観測されなかった。"));
+    }
+
+    // --- issue #73: driver_timeout の再試行と未観測分類。
+    //
+    // 実ホスト負荷を必要としない: `Built` は前段の front/build を経ずに直接組み立てられる
+    // （`run_with` は `built.java` / `built.rust` の `Executable` を呼ぶだけ）。driver の
+    // 代わりに shell script を挟み、「止まったままの driver」を確定的に再現する。
+
+    use std::ffi::OsString;
+    use ubnfc_harness::runner::Executable;
+
+    fn shell(script: &str) -> Executable {
+        Executable {
+            program: PathBuf::from("sh"),
+            args: vec![OsString::from("-c"), OsString::from(script)],
+            // 空なら全ケースを program に直接 dispatch する（`Executable::grammars` の既定）。
+            grammars: BTreeMap::new(),
+        }
+    }
+
+    /// 応答を要求どおりの `id` で返し続ける driver。常に成功する。
+    fn always_ok() -> Executable {
+        shell(
+            r#"while IFS= read -r line; do
+  id=$(printf '%s' "$line" | grep -o '"id":[0-9]*' | head -n1 | cut -d: -f2)
+  printf '{"id":%s,"accepted":true,"allConsumed":true,"consumed":0,"matched":0,"ast":null,"captures":[],"declarations":[],"references":[],"diagnostics":[],"mappingError":null}\n' "$id"
+done"#,
+        )
+    }
+
+    /// stdin を一切読まず眠り続ける driver。`Engine::timeout` を超えたら必ず kill される。
+    ///
+    /// `exec` で `sleep` に置き換わる（同じ pid のまま）ことが重要: `sh -c "sleep 999"`
+    /// のように `sleep` を**子プロセスとして fork** すると、`wait_or_kill` が kill するのは
+    /// 直接の子（`sh`）だけなので、孫の `sleep` が親を失っても生き残り、その pipe
+    /// (stdout) を掴んだままにして `drain` スレッドが EOF を待ち続けてテストが
+    /// 無期限に固まる（このテストを書く過程で実際にハングして踏んだ）。
+    fn always_hang() -> Executable {
+        shell("exec sleep 999")
+    }
+
+    /// 1 回目の起動（`marker` がまだ無い）は `always_hang` と同じで、`marker` を作って
+    /// 眠る。2 回目以降（再試行）は `marker` があるので `always_ok` と同じに振る舞う。
+    /// 「最初の壁時計タイムアウトを、再試行が新しいプロセスで解消する」を模す。
+    fn hang_once_then_ok(marker: &std::path::Path) -> Executable {
+        let marker = marker.display();
+        shell(&format!(
+            r#"if [ ! -e '{marker}' ]; then
+  : > '{marker}'
+  exec sleep 999
+else
+  while IFS= read -r line; do
+    id=$(printf '%s' "$line" | grep -o '"id":[0-9]*' | head -n1 | cut -d: -f2)
+    printf '{{"id":%s,"accepted":true,"allConsumed":true,"consumed":0,"matched":0,"ast":null,"captures":[],"declarations":[],"references":[],"diagnostics":[],"mappingError":null}}\n' "$id"
+  done
+fi"#
+        ))
+    }
+
+    struct TestScratch(PathBuf);
+    impl TestScratch {
+        fn new(label: &str) -> Self {
+            use std::sync::atomic::{AtomicU64, Ordering};
+            static COUNTER: AtomicU64 = AtomicU64::new(0);
+            let nanos = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos();
+            let n = COUNTER.fetch_add(1, Ordering::Relaxed);
+            let path = std::env::temp_dir().join(format!(
+                "ubnfc-fuzz-timeout-test-{label}-{}-{n}-{nanos}",
+                std::process::id()
+            ));
+            std::fs::create_dir_all(&path).expect("scratch dir");
+            Self(path)
+        }
+    }
+    impl Drop for TestScratch {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    fn stub_built(java: Executable, rust: Executable) -> Built {
+        Built {
+            grammar_name: "Stub".into(),
+            java,
+            rust,
+        }
+    }
+
+    #[test]
+    fn a_timed_out_comparison_is_retried_and_stops_being_unobserved_once_it_recovers() {
+        let scratch = TestScratch::new("recovers");
+        let mut engine = Engine::new(scratch.0.join("engine"));
+        // 基準タイムアウトを短くして「負荷」を待たずに再現する。負荷率は 1〜4 倍の
+        // どちらでもテストの成否には影響しない（数百 ms 単位の余裕で足りる）。
+        engine.timeout = Duration::from_millis(150);
+        let marker = scratch.0.join("marker");
+        let built = stub_built(hang_once_then_ok(&marker), always_ok());
+        let texts = vec!["a".to_owned(), "b".to_owned()];
+
+        let (pairs, stats) = run_pair_with_retries(&mut engine, &built, &texts, 2);
+
+        assert_eq!(stats.retried_comparisons, 2, "初回は両方 timeout のはず");
+        assert_eq!(stats.attempts, 1, "1 回の再試行で解消するはず");
+        assert_eq!(stats.still_timeout, 0, "再試行後は timeout が残らないはず");
+        for (java, rust) in &pairs {
+            assert!(!is_driver_timeout(java), "再試行後なのに timeout: {java}");
+            assert!(!is_driver_timeout(rust), "{rust}");
+            assert_eq!(java["accepted"], json!(true));
+            assert_eq!(rust["accepted"], json!(true));
+        }
+    }
+
+    #[test]
+    fn a_comparison_that_never_recovers_stays_unobserved_after_retries_are_exhausted() {
+        let scratch = TestScratch::new("stuck");
+        let mut engine = Engine::new(scratch.0.join("engine"));
+        engine.timeout = Duration::from_millis(120);
+        let built = stub_built(always_hang(), always_ok());
+        let texts = vec!["a".to_owned()];
+
+        let (pairs, stats) = run_pair_with_retries(&mut engine, &built, &texts, 1);
+
+        assert_eq!(stats.retried_comparisons, 1);
+        assert_eq!(stats.attempts, 1, "上限 1 回で打ち切るはず");
+        assert_eq!(
+            stats.still_timeout, 1,
+            "解消しない timeout は再試行後も残るはず"
+        );
+        let (java, rust) = &pairs[0];
+        assert!(is_driver_timeout(java), "{java}");
+        assert!(!is_driver_timeout(rust), "もう片方は正常なはず: {rust}");
+    }
+
+    #[test]
+    fn zero_retries_reports_the_timeout_without_attempting_any_retry() {
+        let scratch = TestScratch::new("zero-retries");
+        let mut engine = Engine::new(scratch.0.join("engine"));
+        engine.timeout = Duration::from_millis(120);
+        let built = stub_built(always_hang(), always_ok());
+        let texts = vec!["a".to_owned()];
+
+        let (pairs, stats) = run_pair_with_retries(&mut engine, &built, &texts, 0);
+
+        assert_eq!(
+            stats.retried_comparisons, 0,
+            "max_retries=0 は再試行そのものをしない"
+        );
+        assert_eq!(stats.attempts, 0);
+        assert_eq!(stats.still_timeout, 1);
+        assert!(is_driver_timeout(&pairs[0].0));
+    }
+
+    /// campaign 本体（`run_seed`）が実際に使う分類規則: 再試行を尽くしてもなお
+    /// timeout の比較は `differences` / `invariants` を経由させず、「未観測」として
+    /// 素通りさせる（`driver_errors` にも `findings` にも入れない）。ここでは
+    /// その判定条件そのものを、run_seed の内側に埋め込むのではなく直接検証する。
+    #[test]
+    fn a_lingering_timeout_is_not_treated_as_a_hard_driver_error() {
+        let scratch = TestScratch::new("classify");
+        let mut engine = Engine::new(scratch.0.join("engine"));
+        engine.timeout = Duration::from_millis(120);
+        let built = stub_built(always_hang(), always_ok());
+        let texts = vec!["a".to_owned()];
+        let (pairs, _) = run_pair_with_retries(&mut engine, &built, &texts, 1);
+        let (java, rust) = &pairs[0];
+
+        let java_timeout = is_driver_timeout(java);
+        let rust_timeout = is_driver_timeout(rust);
+        let java_hard_error = java.get("error").is_some() && !java_timeout;
+        let rust_hard_error = rust.get("error").is_some() && !rust_timeout;
+        let unobserved = (java_timeout || rust_timeout) && !java_hard_error && !rust_hard_error;
+        assert!(unobserved, "片側だけの driver_timeout は未観測のはず");
     }
 }

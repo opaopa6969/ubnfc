@@ -38,6 +38,8 @@ public final class JavaEmitter {
     private final DiagnosticPlan diagnosticPlan;
     private final Prediction prediction;
     private final Factoring factoring;
+    /** D-080: {@code plan.scans} の根ごとの走査関数（D-072 の Java 版）。 */
+    private final Scanning scanning;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
     /** Generated constants (arrays of boundaries, fields, hints, ...) hoisted to static finals: expression text -> field name. */
     private final Map<String, String> constants = new LinkedHashMap<>();
@@ -78,6 +80,7 @@ public final class JavaEmitter {
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
         prediction = new Prediction(ir, expressions, rules, tokens, ruleIds, diagnosticPlan, this::labelText);
         factoring = new Factoring(ir, expressions, rules, captures, semanticShapes, diagnosticPlan, this::labelText, id -> scopeSites().contains(id));
+        scanning = new Scanning(ir, expressions, rules, tokens, recipes, exprIds, this::constant);
     }
     public Map<String, String> sources() throws IOException {
         var result = new TreeMap<String, String>(); String prefix = pkg.replace('.', '/') + "/";
@@ -103,7 +106,7 @@ public final class JavaEmitter {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
-    private static String q(String value) {
+    static String q(String value) {
         if (value == null) return "null";
         // Java source strings: avoid raw control characters and source-level Unicode escapes.
         var out = new StringBuilder("\"");
@@ -339,6 +342,9 @@ public final class JavaEmitter {
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
             .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(", ").append(twoMode()).append(", ").append(plainRecognition()).append(");\n")
+            // D-080: rollback の結果は再解析されずに fast session の到達位置（reached）を診断位置として返すので、
+            // 走査（reached を更新しない）を切って参照経路と同じ位置を返す。
+            .append(scanning.roots.isEmpty() ? "" : "        if (rollback) s.scan = false;\n")
             .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
             .append("        stackFlag[0] = stackFlag[0] || s.stackOverflowTripped;\n")
             .append("        if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }\n")
@@ -348,10 +354,11 @@ public final class JavaEmitter {
             .append("        if (!syntax.ok() || !options.buildAst()) return syntax;\n")
             .append("        if (match.mappingFailure()) throw s.mapping(match.start(), match.end(), \"Recovered input cannot be mapped\", null);\n")
             .append("        if (match.nodes().isEmpty()) return syntax;\n")
-            .append("        return syntax.withAst((").append(ast).append(") build(match.nodes().get(0), s), s.spans);\n    }\n");
+            .append("        return syntax.withAst((").append(ast).append(") build(match.nodes().get(0), s), s.spans());\n    }\n");
         emitBuild(out);
         for (Rule rule : rules.values()) emitRule(out, rule);
         for (Expr expr : expressions.values()) emitExpr(out, expr);
+        out.append(scanning.functions());
         for (var constant : constants.entrySet()) {
             int split = constant.getKey().indexOf(' ');
             out.append("    private static final ").append(constant.getKey(), 0, split).append(' ').append(constant.getValue()).append(" = ").append(constant.getKey().substring(split + 1)).append(";\n");
@@ -497,7 +504,9 @@ public final class JavaEmitter {
         out.append("        return s.capture(f, f.matched ? ").append(parser).append("::").append(method).append("M : ").append(parser).append("::").append(method).append("C, ")
             .append(capArgs(expr)).append(");\n    }\n");
         String body = expression(expr);
-        for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ").append(body).append("\n    }\n");
+        // D-080: 走査は consumed mode（C）だけ。matchOnly mode（M）は参照経路のまま。
+        for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ")
+            .append(mode.equals("C") ? scanning.fastPath(expr.id()) : "").append(body).append("\n    }\n");
     }
     /** {@code Session.capture} / {@code Session.Cap} が共有する 12 引数（site 表・span 規則・意味形・失敗 hint）。 */
     private String capArgs(Expr expr) {
@@ -793,8 +802,14 @@ public final class JavaEmitter {
             out.append("    private static Object build(Recipe r, Session s) { if (r.id().equals(\"#recovery\")) return null; throw s.mapping(r.start(), r.end(), \"No AST recipe\", null); }\n");
             return;
         }
+        // D-079: recipe ごとに 1 つの static method を出し、field の取り出しと変換を直に書く。
+        // 以前は s.scalar(r, i, name, v -> ...) に r / s を捕捉する lambda を渡していたので、
+        // 1 field ごとに lambda 実体を確保し、Session 側の呼出しは recipe 数ぶんの型を見る
+        // megamorphic な interface 呼出しになっていた（inline されない）。
         out.append("    private static Object build(Recipe r, Session s) {\n        if (s.hasBuilt(r)) return s.built(r);\n        if (r.id().equals(\"#recovery\")) return s.remember(r, null);\n        try {\n        Object node = switch (r.id()) {\n");
         var fallbacks = new LinkedHashSet<String>();
+        var methods = new StringBuilder();
+        int methodIndex = 0;
         for (Recipe recipe : recipes.values()) {
             if (recipe.resultTypeId() == null || Set.of("transparent", "text", "skip").contains(recipe.kind())) continue;
             AstType type = types.get(recipe.resultTypeId());
@@ -804,41 +819,57 @@ public final class JavaEmitter {
                 out.append("switch (s.source.substring(r.start(), r.end()).strip()) {\n");
                 for (var variant : type.variants()) out.append("                case ").append(q(variant.literal())).append(" -> ").append(typeName(type.id())).append('.').append(enumNames(type).get(variant.literal())).append(";\n");
                 out.append("                default -> throw s.mapping(r.start(), r.end(), \"Unknown enum literal\", null);\n            };\n");
-            } else {
-                out.append("{\n");
-                var locals = new LinkedHashMap<String, String>();
-                for (AstField field : type.fields()) {
-                    String local = "field" + locals.size(); locals.put(field.name(), local);
-                    var mapping = recipe.fields().stream().filter(f -> f.field().equals(field.name())).findFirst().orElseThrow();
-                    // Session.rule は recipe.fields() の順で値列を詰めるので、添字は生成時に確定する。
-                    int index = recipe.fields().indexOf(mapping);
-                    out.append("                ").append(fieldType(field)).append(' ').append(local).append(" = s.")
-                        .append(mapping.cardinality()).append("(r,").append(index).append(',').append(q(field.name())).append(",v -> ")
-                        .append(convert(field.valueType(), mapping.conversion())).append(");\n");
-                }
-                for (var constraint : ir.semantics().typeofConstraints()) {
-                    Capture own = captures.get(constraint.ownCapture()), referenced = captures.get(constraint.referencedCapture());
-                    if (own.ruleId().equals(recipe.ruleId())) out.append("                s.typeof(r, ")
-                        .append(q(own.name())).append(',').append(locals.get(own.name())).append(',')
-                        .append(q(referenced.name())).append(',').append(locals.get(referenced.name())).append(");\n");
-                }
-                out.append("                yield new ").append(typeName(type.id())).append('(')
-                    .append(String.join(", ", locals.values())).append(");\n            }\n");
+                continue;
             }
+            String method = "b" + methodIndex++;
+            out.append(method).append("(r, s);\n");
+            methods.append("    private static Object ").append(method).append("(Recipe r, Session s) {\n");
+            var locals = new LinkedHashMap<String, String>();
+            for (AstField field : type.fields()) {
+                int n = locals.size();
+                String local = "field" + n; locals.put(field.name(), local);
+                var mapping = recipe.fields().stream().filter(f -> f.field().equals(field.name())).findFirst().orElseThrow();
+                // Session.rule は recipe.fields() の順で値列を詰めるので、添字は生成時に確定する。
+                int index = recipe.fields().indexOf(mapping);
+                String javaType = fieldType(field);
+                switch (mapping.cardinality()) {
+                    case "scalar" -> methods.append("        Recipe.Value v").append(n).append(" = s.scalarValue(r,").append(index).append(',').append(q(field.name())).append(");\n")
+                        .append("        ").append(javaType).append(' ').append(local).append(" = s.present(")
+                        .append(convert(field.valueType(), mapping.conversion(), "v" + n)).append(", v").append(n).append(");\n");
+                    case "optional" -> methods.append("        Recipe.Value v").append(n).append(" = s.firstValue(r,").append(index).append(");\n")
+                        .append("        ").append(javaType).append(' ').append(local).append(" = v").append(n).append(" == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(")
+                        .append(convert(field.valueType(), mapping.conversion(), "v" + n)).append(");\n");
+                    case "list" -> methods.append("        List<Recipe.Value> l").append(n).append(" = r.fieldValues(").append(index).append(");\n")
+                        .append("        Object[] a").append(n).append(" = l").append(n).append(".isEmpty() ? null : new Object[l").append(n).append(".size()]; int k").append(n).append(" = 0;\n")
+                        .append("        for (int i = 0, n = l").append(n).append(".size(); i < n; i++) { Recipe.Value v = l").append(n).append(".get(i); Object x = ")
+                        .append(convert(field.valueType(), mapping.conversion(), "v")).append("; if (x != null) a").append(n).append("[k").append(n).append("++] = x; }\n")
+                        .append("        ").append(javaType).append(' ').append(local).append(" = s.listOf(a").append(n).append(", k").append(n).append(");\n");
+                    default -> throw new IllegalArgumentException(mapping.cardinality());
+                }
+            }
+            for (var constraint : ir.semantics().typeofConstraints()) {
+                Capture own = captures.get(constraint.ownCapture()), referenced = captures.get(constraint.referencedCapture());
+                if (own.ruleId().equals(recipe.ruleId())) methods.append("        s.typeof(r, ")
+                    .append(q(own.name())).append(',').append(locals.get(own.name())).append(',')
+                    .append(q(referenced.name())).append(',').append(locals.get(referenced.name())).append(");\n");
+            }
+            methods.append("        return new ").append(typeName(type.id())).append('(')
+                .append(String.join(", ", locals.values())).append(");\n    }\n");
         }
         for (String fallback : fallbacks) out.append("            case ").append(q("#leaf:" + fallback)).append(" -> new ").append(typeName(fallback)).append("(null, List.of(s.source.substring(r.start(), r.end()).strip()), List.of());\n");
         out.append("            default -> throw s.mapping(r.start(), r.end(), \"Cannot build recipe: \" + r.id(), null);\n        };\n        return s.remember(r, node);\n        } catch (Session.RecoveredNodeMissing missing) { return s.remember(r, null); }\n    }\n");
+        out.append(methods);
     }
-    private String convert(ValueType type, String conversion) {
+    private String convert(ValueType type, String conversion, String v) {
         String java = javaType(type, true);
         return switch (conversion) {
-            case "text" -> "s.text(v)"; case "number" -> "s.number(v)";
-            case "node" -> (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + "build(s.node(v, r), s)";
+            case "text" -> "s.text(" + v + ")"; case "number" -> "s.number(" + v + ")";
+            case "node" -> (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + "build(s.node(" + v + ", r), s)";
             case "mixed" -> {
                 boolean text = type.members().stream().anyMatch(t -> t.kind().equals("text"));
                 boolean number = type.members().stream().anyMatch(t -> t.kind().equals("number"));
-                String leaf = text ? "s.text(v)" : number ? "s.number(v)" : "null";
-                yield (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + "(v.nodes().isEmpty() ? " + leaf + " : build(s.node(v, r), s))";
+                String leaf = text ? "s.text(" + v + ")" : number ? "s.number(" + v + ")" : "null";
+                yield (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + "(" + v + ".nodes().isEmpty() ? " + leaf + " : build(s.node(" + v + ", r), s))";
             }
             default -> throw new IllegalArgumentException(conversion);
         };

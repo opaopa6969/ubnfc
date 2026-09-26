@@ -41,13 +41,15 @@ runner は生成器を呼ばず、指定済み artifact のコンパイル・実
 - `options.scope`: scope の宣言・参照の採取を有効にする。false なら
   `declarations`/`references` を省略する。いずれも解析する文法を変更しない。
   CLI は両方 true。手書き目標の二文法には scope annotation がないため空列を返す。
-- `options.scan`（任意、Rust 生成 driver のみ）: D-072 の一括走査（`plan.scans`）を
+- `options.scan`（任意、Rust 生成 driver と Java 生成 driver。Java は D-080 から）: D-072 の一括走査（`plan.scans`）を
   切り替える **A/B 用の穴**。このキーがあるときは、走査が効く条件そのもので測るために
   **fast mode** で解析する（`diagnostics: false`、`lexical` は false 扱い）。したがって
   `hints` は「fast mode が失敗して診断モードへ上がったとき」だけ出る。キーが無ければ
   従来どおり診断ありで解析し、走査経路には入らない。**同じキーを true / false で 2 度
   送った応答は完全に一致しなければならない**（差分ファジングの in-backend A/B）。
-  他の backend はこのキーを無視してよい。
+  Java driver は同じ意味で受ける（`Session.scanning` をこの要求だけ切り替え、
+  `ParseOptions.withObservations(false, false)` と `lexical: false` で解析する。キーが無い要求は
+  起動時の `-Dubnfc.scan` の値へ戻す）。他の backend はこのキーを無視してよい。
 
 artifact は一つの文法 variant を実装する。runner の既定は各ケースの先頭 grammar_ref。
 `--variant NAME` は artifact が実装する variant を指定する比較用オプションであり、
@@ -393,3 +395,52 @@ farthestExpected` の比較は維持する（D-014）。Extern の失敗候補�
   生成器が互換の文字列を組み立てる。
 - `value` は driver が評価した結果があるときだけキーを置く。全入力解析が成功して AST が無い
   ときは**キーごと出さない**（未観測）。観測済みの `null` は評価結果としての null。
+
+## 負荷に応じた driver タイムアウトと未観測の扱い（issue #73）
+
+`cargo test --workspace` を共有機の高負荷（load average 30〜60、並行 agent 8 本）で回すと、
+`ubnfc-fuzz` の driver 交換が散発的に壁時計タイムアウトへ落ちる（`docs/reports/2026-09-23-differential-fuzzing.md`
+の観測、`docs/reports/2026-09-24-load-aware-timeouts.md` の再現試行）。これは driver 自体の
+バグではなく、`javac` / `cargo build --release` と JVM 起動がホストの他プロセスと CPU を奪い
+合って**基準タイムアウト（既定 90 秒）の中で終わらなくなる**ことが原因である。
+
+### タイムアウトの倍率（`crates/ubnfc-fuzz/src/load.rs`）
+
+- `/proc/loadavg` の 1 分平均を `std::thread::available_parallelism()`（オンライン CPU 数の
+  見積もり）で割り、「1 CPU あたりの負荷」を倍率にする。
+- 倍率は `[1.0, 4.0]` にクランプする。**無負荷（1 CPU あたり 1 未満）では倍率 1 で、
+  基準タイムアウトそのまま**（既定動作は変えない）。上限 4 倍を超えて伸ばさないのは、
+  恒常的な高負荷ホストでも「driver が本当に停止した」の検知が無限に遅れないようにするため。
+- `/proc/loadavg` が読めない環境（Linux 以外）では倍率 1 のまま動く。
+- 倍率は `Engine::run` が driver を起動するたびに**その時点の負荷**から計算し直す
+  （campaign 開始時の 1 回きりではない）。`Engine.timeout` は基準タイムアウト、実際に
+  `exchange` へ渡すのは `base.mul_f64(factor)`。
+
+### `driver_timeout` は「失敗」ではなく「未観測」
+
+- タイムアウトで打ち切られた応答には `{"error": "...", "kind": "driver_timeout"}` の印が付く
+  （`ubnfc_fuzz::engine::is_driver_timeout`）。本物の driver エラー（異常終了・不正 JSON・
+  未知/重複 id など）とはこの印の有無で区別する。
+- `ubnfc_fuzz::campaign` は `driver_timeout` になった比較だけを、**該当 backend だけ**新しい
+  プロセスで最大 `Config::timeout_retries`（既定 2）回再試行する（`run_pair_with_retries`）。
+  同じバッチの他の入力は巻き込まない。
+- 再試行を使い切ってもなお `driver_timeout` の比較は `Summary.unobserved_timeouts` に数え、
+  `driver_errors` にも `findings`（差分）にも入れない。片側だけ応答が欠けたことを「両バック
+  エンドの観測差」として登録しない、という corpus 側の未観測の扱い（本書冒頭）と同じ考え方を
+  driver 交換そのものにも広げたもの。build discard（`build:java` / `build:rust` など）も
+  同じ意味で「未観測」であり、`Summary.discards` に理由コード別で残る。
+- `Summary` は `retried_comparisons` / `retry_attempts` / `unobserved_timeouts` /
+  `max_load_factor`（campaign 中に観測した負荷率の最大）を JSON レポートに残す。
+
+固定 seed campaign（`crates/ubnfc-fuzz/tests/campaign.rs`）の `summary.driver_errors == 0` は
+「本物の driver エラーが無い」ことの主張のまま変えていない。無負荷なら `unobserved_timeouts`
+も 0 のはずなので、この変更は無負荷時の green を壊さない。
+
+### CI での方針（`.github/workflows/ci.yml` の `native` job）
+
+- `--test-threads` は固定しない（cargo の既定 = CPU 数）。runner は他の作業と共有する
+  self-hosted 1 台で、空き CPU が時間ごとに変わるため、スレッド数を絞る代わりに上記の
+  負荷倍率（基準 90 秒 × 1〜4 倍）と再試行・未観測扱いで吸収する。
+- job 全体の timeout は GitHub Actions の既定のまま（native は通常 15 分前後）。
+- それでも `driver_timeout` だけで赤くなった場合は、失敗した job を 1 回だけ再実行する
+  （`gh run rerun <id> --failed`）。2 回続けて落ちるなら負荷ではなく本物の不具合として調べる。
