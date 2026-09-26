@@ -234,11 +234,13 @@ public final class JavaEmitter {
             .append("    public void setDebugStrategy(DebugStrategy strategy) { debugStrategy = java.util.Objects.requireNonNull(strategy); }\n")
             .append("    public T eval(").append(ast).append(" node) {\n")
             .append("        debugStrategy.onEnter(node); T result = evalInternal(node); debugStrategy.onExit(node, result); return result;\n    }\n")
-            .append("    private T evalInternal(").append(ast).append(" node) {\n        return switch (node) {\n");
-        if (types.isEmpty()) out.append("            case ").append(ast).append(".Text n -> evalText(n);\n");
+            .append("    private T evalInternal(").append(ast).append(" node) {\n");
+        // D-081: generated Java compiles with --release 17, so the dispatch is an ordered instanceof
+        // chain instead of an exhaustive sealed pattern switch (Java 21).
+        if (types.isEmpty()) out.append("        if (node instanceof ").append(ast).append(".Text n) return evalText(n);\n");
         for (AstType type : types.values()) if (!type.kind().equals("transparentUnion"))
-            out.append("            case ").append(typeName(type.id())).append(" n -> ").append(evalMethod(type)).append("(n);\n");
-        out.append("        };\n    }\n");
+            out.append("        if (node instanceof ").append(typeName(type.id())).append(" n) return ").append(evalMethod(type)).append("(n);\n");
+        out.append("        throw new IllegalStateException(\"unhandled node: \" + node);\n    }\n");
         if (types.isEmpty()) out.append("    protected abstract T evalText(").append(ast).append(".Text node);\n");
         boolean binary = false, variable = false;
         for (AstType type : types.values()) {
@@ -252,7 +254,7 @@ public final class JavaEmitter {
             else switch (kind) {
                 case "binary_arithmetic" -> {
                     binary = true;
-                    body = "if (node.left() == null && node.right().isEmpty() && node.op().size() == 1) return evalLeaf(node.op().getFirst());\n"
+                    body = "if (node.left() == null && node.right().isEmpty() && node.op().size() == 1) return evalLeaf(node.op().get(0));\n"
                         + "        if (node.left() != null && node.op().isEmpty() && node.right().isEmpty()) return eval(node.left());\n"
                         + "        T current = eval(node.left());\n"
                         + "        for (int i = 0; i < Math.min(node.op().size(), node.right().size()); i++) current = applyBinary(node.op().get(i), current, eval(node.right().get(i)));\n"
@@ -330,11 +332,13 @@ public final class JavaEmitter {
             }
             var roots = symbols.stream().filter(s -> rules.get(s.id()).annotations().stream().anyMatch(a -> a.name().equals("root"))).toList();
             String rootId = roots.size() == 1 ? roots.getFirst().id() : roots.isEmpty() && unit.id().equals(ir.entry().grammarId()) ? ir.entry().ruleId() : null;
-            out.append("            case ").append(q(unit.name())).append(" -> switch (entry) {\n");
-            if (rootId != null) out.append("                case null -> ").append(entryCall(rootId)).append(";\n");
-            else out.append("                case null -> throw new IllegalArgumentException(\"Grammar has no unique root\");\n");
-            for (var symbol : symbols) out.append("                case ").append(q(symbol.name())).append(" -> ").append(entryCall(symbol.id())).append(";\n");
-            out.append("                default -> throw new IllegalArgumentException(\"Unsupported entry: \" + entry);\n            };\n");
+            // D-081: `case null` in a switch is Java 21; test the null entry before the switch.
+            out.append("            case ").append(q(unit.name())).append(" -> {\n");
+            if (rootId != null) out.append("                if (entry == null) yield ").append(entryCall(rootId)).append(";\n");
+            else out.append("                if (entry == null) throw new IllegalArgumentException(\"Grammar has no unique root\");\n");
+            out.append("                yield switch (entry) {\n");
+            for (var symbol : symbols) out.append("                    case ").append(q(symbol.name())).append(" -> ").append(entryCall(symbol.id())).append(";\n");
+            out.append("                    default -> throw new IllegalArgumentException(\"Unsupported entry: \" + entry);\n                };\n            }\n");
         }
         out.append("            default -> throw new IllegalArgumentException(\"Unsupported grammar: \" + grammar);\n        };\n")
             .append("        var s = new Session(source, options, ").append(kStrings(rules.keySet().stream().map(id -> ir.semantics().symbols().stream().filter(t -> t.id().equals(id)).map(Symbol::name).findFirst().orElse(id)).toList())).append(", ").append(twoMode()).append(", ").append(plainRecognition()).append(");\n")
@@ -350,7 +354,7 @@ public final class JavaEmitter {
             .append("        if (!syntax.ok() || !options.buildAst()) return syntax;\n")
             .append("        if (match.mappingFailure()) throw s.mapping(match.start(), match.end(), \"Recovered input cannot be mapped\", null);\n")
             .append("        if (match.nodes().isEmpty()) return syntax;\n")
-            .append("        return syntax.withAst((").append(ast).append(") build(match.nodes().getFirst(), s), s.spans());\n    }\n");
+            .append("        return syntax.withAst((").append(ast).append(") build(match.nodes().get(0), s), s.spans());\n    }\n");
         emitBuild(out);
         for (Rule rule : rules.values()) emitRule(out, rule);
         for (Expr expr : expressions.values()) emitExpr(out, expr);

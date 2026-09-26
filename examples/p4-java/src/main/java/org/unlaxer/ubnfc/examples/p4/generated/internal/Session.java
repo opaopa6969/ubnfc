@@ -162,7 +162,7 @@ public final class Session {
                 if (items[i].isCharacters) members.add(L_SPACE);
                 else if (items[i].isLineComment) members.add(items[i].openLabel);
                 else { members.add(items[i].openLabel); members.add(items[i].closeLabel); }
-                prefixGroups[i] = members.size() == 1 ? members.getFirst() : Label.group(members.toArray(new Label[0]));
+                prefixGroups[i] = members.size() == 1 ? members.get(0) : Label.group(members.toArray(new Label[0]));
             }
         }
         /** 全ての区切りが失敗した周回が登録する 1 件（候補除外の再生が使う）。 */
@@ -587,7 +587,7 @@ public final class Session {
                         } else if (nodeLike && list && !v.nodes().isEmpty()) {
                             List<Recipe> children = v.nodes();
                             // D-079: 要素ごとの Value(start, end, List.of(node)) は recipe が 1 度だけ持つ。
-                            if (captures == null && children.size() == 1 && single == null) { single = children.getFirst().value(); continue; }
+                            if (captures == null && children.size() == 1 && single == null) { single = children.get(0).value(); continue; }
                             if (captures == null) { captures = new ArrayList<>(children.size() + 1); if (single != null) { captures.add(single); single = null; } }
                             for (int ni = 0, nn = children.size(); ni < nn; ni++) captures.add(children.get(ni).value());
                         } else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) {
@@ -613,7 +613,7 @@ public final class Session {
             else {
                 List<Value> values = result.values();
                 if (skipped || nodes != result.nodes()) {
-                    values = made != null ? made.values() : nodes.isEmpty() ? List.of() : List.of(new Value(nodes.getFirst().start(), nodes.getFirst().end(), nodes));
+                    values = made != null ? made.values() : nodes.isEmpty() ? List.of() : List.of(new Value(nodes.get(0).start(), nodes.get(0).end(), nodes));
                 }
                 // D-079: 包み直しても内容が変わらない結果（局所出現・項目が空で区間も同じ）はそのまま返す。
                 if (nodes != result.nodes() || values != result.values() || !result.local().isEmpty() || !result.items().isEmpty()
@@ -723,7 +723,7 @@ public final class Session {
             var items = new ArrayList<Match>();
             for (Match item : result.items()) {
                 Match selected = item;
-                if (selected.items().size() == 1) selected = selected.items().getFirst();
+                if (selected.items().size() == 1) selected = selected.items().get(0);
                 String text = selected.text() == null ? source.substring(selected.start(), selected.end()).strip() : selected.text();
                 var value = new Match(item.nodes(), item.local(), item.captures(), item.traces(), item.start(), item.end(),
                     item.mappingFailure(), item.recoveries(), item.items(), text, item.values());
@@ -823,7 +823,7 @@ public final class Session {
                 : new Match(List.of(), join(items, LOCAL, localN), List.of(), List.of(), start, end);
         }
         if (items.size() == 1) {
-            Match only = items.getFirst();
+            Match only = items.get(0);
             return new Match(only.nodes(), only.local(), only.captures(), only.traces(), start, end, only.mappingFailure(), only.recoveries(), items, only.text(), only.values());
         }
         // 1 回目の走査で各列の合計要素数だけを数え、2 回目で合計長の list を 1 個だけ確保する。
@@ -1533,7 +1533,7 @@ public final class Session {
     }
     public Recipe node(Value value, Recipe owner) {
         if (value.nodes().size() > 1) throw mapping(value.start(), value.end(), "Scalar capture has multiple mapped nodes", null);
-        if (!value.nodes().isEmpty()) return value.nodes().getFirst();
+        if (!value.nodes().isEmpty()) return value.nodes().get(0);
         if (owner.fallback() != null) return Recipe.leaf(leafId(owner.fallback()), value.start(), value.end());
         throw mapping(value.start(), value.end(), "Missing mapped node", null);
     }
@@ -1549,7 +1549,7 @@ public final class Session {
     public Value scalarValue(Recipe recipe, int index, String field) {
         List<Value> values = recipe.fieldValues(index);
         if (values.isEmpty()) throw mapping(recipe.start(), recipe.end(), "Missing scalar capture: " + field, null);
-        return values.getFirst();
+        return values.get(0);
     }
     /** scalar の変換結果の検査。回復で落ちた node を指す値は親ごと省く（{@link RecoveredNodeMissing}）。 */
     public <T> T present(T converted, Value value) {
@@ -1559,7 +1559,7 @@ public final class Session {
     /** optional field の先頭値（無ければ null）。 */
     public Value firstValue(Recipe recipe, int index) {
         List<Value> values = recipe.fieldValues(index);
-        return values.isEmpty() ? null : values.getFirst();
+        return values.isEmpty() ? null : values.get(0);
     }
     /** list field の変換結果（先頭 {@code kept} 件、null は生成側で落としてある）を不変 list にする。 */
     @SuppressWarnings("unchecked")
