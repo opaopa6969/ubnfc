@@ -39,7 +39,7 @@ final class CompilerHarness implements AutoCloseable {
         try (var manager = compiler.getStandardFileManager(messages, null, StandardCharsets.UTF_8); var walk = Files.walk(directory.resolve("src"))) {
             var files = walk.filter(p -> p.toString().endsWith(".java")).sorted().map(Path::toFile).toList();
             boolean ok = compiler.getTask(null, manager, messages,
-                List.of("--release", "21", "-Xlint:all", "-Werror", "-d", classes.toString()), null, manager.getJavaFileObjectsFromFiles(files)).call();
+                List.of("--release", "17", "-Xlint:all", "-Werror", "-d", classes.toString()), null, manager.getJavaFileObjectsFromFiles(files)).call();
             assertTrue(ok, messages.getDiagnostics().toString()); assertTrue(messages.getDiagnostics().isEmpty(), messages.getDiagnostics().toString());
         }
         loader = new URLClassLoader(new java.net.URL[]{classes.toUri().toURL()}, ClassLoader.getPlatformClassLoader());

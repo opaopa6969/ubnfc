@@ -1,7 +1,7 @@
 # ubnfc-java
 
-Grammar IR v1 から、JDK 21 だけでコンパイル・実行できる Java ソースを生成する。
-入力は `ubnfc-analysis.v1-draft1` / `ubnfc-json.v1`。生成器の実行時依存も JDK のみ。
+Grammar IR v1 から、JDK 17 以上だけでコンパイル・実行できる Java ソースを生成する（`--release 17`、D-081）。
+入力は `ubnfc-analysis.v1-draft1` / `ubnfc-json.v1`。生成器そのもの（このモジュール）は JDK 21 で動かし、実行時依存も JDK のみ。
 
 ```sh
 cd ubnfc-java
@@ -30,7 +30,7 @@ namespace `org.unlaxer` の下に置く）。生成パーサを自分のプロ�
 - `runtime-template/src/main/java/ubnfc/rt/*.java`: ビルド時に resource として同梱し、生成時に package だけ変更してコピーする。
   Diagnostics の投機 checkpoint と匿名式 accumulator は独立モジュールでも検証する。
 - `src/test/`: `JavaCompiler` と親 loader が platform の `URLClassLoader` による独立生成物テスト。
-  生成された全ソースを `--release 21 -Xlint:all -Werror` でコンパイルする。
+  生成された全ソースを `--release 17 -Xlint:all -Werror` でコンパイルする（生成物の最低 Java は 17。D-081）。
   一時領域は `mktemp -d` で確保し、テスト後に削除する。
 
 生成先には `{Grammar}Parser.java`, `{Grammar}AST.java`, `{Grammar}Evaluator.java`, `{Grammar}Result.java`,
@@ -224,7 +224,7 @@ oracle 規則どおり ast は null。失敗枝/先読みでは回復表を破�
 | enum | `on/off` は ON/OFF、未知値は fromText で例外。衝突 `on/ON` は ON/ON_2 として生成・mapping 成功。D-017 により旧コンパイル失敗を再現しない |
 
 `M3FeatureTest` / `M3RecoveryTest` は front 由来の16 IR、既存 eval-default/elements fixture、
-手製の境界 IR を生成→`--release 21 -Xlint:all -Werror` コンパイル→実行する。
+手製の境界 IR を生成→`--release 17 -Xlint:all -Werror` コンパイル→実行する。
 既存 oracle・divergences は読み取り専用。追加実行値は oracle の採取値と区別している。
 回復の nested scalar/optional/list、memo ON/OFF、Longest/先読み/失敗枝の復元、scope undo、
 破棄された数値 mapping、同じ ERROR の再訪も固定する。

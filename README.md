@@ -5,7 +5,7 @@ UBNF 文法から、**実行時ライブラリに依存しない** Java パー�
 一切使わず、文法の意味論を Grammar IR へ落としてから各言語のコードを書き下す。
 
 ```
-.ubnf ──▶ ubnfc-front (Rust) ──▶ Grammar IR v1 (JSON) ──┬─▶ ubnfc-java (Java) ──▶ *.java（JDK 21、依存なし）
+.ubnf ──▶ ubnfc-front (Rust) ──▶ Grammar IR v1 (JSON) ──┬─▶ ubnfc-java (Java) ──▶ *.java（JDK 17+、依存なし）
           字句/構文/解決/検証/                            └─▶ ubnfc-rust (Rust) ──▶ *.rs（std のみ、serde は optional）
           脱糖/意味論/解析/最適化計画
 ```
@@ -25,7 +25,7 @@ UBNF 文法から、**実行時ライブラリに依存しない** Java パー�
 - 文法の意味（どこに trivia が入るか、capture の個数、memo が安全か、診断の位置）を
   **front が解析して IR に載せ**、backend はその値をそのまま使う。backend は文字表・
   分岐の形・DFA を選んでよいが、意味を再解釈しない（D-009）。
-- 生成物は JDK 21 / Rust std だけに依存する（生成 Rust は `#![forbid(unsafe_code)]`、
+- 生成物は JDK 17 以上 / Rust std だけに依存する（生成 Java は `--release 17` で通る。D-081。生成 Rust は `#![forbid(unsafe_code)]`、
   生成 Rust crate の依存は `json` feature のときの serde / serde_json だけ。
   `examples/handwritten-target/java` は同じ目標形を `jdeps -recursive` で `java.base` のみと確認している）。
 - 生成 Rust は wasm32 でビルド可、stack escalation は無効化されて深さ診断に落ちる

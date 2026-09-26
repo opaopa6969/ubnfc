@@ -116,7 +116,7 @@ class GeneratedScopeEffectsTest {
         assertEquals(0, store.checkpoint());
         emit(store, "\u00a0name\u00a0", new Span(0, 6), true, true);
         assertTrue(store.isDeclared("\u00a0name\u00a0"));
-        assertEquals(6, store.references().getFirst().len());
+        assertEquals(6, store.references().get(0).len());
     }
 
     @Test
@@ -135,7 +135,7 @@ class GeneratedScopeEffectsTest {
         emit(store, "x", new Span(0, 1), false, true);
         assertTrue(store.allDeclarations().isEmpty());
         assertEquals(1, store.references().size());
-        assertEquals(Severity.WARNING, store.diagnostics().getFirst().severity());
+        assertEquals(Severity.WARNING, store.diagnostics().get(0).severity());
     }
 
     @ParameterizedTest
@@ -188,7 +188,7 @@ class GeneratedScopeEffectsTest {
         ScopeStore store = new ScopeStore();
         // 同一 rule 内のテキスト比較に失敗した生成側が ERROR を明示的に記録する。
         store.addDiagnostic("backref mismatch", 4, 3, Severity.ERROR);
-        assertEquals(Severity.ERROR, store.diagnostics().getFirst().severity());
+        assertEquals(Severity.ERROR, store.diagnostics().get(0).severity());
         assertTrue(store.allDeclarations().isEmpty());
         assertTrue(store.references().isEmpty());
     }
