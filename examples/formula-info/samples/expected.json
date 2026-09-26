@@ -1,9 +1,10 @@
 {
   "about": [
-    "45 本のサンプルの期待判定（issue #83、出典は tinyexpression issue #180 / PR #191）。",
+    "53 本のサンプルの期待判定（issue #83、出典は tinyexpression issue #180 / PR #191、",
+    "issue #211 / PR #213 の END_OF_PART 行の揺れ対応で追補）。",
     "parse はこの文法（構文層）だけの期待値: FormulaInfoBlocksParser を全文消費で実行した",
     "旧 Java 実装（FormulaInfoSourceDocument.parse）の判定と一致する。",
-    "loaderReject: true の 9 本は構文としては accept だが、旧 Java loader（値の意味検査:",
+    "loaderReject: true の 11 本は構文としては accept だが、旧 Java loader（値の意味検査:",
     "formula 必須・byteCode の hex 検査・resultType/dependsOn の解決）はここで拒否する。",
     "この文法はそこまで見ないので、構文層では accept のまま note に理由だけ残す。"
   ],
@@ -15,7 +16,7 @@
     { "file": "accept-05-lone-cr.fi",                          "parse": "accept", "note": "CR のみ" },
     { "file": "accept-06-leading-comments-and-blanks.fi",      "parse": "accept", "note": "先頭コメント・空白行" },
     { "file": "accept-07-value-leading-space-kept.fi",         "parse": "accept", "note": "値の先頭空白保持" },
-    { "file": "accept-08-end-mark-lookalikes.fi",              "parse": "accept", "note": "終端マークの類似行（---END_OF_PART---x 等、値の継続行として扱う）" },
+    { "file": "accept-08-end-mark-lookalikes.fi",              "parse": "accept", "note": "終端マークの類似行（先頭が ---END_OF_PART--- で始まらないもの、値の継続行として扱う。issue #211 で ---END_OF_PART---x 等は reject-syntax-14 へ切り出し）" },
     { "file": "accept-09-header-lookalikes.fi",                "parse": "accept", "note": "ヘッダ類似行（a.b、a b:c、1a:b、$x:y、日本語:... は key: にならない）" },
     { "file": "accept-10-dotted-and-underscore-keys.fi",       "parse": "accept", "note": "dotted key / underscore key" },
     { "file": "accept-11-comment-only-blocks.fi",              "parse": "accept", "note": "コメントだけのブロック" },
@@ -33,6 +34,8 @@
     { "file": "accept-23-existing-fixture-formulaInfo.fi",     "parse": "accept", "note": "既存 fixture 1/3（src/test/resources/formulaInfo.fi）。match 式は P4 が別途拒否するが構文層は accept" },
     { "file": "accept-24-existing-fixture-69.fi",              "parse": "accept", "note": "既存 fixture 2/3（formulaInfo-test/69/formulaInfo.txt）。日本語コメント・空行混じり" },
     { "file": "accept-25-existing-fixture-86.fi",              "parse": "accept", "note": "既存 fixture 3/3（formulaInfo-test/86/formulaInfo.txt）。byteCode/javaCode 込みの実データ" },
+    { "file": "accept-26-end-mark-trailing-blanks.fi",         "parse": "accept", "note": "終端マークの後ろに空白・タブ（LF）。issue #211" },
+    { "file": "accept-27-end-mark-trailing-blanks-crlf.fi",    "parse": "accept", "note": "終端マークの後ろに空白・タブ（CRLF）。issue #211" },
 
     { "file": "reject-load-01-no-formula.fi",                  "parse": "accept", "loaderReject": true, "note": "loader 拒否: formula キーが無い" },
     { "file": "reject-load-02-unknown-backend.fi",             "parse": "accept", "loaderReject": true, "note": "loader 拒否: executionBackend が未知の名前" },
@@ -43,6 +46,8 @@
     { "file": "reject-load-07-unknown-depends-on.fi",          "parse": "accept", "loaderReject": true, "note": "loader 拒否: dependsOn が解決できない参照名" },
     { "file": "reject-load-08-blank-formula.fi",               "parse": "accept", "loaderReject": true, "note": "loader 拒否: formula の値がコメント・空行だけで実質空" },
     { "file": "reject-load-09-empty-value-at-eof.fi",          "parse": "accept", "loaderReject": true, "note": "loader 拒否: formula: が入力末尾で値が 0 文字（Java の NoSuchElementException にバグ互換）" },
+    { "file": "reject-load-10-missing-end-mark-merges-blocks.fi", "parse": "accept", "loaderReject": true, "note": "loader 拒否: 終端マーク無しで 2 ブロックが 1 ブロックに合流し、calculatorName が 2 回出る。issue #211" },
+    { "file": "reject-load-11-duplicate-calculator-name.fi",   "parse": "accept", "loaderReject": true, "note": "loader 拒否: 同一ブロック内で calculatorName が重複（終端マーク欠落と同じ検査）。issue #211" },
 
     { "file": "reject-syntax-01-starts-with-end-mark.fi",                  "parse": "reject", "diagnostic": "syntax", "note": "終端マークで文書が始まる" },
     { "file": "reject-syntax-02-double-end-mark.fi",                      "parse": "reject", "diagnostic": "syntax", "note": "終端マークが 2 連続する" },
@@ -54,6 +59,10 @@
     { "file": "reject-syntax-08-non-ascii-key.fi",                        "parse": "reject", "diagnostic": "syntax", "note": "非 ASCII 始まりの key" },
     { "file": "reject-syntax-09-digit-key.fi",                            "parse": "reject", "diagnostic": "syntax", "note": "数字始まりの key" },
     { "file": "reject-syntax-10-dollar-key.fi",                           "parse": "reject", "diagnostic": "syntax", "note": "'$' 始まりの key" },
-    { "file": "reject-syntax-11-end-mark-with-trailing-space-first.fi",   "parse": "reject", "diagnostic": "syntax", "note": "'---END_OF_PART--- '（末尾に空白）で始まる行" }
+    { "file": "reject-syntax-11-end-mark-with-trailing-space-first.fi",   "parse": "reject", "diagnostic": "syntax", "note": "'---END_OF_PART--- '（末尾に空白）で始まる行" },
+    { "file": "reject-syntax-12-end-mark-trailing-chars.fi",              "parse": "reject", "diagnostic": "syntax", "note": "終端マークの後ろに空白以外の文字（xyz）。issue #211" },
+    { "file": "reject-syntax-13-end-mark-blank-then-chars.fi",            "parse": "reject", "diagnostic": "syntax", "note": "終端マークの後ろに空白、続けて文字（' x'）。issue #211" },
+    { "file": "reject-syntax-14-end-mark-trailing-chars-in-value.fi",     "parse": "reject", "diagnostic": "syntax", "note": "値の中の ---END_OF_PART---x 行（旧 accept-08 の行、issue #211 で値の継続行でなくなった）" },
+    { "file": "reject-syntax-15-end-mark-trailing-vt.fi",                 "parse": "reject", "diagnostic": "syntax", "note": "終端マークの後ろに VT（空白・タブ以外の空白類は不可）。issue #211" }
   ]
 }
