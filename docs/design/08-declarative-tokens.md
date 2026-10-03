@@ -16,7 +16,7 @@ grammar Numbers {
 
 ```ubnf
 grammar Application {
-  import numeric from 'lexical/numbers.ubnf'
+  @import numeric from 'lexical/numbers.ubnf'
   @ubnf: v2
   @root Value ::= numeric.NUMBER;
 }
