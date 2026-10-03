@@ -3,6 +3,7 @@
 use super::ast::*;
 use super::lexer::{Kind, Token};
 use super::SyntaxError;
+use crate::declarative::{LexicalExpression as Lex, Op};
 
 /// grammar 本体の宣言。`Name<...> ::=` だけが雛形（D-043）。
 enum Declaration {
@@ -265,6 +266,19 @@ impl Parser<'_> {
         let start = self.start();
         self.require("token")?;
         let name = self.identifier()?;
+        if self.consume("::=") {
+            let value_start = self.start();
+            let expression = self.lex_expression()?;
+            self.require(";")?;
+            return Ok(TokenDecl {
+                name,
+                value: TokenValue::Declarative {
+                    expression,
+                    span: self.span_from(value_start),
+                },
+                span: self.span_from(start),
+            });
+        }
         self.require("=")?;
         let value = self.token_value()?;
         Ok(TokenDecl {
@@ -272,6 +286,150 @@ impl Parser<'_> {
             value,
             span: self.span_from(start),
         })
+    }
+
+    fn lex_expression(&mut self) -> ParseResult<Lex> {
+        self.depth += 1;
+        if self.depth > DEPTH_LIMIT {
+            return Err(self.error(&["lexical nesting <= 128"]));
+        }
+        let mut children = vec![self.lex_sequence()?];
+        while self.consume("|") {
+            children.push(self.lex_sequence()?);
+        }
+        self.depth -= 1;
+        Ok(Lex::node(Op::CHOICE, children))
+    }
+    fn lex_sequence(&mut self) -> ParseResult<Lex> {
+        let mut children = vec![];
+        while matches!(
+            self.peek(0).kind,
+            Kind::String { .. } | Kind::Identifier(_) | Kind::Punct('(' | '[' | '{')
+        ) {
+            children.push(self.lex_element()?);
+        }
+        if children.is_empty() {
+            return Err(self.error(&["lexical expression"]));
+        }
+        Ok(Lex::node(Op::SEQUENCE, children))
+    }
+    fn lex_integer(&mut self) -> ParseResult<i32> {
+        if let Kind::Digits(value) = self.peek(0).kind {
+            let value = value
+                .parse::<i32>()
+                .map_err(|_| self.error(&["32-bit repeat bound"]))?;
+            self.cursor += 1;
+            Ok(value)
+        } else {
+            Err(self.error(&["repeat bound"]))
+        }
+    }
+    fn lex_element(&mut self) -> ParseResult<Lex> {
+        let child = self.lex_atom()?;
+        if self.consume("?") {
+            return Ok(Lex::repeat(child, 0, 1));
+        }
+        if self.consume("*") {
+            return Ok(Lex::repeat(child, 0, -1));
+        }
+        if self.consume("+") {
+            return Ok(Lex::repeat(child, 1, -1));
+        }
+        if self.is_at(0, "{") && matches!(self.peek(1).kind, Kind::Digits(_)) {
+            self.cursor += 1;
+            let min = self.lex_integer()?;
+            let max = if self.consume(",") {
+                if self.is_at(0, "}") {
+                    -1
+                } else {
+                    self.lex_integer()?
+                }
+            } else {
+                min
+            };
+            self.require("}")?;
+            if max >= 0 && min > max {
+                return Err(self.error(&["ordered repeat bounds"]));
+            }
+            return Ok(Lex::repeat(child, min, max));
+        }
+        Ok(child)
+    }
+    fn lex_atom(&mut self) -> ParseResult<Lex> {
+        if matches!(self.peek(0).kind, Kind::String { .. }) {
+            return Ok(Lex::leaf(Op::LITERAL, self.string()?));
+        }
+        for (open, close, min, max) in [("(", ")", 1, 1), ("[", "]", 0, 1), ("{", "}", 0, -1)] {
+            if self.consume(open) {
+                let child = self.lex_expression()?;
+                self.require(close)?;
+                return Ok(if open == "(" {
+                    child
+                } else {
+                    Lex::repeat(child, min, max)
+                });
+            }
+        }
+        let name = self.dotted()?;
+        if matches!(
+            name.as_str(),
+            "LOOKAHEAD" | "NEGATIVE_LOOKAHEAD" | "CAPTURE" | "SAME_AS" | "NEGATION" | "CHAR_RANGE"
+        ) && self.consume("(")
+        {
+            let result = match name.as_str() {
+                "LOOKAHEAD" | "NEGATIVE_LOOKAHEAD" => Lex::node(
+                    if name == "LOOKAHEAD" {
+                        Op::LOOK
+                    } else {
+                        Op::NOT
+                    },
+                    vec![self.lex_expression()?],
+                ),
+                "CAPTURE" => {
+                    let text = self.identifier()?;
+                    self.require(",")?;
+                    Lex {
+                        text,
+                        ..Lex::node(Op::CAPTURE, vec![self.lex_expression()?])
+                    }
+                }
+                "SAME_AS" => Lex::leaf(Op::BACKREF, self.identifier()?),
+                "NEGATION" => Lex::leaf(Op::EXCEPT, self.string()?),
+                "CHAR_RANGE" => {
+                    let min = self.string()?;
+                    self.require(",")?;
+                    let max = self.string()?;
+                    if min.chars().count() != 1 || max.chars().count() != 1 {
+                        return Err(self.error(&["one Unicode scalar"]));
+                    }
+                    let min = min.chars().next().unwrap() as i32;
+                    let max = max.chars().next().unwrap() as i32;
+                    if min > max {
+                        return Err(self.error(&["ordered scalar range"]));
+                    }
+                    Lex {
+                        min,
+                        max,
+                        ..Lex::leaf(Op::RANGE, String::new())
+                    }
+                }
+                _ => unreachable!(),
+            };
+            self.require(")")?;
+            return Ok(result);
+        }
+        let op = match name.as_str() {
+            "ANY" => Op::ANY,
+            "EOF" => Op::EOF,
+            "BOF" => Op::BOF,
+            "BOL" => Op::BOL,
+            "EOL" => Op::EOL,
+            _ => Op::REF,
+        };
+        Ok(Lex::leaf(
+            op,
+            if op == Op::REF { name } else { String::new() },
+        ))
     }
 
     fn token_value(&mut self) -> ParseResult<TokenValue> {

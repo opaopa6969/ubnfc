@@ -38,6 +38,9 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             continue;
         }
         match &t.spec {
+            TokenSpec::Declarative{expression}=>{
+                writeln!(s,"let start=state.position::<MATCH>();let end={}.match_at(self.text,start);let end=if state.invert {{if end.is_none() {{Some(start)}} else {{None}}}} else {{end}};match end {{Some(end)=>{{let mut next=state;if end>start {{next.advance::<MATCH>(end-start);}}let mut step=Step::yes(next);step.events=self.event(Event::Token {{text_span:None,content_span:None,expr:usize::MAX,rule:usize::MAX,span:[start,end]}});step}},None=>self.fail(state,start,label)}}",lexical_program(expression)).unwrap();
+            },
             TokenSpec::Builtin{which,code_points}=>{
                 match which {
                     BuiltinToken::Number=>writeln!(s,"self.number::<MATCH>(state,label)").unwrap(),
@@ -189,4 +192,9 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         writeln!(s,"if out.position::<MATCH>()==before {{break;}}}}\nif self.lex_enabled {{\nif out.position::<MATCH>()==origin {{self.trivia_skip.insert({canonical},MATCH,origin,(u32::MAX,0));}}\nelse if let (Ok(dc),Ok(dm))=(u32::try_from(out.consumed.saturating_sub(origin)),u32::try_from(out.matched.saturating_sub(origin))) {{\nif dc!=u32::MAX {{self.trivia_skip.insert({canonical},MATCH,origin,(dc,dm));}}}}}}\nout}}").unwrap();
     }
     Ok(s)
+}
+
+fn lexical_program(e: &ubnfc_front::declarative::LexicalExpression) -> String {
+    format!("lexical_program::LexicalExpression {{op:lexical_program::Op::{:?},text:{:?},min:{},max:{},children:&[{}]}}",
+        e.op,e.text,e.min,e.max,e.children.iter().map(lexical_program).collect::<Vec<_>>().join(","))
 }

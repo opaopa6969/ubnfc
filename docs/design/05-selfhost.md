@@ -61,17 +61,20 @@ cargo test -p ubnfc-front --offline --test selfhost_conversion --test selfhost_p
 
 ## 既知の差分
 
-比較対象25件（24 fixture + P4）のうち、`ubnf.ubnf` が記述する構文だけを使う20件は
-`UbnfFile` が全 field/span を含めて一致する。手書き frontend だけの互換拡張を使う次の5件は、
+比較対象25件（24 fixture + P4）のうち、`ubnf.ubnf` が記述する構文だけを使う21件は
+`UbnfFile` が全 field/span を含めて一致する。手書き frontend だけの互換拡張を使う次の4件は、
 生成 parser が表の byte offset で拒否する。self-host を通すための grammar/IR 加工はしていない。
 
 | source | byte | 手書き frontend の互換拡張 |
 |---|---:|---|
 | `positive/annotations.ubnf` | 43 | dotted mapping class (`Node.Item`) |
 | `known/eval-default.ubnf` | 32 | `@eval` entry の `=` 区切り |
-| `known/keyword-boundary.ubnf` | 24 | annotation keyword の識別子境界 (`@rooted`)。**D-040 の語境界そのもの**で、`ubnf.ubnf` を `@ubnf: 2`（または `@literalBoundary: word`）にすると解消する（実測は 2026-09-23、`QuantifiedRef` の chained dot 対応前の grammar 上: 受理 19 → 20、他の 5 件の位置は不変。`docs/reports/2026-09-23-ubnf-v2-word-boundary.md` §1.3）。self-description を v2 にするかは別の判断なので、この表は v1 のままの実測値 |
 | `unlaxer-dsl/examples/tinycalc.ubnf` | 276 | setting block 内の二重引用符 |
 | `tinyexpression-p4.ubnf` | 2595 | `@declares` description の capture 名（非 STRING） |
+
+`known/keyword-boundary.ubnf` の `@rooted` は v2 メタ文法更新で解消済み。
+6 宣言的 token / 66 rule からの自己ホスト固定点と lexical AST の変換は
+[`08-declarative-tokens.md`](08-declarative-tokens.md) を参照。
 
 ### 7 件目 — 唯一の逆向き乖離（生成側が広い）とその閉じ方
 

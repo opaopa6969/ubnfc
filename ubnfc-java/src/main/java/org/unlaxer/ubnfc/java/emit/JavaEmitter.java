@@ -91,6 +91,8 @@ public final class JavaEmitter {
         for (String name : List.of("Span", "Capture", "Diagnostic", "MappingException", "ParseOptions", "ParseResult", "TokenScanner", "Json", "SourceName"))
             result.put(prefix + "api/" + name + ".java", resource("/templates/api/" + name + ".java").replace("generated.", pkg + "."));
         for (String name : List.of("Recipe", "Session")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
+        if (tokens.values().stream().anyMatch(t -> t.spec().kind().equals("declarative")))
+            result.put(prefix + "internal/LexicalExpression.java", resource("/templates/internal/LexicalExpression.java").replace("generated.", pkg + "."));
         for (String name : List.of("Input", "Cursor", "MemoTable", "ScopeStore", "Diagnostics", "Severity"))
             result.put(prefix + "rt/" + name + ".java", resource("/runtime/ubnfc/rt/" + name + ".java").replace("package ubnfc.rt;", "package " + pkg + ".rt;"));
         if (emitDriver) result.put(prefix + "driver/Driver.java", driverSource());
@@ -620,6 +622,8 @@ public final class JavaEmitter {
     }
     private String token(TokenSpec spec, String label) {
         return switch (spec.kind()) {
+            case "declarative" -> pkg + ".internal.LexicalExpression.parse(s,f,"
+                + constant(pkg + ".internal.LexicalExpression", lexicalProgram(spec.expression())) + "," + label(label) + ")";
             case "builtin" -> "s.builtin(f," + q(spec.which()) + "," + constant("int[]", ints(spec.codePoints())) + "," + label(label) + ")";
             case "until" -> "s.until(f," + q(spec.terminator()) + ")";
             case "lookahead", "negativeLookahead" -> "s.look(f,(ss,ff)->ss.literal(ff," + q(spec.pattern()) + ",true," + label(label) + ")," + spec.kind().equals("negativeLookahead") + "," + label(label) + ")";
@@ -635,6 +639,11 @@ public final class JavaEmitter {
         };
     }
     private final Map<String, Integer> externIndices = new LinkedHashMap<>();
+    private String lexicalProgram(GrammarIr.LexicalExpression e) {
+        String type = pkg + ".internal.LexicalExpression";
+        return "new " + type + "(" + type + ".Op." + e.op() + "," + q(e.text()) + "," + e.min() + "," + e.max()
+            + ",List.of(" + e.children().stream().map(this::lexicalProgram).collect(Collectors.joining(",")) + "))";
+    }
     private int externIndex(String logicalId) { return externIndices.computeIfAbsent(logicalId, key -> externIndices.size()); }
     private String repeatedLiteral(String id) {
         ExprNode node = expressions.get(id).node();

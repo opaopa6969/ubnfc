@@ -255,6 +255,7 @@ fn validate_left_recursion(ir: &GrammarIr) -> Result<(), EmitError> {
                 ExprNode::Separated { element, min, .. } => *min == 0 || nullable.contains(element),
                 ExprNode::Literal { value, .. } => value.is_empty(),
                 ExprNode::TokenRef { symbol_id } => match tokens[symbol_id] {
+                    TokenSpec::Declarative { expression } => expression.nullable(),
                     TokenSpec::Builtin { which, .. } => *which == BuiltinToken::EndOfSource,
                     TokenSpec::CaseInsensitive { word, .. } => word.is_empty(),
                     TokenSpec::Eof {}

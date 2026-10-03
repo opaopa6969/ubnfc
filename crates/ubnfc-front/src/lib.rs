@@ -13,6 +13,7 @@
 pub mod analysis;
 pub mod boundary;
 pub mod cli;
+pub mod declarative;
 pub mod desugar;
 pub mod escape;
 pub mod ir;

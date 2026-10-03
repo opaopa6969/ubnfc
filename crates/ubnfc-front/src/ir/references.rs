@@ -328,6 +328,11 @@ impl<'a> Validator<'a> {
             );
             self.annotations(&token.annotations, &format!("{p}/annotations"));
             self.memo_safety(&token.memo_safety, &format!("{p}/memoSafety"));
+            if let TokenSpec::Declarative { expression } = &token.spec {
+                if let Err(message) = expression.validate() {
+                    self.error(&format!("{p}/spec/expression"), message);
+                }
+            }
             if let TokenSpec::CharRange { min, max } = token.spec {
                 if min > max || max > 0x10ffff || (min <= 0xdfff && max >= 0xd800) {
                     self.error(
@@ -1013,6 +1018,12 @@ impl<'a> Validator<'a> {
             }
         };
         require(Captures, !s.captures.is_empty());
+        require(
+            DeclarativeTokens,
+            s.tokens
+                .iter()
+                .any(|t| matches!(t.spec, TokenSpec::Declarative { .. })),
+        );
         require(
             DeferredMapping,
             !s.recipes.is_empty()

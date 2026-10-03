@@ -125,27 +125,51 @@ fn all_unlaxer_ubnf_files_parse() {
         );
     }
     for path in &paths {
+        if path.ends_with("rust/unlaxer-ubnf/tests/fixtures/positive/adapter.ubnf")
+            || (path.starts_with(root.join("spec-corpus/token-adapters"))
+                && read(path).lines().any(|line| {
+                    line.trim_start().starts_with("token ") && line.contains("ADAPTER(")
+                }))
+        {
+            // core's versioned ADAPTER registry is distinct from ubnfc's extern
+            // registry and is deliberately not silently reinterpreted here.
+            assert!(
+                parse_file(&read(path)).is_err(),
+                "ADAPTER is not implemented by ubnfc"
+            );
+            continue;
+        }
+        if path.ends_with("rust/unlaxer-generator/tests/fixtures/portability/syntax.ubnf") {
+            assert!(
+                parse_file(&read(path)).is_err(),
+                "既知の構文エラー: {}",
+                path.display()
+            );
+            continue;
+        }
         parse_fixture(&read(path), path);
     }
     eprintln!("unlaxer-parser: {} 個の .ubnf が成功", paths.len());
 }
 
 #[test]
-fn self_description_has_five_tokens_and_59_rules() {
+fn self_description_has_six_tokens_and_66_rules() {
     let path = unlaxer_root().join("unlaxer-dsl/grammar/ubnf.ubnf");
     let source = read(&path);
     let file = parse_fixture(&source, &path);
     assert_eq!(file.grammars.len(), 1);
     let grammar = &file.grammars[0];
     assert_eq!(grammar.name, "UBNF");
-    assert_eq!(grammar.tokens.len(), 5);
-    assert_eq!(grammar.rules.len(), 59);
+    assert_eq!(grammar.tokens.len(), 6);
+    assert_eq!(grammar.rules.len(), 66);
     // 行頭の独立した宣言を数える。文字列内の '::=' は数えない。
     let declarations = source
         .lines()
         .filter(|line| {
             let trimmed = line.trim_start();
-            trimmed.starts_with(|c: char| c.is_ascii_alphabetic()) && trimmed.contains("::=")
+            trimmed.starts_with(|c: char| c.is_ascii_alphabetic())
+                && !trimmed.starts_with("token ")
+                && trimmed.contains("::=")
         })
         .count();
     assert_eq!(grammar.rules.len(), declarations);

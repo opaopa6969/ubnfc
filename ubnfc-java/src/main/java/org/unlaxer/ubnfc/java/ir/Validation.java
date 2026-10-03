@@ -195,6 +195,10 @@ public final class Validation {
         var unsafe = new HashSet<String>();
         for (Token token : tokens.values()) {
             TokenSpec spec = token.spec();
+            if (spec.kind().equals("declarative")) {
+                require(ir.requiredFeatures().contains("declarativeTokens"), "Missing declarativeTokens feature");
+                LexicalPrograms.validate(spec.expression());
+            }
             // D-063: 境界は code point（U+0000..U+10FFFF）。surrogate を**含む**範囲も拒否して
             // front / Rust backend（analysis/checks.rs、ir/references.rs）と同じ条件にする。
             if (spec.kind().equals("charRange")) require(spec.min() <= spec.max() && spec.max() <= 0x10ffff
@@ -273,6 +277,7 @@ public final class Validation {
                     case "tokenRef" -> {
                         TokenSpec spec = tokens.get(n.symbolId()).spec();
                         yield switch (spec.kind()) {
+                            case "declarative" -> LexicalPrograms.nullable(spec.expression());
                             case "builtin" -> spec.which().equals("EndOfSource");
                             case "caseInsensitive" -> spec.word().isEmpty();
                             case "eof", "empty", "until", "lookahead", "negativeLookahead", "extern" -> true;

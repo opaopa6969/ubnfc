@@ -546,6 +546,12 @@ fn required_features(s: &Semantics, plan: &Plan, imports: &[ImportEdge]) -> Vec<
         StructuredOccurrences,
     ];
     for (feature, used) in [
+        (
+            DeclarativeTokens,
+            s.tokens
+                .iter()
+                .any(|t| matches!(t.spec, TokenSpec::Declarative { .. })),
+        ),
         (Captures, !s.captures.is_empty()),
         (
             DeferredMapping,

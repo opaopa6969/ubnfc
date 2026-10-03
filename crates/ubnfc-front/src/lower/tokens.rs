@@ -24,6 +24,9 @@ pub(super) fn lower(cx: &mut Context<'_>, grammar: &r::Grammar) {
             });
         }
         let spec = match &token.value {
+            T::Declarative { expression } => TokenSpec::Declarative {
+                expression: expression.clone(),
+            },
             T::Builtin { kind } => {
                 let (which, code_points) = match kind {
                     B::Number => (BuiltinToken::Number, vec![]),

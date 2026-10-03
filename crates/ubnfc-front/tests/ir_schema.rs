@@ -3,6 +3,7 @@
 use serde::{de::DeserializeOwned, Serialize};
 use serde_json::{json, Value};
 use std::fmt::Debug;
+use ubnfc_front::declarative::LexicalExpression;
 use ubnfc_front::ir::*;
 
 fn resolve<'a>(schema: &'a Value, defs: &'a Value) -> &'a Value {
@@ -234,6 +235,7 @@ fn every_definition_and_inline_enum_round_trips_and_rejects_invalid_structure() 
         GrammarUnit,
         ImportEdge,
         JsonValue,
+        LexicalExpression,
         LexicalPlan,
         MayStart,
         MemoEntry,

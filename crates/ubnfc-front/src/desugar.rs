@@ -66,7 +66,7 @@ fn language_version_with(
         }
         seen = true;
         let value = match setting {
-            GlobalSetting::String { value, .. } => value.parse::<u64>().ok(),
+            GlobalSetting::String { value, .. } => crate::escape::language_version(value),
             GlobalSetting::Block { .. } => None,
         };
         match value {

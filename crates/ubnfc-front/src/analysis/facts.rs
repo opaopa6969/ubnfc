@@ -153,6 +153,14 @@ pub(super) fn literal(value: &str, case_sensitive: bool) -> Facts {
 
 pub(super) fn token(spec: &TokenSpec) -> Facts {
     match spec {
+        TokenSpec::Declarative { expression } => Facts {
+            certainty: MayStartCertainty::Unknown,
+            ..if expression.nullable() {
+                Facts::unknown()
+            } else {
+                Facts::leaf(CharSet::all(), 1)
+            }
+        },
         TokenSpec::Builtin { which, code_points } => {
             let chars = match which {
                 BuiltinToken::Number => CharSet::chars("+-.0123456789"),

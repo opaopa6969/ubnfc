@@ -3,7 +3,7 @@
 use super::{Span, SyntaxError};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) enum Kind<'a> {
+pub(crate) enum Kind<'a> {
     Identifier(&'a str),
     Digits(&'a str),
     String {
@@ -18,12 +18,12 @@ pub(super) enum Kind<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub(super) struct Token<'a> {
+pub(crate) struct Token<'a> {
     pub kind: Kind<'a>,
     pub span: Span,
 }
 
-pub(super) fn lex(source: &str) -> Result<Vec<Token<'_>>, SyntaxError> {
+pub(crate) fn lex(source: &str) -> Result<Vec<Token<'_>>, SyntaxError> {
     let bytes = source.as_bytes();
     let mut offset = 0;
     let mut tokens = Vec::new();

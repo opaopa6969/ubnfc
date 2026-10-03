@@ -16,6 +16,12 @@ Ast::g_UBNFAST_2e_StringSettingValue(node)=>self.eval_g_UBNFAST_2e_StringSetting
 Ast::g_UBNFAST_2e_BlockSettingValue(node)=>self.eval_g_UBNFAST_2e_BlockSettingValue(node),
 Ast::g_UBNFAST_2e_KeyValuePair(node)=>self.eval_g_UBNFAST_2e_KeyValuePair(node),
 Ast::g_UBNFAST_2e_TokenDecl(node)=>self.eval_g_UBNFAST_2e_TokenDecl(node),
+Ast::g_UBNFAST_2e_DeclarativeTokenValue(node)=>self.eval_g_UBNFAST_2e_DeclarativeTokenValue(node),
+Ast::g_UBNFAST_2e_LexicalChoice(node)=>self.eval_g_UBNFAST_2e_LexicalChoice(node),
+Ast::g_UBNFAST_2e_LexicalSequence(node)=>self.eval_g_UBNFAST_2e_LexicalSequence(node),
+Ast::g_UBNFAST_2e_LexicalElement(node)=>self.eval_g_UBNFAST_2e_LexicalElement(node),
+Ast::g_UBNFAST_2e_LexicalSuffix(node)=>self.eval_g_UBNFAST_2e_LexicalSuffix(node),
+Ast::g_UBNFAST_2e_LexicalAtom(node)=>self.eval_g_UBNFAST_2e_LexicalAtom(node),
 Ast::g_UBNFAST_2e_UntilExpression(node)=>self.eval_g_UBNFAST_2e_UntilExpression(node),
 Ast::g_UBNFAST_2e_NegationExpression(node)=>self.eval_g_UBNFAST_2e_NegationExpression(node),
 Ast::g_UBNFAST_2e_LookaheadExpression(node)=>self.eval_g_UBNFAST_2e_LookaheadExpression(node),
@@ -23,6 +29,7 @@ Ast::g_UBNFAST_2e_NegativeLookaheadExpression(node)=>self.eval_g_UBNFAST_2e_Nega
 Ast::g_UBNFAST_2e_CharRangeExpression(node)=>self.eval_g_UBNFAST_2e_CharRangeExpression(node),
 Ast::g_UBNFAST_2e_CIExpression(node)=>self.eval_g_UBNFAST_2e_CIExpression(node),
 Ast::g_UBNFAST_2e_RegexExpression(node)=>self.eval_g_UBNFAST_2e_RegexExpression(node),
+Ast::g_UBNFAST_2e_AdapterExpression(node)=>self.eval_g_UBNFAST_2e_AdapterExpression(node),
 Ast::g_UBNFAST_2e_AnyExpression(node)=>self.eval_g_UBNFAST_2e_AnyExpression(node),
 Ast::g_UBNFAST_2e_EofExpression(node)=>self.eval_g_UBNFAST_2e_EofExpression(node),
 Ast::g_UBNFAST_2e_EmptyExpression(node)=>self.eval_g_UBNFAST_2e_EmptyExpression(node),
@@ -66,6 +73,12 @@ fn eval_g_UBNFAST_2e_StringSettingValue(&mut self,node:&g_UBNFAST_2e_StringSetti
 fn eval_g_UBNFAST_2e_BlockSettingValue(&mut self,node:&g_UBNFAST_2e_BlockSettingValue)->EvalResult;
 fn eval_g_UBNFAST_2e_KeyValuePair(&mut self,node:&g_UBNFAST_2e_KeyValuePair)->EvalResult;
 fn eval_g_UBNFAST_2e_TokenDecl(&mut self,node:&g_UBNFAST_2e_TokenDecl)->EvalResult;
+fn eval_g_UBNFAST_2e_DeclarativeTokenValue(&mut self,node:&g_UBNFAST_2e_DeclarativeTokenValue)->EvalResult;
+fn eval_g_UBNFAST_2e_LexicalChoice(&mut self,node:&g_UBNFAST_2e_LexicalChoice)->EvalResult;
+fn eval_g_UBNFAST_2e_LexicalSequence(&mut self,node:&g_UBNFAST_2e_LexicalSequence)->EvalResult;
+fn eval_g_UBNFAST_2e_LexicalElement(&mut self,node:&g_UBNFAST_2e_LexicalElement)->EvalResult;
+fn eval_g_UBNFAST_2e_LexicalSuffix(&mut self,node:&g_UBNFAST_2e_LexicalSuffix)->EvalResult;
+fn eval_g_UBNFAST_2e_LexicalAtom(&mut self,node:&g_UBNFAST_2e_LexicalAtom)->EvalResult;
 fn eval_g_UBNFAST_2e_UntilExpression(&mut self,node:&g_UBNFAST_2e_UntilExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_NegationExpression(&mut self,node:&g_UBNFAST_2e_NegationExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_LookaheadExpression(&mut self,node:&g_UBNFAST_2e_LookaheadExpression)->EvalResult;
@@ -73,6 +86,7 @@ fn eval_g_UBNFAST_2e_NegativeLookaheadExpression(&mut self,node:&g_UBNFAST_2e_Ne
 fn eval_g_UBNFAST_2e_CharRangeExpression(&mut self,node:&g_UBNFAST_2e_CharRangeExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_CIExpression(&mut self,node:&g_UBNFAST_2e_CIExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_RegexExpression(&mut self,node:&g_UBNFAST_2e_RegexExpression)->EvalResult;
+fn eval_g_UBNFAST_2e_AdapterExpression(&mut self,node:&g_UBNFAST_2e_AdapterExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_AnyExpression(&mut self,node:&g_UBNFAST_2e_AnyExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_EofExpression(&mut self,node:&g_UBNFAST_2e_EofExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_EmptyExpression(&mut self,node:&g_UBNFAST_2e_EmptyExpression)->EvalResult;
@@ -111,6 +125,7 @@ fn eval_g_UBNFAST_2e_DottedIdentifier(&mut self,node:&g_UBNFAST_2e_DottedIdentif
 /// Automatic kinds work without overrides; semantic callbacks report a missing implementation.
 pub struct DefaultEvaluator;
 impl Evaluator for DefaultEvaluator {
+fn eval_g_UBNFAST_2e_AdapterExpression(&mut self,node:&g_UBNFAST_2e_AdapterExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_AdapterExpression".into()))}
 fn eval_g_UBNFAST_2e_AnnotatedElement(&mut self,node:&g_UBNFAST_2e_AnnotatedElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_AnnotatedElement".into()))}
 fn eval_g_UBNFAST_2e_AnyExpression(&mut self,node:&g_UBNFAST_2e_AnyExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_AnyExpression".into()))}
 fn eval_g_UBNFAST_2e_BackrefAnnotation(&mut self,node:&g_UBNFAST_2e_BackrefAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_BackrefAnnotation".into()))}
@@ -120,6 +135,7 @@ fn eval_g_UBNFAST_2e_CatalogAnnotation(&mut self,node:&g_UBNFAST_2e_CatalogAnnot
 fn eval_g_UBNFAST_2e_CharRangeExpression(&mut self,node:&g_UBNFAST_2e_CharRangeExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CharRangeExpression".into()))}
 fn eval_g_UBNFAST_2e_ChoiceBody(&mut self,node:&g_UBNFAST_2e_ChoiceBody)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_ChoiceBody".into()))}
 fn eval_g_UBNFAST_2e_CommonFieldAnnotation(&mut self,node:&g_UBNFAST_2e_CommonFieldAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CommonFieldAnnotation".into()))}
+fn eval_g_UBNFAST_2e_DeclarativeTokenValue(&mut self,node:&g_UBNFAST_2e_DeclarativeTokenValue)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_DeclarativeTokenValue".into()))}
 fn eval_g_UBNFAST_2e_DeclaresAnnotation(&mut self,node:&g_UBNFAST_2e_DeclaresAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_DeclaresAnnotation".into()))}
 fn eval_g_UBNFAST_2e_DocAnnotation(&mut self,node:&g_UBNFAST_2e_DocAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_DocAnnotation".into()))}
 fn eval_g_UBNFAST_2e_DottedIdentifier(&mut self,node:&g_UBNFAST_2e_DottedIdentifier)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_DottedIdentifier".into()))}
@@ -135,6 +151,11 @@ fn eval_g_UBNFAST_2e_ImportDecl(&mut self,node:&g_UBNFAST_2e_ImportDecl)->EvalRe
 fn eval_g_UBNFAST_2e_InterleaveAnnotation(&mut self,node:&g_UBNFAST_2e_InterleaveAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_InterleaveAnnotation".into()))}
 fn eval_g_UBNFAST_2e_KeyValuePair(&mut self,node:&g_UBNFAST_2e_KeyValuePair)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_KeyValuePair".into()))}
 fn eval_g_UBNFAST_2e_LeftAssocAnnotation(&mut self,node:&g_UBNFAST_2e_LeftAssocAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LeftAssocAnnotation".into()))}
+fn eval_g_UBNFAST_2e_LexicalAtom(&mut self,node:&g_UBNFAST_2e_LexicalAtom)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalAtom".into()))}
+fn eval_g_UBNFAST_2e_LexicalChoice(&mut self,node:&g_UBNFAST_2e_LexicalChoice)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalChoice".into()))}
+fn eval_g_UBNFAST_2e_LexicalElement(&mut self,node:&g_UBNFAST_2e_LexicalElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalElement".into()))}
+fn eval_g_UBNFAST_2e_LexicalSequence(&mut self,node:&g_UBNFAST_2e_LexicalSequence)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalSequence".into()))}
+fn eval_g_UBNFAST_2e_LexicalSuffix(&mut self,node:&g_UBNFAST_2e_LexicalSuffix)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalSuffix".into()))}
 fn eval_g_UBNFAST_2e_LongestChoiceAnnotation(&mut self,node:&g_UBNFAST_2e_LongestChoiceAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LongestChoiceAnnotation".into()))}
 fn eval_g_UBNFAST_2e_LookaheadExpression(&mut self,node:&g_UBNFAST_2e_LookaheadExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LookaheadExpression".into()))}
 fn eval_g_UBNFAST_2e_MappingAnnotation(&mut self,node:&g_UBNFAST_2e_MappingAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_MappingAnnotation".into()))}

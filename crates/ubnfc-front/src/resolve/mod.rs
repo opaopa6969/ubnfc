@@ -319,6 +319,24 @@ impl Resolver<'_> {
                 }
             }
             let file = self.files[&target].clone();
+            if file.grammars.len() != 1
+                && file.grammars.iter().any(|g| {
+                    g.tokens
+                        .iter()
+                        .any(|t| matches!(t.value, TokenValue::Declarative { .. }))
+                })
+            {
+                self.error(
+                    &pending.name,
+                    None,
+                    &target,
+                    file.span,
+                    "E-IMPORT-AMBIGUOUS",
+                    "declarative lexical modules require exactly one grammar".into(),
+                    "Move each lexical module to its own file.",
+                );
+                continue;
+            }
             let Some((index, imported)) = file.grammars.iter().enumerate().next_back() else {
                 self.error(
                     &pending.name,
@@ -431,11 +449,36 @@ impl Resolver<'_> {
                 span: rule.span,
             });
         }
+        let mut definitions = BTreeMap::new();
+        for (_, prefix, token) in &pending.tokens {
+            if let TokenValue::Declarative { expression, .. } = &token.value {
+                let mut expression = expression.clone();
+                crate::declarative::qualify(&mut expression, prefix);
+                definitions.insert(qualify(prefix, &token.name), expression);
+            }
+        }
         for (unit, prefix, token) in pending.tokens {
             let name = qualify(&prefix, &token.name);
             let id = self.result.lookup(pending.id, &name).unwrap();
-            let (value, unresolved) =
+            let (mut value, unresolved) =
                 tokens::classify(&token.value, crate::escape::declares_v2(&grammar.settings));
+            if matches!(value, ResolvedTokenValue::Declarative { .. }) {
+                let declared_v2 =
+                    crate::escape::declares_v2(&self.result.units[unit.0].ast.settings);
+                let result = if declared_v2 {
+                    crate::declarative::compile(&definitions, &name)
+                } else {
+                    Err("declarative tokens require @ubnf: v2".into())
+                };
+                match result {
+                    Ok(expression) => value = ResolvedTokenValue::Declarative { expression },
+                    Err(message) => {
+                        let path = self.result.units[unit.0].path.clone();
+                        self.error(&grammar.name, None, &path, token.span, "E-LEXICAL", message,
+                            "Use acyclic declarative references, definite local captures and advancing unbounded repeats.");
+                    }
+                }
+            }
             grammar.tokens.push(ResolvedToken {
                 id,
                 unit,
