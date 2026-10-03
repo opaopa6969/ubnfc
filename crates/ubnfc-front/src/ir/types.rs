@@ -19,6 +19,8 @@ pub enum JsonValue {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum RequiredFeature {
+    #[serde(rename = "declarativeTokens")]
+    DeclarativeTokens,
     #[serde(rename = "dualCursor")]
     DualCursor,
     #[serde(rename = "cursorFrameFlag")]
@@ -1454,6 +1456,9 @@ pub struct Token {
     deny_unknown_fields
 )]
 pub enum TokenSpec {
+    Declarative {
+        expression: crate::declarative::LexicalExpression,
+    },
     Builtin {
         code_points: Vec<u64>,
         which: BuiltinToken,

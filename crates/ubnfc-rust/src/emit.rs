@@ -247,6 +247,16 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
     files.insert("metadata.rs".into(), crate::metadata::generate(ir));
     files.insert("evaluator.rs".into(), crate::evaluator::generate(ir)?);
     let mut runtime = include_str!("../templates/runtime.rs").to_owned();
+    if ir
+        .semantics
+        .tokens
+        .iter()
+        .any(|t| matches!(t.spec, TokenSpec::Declarative { .. }))
+    {
+        runtime.push_str("\npub mod lexical_program {\n");
+        runtime.push_str(include_str!("../templates/declarative.rs").trim_start_matches("//! Atomic lexical programs generated from UBNF. Matching has no host-context side effects.\n"));
+        runtime.push_str("\n}\n");
+    }
     runtime.push_str(&crate::lexical::generate(&g));
     runtime.push_str(&crate::mapping::generate(&g)?);
     files.insert("runtime.rs".into(), runtime);

@@ -57,6 +57,42 @@ pub(crate) fn project<'a>(ast: &'a Ast, out: &mut MappedNodes<'a>) {
             out.node("TokenDecl", node.span)
                 .field("name", [node.g_name.as_str()]);
         }
+        Ast::g_UBNFAST_2e_DeclarativeTokenValue(node) => {
+            project(&node.g_source, out);
+            out.node("DeclarativeTokenValue", node.span);
+        }
+        Ast::g_UBNFAST_2e_LexicalChoice(node) => {
+            for child in &node.g_alternatives {
+                project(child, out);
+            }
+            out.node("LexicalBody", node.span);
+        }
+        Ast::g_UBNFAST_2e_LexicalSequence(node) => {
+            for child in &node.g_elements {
+                project(child, out);
+            }
+            out.node("LexicalSequence", node.span);
+        }
+        Ast::g_UBNFAST_2e_LexicalElement(node) => {
+            project(&node.g_atom, out);
+            if let Some(child) = &node.g_suffix {
+                project(child, out);
+            }
+            out.node("LexicalElement", node.span);
+        }
+        Ast::g_UBNFAST_2e_LexicalSuffix(node) => {
+            out.node("LexicalSuffix", node.span)
+                .field("text", [node.g_text.as_str()]);
+        }
+        Ast::g_UBNFAST_2e_LexicalAtom(node) => {
+            project(&node.g_value, out);
+            out.node("LexicalAtom", node.span);
+        }
+        Ast::g_UBNFAST_2e_AdapterExpression(node) => {
+            out.node("AdapterExpression", node.span)
+                .field("id", [node.g_id.as_str()])
+                .field("version", [node.g_version.as_str()]);
+        }
         Ast::g_UBNFAST_2e_UntilExpression(node) => {
             out.node("UntilExpression", node.span)
                 .field("terminator", [node.g_terminator.as_str()]);

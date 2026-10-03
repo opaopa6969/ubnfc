@@ -46,6 +46,22 @@ fn self_description_ast_matches_including_every_span() {
 }
 
 #[test]
+fn declarative_programs_and_module_syntax_match_including_spans() {
+    same(include_str!(
+        "../../../fixtures/spec-corpus/declarative-tokens/tokens.ubnf"
+    ));
+    same(include_str!(
+        "../../../fixtures/spec-corpus/lexical-modules/root.ubnf"
+    ));
+    for source in [
+        "grammar G { @ubnf: v2 token X ::= 'a'{2,3} ['b'] {'c'} EOF; @root R ::= X; }",
+        "grammar G { @ubnf: v2 token X ::= CAPTURE(x, '😀'+) SAME_AS(x) LOOKAHEAD(EOF); @root R ::= X; }",
+        "grammar G { @ubnf: v2 token X ::= BOL NEGATIVE_LOOKAHEAD('x') ANY* EOL; @root R ::= X; }",
+        "grammar G { @ubnf: v2 token X ::= 'a'{ 2 // bound\n , } ; @root R ::= X; }",
+    ] { same(source); }
+}
+
+#[test]
 fn suffixes_escapes_comments_and_empty_sequences_match() {
     for source in [
         "", "// 文法😀\r\n", "grammar G {}",
@@ -97,10 +113,6 @@ const KNOWN_REJECTIONS: &[(&str, usize)] = &[
         "rust/unlaxer-ubnf/tests/fixtures/known/eval-default.ubnf",
         32,
     ),
-    (
-        "rust/unlaxer-ubnf/tests/fixtures/known/keyword-boundary.ubnf",
-        24,
-    ),
     ("unlaxer-dsl/examples/tinycalc.ubnf", 276),
     (P4, 2595),
 ];
@@ -135,7 +147,7 @@ fn fixture_acceptance_and_ast_parity() {
             accepted.push(file);
         }
     }
-    assert_eq!(accepted.len(), 20);
+    assert_eq!(accepted.len(), 21);
     assert_eq!(rejected.len(), KNOWN_REJECTIONS.len());
 }
 

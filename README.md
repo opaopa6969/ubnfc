@@ -112,9 +112,9 @@ root への `@recovery` 無効化など）で、新契約 `recovery-projection` 
 `allConsumed == (全入力解析が成功したか)`（D-024）。
 
 self-host（[`docs/design/05-selfhost.md`](docs/design/05-selfhost.md)）: 比較対象 25 件のうち
-`ubnf.ubnf` が記述する構文だけを使う 20 件は `UbnfFile` が全 field / span まで一致する。
-残り**5 件**は**手書き frontend だけが持つ互換拡張**（dotted mapping class、`@eval` の `=` 区切り、
-annotation keyword の識別子境界、setting block 内の二重引用符、`@declares` description の非 STRING capture）で、
+`ubnf.ubnf` が記述する構文だけを使う 21 件は `UbnfFile` が全 field / span まで一致する。
+残り**4 件**は**手書き frontend だけが持つ互換拡張**（dotted mapping class、`@eval` の `=` 区切り、
+setting block 内の二重引用符、`@declares` description の非 STRING capture）で、
 生成パーサが表の byte offset で拒否する。self-host を通すための文法 / IR の加工はしていない。
 これとは別に**唯一の逆向き乖離**（生成側だけが広い）があり、`ubnf.ubnf` 自身が `@whitespace: javaStyle`
 経由で UBNF が定義していない `/* ... */` ブロックコメントを受理してしまう問題を、
@@ -328,10 +328,9 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   driver の wire キーの不一致など）は記録済みで未修正。
 - **差分ファジングが見ていない範囲**: 両 backend が同じように間違っている場合、左再帰の
   runtime 差、`REGEX` token、`@import` の非最小形、大きな入力、`@root` 以外の entry。
-- **self-host の 5 件の既知乖離 + ブロックコメントの字句の門**（§3.1）。うち
-  `known/keyword-boundary.ubnf` は D-040 の語境界そのもので、`ubnf.ubnf` を `@ubnf: 2` にすると
-  解消する（受理 19 → 20、他 4 件は不変）。self-description を v2 にするかは別の判断なので、
-  表は v1 のままの実測値。3 段以上の dotted 参照（旧「8 件目」）は
+- **self-host の 4 件の既知乖離 + ブロックコメントの字句の門**（§3.1）。
+  `known/keyword-boundary.ubnf` は宣言的 token 対応の v2 メタ文法更新で解消した。
+  [`宣言的 token と module`](docs/design/08-declarative-tokens.md) を参照。3 段以上の dotted 参照（旧「8 件目」）は
   [unlaxer-parser #285](https://github.com/opaopa6969/unlaxer-parser/pull/285) +
   [ubnfc #20](https://github.com/opaopa6969/ubnfc/pull/20) で解消済み。
 - **corpus の未観測項目**（Java 59 / Rust 75）。`/evaluationError` 32、`/scope/resolved` 20、
@@ -513,7 +512,8 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 |---|---|
 | [`docs/design/03-design-v1.md`](docs/design/03-design-v1.md) | **正本**。全体構成、実行意味論、IR 契約、結果 API、マイルストーン、**§8 の決定表 D-001 … D-066**（本 commit 時点で 64 行。D-034 は採番の欠番。行は増え続けている） |
 | [`docs/design/04-cursor-and-diagnostics-contract.md`](docs/design/04-cursor-and-diagnostics-contract.md) | 二重カーソルの遷移表、診断の主位置、self-host、左再帰、IR スキーマの要点 |
-| [`docs/design/05-selfhost.md`](docs/design/05-selfhost.md) | self-host 経路と固定点、既知の 5 差分 + ブロックコメントの字句の門 |
+| [`docs/design/05-selfhost.md`](docs/design/05-selfhost.md) | self-host 経路と固定点、既知の 4 差分 + ブロックコメントの字句の門 |
+| [`docs/design/08-declarative-tokens.md`](docs/design/08-declarative-tokens.md) | 機械可読 token、局所 capture、lexical module、Java/Rust 生成 |
 | [`docs/design/06-ubnf-v2.md`](docs/design/06-ubnf-v2.md) | 言語の弱点と v2 の計画・実装状況 |
 | [`docs/design/07-annotation-inventory.md`](docs/design/07-annotation-inventory.md) | 26 の表層アノテーションの棚卸しと統廃合案（順位付き P1〜P7）。**P1/P2/P3/P5 と P7-1/P7-3 は実装済み（D-045〜D-049）、P7-2 は誤りと判明、P4/P6/P7-4 は未着手**（§3.3） |
 | [`docs/design/02-facts-tokens-bench-corpus.md`](docs/design/02-facts-tokens-bench-corpus.md) | 組込み token の受理範囲、ベンチ fixture、corpus の形式 |

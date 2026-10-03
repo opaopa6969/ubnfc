@@ -768,7 +768,15 @@ impl<'a> Converter<'a> {
                 .map(|j| {
                     Ok(TokenDecl {
                         name: self.value(j, "name")?,
-                        value: self.token(self.branch(self.child(j, "TokenValue")?)?)?,
+                        value: if let Some(value) = self.children(j, "DeclarativeTokenValue").next()
+                        {
+                            TokenValue::Declarative {
+                                expression: self.lexical(self.child(value, "LexicalBody")?)?,
+                                span: self.span(value)?,
+                            }
+                        } else {
+                            self.token(self.branch(self.child(j, "TokenValue")?)?)?
+                        },
                         span: self.span(j)?,
                     })
                 })
@@ -792,6 +800,152 @@ impl<'a> Converter<'a> {
             }
             Ok(out)
         })
+    }
+    /// Build the lexical program from generated-parser occurrences, never by
+    /// reparsing a declaration through the bootstrap parser. The lexer is used
+    /// only to decode scalar arguments and bounds already recognized by UBNF.
+    fn lexical(&self, i: usize) -> Result<crate::declarative::LexicalExpression> {
+        use crate::declarative::{LexicalExpression as Lex, Op};
+        use crate::syntax::lexer::{lex, Kind};
+        match self.kind(i) {
+            "LexicalBody" | "LexicalSequence" => {
+                let (op, kind) = if self.kind(i) == "LexicalBody" {
+                    (Op::CHOICE, "LexicalSequence")
+                } else {
+                    (Op::SEQUENCE, "LexicalElement")
+                };
+                Ok(Lex::node(
+                    op,
+                    self.children(i, kind)
+                        .map(|j| self.lexical(j))
+                        .collect::<Result<_>>()?,
+                ))
+            }
+            "LexicalElement" => {
+                let atom = self.lexical(self.child(i, "LexicalAtom")?)?;
+                let Some(suffix) = self.children(i, "LexicalSuffix").next() else {
+                    return Ok(atom);
+                };
+                let raw = self.raw_scalar(suffix, "text")?;
+                let bounds = match raw.trim() {
+                    "?" => (0, 1),
+                    "*" => (0, -1),
+                    "+" => (1, -1),
+                    _ => {
+                        let tokens = lex(raw).map_err(|e| self.error(suffix, e.to_string()))?;
+                        let values = tokens
+                            .iter()
+                            .filter_map(|t| {
+                                if let Kind::Digits(v) = t.kind {
+                                    Some(v)
+                                } else {
+                                    None
+                                }
+                            })
+                            .map(|v| {
+                                v.parse::<i32>()
+                                    .map_err(|_| self.error(suffix, "32-bit repeat bound"))
+                            })
+                            .collect::<Result<Vec<_>>>()?;
+                        let Some(&min) = values.first() else {
+                            return Err(self.error(suffix, "repeat bound"));
+                        };
+                        let comma = tokens.iter().any(|t| matches!(t.kind, Kind::Punct(',')));
+                        let max = values
+                            .get(1)
+                            .copied()
+                            .unwrap_or(if comma { -1 } else { min });
+                        if max >= 0 && min > max {
+                            return Err(self.error(suffix, "ordered repeat bounds"));
+                        }
+                        (min, max)
+                    }
+                };
+                Ok(Lex::repeat(atom, bounds.0, bounds.1))
+            }
+            "LexicalAtom" => {
+                let raw = self.raw_scalar(i, "value")?;
+                let tokens = lex(raw).map_err(|e| self.error(i, e.to_string()))?;
+                let nested = || self.lexical(self.child(i, "LexicalBody")?);
+                let name_arg = || match tokens.get(2).map(|t| &t.kind) {
+                    Some(Kind::Identifier(name)) => Ok((*name).to_owned()),
+                    _ => Err(self.error(i, "capture name")),
+                };
+                match &tokens[0].kind {
+                    Kind::String { value, .. } => Ok(Lex::leaf(Op::LITERAL, value.clone())),
+                    Kind::Punct('(') => nested(),
+                    Kind::Punct('[') => Ok(Lex::repeat(nested()?, 0, 1)),
+                    Kind::Punct('{') => Ok(Lex::repeat(nested()?, 0, -1)),
+                    Kind::Identifier(name)
+                        if matches!(tokens.get(1).map(|t| &t.kind), Some(Kind::Punct('('))) =>
+                    {
+                        match *name {
+                            "LOOKAHEAD" | "NEGATIVE_LOOKAHEAD" => Ok(Lex::node(
+                                if *name == "LOOKAHEAD" {
+                                    Op::LOOK
+                                } else {
+                                    Op::NOT
+                                },
+                                vec![nested()?],
+                            )),
+                            "CAPTURE" => Ok(Lex {
+                                text: name_arg()?,
+                                ..Lex::node(Op::CAPTURE, vec![nested()?])
+                            }),
+                            "SAME_AS" => Ok(Lex::leaf(Op::BACKREF, name_arg()?)),
+                            "NEGATION" | "CHAR_RANGE" => {
+                                let strings = tokens
+                                    .iter()
+                                    .filter_map(|t| {
+                                        if let Kind::String { value, .. } = &t.kind {
+                                            Some(value.as_str())
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                    .collect::<Vec<_>>();
+                                if *name == "NEGATION" && strings.len() == 1 {
+                                    return Ok(Lex::leaf(Op::EXCEPT, strings[0].into()));
+                                }
+                                if strings.len() != 2
+                                    || strings.iter().any(|s| s.chars().count() != 1)
+                                {
+                                    return Err(self.error(i, "one Unicode scalar"));
+                                }
+                                let min = strings[0].chars().next().unwrap() as i32;
+                                let max = strings[1].chars().next().unwrap() as i32;
+                                if min > max {
+                                    return Err(self.error(i, "ordered scalar range"));
+                                }
+                                Ok(Lex {
+                                    min,
+                                    max,
+                                    ..Lex::leaf(Op::RANGE, String::new())
+                                })
+                            }
+                            _ => Err(self.error(i, "unknown lexical operator")),
+                        }
+                    }
+                    Kind::Identifier(_) => {
+                        let name = self.dotted(self.child(i, "DottedIdentifier")?)?;
+                        let op = match name.as_str() {
+                            "ANY" => Op::ANY,
+                            "EOF" => Op::EOF,
+                            "BOF" => Op::BOF,
+                            "BOL" => Op::BOL,
+                            "EOL" => Op::EOL,
+                            _ => Op::REF,
+                        };
+                        Ok(Lex::leaf(
+                            op,
+                            if op == Op::REF { name } else { String::new() },
+                        ))
+                    }
+                    _ => Err(self.error(i, "lexical atom")),
+                }
+            }
+            _ => Err(self.error(i, "lexical occurrence")),
+        }
     }
     fn setting(&self, i: usize) -> Result<GlobalSetting> {
         let key = self.value(i, "key")?;

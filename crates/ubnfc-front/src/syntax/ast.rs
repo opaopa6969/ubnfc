@@ -81,6 +81,10 @@ pub struct TokenDecl {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum TokenValue {
+    Declarative {
+        expression: crate::declarative::LexicalExpression,
+        span: Span,
+    },
     Until {
         terminator: String,
         span: Span,
@@ -362,7 +366,7 @@ macro_rules! impl_span {
 }
 
 impl_span!(GlobalSetting: String, Block);
-impl_span!(TokenValue: Until, Negation, Lookahead, NegativeLookahead, CharRange,
+impl_span!(TokenValue: Declarative, Until, Negation, Lookahead, NegativeLookahead, CharRange,
     CaseInsensitive, Regex, Any, Eof, Empty, ClassRef, Builtin, Extern);
 impl_span!(Annotation: Root, Mapping, Eval, Whitespace, Interleave, Backref, ScopeTree,
     Declares, Catalog, LeftAssoc, RightAssoc, LongestChoice, PredictiveChoice,

@@ -19,7 +19,7 @@ public final class IrReader {
     public static final Set<String> FEATURES = Set.of("dualCursor", "cursorFrameFlag", "orderedChoice",
         "predictiveChoice", "longestChoice", "triviaInsertion", "captures", "deferredMapping", "scopeUndo",
         "backendDiagnostics", "memoReplay", "externTokens", "regex", "operators", "leftRecursionRewrite",
-        "recovery", "imports", "enum", "commonField", "catalog", "structuredOccurrences", "eval", "typeof");
+        "recovery", "imports", "enum", "commonField", "catalog", "structuredOccurrences", "eval", "typeof", "declarativeTokens");
     public static GrammarIr read(Path path) throws IOException { return read(Files.readString(path)); }
     public static GrammarIr read(String source) {
         Object value = Json.read(source);

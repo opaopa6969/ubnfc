@@ -132,6 +132,9 @@ pub(super) fn classify(value: &TokenValue, v2: bool) -> (ResolvedTokenValue, boo
         }
     };
     let value = match value {
+        TokenValue::Declarative { expression, .. } => R::Declarative {
+            expression: expression.clone(),
+        },
         // 中立名は「同じ FQN を書いたとき」と同じ分類器を通す。これで受理範囲が
         // 02-facts §A の表と一致することが構成的に保証される（D-041）。
         TokenValue::Builtin { name, .. } => {

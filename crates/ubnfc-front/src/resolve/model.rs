@@ -106,15 +106,37 @@ pub struct ResolvedToken {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolvedTokenValue {
-    Builtin { kind: BuiltinKind },
-    Extern { class_name: String },
-    Until { terminator: String },
-    Negation { chars: String },
-    Lookahead { pattern: String },
-    NegativeLookahead { pattern: String },
-    CharRange { min: String, max: String },
-    CaseInsensitive { word: String },
-    Regex { pattern: String },
+    Declarative {
+        expression: crate::declarative::LexicalExpression,
+    },
+    Builtin {
+        kind: BuiltinKind,
+    },
+    Extern {
+        class_name: String,
+    },
+    Until {
+        terminator: String,
+    },
+    Negation {
+        chars: String,
+    },
+    Lookahead {
+        pattern: String,
+    },
+    NegativeLookahead {
+        pattern: String,
+    },
+    CharRange {
+        min: String,
+        max: String,
+    },
+    CaseInsensitive {
+        word: String,
+    },
+    Regex {
+        pattern: String,
+    },
     Any,
     Eof,
     Empty,

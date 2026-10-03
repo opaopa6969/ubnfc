@@ -75,6 +75,11 @@ pub(super) fn validate(sem: &Semantics) -> Result<(), Vec<AnalysisError>> {
         }
     }
     for t in &sem.tokens {
+        if let TokenSpec::Declarative { expression } = &t.spec {
+            if let Err(message) = expression.validate() {
+                invalid(&mut errors, &t.symbol_id, message);
+            }
+        }
         match &t.spec {
             TokenSpec::CharRange { min, max }
                 if min > max || *max > 0x10ffff || (*min <= 0xdfff && *max >= 0xd800) =>

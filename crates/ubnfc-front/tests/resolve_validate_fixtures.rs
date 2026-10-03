@@ -108,6 +108,12 @@ fn external_fixture_diagnostics() {
                 } else if name.ends_with("/positive/annotations.ubnf") {
                     // 合成 fixture の `@custom`（D-045）。
                     BTreeMap::from([("W-ANNOTATION-UNKNOWN", 1)])
+                } else if name == "unlaxer-dsl/grammar/ubnf.ubnf" {
+                    // Capability metadata is not yet an ubnfc semantic contract.
+                    BTreeMap::from([
+                        ("W-ANNOTATION-UNKNOWN", 4),
+                        ("W-ANNOTATION-BACKREF-AMBIGUOUS", 1),
+                    ])
                 } else {
                     BTreeMap::new()
                 };
@@ -156,9 +162,8 @@ fn external_fixture_diagnostics() {
         BTreeMap::from([
             ("W-LEFT-RECURSION".into(), 2),
             ("W-GENERAL-NO-ROOT".into(), 3),
-            // D-045: `@rooted`（keyword-boundary.ubnf）と `@custom`（annotations.ubnf）。
-            // 24 fixture + `ubnf.ubnf` + P4 でこの 2 件だけが未知注釈である。
-            ("W-ANNOTATION-UNKNOWN".into(), 2)
+            ("W-ANNOTATION-UNKNOWN".into(), 6),
+            ("W-ANNOTATION-BACKREF-AMBIGUOUS".into(), 1)
         ])
     );
 }

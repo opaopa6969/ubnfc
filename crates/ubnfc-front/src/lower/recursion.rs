@@ -19,6 +19,9 @@ fn nullable_atom(a: &A, nullable: &BTreeSet<SymbolId>, cx: &Context<'_>) -> bool
                     .flat_map(|g| &g.tokens)
                     .find(|t| t.id == *symbol)
                     .is_none_or(|t| {
+                        if let r::ResolvedTokenValue::Declarative { expression } = &t.value {
+                            return expression.nullable();
+                        }
                         matches!(
                             t.value,
                             r::ResolvedTokenValue::Eof

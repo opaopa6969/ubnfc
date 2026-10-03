@@ -11,6 +11,12 @@ g_UBNFAST_2e_StringSettingValue(g_UBNFAST_2e_StringSettingValue),
 g_UBNFAST_2e_BlockSettingValue(g_UBNFAST_2e_BlockSettingValue),
 g_UBNFAST_2e_KeyValuePair(g_UBNFAST_2e_KeyValuePair),
 g_UBNFAST_2e_TokenDecl(g_UBNFAST_2e_TokenDecl),
+g_UBNFAST_2e_DeclarativeTokenValue(g_UBNFAST_2e_DeclarativeTokenValue),
+g_UBNFAST_2e_LexicalChoice(g_UBNFAST_2e_LexicalChoice),
+g_UBNFAST_2e_LexicalSequence(g_UBNFAST_2e_LexicalSequence),
+g_UBNFAST_2e_LexicalElement(g_UBNFAST_2e_LexicalElement),
+g_UBNFAST_2e_LexicalSuffix(g_UBNFAST_2e_LexicalSuffix),
+g_UBNFAST_2e_LexicalAtom(g_UBNFAST_2e_LexicalAtom),
 g_UBNFAST_2e_UntilExpression(g_UBNFAST_2e_UntilExpression),
 g_UBNFAST_2e_NegationExpression(g_UBNFAST_2e_NegationExpression),
 g_UBNFAST_2e_LookaheadExpression(g_UBNFAST_2e_LookaheadExpression),
@@ -18,6 +24,7 @@ g_UBNFAST_2e_NegativeLookaheadExpression(g_UBNFAST_2e_NegativeLookaheadExpressio
 g_UBNFAST_2e_CharRangeExpression(g_UBNFAST_2e_CharRangeExpression),
 g_UBNFAST_2e_CIExpression(g_UBNFAST_2e_CIExpression),
 g_UBNFAST_2e_RegexExpression(g_UBNFAST_2e_RegexExpression),
+g_UBNFAST_2e_AdapterExpression(g_UBNFAST_2e_AdapterExpression),
 g_UBNFAST_2e_AnyExpression(g_UBNFAST_2e_AnyExpression),
 g_UBNFAST_2e_EofExpression(g_UBNFAST_2e_EofExpression),
 g_UBNFAST_2e_EmptyExpression(g_UBNFAST_2e_EmptyExpression),
@@ -86,6 +93,25 @@ pub g_value: String,
 pub g_name: String,
 pub g_value: Box<Ast>,
 }
+#[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_DeclarativeTokenValue { pub span:Span, pub node_id:usize,
+pub g_source: Box<Ast>,
+}
+#[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_LexicalChoice { pub span:Span, pub node_id:usize,
+pub g_alternatives: Vec<Ast>,
+}
+#[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_LexicalSequence { pub span:Span, pub node_id:usize,
+pub g_elements: Vec<Ast>,
+}
+#[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_LexicalElement { pub span:Span, pub node_id:usize,
+pub g_atom: Box<Ast>,
+pub g_suffix: Option<Box<Ast>>,
+}
+#[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_LexicalSuffix { pub span:Span, pub node_id:usize,
+pub g_text: String,
+}
+#[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_LexicalAtom { pub span:Span, pub node_id:usize,
+pub g_value: Box<Ast>,
+}
 #[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_UntilExpression { pub span:Span, pub node_id:usize,
 pub g_terminator: String,
 }
@@ -107,6 +133,10 @@ pub g_word: String,
 }
 #[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_RegexExpression { pub span:Span, pub node_id:usize,
 pub g_pattern: String,
+}
+#[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_AdapterExpression { pub span:Span, pub node_id:usize,
+pub g_id: String,
+pub g_version: String,
 }
 #[derive(Clone,Debug,PartialEq)] pub struct g_UBNFAST_2e_AnyExpression { pub span:Span, pub node_id:usize,
 }
@@ -216,6 +246,12 @@ Self::g_UBNFAST_2e_StringSettingValue(node)=>Some(node.span),
 Self::g_UBNFAST_2e_BlockSettingValue(node)=>Some(node.span),
 Self::g_UBNFAST_2e_KeyValuePair(node)=>Some(node.span),
 Self::g_UBNFAST_2e_TokenDecl(node)=>Some(node.span),
+Self::g_UBNFAST_2e_DeclarativeTokenValue(node)=>Some(node.span),
+Self::g_UBNFAST_2e_LexicalChoice(node)=>Some(node.span),
+Self::g_UBNFAST_2e_LexicalSequence(node)=>Some(node.span),
+Self::g_UBNFAST_2e_LexicalElement(node)=>Some(node.span),
+Self::g_UBNFAST_2e_LexicalSuffix(node)=>Some(node.span),
+Self::g_UBNFAST_2e_LexicalAtom(node)=>Some(node.span),
 Self::g_UBNFAST_2e_UntilExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_NegationExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_LookaheadExpression(node)=>Some(node.span),
@@ -223,6 +259,7 @@ Self::g_UBNFAST_2e_NegativeLookaheadExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_CharRangeExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_CIExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_RegexExpression(node)=>Some(node.span),
+Self::g_UBNFAST_2e_AdapterExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_AnyExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_EofExpression(node)=>Some(node.span),
 Self::g_UBNFAST_2e_EmptyExpression(node)=>Some(node.span),
@@ -267,6 +304,12 @@ Self::g_UBNFAST_2e_StringSettingValue(_)=>"StringSettingValue",
 Self::g_UBNFAST_2e_BlockSettingValue(_)=>"BlockSettingValue",
 Self::g_UBNFAST_2e_KeyValuePair(_)=>"KeyValuePair",
 Self::g_UBNFAST_2e_TokenDecl(_)=>"TokenDecl",
+Self::g_UBNFAST_2e_DeclarativeTokenValue(_)=>"DeclarativeTokenValue",
+Self::g_UBNFAST_2e_LexicalChoice(_)=>"LexicalChoice",
+Self::g_UBNFAST_2e_LexicalSequence(_)=>"LexicalSequence",
+Self::g_UBNFAST_2e_LexicalElement(_)=>"LexicalElement",
+Self::g_UBNFAST_2e_LexicalSuffix(_)=>"LexicalSuffix",
+Self::g_UBNFAST_2e_LexicalAtom(_)=>"LexicalAtom",
 Self::g_UBNFAST_2e_UntilExpression(_)=>"UntilExpression",
 Self::g_UBNFAST_2e_NegationExpression(_)=>"NegationExpression",
 Self::g_UBNFAST_2e_LookaheadExpression(_)=>"LookaheadExpression",
@@ -274,6 +317,7 @@ Self::g_UBNFAST_2e_NegativeLookaheadExpression(_)=>"NegativeLookaheadExpression"
 Self::g_UBNFAST_2e_CharRangeExpression(_)=>"CharRangeExpression",
 Self::g_UBNFAST_2e_CIExpression(_)=>"CIExpression",
 Self::g_UBNFAST_2e_RegexExpression(_)=>"RegexExpression",
+Self::g_UBNFAST_2e_AdapterExpression(_)=>"AdapterExpression",
 Self::g_UBNFAST_2e_AnyExpression(_)=>"AnyExpression",
 Self::g_UBNFAST_2e_EofExpression(_)=>"EofExpression",
 Self::g_UBNFAST_2e_EmptyExpression(_)=>"EmptyExpression",
@@ -318,6 +362,12 @@ Self::g_UBNFAST_2e_StringSettingValue(_)=>"UBNFAST.StringSettingValue",
 Self::g_UBNFAST_2e_BlockSettingValue(_)=>"UBNFAST.BlockSettingValue",
 Self::g_UBNFAST_2e_KeyValuePair(_)=>"UBNFAST.KeyValuePair",
 Self::g_UBNFAST_2e_TokenDecl(_)=>"UBNFAST.TokenDecl",
+Self::g_UBNFAST_2e_DeclarativeTokenValue(_)=>"UBNFAST.DeclarativeTokenValue",
+Self::g_UBNFAST_2e_LexicalChoice(_)=>"UBNFAST.LexicalChoice",
+Self::g_UBNFAST_2e_LexicalSequence(_)=>"UBNFAST.LexicalSequence",
+Self::g_UBNFAST_2e_LexicalElement(_)=>"UBNFAST.LexicalElement",
+Self::g_UBNFAST_2e_LexicalSuffix(_)=>"UBNFAST.LexicalSuffix",
+Self::g_UBNFAST_2e_LexicalAtom(_)=>"UBNFAST.LexicalAtom",
 Self::g_UBNFAST_2e_UntilExpression(_)=>"UBNFAST.UntilExpression",
 Self::g_UBNFAST_2e_NegationExpression(_)=>"UBNFAST.NegationExpression",
 Self::g_UBNFAST_2e_LookaheadExpression(_)=>"UBNFAST.LookaheadExpression",
@@ -325,6 +375,7 @@ Self::g_UBNFAST_2e_NegativeLookaheadExpression(_)=>"UBNFAST.NegativeLookaheadExp
 Self::g_UBNFAST_2e_CharRangeExpression(_)=>"UBNFAST.CharRangeExpression",
 Self::g_UBNFAST_2e_CIExpression(_)=>"UBNFAST.CIExpression",
 Self::g_UBNFAST_2e_RegexExpression(_)=>"UBNFAST.RegexExpression",
+Self::g_UBNFAST_2e_AdapterExpression(_)=>"UBNFAST.AdapterExpression",
 Self::g_UBNFAST_2e_AnyExpression(_)=>"UBNFAST.AnyExpression",
 Self::g_UBNFAST_2e_EofExpression(_)=>"UBNFAST.EofExpression",
 Self::g_UBNFAST_2e_EmptyExpression(_)=>"UBNFAST.EmptyExpression",
@@ -393,6 +444,25 @@ Self::g_UBNFAST_2e_TokenDecl(node)=>serde_json::json!({"fields":{
 "name":node.g_name,
 "value":node.g_value.canonical_value(),
 },"span":node.span,"type":"TokenDecl"}),
+Self::g_UBNFAST_2e_DeclarativeTokenValue(node)=>serde_json::json!({"fields":{
+"source":node.g_source.canonical_value(),
+},"span":node.span,"type":"DeclarativeTokenValue"}),
+Self::g_UBNFAST_2e_LexicalChoice(node)=>serde_json::json!({"fields":{
+"alternatives":node.g_alternatives.iter().map(Ast::canonical_value).collect::<Vec<_>>(),
+},"span":node.span,"type":"LexicalChoice"}),
+Self::g_UBNFAST_2e_LexicalSequence(node)=>serde_json::json!({"fields":{
+"elements":node.g_elements.iter().map(Ast::canonical_value).collect::<Vec<_>>(),
+},"span":node.span,"type":"LexicalSequence"}),
+Self::g_UBNFAST_2e_LexicalElement(node)=>serde_json::json!({"fields":{
+"atom":node.g_atom.canonical_value(),
+"suffix":node.g_suffix.as_ref().map(|v|v.canonical_value()),
+},"span":node.span,"type":"LexicalElement"}),
+Self::g_UBNFAST_2e_LexicalSuffix(node)=>serde_json::json!({"fields":{
+"text":node.g_text,
+},"span":node.span,"type":"LexicalSuffix"}),
+Self::g_UBNFAST_2e_LexicalAtom(node)=>serde_json::json!({"fields":{
+"value":node.g_value.canonical_value(),
+},"span":node.span,"type":"LexicalAtom"}),
 Self::g_UBNFAST_2e_UntilExpression(node)=>serde_json::json!({"fields":{
 "terminator":node.g_terminator,
 },"span":node.span,"type":"UntilExpression"}),
@@ -415,6 +485,10 @@ Self::g_UBNFAST_2e_CIExpression(node)=>serde_json::json!({"fields":{
 Self::g_UBNFAST_2e_RegexExpression(node)=>serde_json::json!({"fields":{
 "pattern":node.g_pattern,
 },"span":node.span,"type":"RegexExpression"}),
+Self::g_UBNFAST_2e_AdapterExpression(node)=>serde_json::json!({"fields":{
+"id":node.g_id,
+"version":node.g_version,
+},"span":node.span,"type":"AdapterExpression"}),
 Self::g_UBNFAST_2e_AnyExpression(node)=>serde_json::json!({"fields":{
 },"span":node.span,"type":"AnyExpression"}),
 Self::g_UBNFAST_2e_EofExpression(node)=>serde_json::json!({"fields":{
@@ -882,50 +956,57 @@ pub const K_g_UBNFAST_2e_StringSettingValue: u16 = 6;
 pub const K_g_UBNFAST_2e_BlockSettingValue: u16 = 7;
 pub const K_g_UBNFAST_2e_KeyValuePair: u16 = 8;
 pub const K_g_UBNFAST_2e_TokenDecl: u16 = 9;
-pub const K_g_UBNFAST_2e_UntilExpression: u16 = 10;
-pub const K_g_UBNFAST_2e_NegationExpression: u16 = 11;
-pub const K_g_UBNFAST_2e_LookaheadExpression: u16 = 12;
-pub const K_g_UBNFAST_2e_NegativeLookaheadExpression: u16 = 13;
-pub const K_g_UBNFAST_2e_CharRangeExpression: u16 = 14;
-pub const K_g_UBNFAST_2e_CIExpression: u16 = 15;
-pub const K_g_UBNFAST_2e_RegexExpression: u16 = 16;
-pub const K_g_UBNFAST_2e_AnyExpression: u16 = 17;
-pub const K_g_UBNFAST_2e_EofExpression: u16 = 18;
-pub const K_g_UBNFAST_2e_EmptyExpression: u16 = 19;
-pub const K_g_UBNFAST_2e_RuleDecl: u16 = 20;
-pub const K_g_UBNFAST_2e_RootAnnotation: u16 = 21;
-pub const K_g_UBNFAST_2e_MappingAnnotation: u16 = 22;
-pub const K_g_UBNFAST_2e_EvalAnnotation: u16 = 23;
-pub const K_g_UBNFAST_2e_WhitespaceAnnotation: u16 = 24;
-pub const K_g_UBNFAST_2e_InterleaveAnnotation: u16 = 25;
-pub const K_g_UBNFAST_2e_BackrefAnnotation: u16 = 26;
-pub const K_g_UBNFAST_2e_ScopeTreeAnnotation: u16 = 27;
-pub const K_g_UBNFAST_2e_DeclaresAnnotation: u16 = 28;
-pub const K_g_UBNFAST_2e_CatalogAnnotation: u16 = 29;
-pub const K_g_UBNFAST_2e_LeftAssocAnnotation: u16 = 30;
-pub const K_g_UBNFAST_2e_RightAssocAnnotation: u16 = 31;
-pub const K_g_UBNFAST_2e_LongestChoiceAnnotation: u16 = 32;
-pub const K_g_UBNFAST_2e_PredictiveChoiceAnnotation: u16 = 33;
-pub const K_g_UBNFAST_2e_PrecedenceAnnotation: u16 = 34;
-pub const K_g_UBNFAST_2e_DocAnnotation: u16 = 35;
-pub const K_g_UBNFAST_2e_RecoveryAnnotation: u16 = 36;
-pub const K_g_UBNFAST_2e_SkipAnnotation: u16 = 37;
-pub const K_g_UBNFAST_2e_CommonFieldAnnotation: u16 = 38;
-pub const K_g_UBNFAST_2e_EnumAnnotation: u16 = 39;
-pub const K_g_UBNFAST_2e_SimpleAnnotation: u16 = 40;
-pub const K_g_UBNFAST_2e_ChoiceBody: u16 = 41;
-pub const K_g_UBNFAST_2e_SequenceBody: u16 = 42;
-pub const K_g_UBNFAST_2e_AnnotatedElement: u16 = 43;
-pub const K_g_UBNFAST_2e_GroupElement: u16 = 44;
-pub const K_g_UBNFAST_2e_OptionalElement: u16 = 45;
-pub const K_g_UBNFAST_2e_RepeatElement: u16 = 46;
-pub const K_g_UBNFAST_2e_ErrorElement: u16 = 47;
-pub const K_g_UBNFAST_2e_TerminalElement: u16 = 48;
-pub const K_g_UBNFAST_2e_TypeofElement: u16 = 49;
-pub const K_g_UBNFAST_2e_DottedIdentifier: u16 = 50;
-pub(crate) const TYPE_IDS: &[&str] = &["text","null","UBNFAST.UBNFFile","UBNFAST.ImportDecl","UBNFAST.GrammarDecl","UBNFAST.GlobalSetting","UBNFAST.StringSettingValue","UBNFAST.BlockSettingValue","UBNFAST.KeyValuePair","UBNFAST.TokenDecl","UBNFAST.UntilExpression","UBNFAST.NegationExpression","UBNFAST.LookaheadExpression","UBNFAST.NegativeLookaheadExpression","UBNFAST.CharRangeExpression","UBNFAST.CIExpression","UBNFAST.RegexExpression","UBNFAST.AnyExpression","UBNFAST.EofExpression","UBNFAST.EmptyExpression","UBNFAST.RuleDecl","UBNFAST.RootAnnotation","UBNFAST.MappingAnnotation","UBNFAST.EvalAnnotation","UBNFAST.WhitespaceAnnotation","UBNFAST.InterleaveAnnotation","UBNFAST.BackrefAnnotation","UBNFAST.ScopeTreeAnnotation","UBNFAST.DeclaresAnnotation","UBNFAST.CatalogAnnotation","UBNFAST.LeftAssocAnnotation","UBNFAST.RightAssocAnnotation","UBNFAST.LongestChoiceAnnotation","UBNFAST.PredictiveChoiceAnnotation","UBNFAST.PrecedenceAnnotation","UBNFAST.DocAnnotation","UBNFAST.RecoveryAnnotation","UBNFAST.SkipAnnotation","UBNFAST.CommonFieldAnnotation","UBNFAST.EnumAnnotation","UBNFAST.SimpleAnnotation","UBNFAST.ChoiceBody","UBNFAST.SequenceBody","UBNFAST.AnnotatedElement","UBNFAST.GroupElement","UBNFAST.OptionalElement","UBNFAST.RepeatElement","UBNFAST.ErrorElement","UBNFAST.TerminalElement","UBNFAST.TypeofElement","UBNFAST.DottedIdentifier"];
-pub(crate) const TYPE_NAMES: &[&str] = &["text","null","UBNFFile","ImportDecl","GrammarDecl","GlobalSetting","StringSettingValue","BlockSettingValue","KeyValuePair","TokenDecl","UntilExpression","NegationExpression","LookaheadExpression","NegativeLookaheadExpression","CharRangeExpression","CIExpression","RegexExpression","AnyExpression","EofExpression","EmptyExpression","RuleDecl","RootAnnotation","MappingAnnotation","EvalAnnotation","WhitespaceAnnotation","InterleaveAnnotation","BackrefAnnotation","ScopeTreeAnnotation","DeclaresAnnotation","CatalogAnnotation","LeftAssocAnnotation","RightAssocAnnotation","LongestChoiceAnnotation","PredictiveChoiceAnnotation","PrecedenceAnnotation","DocAnnotation","RecoveryAnnotation","SkipAnnotation","CommonFieldAnnotation","EnumAnnotation","SimpleAnnotation","ChoiceBody","SequenceBody","AnnotatedElement","GroupElement","OptionalElement","RepeatElement","ErrorElement","TerminalElement","TypeofElement","DottedIdentifier"];
-pub(crate) const RULE_IDS: &[&str] = &["UBNF::UBNFFile", "UBNF::ImportDecl", "UBNF::GrammarDecl", "UBNF::GlobalSetting", "UBNF::SettingValue", "UBNF::StringSettingValue", "UBNF::BlockSettingValue", "UBNF::KeyValuePair", "UBNF::TokenDecl", "UBNF::TokenValue", "UBNF::UntilExpression", "UBNF::NegationExpression", "UBNF::LookaheadExpression", "UBNF::NegativeLookaheadExpression", "UBNF::CharRangeExpression", "UBNF::CIExpression", "UBNF::RegexExpression", "UBNF::AnyExpression", "UBNF::EofExpression", "UBNF::EmptyExpression", "UBNF::RuleDecl", "UBNF::Annotation", "UBNF::RootAnnotation", "UBNF::MappingAnnotation", "UBNF::EvalAnnotation", "UBNF::WhitespaceAnnotation", "UBNF::InterleaveAnnotation", "UBNF::BackrefAnnotation", "UBNF::ScopeTreeAnnotation", "UBNF::DeclaresAnnotation", "UBNF::CatalogAnnotation", "UBNF::LeftAssocAnnotation", "UBNF::RightAssocAnnotation", "UBNF::LongestChoiceAnnotation", "UBNF::PredictiveChoiceAnnotation", "UBNF::PrecedenceAnnotation", "UBNF::DocAnnotation", "UBNF::RecoveryAnnotation", "UBNF::SkipAnnotation", "UBNF::CommonFieldAnnotation", "UBNF::EnumAnnotation", "UBNF::SimpleAnnotation", "UBNF::ChoiceBody", "UBNF::SequenceBody", "UBNF::AnnotatedElement", "UBNF::PostfixQuantifier", "UBNF::SeparatedBy", "UBNF::BoundedQuantifier", "UBNF::Digits", "UBNF::AtomicElement", "UBNF::GroupElement", "UBNF::OptionalElement", "UBNF::RepeatElement", "UBNF::ErrorElement", "UBNF::TerminalElement", "UBNF::QuantifiedRef", "UBNF::TypeofElement", "UBNF::DottedIdentifier", "UBNF::RuleBody"];
+pub const K_g_UBNFAST_2e_DeclarativeTokenValue: u16 = 10;
+pub const K_g_UBNFAST_2e_LexicalChoice: u16 = 11;
+pub const K_g_UBNFAST_2e_LexicalSequence: u16 = 12;
+pub const K_g_UBNFAST_2e_LexicalElement: u16 = 13;
+pub const K_g_UBNFAST_2e_LexicalSuffix: u16 = 14;
+pub const K_g_UBNFAST_2e_LexicalAtom: u16 = 15;
+pub const K_g_UBNFAST_2e_UntilExpression: u16 = 16;
+pub const K_g_UBNFAST_2e_NegationExpression: u16 = 17;
+pub const K_g_UBNFAST_2e_LookaheadExpression: u16 = 18;
+pub const K_g_UBNFAST_2e_NegativeLookaheadExpression: u16 = 19;
+pub const K_g_UBNFAST_2e_CharRangeExpression: u16 = 20;
+pub const K_g_UBNFAST_2e_CIExpression: u16 = 21;
+pub const K_g_UBNFAST_2e_RegexExpression: u16 = 22;
+pub const K_g_UBNFAST_2e_AdapterExpression: u16 = 23;
+pub const K_g_UBNFAST_2e_AnyExpression: u16 = 24;
+pub const K_g_UBNFAST_2e_EofExpression: u16 = 25;
+pub const K_g_UBNFAST_2e_EmptyExpression: u16 = 26;
+pub const K_g_UBNFAST_2e_RuleDecl: u16 = 27;
+pub const K_g_UBNFAST_2e_RootAnnotation: u16 = 28;
+pub const K_g_UBNFAST_2e_MappingAnnotation: u16 = 29;
+pub const K_g_UBNFAST_2e_EvalAnnotation: u16 = 30;
+pub const K_g_UBNFAST_2e_WhitespaceAnnotation: u16 = 31;
+pub const K_g_UBNFAST_2e_InterleaveAnnotation: u16 = 32;
+pub const K_g_UBNFAST_2e_BackrefAnnotation: u16 = 33;
+pub const K_g_UBNFAST_2e_ScopeTreeAnnotation: u16 = 34;
+pub const K_g_UBNFAST_2e_DeclaresAnnotation: u16 = 35;
+pub const K_g_UBNFAST_2e_CatalogAnnotation: u16 = 36;
+pub const K_g_UBNFAST_2e_LeftAssocAnnotation: u16 = 37;
+pub const K_g_UBNFAST_2e_RightAssocAnnotation: u16 = 38;
+pub const K_g_UBNFAST_2e_LongestChoiceAnnotation: u16 = 39;
+pub const K_g_UBNFAST_2e_PredictiveChoiceAnnotation: u16 = 40;
+pub const K_g_UBNFAST_2e_PrecedenceAnnotation: u16 = 41;
+pub const K_g_UBNFAST_2e_DocAnnotation: u16 = 42;
+pub const K_g_UBNFAST_2e_RecoveryAnnotation: u16 = 43;
+pub const K_g_UBNFAST_2e_SkipAnnotation: u16 = 44;
+pub const K_g_UBNFAST_2e_CommonFieldAnnotation: u16 = 45;
+pub const K_g_UBNFAST_2e_EnumAnnotation: u16 = 46;
+pub const K_g_UBNFAST_2e_SimpleAnnotation: u16 = 47;
+pub const K_g_UBNFAST_2e_ChoiceBody: u16 = 48;
+pub const K_g_UBNFAST_2e_SequenceBody: u16 = 49;
+pub const K_g_UBNFAST_2e_AnnotatedElement: u16 = 50;
+pub const K_g_UBNFAST_2e_GroupElement: u16 = 51;
+pub const K_g_UBNFAST_2e_OptionalElement: u16 = 52;
+pub const K_g_UBNFAST_2e_RepeatElement: u16 = 53;
+pub const K_g_UBNFAST_2e_ErrorElement: u16 = 54;
+pub const K_g_UBNFAST_2e_TerminalElement: u16 = 55;
+pub const K_g_UBNFAST_2e_TypeofElement: u16 = 56;
+pub const K_g_UBNFAST_2e_DottedIdentifier: u16 = 57;
+pub(crate) const TYPE_IDS: &[&str] = &["text","null","UBNFAST.UBNFFile","UBNFAST.ImportDecl","UBNFAST.GrammarDecl","UBNFAST.GlobalSetting","UBNFAST.StringSettingValue","UBNFAST.BlockSettingValue","UBNFAST.KeyValuePair","UBNFAST.TokenDecl","UBNFAST.DeclarativeTokenValue","UBNFAST.LexicalChoice","UBNFAST.LexicalSequence","UBNFAST.LexicalElement","UBNFAST.LexicalSuffix","UBNFAST.LexicalAtom","UBNFAST.UntilExpression","UBNFAST.NegationExpression","UBNFAST.LookaheadExpression","UBNFAST.NegativeLookaheadExpression","UBNFAST.CharRangeExpression","UBNFAST.CIExpression","UBNFAST.RegexExpression","UBNFAST.AdapterExpression","UBNFAST.AnyExpression","UBNFAST.EofExpression","UBNFAST.EmptyExpression","UBNFAST.RuleDecl","UBNFAST.RootAnnotation","UBNFAST.MappingAnnotation","UBNFAST.EvalAnnotation","UBNFAST.WhitespaceAnnotation","UBNFAST.InterleaveAnnotation","UBNFAST.BackrefAnnotation","UBNFAST.ScopeTreeAnnotation","UBNFAST.DeclaresAnnotation","UBNFAST.CatalogAnnotation","UBNFAST.LeftAssocAnnotation","UBNFAST.RightAssocAnnotation","UBNFAST.LongestChoiceAnnotation","UBNFAST.PredictiveChoiceAnnotation","UBNFAST.PrecedenceAnnotation","UBNFAST.DocAnnotation","UBNFAST.RecoveryAnnotation","UBNFAST.SkipAnnotation","UBNFAST.CommonFieldAnnotation","UBNFAST.EnumAnnotation","UBNFAST.SimpleAnnotation","UBNFAST.ChoiceBody","UBNFAST.SequenceBody","UBNFAST.AnnotatedElement","UBNFAST.GroupElement","UBNFAST.OptionalElement","UBNFAST.RepeatElement","UBNFAST.ErrorElement","UBNFAST.TerminalElement","UBNFAST.TypeofElement","UBNFAST.DottedIdentifier"];
+pub(crate) const TYPE_NAMES: &[&str] = &["text","null","UBNFFile","ImportDecl","GrammarDecl","GlobalSetting","StringSettingValue","BlockSettingValue","KeyValuePair","TokenDecl","DeclarativeTokenValue","LexicalChoice","LexicalSequence","LexicalElement","LexicalSuffix","LexicalAtom","UntilExpression","NegationExpression","LookaheadExpression","NegativeLookaheadExpression","CharRangeExpression","CIExpression","RegexExpression","AdapterExpression","AnyExpression","EofExpression","EmptyExpression","RuleDecl","RootAnnotation","MappingAnnotation","EvalAnnotation","WhitespaceAnnotation","InterleaveAnnotation","BackrefAnnotation","ScopeTreeAnnotation","DeclaresAnnotation","CatalogAnnotation","LeftAssocAnnotation","RightAssocAnnotation","LongestChoiceAnnotation","PredictiveChoiceAnnotation","PrecedenceAnnotation","DocAnnotation","RecoveryAnnotation","SkipAnnotation","CommonFieldAnnotation","EnumAnnotation","SimpleAnnotation","ChoiceBody","SequenceBody","AnnotatedElement","GroupElement","OptionalElement","RepeatElement","ErrorElement","TerminalElement","TypeofElement","DottedIdentifier"];
+pub(crate) const RULE_IDS: &[&str] = &["UBNF::UBNFFile", "UBNF::ImportDecl", "UBNF::GrammarDecl", "UBNF::GlobalSetting", "UBNF::SettingValue", "UBNF::StringSettingValue", "UBNF::BlockSettingValue", "UBNF::KeyValuePair", "UBNF::TokenDecl", "UBNF::DeclarativeTokenValue", "UBNF::LexicalBody", "UBNF::LexicalSequence", "UBNF::LexicalElement", "UBNF::LexicalSuffix", "UBNF::LexicalAtom", "UBNF::TokenValue", "UBNF::UntilExpression", "UBNF::NegationExpression", "UBNF::LookaheadExpression", "UBNF::NegativeLookaheadExpression", "UBNF::CharRangeExpression", "UBNF::CIExpression", "UBNF::RegexExpression", "UBNF::AdapterExpression", "UBNF::AnyExpression", "UBNF::EofExpression", "UBNF::EmptyExpression", "UBNF::RuleDecl", "UBNF::Annotation", "UBNF::RootAnnotation", "UBNF::MappingAnnotation", "UBNF::EvalAnnotation", "UBNF::WhitespaceAnnotation", "UBNF::InterleaveAnnotation", "UBNF::BackrefAnnotation", "UBNF::ScopeTreeAnnotation", "UBNF::DeclaresAnnotation", "UBNF::CatalogAnnotation", "UBNF::LeftAssocAnnotation", "UBNF::RightAssocAnnotation", "UBNF::LongestChoiceAnnotation", "UBNF::PredictiveChoiceAnnotation", "UBNF::PrecedenceAnnotation", "UBNF::DocAnnotation", "UBNF::RecoveryAnnotation", "UBNF::SkipAnnotation", "UBNF::CommonFieldAnnotation", "UBNF::EnumAnnotation", "UBNF::SimpleAnnotation", "UBNF::ChoiceBody", "UBNF::SequenceBody", "UBNF::AnnotatedElement", "UBNF::PostfixQuantifier", "UBNF::SeparatedBy", "UBNF::BoundedQuantifier", "UBNF::Digits", "UBNF::AtomicElement", "UBNF::GroupElement", "UBNF::OptionalElement", "UBNF::RepeatElement", "UBNF::ErrorElement", "UBNF::TerminalElement", "UBNF::QuantifiedRef", "UBNF::TypeofElement", "UBNF::DottedIdentifier", "UBNF::RuleBody"];
 /// `super::Ast` と同じ形の、木への参照。
 #[derive(Clone, Copy, Debug)]
 pub enum Node<'t> { Text(&'t str), Null,
@@ -937,6 +1018,12 @@ g_UBNFAST_2e_StringSettingValue(g_UBNFAST_2e_StringSettingValue<'t>),
 g_UBNFAST_2e_BlockSettingValue(g_UBNFAST_2e_BlockSettingValue<'t>),
 g_UBNFAST_2e_KeyValuePair(g_UBNFAST_2e_KeyValuePair<'t>),
 g_UBNFAST_2e_TokenDecl(g_UBNFAST_2e_TokenDecl<'t>),
+g_UBNFAST_2e_DeclarativeTokenValue(g_UBNFAST_2e_DeclarativeTokenValue<'t>),
+g_UBNFAST_2e_LexicalChoice(g_UBNFAST_2e_LexicalChoice<'t>),
+g_UBNFAST_2e_LexicalSequence(g_UBNFAST_2e_LexicalSequence<'t>),
+g_UBNFAST_2e_LexicalElement(g_UBNFAST_2e_LexicalElement<'t>),
+g_UBNFAST_2e_LexicalSuffix(g_UBNFAST_2e_LexicalSuffix<'t>),
+g_UBNFAST_2e_LexicalAtom(g_UBNFAST_2e_LexicalAtom<'t>),
 g_UBNFAST_2e_UntilExpression(g_UBNFAST_2e_UntilExpression<'t>),
 g_UBNFAST_2e_NegationExpression(g_UBNFAST_2e_NegationExpression<'t>),
 g_UBNFAST_2e_LookaheadExpression(g_UBNFAST_2e_LookaheadExpression<'t>),
@@ -944,6 +1031,7 @@ g_UBNFAST_2e_NegativeLookaheadExpression(g_UBNFAST_2e_NegativeLookaheadExpressio
 g_UBNFAST_2e_CharRangeExpression(g_UBNFAST_2e_CharRangeExpression<'t>),
 g_UBNFAST_2e_CIExpression(g_UBNFAST_2e_CIExpression<'t>),
 g_UBNFAST_2e_RegexExpression(g_UBNFAST_2e_RegexExpression<'t>),
+g_UBNFAST_2e_AdapterExpression(g_UBNFAST_2e_AdapterExpression<'t>),
 g_UBNFAST_2e_AnyExpression(g_UBNFAST_2e_AnyExpression<'t>),
 g_UBNFAST_2e_EofExpression(g_UBNFAST_2e_EofExpression<'t>),
 g_UBNFAST_2e_EmptyExpression(g_UBNFAST_2e_EmptyExpression<'t>),
@@ -990,6 +1078,12 @@ K_g_UBNFAST_2e_StringSettingValue => Node::g_UBNFAST_2e_StringSettingValue(g_UBN
 K_g_UBNFAST_2e_BlockSettingValue => Node::g_UBNFAST_2e_BlockSettingValue(g_UBNFAST_2e_BlockSettingValue { tree, id }),
 K_g_UBNFAST_2e_KeyValuePair => Node::g_UBNFAST_2e_KeyValuePair(g_UBNFAST_2e_KeyValuePair { tree, id }),
 K_g_UBNFAST_2e_TokenDecl => Node::g_UBNFAST_2e_TokenDecl(g_UBNFAST_2e_TokenDecl { tree, id }),
+K_g_UBNFAST_2e_DeclarativeTokenValue => Node::g_UBNFAST_2e_DeclarativeTokenValue(g_UBNFAST_2e_DeclarativeTokenValue { tree, id }),
+K_g_UBNFAST_2e_LexicalChoice => Node::g_UBNFAST_2e_LexicalChoice(g_UBNFAST_2e_LexicalChoice { tree, id }),
+K_g_UBNFAST_2e_LexicalSequence => Node::g_UBNFAST_2e_LexicalSequence(g_UBNFAST_2e_LexicalSequence { tree, id }),
+K_g_UBNFAST_2e_LexicalElement => Node::g_UBNFAST_2e_LexicalElement(g_UBNFAST_2e_LexicalElement { tree, id }),
+K_g_UBNFAST_2e_LexicalSuffix => Node::g_UBNFAST_2e_LexicalSuffix(g_UBNFAST_2e_LexicalSuffix { tree, id }),
+K_g_UBNFAST_2e_LexicalAtom => Node::g_UBNFAST_2e_LexicalAtom(g_UBNFAST_2e_LexicalAtom { tree, id }),
 K_g_UBNFAST_2e_UntilExpression => Node::g_UBNFAST_2e_UntilExpression(g_UBNFAST_2e_UntilExpression { tree, id }),
 K_g_UBNFAST_2e_NegationExpression => Node::g_UBNFAST_2e_NegationExpression(g_UBNFAST_2e_NegationExpression { tree, id }),
 K_g_UBNFAST_2e_LookaheadExpression => Node::g_UBNFAST_2e_LookaheadExpression(g_UBNFAST_2e_LookaheadExpression { tree, id }),
@@ -997,6 +1091,7 @@ K_g_UBNFAST_2e_NegativeLookaheadExpression => Node::g_UBNFAST_2e_NegativeLookahe
 K_g_UBNFAST_2e_CharRangeExpression => Node::g_UBNFAST_2e_CharRangeExpression(g_UBNFAST_2e_CharRangeExpression { tree, id }),
 K_g_UBNFAST_2e_CIExpression => Node::g_UBNFAST_2e_CIExpression(g_UBNFAST_2e_CIExpression { tree, id }),
 K_g_UBNFAST_2e_RegexExpression => Node::g_UBNFAST_2e_RegexExpression(g_UBNFAST_2e_RegexExpression { tree, id }),
+K_g_UBNFAST_2e_AdapterExpression => Node::g_UBNFAST_2e_AdapterExpression(g_UBNFAST_2e_AdapterExpression { tree, id }),
 K_g_UBNFAST_2e_AnyExpression => Node::g_UBNFAST_2e_AnyExpression(g_UBNFAST_2e_AnyExpression { tree, id }),
 K_g_UBNFAST_2e_EofExpression => Node::g_UBNFAST_2e_EofExpression(g_UBNFAST_2e_EofExpression { tree, id }),
 K_g_UBNFAST_2e_EmptyExpression => Node::g_UBNFAST_2e_EmptyExpression(g_UBNFAST_2e_EmptyExpression { tree, id }),
@@ -1113,6 +1208,61 @@ pub fn to_ast(&self) -> super::g_UBNFAST_2e_TokenDecl { self.tree.project_g_UBNF
 pub fn g_name(&self) -> &'t str { let tree = self.tree; tree.text_in(&tree.source, tree.slot(self.id, 0)) }
 pub fn g_value(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.tree.slot(self.id, 1) } }
 }
+#[derive(Clone, Copy)] pub struct g_UBNFAST_2e_DeclarativeTokenValue<'t> { tree: &'t AstTree, id: u32 }
+impl std::fmt::Debug for g_UBNFAST_2e_DeclarativeTokenValue<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_DeclarativeTokenValue").field("id", &self.id).finish() } }
+impl<'t> g_UBNFAST_2e_DeclarativeTokenValue<'t> {
+pub fn node(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.id } }
+pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
+pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
+pub fn to_ast(&self) -> super::g_UBNFAST_2e_DeclarativeTokenValue { self.tree.project_g_UBNFAST_2e_DeclarativeTokenValue(&self.tree.source, &self.tree.nodes[self.id as usize]) }
+pub fn g_source(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.tree.slot(self.id, 0) } }
+}
+#[derive(Clone, Copy)] pub struct g_UBNFAST_2e_LexicalChoice<'t> { tree: &'t AstTree, id: u32 }
+impl std::fmt::Debug for g_UBNFAST_2e_LexicalChoice<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_LexicalChoice").field("id", &self.id).finish() } }
+impl<'t> g_UBNFAST_2e_LexicalChoice<'t> {
+pub fn node(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.id } }
+pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
+pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
+pub fn to_ast(&self) -> super::g_UBNFAST_2e_LexicalChoice { self.tree.project_g_UBNFAST_2e_LexicalChoice(&self.tree.source, &self.tree.nodes[self.id as usize]) }
+pub fn g_alternatives(&self) -> NodeList<'t> { NodeList { tree: self.tree, ids: self.tree.items(self.id, 0) } }
+}
+#[derive(Clone, Copy)] pub struct g_UBNFAST_2e_LexicalSequence<'t> { tree: &'t AstTree, id: u32 }
+impl std::fmt::Debug for g_UBNFAST_2e_LexicalSequence<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_LexicalSequence").field("id", &self.id).finish() } }
+impl<'t> g_UBNFAST_2e_LexicalSequence<'t> {
+pub fn node(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.id } }
+pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
+pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
+pub fn to_ast(&self) -> super::g_UBNFAST_2e_LexicalSequence { self.tree.project_g_UBNFAST_2e_LexicalSequence(&self.tree.source, &self.tree.nodes[self.id as usize]) }
+pub fn g_elements(&self) -> NodeList<'t> { NodeList { tree: self.tree, ids: self.tree.items(self.id, 0) } }
+}
+#[derive(Clone, Copy)] pub struct g_UBNFAST_2e_LexicalElement<'t> { tree: &'t AstTree, id: u32 }
+impl std::fmt::Debug for g_UBNFAST_2e_LexicalElement<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_LexicalElement").field("id", &self.id).finish() } }
+impl<'t> g_UBNFAST_2e_LexicalElement<'t> {
+pub fn node(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.id } }
+pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
+pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
+pub fn to_ast(&self) -> super::g_UBNFAST_2e_LexicalElement { self.tree.project_g_UBNFAST_2e_LexicalElement(&self.tree.source, &self.tree.nodes[self.id as usize]) }
+pub fn g_atom(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.tree.slot(self.id, 0) } }
+pub fn g_suffix(&self) -> Option<NodeRef<'t>> { let v = self.tree.slot(self.id, 1); (v != NONE).then_some(NodeRef { tree: self.tree, id: v }) }
+}
+#[derive(Clone, Copy)] pub struct g_UBNFAST_2e_LexicalSuffix<'t> { tree: &'t AstTree, id: u32 }
+impl std::fmt::Debug for g_UBNFAST_2e_LexicalSuffix<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_LexicalSuffix").field("id", &self.id).finish() } }
+impl<'t> g_UBNFAST_2e_LexicalSuffix<'t> {
+pub fn node(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.id } }
+pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
+pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
+pub fn to_ast(&self) -> super::g_UBNFAST_2e_LexicalSuffix { self.tree.project_g_UBNFAST_2e_LexicalSuffix(&self.tree.source, &self.tree.nodes[self.id as usize]) }
+pub fn g_text(&self) -> &'t str { let tree = self.tree; tree.text_in(&tree.source, tree.slot(self.id, 0)) }
+}
+#[derive(Clone, Copy)] pub struct g_UBNFAST_2e_LexicalAtom<'t> { tree: &'t AstTree, id: u32 }
+impl std::fmt::Debug for g_UBNFAST_2e_LexicalAtom<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_LexicalAtom").field("id", &self.id).finish() } }
+impl<'t> g_UBNFAST_2e_LexicalAtom<'t> {
+pub fn node(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.id } }
+pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
+pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
+pub fn to_ast(&self) -> super::g_UBNFAST_2e_LexicalAtom { self.tree.project_g_UBNFAST_2e_LexicalAtom(&self.tree.source, &self.tree.nodes[self.id as usize]) }
+pub fn g_value(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.tree.slot(self.id, 0) } }
+}
 #[derive(Clone, Copy)] pub struct g_UBNFAST_2e_UntilExpression<'t> { tree: &'t AstTree, id: u32 }
 impl std::fmt::Debug for g_UBNFAST_2e_UntilExpression<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_UntilExpression").field("id", &self.id).finish() } }
 impl<'t> g_UBNFAST_2e_UntilExpression<'t> {
@@ -1176,6 +1326,16 @@ pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
 pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
 pub fn to_ast(&self) -> super::g_UBNFAST_2e_RegexExpression { self.tree.project_g_UBNFAST_2e_RegexExpression(&self.tree.source, &self.tree.nodes[self.id as usize]) }
 pub fn g_pattern(&self) -> &'t str { let tree = self.tree; tree.text_in(&tree.source, tree.slot(self.id, 0)) }
+}
+#[derive(Clone, Copy)] pub struct g_UBNFAST_2e_AdapterExpression<'t> { tree: &'t AstTree, id: u32 }
+impl std::fmt::Debug for g_UBNFAST_2e_AdapterExpression<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_AdapterExpression").field("id", &self.id).finish() } }
+impl<'t> g_UBNFAST_2e_AdapterExpression<'t> {
+pub fn node(&self) -> NodeRef<'t> { NodeRef { tree: self.tree, id: self.id } }
+pub fn span(&self) -> Span { span_of(&self.tree.nodes[self.id as usize]) }
+pub fn node_id(&self) -> usize { self.tree.nodes[self.id as usize].node_id as usize }
+pub fn to_ast(&self) -> super::g_UBNFAST_2e_AdapterExpression { self.tree.project_g_UBNFAST_2e_AdapterExpression(&self.tree.source, &self.tree.nodes[self.id as usize]) }
+pub fn g_id(&self) -> &'t str { let tree = self.tree; tree.text_in(&tree.source, tree.slot(self.id, 0)) }
+pub fn g_version(&self) -> &'t str { let tree = self.tree; tree.text_in(&tree.source, tree.slot(self.id, 1)) }
 }
 #[derive(Clone, Copy)] pub struct g_UBNFAST_2e_AnyExpression<'t> { tree: &'t AstTree, id: u32 }
 impl std::fmt::Debug for g_UBNFAST_2e_AnyExpression<'_> { fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.debug_struct("g_UBNFAST_2e_AnyExpression").field("id", &self.id).finish() } }
@@ -1491,6 +1651,12 @@ K_g_UBNFAST_2e_StringSettingValue => super::Ast::g_UBNFAST_2e_StringSettingValue
 K_g_UBNFAST_2e_BlockSettingValue => super::Ast::g_UBNFAST_2e_BlockSettingValue(self.project_g_UBNFAST_2e_BlockSettingValue(source, &node)),
 K_g_UBNFAST_2e_KeyValuePair => super::Ast::g_UBNFAST_2e_KeyValuePair(self.project_g_UBNFAST_2e_KeyValuePair(source, &node)),
 K_g_UBNFAST_2e_TokenDecl => super::Ast::g_UBNFAST_2e_TokenDecl(self.project_g_UBNFAST_2e_TokenDecl(source, &node)),
+K_g_UBNFAST_2e_DeclarativeTokenValue => super::Ast::g_UBNFAST_2e_DeclarativeTokenValue(self.project_g_UBNFAST_2e_DeclarativeTokenValue(source, &node)),
+K_g_UBNFAST_2e_LexicalChoice => super::Ast::g_UBNFAST_2e_LexicalChoice(self.project_g_UBNFAST_2e_LexicalChoice(source, &node)),
+K_g_UBNFAST_2e_LexicalSequence => super::Ast::g_UBNFAST_2e_LexicalSequence(self.project_g_UBNFAST_2e_LexicalSequence(source, &node)),
+K_g_UBNFAST_2e_LexicalElement => super::Ast::g_UBNFAST_2e_LexicalElement(self.project_g_UBNFAST_2e_LexicalElement(source, &node)),
+K_g_UBNFAST_2e_LexicalSuffix => super::Ast::g_UBNFAST_2e_LexicalSuffix(self.project_g_UBNFAST_2e_LexicalSuffix(source, &node)),
+K_g_UBNFAST_2e_LexicalAtom => super::Ast::g_UBNFAST_2e_LexicalAtom(self.project_g_UBNFAST_2e_LexicalAtom(source, &node)),
 K_g_UBNFAST_2e_UntilExpression => super::Ast::g_UBNFAST_2e_UntilExpression(self.project_g_UBNFAST_2e_UntilExpression(source, &node)),
 K_g_UBNFAST_2e_NegationExpression => super::Ast::g_UBNFAST_2e_NegationExpression(self.project_g_UBNFAST_2e_NegationExpression(source, &node)),
 K_g_UBNFAST_2e_LookaheadExpression => super::Ast::g_UBNFAST_2e_LookaheadExpression(self.project_g_UBNFAST_2e_LookaheadExpression(source, &node)),
@@ -1498,6 +1664,7 @@ K_g_UBNFAST_2e_NegativeLookaheadExpression => super::Ast::g_UBNFAST_2e_NegativeL
 K_g_UBNFAST_2e_CharRangeExpression => super::Ast::g_UBNFAST_2e_CharRangeExpression(self.project_g_UBNFAST_2e_CharRangeExpression(source, &node)),
 K_g_UBNFAST_2e_CIExpression => super::Ast::g_UBNFAST_2e_CIExpression(self.project_g_UBNFAST_2e_CIExpression(source, &node)),
 K_g_UBNFAST_2e_RegexExpression => super::Ast::g_UBNFAST_2e_RegexExpression(self.project_g_UBNFAST_2e_RegexExpression(source, &node)),
+K_g_UBNFAST_2e_AdapterExpression => super::Ast::g_UBNFAST_2e_AdapterExpression(self.project_g_UBNFAST_2e_AdapterExpression(source, &node)),
 K_g_UBNFAST_2e_AnyExpression => super::Ast::g_UBNFAST_2e_AnyExpression(self.project_g_UBNFAST_2e_AnyExpression(source, &node)),
 K_g_UBNFAST_2e_EofExpression => super::Ast::g_UBNFAST_2e_EofExpression(self.project_g_UBNFAST_2e_EofExpression(source, &node)),
 K_g_UBNFAST_2e_EmptyExpression => super::Ast::g_UBNFAST_2e_EmptyExpression(self.project_g_UBNFAST_2e_EmptyExpression(source, &node)),
@@ -1565,6 +1732,25 @@ fn project_g_UBNFAST_2e_TokenDecl(&self, source: &str, node: &TreeNode) -> super
 g_name: self.text_in(source, f[0]).to_owned(),
 g_value: Box::new(self.project(source, f[1])),
 } }
+fn project_g_UBNFAST_2e_DeclarativeTokenValue(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_DeclarativeTokenValue { let f = &self.slots[node.a as usize..node.a as usize + 1]; super::g_UBNFAST_2e_DeclarativeTokenValue { span: span_of(node), node_id: node.node_id as usize,
+g_source: Box::new(self.project(source, f[0])),
+} }
+fn project_g_UBNFAST_2e_LexicalChoice(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_LexicalChoice { let f = &self.slots[node.a as usize..node.a as usize + 2]; super::g_UBNFAST_2e_LexicalChoice { span: span_of(node), node_id: node.node_id as usize,
+g_alternatives: self.list_at(f[0], f[1]).iter().map(|&v| self.project(source, v)).collect(),
+} }
+fn project_g_UBNFAST_2e_LexicalSequence(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_LexicalSequence { let f = &self.slots[node.a as usize..node.a as usize + 2]; super::g_UBNFAST_2e_LexicalSequence { span: span_of(node), node_id: node.node_id as usize,
+g_elements: self.list_at(f[0], f[1]).iter().map(|&v| self.project(source, v)).collect(),
+} }
+fn project_g_UBNFAST_2e_LexicalElement(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_LexicalElement { let f = &self.slots[node.a as usize..node.a as usize + 2]; super::g_UBNFAST_2e_LexicalElement { span: span_of(node), node_id: node.node_id as usize,
+g_atom: Box::new(self.project(source, f[0])),
+g_suffix: { let v = f[1]; (v != NONE).then(|| Box::new(self.project(source, v))) },
+} }
+fn project_g_UBNFAST_2e_LexicalSuffix(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_LexicalSuffix { let f = &self.slots[node.a as usize..node.a as usize + 1]; super::g_UBNFAST_2e_LexicalSuffix { span: span_of(node), node_id: node.node_id as usize,
+g_text: self.text_in(source, f[0]).to_owned(),
+} }
+fn project_g_UBNFAST_2e_LexicalAtom(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_LexicalAtom { let f = &self.slots[node.a as usize..node.a as usize + 1]; super::g_UBNFAST_2e_LexicalAtom { span: span_of(node), node_id: node.node_id as usize,
+g_value: Box::new(self.project(source, f[0])),
+} }
 fn project_g_UBNFAST_2e_UntilExpression(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_UntilExpression { let f = &self.slots[node.a as usize..node.a as usize + 1]; super::g_UBNFAST_2e_UntilExpression { span: span_of(node), node_id: node.node_id as usize,
 g_terminator: self.text_in(source, f[0]).to_owned(),
 } }
@@ -1586,6 +1772,10 @@ g_word: self.text_in(source, f[0]).to_owned(),
 } }
 fn project_g_UBNFAST_2e_RegexExpression(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_RegexExpression { let f = &self.slots[node.a as usize..node.a as usize + 1]; super::g_UBNFAST_2e_RegexExpression { span: span_of(node), node_id: node.node_id as usize,
 g_pattern: self.text_in(source, f[0]).to_owned(),
+} }
+fn project_g_UBNFAST_2e_AdapterExpression(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_AdapterExpression { let f = &self.slots[node.a as usize..node.a as usize + 2]; super::g_UBNFAST_2e_AdapterExpression { span: span_of(node), node_id: node.node_id as usize,
+g_id: self.text_in(source, f[0]).to_owned(),
+g_version: self.text_in(source, f[1]).to_owned(),
 } }
 fn project_g_UBNFAST_2e_AnyExpression(&self, source: &str, node: &TreeNode) -> super::g_UBNFAST_2e_AnyExpression { let _ = source; super::g_UBNFAST_2e_AnyExpression { span: span_of(node), node_id: node.node_id as usize,
 } }
@@ -1721,6 +1911,25 @@ K_g_UBNFAST_2e_TokenDecl => { out.push(ValueSpan { path: path.clone(), span: spa
 { let len = path.len(); path.push_str("/fields/name"); self.text_value_span(self.slot(id, 0), path, out); path.truncate(len); }
 { let len = path.len(); path.push_str("/fields/value"); self.collect_value_spans(source, self.slot(id, 1), path, out); path.truncate(len); }
 },
+K_g_UBNFAST_2e_DeclarativeTokenValue => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
+{ let len = path.len(); path.push_str("/fields/source"); self.collect_value_spans(source, self.slot(id, 0), path, out); path.truncate(len); }
+},
+K_g_UBNFAST_2e_LexicalChoice => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
+{ let len = path.len(); path.push_str("/fields/alternatives"); for (i, &v) in self.items(id, 0).iter().enumerate() { let len = path.len(); let _ = std::fmt::Write::write_fmt(path, format_args!("/{i}")); self.collect_value_spans(source, v, path, out); path.truncate(len); } path.truncate(len); }
+},
+K_g_UBNFAST_2e_LexicalSequence => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
+{ let len = path.len(); path.push_str("/fields/elements"); for (i, &v) in self.items(id, 0).iter().enumerate() { let len = path.len(); let _ = std::fmt::Write::write_fmt(path, format_args!("/{i}")); self.collect_value_spans(source, v, path, out); path.truncate(len); } path.truncate(len); }
+},
+K_g_UBNFAST_2e_LexicalElement => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
+{ let len = path.len(); path.push_str("/fields/atom"); self.collect_value_spans(source, self.slot(id, 0), path, out); path.truncate(len); }
+{ let len = path.len(); path.push_str("/fields/suffix"); let v = self.slot(id, 1); if v != NONE { self.collect_value_spans(source, v, path, out); } path.truncate(len); }
+},
+K_g_UBNFAST_2e_LexicalSuffix => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
+{ let len = path.len(); path.push_str("/fields/text"); self.text_value_span(self.slot(id, 0), path, out); path.truncate(len); }
+},
+K_g_UBNFAST_2e_LexicalAtom => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
+{ let len = path.len(); path.push_str("/fields/value"); self.collect_value_spans(source, self.slot(id, 0), path, out); path.truncate(len); }
+},
 K_g_UBNFAST_2e_UntilExpression => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
 { let len = path.len(); path.push_str("/fields/terminator"); self.text_value_span(self.slot(id, 0), path, out); path.truncate(len); }
 },
@@ -1742,6 +1951,10 @@ K_g_UBNFAST_2e_CIExpression => { out.push(ValueSpan { path: path.clone(), span: 
 },
 K_g_UBNFAST_2e_RegexExpression => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
 { let len = path.len(); path.push_str("/fields/pattern"); self.text_value_span(self.slot(id, 0), path, out); path.truncate(len); }
+},
+K_g_UBNFAST_2e_AdapterExpression => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
+{ let len = path.len(); path.push_str("/fields/id"); self.text_value_span(self.slot(id, 0), path, out); path.truncate(len); }
+{ let len = path.len(); path.push_str("/fields/version"); self.text_value_span(self.slot(id, 1), path, out); path.truncate(len); }
 },
 K_g_UBNFAST_2e_AnyExpression => { out.push(ValueSpan { path: path.clone(), span: span_of(&node), text: None });
 },
@@ -1882,6 +2095,25 @@ K_g_UBNFAST_2e_TokenDecl => serde_json::json!({"fields":{
 "name":(text(tree.slot(id, 0))),
 "value":(value(tree.slot(id, 1))),
 },"span":span_of(&node),"type":"TokenDecl"}),
+K_g_UBNFAST_2e_DeclarativeTokenValue => serde_json::json!({"fields":{
+"source":(value(tree.slot(id, 0))),
+},"span":span_of(&node),"type":"DeclarativeTokenValue"}),
+K_g_UBNFAST_2e_LexicalChoice => serde_json::json!({"fields":{
+"alternatives":(tree.items(id, 0).iter().map(|&v| value(v)).collect::<Vec<_>>()),
+},"span":span_of(&node),"type":"LexicalChoice"}),
+K_g_UBNFAST_2e_LexicalSequence => serde_json::json!({"fields":{
+"elements":(tree.items(id, 0).iter().map(|&v| value(v)).collect::<Vec<_>>()),
+},"span":span_of(&node),"type":"LexicalSequence"}),
+K_g_UBNFAST_2e_LexicalElement => serde_json::json!({"fields":{
+"atom":(value(tree.slot(id, 0))),
+"suffix":({ let v = tree.slot(id, 1); (v != NONE).then(|| value(v)) }),
+},"span":span_of(&node),"type":"LexicalElement"}),
+K_g_UBNFAST_2e_LexicalSuffix => serde_json::json!({"fields":{
+"text":(text(tree.slot(id, 0))),
+},"span":span_of(&node),"type":"LexicalSuffix"}),
+K_g_UBNFAST_2e_LexicalAtom => serde_json::json!({"fields":{
+"value":(value(tree.slot(id, 0))),
+},"span":span_of(&node),"type":"LexicalAtom"}),
 K_g_UBNFAST_2e_UntilExpression => serde_json::json!({"fields":{
 "terminator":(text(tree.slot(id, 0))),
 },"span":span_of(&node),"type":"UntilExpression"}),
@@ -1904,6 +2136,10 @@ K_g_UBNFAST_2e_CIExpression => serde_json::json!({"fields":{
 K_g_UBNFAST_2e_RegexExpression => serde_json::json!({"fields":{
 "pattern":(text(tree.slot(id, 0))),
 },"span":span_of(&node),"type":"RegexExpression"}),
+K_g_UBNFAST_2e_AdapterExpression => serde_json::json!({"fields":{
+"id":(text(tree.slot(id, 0))),
+"version":(text(tree.slot(id, 1))),
+},"span":span_of(&node),"type":"AdapterExpression"}),
 K_g_UBNFAST_2e_AnyExpression => serde_json::json!({"fields":{
 },"span":span_of(&node),"type":"AnyExpression"}),
 K_g_UBNFAST_2e_EofExpression => serde_json::json!({"fields":{

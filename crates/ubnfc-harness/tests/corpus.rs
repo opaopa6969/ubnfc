@@ -26,11 +26,11 @@ fn every_required_file_loads_with_the_measured_counts() {
         ("nested-captures/corpus.json", InlineAst, 10),
         ("rule-trivia/corpus.json", InlineAst, 33),
         ("scope-annotations/corpus.json", InlineAst, 14),
-        ("primitives/corpus.json", Token, 109),
+        ("primitives/corpus.json", Token, 115),
         ("lexical/corpus.json", Token, 78),
         ("semantic-cardinality/corpus.json", Rule, 94),
         ("semantic-cardinality/pure-alias.json", Rule, 69),
-        ("tiny-code-fence/corpus.json", Rule, 73),
+        ("tiny-code-fence/corpus.json", Rule, 86),
         ("tiny-string-token/corpus.json", Rule, 39),
         ("mixed-values/corpus.json", Rule, 23),
         ("mixed-values/delimited-corpus.json", Rule, 15),
@@ -79,14 +79,14 @@ fn every_required_file_loads_with_the_measured_counts() {
                 Token,
                 Counts {
                     files: 2,
-                    cases: 187
+                    cases: 193
                 }
             ),
             (
                 Rule,
                 Counts {
                     files: 7,
-                    cases: 324
+                    cases: 337
                 }
             ),
             (
@@ -113,7 +113,7 @@ fn every_required_file_loads_with_the_measured_counts() {
         ])
     );
     let total: usize = corpus().iter().map(|file| file.cases.len()).sum();
-    assert_eq!(total, 1212);
+    assert_eq!(total, 1231);
 }
 
 // 各元 row の期待値キーを正規化側と照合。型付けによるキーや null の欠落を検出する。

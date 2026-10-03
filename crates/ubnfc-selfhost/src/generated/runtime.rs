@@ -1796,8 +1796,127 @@ if name.is_empty()
         self.give_stack(stack);
     }
 }
-/// 統合 DFA の bitset 語数（literal 62 個）。0 なら cache を作らない。
-const LEX_WORDS:usize=1;
+
+pub mod lexical_program {
+use std::collections::HashMap;
+
+#[allow(clippy::upper_case_acronyms)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Op {
+    LITERAL,
+    ANY,
+    EOF,
+    BOF,
+    BOL,
+    EOL,
+    RANGE,
+    EXCEPT,
+    SEQUENCE,
+    CHOICE,
+    REPEAT,
+    LOOK,
+    NOT,
+    CAPTURE,
+    BACKREF,
+    SCOPE,
+}
+
+#[derive(Clone, Debug)]
+pub struct LexicalExpression {
+    pub op: Op,
+    pub text: &'static str,
+    pub min: i32,
+    pub max: i32,
+    pub children: &'static [LexicalExpression],
+}
+
+impl LexicalExpression {
+    pub fn match_at(&self, source: &str, start: usize) -> Option<usize> {
+        self.run(source, start, &mut HashMap::new())
+    }
+    fn run<'a>(
+        &self,
+        s: &'a str,
+        p: usize,
+        bindings: &mut HashMap<&'static str, &'a str>,
+    ) -> Option<usize> {
+        let before = bindings.clone();
+        let end = self.eval(s, p, bindings);
+        if end.is_none() {
+            *bindings = before;
+        }
+        end
+    }
+    fn eval<'a>(
+        &self,
+        s: &'a str,
+        p: usize,
+        bindings: &mut HashMap<&'static str, &'a str>,
+    ) -> Option<usize> {
+        match self.op {
+            Op::LITERAL => s[p..].starts_with(self.text).then_some(p + self.text.len()),
+            Op::ANY => s[p..].chars().next().map(|c| p + c.len_utf8()),
+            Op::EOF => (p == s.len()).then_some(p),
+            Op::BOF => (p == 0).then_some(p),
+            Op::BOL => {
+                (p == 0 || matches!(s.as_bytes().get(p - 1), Some(b'\r' | b'\n'))).then_some(p)
+            }
+            Op::EOL => {
+                (p == s.len() || matches!(s.as_bytes().get(p), Some(b'\r' | b'\n'))).then_some(p)
+            }
+            Op::RANGE => s[p..]
+                .chars()
+                .next()
+                .filter(|c| (*c as i32) >= self.min && (*c as i32) <= self.max)
+                .map(|c| p + c.len_utf8()),
+            Op::EXCEPT => s[p..]
+                .chars()
+                .next()
+                .filter(|c| !self.text.contains(*c))
+                .map(|c| p + c.len_utf8()),
+            Op::SEQUENCE => self
+                .children
+                .iter()
+                .try_fold(p, |p, child| child.run(s, p, bindings)),
+            Op::CHOICE => self
+                .children
+                .iter()
+                .find_map(|child| child.run(s, p, bindings)),
+            Op::REPEAT => {
+                let mut end = p;
+                let mut count = 0;
+                while self.max < 0 || count < self.max {
+                    let Some(next) = self.children[0].run(s, end, bindings) else {
+                        break;
+                    };
+                    count += 1;
+                    assert!(next != end || self.max >= 0, "nullable lexical repeat");
+                    end = next;
+                }
+                (count >= self.min).then_some(end)
+            }
+            Op::LOOK | Op::NOT => {
+                let matched = self.children[0].run(s, p, &mut bindings.clone()).is_some();
+                (matched == (self.op == Op::LOOK)).then_some(p)
+            }
+            Op::CAPTURE => {
+                let end = self.children[0].run(s, p, bindings)?;
+                bindings.insert(self.text, &s[p..end]);
+                Some(end)
+            }
+            Op::BACKREF => bindings
+                .get(self.text)
+                .filter(|text| s[p..].starts_with(**text))
+                .map(|text| p + text.len()),
+            Op::SCOPE => self.children[0].run(s, p, &mut HashMap::new()),
+        }
+    }
+}
+
+
+}
+/// 統合 DFA の bitset 語数（literal 66 個）。0 なら cache を作らない。
+const LEX_WORDS:usize=2;
 /// 診断を記録しない読み飛ばし cache を持つ trivia policy 数（区切り集合で正規化済み）。
 const TRIVIA_POLICIES:usize=1;
 /// 全 literal 終端を 1 本にまとめた DFA（trie）。位置 `pos` から 1 回走らせ、
@@ -1821,27 +1940,29 @@ state=match state {
 63=>{out[0]|=2048;13},
 64=>{out[0]|=4096;14},
 65=>170,
-67=>173,
-69=>184,
-76=>195,
-78=>204,
-82=>224,
-85=>229,
-91=>{out[0]|=35184372088832;234},
-93=>{out[0]|=70368744177664;235},
-99=>236,
-100=>243,
-102=>254,
-103=>258,
-108=>265,
-109=>270,
-110=>274,
-112=>278,
-115=>290,
-116=>298,
-123=>{out[0]|=576460752303423488;303},
-124=>{out[0]|=1152921504606846976;304},
-125=>{out[0]|=2305843009213693952;305},
+67=>179,
+69=>196,
+76=>207,
+78=>216,
+82=>236,
+83=>241,
+85=>248,
+91=>{out[0]|=281474976710656;253},
+93=>{out[0]|=562949953421312;254},
+99=>255,
+100=>262,
+102=>273,
+103=>277,
+108=>284,
+109=>289,
+110=>293,
+112=>297,
+115=>309,
+116=>317,
+118=>322,
+123=>{out[0]|=9223372036854775808;329},
+124=>{out[1]|=1;330},
+125=>{out[1]|=2;331},
 _=>return,
 },
 8=>match c {
@@ -2413,143 +2534,144 @@ _=>return,
 _=>return,
 },
 170=>match c {
-78=>171,
+68=>171,
+78=>177,
 _=>return,
 },
 171=>match c {
-89=>{out[0]|=17179869184;172},
+65=>172,
+_=>return,
+},
+172=>match c {
+80=>173,
 _=>return,
 },
 173=>match c {
-72=>174,
-73=>{out[0]|=68719476736;183},
+84=>174,
 _=>return,
 },
 174=>match c {
-65=>175,
+69=>175,
 _=>return,
 },
 175=>match c {
-82=>176,
-_=>return,
-},
-176=>match c {
-95=>177,
+82=>{out[0]|=17179869184;176},
 _=>return,
 },
 177=>match c {
-82=>178,
-_=>return,
-},
-178=>match c {
-65=>179,
+89=>{out[0]|=34359738368;178},
 _=>return,
 },
 179=>match c {
-78=>180,
+65=>180,
+72=>186,
+73=>{out[0]|=274877906944;195},
 _=>return,
 },
 180=>match c {
-71=>181,
+80=>181,
 _=>return,
 },
 181=>match c {
-69=>{out[0]|=34359738368;182},
+84=>182,
+_=>return,
+},
+182=>match c {
+85=>183,
+_=>return,
+},
+183=>match c {
+82=>184,
 _=>return,
 },
 184=>match c {
-77=>185,
-79=>189,
-82=>191,
-_=>return,
-},
-185=>match c {
-80=>186,
+69=>{out[0]|=68719476736;185},
 _=>return,
 },
 186=>match c {
-84=>187,
+65=>187,
 _=>return,
 },
 187=>match c {
-89=>{out[0]|=137438953472;188},
+82=>188,
+_=>return,
+},
+188=>match c {
+95=>189,
 _=>return,
 },
 189=>match c {
-70=>{out[0]|=274877906944;190},
+82=>190,
+_=>return,
+},
+190=>match c {
+65=>191,
 _=>return,
 },
 191=>match c {
-82=>192,
+78=>192,
 _=>return,
 },
 192=>match c {
-79=>193,
+71=>193,
 _=>return,
 },
 193=>match c {
-82=>{out[0]|=549755813888;194},
-_=>return,
-},
-195=>match c {
-79=>196,
+69=>{out[0]|=137438953472;194},
 _=>return,
 },
 196=>match c {
-79=>197,
+77=>197,
+79=>201,
+82=>203,
 _=>return,
 },
 197=>match c {
-75=>198,
+80=>198,
 _=>return,
 },
 198=>match c {
-65=>199,
+84=>199,
 _=>return,
 },
 199=>match c {
-72=>200,
-_=>return,
-},
-200=>match c {
-69=>201,
+89=>{out[0]|=549755813888;200},
 _=>return,
 },
 201=>match c {
-65=>202,
+70=>{out[0]|=1099511627776;202},
 _=>return,
 },
-202=>match c {
-68=>{out[0]|=1099511627776;203},
+203=>match c {
+82=>204,
 _=>return,
 },
 204=>match c {
-69=>205,
+79=>205,
 _=>return,
 },
 205=>match c {
-71=>206,
-_=>return,
-},
-206=>match c {
-65=>207,
+82=>{out[0]|=2199023255552;206},
 _=>return,
 },
 207=>match c {
-84=>208,
+79=>208,
 _=>return,
 },
 208=>match c {
-73=>209,
+79=>209,
 _=>return,
 },
 209=>match c {
-79=>210,
-86=>212,
+75=>210,
 _=>return,
 },
 210=>match c {
-78=>{out[0]|=2199023255552;211},
+65=>211,
+_=>return,
+},
+211=>match c {
+72=>212,
 _=>return,
 },
 212=>match c {
@@ -2557,23 +2679,19 @@ _=>return,
 _=>return,
 },
 213=>match c {
-95=>214,
+65=>214,
 _=>return,
 },
 214=>match c {
-76=>215,
-_=>return,
-},
-215=>match c {
-79=>216,
+68=>{out[0]|=4398046511104;215},
 _=>return,
 },
 216=>match c {
-79=>217,
+69=>217,
 _=>return,
 },
 217=>match c {
-75=>218,
+71=>218,
 _=>return,
 },
 218=>match c {
@@ -2581,19 +2699,20 @@ _=>return,
 _=>return,
 },
 219=>match c {
-72=>220,
+84=>220,
 _=>return,
 },
 220=>match c {
-69=>221,
+73=>221,
 _=>return,
 },
 221=>match c {
-65=>222,
+79=>222,
+86=>224,
 _=>return,
 },
 222=>match c {
-68=>{out[0]|=4398046511104;223},
+78=>{out[0]|=8796093022208;223},
 _=>return,
 },
 224=>match c {
@@ -2601,99 +2720,99 @@ _=>return,
 _=>return,
 },
 225=>match c {
-71=>226,
+95=>226,
 _=>return,
 },
 226=>match c {
-69=>227,
+76=>227,
 _=>return,
 },
 227=>match c {
-88=>{out[0]|=8796093022208;228},
+79=>228,
+_=>return,
+},
+228=>match c {
+79=>229,
 _=>return,
 },
 229=>match c {
-78=>230,
+75=>230,
 _=>return,
 },
 230=>match c {
-84=>231,
+65=>231,
 _=>return,
 },
 231=>match c {
-73=>232,
+72=>232,
 _=>return,
 },
 232=>match c {
-76=>{out[0]|=17592186044416;233},
+69=>233,
+_=>return,
+},
+233=>match c {
+65=>234,
+_=>return,
+},
+234=>match c {
+68=>{out[0]|=17592186044416;235},
 _=>return,
 },
 236=>match c {
-111=>237,
+69=>237,
 _=>return,
 },
 237=>match c {
-110=>238,
+71=>238,
 _=>return,
 },
 238=>match c {
-116=>239,
+69=>239,
 _=>return,
 },
 239=>match c {
-101=>240,
-_=>return,
-},
-240=>match c {
-120=>241,
+88=>{out[0]|=35184372088832;240},
 _=>return,
 },
 241=>match c {
-116=>{out[0]|=140737488355328;242},
+65=>242,
+_=>return,
+},
+242=>match c {
+77=>243,
 _=>return,
 },
 243=>match c {
-101=>244,
+69=>244,
 _=>return,
 },
 244=>match c {
-115=>245,
+95=>245,
 _=>return,
 },
 245=>match c {
-99=>246,
+65=>246,
 _=>return,
 },
 246=>match c {
-114=>247,
-_=>return,
-},
-247=>match c {
-105=>248,
+83=>{out[0]|=70368744177664;247},
 _=>return,
 },
 248=>match c {
-112=>249,
+78=>249,
 _=>return,
 },
 249=>match c {
-116=>250,
+84=>250,
 _=>return,
 },
 250=>match c {
-105=>251,
+73=>251,
 _=>return,
 },
 251=>match c {
-111=>252,
-_=>return,
-},
-252=>match c {
-110=>{out[0]|=281474976710656;253},
-_=>return,
-},
-254=>match c {
-114=>255,
+76=>{out[0]|=140737488355328;252},
 _=>return,
 },
 255=>match c {
@@ -2701,47 +2820,55 @@ _=>return,
 _=>return,
 },
 256=>match c {
-109=>{out[0]|=562949953421312;257},
+110=>257,
+_=>return,
+},
+257=>match c {
+116=>258,
 _=>return,
 },
 258=>match c {
-114=>259,
+101=>259,
 _=>return,
 },
 259=>match c {
-97=>260,
+120=>260,
 _=>return,
 },
 260=>match c {
-109=>261,
-_=>return,
-},
-261=>match c {
-109=>262,
+116=>{out[0]|=1125899906842624;261},
 _=>return,
 },
 262=>match c {
-97=>263,
+101=>263,
 _=>return,
 },
 263=>match c {
-114=>{out[0]|=1125899906842624;264},
+115=>264,
+_=>return,
+},
+264=>match c {
+99=>265,
 _=>return,
 },
 265=>match c {
-101=>266,
+114=>266,
 _=>return,
 },
 266=>match c {
-118=>267,
+105=>267,
 _=>return,
 },
 267=>match c {
-101=>268,
+112=>268,
 _=>return,
 },
 268=>match c {
-108=>{out[0]|=2251799813685248;269},
+116=>269,
+_=>return,
+},
+269=>match c {
+105=>270,
 _=>return,
 },
 270=>match c {
@@ -2749,105 +2876,189 @@ _=>return,
 _=>return,
 },
 271=>match c {
-100=>272,
+110=>{out[0]|=2251799813685248;272},
 _=>return,
 },
-272=>match c {
-101=>{out[0]|=4503599627370496;273},
+273=>match c {
+114=>274,
 _=>return,
 },
 274=>match c {
-97=>275,
+111=>275,
 _=>return,
 },
 275=>match c {
-109=>276,
+109=>{out[0]|=4503599627370496;276},
 _=>return,
 },
-276=>match c {
-101=>{out[0]|=9007199254740992;277},
+277=>match c {
+114=>278,
 _=>return,
 },
 278=>match c {
 97=>279,
-114=>284,
 _=>return,
 },
 279=>match c {
-114=>280,
+109=>280,
 _=>return,
 },
 280=>match c {
-97=>281,
+109=>281,
 _=>return,
 },
 281=>match c {
-109=>282,
+97=>282,
 _=>return,
 },
 282=>match c {
-115=>{out[0]|=18014398509481984;283},
+114=>{out[0]|=9007199254740992;283},
 _=>return,
 },
 284=>match c {
-111=>285,
+101=>285,
 _=>return,
 },
 285=>match c {
-102=>286,
+118=>286,
 _=>return,
 },
 286=>match c {
-105=>287,
+101=>287,
 _=>return,
 },
 287=>match c {
-108=>288,
+108=>{out[0]|=18014398509481984;288},
 _=>return,
 },
-288=>match c {
-101=>{out[0]|=36028797018963968;289},
+289=>match c {
+111=>290,
 _=>return,
 },
 290=>match c {
-121=>291,
+100=>291,
 _=>return,
 },
 291=>match c {
-109=>292,
-110=>296,
-_=>return,
-},
-292=>match c {
-98=>293,
+101=>{out[0]|=36028797018963968;292},
 _=>return,
 },
 293=>match c {
-111=>294,
+97=>294,
 _=>return,
 },
 294=>match c {
-108=>{out[0]|=72057594037927936;295},
+109=>295,
 _=>return,
 },
-296=>match c {
-99=>{out[0]|=144115188075855872;297},
+295=>match c {
+101=>{out[0]|=72057594037927936;296},
+_=>return,
+},
+297=>match c {
+97=>298,
+114=>303,
 _=>return,
 },
 298=>match c {
-111=>299,
+114=>299,
 _=>return,
 },
 299=>match c {
-107=>300,
+97=>300,
 _=>return,
 },
 300=>match c {
-101=>301,
+109=>301,
 _=>return,
 },
 301=>match c {
-110=>{out[0]|=288230376151711744;302},
+115=>{out[0]|=144115188075855872;302},
+_=>return,
+},
+303=>match c {
+111=>304,
+_=>return,
+},
+304=>match c {
+102=>305,
+_=>return,
+},
+305=>match c {
+105=>306,
+_=>return,
+},
+306=>match c {
+108=>307,
+_=>return,
+},
+307=>match c {
+101=>{out[0]|=288230376151711744;308},
+_=>return,
+},
+309=>match c {
+121=>310,
+_=>return,
+},
+310=>match c {
+109=>311,
+110=>315,
+_=>return,
+},
+311=>match c {
+98=>312,
+_=>return,
+},
+312=>match c {
+111=>313,
+_=>return,
+},
+313=>match c {
+108=>{out[0]|=576460752303423488;314},
+_=>return,
+},
+315=>match c {
+99=>{out[0]|=1152921504606846976;316},
+_=>return,
+},
+317=>match c {
+111=>318,
+_=>return,
+},
+318=>match c {
+107=>319,
+_=>return,
+},
+319=>match c {
+101=>320,
+_=>return,
+},
+320=>match c {
+110=>{out[0]|=2305843009213693952;321},
+_=>return,
+},
+322=>match c {
+101=>323,
+_=>return,
+},
+323=>match c {
+114=>324,
+_=>return,
+},
+324=>match c {
+115=>325,
+_=>return,
+},
+325=>match c {
+105=>326,
+_=>return,
+},
+326=>match c {
+111=>327,
+_=>return,
+},
+327=>match c {
+110=>{out[0]|=4611686018427387904;328},
 _=>return,
 },
 _=>return,
@@ -2860,12 +3071,12 @@ use super::ast::*;
 const HAS_RECOVERY:bool=false;
 const SCOPE_MODES:&[&str]=&["sameRuleText"];
 const HAS_SCOPE:bool=true;
-const RULES:&[&str]=&["UBNF::UBNFFile", "UBNF::ImportDecl", "UBNF::GrammarDecl", "UBNF::GlobalSetting", "UBNF::SettingValue", "UBNF::StringSettingValue", "UBNF::BlockSettingValue", "UBNF::KeyValuePair", "UBNF::TokenDecl", "UBNF::TokenValue", "UBNF::UntilExpression", "UBNF::NegationExpression", "UBNF::LookaheadExpression", "UBNF::NegativeLookaheadExpression", "UBNF::CharRangeExpression", "UBNF::CIExpression", "UBNF::RegexExpression", "UBNF::AnyExpression", "UBNF::EofExpression", "UBNF::EmptyExpression", "UBNF::RuleDecl", "UBNF::Annotation", "UBNF::RootAnnotation", "UBNF::MappingAnnotation", "UBNF::EvalAnnotation", "UBNF::WhitespaceAnnotation", "UBNF::InterleaveAnnotation", "UBNF::BackrefAnnotation", "UBNF::ScopeTreeAnnotation", "UBNF::DeclaresAnnotation", "UBNF::CatalogAnnotation", "UBNF::LeftAssocAnnotation", "UBNF::RightAssocAnnotation", "UBNF::LongestChoiceAnnotation", "UBNF::PredictiveChoiceAnnotation", "UBNF::PrecedenceAnnotation", "UBNF::DocAnnotation", "UBNF::RecoveryAnnotation", "UBNF::SkipAnnotation", "UBNF::CommonFieldAnnotation", "UBNF::EnumAnnotation", "UBNF::SimpleAnnotation", "UBNF::ChoiceBody", "UBNF::SequenceBody", "UBNF::AnnotatedElement", "UBNF::PostfixQuantifier", "UBNF::SeparatedBy", "UBNF::BoundedQuantifier", "UBNF::Digits", "UBNF::AtomicElement", "UBNF::GroupElement", "UBNF::OptionalElement", "UBNF::RepeatElement", "UBNF::ErrorElement", "UBNF::TerminalElement", "UBNF::QuantifiedRef", "UBNF::TypeofElement", "UBNF::DottedIdentifier", "UBNF::RuleBody"];
-const EXPRESSIONS:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1155:1166:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1335:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1354:1360:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1507:1685:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1507:1516:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1517:1527:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1539:1542:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1550:1564:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1552:1562:body/3/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1584:1601:body/4/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1586:1599:body/4/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1619:1632:body/5/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1621:1630:body/5/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1652:1664:body/6/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1654:1662:body/6/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1682:1685:body/7/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1788:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1805:1808:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1878:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1886:1903:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2087:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2090:2102:body/1/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2114:2117:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2215:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2199:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2205:2208:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2209:2215:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2364:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2382:2385:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2470:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2478:2496:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2504:2523:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2531:2558:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2566:2585:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2593:2605:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2613:2628:body/6/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2636:2649:body/7/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2657:2670:body/8/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2678:2693:body/9/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2701:2717:body/10/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2828:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2829:2832:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2852:2855:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2968:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2969:2972:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2987:2990:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3111:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3112:3115:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3132:3135:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3290:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3291:3294:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3311:3314:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3436:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3437:3440:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3453:3456:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3469:3472:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3562:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3563:3566:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3580:3583:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3688:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3689:3692:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3709:3712:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4129:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4117:4127:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4170:4175:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4176:4184:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4196:4199:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4269:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4277:4294:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4302:4316:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4324:4344:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4352:4372:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4380:4397:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4405:4424:body/6/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4432:4450:body/7/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4458:4475:body/8/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4483:4502:body/9/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4510:4530:body/10/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4538:4561:body/11/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4569:4595:body/12/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4603:4623:body/13/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4631:4644:body/14/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4652:4670:body/15/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4678:4692:body/16/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4700:4721:body/17/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4729:4743:body/18/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4751:4767:body/19/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:4937:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4938:4941:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4949:4959:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4978:5060:body/3/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4980:5058:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4980:4983:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4984:4992:body/3/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4993:4996:body/3/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4997:5000:body/3/0/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5001:5011:body/3/0/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5024:5054:body/3/0/5/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5026:5040:body/3/0/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5026:5029:body/3/0/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5030:5040:body/3/0/5/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5055:5058:body/3/0/6/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5066:5069:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5149:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5150:5153:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5154:5166:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5176:5205:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5178:5194:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5178:5181:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5182:5194:body/3/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5206:5209:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5305:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5306:5335:body/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5308:5333:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5308:5311:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5312:5322:body/1/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5330:5333:body/1/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5433:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5434:5437:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5438:5447:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5448:5451:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5452:5462:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5472:5475:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5561:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5562:5565:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5566:5572:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5573:5576:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5577:5587:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5594:5597:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5689:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5690:5693:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5694:5700:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5701:5704:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5705:5715:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5722:5725:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5829:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5830:5833:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5834:5842:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5843:5846:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5847:5857:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5866:5911:body/5/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5868:5896:body/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5868:5871:body/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5872:5885:body/5/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5886:5889:body/5/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5890:5896:body/5/0/3/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5912:5915:body/6/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6004:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6005:6008:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6009:6018:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6019:6022:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6023:6029:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6039:6042:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6482:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6483:6486:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6487:6494:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6495:6498:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6499:6515:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6523:6526:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6600:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6601:6604:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6605:6611:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6618:6621:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6722:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6723:6726:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6727:6779:body/2/group", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6771:body/2/0/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6746:body/2/0/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6729:6735:body/2/0/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6736:6739:body/2/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6740:6746:body/2/0/0/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6761:6771:body/2/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6780:6783:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7022:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7023:7026:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7027:7037:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7080:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7052:7066:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7052:7055:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7056:7066:body/3/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7081:7084:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7287:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7276:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7277:7287:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7407:7468:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7407:7419:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7434:7468:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7436:7452:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7436:7439:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7440:7452:body/1/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7554:7574:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7554:7574:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7556:7572:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7738:7923:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7738:7773:body/0/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7740:7753:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7781:7794:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7811:7832:body/2/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7813:7830:body/2/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7840:7861:body/3/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7842:7859:body/3/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7869:7884:body/4/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7871:7882:body/4/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7892:7923:body/5/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7894:7908:body/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7894:7897:body/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7898:7908:body/5/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7972:7987:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7972:7975:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7978:7981:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7984:7987:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8036:8053:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8036:8039:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8040:8053:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8111:8144:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8111:8114:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8115:8121:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8122:8140:body/2/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8124:8138:body/2/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8124:8127:body/2/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8128:8138:body/2/0/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8130:8136:body/2/0/1/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8141:8144:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8163:8178:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8163:8168:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8169:8178:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8171:8176:body/1/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8325:8445:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8325:8337:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8345:8360:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8368:8381:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8389:8401:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8409:8424:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8432:8445:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8535:8557:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8535:8538:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8539:8547:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8554:8557:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8647:8669:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8647:8650:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8651:8659:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8666:8669:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8760:8782:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8760:8763:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8764:8772:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8779:8782:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8882:8913:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8882:8889:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8890:8893:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8894:8900:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8910:8913:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9008:9014:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9008:9014:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9351:9391:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9351:9369:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9353:9367:body/0/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9353:9363:body/0/0/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9364:9367:body/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9391:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9518:9559:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9518:9527:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9528:9531:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9532:9542:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9556:9559:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9663:9706:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9663:9673:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9681:9706:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9683:9697:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9683:9686:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9687:9697:body/1/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9764:9774:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9764:9774:body/0/ruleRef"];
-const BODIES:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1326:1367:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1507:1685:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1785:1821:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1860:1903:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2084:2117:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2215:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2357:2396:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2455:2717:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2855:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2958:2990:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3100:3135:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3270:3314:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3424:3472:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3558:3583:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3681:3712:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3775:3780:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3843:3848:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3917:3924:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4255:4767:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4822:4829:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4927:5069:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5142:5209:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5292:5335:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5420:5475:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5551:5597:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5677:5725:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5818:5915:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6042:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6107:6119:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6186:6199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6272:6288:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6367:6386:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6469:6526:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6594:6621:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6711:6783:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6838:6845:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7008:7084:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7192:7199:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7273:7287:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7407:7468:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7554:7574:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7738:7923:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7972:7987:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8036:8053:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8111:8144:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8163:8178:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8325:8445:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8535:8557:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8647:8669:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8760:8782:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8882:8913:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9008:9014:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9351:9391:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9518:9559:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9663:9706:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9764:9774:body/seq"];
-const RULE_NODE:&[bool]=&[true, true, true, true, false, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, true, true, true, true, true, false, true, true, false];
-const RULE_SLOTS:&[u32]=&[2, 2, 9, 2, 0, 1, 2, 2, 2, 0, 1, 1, 1, 1, 2, 1, 1, 0, 0, 0, 4, 0, 0, 3, 2, 1, 1, 1, 1, 2, 1, 0, 0, 0, 0, 1, 1, 2, 0, 2, 0, 1, 2, 2, 3, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 2, 0];
-const SITES:&[(&str,&str)]=&[("expr:unlaxer-dsl/grammar/ubnf.ubnf:1153:1168:body/0/repeat/capture/0", "grammars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1336:1346:body/1/tokenRef/capture/0", "alias"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1361:1367:body/3/tokenRef/capture/0", "path"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1517:1527:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1550:1564:body/3/repeat/capture/0", "imports"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1584:1601:body/4/repeat/capture/0", "settings"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1619:1632:body/5/repeat/capture/0", "tokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1652:1664:body/6/repeat/capture/0", "rules"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1789:1799:body/1/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1809:1821:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1998:body/0/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2088:2104:body/1/repeat/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2189:2199:body/0/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2209:2215:body/2/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2365:2375:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2833:2839:body/2/tokenRef/capture/0", "terminator"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2973:2979:body/2/tokenRef/capture/0", "chars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3116:3122:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3295:3301:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3441:3447:body/2/tokenRef/capture/0", "min"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3457:3463:body/4/tokenRef/capture/0", "max"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3567:3573:body/2/tokenRef/capture/0", "word"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3693:3699:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4115:4129:body/0/repeat/capture/0", "annotations"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4176:4184:body/3/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4949:4959:body/2/tokenRef/capture/0", "className"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5001:5011:body/3/0/4/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5030:5040:body/3/0/5/0/1/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5154:5166:body/2/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5182:5194:body/3/0/1/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5312:5322:body/1/0/1/tokenRef/capture/0", "style"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5452:5462:body/4/tokenRef/capture/0", "profile"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5577:5587:body/4/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5705:5715:body/4/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5847:5857:body/4/tokenRef/capture/0", "symbol"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5890:5896:body/5/0/3/tokenRef/capture/0", "description"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6023:6029:body/4/tokenRef/capture/0", "context"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6499:6515:body/4/tokenRef/capture/0", "level"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6605:6611:body/2/tokenRef/capture/0", "text"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6740:6746:body/2/0/0/2/tokenRef/capture/0", "syncTokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6761:6771:body/2/0/1/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7027:7037:body/2/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7056:7066:body/3/0/1/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7277:7287:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7407:7419:body/0/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7440:7452:body/1/0/1/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7554:7574:body/0/repeat/capture/0", "elements"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7740:7753:body/0/0/ruleRef/capture/0", "typeofConstraint"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7781:7794:body/1/ruleRef/capture/0", "element"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7898:7908:body/5/0/1/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8539:8547:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8651:8659:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8764:8772:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8894:8900:body/2/tokenRef/capture/0", "message"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9008:9014:body/0/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9351:9369:body/0/repeat/capture/0", "namespace"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9391:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9532:9542:body/2/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9663:9673:body/0/tokenRef/capture/0", "parts"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9687:9697:body/1/0/1/tokenRef/capture/0", "parts")];
+const RULES:&[&str]=&["UBNF::UBNFFile", "UBNF::ImportDecl", "UBNF::GrammarDecl", "UBNF::GlobalSetting", "UBNF::SettingValue", "UBNF::StringSettingValue", "UBNF::BlockSettingValue", "UBNF::KeyValuePair", "UBNF::TokenDecl", "UBNF::DeclarativeTokenValue", "UBNF::LexicalBody", "UBNF::LexicalSequence", "UBNF::LexicalElement", "UBNF::LexicalSuffix", "UBNF::LexicalAtom", "UBNF::TokenValue", "UBNF::UntilExpression", "UBNF::NegationExpression", "UBNF::LookaheadExpression", "UBNF::NegativeLookaheadExpression", "UBNF::CharRangeExpression", "UBNF::CIExpression", "UBNF::RegexExpression", "UBNF::AdapterExpression", "UBNF::AnyExpression", "UBNF::EofExpression", "UBNF::EmptyExpression", "UBNF::RuleDecl", "UBNF::Annotation", "UBNF::RootAnnotation", "UBNF::MappingAnnotation", "UBNF::EvalAnnotation", "UBNF::WhitespaceAnnotation", "UBNF::InterleaveAnnotation", "UBNF::BackrefAnnotation", "UBNF::ScopeTreeAnnotation", "UBNF::DeclaresAnnotation", "UBNF::CatalogAnnotation", "UBNF::LeftAssocAnnotation", "UBNF::RightAssocAnnotation", "UBNF::LongestChoiceAnnotation", "UBNF::PredictiveChoiceAnnotation", "UBNF::PrecedenceAnnotation", "UBNF::DocAnnotation", "UBNF::RecoveryAnnotation", "UBNF::SkipAnnotation", "UBNF::CommonFieldAnnotation", "UBNF::EnumAnnotation", "UBNF::SimpleAnnotation", "UBNF::ChoiceBody", "UBNF::SequenceBody", "UBNF::AnnotatedElement", "UBNF::PostfixQuantifier", "UBNF::SeparatedBy", "UBNF::BoundedQuantifier", "UBNF::Digits", "UBNF::AtomicElement", "UBNF::GroupElement", "UBNF::OptionalElement", "UBNF::RepeatElement", "UBNF::ErrorElement", "UBNF::TerminalElement", "UBNF::QuantifiedRef", "UBNF::TypeofElement", "UBNF::DottedIdentifier", "UBNF::RuleBody"];
+const EXPRESSIONS:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1350:1365:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1350:1365:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1352:1363:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1523:1564:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1523:1532:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1533:1543:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1551:1557:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1558:1564:body/3/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1704:1882:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1704:1713:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1714:1724:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1736:1739:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1747:1761:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1749:1759:body/3/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1781:1798:body/4/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1783:1796:body/4/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1816:1829:body/5/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1818:1827:body/5/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1849:1861:body/6/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1851:1859:body/6/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1879:1882:body/7/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:2018:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1985:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1986:1996:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2002:2005:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2006:2018:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2057:2100:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2057:2075:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2083:2100:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2179:2195:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2179:2195:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2281:2314:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2281:2284:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2285:2301:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2287:2299:body/1/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2311:2314:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2412:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2402:2405:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2406:2412:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2554:2645:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2554:2561:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2562:2572:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2583:2645:body/2/group", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2585:2636:body/2/0/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2585:2599:body/2/0/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2585:2588:body/2/0/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2589:2599:body/2/0/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2609:2636:body/2/0/1/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2609:2614:body/2/0/1/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2615:2636:body/2/0/1/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2728:2751:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2728:2739:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2748:2751:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2888:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2836:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2851:2888:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2853:2872:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2853:2856:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2857:2872:body/1/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2960:2975:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2960:2975:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2960:2974:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3059:3102:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3059:3070:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3077:3102:body/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3079:3092:body/1/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3166:3245:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3166:3245:body/0/group", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3168:3243:body/0/0/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3168:3171:body/0/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3174:3177:body/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3180:3183:body/0/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3190:3243:body/0/0/3/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3190:3193:body/0/0/3/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3194:3210:body/0/0/3/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3211:3239:body/0/0/3/2/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3213:3237:body/0/0/3/2/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3213:3216:body/0/0/3/2/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3217:3237:body/0/0/3/2/0/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3219:3235:body/0/0/3/2/0/1/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3240:3243:body/0/0/3/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3316:3655:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3316:3655:body/0/group", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3318:3653:body/0/0/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3318:3324:body/0/0/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3331:3350:body/0/0/1/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3331:3334:body/0/0/1/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3335:3346:body/0/0/1/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3347:3350:body/0/0/1/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3357:3376:body/0/0/2/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3357:3360:body/0/0/2/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3361:3372:body/0/0/2/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3373:3376:body/0/0/2/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3383:3402:body/0/0/3/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3383:3386:body/0/0/3/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3387:3398:body/0/0/3/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3399:3402:body/0/0/3/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3409:3467:body/0/0/4/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3409:3447:body/0/0/4/0/group", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3411:3445:body/0/0/4/0/0/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3411:3422:body/0/0/4/0/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3425:3445:body/0/0/4/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3448:3451:body/0/0/4/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3452:3463:body/0/0/4/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3464:3467:body/0/0/4/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3474:3518:body/0/0/5/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3474:3483:body/0/0/5/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3484:3487:body/0/0/5/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3488:3498:body/0/0/5/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3499:3502:body/0/0/5/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3503:3514:body/0/0/5/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3515:3518:body/0/0/5/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3525:3553:body/0/0/6/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3525:3534:body/0/0/6/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3535:3538:body/0/0/6/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3539:3549:body/0/0/6/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3550:3553:body/0/0/6/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3560:3598:body/0/0/7/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3560:3572:body/0/0/7/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3573:3576:body/0/0/7/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3577:3583:body/0/0/7/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3584:3587:body/0/0/7/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3588:3594:body/0/0/7/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3595:3598:body/0/0/7/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3605:3630:body/0/0/8/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3605:3615:body/0/0/8/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3616:3619:body/0/0/8/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3620:3626:body/0/0/8/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3627:3630:body/0/0/8/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3637:3653:body/0/0/9/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3713:4000:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3713:3728:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3736:3754:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3762:3781:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3789:3816:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3824:3843:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3851:3863:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3871:3886:body/6/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3894:3911:body/7/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3919:3932:body/8/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3940:3953:body/9/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3961:3976:body/10/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3984:4000:body/11/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4104:4138:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4104:4111:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4112:4115:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4116:4122:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4135:4138:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4241:4273:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4241:4251:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4252:4255:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4256:4262:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4270:4273:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4383:4418:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4383:4394:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4395:4398:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4399:4405:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4415:4418:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4553:4597:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4553:4573:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4574:4577:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4578:4584:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4594:4597:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4707:4755:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4707:4719:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4720:4723:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4724:4730:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4736:4739:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4740:4746:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4752:4755:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4841:4866:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4841:4845:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4846:4849:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4850:4856:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4863:4866:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4964:4995:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4964:4971:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4972:4975:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4976:4982:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4992:4995:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5124:5196:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5124:5133:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5134:5137:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5138:5144:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5149:5152:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5153:5162:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5163:5166:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5167:5183:body/6/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5193:5196:body/7/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5259:5264:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5259:5264:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5327:5332:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5327:5332:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5401:5408:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5401:5408:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5599:5683:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5599:5613:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5601:5611:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5632:5642:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5654:5659:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5660:5668:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5680:5683:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5739:6251:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5739:5753:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5761:5778:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5786:5800:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5808:5828:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5836:5856:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5864:5881:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5889:5908:body/6/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5916:5934:body/7/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5942:5959:body/8/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5967:5986:body/9/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5994:6014:body/10/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6022:6045:body/11/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6053:6079:body/12/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6087:6107:body/13/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6115:6128:body/14/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6136:6154:body/15/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6162:6176:body/16/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6184:6205:body/17/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6213:6227:body/18/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6235:6251:body/19/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6306:6313:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6306:6313:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6411:6553:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6411:6421:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6422:6425:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6433:6443:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6462:6544:body/3/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6464:6542:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6464:6467:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6468:6476:body/3/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6477:6480:body/3/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6481:6484:body/3/0/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6485:6495:body/3/0/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6508:6538:body/3/0/5/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6510:6524:body/3/0/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6510:6513:body/3/0/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6514:6524:body/3/0/5/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6539:6542:body/3/0/6/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6550:6553:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6626:6693:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6626:6633:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6634:6637:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6638:6650:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6660:6689:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6662:6678:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6662:6665:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6666:6678:body/3/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6690:6693:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6776:6819:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6776:6789:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6790:6819:body/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6792:6817:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6792:6795:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6796:6806:body/1/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6814:6817:body/1/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6904:6959:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6904:6917:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6918:6921:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6922:6931:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6932:6935:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6936:6946:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6956:6959:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7035:7081:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7035:7045:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7046:7049:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7056:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7057:7060:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7061:7071:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7078:7081:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7161:7209:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7161:7173:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7174:7177:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7178:7184:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7185:7188:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7189:7199:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7206:7209:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7302:7399:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7302:7313:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7314:7317:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7318:7326:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7327:7330:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7331:7341:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7350:7395:body/5/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7352:7380:body/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7352:7355:body/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7356:7369:body/5/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7370:7373:body/5/0/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7374:7380:body/5/0/3/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7399:body/6/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7478:7526:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7478:7488:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7489:7492:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7493:7502:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7503:7506:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7507:7513:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7523:7526:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7591:7603:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7591:7603:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7670:7683:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7670:7683:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7756:7772:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7756:7772:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7851:7870:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7851:7870:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7953:8010:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7953:7966:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7967:7970:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7971:7978:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7979:7982:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7983:7999:body/4/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8007:8010:body/5/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8078:8105:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8078:8084:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8085:8088:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8089:8095:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8102:8105:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8195:8267:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8195:8206:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8207:8210:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8211:8263:body/2/group", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8213:8255:body/2/0/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8213:8230:body/2/0/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8213:8219:body/2/0/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8220:8223:body/2/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8224:8230:body/2/0/0/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8245:8255:body/2/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8264:8267:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8322:8329:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8322:8329:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8492:8568:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8492:8506:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8507:8510:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8511:8521:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8534:8564:body/3/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8536:8550:body/3/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8536:8539:body/3/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8540:8550:body/3/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8565:8568:body/4/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8676:8683:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8676:8683:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8757:8771:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8757:8760:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8761:8771:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8891:8952:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8891:8903:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8918:8952:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8920:8936:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8920:8923:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8924:8936:body/1/0/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9038:9058:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9038:9058:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9040:9056:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9222:9407:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9222:9257:body/0/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9224:9237:body/0/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9265:9278:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9295:9316:body/2/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9297:9314:body/2/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9324:9345:body/3/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9326:9343:body/3/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9353:9368:body/4/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9355:9366:body/4/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9376:9407:body/5/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9378:9392:body/5/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9378:9381:body/5/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9382:9392:body/5/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9456:9471:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9456:9459:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9462:9465:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9468:9471:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9520:9537:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9520:9523:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9524:9537:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9595:9628:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9595:9598:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9599:9605:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9606:9624:body/2/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9608:9622:body/2/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9608:9611:body/2/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9612:9622:body/2/0/1/optional", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9614:9620:body/2/0/1/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9625:9628:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9647:9662:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9647:9652:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9653:9662:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9655:9660:body/1/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9809:9929:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9809:9821:body/0/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9829:9844:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9852:9865:body/2/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9873:9885:body/3/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9893:9908:body/4/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9916:9929:body/5/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10019:10041:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10019:10022:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10023:10031:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10038:10041:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10131:10153:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10131:10134:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10135:10143:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10150:10153:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10244:10266:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10244:10247:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10248:10256:body/1/ruleRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10263:10266:body/2/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10366:10397:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10366:10373:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10374:10377:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10378:10384:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10394:10397:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10492:10498:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10492:10498:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10835:10875:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10835:10853:body/0/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10837:10851:body/0/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10837:10847:body/0/0/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10848:10851:body/0/0/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10865:10875:body/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11002:11043:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11002:11011:body/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11012:11015:body/1/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11016:11026:body/2/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11040:11043:body/3/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11147:11190:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11147:11157:body/0/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11165:11190:body/1/repeat", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11167:11181:body/1/0/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11167:11170:body/1/0/0/literal", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11171:11181:body/1/0/1/tokenRef", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11248:11258:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11248:11258:body/0/ruleRef"];
+const BODIES:&[&str]=&["expr:unlaxer-dsl/grammar/ubnf.ubnf:1350:1365:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1523:1564:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1704:1882:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:2018:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2057:2100:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2179:2195:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2281:2314:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2412:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2554:2645:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2728:2751:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2888:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:2960:2975:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3059:3102:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3166:3245:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3316:3655:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:3713:4000:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4104:4138:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4241:4273:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4383:4418:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4553:4597:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4707:4755:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4841:4866:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:4964:4995:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5124:5196:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5259:5264:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5327:5332:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5401:5408:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5599:5683:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:5739:6251:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6306:6313:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6411:6553:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6626:6693:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6776:6819:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:6904:6959:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7035:7081:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7161:7209:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7302:7399:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7478:7526:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7591:7603:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7670:7683:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7756:7772:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7851:7870:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:7953:8010:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8078:8105:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8195:8267:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8322:8329:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8492:8568:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8676:8683:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8757:8771:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:8891:8952:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9038:9058:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9222:9407:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9456:9471:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9520:9537:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9595:9628:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9647:9662:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:9809:9929:body/choice", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10019:10041:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10131:10153:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10244:10266:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10366:10397:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10492:10498:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:10835:10875:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11002:11043:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11147:11190:body/seq", "expr:unlaxer-dsl/grammar/ubnf.ubnf:11248:11258:body/seq"];
+const RULE_NODE:&[bool]=&[true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, true, true, true, true, true, false, true, true, false];
+const RULE_SLOTS:&[u32]=&[2, 2, 9, 2, 0, 1, 2, 2, 2, 1, 2, 2, 2, 1, 1, 0, 1, 1, 1, 1, 2, 1, 1, 2, 0, 0, 0, 4, 0, 0, 3, 2, 1, 1, 1, 1, 2, 1, 0, 0, 0, 0, 1, 1, 2, 0, 2, 0, 1, 2, 2, 3, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 2, 0];
+const SITES:&[(&str,&str)]=&[("expr:unlaxer-dsl/grammar/ubnf.ubnf:1350:1365:body/0/repeat/capture/0", "grammars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1533:1543:body/1/tokenRef/capture/0", "alias"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1558:1564:body/3/tokenRef/capture/0", "path"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1714:1724:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1747:1761:body/3/repeat/capture/0", "imports"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1781:1798:body/4/repeat/capture/0", "settings"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1816:1829:body/5/repeat/capture/0", "tokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1849:1861:body/6/repeat/capture/0", "rules"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:1986:1996:body/1/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2006:2018:body/3/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2179:2195:body/0/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2285:2301:body/1/repeat/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2386:2396:body/0/tokenRef/capture/0", "key"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2406:2412:body/2/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2562:2572:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2589:2599:body/2/0/0/1/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2615:2636:body/2/0/1/1/ruleRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2728:2739:body/0/ruleRef/capture/0", "source"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2821:2836:body/0/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2857:2872:body/1/0/1/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:2960:2975:body/0/repeat/capture/0", "elements"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3059:3070:body/0/ruleRef/capture/0", "atom"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3079:3092:body/1/0/ruleRef/capture/0", "suffix"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3166:3245:body/0/group/capture/0", "text"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:3316:3655:body/0/group/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4116:4122:body/2/tokenRef/capture/0", "terminator"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4256:4262:body/2/tokenRef/capture/0", "chars"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4399:4405:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4578:4584:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4724:4730:body/2/tokenRef/capture/0", "min"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4740:4746:body/4/tokenRef/capture/0", "max"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4850:4856:body/2/tokenRef/capture/0", "word"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:4976:4982:body/2/tokenRef/capture/0", "pattern"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5138:5144:body/2/tokenRef/capture/0", "id"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5167:5183:body/6/tokenRef/capture/0", "version"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5599:5613:body/0/repeat/capture/0", "annotations"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5632:5642:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:5660:5668:body/3/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6433:6443:body/2/tokenRef/capture/0", "className"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6485:6495:body/3/0/4/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6514:6524:body/3/0/5/0/1/tokenRef/capture/0", "paramNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6638:6650:body/2/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6666:6678:body/3/0/1/ruleRef/capture/0", "entries"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6796:6806:body/1/0/1/tokenRef/capture/0", "style"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:6936:6946:body/4/tokenRef/capture/0", "profile"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7061:7071:body/4/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7189:7199:body/4/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7331:7341:body/4/tokenRef/capture/0", "symbol"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7374:7380:body/5/0/3/tokenRef/capture/0", "description"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7507:7513:body/4/tokenRef/capture/0", "context"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:7983:7999:body/4/tokenRef/capture/0", "level"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8089:8095:body/2/tokenRef/capture/0", "text"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8224:8230:body/2/0/0/2/tokenRef/capture/0", "syncTokens"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8245:8255:body/2/0/1/tokenRef/capture/0", "mode"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8511:8521:body/2/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8540:8550:body/3/0/1/tokenRef/capture/0", "fieldNames"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8761:8771:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8891:8903:body/0/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:8924:8936:body/1/0/1/ruleRef/capture/0", "alternatives"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9038:9058:body/0/repeat/capture/0", "elements"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9224:9237:body/0/0/ruleRef/capture/0", "typeofConstraint"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9265:9278:body/1/ruleRef/capture/0", "element"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:9382:9392:body/5/0/1/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:10023:10031:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:10135:10143:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:10248:10256:body/1/ruleRef/capture/0", "body"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:10378:10384:body/2/tokenRef/capture/0", "message"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:10492:10498:body/0/tokenRef/capture/0", "value"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:10835:10853:body/0/repeat/capture/0", "namespace"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:10865:10875:body/1/tokenRef/capture/0", "name"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:11016:11026:body/2/tokenRef/capture/0", "captureName"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:11147:11157:body/0/tokenRef/capture/0", "parts"), ("expr:unlaxer-dsl/grammar/ubnf.ubnf:11171:11181:body/1/0/1/tokenRef/capture/0", "parts")];
 impl<const DIAG: bool> Session<'_, DIAG> {
 fn build_values(&mut self,root:EventId)->Result<Vec<u32>,String> {let mut out=Vec::new();self.build_values_into(root,&mut out)?;Ok(out)}
 #[inline(never)] fn build_values_into(&mut self,root:EventId,out:&mut Vec<u32>)->Result<(),String> {let frame=0u8;let address=std::ptr::addr_of!(frame) as usize;let anchor=*self.mapping_anchor.get_or_insert(address);if self.mapping_depth>=self.options.limits.mapping_depth || anchor.abs_diff(address)>256*1024 {return Err("maximum mapping depth exceeded".into());}self.mapping_depth+=1;let result=self.build_values_inner(root,out);self.mapping_depth-=1;result}
@@ -2890,26 +3101,26 @@ fn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&m
 6=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_6(caps,span,child,out);self.value_region=outer;built},
 7=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_7(caps,span,child,out);self.value_region=outer;built},
 8=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_8(caps,span,child,out);self.value_region=outer;built},
-9=>self.map_rule_9(caps,span,child,out),
+9=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_9(caps,span,child,out);self.value_region=outer;built},
 10=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_10(caps,span,child,out);self.value_region=outer;built},
 11=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_11(caps,span,child,out);self.value_region=outer;built},
 12=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_12(caps,span,child,out);self.value_region=outer;built},
 13=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_13(caps,span,child,out);self.value_region=outer;built},
 14=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_14(caps,span,child,out);self.value_region=outer;built},
-15=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_15(caps,span,child,out);self.value_region=outer;built},
+15=>self.map_rule_15(caps,span,child,out),
 16=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_16(caps,span,child,out);self.value_region=outer;built},
 17=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_17(caps,span,child,out);self.value_region=outer;built},
 18=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_18(caps,span,child,out);self.value_region=outer;built},
 19=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_19(caps,span,child,out);self.value_region=outer;built},
 20=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_20(caps,span,child,out);self.value_region=outer;built},
-21=>self.map_rule_21(caps,span,child,out),
+21=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_21(caps,span,child,out);self.value_region=outer;built},
 22=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_22(caps,span,child,out);self.value_region=outer;built},
 23=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_23(caps,span,child,out);self.value_region=outer;built},
 24=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_24(caps,span,child,out);self.value_region=outer;built},
 25=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_25(caps,span,child,out);self.value_region=outer;built},
 26=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_26(caps,span,child,out);self.value_region=outer;built},
 27=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_27(caps,span,child,out);self.value_region=outer;built},
-28=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_28(caps,span,child,out);self.value_region=outer;built},
+28=>self.map_rule_28(caps,span,child,out),
 29=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_29(caps,span,child,out);self.value_region=outer;built},
 30=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_30(caps,span,child,out);self.value_region=outer;built},
 31=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_31(caps,span,child,out);self.value_region=outer;built},
@@ -2926,20 +3137,27 @@ fn build_rule(&mut self,rule:usize,caps:(u32,u32),span:Span,child:EventId,out:&m
 42=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_42(caps,span,child,out);self.value_region=outer;built},
 43=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_43(caps,span,child,out);self.value_region=outer;built},
 44=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_44(caps,span,child,out);self.value_region=outer;built},
-45=>self.map_rule_45(caps,span,child,out),
-46=>self.map_rule_46(caps,span,child,out),
-47=>self.map_rule_47(caps,span,child,out),
-48=>self.map_rule_48(caps,span,child,out),
-49=>self.map_rule_49(caps,span,child,out),
+45=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_45(caps,span,child,out);self.value_region=outer;built},
+46=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_46(caps,span,child,out);self.value_region=outer;built},
+47=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_47(caps,span,child,out);self.value_region=outer;built},
+48=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_48(caps,span,child,out);self.value_region=outer;built},
+49=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_49(caps,span,child,out);self.value_region=outer;built},
 50=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_50(caps,span,child,out);self.value_region=outer;built},
 51=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_51(caps,span,child,out);self.value_region=outer;built},
-52=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_52(caps,span,child,out);self.value_region=outer;built},
-53=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_53(caps,span,child,out);self.value_region=outer;built},
-54=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_54(caps,span,child,out);self.value_region=outer;built},
+52=>self.map_rule_52(caps,span,child,out),
+53=>self.map_rule_53(caps,span,child,out),
+54=>self.map_rule_54(caps,span,child,out),
 55=>self.map_rule_55(caps,span,child,out),
-56=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_56(caps,span,child,out);self.value_region=outer;built},
+56=>self.map_rule_56(caps,span,child,out),
 57=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_57(caps,span,child,out);self.value_region=outer;built},
-58=>self.map_rule_58(caps,span,child,out),
+58=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_58(caps,span,child,out);self.value_region=outer;built},
+59=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_59(caps,span,child,out);self.value_region=outer;built},
+60=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_60(caps,span,child,out);self.value_region=outer;built},
+61=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_61(caps,span,child,out);self.value_region=outer;built},
+62=>self.map_rule_62(caps,span,child,out),
+63=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_63(caps,span,child,out);self.value_region=outer;built},
+64=>{let outer=std::mem::take(&mut self.value_region);let built=self.map_rule_64(caps,span,child,out);self.value_region=outer;built},
+65=>self.map_rule_65(caps,span,child,out),
 _=>Err(format!("unknown rule {rule}"))}}
 fn map_rule_0(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut f0=self.take_values();self.node_values(&caps,&[0],&[],None,&mut f0)?;
@@ -3006,223 +3224,271 @@ fn map_rule_8(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>
 let mut t0=self.take_values();self.text_values(&caps,&[14],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[14]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-let mut v1=self.take_values();self.node_values(&caps,&[15],&[],None,&mut v1)?;
-if !v1.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_AnyExpression || k==tree::K_g_UBNFAST_2e_CIExpression || k==tree::K_g_UBNFAST_2e_CharRangeExpression || k==tree::K_g_UBNFAST_2e_DottedIdentifier || k==tree::K_g_UBNFAST_2e_EmptyExpression || k==tree::K_g_UBNFAST_2e_EofExpression || k==tree::K_g_UBNFAST_2e_LookaheadExpression || k==tree::K_g_UBNFAST_2e_NegationExpression || k==tree::K_g_UBNFAST_2e_NegativeLookaheadExpression || k==tree::K_g_UBNFAST_2e_RegexExpression || k==tree::K_g_UBNFAST_2e_UntilExpression}) {return Err("value: mapped value type mismatch".into());}
-if v1.is_empty() && self.missing_field(&caps,&[15]) {return Ok(());}
+let mut v1=self.take_values();self.node_values(&caps,&[15, 16],&[],None,&mut v1)?;
+if !v1.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_AdapterExpression || k==tree::K_g_UBNFAST_2e_AnyExpression || k==tree::K_g_UBNFAST_2e_CIExpression || k==tree::K_g_UBNFAST_2e_CharRangeExpression || k==tree::K_g_UBNFAST_2e_DeclarativeTokenValue || k==tree::K_g_UBNFAST_2e_DottedIdentifier || k==tree::K_g_UBNFAST_2e_EmptyExpression || k==tree::K_g_UBNFAST_2e_EofExpression || k==tree::K_g_UBNFAST_2e_LookaheadExpression || k==tree::K_g_UBNFAST_2e_NegationExpression || k==tree::K_g_UBNFAST_2e_NegativeLookaheadExpression || k==tree::K_g_UBNFAST_2e_RegexExpression || k==tree::K_g_UBNFAST_2e_UntilExpression}) {return Err("value: mapped value type mismatch".into());}
+if v1.is_empty() && self.missing_field(&caps,&[15, 16]) {return Ok(());}
 if v1.len()!=1 {return Err("value requires one node".into());}let f1=v1.pop().unwrap();self.give_values(v1);
 let f1:u32=f1;
 self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_TokenDecl,8,span,&[f0,f1]);out.push(node);Ok(())}}
-fn map_rule_9(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_9(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut v0=self.take_values();self.node_values(&caps,&[17],&[],None,&mut v0)?;
+if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_LexicalChoice}) {return Err("source: mapped value type mismatch".into());}
+if v0.is_empty() && self.missing_field(&caps,&[17]) {return Ok(());}
+if v0.len()!=1 {return Err("source requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_DeclarativeTokenValue,9,span,&[f0]);out.push(node);Ok(())}}
 fn map_rule_10(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[16],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[16]) {return Ok(());}
-if t0.len()!=1 {return Err("terminator requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_UntilExpression,10,span,&[f0]);out.push(node);Ok(())}}
+let mut f0=self.take_values();self.node_values(&caps,&[18, 19],&[],None,&mut f0)?;
+if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_LexicalSequence}) {return Err("alternatives: mapped value type mismatch".into());}
+let f0:Vec<u32>=f0;
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_LexicalChoice,10,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
 fn map_rule_11(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[17],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[17]) {return Ok(());}
-if t0.len()!=1 {return Err("chars requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_NegationExpression,11,span,&[f0]);out.push(node);Ok(())}}
+let mut f0=self.take_values();self.node_values(&caps,&[20],&[],None,&mut f0)?;
+if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_LexicalElement}) {return Err("elements: mapped value type mismatch".into());}
+let f0:Vec<u32>=f0;
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_LexicalSequence,11,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
 fn map_rule_12(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[18],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[18]) {return Ok(());}
-if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let mut v0=self.take_values();self.node_values(&caps,&[21],&[],None,&mut v0)?;
+if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_LexicalAtom}) {return Err("atom: mapped value type mismatch".into());}
+if v0.is_empty() && self.missing_field(&caps,&[21]) {return Ok(());}
+if v0.len()!=1 {return Err("atom requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LookaheadExpression,12,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_13(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[19],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[19]) {return Ok(());}
-if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_NegativeLookaheadExpression,13,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_14(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[20],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[20]) {return Ok(());}
-if t0.len()!=1 {return Err("min requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-let mut t1=self.take_values();self.text_values(&caps,&[21],&mut t1);if t1.is_empty() && self.missing_field(&caps,&[21]) {return Ok(());}
-if t1.len()!=1 {return Err("max requires one value".into());}let f1=t1.pop().unwrap();self.give_values(t1);
-let f1:u32=f1;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_CharRangeExpression,14,span,&[f0,f1]);out.push(node);Ok(())}}
-fn map_rule_15(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[22],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[22]) {return Ok(());}
-if t0.len()!=1 {return Err("word requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_CIExpression,15,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_16(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[23],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[23]) {return Ok(());}
-if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RegexExpression,16,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_17(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_AnyExpression,17,span,&[]);out.push(node);Ok(())}}
-fn map_rule_18(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_EofExpression,18,span,&[]);out.push(node);Ok(())}}
-fn map_rule_19(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_EmptyExpression,19,span,&[]);out.push(node);Ok(())}}
-fn map_rule_20(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[24],&[],None,&mut f0)?;
-if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_BackrefAnnotation || k==tree::K_g_UBNFAST_2e_CatalogAnnotation || k==tree::K_g_UBNFAST_2e_CommonFieldAnnotation || k==tree::K_g_UBNFAST_2e_DeclaresAnnotation || k==tree::K_g_UBNFAST_2e_DocAnnotation || k==tree::K_g_UBNFAST_2e_EnumAnnotation || k==tree::K_g_UBNFAST_2e_EvalAnnotation || k==tree::K_g_UBNFAST_2e_InterleaveAnnotation || k==tree::K_g_UBNFAST_2e_LeftAssocAnnotation || k==tree::K_g_UBNFAST_2e_LongestChoiceAnnotation || k==tree::K_g_UBNFAST_2e_MappingAnnotation || k==tree::K_g_UBNFAST_2e_PrecedenceAnnotation || k==tree::K_g_UBNFAST_2e_PredictiveChoiceAnnotation || k==tree::K_g_UBNFAST_2e_RecoveryAnnotation || k==tree::K_g_UBNFAST_2e_RightAssocAnnotation || k==tree::K_g_UBNFAST_2e_RootAnnotation || k==tree::K_g_UBNFAST_2e_ScopeTreeAnnotation || k==tree::K_g_UBNFAST_2e_SimpleAnnotation || k==tree::K_g_UBNFAST_2e_SkipAnnotation || k==tree::K_g_UBNFAST_2e_WhitespaceAnnotation}) {return Err("annotations: mapped value type mismatch".into());}
-let f0:Vec<u32>=f0;
-let mut t1=self.take_values();self.text_values(&caps,&[25],&mut t1);if t1.is_empty() && self.missing_field(&caps,&[25]) {return Ok(());}
-if t1.len()!=1 {return Err("name requires one value".into());}let f1=t1.pop().unwrap();self.give_values(t1);
-let f1:u32=f1;
-let mut v2=self.take_values();self.node_values(&caps,&[26],&[],None,&mut v2)?;
-if !v2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
-if v2.is_empty() && self.missing_field(&caps,&[26]) {return Ok(());}
-if v2.len()!=1 {return Err("body requires one node".into());}let f2=v2.pop().unwrap();self.give_values(v2);
-let f2:u32=f2;
-self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_RuleDecl,20,span,&[l0[0],l0[1],f1,f2]);out.push(node);Ok(())}}
-fn map_rule_21(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_22(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RootAnnotation,22,span,&[]);out.push(node);Ok(())}}
-fn map_rule_23(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[27],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[27]) {return Ok(());}
-if t0.len()!=1 {return Err("className requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-let mut f1=self.take_values();self.text_values(&caps,&[28, 29],&mut f1);
-let f1:Vec<u32>=f1;
-self.give_captures(caps);let span=self.span(span);let l1=self.tree.list(&f1);self.give_values(f1);let node=self.tree.record(tree::K_g_UBNFAST_2e_MappingAnnotation,23,span,&[f0,l1[0],l1[1]]);out.push(node);Ok(())}}
-fn map_rule_24(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[30, 31],&[],None,&mut f0)?;
-if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_KeyValuePair}) {return Err("entries: mapped value type mismatch".into());}
-let f0:Vec<u32>=f0;
-self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_EvalAnnotation,24,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
-fn map_rule_25(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[32],&mut t0);if t0.len()>1 {return Err("style requires at most one value".into());}let f0=t0.pop();self.give_values(t0);
-let f0:Option<u32>=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_WhitespaceAnnotation,25,span,&[f0.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_26(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[33],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[33]) {return Ok(());}
-if t0.len()!=1 {return Err("profile requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_InterleaveAnnotation,26,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_27(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[34],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[34]) {return Ok(());}
-if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_BackrefAnnotation,27,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_28(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[35],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[35]) {return Ok(());}
-if t0.len()!=1 {return Err("mode requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_ScopeTreeAnnotation,28,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_29(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[36],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[36]) {return Ok(());}
-if t0.len()!=1 {return Err("symbol requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-let mut t1=self.take_values();self.text_values(&caps,&[37],&mut t1);if t1.len()>1 {return Err("description requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
+let mut v1=self.take_values();self.node_values(&caps,&[22],&[],None,&mut v1)?;
+if !v1.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_LexicalSuffix}) {return Err("suffix: mapped value type mismatch".into());}
+if v1.len()>1 {return Err("suffix requires at most one node".into());}let f1=v1.pop();self.give_values(v1);
 let f1:Option<u32>=f1;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_DeclaresAnnotation,29,span,&[f0,f1.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_30(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[38],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[38]) {return Ok(());}
-if t0.len()!=1 {return Err("context requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_CatalogAnnotation,30,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_31(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LeftAssocAnnotation,31,span,&[]);out.push(node);Ok(())}}
-fn map_rule_32(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RightAssocAnnotation,32,span,&[]);out.push(node);Ok(())}}
-fn map_rule_33(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LongestChoiceAnnotation,33,span,&[]);out.push(node);Ok(())}}
-fn map_rule_34(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_PredictiveChoiceAnnotation,34,span,&[]);out.push(node);Ok(())}}
-fn map_rule_35(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[39],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[39]) {return Ok(());}
-if t0.len()!=1 {return Err("level requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
-let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_PrecedenceAnnotation,35,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_36(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[40],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[40]) {return Ok(());}
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LexicalElement,12,span,&[f0,f1.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
+fn map_rule_13(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[23],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[23]) {return Ok(());}
 if t0.len()!=1 {return Err("text requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_DocAnnotation,36,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_37(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[42],&mut t0);if t0.len()>1 {return Err("mode requires at most one value".into());}let f0=t0.pop();self.give_values(t0);
-let f0:Option<u32>=f0;
-let mut t1=self.take_values();self.text_values(&caps,&[41],&mut t1);if t1.len()>1 {return Err("syncTokens requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
-let f1:Option<u32>=f1;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RecoveryAnnotation,37,span,&[f0.unwrap_or(tree::NONE),f1.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_38(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_SkipAnnotation,38,span,&[]);out.push(node);Ok(())}}
-fn map_rule_39(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.text_values(&caps,&[43, 44],&mut f0);
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LexicalSuffix,13,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_14(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut v0=self.take_values();self.node_values(&caps,&[24],&[],None,&mut v0)?;
+if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::KIND_TEXT || k==tree::K_g_UBNFAST_2e_DottedIdentifier || k==tree::K_g_UBNFAST_2e_LexicalChoice}) {return Err("value: mapped value type mismatch".into());}
+if v0.is_empty() && self.missing_field(&caps,&[24]) {return Ok(());}
+if v0.len()!=1 {return Err("value requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LexicalAtom,14,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_15(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_16(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[25],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[25]) {return Ok(());}
+if t0.len()!=1 {return Err("terminator requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_UntilExpression,16,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_17(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[26],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[26]) {return Ok(());}
+if t0.len()!=1 {return Err("chars requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_NegationExpression,17,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_18(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[27],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[27]) {return Ok(());}
+if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LookaheadExpression,18,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_19(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[28],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[28]) {return Ok(());}
+if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_NegativeLookaheadExpression,19,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_20(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[29],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[29]) {return Ok(());}
+if t0.len()!=1 {return Err("min requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+let mut t1=self.take_values();self.text_values(&caps,&[30],&mut t1);if t1.is_empty() && self.missing_field(&caps,&[30]) {return Ok(());}
+if t1.len()!=1 {return Err("max requires one value".into());}let f1=t1.pop().unwrap();self.give_values(t1);
+let f1:u32=f1;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_CharRangeExpression,20,span,&[f0,f1]);out.push(node);Ok(())}}
+fn map_rule_21(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[31],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[31]) {return Ok(());}
+if t0.len()!=1 {return Err("word requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_CIExpression,21,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_22(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[32],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[32]) {return Ok(());}
+if t0.len()!=1 {return Err("pattern requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RegexExpression,22,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_23(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[33],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[33]) {return Ok(());}
+if t0.len()!=1 {return Err("id requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+let mut t1=self.take_values();self.text_values(&caps,&[34],&mut t1);if t1.is_empty() && self.missing_field(&caps,&[34]) {return Ok(());}
+if t1.len()!=1 {return Err("version requires one value".into());}let f1=t1.pop().unwrap();self.give_values(t1);
+let f1:u32=f1;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_AdapterExpression,23,span,&[f0,f1]);out.push(node);Ok(())}}
+fn map_rule_24(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_AnyExpression,24,span,&[]);out.push(node);Ok(())}}
+fn map_rule_25(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_EofExpression,25,span,&[]);out.push(node);Ok(())}}
+fn map_rule_26(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_EmptyExpression,26,span,&[]);out.push(node);Ok(())}}
+fn map_rule_27(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut f0=self.take_values();self.node_values(&caps,&[35],&[],None,&mut f0)?;
+if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_BackrefAnnotation || k==tree::K_g_UBNFAST_2e_CatalogAnnotation || k==tree::K_g_UBNFAST_2e_CommonFieldAnnotation || k==tree::K_g_UBNFAST_2e_DeclaresAnnotation || k==tree::K_g_UBNFAST_2e_DocAnnotation || k==tree::K_g_UBNFAST_2e_EnumAnnotation || k==tree::K_g_UBNFAST_2e_EvalAnnotation || k==tree::K_g_UBNFAST_2e_InterleaveAnnotation || k==tree::K_g_UBNFAST_2e_LeftAssocAnnotation || k==tree::K_g_UBNFAST_2e_LongestChoiceAnnotation || k==tree::K_g_UBNFAST_2e_MappingAnnotation || k==tree::K_g_UBNFAST_2e_PrecedenceAnnotation || k==tree::K_g_UBNFAST_2e_PredictiveChoiceAnnotation || k==tree::K_g_UBNFAST_2e_RecoveryAnnotation || k==tree::K_g_UBNFAST_2e_RightAssocAnnotation || k==tree::K_g_UBNFAST_2e_RootAnnotation || k==tree::K_g_UBNFAST_2e_ScopeTreeAnnotation || k==tree::K_g_UBNFAST_2e_SimpleAnnotation || k==tree::K_g_UBNFAST_2e_SkipAnnotation || k==tree::K_g_UBNFAST_2e_WhitespaceAnnotation}) {return Err("annotations: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
-self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_CommonFieldAnnotation,39,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
-fn map_rule_40(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_EnumAnnotation,40,span,&[]);out.push(node);Ok(())}}
-fn map_rule_41(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t1=self.take_values();self.text_values(&caps,&[36],&mut t1);if t1.is_empty() && self.missing_field(&caps,&[36]) {return Ok(());}
+if t1.len()!=1 {return Err("name requires one value".into());}let f1=t1.pop().unwrap();self.give_values(t1);
+let f1:u32=f1;
+let mut v2=self.take_values();self.node_values(&caps,&[37],&[],None,&mut v2)?;
+if !v2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
+if v2.is_empty() && self.missing_field(&caps,&[37]) {return Ok(());}
+if v2.len()!=1 {return Err("body requires one node".into());}let f2=v2.pop().unwrap();self.give_values(v2);
+let f2:u32=f2;
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_RuleDecl,27,span,&[l0[0],l0[1],f1,f2]);out.push(node);Ok(())}}
+fn map_rule_28(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_29(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RootAnnotation,29,span,&[]);out.push(node);Ok(())}}
+fn map_rule_30(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[38],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[38]) {return Ok(());}
+if t0.len()!=1 {return Err("className requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+let mut f1=self.take_values();self.text_values(&caps,&[39, 40],&mut f1);
+let f1:Vec<u32>=f1;
+self.give_captures(caps);let span=self.span(span);let l1=self.tree.list(&f1);self.give_values(f1);let node=self.tree.record(tree::K_g_UBNFAST_2e_MappingAnnotation,30,span,&[f0,l1[0],l1[1]]);out.push(node);Ok(())}}
+fn map_rule_31(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut f0=self.take_values();self.node_values(&caps,&[41, 42],&[],None,&mut f0)?;
+if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_KeyValuePair}) {return Err("entries: mapped value type mismatch".into());}
+let f0:Vec<u32>=f0;
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_EvalAnnotation,31,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
+fn map_rule_32(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[43],&mut t0);if t0.len()>1 {return Err("style requires at most one value".into());}let f0=t0.pop();self.give_values(t0);
+let f0:Option<u32>=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_WhitespaceAnnotation,32,span,&[f0.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
+fn map_rule_33(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[44],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[44]) {return Ok(());}
+if t0.len()!=1 {return Err("profile requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_InterleaveAnnotation,33,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_34(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
 let mut t0=self.take_values();self.text_values(&caps,&[45],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[45]) {return Ok(());}
 if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_SimpleAnnotation,41,span,&[f0]);out.push(node);Ok(())}}
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_BackrefAnnotation,34,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_35(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[46],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[46]) {return Ok(());}
+if t0.len()!=1 {return Err("mode requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_ScopeTreeAnnotation,35,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_36(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[47],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[47]) {return Ok(());}
+if t0.len()!=1 {return Err("symbol requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+let mut t1=self.take_values();self.text_values(&caps,&[48],&mut t1);if t1.len()>1 {return Err("description requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
+let f1:Option<u32>=f1;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_DeclaresAnnotation,36,span,&[f0,f1.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
+fn map_rule_37(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[49],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[49]) {return Ok(());}
+if t0.len()!=1 {return Err("context requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_CatalogAnnotation,37,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_38(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LeftAssocAnnotation,38,span,&[]);out.push(node);Ok(())}}
+fn map_rule_39(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RightAssocAnnotation,39,span,&[]);out.push(node);Ok(())}}
+fn map_rule_40(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_LongestChoiceAnnotation,40,span,&[]);out.push(node);Ok(())}}
+fn map_rule_41(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_PredictiveChoiceAnnotation,41,span,&[]);out.push(node);Ok(())}}
 fn map_rule_42(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[46, 47],&[],None,&mut f0)?;
+let mut t0=self.take_values();self.text_values(&caps,&[50],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[50]) {return Ok(());}
+if t0.len()!=1 {return Err("level requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_PrecedenceAnnotation,42,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_43(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[51],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[51]) {return Ok(());}
+if t0.len()!=1 {return Err("text requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_DocAnnotation,43,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_44(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[53],&mut t0);if t0.len()>1 {return Err("mode requires at most one value".into());}let f0=t0.pop();self.give_values(t0);
+let f0:Option<u32>=f0;
+let mut t1=self.take_values();self.text_values(&caps,&[52],&mut t1);if t1.len()>1 {return Err("syncTokens requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
+let f1:Option<u32>=f1;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RecoveryAnnotation,44,span,&[f0.unwrap_or(tree::NONE),f1.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
+fn map_rule_45(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_SkipAnnotation,45,span,&[]);out.push(node);Ok(())}}
+fn map_rule_46(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut f0=self.take_values();self.text_values(&caps,&[54, 55],&mut f0);
+let f0:Vec<u32>=f0;
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_CommonFieldAnnotation,46,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
+fn map_rule_47(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_EnumAnnotation,47,span,&[]);out.push(node);Ok(())}}
+fn map_rule_48(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[56],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[56]) {return Ok(());}
+if t0.len()!=1 {return Err("name requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
+let f0:u32=f0;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_SimpleAnnotation,48,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_49(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut f0=self.take_values();self.node_values(&caps,&[57, 58],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_SequenceBody}) {return Err("alternatives: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
-self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_ChoiceBody,42,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
-fn map_rule_43(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.node_values(&caps,&[48],&[],None,&mut f0)?;
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_ChoiceBody,49,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
+fn map_rule_50(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut f0=self.take_values();self.node_values(&caps,&[59],&[],None,&mut f0)?;
 if !f0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_AnnotatedElement}) {return Err("elements: mapped value type mismatch".into());}
 let f0:Vec<u32>=f0;
-self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_SequenceBody,43,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
-fn map_rule_44(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[50],&[],None,&mut v0)?;
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_SequenceBody,50,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
+fn map_rule_51(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut v0=self.take_values();self.node_values(&caps,&[61],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::KIND_TEXT || k==tree::K_g_UBNFAST_2e_ErrorElement || k==tree::K_g_UBNFAST_2e_GroupElement || k==tree::K_g_UBNFAST_2e_OptionalElement || k==tree::K_g_UBNFAST_2e_RepeatElement || k==tree::K_g_UBNFAST_2e_TerminalElement}) {return Err("element: mapped value type mismatch".into());}
-if v0.is_empty() && self.missing_field(&caps,&[50]) {return Ok(());}
+if v0.is_empty() && self.missing_field(&caps,&[61]) {return Ok(());}
 if v0.len()!=1 {return Err("element requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
-let mut t1=self.take_values();self.text_values(&caps,&[51],&mut t1);if t1.len()>1 {return Err("captureName requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
+let mut t1=self.take_values();self.text_values(&caps,&[62],&mut t1);if t1.len()>1 {return Err("captureName requires at most one value".into());}let f1=t1.pop();self.give_values(t1);
 let f1:Option<u32>=f1;
-let mut v2=self.take_values();self.node_values(&caps,&[49],&[],None,&mut v2)?;
+let mut v2=self.take_values();self.node_values(&caps,&[60],&[],None,&mut v2)?;
 if !v2.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_TypeofElement}) {return Err("typeofConstraint: mapped value type mismatch".into());}
 if v2.len()>1 {return Err("typeofConstraint requires at most one node".into());}let f2=v2.pop();self.give_values(v2);
 let f2:Option<u32>=f2;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_AnnotatedElement,44,span,&[f0,f1.unwrap_or(tree::NONE),f2.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
-fn map_rule_45(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_46(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_47(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_48(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_49(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_50(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[52],&[],None,&mut v0)?;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_AnnotatedElement,51,span,&[f0,f1.unwrap_or(tree::NONE),f2.unwrap_or(tree::NONE)]);out.push(node);Ok(())}}
+fn map_rule_52(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_53(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_54(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_55(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_56(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_57(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut v0=self.take_values();self.node_values(&caps,&[63],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
-if v0.is_empty() && self.missing_field(&caps,&[52]) {return Ok(());}
+if v0.is_empty() && self.missing_field(&caps,&[63]) {return Ok(());}
 if v0.len()!=1 {return Err("body requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_GroupElement,50,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_51(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[53],&[],None,&mut v0)?;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_GroupElement,57,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_58(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut v0=self.take_values();self.node_values(&caps,&[64],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
-if v0.is_empty() && self.missing_field(&caps,&[53]) {return Ok(());}
+if v0.is_empty() && self.missing_field(&caps,&[64]) {return Ok(());}
 if v0.len()!=1 {return Err("body requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_OptionalElement,51,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_52(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut v0=self.take_values();self.node_values(&caps,&[54],&[],None,&mut v0)?;
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_OptionalElement,58,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_59(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut v0=self.take_values();self.node_values(&caps,&[65],&[],None,&mut v0)?;
 if !v0.iter().all(|value|{let k=self.tree.kind(*value);k==tree::K_g_UBNFAST_2e_ChoiceBody}) {return Err("body: mapped value type mismatch".into());}
-if v0.is_empty() && self.missing_field(&caps,&[54]) {return Ok(());}
+if v0.is_empty() && self.missing_field(&caps,&[65]) {return Ok(());}
 if v0.len()!=1 {return Err("body requires one node".into());}let f0=v0.pop().unwrap();self.give_values(v0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RepeatElement,52,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_53(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[55],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[55]) {return Ok(());}
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_RepeatElement,59,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_60(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[66],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[66]) {return Ok(());}
 if t0.len()!=1 {return Err("message requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_ErrorElement,53,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_54(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[56],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[56]) {return Ok(());}
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_ErrorElement,60,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_61(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[67],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[67]) {return Ok(());}
 if t0.len()!=1 {return Err("value requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_TerminalElement,54,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_55(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
-fn map_rule_56(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut t0=self.take_values();self.text_values(&caps,&[59],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[59]) {return Ok(());}
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_TerminalElement,61,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_62(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{if self.value_region>0 {return Ok(());}let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+fn map_rule_63(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut t0=self.take_values();self.text_values(&caps,&[70],&mut t0);if t0.is_empty() && self.missing_field(&caps,&[70]) {return Ok(());}
 if t0.len()!=1 {return Err("captureName requires one value".into());}let f0=t0.pop().unwrap();self.give_values(t0);
 let f0:u32=f0;
-self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_TypeofElement,56,span,&[f0]);out.push(node);Ok(())}}
-fn map_rule_57(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
-let mut f0=self.take_values();self.text_values(&caps,&[60, 61],&mut f0);
+self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree::K_g_UBNFAST_2e_TypeofElement,63,span,&[f0]);out.push(node);Ok(())}}
+fn map_rule_64(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let mut slots=self.take_captures();self.rule_captures(caps,&mut slots);let caps=slots;
+let mut f0=self.take_values();self.text_values(&caps,&[71, 72],&mut f0);
 let f0:Vec<u32>=f0;
-self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_DottedIdentifier,57,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
-fn map_rule_58(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
+self.give_captures(caps);let span=self.span(span);let l0=self.tree.list(&f0);self.give_values(f0);let node=self.tree.record(tree::K_g_UBNFAST_2e_DottedIdentifier,64,span,&[l0[0],l0[1]]);out.push(node);Ok(())}}
+fn map_rule_65(&mut self,caps:(u32,u32),span:Span,child:EventId,out:&mut Vec<u32>)->Result<(),String> {let _=(caps,span,child,&out);{let start=out.len();self.build_values_into(child,out)?;if out.len()==start && !self.has_recovery(child) && !self.has_value_group(child) {let text=self.semantic_text(child,span);out.push(text);}Ok(())}}
 /// 出現（capture / rule / token）の収集と、AST 構築が rule ごとに読む直下 capture 表を
 /// 1 回の走査で作る。以前は出現収集の後に AST 構築が rule ごとに `collect_captures` で
 /// 同じ木をもう一度下っていた。

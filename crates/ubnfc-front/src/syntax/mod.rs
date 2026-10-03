@@ -1,7 +1,7 @@
 //! UBNF ソースから構文木を作る。名前解決・意味検証・IR への変換は行わない。
 
 pub mod ast;
-mod lexer;
+pub(crate) mod lexer;
 mod parser;
 
 pub use ast::{GrammarAst, Span, UbnfFile};

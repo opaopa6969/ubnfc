@@ -53,12 +53,17 @@ impl EscapeErrorKind {
 pub fn declares_v2(settings: &[GlobalSetting]) -> bool {
     settings.iter().any(|s| match s {
         // 余白の刈り方は validate の `trim` と同じ（制御文字も落とす）。
-        GlobalSetting::String { key, value, .. } if key == "ubnf" => value
-            .trim_matches(|c: char| c <= '\u{20}')
-            .parse::<u64>()
-            .is_ok_and(|version| version >= 2),
+        GlobalSetting::String { key, value, .. } if key == "ubnf" => {
+            language_version(value).is_some_and(|v| v >= 2)
+        }
         _ => false,
     })
+}
+
+/// Both the historical numeric spelling and shared UBNF `v2` spelling are accepted.
+pub fn language_version(value: &str) -> Option<u64> {
+    let value = value.trim_matches(|c: char| c <= '\u{20}');
+    value.strip_prefix('v').unwrap_or(value).parse().ok()
 }
 
 /// 原文に `\uXXXX` / `\u{X…}` の**エスケープとして**現れる列があるか。
