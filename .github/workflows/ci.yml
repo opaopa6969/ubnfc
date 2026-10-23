@@ -5,10 +5,13 @@ on:
     branches: [master]
   pull_request:
 
-# Both jobs run on the repository-scoped self-hosted runner (labels: ubnfc-ci). This
-# repository is private, so GitHub-hosted runners are billed and have never started a job
-# here ("recent account payments have failed or your spending limit needs to be
-# increased" — every run since the repository was created failed in 2 s).
+# Both jobs run on the repository-scoped self-hosted runner (labels: ubnfc-ci); this
+# repository does not use GitHub-hosted runners.
+#
+# The repository is public and the runner is a persistent machine, so pull requests from
+# forks must never run on it. Each job therefore runs only for pushes and for pull requests
+# whose head branch lives in this repository; the repository settings additionally require
+# approval before any workflow from an outside contributor runs.
 #
 # External fixtures (unlaxer-parser / tinyexpression, both public) are fetched inside the
 # native job at the commits pinned in scripts/external-pins.env (issue #105), under
@@ -28,6 +31,7 @@ env:
 jobs:
   wasm32:
     name: wasm32-unknown-unknown build (issue #65 / D-070)
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: [self-hosted, Linux, X64, ubnfc-ci]
     steps:
       - uses: actions/checkout@v4
@@ -61,6 +65,7 @@ jobs:
 
   native:
     name: native workspace tests
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: [self-hosted, Linux, X64, ubnfc-ci]
     steps:
       - uses: actions/checkout@v4

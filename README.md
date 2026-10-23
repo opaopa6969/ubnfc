@@ -550,3 +550,7 @@ report は日付 + 話題で名前が付いている。性能の出発点は
 - **unlaxer Classic**（`classic`）: `unlaxer-parser` のコンビネータ実行系（ParseContext / transaction / Token 木）と `unlaxer-dsl` の生成器。
 - **ubnfc**: このリポジトリ。UBNF コンパイラで、実行系に依存しない **ubnfc parser** を Java / Rust に書き出す。
 - どちらを使うかの目安（Classic にしか無いもの、ubnfc にしか無いもの、判断手順、保守方針）: [unlaxer-parser/docs/engine-selection-guide-ja.md](https://github.com/opaopa6969/unlaxer-parser/blob/master/docs/engine-selection-guide-ja.md)
+
+## ライセンス
+
+MIT License（[LICENSE](LICENSE)）。第三者由来のテスト入力の出典は [NOTICE](NOTICE) にある。
