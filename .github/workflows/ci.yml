@@ -15,8 +15,15 @@ on:
 # $RUNNER_TEMP. The job never reads a developer working tree on the runner's machine, so
 # its result depends only on this repository's commit. How to move a pin:
 # docs/ci-external-fixtures.md.
+#
+# The runner shares the machine's ~/.rustup, whose *default* toolchain is changed by other
+# work (it was 1.98.1 at the last green run on 2026-10-03 and 1.85.0 from 2026-10-22). Name
+# the toolchain explicitly so the default does not leak in: the workspace tests clippy the
+# generated crates with -D warnings, so the lint set (and therefore the result) depends on
+# the toolchain. `stable` is what the tests were last green on; the version is printed below.
 env:
   CARGO_TERM_COLOR: always
+  RUSTUP_TOOLCHAIN: stable
 
 jobs:
   wasm32:
