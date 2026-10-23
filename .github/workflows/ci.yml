@@ -8,14 +8,22 @@ on:
 # Both jobs run on the repository-scoped self-hosted runner (labels: ubnfc-ci). This
 # repository is private, so GitHub-hosted runners are billed and have never started a job
 # here ("recent account payments have failed or your spending limit needs to be
-# increased" — every run since the repository was created failed in 2 s). The runner
-# lives on the same machine as the sibling unlaxer-parser checkout, so the native job's
-# fixtures resolve via UNLAXER_PARSER_DIR and the job is merge-blocking again.
+# increased" — every run since the repository was created failed in 2 s).
+#
+# External fixtures (unlaxer-parser / tinyexpression, both public) are fetched inside the
+# native job at the commits pinned in scripts/external-pins.env (issue #105), under
+# $RUNNER_TEMP. The job never reads a developer working tree on the runner's machine, so
+# its result depends only on this repository's commit. How to move a pin:
+# docs/ci-external-fixtures.md.
+#
+# The runner shares the machine's ~/.rustup, whose *default* toolchain is changed by other
+# work (it was 1.98.1 at the last green run on 2026-10-03 and 1.85.0 from 2026-10-22). Name
+# the toolchain explicitly so the default does not leak in: the workspace tests clippy the
+# generated crates with -D warnings, so the lint set (and therefore the result) depends on
+# the toolchain. `stable` is what the tests were last green on; the version is printed below.
 env:
-  UNLAXER_PARSER_DIR: /home/opa/work/unlaxer-workspace/unlaxer-parser
-  UNLAXER_PARSER_ROOT: /home/opa/work/unlaxer-workspace/unlaxer-parser
-  TINYEXPRESSION_DIR: /home/opa/work/unlaxer-workspace/tinyexpression
   CARGO_TERM_COLOR: always
+  RUSTUP_TOOLCHAIN: stable
 
 jobs:
   wasm32:
@@ -62,10 +70,16 @@ jobs:
           rustup target list --installed | grep -q wasm32-unknown-unknown
           java -version 2>&1 | head -1 && mvn -v | head -1
 
-      # Several tests and the handwritten-target example hard-code the sibling layout
-      # ../../../unlaxer-parser and ../../../tinyexpression relative to their crate (no env
-      # override), so give the runner's _work/ubnfc/ the same siblings as the developer's
-      # workspace. ln -sfn is idempotent; actions/checkout only cleans $GITHUB_WORKSPACE.
+      # Shallow-fetch exactly the pinned commits (git fetch --depth 1 origin <sha>) into
+      # $RUNNER_TEMP/external and export UNLAXER_PARSER_DIR / UNLAXER_PARSER_ROOT /
+      # TINYEXPRESSION_DIR to the following steps via $GITHUB_ENV.
+      - name: fetch pinned external fixtures (scripts/external-pins.env)
+        run: scripts/fetch-external-fixtures.sh "$RUNNER_TEMP/external"
+
+      # Tests fall back to the sibling layout ../../../unlaxer-parser and
+      # ../../../tinyexpression relative to their crate when the variables are unset, so
+      # point the runner's _work/ubnfc/ siblings at the same pinned checkouts too. ln -sfn
+      # is idempotent; actions/checkout only cleans $GITHUB_WORKSPACE.
       - name: link sibling checkouts next to the workspace
         run: |
           ln -sfn "$UNLAXER_PARSER_DIR" "$GITHUB_WORKSPACE/../unlaxer-parser"
@@ -75,9 +89,8 @@ jobs:
       - name: build ubnfc-java jar (needed by Rust<->Java cross-backend tests)
         run: cd ubnfc-java && mvn -q -DskipTests package
 
-      # Fixture-driven tests read UNLAXER_PARSER_DIR / TINYEXPRESSION_DIR (set above) or the
-      # sibling links created earlier. Those checkouts are the developer working trees on the
-      # runner's machine (usually master; may be ahead of what the PR was written against).
+      # Fixture-driven tests read UNLAXER_PARSER_DIR / TINYEXPRESSION_DIR (exported by the
+      # fetch step) or the sibling links created earlier; both are the pinned checkouts.
       # This job is merge-blocking.
       #
       # Test threads / timeouts (issue #73, docs/harness-driver-protocol.md "CI での方針"):

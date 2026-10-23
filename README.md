@@ -430,6 +430,10 @@ cd ubnfc-java && mvn -o -q test           # Java backend
 cd examples/p4-java && mvn -o -q test     # P4 Java 実行例
 ```
 
+fixture は sibling の `unlaxer-parser` / `tinyexpression` から読む。CI は
+[`scripts/external-pins.env`](scripts/external-pins.env) に固定した commit を取得して読む
+（取得・pin の更新手順は [`docs/ci-external-fixtures.md`](docs/ci-external-fixtures.md)）。
+
 self-host の固定点だけを見るなら:
 
 ```sh
@@ -519,6 +523,7 @@ cd examples/p4-java && mvn -o -q -DskipTests package && bash scripts/benchmark.s
 | [`docs/design/02-facts-tokens-bench-corpus.md`](docs/design/02-facts-tokens-bench-corpus.md) | 組込み token の受理範囲、ベンチ fixture、corpus の形式 |
 | [`docs/compat-matrix.md`](docs/compat-matrix.md) | 機能 × 観測面の oracle 対応表。「oracle なし」を空欄と区別する |
 | [`docs/harness-driver-protocol.md`](docs/harness-driver-protocol.md) | 生成物と手書き目標が共有する JSON Lines の driver 契約 |
+| [`docs/ci-external-fixtures.md`](docs/ci-external-fixtures.md) | CI が読む外部 fixture（unlaxer-parser / tinyexpression）の commit pin と更新手順 |
 | [`docs/decisions/`](docs/decisions/) | 疑似コードや根拠が長い決定（D-004 precedence climbing、D-018 未決乖離 15 件） |
 | [`docs/reports/`](docs/reports/) | 全計測・全 corpus 実行の記録。**性能を語るときはここの数字と条件を引く** |
 | [`docs/reviews/`](docs/reviews/) | 両 backend への敵対的レビュー |
