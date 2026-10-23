@@ -551,6 +551,10 @@ report は日付 + 話題で名前が付いている。性能の出発点は
 - **ubnfc**: このリポジトリ。UBNF コンパイラで、実行系に依存しない **ubnfc parser** を Java / Rust に書き出す。
 - どちらを使うかの目安（Classic にしか無いもの、ubnfc にしか無いもの、判断手順、保守方針）: [unlaxer-parser/docs/engine-selection-guide-ja.md](https://github.com/opaopa6969/unlaxer-parser/blob/master/docs/engine-selection-guide-ja.md)
 
+## issue 番号について
+
+この repository は 2026-10-23 に履歴を作り直して公開した。commit message・docs・コード中の `#105` 以前の番号は旧 repository（非公開）の issue / PR 番号で、この repository の番号とは対応しない。open だった issue の対応表は [#9](https://github.com/opaopa6969/ubnfc/issues/9) にある。
+
 ## ライセンス
 
 MIT License（[LICENSE](LICENSE)）。第三者由来のテスト入力の出典は [NOTICE](NOTICE) にある。
