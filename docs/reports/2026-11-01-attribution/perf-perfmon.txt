@@ -1,12 +1,12 @@
 
  Performance counter stats for 'true':
 
-              0.69 msec task-clock                       #    0.293 CPUs utilized          
-           2798526      cycles                           #    4.033 GHz                    
-            659536      instructions                     #    0.24  insn per cycle         
-            147946      branches                         #  213.211 M/sec                  
-             22255      branch-misses                    #   15.04% of all branches        
-             31597      cache-misses                                                       
+              0.69 msec task-clock                       #    0.293 CPUs utilized
+           2798526      cycles                           #    4.033 GHz
+            659536      instructions                     #    0.24  insn per cycle
+            147946      branches                         #  213.211 M/sec
+             22255      branch-misses                    #   15.04% of all branches
+             31597      cache-misses
 
        0.002371309 seconds time elapsed
 

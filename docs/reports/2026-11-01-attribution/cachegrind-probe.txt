@@ -2,25 +2,25 @@
 ==1== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.
 ==1== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
 ==1== Command: /bin/true
-==1== 
+==1==
 --1-- warning: L3 cache found, using its data for the LL simulation.
-==1== 
+==1==
 ==1== I   refs:      110,375
 ==1== I1  misses:      1,091
 ==1== LLi misses:      1,072
 ==1== I1  miss rate:    0.99%
 ==1== LLi miss rate:    0.97%
-==1== 
+==1==
 ==1== D   refs:       36,364  (26,101 rd   + 10,263 wr)
 ==1== D1  misses:      1,536  ( 1,194 rd   +    342 wr)
 ==1== LLd misses:      1,304  (   992 rd   +    312 wr)
 ==1== D1  miss rate:     4.2% (   4.6%     +    3.3%  )
 ==1== LLd miss rate:     3.6% (   3.8%     +    3.0%  )
-==1== 
+==1==
 ==1== LL refs:         2,627  ( 2,285 rd   +    342 wr)
 ==1== LL misses:       2,376  ( 2,064 rd   +    312 wr)
 ==1== LL miss rate:      1.6% (   1.5%     +    3.0%  )
-==1== 
+==1==
 ==1== Branches:       20,583  (20,304 cond +    279 ind)
 ==1== Mispredicts:     2,908  ( 2,758 cond +    150 ind)
 ==1== Mispred rate:     14.1% (  13.6%     +   53.8%   )

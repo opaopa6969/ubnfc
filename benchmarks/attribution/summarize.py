@@ -47,7 +47,7 @@ def callgrind(path, count):
     totals = sum((c for c in costs.values()), collections.Counter())
     if totals["Ir"] == 0:
         raise ValueError("callgrind の収集命令が 0（計装区間を確認）")
-    writer = csv.writer(sys.stdout, delimiter="\t")
+    writer = csv.writer(sys.stdout, delimiter="\t", lineterminator="\n")
     writer.writerow(["関数", "calls/parse", "自己時間ns", "自己Ir%"] + [f"{e}/parse" for e in events])
     writer.writerow(["合計", "—", "未取得", "100"] + [f"{totals[e] / count:.3f}" for e in events])
     for key, cost in sorted(costs.items(), key=lambda item: -item[1]["Ir"]):
@@ -69,7 +69,7 @@ def jfr(path):
             method = frames[0]["method"]
             label = method["type"]["name"] + "." + method["name"] + method["descriptor"]
             counts[label] += 1
-    writer = csv.writer(sys.stdout, delimiter="\t")
+    writer = csv.writer(sys.stdout, delimiter="\t", lineterminator="\n")
     writer.writerow(["関数（先頭 frame）", "自己CPUサンプル", "自己CPUサンプル%", "自己時間ns", "命令数", "分岐ミス", "cache miss"])
     total = counts.total()
     if not total:
@@ -80,7 +80,7 @@ def jfr(path):
 
 
 def perf(path, count):
-    writer = csv.writer(sys.stdout, delimiter="\t")
+    writer = csv.writer(sys.stdout, delimiter="\t", lineterminator="\n")
     writer.writerow(["関数", "自己CPU時間ns/parse（標本推定）", "自己CPU%", "命令数", "分岐ミス", "cache miss"])
     rows = []
     for line in pathlib.Path(path).read_text().splitlines():

@@ -2,29 +2,29 @@
 ==1== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
 ==1== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
 ==1== Command: /tmp/tmp.MXwAhUNyJV/target/release/attribution p4 recognize /tmp/tmp.MXwAhUNyJV/inputs/complex.tiny 100 10
-==1== 
+==1==
 --1-- warning: L3 cache found, using its data for the LL simulation.
 ==1== For interactive control, run 'callgrind_control -h'.
-==1== 
+==1==
 ==1== Events    : Ir Dr Dw I1mr D1mr D1mw ILmr DLmr DLmw Bc Bcm Bi Bim
 ==1== Collected : 8521785 2463139 2149086 252598 15562 31870 5065 387 2363 1099379 53126 61631 5431
-==1== 
+==1==
 ==1== I   refs:      8,521,785
 ==1== I1  misses:      252,598
 ==1== LLi misses:        5,065
 ==1== I1  miss rate:      2.96%
 ==1== LLi miss rate:      0.06%
-==1== 
+==1==
 ==1== D   refs:      4,612,225  (2,463,139 rd + 2,149,086 wr)
 ==1== D1  misses:       47,432  (   15,562 rd +    31,870 wr)
 ==1== LLd misses:        2,750  (      387 rd +     2,363 wr)
 ==1== D1  miss rate:       1.0% (      0.6%   +       1.5%  )
 ==1== LLd miss rate:       0.1% (      0.0%   +       0.1%  )
-==1== 
+==1==
 ==1== LL refs:         300,030  (  268,160 rd +    31,870 wr)
 ==1== LL misses:         7,815  (    5,452 rd +     2,363 wr)
 ==1== LL miss rate:        0.1% (      0.0%   +       0.1%  )
-==1== 
+==1==
 ==1== Branches:      1,161,010  (1,099,379 cond +    61,631 ind)
 ==1== Mispredicts:      58,557  (   53,126 cond +     5,431 ind)
 ==1== Mispred rate:        5.0% (      4.8%     +       8.8%   )
