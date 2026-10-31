@@ -1,7 +1,7 @@
 # host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64, core=30, runs=7, run_seconds=0.5
-# before=66a18ff8e71839b893d2edabdad14825f8436dae after=2fc6dbed9ae4a4df016ac85edc069ead68c83714
- 08:15:36 up 13 days, 14:40,  0 users,  load average: 64.12, 69.39, 54.23
-# load average (開始): 64.12 69.39 54.23
- 08:17:23 up 13 days, 14:42,  0 users,  load average: 51.44, 64.86, 54.31
-# load average (終了): 51.44 64.86 54.31
-# /tmp/tmp.8VwGMxLRNw/final2/swar-time.csv
+# before=66a18ff8e71839b893d2edabdad14825f8436dae after=3fa69b5c8e4e438c76a4679c634ef382ef2b1cb6
+ 08:29:54 up 13 days, 14:54,  0 users,  load average: 29.59, 42.35, 49.56
+# load average (開始): 29.59 42.35 49.56
+ 08:31:16 up 13 days, 14:56,  0 users,  load average: 36.25, 41.01, 48.43
+# load average (終了): 36.25 41.01 48.43
+# /tmp/tmp.8VwGMxLRNw/clean2/swar-time.csv
