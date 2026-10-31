@@ -22,7 +22,7 @@ pub(super) fn validate(cx: &mut Context<'_>) {
     }
     for setting in whitespace {
         let message = match setting {
-            GlobalSetting::String { value, .. } if valid_whitespace(trim(value)) => continue,
+            GlobalSetting::String { value, .. } if cx.whitespace_ok(trim(value)) => continue,
             GlobalSetting::String { value, .. } => format!(
                 "global @whitespace style must be javaStyle or none: {}",
                 trim(value)

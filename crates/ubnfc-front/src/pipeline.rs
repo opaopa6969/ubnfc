@@ -114,6 +114,9 @@ pub fn compile(
     main_path: impl AsRef<Path>,
     loader: &dyn Fn(&Path) -> io::Result<String>,
 ) -> Result<Compiled, PipelineError> {
+    // `pkg:` の import（crate::packages）は仮想パスとして loader に届く。
+    let packaged = crate::packages::loader(loader);
+    let loader: &dyn Fn(&Path) -> io::Result<String> = &packaged;
     let path = absolute_path(main_path.as_ref()).map_err(|error| PipelineError::Io {
         path: main_path.as_ref().into(),
         error,
@@ -142,6 +145,9 @@ pub fn compile_with_strict(
     loader: &dyn Fn(&Path) -> io::Result<String>,
     strict: bool,
 ) -> Result<Compiled, PipelineError> {
+    // `pkg:` の import（crate::packages）は仮想パスとして loader に届く。
+    let packaged = crate::packages::loader(loader);
+    let loader: &dyn Fn(&Path) -> io::Result<String> = &packaged;
     let path = absolute_path(main_path.as_ref()).map_err(|error| PipelineError::Io {
         path: main_path.as_ref().into(),
         error,
@@ -262,6 +268,9 @@ pub fn validate_file(
     main_path: impl AsRef<Path>,
     loader: &dyn Fn(&Path) -> io::Result<String>,
 ) -> Result<Vec<ValidationIssue>, PipelineError> {
+    // `pkg:` の import（crate::packages）は仮想パスとして loader に届く。
+    let packaged = crate::packages::loader(loader);
+    let loader: &dyn Fn(&Path) -> io::Result<String> = &packaged;
     let path = absolute_path(main_path.as_ref()).map_err(|error| PipelineError::Io {
         path: main_path.as_ref().into(),
         error,
