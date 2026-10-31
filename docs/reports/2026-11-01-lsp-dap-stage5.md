@@ -98,7 +98,15 @@ Java backend テストを重ねて走らせない。既存の Java jar build →
 今回の実装による既存観測の変更として承認したものではなく、コミット済み IR と期待値のずれを補正した。
 
 pin 済み外部 fixture を使う `RUSTUP_TOOLCHAIN=stable cargo test --workspace --no-fail-fast`
-と PR の CI も確認する。
+は558成功・1失敗（exit 101）。失敗は `ubnfc-harness --test cli` の既定 fixture 探索であり、
+テストが環境変数を意図的に外したとき、worktree の sibling に `unlaxer-parser` が無かったため。
+共有ディレクトリにリンクを作らず、専用 `mktemp -d` の中へ同じ commit を展開し、
+CI と同じ sibling 配置を作って同じ pin の `cargo test -p ubnfc-harness --test cli` を再実行した。
+その2テストは成功した。テストコードや pin の変更は不要だった。
+
+その後 `origin/master`（`763eb5c`）を merge で取り込み、D-083 を保持して
+D-086〜D-088 の番号に衝突がないことを確認した。取り込み後も LSP 15テストが成功し、
+小文法から再生成した IR が同梱 IR と byte 一致した。統合後の head も PR の CI で検査する。
 最終結果は PR の Checks と issue #1 の完了コメントに記録し、CI 成功を merge の条件にする。
 
 ## 7. 未着手と理由

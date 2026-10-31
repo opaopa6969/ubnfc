@@ -1,0 +1,6 @@
+{
+  "samples": [
+    { "file": "17-bad-syntax.stax", "parse": "reject", "diagnostic": "syntax", "typecheck": "n/a",
+      "note": "スタック効果の ) が無い。20 本の受理サンプルとは別に両 backend の拒否を確認する" }
+  ]
+}

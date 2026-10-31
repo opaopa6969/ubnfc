@@ -18,6 +18,7 @@ pub mod desugar;
 pub mod escape;
 pub mod ir;
 pub mod lower;
+pub mod packages;
 pub mod pipeline;
 pub mod resolve;
 pub mod selfhost;
