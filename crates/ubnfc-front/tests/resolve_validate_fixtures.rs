@@ -67,7 +67,7 @@ fn external_fixture_diagnostics() {
         let ast = parse_file(&source).unwrap_or_else(|e| panic!("{name}: {e}"));
         // evolution/{0..3} を含め、異なる版は独立して解決する。
         let files = [(path, ast)];
-        let result = resolve(&files, &|path| std::fs::read_to_string(path));
+        let result = resolve(&files, &|path| ubnfc_front::packages::read_to_string(path));
         if name.ends_with("/all-tokens.ubnf") || name.ends_with("/namespace.ubnf") {
             let errors = result.expect_err(&format!("既知の不正 fixture が受理された: {name}"));
             assert_eq!(errors.len(), 1, "{name}: {errors:?}");
@@ -139,7 +139,7 @@ fn external_fixture_diagnostics() {
                 if name == "P4" {
                     assert_eq!(
                         grammar,
-                        resolve(&files, &|path| std::fs::read_to_string(path)).unwrap()
+                        resolve(&files, &|path| ubnfc_front::packages::read_to_string(path)).unwrap()
                     );
                     assert_eq!(grammar.grammars[0].rules.len(), 124);
                     assert!(issues.is_empty());
