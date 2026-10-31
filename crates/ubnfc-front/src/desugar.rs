@@ -177,7 +177,7 @@ fn annotation_name(annotation: &Annotation) -> &str {
         Annotation::Skip { .. } => "@skip",
         Annotation::CommonField { .. } => "@commonField",
         Annotation::Enum { .. } => "@enum",
-        Annotation::Simple { name, .. } => name,
+        Annotation::Simple { name, .. } | Annotation::Unsupported { name, .. } => name,
     }
 }
 
@@ -538,6 +538,7 @@ fn respan(annotation: &Annotation, span: Span) -> Annotation {
         CommonField { fields },
         Enum {},
         Simple { name },
+        Unsupported { name },
     )
 }
 

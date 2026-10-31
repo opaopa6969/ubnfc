@@ -133,9 +133,16 @@ fn all_unlaxer_ubnf_files_parse() {
         {
             // core's versioned ADAPTER registry is distinct from ubnfc's extern
             // registry and is deliberately not silently reinterpreted here.
+            // The spelling parses (Classic is the canonical spelling, D-084) and resolve
+            // rejects it at its position (E-TOKEN-ADAPTER-UNSUPPORTED, D-085).
+            let file = parse_fixture(&read(path), path);
             assert!(
-                parse_file(&read(path)).is_err(),
-                "ADAPTER is not implemented by ubnfc"
+                file.grammars
+                    .iter()
+                    .flat_map(|g| &g.tokens)
+                    .any(|t| matches!(t.value, TokenValue::Adapter { .. })),
+                "{}",
+                path.display()
             );
             continue;
         }

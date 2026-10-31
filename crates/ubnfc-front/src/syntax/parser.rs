@@ -210,6 +210,21 @@ impl Parser<'_> {
         }
     }
 
+    /// 宣言的 token（v2）の `CHAR_RANGE` / `NEGATION` の引数。`\uXXXX` / `\u{X…}` を
+    /// code point 1 個へ展開する（D-063 を宣言的 token にも当てる。Classic も同じ）。
+    fn scalar_string(&mut self) -> ParseResult<String> {
+        let span = self.peek(0).span;
+        let (value, raw) = self.string_with_raw()?;
+        if !crate::escape::has_unicode_escape(&raw) {
+            return Ok(value);
+        }
+        crate::escape::expand(&raw).map_err(|e| SyntaxError {
+            message: format!("{}: {}", e.code.code(), e.text),
+            span,
+            expected: vec!["\\uXXXX or \\u{X…} within U+10FFFF, not a surrogate"],
+        })
+    }
+
     fn integer(&mut self) -> ParseResult<u64> {
         let Kind::Digits(digits) = self.peek(0).kind else {
             return Err(self.error(&["unsigned integer"]));
@@ -473,11 +488,11 @@ impl Parser<'_> {
                     }
                 }
                 "SAME_AS" => Lex::leaf(Op::BACKREF, self.identifier()?),
-                "NEGATION" => Lex::leaf(Op::EXCEPT, self.string()?),
+                "NEGATION" => Lex::leaf(Op::EXCEPT, self.scalar_string()?),
                 "CHAR_RANGE" => {
-                    let min = self.string()?;
+                    let min = self.scalar_string()?;
                     self.require(",")?;
-                    let max = self.string()?;
+                    let max = self.scalar_string()?;
                     if min.chars().count() != 1 || max.chars().count() != 1 {
                         return Err(self.error(&["one Unicode scalar"]));
                     }
@@ -520,6 +535,19 @@ impl Parser<'_> {
             let name = self.string()?;
             return Ok(TokenValue::Extern {
                 name,
+                span: self.span_from(start),
+            });
+        }
+        // Classic の版付き token adapter（unlaxer-parser #158）。
+        if dotted == "ADAPTER" && self.consume("(") {
+            let id = self.string()?;
+            self.require(",")?;
+            self.named_argument("version")?;
+            let version = self.integer()?;
+            self.require(")")?;
+            return Ok(TokenValue::Adapter {
+                id,
+                version,
                 span: self.span_from(start),
             });
         }
@@ -848,6 +876,9 @@ impl Parser<'_> {
 
     fn annotation(&mut self) -> ParseResult<Annotation> {
         let start = self.start();
+        // Classic（unlaxer-parser #715）: `@` と名前の間に空白・コメントがある形は、名前が
+        // 既知でも適用しない Simple 注釈になる（`@ leftAssoc`）。
+        let plain = !self.adjacent(0);
         self.require("@")?;
         let name = self.identifier()?;
         macro_rules! finish {
@@ -855,7 +886,22 @@ impl Parser<'_> {
                 Ok(Annotation::$variant { $($field,)* span: self.span_from(start) })
             };
         }
+        // 引数が要る名前を `(` なしで書いた形も Simple 注釈（`@mapping`、#715）。
+        const NEEDS_ARGUMENTS: &[&str] = &[
+            "mapping", "eval", "interleave", "backref", "symbolRef", "sameText", "scopeTree",
+            "declares", "catalog", "precedence", "doc", "recovery", "commonField",
+            "lexicalContext", "namePredicate", "predicate",
+        ];
+        if plain || (NEEDS_ARGUMENTS.contains(&name.as_str()) && !self.is_at(0, "(")) {
+            return finish!(Simple, name);
+        }
         match name.as_str() {
+            // Classic にあって ubnfc に無い意味の注釈。引数は括弧の釣り合いだけを見て読み飛ばす。
+            "lexicalContext" | "namePredicate" | "predicate" => {
+                self.skip_balanced()?;
+                finish!(Unsupported, name)
+            }
+            "uniqueLongestChoice" | "nestedCaptures" => finish!(Unsupported, name),
             "root" => finish!(Root),
             "leftAssoc" => finish!(LeftAssoc),
             "rightAssoc" => finish!(RightAssoc),
@@ -994,6 +1040,22 @@ impl Parser<'_> {
             }
             _ => finish!(Simple, name),
         }
+    }
+
+    /// `(` から対応する `)` までを読み飛ばす（入れ子の括弧・角括弧を数える）。
+    fn skip_balanced(&mut self) -> ParseResult<()> {
+        self.require("(")?;
+        let mut depth = 1usize;
+        while depth > 0 {
+            match self.peek(0).kind {
+                Kind::Eof => return Err(self.error(&[")"])),
+                Kind::Punct('(' | '[') => depth += 1,
+                Kind::Punct(')' | ']') => depth -= 1,
+                _ => {}
+            }
+            self.cursor += 1;
+        }
+        Ok(())
     }
 
     fn identifier_argument(&mut self, name: &'static str) -> ParseResult<String> {

@@ -333,6 +333,11 @@ ubnfc の front は Classic の綴りを受け付ける。ubnfc 独自の綴り�
 | 規則の中の `COMMIT(e[, 'msg'])` / `LABEL(l, e)` / `CATCH(e, alt {, l})`（#700） | その位置で `E-CUT-UNSUPPORTED` | IR に cut が無い。取り除くと受理する言語が変わることがある |
 | `@autoCommit`（#702） | 受理し、何も挿入しない | FIRST 集合で「受理と AST を変えない」位置にだけ `COMMIT` を入れる注釈なので、変わるのは失敗の位置と診断だけ。Classic が解析の対象外の文法で注釈を取り除くのと同じ |
 
+| plain form の注釈 `@ leftAssoc`（`@` の後に空白）、`(` の無い `@mapping`（#715） | 適用しない Simple 注釈にして `W-ANNOTATION-IGNORED`（D-085） | Classic と同じ |
+| `@lexicalContext(...)` / `@predicate(...)` / `@namePredicate(...)` / `@uniqueLongestChoice` / `@nestedCaptures` | その位置で `E-ANNOTATION-UNSUPPORTED`（D-085） | 受理または AST が変わる機能で、ubnfc に無い。以前は未知の注釈として警告だけ出して無視していた |
+| token adapter `ADAPTER('id', version=N)`（#158） | その位置で `E-TOKEN-ADAPTER-UNSUPPORTED`（D-085） | Classic の adapter registry は ubnfc の extern registry（D-041）と別物なので読み替えない |
+| 宣言的 token の `CHAR_RANGE` / `NEGATION` の `\uXXXX` / `\u{X…}` | code point 1 個へ展開する（D-085） | D-063 を宣言的 token にも当てる。Classic と同じ |
+
 関数形式（`CAPTURE(` など）になるのは、名前と `(` が隣接しているときだけである。`CAPTURE ('x')` のように空白・
 コメントを挟めば、従来どおり参照と group になる（Classic と同じ）。宣言的 token の中の `CAPTURE` / `SAME_AS`
 （D-061）は従来どおり使える。
@@ -369,4 +374,4 @@ Classic の拒否例 25 件のうち 20 件を、ubnfc も同じ趣旨の code �
 6. ~~§6 統廃合の P1 / P2 / P3 / P5 と P7-1 / P7-3~~ **完了（D-045 〜 D-049）**
 7. ~~§7 code point クラス~~ **完了（D-063）**
 8. §6 の残り（P4 / P6 / P7-4）
-10. ~~§9 Classic の綴り~~ **完了（D-084）**
+10. ~~§9 Classic の綴り~~ **完了（D-084 / D-085）**
