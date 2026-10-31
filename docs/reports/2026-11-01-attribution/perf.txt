@@ -1,0 +1,5 @@
+Error:
+No permission to enable task-clock event.
+
+
+利用不可（exit=255）
