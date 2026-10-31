@@ -14,5 +14,5 @@
   ],
   "evaluate": "error: evaluate は文法デバッガでは未対応です（値を計算する評価器を持っていません）。言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください（生成された EvaluatorBridge.java の Javadoc に例があります）。",
   "setVariable": "error: setVariable は文法デバッガでは未対応です（値を計算する評価器を持っていません）。言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください（生成された EvaluatorBridge.java の Javadoc に例があります）。",
-  "events": ["initialized", "output:stderr:<program>:3:1: Error: 構文エラー（余分な入力）: ' ' | '%' | '(' | ')' | '*' | '*/' | '+' | '.' ほか 20 件 を期待しました", "output:stdout:Completed: <program>", "terminated", "exited:0"]
+  "events": ["initialized", "output:stderr:<program>:3:1: Error: 構文エラー（余分な入力）: ' ' | '%' | '(' | ')' | '*' | '*/' | '+' | '.' ほか 18 件 を期待しました", "output:stdout:Completed: <program>", "terminated", "exited:0"]
 }

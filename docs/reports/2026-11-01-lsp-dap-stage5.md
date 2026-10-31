@@ -85,10 +85,20 @@ Java backend テストを重ねて走らせない。既存の Java jar build →
 - `mvn -o -q -Plsp -DskipTests package`: 成功。
 - `mvn -o -q -Plsp -pl ubnfc-lsp -am test "-Dtest=org.unlaxer.ubnfc.lsp.*Test" -Dsurefire.failIfNoSpecifiedTests=false`:
   15 テスト、失敗・エラー・skip とも 0。golden 更新後の通常照合で確認。
+- `mvn -o -q -Plsp test`: Java backend 11,885 テスト + LSP 15 テスト、すべて成功。
+- `SKIP_VSIX=1 scripts/build-vsix.sh --with-dap all`: P4 は30テスト成功。
+  UBNF は下記の既存 golden を補正後、`mvn -o -q -f examples/ubnf-vscode/server/pom.xml -Pdap test`
+  の通常照合で21テスト成功。VSIX の組立て・実機への導入は実施していない。
 - `which code`: exit 1・出力なし。実機確認は実施できない。
 
-Java 全テスト、既存 P4 / UBNF サーバの golden、pin 済み外部 fixture を使う
-`RUSTUP_TOOLCHAIN=stable cargo test --workspace --no-fail-fast`、PR の CI も確認する。
+既存 UBNF golden の4行（診断候補の残数2行と semantic token の分類2行）にも不一致があった。
+`origin/master`（`66a18ff`）を専用の一時ディレクトリへ展開し、旧生成器の実応答でも同じ差分が
+出ることを確かめてから、その応答に期待値を合わせた。新旧の UBNF パーサ生成物と DAP 生成物は
+`diff -qr` で byte 一致し、新機能を含むサーバの通常 golden も一致した。
+今回の実装による既存観測の変更として承認したものではなく、コミット済み IR と期待値のずれを補正した。
+
+pin 済み外部 fixture を使う `RUSTUP_TOOLCHAIN=stable cargo test --workspace --no-fail-fast`
+と PR の CI も確認する。
 最終結果は PR の Checks と issue #1 の完了コメントに記録し、CI 成功を merge の条件にする。
 
 ## 7. 未着手と理由
