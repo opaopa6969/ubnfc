@@ -22,7 +22,7 @@ import generated.rt.Input;
 import generated.rt.MemoTable;
 import generated.rt.ScopeStore;
 import generated.rt.Severity;
-import generated.internal.Recipe.Value;
+import generated.internal.AstEvent.Value;
 
 /** Per-parse state; transactions preserve syntax diagnostics but undo semantic effects. */
 public final class Session {
@@ -102,23 +102,23 @@ public final class Session {
     }
     public record Trace(String rule, String expr, int start, int end, List<Trace> children, String token) {}
     public record RecoveryEvent(String rule, String mode, int start, int end, String pattern, int syncStart,
-                                int syncEnd, Diagnostic diagnostic, Recipe marker) {}
+                                int syncEnd, Diagnostic diagnostic, AstEvent marker) {}
     /** values == null denotes plain text; an empty values list denotes an absent semantic value. */
-    public record Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
+    public record Match(List<AstEvent> nodes, List<Occurrence> local, List<Occurrence> captures,
                         List<Trace> traces, int start, int end, boolean mappingFailure, List<RecoveryEvent> recoveries, List<Match> items, String text, List<Value> values) {
-        public Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
+        public Match(List<AstEvent> nodes, List<Occurrence> local, List<Occurrence> captures,
                      List<Trace> traces, int start, int end, boolean mappingFailure, List<RecoveryEvent> recoveries, List<Match> items, String text) {
             this(nodes, local, captures, traces, start, end, mappingFailure, recoveries, items, text, null);
         }
-        public Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
+        public Match(List<AstEvent> nodes, List<Occurrence> local, List<Occurrence> captures,
                      List<Trace> traces, int start, int end, boolean mappingFailure, List<RecoveryEvent> recoveries) {
             this(nodes, local, captures, traces, start, end, mappingFailure, recoveries, List.of(), null);
         }
-        public Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
+        public Match(List<AstEvent> nodes, List<Occurrence> local, List<Occurrence> captures,
                      List<Trace> traces, int start, int end, boolean mappingFailure) {
             this(nodes, local, captures, traces, start, end, mappingFailure, List.of());
         }
-        public Match(List<Recipe> nodes, List<Occurrence> local, List<Occurrence> captures,
+        public Match(List<AstEvent> nodes, List<Occurrence> local, List<Occurrence> captures,
                      List<Trace> traces, int start, int end) { this(nodes, local, captures, traces, start, end, false); }
         // Lists are built only inside Session and never mutated after construction; no defensive copies.
         public static Match empty(int start, int end) { return new Match(List.of(), List.of(), List.of(), List.of(), start, end); }
@@ -323,7 +323,10 @@ public final class Session {
      * との差分検証と計測のためだけに false にする（system property {@code -Dubnfc.factor=false} でも切れる）。
      */
     public static boolean factoring = !"false".equals(System.getProperty("ubnfc.factor"));
-    /** D-068 の A/B 用。{@code -Dubnfc.astwrap=false} で AST 経路だけ参照経路（包みを通る）に戻す。 */
+    /** 直接構築と旧 Recipe 経路を比較するためのスイッチ（既定 true）。 */
+    public static boolean directAst = !"false".equals(System.getProperty("ubnfc.directAst"));
+    public final boolean direct;
+    /** D-068 の capture 包みを比較するスイッチ。 */
     public static boolean astBypass = !"false".equals(System.getProperty("ubnfc.astwrap"));
     /**
      * この解析で左因数分解を使ってよいか。診断を記録する経路（主診断 DAG / display frame を組む）と
@@ -346,6 +349,7 @@ public final class Session {
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false, false); }
     public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode) { this(source, options, ruleNames, twoMode, false); }
     public Session(CharSequence source, ParseOptions options, String[] ruleNames, boolean twoMode, boolean plainRecognition) {
+        this.direct = directAst;
         this.tree = !twoMode || options.buildAst() || options.lexical() || options.occurrences();
         this.occ = !twoMode || options.occurrences();
         this.diag = !twoMode || options.diagnostics();
@@ -532,6 +536,46 @@ public final class Session {
             default -> throw new IllegalArgumentException("Unsupported scanner effect: " + effect.action());
         }
     }
+    /** field が読む認識時の出現だけを、旧 Recipe と同じ順序・平坦化規則で射影する。 */
+    private List<Value> collect(Fields fields, int fi, List<Occurrence> local) {
+        int localCount = local.size();
+        String[] sites = fields.items[fi].sites();
+        boolean nodeLike = fields.nodeLike[fi], list = fields.list[fi], scalar = fields.scalar[fi];
+        // 1 値しか集まらない field が多数派なので、2 件目が出るまで list を確保しない。
+        Value single = null; ArrayList<Value> captures = null;
+        for (int k = 0; k < localCount; k++) { Occurrence occurrence = local.get(k); if (!contains(sites, occurrence.site())) continue;
+            Value v = occurrence.value();
+            if (nodeLike && !scalar && v.elements() != null) {
+                List<Value> elements = v.elements();
+                if (elements.isEmpty()) continue;
+                if (captures == null) { captures = new ArrayList<>(elements.size() + 1); if (single != null) { captures.add(single); single = null; } }
+                captures.addAll(elements);
+            } else if (nodeLike && list && !v.nodes().isEmpty()) {
+                List<AstEvent> children = v.nodes();
+                // D-079: 要素ごとの Value(start, end, List.of(node)) は recipe が 1 度だけ持つ。
+                if (captures == null && children.size() == 1 && single == null) { single = children.get(0).value(); continue; }
+                if (captures == null) { captures = new ArrayList<>(children.size() + 1); if (single != null) { captures.add(single); single = null; } }
+                for (int ni = 0, nn = children.size(); ni < nn; ni++) captures.add(children.get(ni).value());
+            } else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) {
+                if (captures != null) captures.add(v);
+                else if (single == null) single = v;
+                else { captures = new ArrayList<>(); captures.add(single); captures.add(v); single = null; }
+            }
+        }
+        return captures != null ? List.copyOf(captures) : single == null ? List.of() : List.of(single);
+    }
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private List<Value>[] collectAll(Fields fields, List<Occurrence> local) {
+        List<Value>[] values = new List[fields.items.length];
+        for (int i = 0; i < values.length; i++) values[i] = collect(fields, i, local);
+        return values;
+    }
+    public List<Value> fieldValues(AstEvent event, int index) {
+        return event instanceof Recipe recipe ? recipe.fieldValues(index) : collect(event.fields, index, event.captures);
+    }
+    private AstEvent leafEvent(String id, int start, int end) {
+        return direct ? AstEvent.leaf(id, start, end) : new Recipe(id, start, end, collectAll(Fields.NONE, List.of()), null);
+    }
     public Match rule(Frame f, int id, int memoId, boolean successMemo, boolean failureMemo, Call body,
                       String recipe, String fallback, String recipeKind, Fields fields, Effect[] scopeEffects, boolean skip, Label[] recoveryHints, boolean rightAssociative, Label[] failureHints) {
         int c = f.c, m = f.m, state = scope.stateVersion();
@@ -564,47 +608,21 @@ public final class Session {
                 applyEffects(scopeEffects, "successAfterLeave", result);
                 applyEffects(scopeEffects, "afterDeclarations", result);
             }
-            List<Recipe> nodes = result.nodes(); Recipe made = null;
+            List<AstEvent> nodes = result.nodes(); AstEvent made = null;
             boolean skipped = skip || "skip".equals(recipeKind);
             if (!tree) nodes = List.of();
             else if (skipped) nodes = List.of();
             else if (recipe != null && !"transparent".equals(recipeKind) && !"text".equals(recipeKind)) {
-                Field[] items = fields.items; List<Value>[] lists = Recipe.lists(items.length); recipeCount++;
-                List<Occurrence> local = result.local();
-                int localCount = local.size();
-                for (int fi = 0; fi < items.length; fi++) {
-                    String[] sites = items[fi].sites();
-                    boolean nodeLike = fields.nodeLike[fi], list = fields.list[fi], scalar = fields.scalar[fi];
-                    // 1 値しか集まらない field が多数派なので、2 件目が出るまで list を確保しない。
-                    Value single = null; ArrayList<Value> captures = null;
-                    for (int k = 0; k < localCount; k++) { Occurrence occurrence = local.get(k); if (!contains(sites, occurrence.site())) continue;
-                        Value v = occurrence.value();
-                        if (nodeLike && !scalar && v.elements() != null) {
-                            List<Value> elements = v.elements();
-                            if (elements.isEmpty()) continue;
-                            if (captures == null) { captures = new ArrayList<>(elements.size() + 1); if (single != null) { captures.add(single); single = null; } }
-                            captures.addAll(elements);
-                        } else if (nodeLike && list && !v.nodes().isEmpty()) {
-                            List<Recipe> children = v.nodes();
-                            // D-079: 要素ごとの Value(start, end, List.of(node)) は recipe が 1 度だけ持つ。
-                            if (captures == null && children.size() == 1 && single == null) { single = children.get(0).value(); continue; }
-                            if (captures == null) { captures = new ArrayList<>(children.size() + 1); if (single != null) { captures.add(single); single = null; } }
-                            for (int ni = 0, nn = children.size(); ni < nn; ni++) captures.add(children.get(ni).value());
-                        } else if (!(nodeLike && list && v.start() == v.end() && v.nodes().isEmpty())) {
-                            if (captures != null) captures.add(v);
-                            else if (single == null) single = v;
-                            else { captures = new ArrayList<>(); captures.add(single); captures.add(v); single = null; }
-                        }
-                    }
-                    lists[fi] = captures != null ? List.copyOf(captures) : single == null ? List.of() : List.of(single);
-                }
+                recipeCount++;
+                List<Value>[] lists = !direct || rightAssociative && nested ? collectAll(fields, result.local()) : null;
                 int nodeEnd = f.c;
                 if (rightAssociative && nested) {
                     int max = Integer.MIN_VALUE;
                     for (List<Value> list : lists) for (int k = 0; k < list.size(); k++) max = Math.max(max, list.get(k).end());
                     if (max != Integer.MIN_VALUE) nodeEnd = max;
                 }
-                made = new Recipe(recipe, c, nodeEnd, fields.names, lists, fallback);
+                made = direct ? new AstEvent(recipe, c, nodeEnd, fields, result.local(), fallback)
+                    : new Recipe(recipe, c, nodeEnd, lists, fallback);
                 nodes = made.self();
             }
             List<Occurrence> completed = result.local();
@@ -839,7 +857,7 @@ public final class Session {
             if (itemValues != null) { anyValues = true; valuesN += itemValues.size(); }
             failure |= item.mappingFailure();
         }
-        List<Recipe> nodes = join(items, NODES, nodesN);
+        List<AstEvent> nodes = join(items, NODES, nodesN);
         List<Occurrence> local = join(items, LOCAL, localN), captures = join(items, CAPTURES, capturesN);
         List<Trace> traces = join(items, TRACES, tracesN);
         List<RecoveryEvent> recoveries = join(items, RECOVERIES, recoveriesN);
@@ -1425,7 +1443,7 @@ public final class Session {
             hints, failure.deepestRule() < 0 ? null : ruleNames[failure.deepestRule()],
             Arrays.stream(failure.ruleStack()).mapToObj(i -> ruleNames[i]).toList(), hints, "ERROR", input.cpLength(start, end), "recovery");
         String id = projection.equals("explicitRecipe") ? recipe : "#recovery";
-        Recipe marker = Recipe.leaf(id, start, end);
+        AstEvent marker = leafEvent(id, start, end);
         var recovery = new RecoveryEvent(rule, mode, start, end, selected, syncStart, syncStart < 0 ? -1 : syncStart + syncLength, diagnostic, marker);
         return new Match(List.of(marker), List.of(), List.of(), List.of(), start, end,
             projection.equals("mappingFailure"), List.of(recovery));
@@ -1531,10 +1549,10 @@ public final class Session {
         try { return Integer.parseInt(text(value)); }
         catch (NumberFormatException error) { throw mapping(value.start(), value.end(), "NUMBER cannot be mapped to int", error); }
     }
-    public Recipe node(Value value, Recipe owner) {
+    public AstEvent node(Value value, AstEvent owner) {
         if (value.nodes().size() > 1) throw mapping(value.start(), value.end(), "Scalar capture has multiple mapped nodes", null);
         if (!value.nodes().isEmpty()) return value.nodes().get(0);
-        if (owner.fallback() != null) return Recipe.leaf(leafId(owner.fallback()), value.start(), value.end());
+        if (owner.fallback() != null) return leafEvent(leafId(owner.fallback()), value.start(), value.end());
         throw mapping(value.start(), value.end(), "Missing mapped node", null);
     }
     private static final java.util.concurrent.ConcurrentHashMap<String, String> LEAF_IDS = new java.util.concurrent.ConcurrentHashMap<>();
@@ -1546,10 +1564,10 @@ public final class Session {
     }
     // D-079: 生成される recipe ごとの構築 method が field を添字で直に読む（lambda を渡さない）。
     /** scalar field の値。無ければ従来の {@code scalar} と同じ mapping 失敗。 */
-    public Value scalarValue(Recipe recipe, int index, String field) {
-        List<Value> values = recipe.fieldValues(index);
-        if (values.isEmpty()) throw mapping(recipe.start(), recipe.end(), "Missing scalar capture: " + field, null);
-        return values.get(0);
+    public Value scalarValue(AstEvent recipe, int index, String field) {
+        Value value = firstValue(recipe, index);
+        if (value == null) throw mapping(recipe.start(), recipe.end(), "Missing scalar capture: " + field, null);
+        return value;
     }
     /** scalar の変換結果の検査。回復で落ちた node を指す値は親ごと省く（{@link RecoveredNodeMissing}）。 */
     public <T> T present(T converted, Value value) {
@@ -1557,9 +1575,24 @@ public final class Session {
         return converted;
     }
     /** optional field の先頭値（無ければ null）。 */
-    public Value firstValue(Recipe recipe, int index) {
-        List<Value> values = recipe.fieldValues(index);
-        return values.isEmpty() ? null : values.get(0);
+    public Value firstValue(AstEvent recipe, int index) {
+        if (recipe instanceof Recipe reference) {
+            List<Value> values = reference.fieldValues(index);
+            return values.isEmpty() ? null : values.get(0);
+        }
+        Fields fields = recipe.fields;
+        String[] sites = fields.items[index].sites();
+        for (int i = 0, n = recipe.captures.size(); i < n; i++) {
+            Occurrence occurrence = recipe.captures.get(i);
+            if (!contains(sites, occurrence.site())) continue;
+            Value value = occurrence.value();
+            if (fields.nodeLike[index] && !fields.scalar[index] && value.elements() != null) {
+                if (value.elements().isEmpty()) continue;
+                return value.elements().get(0);
+            }
+            return value;
+        }
+        return null;
     }
     /** list field の変換結果（先頭 {@code kept} 件、null は生成側で落としてある）を不変 list にする。 */
     @SuppressWarnings("unchecked")
@@ -1573,7 +1606,7 @@ public final class Session {
         private static final long serialVersionUID = 1L;
         private RecoveredNodeMissing() { super(null, null, false, false); }
     }
-    public void typeof(Recipe recipe, String ownName, Object own, String refName, Object referenced) {
+    public void typeof(AstEvent recipe, String ownName, Object own, String refName, Object referenced) {
         if (own != null && referenced != null && !own.getClass().equals(referenced.getClass()))
             {
             String message = "@typeof constraint violated: " + ownName + " must be same type as " + refName
@@ -1581,7 +1614,7 @@ public final class Session {
             throw mapping(recipe.start(), recipe.end(), message, new IllegalArgumentException(message));
         }
     }
-    public boolean hasBuilt(Recipe recipe) { return recipe.built != Recipe.UNBUILT; }
-    public Object built(Recipe recipe) { Object object = recipe.built; return object == Recipe.UNBUILT ? null : object; }
-    public Object remember(Recipe recipe, Object object) { recipe.built = object; if (object != null) spans().put(object, span(recipe.start(), recipe.end())); return object; }
+    public boolean hasBuilt(AstEvent recipe) { return recipe.built != AstEvent.UNBUILT; }
+    public Object built(AstEvent recipe) { Object object = recipe.built; return object == AstEvent.UNBUILT ? null : object; }
+    public Object remember(AstEvent recipe, Object object) { recipe.built = object; if (object != null) spans().put(object, span(recipe.start(), recipe.end())); return object; }
 }

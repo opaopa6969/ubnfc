@@ -90,7 +90,7 @@ public final class JavaEmitter {
         result.put(prefix + grammar + "Result.java", "package " + pkg + ";\nimport " + pkg + ".api.ParseResult;\npublic record " + grammar + "Result(ParseResult<" + ast + "> result) {}\n");
         for (String name : List.of("Span", "Capture", "Diagnostic", "MappingException", "ParseOptions", "ParseResult", "TokenScanner", "Json", "SourceName"))
             result.put(prefix + "api/" + name + ".java", resource("/templates/api/" + name + ".java").replace("generated.", pkg + "."));
-        for (String name : List.of("Recipe", "Session")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
+        for (String name : List.of("AstEvent", "Recipe", "Session")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
         if (tokens.values().stream().anyMatch(t -> t.spec().kind().equals("declarative")))
             result.put(prefix + "internal/LexicalExpression.java", resource("/templates/internal/LexicalExpression.java").replace("generated.", pkg + "."));
         for (String name : List.of("Input", "Cursor", "MemoTable", "ScopeStore", "Diagnostics", "Severity"))
@@ -288,7 +288,7 @@ public final class JavaEmitter {
     }
     private String parserSource() {
         String defaultEntry = ir.semantics().symbols().stream().filter(s -> s.id().equals(ir.entry().ruleId())).findFirst().orElseThrow().name();
-        var out = new StringBuilder("package " + pkg + ";\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Optional;\nimport java.util.regex.Pattern;\nimport " + pkg + ".api.*;\nimport " + pkg + ".internal.Recipe;\nimport " + pkg + ".internal.Session;\nimport " + pkg + ".internal.Session.*;\n\npublic final class " + parser + " {\n    private " + parser + "() {}\n");
+        var out = new StringBuilder("package " + pkg + ";\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Optional;\nimport java.util.regex.Pattern;\nimport " + pkg + ".api.*;\nimport " + pkg + ".internal.AstEvent;\nimport " + pkg + ".internal.Session;\nimport " + pkg + ".internal.Session.*;\n\npublic final class " + parser + " {\n    private " + parser + "() {}\n");
         out.append("    public static ParseResult<").append(ast).append("> parse(CharSequence source) { return parse(source, ParseOptions.DEFAULT); }\n")
             .append("    public static ParseResult<").append(ast).append("> parse(CharSequence source, ParseOptions options) {\n")
             .append("        return parseEntry(").append(q(grammar)).append(", ").append(q(defaultEntry)).append(", source, options);\n    }\n")
@@ -808,14 +808,14 @@ public final class JavaEmitter {
     }
     private void emitBuild(StringBuilder out) {
         if (recipes.values().stream().noneMatch(r -> r.resultTypeId() != null && !Set.of("transparent", "text", "skip").contains(r.kind()))) {
-            out.append("    private static Object build(Recipe r, Session s) { if (r.id().equals(\"#recovery\")) return null; throw s.mapping(r.start(), r.end(), \"No AST recipe\", null); }\n");
+            out.append("    private static Object build(AstEvent r, Session s) { if (r.id().equals(\"#recovery\")) return null; throw s.mapping(r.start(), r.end(), \"No AST recipe\", null); }\n");
             return;
         }
         // D-079: recipe ごとに 1 つの static method を出し、field の取り出しと変換を直に書く。
         // 以前は s.scalar(r, i, name, v -> ...) に r / s を捕捉する lambda を渡していたので、
         // 1 field ごとに lambda 実体を確保し、Session 側の呼出しは recipe 数ぶんの型を見る
         // megamorphic な interface 呼出しになっていた（inline されない）。
-        out.append("    private static Object build(Recipe r, Session s) {\n        if (s.hasBuilt(r)) return s.built(r);\n        if (r.id().equals(\"#recovery\")) return s.remember(r, null);\n        try {\n        Object node = switch (r.id()) {\n");
+        out.append("    private static Object build(AstEvent r, Session s) {\n        if (s.hasBuilt(r)) return s.built(r);\n        if (r.id().equals(\"#recovery\")) return s.remember(r, null);\n        try {\n        Object node = switch (r.id()) {\n");
         var fallbacks = new LinkedHashSet<String>();
         var methods = new StringBuilder();
         int methodIndex = 0;
@@ -832,7 +832,7 @@ public final class JavaEmitter {
             }
             String method = "b" + methodIndex++;
             out.append(method).append("(r, s);\n");
-            methods.append("    private static Object ").append(method).append("(Recipe r, Session s) {\n");
+            methods.append("    private static Object ").append(method).append("(AstEvent r, Session s) {\n");
             var locals = new LinkedHashMap<String, String>();
             for (AstField field : type.fields()) {
                 int n = locals.size();
@@ -842,15 +842,15 @@ public final class JavaEmitter {
                 int index = recipe.fields().indexOf(mapping);
                 String javaType = fieldType(field);
                 switch (mapping.cardinality()) {
-                    case "scalar" -> methods.append("        Recipe.Value v").append(n).append(" = s.scalarValue(r,").append(index).append(',').append(q(field.name())).append(");\n")
+                    case "scalar" -> methods.append("        AstEvent.Value v").append(n).append(" = s.scalarValue(r,").append(index).append(',').append(q(field.name())).append(");\n")
                         .append("        ").append(javaType).append(' ').append(local).append(" = s.present(")
                         .append(convert(field.valueType(), mapping.conversion(), "v" + n)).append(", v").append(n).append(");\n");
-                    case "optional" -> methods.append("        Recipe.Value v").append(n).append(" = s.firstValue(r,").append(index).append(");\n")
+                    case "optional" -> methods.append("        AstEvent.Value v").append(n).append(" = s.firstValue(r,").append(index).append(");\n")
                         .append("        ").append(javaType).append(' ').append(local).append(" = v").append(n).append(" == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(")
                         .append(convert(field.valueType(), mapping.conversion(), "v" + n)).append(");\n");
-                    case "list" -> methods.append("        List<Recipe.Value> l").append(n).append(" = r.fieldValues(").append(index).append(");\n")
+                    case "list" -> methods.append("        List<AstEvent.Value> l").append(n).append(" = s.fieldValues(r,").append(index).append(");\n")
                         .append("        Object[] a").append(n).append(" = l").append(n).append(".isEmpty() ? null : new Object[l").append(n).append(".size()]; int k").append(n).append(" = 0;\n")
-                        .append("        for (int i = 0, n = l").append(n).append(".size(); i < n; i++) { Recipe.Value v = l").append(n).append(".get(i); Object x = ")
+                        .append("        for (int i = 0, n = l").append(n).append(".size(); i < n; i++) { AstEvent.Value v = l").append(n).append(".get(i); Object x = ")
                         .append(convert(field.valueType(), mapping.conversion(), "v")).append("; if (x != null) a").append(n).append("[k").append(n).append("++] = x; }\n")
                         .append("        ").append(javaType).append(' ').append(local).append(" = s.listOf(a").append(n).append(", k").append(n).append(");\n");
                     default -> throw new IllegalArgumentException(mapping.cardinality());
