@@ -317,6 +317,34 @@ UTF-8 1 scalar 復号、Java は `Character.codePointAt` + `Character.charCount`
 `REGEX` の正則部分集合に `\xHH` / `\uHHHH` / `\u{X…}` とクラス否定（`[^…]`）を足すこと（issue #34 の候補 (c)）。
 `REGEX` の文字列は解析器が生の `\` 列を読むので、前段で展開すると意味が二重になる。別 issue で扱う。
 
+## 8. package の import と package 由来の空白 — **実装済み（D-083）**
+
+Classic（unlaxer-parser #401、`docs/ubnf-packages.md`）は、版付きの artifact を
+`@import alias from 'pkg:ID'` で読み、その token を `@whitespace: alias.TOKEN` の profile に使える。
+tinyexpression P4 は 2026-10 にこの綴りへ移った（`pkg:std/layout` の `SPACES_AND_COMMENTS`）。
+
+### 採った形
+
+- `pkg:ID` の import は、grammar と同じディレクトリの `ubnf.json`（manifest）と `ubnf.lock.json`（lock）で
+  解決する。Classic と同じく取得はしない。manifest の版と lock の `roots` が違えば stale lock として拒否する。
+- `builtin:` の source は ubnfc に同梱した artifact（`crates/ubnfc-front/packages/`、Classic の同梱物と byte 同一）を
+  使い、lock の SHA-256 と照合する。それ以外の source は `.ubnf-cache/packages/<sha256>.json` を読み、内容の
+  SHA-256 が lock と一致するときだけ使う。
+- resolve は `pkg:ID` を仮想パス `<grammar のディレクトリ>/.ubnf-packages/ID` に写す。IR の `sources[]` には
+  この論理パスと entry 本文の SHA-256 が載る。
+- `@whitespace` の値（設定・規則注釈とも）には、**std/layout 1.0.0 と構文木が同一の import の
+  `SPACES_AND_COMMENTS` だけ**を書ける。これは javaStyle と同じ区切り集合（ASCII space と TAB〜CR、`//` から
+  CR / LF の直前まで、`/*` から最初の `*/` まで）なので、IR では javaStyle と同じ `effectiveDelimiterSet` になる。
+  Classic も javaStyle の 11 文法・24 入力を明示 import に置き換えて同値を確かめている。
+- 失敗はすべて import の位置付きの `E-IMPORT-UNRESOLVED`（hint に理由）。std/layout 以外の token を profile に
+  する綴りは、従来どおり `E-WHITESPACE-GLOBAL-STYLE` / `E-WHITESPACE-RULE-STYLE`。
+
+### 範囲外
+
+- 任意の declarative token を空白 profile にすること（IR の delimiter は文字集合・行コメント・block comment の
+  3 種だけなので、一般の lexical program は表せない）。
+- package の中からの import（package 内の相対 import と推移的な package 依存）。std/layout はどちらも持たない。
+- `unlaxer deps resolve` に当たる取得コマンド。lock と cache は Classic の CLI で作る。
 ## 9. 綴りの正本は Classic — **実装済み（D-084）**
 
 2026-10-23 に所有者が決めた方針: **UBNF の綴りは Classic（unlaxer-parser）を正本とする。**
@@ -374,4 +402,5 @@ Classic の拒否例 25 件のうち 20 件を、ubnfc も同じ趣旨の code �
 6. ~~§6 統廃合の P1 / P2 / P3 / P5 と P7-1 / P7-3~~ **完了（D-045 〜 D-049）**
 7. ~~§7 code point クラス~~ **完了（D-063）**
 8. §6 の残り（P4 / P6 / P7-4）
+9. ~~§8 package の import~~ **完了（D-083）**
 10. ~~§9 Classic の綴り~~ **完了（D-084 / D-085）**

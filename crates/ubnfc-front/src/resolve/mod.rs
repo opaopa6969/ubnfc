@@ -282,7 +282,39 @@ impl Resolver<'_> {
                 );
                 continue;
             }
-            let target = normalize(&path.parent().unwrap_or(Path::new("")).join(&import.path));
+            let dir = path.parent().unwrap_or(Path::new(""));
+            // package の中からの import（相対・推移的 package）はまだ扱わない（crate::packages）。
+            if path
+                .components()
+                .any(|c| c.as_os_str() == crate::packages::VIRTUAL_DIR)
+            {
+                self.error(
+                    &pending.name,
+                    None,
+                    path,
+                    import.span,
+                    "E-IMPORT-UNRESOLVED",
+                    format!("import が解決できません: '{}'", import.path),
+                    "ubnfc は package の中からの import（package 内の相対 import と推移的な package 依存）をまだ扱いません。",
+                );
+                continue;
+            }
+            let target = match crate::packages::virtual_path(dir, &import.path) {
+                Some(Ok(target)) => normalize(&target),
+                Some(Err(message)) => {
+                    self.error(
+                        &pending.name,
+                        None,
+                        path,
+                        import.span,
+                        "E-IMPORT-UNRESOLVED",
+                        format!("import が解決できません: '{}'", import.path),
+                        &message,
+                    );
+                    continue;
+                }
+                None => normalize(&dir.join(&import.path)),
+            };
             if stack.contains(&target) {
                 self.error(
                     &pending.name,

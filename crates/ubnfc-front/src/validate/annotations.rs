@@ -1,7 +1,7 @@
 use crate::resolve::{ResolvedBody, ResolvedRule};
 use crate::syntax::ast::Annotation;
 
-use super::{captures, general::valid_whitespace, general::I32_MAX, nested_body, trim, Context};
+use super::{captures, general::I32_MAX, nested_body, trim, Context};
 
 /// `@recovery(mode)` で受理する mode（design v1 §3.10）。大小は無視する。
 const RECOVERY_MODES: &[&str] = &["sync", "auto", "skip"];
@@ -111,7 +111,7 @@ pub(super) fn validate(rule: &ResolvedRule, scope: bool, v2: bool, cx: &mut Cont
             Annotation::Whitespace { style, .. } => {
                 whitespace += 1;
                 let style = trim(style.as_deref().unwrap_or("javaStyle"));
-                if !valid_whitespace(style) {
+                if !cx.whitespace_ok(style) {
                     cx.rule(rule, "E-WHITESPACE-RULE-STYLE", format!("rule {name} uses unsupported @whitespace style: {style} (allowed: javaStyle, none)"),
                         "Use @whitespace or @whitespace(none).");
                 }
