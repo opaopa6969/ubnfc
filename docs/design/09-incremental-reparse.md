@@ -8,7 +8,7 @@
 
 既存の [D-023・D-060・D-062](03-design-v1.md) と
 [二重カーソル・診断の契約](04-cursor-and-diagnostics-contract.md) を維持する。
-本決定は D-083。D-060 の「現時点では全文再解析」を継続し、導入の条件を具体化する。
+本決定は D-084。D-060 の「現時点では全文再解析」を継続し、導入の条件を具体化する。
 
 ## 1. 現状と測定範囲
 
@@ -31,7 +31,7 @@ JSON-RPC の転送、エディタの描画、completion、遅延 lexical は含�
 
 ### 現在の master の再測定
 
-測定元は `66a18ff8e71839b893d2edabdad14825f8436dae`（2026-11-01 時点の master）。
+測定元は `66a18ff8e71839b893d2edabdad14825f8436dae`（2026-11-01 測定時点の master）。
 生成器・IR fixture・LSP テンプレートをこの commit から使い、実装を変更せずにサーバ jar を生成した。
 外部 fixture の取得は不要で、リポジトリ内の IR と P4 fixture だけで再現できる。
 
@@ -104,6 +104,7 @@ p50 はソート後の中央、p90 は nearest-rank。入力生成・事前の�
    EOF に依存する結果は旧末尾への挿入で無効になる。
 4. 変更の後ろの有効な結果を `deltaCp = 挿入 cp 数 - (b-a)` だけシフトする。
    キーの consumed / matched、終了 C/M、span、効果内の位置など**全位置**が対象。
+   `mode` / `invert` / `reset` のキーと結果状態も保つ。
    先頭側は delta 0。C と M が変更の両側にあるものは単一シフトで扱わず失効させる。
    UTF-16 の差分から直接 cp のシフト量を推測せず、`Positions` 相当の変換で編集位置を確定する。
 5. scope の入出状態と効果を検証する。現行の `ScopeStore.stateVersion()` は解析内の世代であり、
