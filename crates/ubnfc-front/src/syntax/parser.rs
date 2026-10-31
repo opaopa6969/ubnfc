@@ -904,7 +904,8 @@ impl Parser<'_> {
             }
             "whitespace" => {
                 let style = if self.consume("(") {
-                    let style = self.identifier()?;
+                    // Classic の package 由来の profile（`layout.SPACES_AND_COMMENTS`）も受ける。
+                    let style = self.dotted()?;
                     self.require(")")?;
                     Some(style)
                 } else {

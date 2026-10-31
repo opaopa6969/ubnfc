@@ -72,6 +72,7 @@ pub fn validate(resolved: &ResolvedGrammar) -> Vec<ValidationIssue> {
         let mut context = Context {
             grammar,
             issues: &mut issues,
+            profiles: crate::packages::whitespace_profiles(resolved, grammar),
         };
         let v2 = general::declares_v2(grammar);
         general::validate(&mut context);
@@ -98,9 +99,17 @@ pub fn validate(resolved: &ResolvedGrammar) -> Vec<ValidationIssue> {
 struct Context<'a> {
     grammar: &'a Grammar,
     issues: &'a mut Vec<ValidationIssue>,
+    /// `@whitespace` に書ける package 由来の profile 名（`layout.SPACES_AND_COMMENTS`）。
+    /// `crate::packages::whitespace_profiles` が std/layout と同一の import だけを入れる。
+    profiles: std::collections::BTreeSet<String>,
 }
 
 impl Context<'_> {
+    /// `javaStyle` / `none`、または std/layout の `SPACES_AND_COMMENTS`（javaStyle と同じ集合）。
+    fn whitespace_ok(&self, style: &str) -> bool {
+        general::valid_whitespace(style) || self.profiles.contains(style)
+    }
+
     fn add(
         &mut self,
         rule: Option<&str>,

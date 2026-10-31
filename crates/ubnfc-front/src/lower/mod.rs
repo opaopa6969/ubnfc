@@ -24,6 +24,7 @@ use crate::syntax::ast as a;
 use serde::Serialize;
 
 pub use source::SourceInput;
+pub(crate) use source::sha256;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LowerError {
