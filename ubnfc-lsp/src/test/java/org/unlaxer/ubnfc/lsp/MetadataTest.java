@@ -62,8 +62,8 @@ class MetadataTest {
     /** UBNF 自身の文法は {@code @backref} が {@code sameRuleText} なので ScopeStore に宣言が積まれない。 */
     @Test void ubnfDeclarationsComeFromCaptureSites() throws Exception {
         var emitter = emitter(UBNF);
-        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:4148:4158:body/1/tokenRef"), emitter.declareSites());
-        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:9381:9391:body/1/tokenRef"), emitter.useSites());
+        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:5632:5642:body/1/tokenRef"), emitter.declareSites());
+        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:10865:10875:body/1/tokenRef"), emitter.useSites());
     }
 
     @Test void triviaDelimitersAreExcludedFromCompletion() throws Exception {

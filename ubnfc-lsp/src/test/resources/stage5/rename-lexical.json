@@ -1,0 +1,45 @@
+{
+  "changes": {
+    "file:///stage5.demo": [
+      {
+        "range": {
+          "start": {
+            "line": 2,
+            "character": 10
+          },
+          "end": {
+            "line": 2,
+            "character": 14
+          }
+        },
+        "newText": "Term"
+      },
+      {
+        "range": {
+          "start": {
+            "line": 2,
+            "character": 15
+          },
+          "end": {
+            "line": 2,
+            "character": 19
+          }
+        },
+        "newText": "Term"
+      },
+      {
+        "range": {
+          "start": {
+            "line": 3,
+            "character": 10
+          },
+          "end": {
+            "line": 3,
+            "character": 14
+          }
+        },
+        "newText": "Term"
+      }
+    ]
+  }
+}

@@ -9,6 +9,11 @@ import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionOptions;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.DefinitionParams;
+import org.eclipse.lsp4j.FoldingRange;
+import org.eclipse.lsp4j.FoldingRangeRequestParams;
+import org.eclipse.lsp4j.RenameParams;
+import org.eclipse.lsp4j.TextEdit;
+import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
@@ -40,10 +45,10 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import __API_PACKAGE__.TokenScanner;
 
 /**
- * __GRAMMAR__ 用に生成された LSP サーバ（段階 3）。
+ * __GRAMMAR__ 用に生成された LSP サーバ（段階 5）。
  *
  * <p>提供するもの: 診断（構文・scope・前半 scope）/ definition / references / document symbols /
- * semantic tokens / completion / hover。DAP と増分解析は入っていない（D-060 / 段階 4）。
+ * semantic tokens / completion / hover / rename / folding range。増分解析は無い（D-060）。
  *
  * <p>生成パーサは依存ゼロのまま。lsp4j に依存するのはこの薄い包み側だけ（opt-in feature）。
  *
@@ -86,6 +91,8 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
         capabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
         capabilities.setDefinitionProvider(true);
         capabilities.setReferencesProvider(true);
+        capabilities.setRenameProvider(true);
+        capabilities.setFoldingRangeProvider(true);
         capabilities.setDocumentSymbolProvider(true);
         capabilities.setHoverProvider(true);
         var completion = new CompletionOptions();
@@ -164,6 +171,31 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
             }
         }
         return CompletableFuture.completedFuture(out);
+    }
+
+    /** definition / references と同じ文書内・綴り単位の索引を使う。部分解析では変更を返さない。 */
+    @Override public CompletableFuture<WorkspaceEdit> rename(RenameParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        var changes = new java.util.LinkedHashMap<String, List<TextEdit>>();
+        if (analysis != null && analysis.primary() != null && analysis.primary().ok()
+                && params.getNewName() != null && !params.getNewName().isBlank()) {
+            var symbols = analysis.symbols();
+            var symbol = symbols.at(analysis.positions().offsetOf(params.getPosition()));
+            if (symbol != null) {
+                var ranges = new java.util.TreeMap<Integer, Symbols.Symbol>();
+                for (var found : symbols.named(symbol.name())) ranges.putIfAbsent(found.offsetCp(), found);
+                var edits = new ArrayList<TextEdit>();
+                for (var found : ranges.values())
+                    edits.add(new TextEdit(analysis.positions().rangeOf(found.offsetCp(), found.endCp()), params.getNewName()));
+                if (!edits.isEmpty()) changes.put(analysis.uri(), edits);
+            }
+        }
+        return CompletableFuture.completedFuture(new WorkspaceEdit(changes));
+    }
+
+    @Override public CompletableFuture<List<FoldingRange>> foldingRange(FoldingRangeRequestParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        return CompletableFuture.completedFuture(analysis == null ? List.of() : FoldingRanges.of(analysis));
     }
 
     @Override public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>>

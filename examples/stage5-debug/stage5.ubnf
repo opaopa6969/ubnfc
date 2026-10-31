@@ -1,0 +1,32 @@
+// LSP / DAP 段階 5 の実例。文法と評価器を小さく保ち、P4 の実行環境に依存しない。
+grammar Stage5 {
+  @whitespace: javaStyle
+  token IDENT = IDENTIFIER
+  token NUMBER = NUMBER
+  token STRING = DOUBLE_QUOTED
+
+  token EOF = END_OF_INPUT
+
+  @root
+  @scopeTree(mode=lexical)
+  @mapping(Program, params=[items])
+  Program ::= { Item @items } EOF ;
+
+  @mapping(Item)
+  Item ::= Let | Use | Block | Note ;
+
+  @declares(symbol=name)
+  @mapping(Let, params=[name, value])
+  Let ::= 'let' IDENT @name '=' NUMBER @value ';' ;
+
+  @symbolRef(name=name)
+  @mapping(Use, params=[name])
+  Use ::= 'use' IDENT @name ';' ;
+
+  @scopeTree(mode=lexical)
+  @mapping(Block, params=[items])
+  Block ::= '{' { Item @items } '}' ;
+
+  @mapping(Note, params=[text])
+  Note ::= 'note' STRING @text ';' ;
+}

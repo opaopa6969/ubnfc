@@ -94,6 +94,9 @@ jobs:
       - name: build ubnfc-java jar (needed by Rust<->Java cross-backend tests)
         run: cd ubnfc-java && mvn -q -DskipTests package
 
+      - name: LSP / DAP の生成・opt-in 不変条件・段階 5 golden
+        run: mvn -q -Plsp -pl ubnfc-lsp -am test "-Dtest=org.unlaxer.ubnfc.lsp.*Test" -Dsurefire.failIfNoSpecifiedTests=false
+
       # Fixture-driven tests read UNLAXER_PARSER_DIR / TINYEXPRESSION_DIR (exported by the
       # fetch step) or the sibling links created earlier; both are the pinned checkouts.
       # This job is merge-blocking.
