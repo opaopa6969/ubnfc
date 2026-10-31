@@ -149,6 +149,82 @@ fn class_condition(class: &ScanClass) -> String {
     s
 }
 
+/// 各 byte の上位 bit に区間内判定を置く。`x` は上位 bit を除いた word。
+/// 各 lane に番兵 bit を足してから引くので、隣の lane へ borrow しない。
+fn lane_range(lo: u8, hi: u8) -> String {
+    let repeat = |b: u8| u64::from(b) * 0x0101_0101_0101_0101;
+    match (lo, hi) {
+        (0, 127) => "0x8080808080808080u64".into(),
+        (0, hi) => format!("{:#x}u64-x", repeat(hi) | 0x8080_8080_8080_8080),
+        (lo, 127) => format!("(x|0x8080808080808080u64)-{:#x}u64", repeat(lo)),
+        (lo, hi) => format!(
+            "((x|0x8080808080808080u64)-{:#x}u64)&({:#x}u64-x)",
+            repeat(lo),
+            repeat(hi) | 0x8080_8080_8080_8080
+        ),
+    }
+}
+
+/// ASCII 表の連続区間か、その補集合のうち短い方を SWAR 判定へ落とす。
+/// 非 ASCII は常に止め、従来の code point 判定へ渡す。CPU 固有命令は使わない。
+/// 返す式の各 lane 上位 bit が不一致を表す。little endian 読み込みと
+/// trailing_zeros で、停止文字の前にある 0..8 byte だけを消費する。
+fn word_failure_mask(class: &ScanClass) -> Option<String> {
+    let ranges = |accepted: bool| {
+        let mut result = Vec::new();
+        let mut b = 0u16;
+        while b < 128 {
+            let member = |b: u16| {
+                let bits = if b < 64 {
+                    class.ascii_low
+                } else {
+                    class.ascii_high
+                };
+                (bits >> (b % 64)) & 1 != 0
+            };
+            if member(b) != accepted {
+                b += 1;
+                continue;
+            }
+            let lo = b;
+            while b + 1 < 128 && member(b + 1) == accepted {
+                b += 1;
+            }
+            result.push((lo as u8, b as u8));
+            b += 1;
+        }
+        result
+    };
+    let yes = ranges(true);
+    let no = ranges(false);
+    if yes.is_empty() {
+        return Some("0x8080808080808080u64".into());
+    }
+    if no.is_empty() {
+        return Some("w&0x8080808080808080u64".into());
+    }
+    let complement = no.len() < yes.len();
+    let intervals = if complement { no } else { yes };
+    // 複雑な集合では短い走査に対して演算が増えるので既存の表引きを保つ。
+    if intervals.len() > 3 {
+        return None;
+    }
+    let mask = if intervals.len() == 1 {
+        lane_range(intervals[0].0, intervals[0].1)
+    } else {
+        intervals
+            .into_iter()
+            .map(|(lo, hi)| format!("({})", lane_range(lo, hi)))
+            .collect::<Vec<_>>()
+            .join("|")
+    };
+    Some(if complement {
+        format!("(w|({mask}))&0x8080808080808080u64")
+    } else {
+        format!("(w|!({mask}))&0x8080808080808080u64")
+    })
+}
+
 /// 走査関数の本体。`p` から読み、消費した byte 数を返す。
 fn body(g: &Generator<'_>, scans: &Scans, i: usize) -> Option<String> {
     let expr = &g.ir.semantics.expressions[i];
@@ -209,7 +285,12 @@ fn body(g: &Generator<'_>, scans: &Scans, i: usize) -> Option<String> {
                 s.push_str("let mut count=0usize;\n");
             }
             let bulk = table.map(|class| {
-                format!("let bytes=self.text.as_bytes();while let Some(&b)=bytes.get(p) {{\nif b<0x80 {{if (if b<64 {{{:#x}u64>>b}} else {{{:#x}u64>>(b-64)}})&1==0 {{break;}}p+=1;}}\nelse {{let Some((c,n))=self.input.cp_at(p) else {{break;}};if !{} {{break;}}p+=n;}}\n{}}}\n",class.ascii_low,class.ascii_high,class_condition(class),if counted {"count+=1;"} else {""})
+                let word = word_failure_mask(class).map(|condition| format!(
+                    "let Some(&first)=bytes.get(p) else {{break;}};\nif first<0x80 {{if (if first<64 {{{:#x}u64>>first}} else {{{:#x}u64>>(first-64)}})&1==0 {{break;}}\nwhile let Some(chunk)=bytes.get(p..).and_then(|tail|tail.get(..8)) {{\nlet w=u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"));\nlet x=w&0x7f7f7f7f7f7f7f7fu64;let _=x;\nlet bad={condition};let n=(bad.trailing_zeros()/8) as usize;p+=n;{}if bad!=0 {{break;}}\n}}}}\n",
+                    class.ascii_low, class.ascii_high,
+                    if counted {"count+=n;"} else {""}
+                )).unwrap_or_default();
+                format!("let bytes=self.text.as_bytes();loop {{\n{word}let Some(&b)=bytes.get(p) else {{break;}};\nif b<0x80 {{if (if b<64 {{{:#x}u64>>b}} else {{{:#x}u64>>(b-64)}})&1==0 {{break;}}p+=1;}}\nelse {{let Some((c,n))=self.input.cp_at(p) else {{break;}};if !{} {{break;}}p+=n;}}\n{}}}\n",class.ascii_low,class.ascii_high,class_condition(class),if counted {"count+=1;"} else {""})
             });
             if complete {
                 s.push_str(bulk.as_deref().expect("complete implies a table"));
@@ -301,4 +382,69 @@ pub(crate) fn fast_path(g: &Generator<'_>, scans: &Scans, i: usize, mode: bool) 
          }}\n\
          }} else {{\n"
     ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn swar_predicates_match_scalar_tables_in_every_byte_lane() {
+        let output = std::process::Command::new("mktemp")
+            .arg("-d")
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let dir = std::path::PathBuf::from(String::from_utf8(output.stdout).unwrap().trim());
+        let mut source = String::from("fn main(){\n");
+        let mut seed = 3u64;
+        let mut tested = 0;
+        for n in 0..256 {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+            let lo = (seed % 128) as u8;
+            let hi = lo + ((seed >> 8) % (128 - u64::from(lo))) as u8;
+            let mut class = ScanClass {
+                ascii_low: 0,
+                ascii_high: 0,
+                complete: true,
+                ranges: vec![],
+            };
+            for b in 0..128u8 {
+                if (lo..=hi).contains(&b) ^ (n % 2 == 0) {
+                    if b < 64 {
+                        class.ascii_low |= 1u64 << b;
+                    } else {
+                        class.ascii_high |= 1u64 << (b - 64);
+                    }
+                }
+            }
+            let condition = word_failure_mask(&class).unwrap();
+            // 各 lane に全 256 byte。背景には許容文字・非許容文字・非 ASCII を使い、
+            // 隣接 lane の carry / borrow で結果が汚染されないことも確認する。
+            writeln!(source, "{{let predicate=|w:u64|{{let x=w&0x7f7f7f7f7f7f7f7fu64;let _=x;({condition}).trailing_zeros()/8}}; let low={:#x}u64;let high={:#x}u64;for background in [0u8,{lo},{hi},127,128,255] {{for lane in 0..8 {{for b in 0..=255u8 {{let mut bytes=[background;8];bytes[lane]=b;let expected=bytes.iter().take_while(|&&v|v<128 && (if v<64 {{low>>v}} else {{high>>(v-64)}})&1!=0).count() as u32;assert_eq!(predicate(u64::from_le_bytes(bytes)),expected,\"class={n} lane={{lane}} byte={{b}} background={{background}}\");}}}}}}}}",class.ascii_low,class.ascii_high).unwrap();
+            tested += 1;
+        }
+        source.push_str("}\n");
+        std::fs::write(dir.join("check.rs"), source).unwrap();
+        let compiled = std::process::Command::new("rustc")
+            .args(["--edition=2021", "check.rs", "-o", "check"])
+            .current_dir(&dir)
+            .output()
+            .unwrap();
+        assert!(
+            compiled.status.success(),
+            "{}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
+        let run = std::process::Command::new(dir.join("check"))
+            .output()
+            .unwrap();
+        assert!(
+            run.status.success(),
+            "{}",
+            String::from_utf8_lossy(&run.stderr)
+        );
+        std::fs::remove_dir_all(dir).unwrap();
+        assert_eq!(tested, 256);
+    }
 }

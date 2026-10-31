@@ -91,3 +91,16 @@ WORK=$WORK CORE=30 RUNS=7 benchmarks/scripts/run-arena-ab.sh time
 - `java/FamilyBJavaBench.java` … family B の Java 2 実装を 1 JVM で交互に測る（反射）
 - `java/UbnfLegacyBench.java` … family C の旧 Java `UBNFParsers`（反射）
 - family A の Java は既存の `examples/p4-java` の `Benchmark` / `LegacyBenchmark` をそのまま使う
+
+Rust bulk scan 内の portable SWAR（issue #3）の A/B は `run-swar-ab.sh`。
+旧 #48 後の基準 revision と変更後の生成器へ同一 IR を渡し、認識のみを同じ binary に入れる。
+各 round は before/after の先後を交替し、全 round の生データと load average（1/5/15 分）を CSV に残す。
+JSONTestSuite は `scripts/fetch-external-tools.sh` の固定 commit を使い、入力の sha256 を
+`examples/json/evidence/inputs.sha256` と照合する。中央値・最小値は入力と variant ごとに集計する。
+
+```sh
+export RUSTUP_TOOLCHAIN=stable
+export WORK=$(mktemp -d)
+BASE=66a18ff JSON_TEST_SUITE=/path/to/JSONTestSuite benchmarks/scripts/run-swar-ab.sh prepare
+CORE=30 RUNS=7 benchmarks/scripts/run-swar-ab.sh time
+```
