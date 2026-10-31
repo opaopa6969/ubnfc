@@ -1,0 +1,10 @@
+// v2 の語境界。Int / dup / true / let の接頭辞が利用者の名前を横取りしない。
+type Integer = Int ;
+
+: duplicate ( Integer -- Integer ) dup + ;
+: true_value ( -- Bool ) true ;
+: letter ( Int -- Int ) 1 + ;
+
+: main ( -- )
+  3 duplicate letter int_to_str print newline
+  true_value drop ;
