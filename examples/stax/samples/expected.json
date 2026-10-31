@@ -23,8 +23,8 @@
     { "file": "15-use-vec.stax",         "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "ライブラリを使う側。16-veclib.stax の語を取込む" },
     { "file": "16-veclib.stax",          "parse": "accept", "scopeWarnings": [], "typecheck": "ok",    "note": "ライブラリ側。15-use-vec.stax から使われる" },
 
-    { "file": "17-bad-syntax.stax",      "parse": "reject", "diagnostic": "syntax", "typecheck": "n/a",
-      "note": "拒否 1: スタック効果の ) が無い。両 backend とも accepted=false" },
+    { "file": "17-boundaries.stax",      "parse": "accept", "scopeWarnings": [], "typecheck": "ok",
+      "note": "v2 の語境界。Integer / duplicate / true_value / letter を横取りしない" },
     { "file": "18-undefined-word.stax",  "parse": "accept",
       "scopeWarnings": ["not_defined_anywhere", "later_word"], "typecheck": "error",
       "note": "拒否 2: 未定義の語と前方参照。構文は成功し、スコープ検査が WARNING を 2 件出す" },
