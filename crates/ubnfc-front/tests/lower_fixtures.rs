@@ -27,7 +27,7 @@ fn run(root: &Path, relative: &str) -> SemanticsIr {
     let ast = parse_file(&text).unwrap();
     let inputs = RefCell::new(BTreeMap::from([(path.clone(), text)]));
     let grammar = resolve(&[(path, ast)], &|p| {
-        let text = std::fs::read_to_string(p)?;
+        let text = ubnfc_front::packages::read_to_string(p)?;
         inputs.borrow_mut().insert(p.to_path_buf(), text.clone());
         Ok(text)
     })
@@ -192,6 +192,13 @@ fn assert_semantics_references(out: &SemanticsIr, name: &str) {
             .into_iter()
             .filter(|e| match e {
                 ir::IrError::Validation { path, message } => !path.starts_with("/analysis/")
+                    // import した symbol の sourceId は pipeline の finalize_origins が宣言元へ
+                    // 付け替える（lower 単体の出力は統合先を指す）。import を持つ fixture
+                    // （tinyexpression P4 の lexical module / std/layout）の完成した IR は
+                    // pipeline_golden が検査する。
+                    && !(!out.import_edges.is_empty()
+                        && path.starts_with("/semantics/symbols/")
+                        && message == "symbol source differs from its grammar source")
                     && !(path.starts_with("/semantics/recovery/")
                         && message
                             == "AUTO recovery requires analyzed FOLLOW; null is not an empty set"),
