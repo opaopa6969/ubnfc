@@ -1,0 +1,10 @@
+ubnfc
+Copyright (c) 2026 Hisayuki Ookubo
+Licensed under the MIT License (see LICENSE).
+
+This repository embeds test inputs derived from third-party material:
+
+- corpus/spec/json/*.json contain inputs taken from JSONTestSuite
+  (https://github.com/nst/JSONTestSuite), each tagged with its `suiteFile`.
+  JSONTestSuite is Copyright (c) 2016 Nicolas Seriot and is distributed under the
+  MIT License.

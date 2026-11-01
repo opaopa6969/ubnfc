@@ -245,3 +245,8 @@ standaloneのRust比較crateも再buildし、binary SHA-256が前後とも `92aa
 ## REGEX方針の文書統合
 
 master `1a51aad`（#43）の変更は設計文書2件だけで、実装・golden・corpus・計測ソースは不変。masterのREGEX方針D-092を保持し、自分のAST決定行だけ **D-093** へ振り直した。上の履歴節・保存した検証記録のD-092は統合当時の番号で、現在のAST方針はD-093を参照する。数値の再計測を要する変更はなく、最新A/B値と全1,492行の同値結果を維持する。
+
+## stax段階4統合後の確認
+
+master `bdd87bd`（#51）のstax生成LSP・VSIXと検証をmergeで取り込んだ。変更はstax例と専用harnessテストに限られ、Java構築部・front・corpus・pin・共有scanner・P4/Rust/手書きの計測ソースは不変（最新 `after-long/source.sha256` 全件一致）。D-093を保持し、設計番号重複はない。
+追加の `cargo test -p ubnfc-harness --test stax_lsp --no-fail-fast` が **1件成功、0失敗（49.18秒）**。直接AST経路で生成したstax LSPのprotocol・recovery・TextMate goldenを確認した。対象不変のため最新corpus・A/B値を維持し、統合後HEADのnative / wasm CIを待つ。証拠は `after-stax4/`。
