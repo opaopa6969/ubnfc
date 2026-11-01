@@ -1,13 +1,13 @@
 # 新 pin の corpus 残差の解消（issue #46 / #45）
 
-4 系統は両 backend で比較 Fail 0。現在の全件実行には、未 merge の #44 が解消する tiny-code-fence の IR 失敗 13 件だけが残る。
-#44 の取り込み後に最終の全件結果と CI / merge の結果を更新する。
+現 pin の全 1,492 件を両 backend で実行し、IR 失敗 0・比較 Fail 0・exit 0 を確認した。
+PR #44 の LONG 対応（`49d1a9d`）を取り込み、tiny-code-fence の 13 件も含めた結果である。
 
 ## 対象と固定した条件
 
 `opaopa6969/ubnfc` の issue #46 に #45 の受け入れ条件を含める。
 `fix/issue-46-new-pin-corpus` の専用 worktree で実装し、共有の main 作業ツリーは編集していない。
-変更前は `origin/master` の `cd0516f`。`scripts/external-pins.env` は変更していない。
+変更前は `origin/master` の `cd0516f`。修正後は実装 `42e7a1b` と #44 を統合した `4211d9b`。`scripts/external-pins.env` は変更していない。
 
 | 外部 fixture | pin |
 |---|---|
@@ -145,12 +145,16 @@ native probe は上記 `.rs` を一時 crate の `src/main.rs` へ保存し、�
 `unlaxer-runtime = { path = "<UNLAXER_PARSER_DIR>/rust/unlaxer-runtime" }` として
 `cargo run --offline --manifest-path <一時 crate>/Cargo.toml` で実行する。
 
-## 系統別表（#44 取り込み前の中間結果）
+## 系統別表（#44 統合後の最終実測）
 
-全 1,492 件。両 backend とも生成・build・実行エラーは 0、exit は残る LONG 13 件のため 1。
-新しい期待拒否は 0 件。rule-trivia の未観測 2 件は診断の照合を実装して Pass へ移った。
-その他の Known / 未観測は不変。
-
+全 1,492 件。両 backend とも IR・生成・build・実行エラー・比較 Fail は 0、exit 0。
+新しい期待拒否は 0 件。既存の期待拒否は Java 27 / Rust 29 のまま。
+内訳は reversed precedence 24、commonField 欠落 1、sum eval 1、import cycle 1、
+Rust では加えて非正則な REGEX 後方参照 2 件（元 snapshot と再採取）である。
+rule-trivia の未観測 2 件は公開診断の照合を実装して Pass へ移った。
+それ以外の Known / 未観測は case ごとに不変で、変更前の Pass と期待拒否 Pass もすべて維持した。
+#44 前の中間実測も [Java](2026-11-01-new-pin-corpus-data/java-pre44.json) /
+[Rust](2026-11-01-new-pin-corpus-data/rust-pre44.json) に残した。
 
 ### Java
 
@@ -171,15 +175,15 @@ native probe は上記 `.rs` を一時 crate の `src/main.rs` へ保存し、�
 | scope-annotations | 14→14 | 0→0 | 0→0 | 0→0 | 0→0 | 0→0 |
 | scope-store | 0→0 | 0→0 | 0→0 | 9→9 | 0→0 | 0→0 |
 | semantic-cardinality | 163→163 | 0→0 | 0→0 | 0→0 | 0→0 | 0→0 |
-| tiny-code-fence | 73→73 | 0→0 | 0→0 | 0→0 | 13→13 | 0→0 |
+| tiny-code-fence | 73→86 | 0→0 | 0→0 | 0→0 | 13→0 | 0→0 |
 | tiny-string-token | 39→39 | 0→0 | 0→0 | 0→0 | 0→0 | 0→0 |
-| 合計 | 1315→1364 | 27→27 | 29→29 | 61→59 | 57→13 | 3→0 |
+| 合計 | 1315→1377 | 27→27 | 29→29 | 61→59 | 57→0 | 3→0 |
 
 変更前 front SHA-256: `d4c6cebb6aa634a79d53338f80c6389b7a4f70608ac4d96bcb2d70fc74cbe92a`。生成器 SHA-256: `74b7c7bbb9d8e4404f1dcf1e1c614c2a1714a402496f285426a5a2fe29ea3555`。
 
-#44 前の修正後 front SHA-256: `1baf975cb62150bc366db7508dda892d76c9918ed318055e20065bfe82e01cd2`。生成器 SHA-256: `2acb43a1310b3dfddd0ccb9869627db9b0087cbbff6925e1b5def7041e55f7fd`。
+修正後 front SHA-256: `b30ebda069797bd293a798f9d254ba7245411f7a8f71607b2f1028e59af2970e`。生成器 SHA-256: `5be1f08213b4080bee764704fd980e4c6ef2101b904c5b4e4457c8f055daa876`。
 
-[全 case の比較結果](2026-11-01-new-pin-corpus-data/java-pre44.json)。
+[全 case の比較結果](2026-11-01-new-pin-corpus-data/java-after.json)。
 
 ### Rust
 
@@ -200,14 +204,23 @@ native probe は上記 `.rs` を一時 crate の `src/main.rs` へ保存し、�
 | scope-annotations | 0→0 | 0→0 | 0→0 | 14→14 | 0→0 | 0→0 |
 | scope-store | 0→0 | 0→0 | 0→0 | 9→9 | 0→0 | 0→0 |
 | semantic-cardinality | 163→163 | 0→0 | 0→0 | 0→0 | 0→0 | 0→0 |
-| tiny-code-fence | 73→73 | 0→0 | 0→0 | 0→0 | 13→13 | 0→0 |
+| tiny-code-fence | 73→86 | 0→0 | 0→0 | 0→0 | 13→0 | 0→0 |
 | tiny-string-token | 39→39 | 0→0 | 0→0 | 0→0 | 0→0 | 0→0 |
-| 合計 | 1296→1346 | 29→29 | 29→29 | 77→75 | 57→13 | 4→0 |
+| 合計 | 1296→1359 | 29→29 | 29→29 | 77→75 | 57→0 | 4→0 |
 
 変更前 front SHA-256: `d4c6cebb6aa634a79d53338f80c6389b7a4f70608ac4d96bcb2d70fc74cbe92a`。生成器 SHA-256: `a2fa844f771fca3b2bbcfa4d51fe6d3b36774ff911c3ca8686998244c0eae505`。
 
-#44 前の修正後 front SHA-256: `1baf975cb62150bc366db7508dda892d76c9918ed318055e20065bfe82e01cd2`。生成器 SHA-256: `60f7c42d493ff826a0fde1f773d1db127f10509f02ce0dfe686efc4aee5ace06`。
+修正後 front SHA-256: `b30ebda069797bd293a798f9d254ba7245411f7a8f71607b2f1028e59af2970e`。生成器 SHA-256: `f5c1025350b78d6867211af9a00eebb453ef13725d7cb141a064a94e3048547f`。
 
-[全 case の比較結果](2026-11-01-new-pin-corpus-data/rust-pre44.json)。
+[全 case の比較結果](2026-11-01-new-pin-corpus-data/rust-after.json)。
 
-最終の全件実行・CI・merge は確認待ち。完了として扱わない。
+## 検証環境と補足
+
+Rust / Cargo は stable 1.99.1（rustc `58cf8f9c3`）、Java は Oracle 21.0.9+7-LTS-338、Maven は 3.9.9。
+全件実行では front / generator の実体を専用ディレクトリへコピーし、並行 build 中も同じ SHA の実体を使った。
+
+Java の `mvn -q -o test`、oracle の `verify.py`、Rust の生成物 semantics（all-features / clippy `-D warnings` を含む）、
+LL(1) と参照経路の比較、自己ホスト parity・再生成・固定点、既存 IR / 診断 golden を個別にも確認した。
+P4 の再生成を含む `cargo test --workspace --no-fail-fast` 全体と wasm32 は、下記 CI の最終 head でも検証する。
+
+[PR #47 の CI](https://github.com/opaopa6969/ubnfc/pull/47/checks)で最終 head の native / wasm32 検証を確認する。
