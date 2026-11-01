@@ -1,0 +1,4 @@
+Linux 31780707829c 6.18.33.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026 x86_64 GNU/Linux
+valgrind-3.19.0
+perf version 6.1.190
+2

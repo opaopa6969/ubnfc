@@ -1,0 +1,7 @@
+[ perf record: Woken up 2390 times to write data ]
+Warning:
+Processed 40183 events and lost 1 chunks!
+
+Check IO/CPU overload!
+
+[ perf record: Captured and wrote 597.292 MB /tmp/tmp.MXwAhUNyJV/results/perf-json-ast.data (37655 samples) ]

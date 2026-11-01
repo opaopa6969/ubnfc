@@ -1,0 +1,2 @@
+[ perf record: Woken up 328 times to write data ]
+[ perf record: Captured and wrote 81.933 MB /tmp/tmp.MXwAhUNyJV/results/perf-json-recognize.data (5165 samples) ]
