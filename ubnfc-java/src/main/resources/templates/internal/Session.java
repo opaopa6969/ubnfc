@@ -574,7 +574,7 @@ public final class Session {
         return event instanceof Recipe recipe ? recipe.fieldValues(index) : collect(event.fields, index, event.captures);
     }
     private AstEvent leafEvent(String id, int start, int end) {
-        return direct ? AstEvent.leaf(id, start, end) : new Recipe(id, start, end, collectAll(Fields.NONE, List.of()), null);
+        return direct ? AstEvent.leaf(id, start, end) : Recipe.leaf(id, start, end);
     }
     public Match rule(Frame f, int id, int memoId, boolean successMemo, boolean failureMemo, Call body,
                       String recipe, String fallback, String recipeKind, Fields fields, Effect[] scopeEffects, boolean skip, Label[] recoveryHints, boolean rightAssociative, Label[] failureHints) {
@@ -1613,6 +1613,11 @@ public final class Session {
                 + ", expected " + referenced.getClass().getSimpleName() + " but got " + own.getClass().getSimpleName();
             throw mapping(recipe.start(), recipe.end(), message, new IllegalArgumentException(message));
         }
+    }
+    /** capture の原文から直接構築した leaf。中間 event を作らず同じ span だけを登録する。 */
+    public Object rememberLeaf(Object object, int start, int end) {
+        if (object != null) spans().put(object, span(start, end));
+        return object;
     }
     public boolean hasBuilt(AstEvent recipe) { return recipe.built != AstEvent.UNBUILT; }
     public Object built(AstEvent recipe) { Object object = recipe.built; return object == AstEvent.UNBUILT ? null : object; }

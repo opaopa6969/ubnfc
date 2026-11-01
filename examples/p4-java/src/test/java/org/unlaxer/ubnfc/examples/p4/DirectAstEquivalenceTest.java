@@ -94,4 +94,24 @@ final class DirectAstEquivalenceTest {
         }
         assertTrue(compared > 4000, "比較件数: " + compared);
     }
+    @Test
+    void directLeafFallbackKeepsTheCompletePublicSpanTable() throws IOException {
+        String source = Files.readString(Path.of("src/test/resources/fixtures/complex.tiny"));
+        var options = P4Scanners.options(true).withObservations(false, false);
+        try {
+            Session.directAst = false;
+            var reference = TinyExpressionP4Parser.parse(source, options);
+            Session.directAst = true;
+            var direct = TinyExpressionP4Parser.parse(source, options);
+            assertEquals(Json.canonical(reference), Json.canonical(direct));
+            var before = reference.nodeSpans().entrySet().stream()
+                .map(e -> e.getKey().getClass().getName() + ":" + e.getKey() + ":" + e.getValue()).sorted().toList();
+            var after = direct.nodeSpans().entrySet().stream()
+                .map(e -> e.getKey().getClass().getName() + ":" + e.getKey() + ":" + e.getValue()).sorted().toList();
+            assertEquals(before, after, "leaf の原文へ余計な span を付けず、AST 自身の span を保持する");
+        } finally {
+            Session.directAst = true;
+        }
+    }
+
 }

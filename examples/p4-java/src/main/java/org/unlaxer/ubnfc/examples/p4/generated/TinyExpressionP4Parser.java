@@ -490,27 +490,27 @@ public final class TinyExpressionP4Parser {
     }
     private static Object b23(AstEvent r, Session s) {
         AstEvent.Value v0 = s.scalarValue(r,0,"left");
-        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) build(s.node(v0, r), s), v0);
+        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) (s.direct && v0.nodes().isEmpty() ? leaf0(v0, s) : build(s.node(v0, r), s)), v0);
         List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
         for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
         List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST) (s.direct && v.nodes().isEmpty() ? leaf0(v, s) : build(s.node(v, r), s)); if (x != null) a2[k2++] = x; }
         java.util.List<TinyExpressionP4AST> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.BinaryExpr(field0, field1, field2);
     }
     private static Object b24(AstEvent r, Session s) {
         AstEvent.Value v0 = s.scalarValue(r,0,"left");
-        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) build(s.node(v0, r), s), v0);
+        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) (s.direct && v0.nodes().isEmpty() ? leaf0(v0, s) : build(s.node(v0, r), s)), v0);
         List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
         for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
         List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST) (s.direct && v.nodes().isEmpty() ? leaf0(v, s) : build(s.node(v, r), s)); if (x != null) a2[k2++] = x; }
         java.util.List<TinyExpressionP4AST> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.BinaryExpr(field0, field1, field2);
     }
@@ -974,6 +974,9 @@ public final class TinyExpressionP4Parser {
         AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
         return new TinyExpressionP4AST.ExpressionExpr(field0);
+    }
+    private static Object leaf0(AstEvent.Value v, Session s) {
+        return s.rememberLeaf(new TinyExpressionP4AST.BinaryExpr(null, List.of(s.source.substring(v.start(), v.end()).strip()), List.of()), v.start(), v.end());
     }
     private static Match parseFormula_0(Session s, Frame f) {
         return s.rule(f, 0, 1043, true, true, TinyExpressionP4Parser::e0, "recipe:Formula", null, "construct", K2, K3, false, K4, false, K5);

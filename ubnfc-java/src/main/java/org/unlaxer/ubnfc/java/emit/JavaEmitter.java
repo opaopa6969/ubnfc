@@ -816,13 +816,14 @@ public final class JavaEmitter {
         // 1 field ごとに lambda 実体を確保し、Session 側の呼出しは recipe 数ぶんの型を見る
         // megamorphic な interface 呼出しになっていた（inline されない）。
         out.append("    private static Object build(AstEvent r, Session s) {\n        if (s.hasBuilt(r)) return s.built(r);\n        if (r.id().equals(\"#recovery\")) return s.remember(r, null);\n        try {\n        Object node = switch (r.id()) {\n");
-        var fallbacks = new LinkedHashSet<String>();
+        var fallbacks = new LinkedHashMap<String, String>();
         var methods = new StringBuilder();
         int methodIndex = 0;
         for (Recipe recipe : recipes.values()) {
             if (recipe.resultTypeId() == null || Set.of("transparent", "text", "skip").contains(recipe.kind())) continue;
             AstType type = types.get(recipe.resultTypeId());
-            if (recipe.leafFallback() != null) fallbacks.add(recipe.leafFallback().typeId());
+            String leaf = recipe.leafFallback() == null ? null : fallbacks.computeIfAbsent(
+                recipe.leafFallback().typeId(), id -> "leaf" + fallbacks.size());
             out.append("            case ").append(q(recipe.id())).append(" -> ");
             if (type.kind().equals("enum")) {
                 out.append("switch (s.source.substring(r.start(), r.end()).strip()) {\n");
@@ -844,14 +845,14 @@ public final class JavaEmitter {
                 switch (mapping.cardinality()) {
                     case "scalar" -> methods.append("        AstEvent.Value v").append(n).append(" = s.scalarValue(r,").append(index).append(',').append(q(field.name())).append(");\n")
                         .append("        ").append(javaType).append(' ').append(local).append(" = s.present(")
-                        .append(convert(field.valueType(), mapping.conversion(), "v" + n)).append(", v").append(n).append(");\n");
+                        .append(convert(field.valueType(), mapping.conversion(), "v" + n, leaf)).append(", v").append(n).append(");\n");
                     case "optional" -> methods.append("        AstEvent.Value v").append(n).append(" = s.firstValue(r,").append(index).append(");\n")
                         .append("        ").append(javaType).append(' ').append(local).append(" = v").append(n).append(" == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(")
-                        .append(convert(field.valueType(), mapping.conversion(), "v" + n)).append(");\n");
+                        .append(convert(field.valueType(), mapping.conversion(), "v" + n, leaf)).append(");\n");
                     case "list" -> methods.append("        List<AstEvent.Value> l").append(n).append(" = s.fieldValues(r,").append(index).append(");\n")
                         .append("        Object[] a").append(n).append(" = l").append(n).append(".isEmpty() ? null : new Object[l").append(n).append(".size()]; int k").append(n).append(" = 0;\n")
                         .append("        for (int i = 0, n = l").append(n).append(".size(); i < n; i++) { AstEvent.Value v = l").append(n).append(".get(i); Object x = ")
-                        .append(convert(field.valueType(), mapping.conversion(), "v")).append("; if (x != null) a").append(n).append("[k").append(n).append("++] = x; }\n")
+                        .append(convert(field.valueType(), mapping.conversion(), "v", leaf)).append("; if (x != null) a").append(n).append("[k").append(n).append("++] = x; }\n")
                         .append("        ").append(javaType).append(' ').append(local).append(" = s.listOf(a").append(n).append(", k").append(n).append(");\n");
                     default -> throw new IllegalArgumentException(mapping.cardinality());
                 }
@@ -865,20 +866,26 @@ public final class JavaEmitter {
             methods.append("        return new ").append(typeName(type.id())).append('(')
                 .append(String.join(", ", locals.values())).append(");\n    }\n");
         }
-        for (String fallback : fallbacks) out.append("            case ").append(q("#leaf:" + fallback)).append(" -> new ").append(typeName(fallback)).append("(null, List.of(s.source.substring(r.start(), r.end()).strip()), List.of());\n");
+        for (String fallback : fallbacks.keySet()) out.append("            case ").append(q("#leaf:" + fallback)).append(" -> new ").append(typeName(fallback)).append("(null, List.of(s.source.substring(r.start(), r.end()).strip()), List.of());\n");
         out.append("            default -> throw s.mapping(r.start(), r.end(), \"Cannot build recipe: \" + r.id(), null);\n        };\n        return s.remember(r, node);\n        } catch (Session.RecoveredNodeMissing missing) { return s.remember(r, null); }\n    }\n");
         out.append(methods);
+        // leaf fallback も認識済み capture から直接構築する。捨てられた枝はこの段へ来ない。
+        for (var leaf : fallbacks.entrySet()) out.append("    private static Object ").append(leaf.getValue())
+            .append("(AstEvent.Value v, Session s) {\n        return s.rememberLeaf(new ").append(typeName(leaf.getKey()))
+            .append("(null, List.of(s.source.substring(v.start(), v.end()).strip()), List.of()), v.start(), v.end());\n    }\n");
     }
-    private String convert(ValueType type, String conversion, String v) {
+    private String convert(ValueType type, String conversion, String v, String leaf) {
         String java = javaType(type, true);
+        String node = "build(s.node(" + v + ", r), s)";
+        if (leaf != null) node = "(s.direct && " + v + ".nodes().isEmpty() ? " + leaf + "(" + v + ", s) : " + node + ")";
         return switch (conversion) {
             case "text" -> "s.text(" + v + ")"; case "number" -> "s.number(" + v + ")";
-            case "node" -> (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + "build(s.node(" + v + ", r), s)";
+            case "node" -> (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + node;
             case "mixed" -> {
                 boolean text = type.members().stream().anyMatch(t -> t.kind().equals("text"));
                 boolean number = type.members().stream().anyMatch(t -> t.kind().equals("number"));
-                String leaf = text ? "s.text(" + v + ")" : number ? "s.number(" + v + ")" : "null";
-                yield (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + "(" + v + ".nodes().isEmpty() ? " + leaf + " : build(s.node(" + v + ", r), s))";
+                String scalar = text ? "s.text(" + v + ")" : number ? "s.number(" + v + ")" : "null";
+                yield (java.equals("java.lang.Object") ? "" : "(" + java + ") ") + "(" + v + ".nodes().isEmpty() ? " + scalar + " : build(s.node(" + v + ", r), s))";
             }
             default -> throw new IllegalArgumentException(conversion);
         };
