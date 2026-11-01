@@ -10,7 +10,7 @@ mkdir -p "$work/ll1-bench/src"
 cargo build --manifest-path "$repo/Cargo.toml" --release --offline --bin ubnfc --bin ubnfc-rust
 "$repo/target/release/ubnfc" ir --grammar "$repo/examples/json/json.ubnf" --out "$work/json.ir.json"
 "$repo/target/release/ubnfc-rust" --ir "$work/json.ir.json" --out "$work/json" --no-emit-driver
-"$repo/target/release/ubnfc-rust" --ir "$repo/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json" --out "$work/p4" --no-emit-driver
+"$repo/target/release/ubnfc-rust" --ir "$repo/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json" --out "$work/p4" --no-emit-driver
 cp "$repo/benchmarks/src/family_ll1.rs" "$work/ll1-bench/src/main.rs"
 cat > "$work/ll1-bench/Cargo.toml" <<MANIFEST
 [workspace]

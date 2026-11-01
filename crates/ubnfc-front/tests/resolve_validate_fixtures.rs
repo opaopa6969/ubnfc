@@ -105,15 +105,16 @@ fn external_fixture_diagnostics() {
                     .any(|suffix| name.ends_with(suffix))
                 {
                     BTreeMap::from([("W-GENERAL-NO-ROOT", 1)])
+                } else if name == "P4" {
+                    // P4 は 2026-10 に `@ubnf: v2` へ移ったので、旧綴り `@backref` に v2 の
+                    // 非推奨警告が付く（D-046）。
+                    BTreeMap::from([("W-ANNOTATION-BACKREF-AMBIGUOUS", 2)])
                 } else if name.ends_with("/positive/annotations.ubnf") {
                     // 合成 fixture の `@custom`（D-045）。
                     BTreeMap::from([("W-ANNOTATION-UNKNOWN", 1)])
                 } else if name == "unlaxer-dsl/grammar/ubnf.ubnf" {
-                    // Capability metadata is not yet an ubnfc semantic contract.
-                    BTreeMap::from([
-                        ("W-ANNOTATION-UNKNOWN", 4),
-                        ("W-ANNOTATION-BACKREF-AMBIGUOUS", 1),
-                    ])
+                    // 2026-10 に未知の注釈（capability metadata）は自己記述文法から消えた。
+                    BTreeMap::from([("W-ANNOTATION-BACKREF-AMBIGUOUS", 1)])
                 } else {
                     BTreeMap::new()
                 };
@@ -141,8 +142,8 @@ fn external_fixture_diagnostics() {
                         grammar,
                         resolve(&files, &|path| ubnfc_front::packages::read_to_string(path)).unwrap()
                     );
-                    assert_eq!(grammar.grammars[0].rules.len(), 124);
-                    assert!(issues.is_empty());
+                    assert_eq!(grammar.grammars[0].rules.len(), 130);
+                    assert!(issues.iter().all(|i| i.code == "W-ANNOTATION-BACKREF-AMBIGUOUS"));
                     for rule in &grammar.grammars[0].rules {
                         for site in &rule.captures {
                             assert!(
@@ -162,8 +163,9 @@ fn external_fixture_diagnostics() {
         BTreeMap::from([
             ("W-LEFT-RECURSION".into(), 2),
             ("W-GENERAL-NO-ROOT".into(), 3),
-            ("W-ANNOTATION-UNKNOWN".into(), 6),
-            ("W-ANNOTATION-BACKREF-AMBIGUOUS".into(), 1)
+            // ubnf.ubnf の未知の注釈 4 件が消え、P4（v2 へ移った）の @backref 2 件が増えた。
+            ("W-ANNOTATION-UNKNOWN".into(), 2),
+            ("W-ANNOTATION-BACKREF-AMBIGUOUS".into(), 3)
         ])
     );
 }

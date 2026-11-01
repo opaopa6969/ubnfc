@@ -163,7 +163,7 @@ class ScanEquivalenceTest {
     /** {@code plan.scans} が空の文法には走査関数も走査経路も出ない（生成 parser は従来と同じ）。 */
     @Test void grammarsWithoutScanPlansAreUnchanged() throws Exception {
         for (String ir : List.of("src/test/resources/ir/operators.ir.json", "src/test/resources/ir/power.ir.json",
-                "../ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json")) {
+                "../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json")) {
             var emitted = new JavaEmitter(IrReader.read(Path.of(ir)), "probe.noscan").sources();
             String parser = emitted.entrySet().stream().filter(e -> e.getKey().endsWith("Parser.java")).findFirst().orElseThrow().getValue();
             assertFalse(parser.contains("scanned(") || parser.contains("private static long scan"), ir);

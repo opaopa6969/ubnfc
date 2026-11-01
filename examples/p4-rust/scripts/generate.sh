@@ -3,7 +3,7 @@
 set -euo pipefail
 module=$(cd "$(dirname "$0")/.." && pwd)
 root=$(cd "$module/../.." && pwd)
-ir="$root/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
+ir="$root/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json"
 mode=${1:---check}
 out=$(mktemp -d)
 trap 'rm -rf "$out"' EXIT

@@ -22,8 +22,8 @@ import org.unlaxer.ubnfc.java.ir.IrReader;
  * 表示の経路は {@code Meta.documentation()} で共通。
  */
 class MetadataTest {
-    private static final Path P4 = Path.of("..", "ir", "fixtures",
-        "tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json");
+    private static final Path P4 = Path.of("..", "ir", "frozen",
+        "tinyexpression-p4-f86ce8a5.ir.json");
     private static final Path UBNF = Path.of("..", "ir", "fixtures", "unlaxer-dsl__grammar__ubnf.ubnf.ir.json");
     private static final Path DOCS = Path.of("src", "test", "resources", "doc-demo.ir.json");
 

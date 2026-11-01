@@ -1,6 +1,6 @@
 # examples/p4-vscode — TinyExpression P4 の VS Code 拡張（ubnfc 生成）
 
-`ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json` から
+`ir/frozen/tinyexpression-p4-f86ce8a5.ir.json` から
 **パーサと LSP サーバの両方を生成**し、VSIX に梱包する例。issue #28 の段階 2 と 3。
 設計判断は D-060 / D-062、調査と実測は
 [`docs/reports/2026-09-24-lsp-vsix-stage1.md`](../../docs/reports/2026-09-24-lsp-vsix-stage1.md) と
