@@ -98,7 +98,33 @@
   "invalid": {
     "changes": {}
   },
-  "prefixFolding": [],
+  "prefixFolding": [
+    {
+      "startLine": 0,
+      "endLine": 1,
+      "startCharacter": 0,
+      "endCharacter": 8,
+      "kind": "comment"
+    },
+    {
+      "startLine": 0,
+      "endLine": 11,
+      "startCharacter": 0,
+      "endCharacter": 12
+    },
+    {
+      "startLine": 3,
+      "endLine": 8,
+      "startCharacter": 0,
+      "endCharacter": 1
+    },
+    {
+      "startLine": 5,
+      "endLine": 7,
+      "startCharacter": 1,
+      "endCharacter": 2
+    }
+  ],
   "closed": {
     "changes": {}
   },

@@ -13,7 +13,7 @@ import __API_PACKAGE__.TokenScanner;
  * <ul>
  *   <li><b>primary</b> — 全文を認識モード（D-023 の二段構え）で解析したもの。診断の出所。</li>
  *   <li><b>scoped</b> — scope 観測・lexical の出所。全文が通ればそれ自身。
- *       <b>失敗したときは主失敗位置で入力を切り、その前半だけを解析し直す</b>。</li>
+ *       <b>失敗したときは、最遠失敗位置以下で単独で解析に成功する最長の前半を使う</b>。</li>
  * </ul>
  *
  * <p><b>なぜ切って解析し直すのか</b>（段階 2 の唯一のパリティ欠落、D-062）。
@@ -21,9 +21,9 @@ import __API_PACKAGE__.TokenScanner;
  * {@code declarations()} / {@code references()} / {@code diagnostics()} が<b>全部空</b>になる。
  * 巻き戻しをやめれば観測契約（{@code docs/design/04-cursor-and-diagnostics-contract.md} と
  * D-025 の scope 観測）が変わってしまうので、<b>パーサ側は 1 行も変えず</b>、
- * 「主失敗位置までの前半を別の入力として解析し直す」ほうを採った。
+ * 「成功する前半を別の入力として解析し直す」ほうを採った。
  * 解析は決定的なので、この再解析の観測は「その前半だけを書いた文書」の観測と完全に一致する。
- * 失敗したときだけ 1 回余計に解析するので、通る文書の打鍵ごとの費用は段階 2 と同じ。
+ * 失敗時は切断位置を code point ごとに後退して探索する。全文が通る場合の追加解析は無い。
  *
  * <p>lexical（semantic tokens 用）は<b>要求されたときだけ</b>解析し直す。
  * {@code lexical=true} は Match 木を作らせるので、診断の経路には載せない。
@@ -65,17 +65,23 @@ public final class Analysis {
         }
         if (primary.ok())
             return new Analysis(uri, text, positions, scanners, primary, primary, text, false, -1, null);
-        int cut = primary.diagnostics() == null ? -1
-            : primary.diagnostics().offset() >= 0 ? primary.diagnostics().offset() : primary.diagnostics().farthestCp();
-        if (cut > 0 && cut < positions.lengthCp()) {
-            String head = head(text, cut);
+        var diagnostic = primary.diagnostics();
+        int farthest = diagnostic == null ? positions.lengthCp()
+            : Math.max(diagnostic.offset(), diagnostic.farthestCp());
+        int cut = Math.max(0, Math.min(positions.lengthCp() - 1, farthest));
+        int utf16 = text.offsetByCodePoints(0, cut);
+        // 入口に EOF がある文法では offset=0 のまま全文が巻き戻る。
+        // requireFullInput=false でも EOF は消えないため、単独で成功する境界を探す。
+        for (; cut > 0; cut--) {
+            String head = text.substring(0, utf16);
             try {
-                var prefix = parse(head, options(scanners, false, false));
+                var prefix = parse(head, options(scanners, true, false));
                 if (prefix.ok())
                     return new Analysis(uri, text, positions, scanners, primary, prefix, head, true, cut, null);
             } catch (RuntimeException ignored) {
-                // 前半の再解析は「あれば得」なので、落ちても診断は出す。
+                // 前半の索引が得られなくても、全文の診断は保持する。
             }
+            utf16 -= Character.charCount(text.codePointBefore(utf16));
         }
         return new Analysis(uri, text, positions, scanners, primary, null, text, false, -1, null);
     }
@@ -100,7 +106,7 @@ public final class Analysis {
     public RuntimeException failure() { return failure; }
     /** scope 観測・lexical の出所。無ければ null。 */
     public ParseResult<?> scoped() { return scoped; }
-    /** {@link #scoped()} が「主失敗位置までの前半」なら true。診断にその旨を書く。 */
+    /** {@link #scoped()} が「単独で成功する正常前半」なら true。診断にその旨を書く。 */
     public boolean scopedIsPrefix() { return scopedIsPrefix; }
     /** 前半を切った code point 位置（切っていなければ -1）。 */
     public int cutCp() { return cutCp; }
@@ -112,7 +118,7 @@ public final class Analysis {
         if (lexical != null) return lexical;
         if (scoped == null) return lexical = List.of();
         try {
-            lexical = parse(scopedText, options(scanners, !scopedIsPrefix, true)).lexical();
+            lexical = parse(scopedText, options(scanners, true, true)).lexical();
         } catch (RuntimeException error) {
             lexical = List.of();
         }
