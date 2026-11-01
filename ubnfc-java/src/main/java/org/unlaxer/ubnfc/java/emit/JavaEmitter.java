@@ -91,8 +91,7 @@ public final class JavaEmitter {
         for (String name : List.of("Span", "Capture", "Diagnostic", "MappingException", "ParseOptions", "ParseResult", "TokenScanner", "Json", "SourceName"))
             result.put(prefix + "api/" + name + ".java", resource("/templates/api/" + name + ".java").replace("generated.", pkg + "."));
         for (String name : List.of("Recipe", "Session")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
-        if (tokens.values().stream().anyMatch(t -> t.spec().kind().equals("declarative")))
-            result.put(prefix + "internal/LexicalExpression.java", resource("/templates/internal/LexicalExpression.java").replace("generated.", pkg + "."));
+        result.put(prefix + "internal/LexicalExpression.java", resource("/templates/internal/LexicalExpression.java").replace("generated.", pkg + "."));
         for (String name : List.of("Input", "Cursor", "MemoTable", "ScopeStore", "Diagnostics", "Severity"))
             result.put(prefix + "rt/" + name + ".java", resource("/runtime/ubnfc/rt/" + name + ".java").replace("package ubnfc.rt;", "package " + pkg + ".rt;"));
         if (emitDriver) result.put(prefix + "driver/Driver.java", driverSource());
@@ -492,7 +491,7 @@ public final class JavaEmitter {
                 .append(", ").append(parser).append("::").append(method).append("Body);\n    }\n")
                 .append("    private static Match ").append(method).append("Body(Session s, Frame f) {\n");
         }
-        if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
+        if (!(expr.node().kind().equals("repeat") && Integer.valueOf(0).equals(expr.node().max())) && expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         // 認識専用経路（Match 木も診断も作らない）で capture の包みが恒等になる式は、包みを飛ばして
         // 中身を直に呼ぶ。到達位置の更新だけ同じ位置で行う（包みの中の progress と同じ）。
         // D-068: AST を作る経路でも、読まれる capture site を 1 つも持たない式は包みが
@@ -581,7 +580,7 @@ public final class JavaEmitter {
             case "seq" -> "return s.sequence(f, " + calls(n.items()) + ", " + boundary + ");";
             case "group" -> expr.execution().transaction().equals("delegate") ? "return " + method(n.child()) + "(s, f);" : "return s.sequence(f, " + calls(List.of(n.child())) + ", " + boundary + ");";
             case "optional" -> "return s.optional(f, " + call(n.child()) + ");";
-            case "repeat" -> "return s.repeat(f, " + call(n.child()) + ", " + n.min() + ", " + (n.max() == null ? "Integer.MAX_VALUE" : n.max()) + ", " + (n.terminator() == null ? "null" : call(n.terminator())) + ", " + boundary + (Integer.valueOf(0).equals(n.max()) && repeatedLiteral(n.child()) != null ? "," + label("'" + repeatedLiteral(n.child()) + "'") : "") + ");";
+            case "repeat" -> "return s.repeat(f, " + call(n.child()) + ", " + n.min() + ", " + (n.max() == null ? "Integer.MAX_VALUE" : n.max()) + ", " + (n.terminator() == null ? "null" : call(n.terminator())) + ", " + boundary + ");";
             case "separated" -> "return s.separated(f, " + call(n.element()) + ", " + call(n.separator()) + ", " + n.min() + ", " + boundary + ");";
             case "choice" -> choice(expr);
             case "literal" -> "return s.literal(f, " + q(n.value()) + ", " + n.caseSensitive() + ", " + Boolean.TRUE.equals(n.wordBoundary()) + ", " + label(label) + ");";
@@ -645,13 +644,7 @@ public final class JavaEmitter {
             + ",List.of(" + e.children().stream().map(this::lexicalProgram).collect(Collectors.joining(",")) + "))";
     }
     private int externIndex(String logicalId) { return externIndices.computeIfAbsent(logicalId, key -> externIndices.size()); }
-    private String repeatedLiteral(String id) {
-        ExprNode node = expressions.get(id).node();
-        if (node.kind().equals("literal")) return node.value();
-        if (node.kind().equals("group")) return repeatedLiteral(node.child());
-        if (node.kind().equals("seq") && node.items().size() == 1) return repeatedLiteral(node.items().getFirst());
-        return null;
-    }
+
     private String regex(TokenSpec spec, String label) {
         if (spec.dfa() != null) {
             var dfa = spec.dfa();
@@ -804,7 +797,7 @@ public final class JavaEmitter {
     private String delimiters(String policyId) {
         TriviaPolicy policy = Validation.index(ir.semantics().trivia().policies(), TriviaPolicy::id).get(policyId);
         return constant("Delimiters", "new Delimiters(" + policy.effectiveDelimiterSet().stream()
-            .map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + ")").collect(Collectors.joining(",")) + ")");
+            .map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + "," + (d.expression() == null ? "null" : lexicalProgram(d.expression())) + "," + q(d.label()) + ")").collect(Collectors.joining(",")) + ")");
     }
     private void emitBuild(StringBuilder out) {
         if (recipes.values().stream().noneMatch(r -> r.resultTypeId() != null && !Set.of("transparent", "text", "skip").contains(r.kind()))) {

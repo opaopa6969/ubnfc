@@ -331,3 +331,15 @@ runall/runner の driver 拡張は本採取の対象外であり、そこでの�
     構文拒否や正常な数値へ補正せず、AST と評価エラーをそのまま固定した。
     各版の全入力受理は17/18/22/25、評価値ありは12/13/17/20。
     各版5件の評価エラーの残り1件は `1e309` の非有限値で、既存テストが明示する評価契約。
+
+## 2026-11-01: ゼロ上限と不完全指数の再採取（issue #46）
+
+現 pin `d3ea73e8cfa440df8bdbb70abb29e06259435ba2` の Classic を
+上記 `collect.sh` で別ディレクトリへ実走し、`empty-zero.json` と `repeat-zero.json` を
+再採取した。入力・文法は無変更。通常の `{0,0}` は子を試さず成功する契約へ変わったため、
+旧 revision の失敗期待を新 runtime の比較に流用しない。他の採取ファイルは更新していない。
+
+Rust 側の `numeric.json:numeric/7` も、同じ pin の `unlaxer-runtime::parse_detailed` を
+直接呼んで再採取した。不完全指数の消費は仮数まで戻るが、主診断は指数内の失敗位置を保持する。
+同梱 sidecar の当該行と `reobservations` に記録した。詳細・再現コードは
+[報告書](../../docs/reports/2026-11-01-new-pin-corpus.md)を参照。

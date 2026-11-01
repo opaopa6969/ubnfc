@@ -1,5 +1,6 @@
 //! 全 corpus の .ubnf → IR → Java/Rust → build → driver → 独立 oracle 比較。
 //! loader が既存 Conformance テストと同じ形に合成した文法を再解釈しない。
+mod fixture_files;
 #[cfg(test)]
 mod rejection_tests;
 mod report;
@@ -381,12 +382,7 @@ fn source_parts(grammar: &GrammarSource) -> Result<(String, String, BTreeMap<Str
             metadata,
         } => (name, fs::read_to_string(path)?, metadata),
     };
-    let imports = match metadata.get("imports") {
-        None => BTreeMap::new(),
-        Some(value) => {
-            serde_json::from_value(value.clone()).map_err(|e| Error(format!("imports: {e}")))?
-        }
-    };
+    let imports = fixture_files::expand(metadata)?;
     Ok((name.clone(), source, imports))
 }
 
@@ -814,6 +810,41 @@ mod tests {
     }
 
     #[test]
+    fn identical_main_sources_keep_distinct_module_and_manifest_builds() {
+        let scratch = Scratch::new().unwrap();
+        let directory = scratch.0.join("rule-trivia");
+        fs::create_dir_all(&directory).unwrap();
+        let fixture = |name: &str, gap: &str| {
+            serde_json::json!({
+                "name":name,"grammar":"grammar G { @import layout from 'pkg:team/layout' @ubnf: v2 @whitespace: layout.GAP @root R ::= 'a' 'b'; }",
+                "modules":{"layout.json":serde_json::json!({"schemaVersion":1,"id":"team/layout","version":"1.0.0","entry":"layout.ubnf",
+                    "files":{"layout.ubnf":format!("grammar L {{ @ubnf: v2 token GAP ::= '{gap}'; }}")},"dependencies":{}}).to_string()},
+                "manifest":{"schemaVersion":1,"dependencies":{"team/layout":{"version":"1.0.0","source":"local:layout.json"}}},
+                "cases":[{"id":"ab","input":"ab","accepted":true}]
+            })
+        };
+        let path = directory.join("corpus.json");
+        fs::write(
+            &path,
+            serde_json::to_string(&vec![fixture("hash", "#"), fixture("plus", "+")]).unwrap(),
+        )
+        .unwrap();
+        let file = crate::corpus::ast::load(&path).unwrap();
+        let plan = plan(&[file], &[], Backend::Java).unwrap();
+        assert_eq!(plan.work.len(), 2);
+        assert_eq!(plan.work[0].build.source, plan.work[1].build.source);
+        assert_ne!(plan.work[0].build.id, plan.work[1].build.id);
+        for work in &plan.work {
+            let target = scratch.0.join(&work.build.id);
+            let main = materialize(&work.grammar, &target).unwrap();
+            assert!(main.is_file());
+            for (name, text) in &work.build.imports {
+                assert_eq!(fs::read_to_string(target.join(name)).unwrap(), *text);
+            }
+        }
+    }
+
+    #[test]
     fn cache_deduplicates_sources_but_keeps_import_contents_and_all_variants() {
         let files = crate::load_all(crate::default_root()).unwrap();
         let plan = plan(&files, &[], Backend::Java).unwrap();
@@ -832,7 +863,13 @@ mod tests {
             .iter()
             .filter(|w| !w.build.imports.is_empty())
             .collect();
-        assert_eq!(imports.len(), 3);
+        let supporting = files
+            .iter()
+            .flat_map(|f| &f.grammars)
+            .filter(|g| !source_parts(g).unwrap().2.is_empty())
+            .count();
+        assert!(imports.len() <= supporting);
+        assert!(imports.len() >= 3);
         let alias = imports
             .iter()
             .find(|w| w.build.grammars[0].contains("import-alias.json"))

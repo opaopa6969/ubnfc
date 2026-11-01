@@ -220,6 +220,7 @@ final class Scanning {
      * 本体を呼ばずに食べる。表の周回は 1 code point の終端の成功なので値を持つ（値なし bit は立たない）。
      */
     private String repeat(String id, ExprNode n) {
+        if (Integer.valueOf(0).equals(n.max()) && Integer.valueOf(0).equals(n.min())) return "return (long) p << 1 | 1L;";
         int min = n.min() == null ? 0 : n.min();
         String max = n.max() == null ? "Integer.MAX_VALUE" : n.max().toString();
         ScanClass table = n.max() == null ? classes.get(id) : null;

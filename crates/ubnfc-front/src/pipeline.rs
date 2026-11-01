@@ -561,6 +561,14 @@ fn required_features(s: &Semantics, plan: &Plan, imports: &[ImportEdge]) -> Vec<
                 .iter()
                 .any(|t| matches!(t.spec, TokenSpec::Declarative { .. })),
         ),
+        (
+            LexicalTrivia,
+            s.trivia.policies.iter().any(|p| {
+                p.effective_delimiter_set
+                    .iter()
+                    .any(|d| matches!(d, Delimiter::Lexical { .. }))
+            }),
+        ),
         (Captures, !s.captures.is_empty()),
         (
             DeferredMapping,

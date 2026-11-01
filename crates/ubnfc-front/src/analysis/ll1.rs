@@ -67,6 +67,11 @@ fn local_ok(cx: &Context<'_>, i: usize) -> bool {
         ExprNode::RuleRef { symbol_id } => rule_ok(cx, cx.rules[symbol_id]),
         ExprNode::Optional { .. } => true,
         ExprNode::Repeat {
+            min: 0,
+            max: Some(0),
+            ..
+        } => true,
+        ExprNode::Repeat {
             child,
             terminator,
             max,
@@ -107,7 +112,15 @@ pub(super) fn plans(cx: &Context<'_>) -> Vec<Ll1State> {
     loop {
         let mut changed = false;
         for i in 0..ok.len() {
-            if ok[i] && cx.deps[i].iter().any(|&j| !ok[j]) {
+            let zero = matches!(
+                cx.sem.expressions[i].node,
+                ExprNode::Repeat {
+                    min: 0,
+                    max: Some(0),
+                    ..
+                }
+            );
+            if ok[i] && !zero && cx.deps[i].iter().any(|&j| !ok[j]) {
                 ok[i] = false;
                 changed = true;
             }
@@ -154,6 +167,11 @@ pub(super) fn plans(cx: &Context<'_>) -> Vec<Ll1State> {
                 ExprNode::Optional { child } => Ll1Operation::Optional {
                     target: target(child),
                 },
+                ExprNode::Repeat {
+                    min: 0,
+                    max: Some(0),
+                    ..
+                } => Ll1Operation::Empty {},
                 ExprNode::Repeat {
                     child, min, max, ..
                 } => Ll1Operation::Repeat {

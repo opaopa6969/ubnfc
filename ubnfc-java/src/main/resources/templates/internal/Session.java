@@ -125,9 +125,11 @@ public final class Session {
     }
     /** Trivia delimiter with labels and an ASCII bitmap precomputed once (generated code builds these as static constants). */
     public static final class Delimiter {
-        private final String kind, open, close; private final int[] characters;
+        private final String kind, open, close; private final int[] characters; private final LexicalExpression expression; private final String label;
         final boolean isCharacters, isLineComment; final Label openLabel, closeLabel; final long asciiLow, asciiHigh; final boolean asciiOnly; final char first;
-        public Delimiter(String kind, String open, String close, int[] characters) {
+        public Delimiter(String kind, String open, String close, int[] characters) { this(kind, open, close, characters, null, null); }
+        public Delimiter(String kind, String open, String close, int[] characters, LexicalExpression expression, String label) {
+            this.expression = expression; this.label = label;
             this.kind = kind; this.open = open; this.close = close; this.characters = characters;
             isCharacters = kind.equals("characters"); isLineComment = kind.equals("lineComment");
             openLabel = open == null ? null : Label.of("'" + open + "'"); closeLabel = close == null ? null : Label.of("'" + close + "'");
@@ -160,6 +162,7 @@ public final class Session {
             var members = new ArrayList<Label>();
             for (int i = 0; i < items.length; i++) {
                 if (items[i].isCharacters) members.add(L_SPACE);
+                else if (items[i].expression != null) members.add(Label.of(items[i].label));
                 else if (items[i].isLineComment) members.add(items[i].openLabel);
                 else { members.add(items[i].openLabel); members.add(items[i].closeLabel); }
                 prefixGroups[i] = members.size() == 1 ? members.get(0) : Label.group(members.toArray(new Label[0]));
@@ -1099,6 +1102,11 @@ public final class Session {
         return repeat(parent, child, min, max, terminator, trivia, Label.of(label));
     }
     public Match repeat(Frame f, Call child, int min, int max, Call terminator, Trivia trivia, Label label) {
+        return occurs(f, child, min, max, terminator, trivia, label, false);
+    }
+    private Match occurs(Frame f, Call child, int min, int max, Call terminator, Trivia trivia, Label label, boolean zeroMatchCheck) {
+        // 通常の上限ゼロと、EOF の歴史的な「一度試して失敗だけを受理」を区別する。
+        if (!zeroMatchCheck && min == 0 && max == 0) return success(f.c, f.c);
         long whole = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset, matched0 = f.matched;
         if (reset0) f.m = f.c;
         int start = f.c, count = 0;
@@ -1225,7 +1233,7 @@ public final class Session {
         int length = Character.charCount(cp(at)); f.advance(length); return success(at, at + length);
     }
     public Match empty(Frame f) { return optional(f, (s, p) -> s.look(p, (ss, pp) -> ss.any(pp, L_ANY), false, L_EMPTY)); }
-    public Match eof(Frame f) { return repeat(f, (s, p) -> s.any(p, L_WILDCARD_CHAR), 0, 0, null, Trivia.NONE, L_EOS); }
+    public Match eof(Frame f) { return occurs(f, (s, p) -> s.any(p, L_WILDCARD_CHAR), 0, 0, null, Trivia.NONE, L_EOS, true); }
     public Match error(Frame f, String message) { fail(Math.max(f.c, f.m), message); return null; }
     public Match error(Frame f, Label message) { fail(Math.max(f.c, f.m), message); return null; }
     private boolean digit(int p) { return cp(p) >= '0' && cp(p) <= '9'; }
@@ -1361,7 +1369,14 @@ public final class Session {
             if (!set.canStart(p < input.length() ? input.codePointAt(p) : -1)) { fail(at, set.fullGroup()); return; }
             for (var delimiter : delimiters) {
                 int next = p, terminatorEnd = -1;
-                if (delimiter.isCharacters) {
+                if (delimiter.expression != null) {
+                    int end = delimiter.expression.match(source, p);
+                    if (end > p) next = end;
+                    else if (end == p) {
+                        if (failed > 0) fail(at, set.prefixGroups[failed - 1]);
+                        return;
+                    }
+                } else if (delimiter.isCharacters) {
                     int ch = cp(p);
                     if (ch >= 0 && delimiter.contains(ch)) next += Character.charCount(ch);
                 } else if (p < input.length() && input.charAt(p) == delimiter.first && input.startsWith(p, delimiter.open)) {

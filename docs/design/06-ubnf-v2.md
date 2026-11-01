@@ -111,7 +111,9 @@ PEG の順序付き選択は、候補順を誤ると黙って前の候補が勝�
 
 ### 設定と版
 
-`@literalBoundary: word|none`（grammar ごと、1 回）。既定は `@ubnf: 1` で `none`、`@ubnf: 2` で `word`。
+`@literalBoundary: word|none`（grammar ごと、1 回）。既定は数値版 `@ubnf: 1` で `none`、数値版 `@ubnf: 2` で `word`。
+Classic の綴り `@ubnf: v2` は Classic と同じ prefix 一致を保ち、暗黙の単語境界を加えない（D-092）。
+明示的な `@literalBoundary` はどちらの綴りでも優先する。
 IR は既存キー `ExprNode.literal.wordBoundary` を固定値 `false` から真の bool に変え、
 `TokenSpec.caseInsensitive` に同名キーを足した（追加キー）。**backend は flag しか見ない**。
 
@@ -332,18 +334,19 @@ tinyexpression P4 は 2026-10 にこの綴りへ移った（`pkg:std/layout` の
   SHA-256 が lock と一致するときだけ使う。
 - resolve は `pkg:ID` を仮想パス `<grammar のディレクトリ>/.ubnf-packages/ID` に写す。IR の `sources[]` には
   この論理パスと entry 本文の SHA-256 が載る。
-- `@whitespace` の値（設定・規則注釈とも）には、**std/layout 1.0.0 と構文木が同一の import の
-  `SPACES_AND_COMMENTS` だけ**を書ける。これは javaStyle と同じ区切り集合（ASCII space と TAB〜CR、`//` から
+- `@whitespace` の値（設定・規則注釈とも）には宣言的 token を書ける（D-092）。
+  **std/layout 1.0.0 と構文木が同一の import の `SPACES_AND_COMMENTS` だけ**は
+  javaStyle と同じ区切り集合（ASCII space と TAB〜CR、`//` から
   CR / LF の直前まで、`/*` から最初の `*/` まで）なので、IR では javaStyle と同じ `effectiveDelimiterSet` になる。
   Classic も javaStyle の 11 文法・24 入力を明示 import に置き換えて同値を確かめている。
-- 失敗はすべて import の位置付きの `E-IMPORT-UNRESOLVED`（hint に理由）。std/layout 以外の token を profile に
-  する綴りは、従来どおり `E-WHITESPACE-GLOBAL-STYLE` / `E-WHITESPACE-RULE-STYLE`。
+- その他の宣言的 token は `Delimiter::Lexical { expression, label }` と必須 feature `lexicalTrivia` に落とす。
+  各照合は atomic で capture は私有。ゼロ幅成功では止まり、trivia 走査を無限反復しない。
+  未宣言名・宣言的でない token は位置付きの `E-WHITESPACE-GLOBAL-STYLE` / `E-WHITESPACE-RULE-STYLE`。
+- package 内の相対 import と推移依存も、artifact の `files` / `dependencies` と lock に基づいて解決する。
+  hash・ID・版・依存の不一致、外へのパスは import 位置の `E-IMPORT-UNRESOLVED`（hint に理由）。
 
 ### 範囲外
 
-- 任意の declarative token を空白 profile にすること（IR の delimiter は文字集合・行コメント・block comment の
-  3 種だけなので、一般の lexical program は表せない）。
-- package の中からの import（package 内の相対 import と推移的な package 依存）。std/layout はどちらも持たない。
 - `unlaxer deps resolve` に当たる取得コマンド。lock と cache は Classic の CLI で作る。
 ## 9. 綴りの正本は Classic — **実装済み（D-084）**
 

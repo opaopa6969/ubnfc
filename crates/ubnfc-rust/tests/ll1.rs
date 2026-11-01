@@ -107,7 +107,7 @@ fn generated_table_matches_the_reference_including_partial_failure_unicode_and_l
     let temp = Temp(PathBuf::from(
         String::from_utf8(output.stdout).unwrap().trim(),
     ));
-    let ir = grammar("@root Root ::= '(' [ Root ] ')' | D ;");
+    let ir = grammar("@root Root ::= D{0} ( '(' [ Root ] ')' | D ) ;");
     let json = compile("../../examples/json/json.ubnf", &|p| fs::read_to_string(p))
         .unwrap()
         .ir;
@@ -151,4 +151,18 @@ fn generated_table_matches_the_reference_including_partial_failure_unicode_and_l
         "{}",
         String::from_utf8_lossy(&output.stderr)
     );
+}
+
+#[test]
+fn zero_repetition_is_an_empty_ll1_instruction_without_a_child_edge() {
+    let ir = grammar("@root Root ::= D{0} '(' D ')' ;");
+    let zero = ir
+        .semantics
+        .expressions
+        .iter()
+        .find(|e| matches!(e.node, ExprNode::Repeat { max: Some(0), .. }))
+        .unwrap();
+    let row = ir.plan.ll1.iter().find(|s| s.expr_id == zero.id).unwrap();
+    assert!(matches!(row.operation, Ll1Operation::Empty {}));
+    assert!(root_covered(&ir));
 }
