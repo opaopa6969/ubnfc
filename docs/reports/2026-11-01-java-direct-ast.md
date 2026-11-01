@@ -250,3 +250,8 @@ master `1a51aad`（#43）の変更は設計文書2件だけで、実装・golden
 
 master `bdd87bd`（#51）のstax生成LSP・VSIXと検証をmergeで取り込んだ。変更はstax例と専用harnessテストに限られ、Java構築部・front・corpus・pin・共有scanner・P4/Rust/手書きの計測ソースは不変（最新 `after-long/source.sha256` 全件一致）。D-093を保持し、設計番号重複はない。
 追加の `cargo test -p ubnfc-harness --test stax_lsp --no-fail-fast` が **1件成功、0失敗（49.18秒）**。直接AST経路で生成したstax LSPのprotocol・recovery・TextMate goldenを確認した。対象不変のため最新corpus・A/B値を維持し、統合後HEADのnative / wasm CIを待つ。証拠は `after-stax4/`。
+
+## 増分再解析の設計統合後の確認
+
+master `06fa27b`（#18）の増分再解析設計・報告と独立した計測スクリプトをmergeで取り込んだ。masterのD-093を保持し、自分のAST決定行だけ **D-094** へ変更した。前節までのD-093は当時の番号で、現在のAST方針はD-094を参照する。
+実装・front・golden・corpus・pin・共有scannerを含む最新計測ソースのSHAは全件一致し、追加スクリプトの `bash -n` も通過。ASTの意味論・性能の対象変更はないため最新corpusとA/B値を維持する。設計番号の重複とmaster行の欠落がないことを確認した。証拠は `after-reparse/`。統合後HEADのCIを確認してmergeする。
