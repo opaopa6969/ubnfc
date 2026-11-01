@@ -22,9 +22,10 @@ public final class Registry {
             Map.entry("CodeStartParser", scanner(Kind.START)),
             Map.entry("org.unlaxer.tinyexpression.parser.javalang.CodeEndParser", scanner(Kind.END)),
             Map.entry("CodeEndParser", scanner(Kind.END)),
+            Map.entry("org.unlaxer.tinyexpression.parser.javalang.LongCodeBlockParser", scanner(Kind.LONG)),
             Map.entry("oracle.ExternalCursorParser", scanner(Kind.EXTERNAL)));
     }
-    private enum Kind { DOUBLE, SINGLE, STRING, START, END, EXTERNAL }
+    private enum Kind { DOUBLE, SINGLE, STRING, START, END, LONG, EXTERNAL }
     private static TokenScanner scanner(Kind kind) {
         return (input, state) -> new Scan(input, state).run(kind);
     }
@@ -97,6 +98,42 @@ public final class Registry {
             else if (cp() >= 0) return fail("end of line");
             return true;
         }
+        boolean longFence() {
+            int start = p;
+            if (!scanLongFence()) {
+                p = start;
+                return fail("long code block");
+            }
+            return true;
+        }
+        boolean scanLongFence() {
+            // tinyexpression c736c2c6: LongCodeFence.scan / LongCodeBlockParser.getToken。
+            // 幅が一致する単独行だけで閉じ、本文の文字列・コメントは解釈しない。
+            if (state.invertMatch() || !(p == 0 || input.startsWith(p - 1, "\r") || input.startsWith(p - 1, "\n")))
+                return false;
+            int start = p;
+            while (cp() == '`') p++;
+            int width = p - start;
+            if (width < 4 || !identifier() || !word(":") || !identifier()) return false;
+            while (cp() == '.') { p++; if (!identifier()) return false; }
+            if (cp() != '\r' && cp() != '\n') return false;
+            if (cp() == '\r') p++;
+            if (cp() == '\n') p++;
+            while (cp() >= 0) {
+                if ((input.startsWith(p - 1, "\r") || input.startsWith(p - 1, "\n")) && cp() == '`') {
+                    int close = p;
+                    while (cp() == '`') p++;
+                    if (p - close == width && (cp() < 0 || cp() == '\r' || cp() == '\n')) {
+                        // mapper の値は strip 後、capture 原文と cursor は改行を含む。
+                        valueEnd = p;
+                        if (cp() == '\r') p++;
+                        if (cp() == '\n') p++;
+                        return true;
+                    }
+                } else p += Character.charCount(cp());
+            }
+            return false;
+        }
         ScanResult run(Kind kind) {
             // ChainInterface.java:17 は reset=false、ChoiceInterface.java:28-29 は begin で reset を参照。
             if (kind == Kind.STRING && state.mode() == Mode.matchOnly && state.resetMatchedWithConsumed())
@@ -109,6 +146,7 @@ public final class Registry {
                 case STRING -> quoted(cp() == '"' ? '"' : '\'');
                 case START -> fence(true);
                 case END -> fence(false);
+                case LONG -> longFence();
                 // corpus/oracle/tools/ExternalCursorParser.java:8-10: 😀 消費 + x の MatchOnly。
                 case EXTERNAL -> word("😀");
             };
