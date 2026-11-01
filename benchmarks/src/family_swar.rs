@@ -115,6 +115,8 @@ fn main() {
                 let ms = start.elapsed().as_secs_f64()*1e3/iterations as f64;
                 let load = std::fs::read_to_string("/proc/loadavg").unwrap().split_whitespace().take(3).collect::<Vec<_>>().join("/");
                 println!("{name},{},{},{iterations},{round},{ms:.6},{load}",text.len(),["before", "after"][v]);
+                let uptime = std::process::Command::new("uptime").output().expect("uptime");
+                eprintln!("# {name} {} round={round}: {}", ["before", "after"][v], String::from_utf8_lossy(&uptime.stdout).trim());
             }
         }
     }

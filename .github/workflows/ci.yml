@@ -114,3 +114,11 @@ jobs:
       # If a run still goes red only on driver_timeout, rerun the failed job once.
       - name: cargo test --workspace
         run: cargo test --workspace --no-fail-fast
+
+      # 既定の scalar は上の workspace 検査で確認し、opt-in の SWAR も
+      # 同じ生成検査・固定 seed の scan on/off 差分を通す（issue #31）。
+      - name: opt-in SWAR の生成と境界差分を検証
+        run: |
+          cargo build -j 8 --bin ubnfc-rust --features ubnfc-rust/swar
+          cargo test -j 8 -p ubnfc-rust --features swar --test scan
+          cargo test -j 8 -p ubnfc-fuzz --test swar_scan

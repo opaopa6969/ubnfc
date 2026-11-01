@@ -1,0 +1,30 @@
+==1== Callgrind, a call-graph generating cache profiler
+==1== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==1== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==1== Command: /home/opa/work/.wt/ubnfc-perf-31/target/perf31-original-7jQhlk/callgrind/target/release/scan-attribution before /home/opa/work/.wt/ubnfc-perf-31/target/perf31-original-7jQhlk/inputs/json-1m.json 10
+==1== 
+--1-- warning: L3 cache found, using its data for the LL simulation.
+==1== For interactive control, run 'callgrind_control -h'.
+==1== 
+==1== Events    : Ir Dr Dw I1mr D1mr D1mw ILmr DLmr DLmw Bc Bcm Bi Bim
+==1== Collected : 1954153786 516144934 368449156 218628 314270 15129 803 15695 1474 302391001 7147751 23069091 26557
+==1== 
+==1== I   refs:      1,954,153,786
+==1== I1  misses:          218,628
+==1== LLi misses:              803
+==1== I1  miss rate:          0.01%
+==1== LLi miss rate:          0.00%
+==1== 
+==1== D   refs:        884,594,090  (516,144,934 rd + 368,449,156 wr)
+==1== D1  misses:          329,399  (    314,270 rd +      15,129 wr)
+==1== LLd misses:           17,169  (     15,695 rd +       1,474 wr)
+==1== D1  miss rate:           0.0% (        0.1%   +         0.0%  )
+==1== LLd miss rate:           0.0% (        0.0%   +         0.0%  )
+==1== 
+==1== LL refs:             548,027  (    532,898 rd +      15,129 wr)
+==1== LL misses:            17,972  (     16,498 rd +       1,474 wr)
+==1== LL miss rate:            0.0% (        0.0%   +         0.0%  )
+==1== 
+==1== Branches:        325,460,092  (302,391,001 cond +  23,069,091 ind)
+==1== Mispredicts:       7,174,308  (  7,147,751 cond +      26,557 ind)
+==1== Mispred rate:            2.2% (        2.4%     +         0.1%   )
