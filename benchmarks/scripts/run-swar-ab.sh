@@ -34,7 +34,7 @@ prepare() {
   # 2. IR（共通）と生成物。
   mkdir -p "$work/ir"
   "$work/target-after/release/ubnfc" ir --grammar "$ubnfc/examples/json/json.ubnf" --out "$work/ir/json.ir.json"
-  cp "$ubnfc/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json" "$work/ir/p4.ir.json"
+  cp "$ubnfc/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json" "$work/ir/p4.ir.json"
   cp "$ubnfc/ir/fixtures/unlaxer-dsl__src__test__resources__associative__Operators.ubnf.ir.json" "$work/ir/ops.ir.json"
   for side in before after; do
     local gen=$work/target-$([ "$side" = before ] && echo base || echo after)/release/ubnfc-rust
