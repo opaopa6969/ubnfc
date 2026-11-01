@@ -107,7 +107,10 @@ CI と同じ sibling 配置を作って同じ pin の `cargo test -p ubnfc-harne
 
 その後 `origin/master`（`763eb5c`）を merge で取り込み、D-083 を保持して
 D-086〜D-088 の番号に衝突がないことを確認した。取り込み後も LSP 15テストが成功し、
-小文法から再生成した IR が同梱 IR と byte 一致した。統合後の head も PR の CI で検査する。
+小文法から再生成した IR が同梱 IR と byte 一致した。
+CI の native job（[run 41255946676](https://github.com/opaopa6969/ubnfc/actions/runs/41255946676/job/124699007057)）も成功した。
+最終統合時には stax 段階2 / Classic 構文対応を含む master（`65a9edd`）も merge し、
+D-084 を保持して D-086〜D-088 と併存させ、小文法の再生成 IR の byte 一致も再確認した。
 最終結果は PR の Checks と issue #1 の完了コメントに記録し、CI 成功を merge の条件にする。
 
 ## 7. 未着手と理由

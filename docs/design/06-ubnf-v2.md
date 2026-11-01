@@ -345,6 +345,47 @@ tinyexpression P4 は 2026-10 にこの綴りへ移った（`pkg:std/layout` の
   3 種だけなので、一般の lexical program は表せない）。
 - package の中からの import（package 内の相対 import と推移的な package 依存）。std/layout はどちらも持たない。
 - `unlaxer deps resolve` に当たる取得コマンド。lock と cache は Classic の CLI で作る。
+## 9. 綴りの正本は Classic — **実装済み（D-084）**
+
+2026-10-23 に所有者が決めた方針: **UBNF の綴りは Classic（unlaxer-parser）を正本とする。**
+ubnfc の front は Classic の綴りを受け付ける。ubnfc 独自の綴り（`Name<args>`、D-043）は当面互換のために残し、
+非推奨にするかどうかは別の issue で決める。同じ文法ファイルを両方のエンジンに通せることが目的である。
+
+### 受け付ける綴りと、IR に落とせないもの
+
+| Classic の綴り | ubnfc の扱い | 根拠・検査 |
+|---|---|---|
+| 引数付き規則 `F(p1, …, pn) ::= body ;` と呼び出し `F(e1, …, en)`（#701） | 受理し、`<...>` の雛形と同じくその場で展開する。版の門（`@ubnf: 2`）は掛けない | 隣接した `F(` が呼び出しになるのは同じ grammar ブロックに定義がある名前だけ。`F (x) ::=`・`F()`・末尾 `,`・引数位置の literal は構文エラー。Classic の受理例 10 文法・26 入力で受理と AST が一致（`crates/ubnfc-rust/tests/classic_parameterized.rs`） |
+| 値渡しの引数 `F(=p) ::=`（#704） | 構文は受理し、Classic と同じく `CAPTURE_SCOPE(CAPTURE(F(=p), a) … body')` に展開して、呼び出しの位置で `E-OWNED-CAPTURE-UNSUPPORTED` | IR に owned capture が無い |
+| 規則の中の `CAPTURE(name, e)` / `SAME_AS(name)` / `CAPTURE_SCOPE(e)` | その位置で `E-OWNED-CAPTURE-UNSUPPORTED` | 同上 |
+| 規則の中の `COMMIT(e[, 'msg'])` / `LABEL(l, e)` / `CATCH(e, alt {, l})`（#700） | その位置で `E-CUT-UNSUPPORTED` | IR に cut が無い。取り除くと受理する言語が変わることがある |
+| `@autoCommit`（#702） | 受理し、何も挿入しない | FIRST 集合で「受理と AST を変えない」位置にだけ `COMMIT` を入れる注釈なので、変わるのは失敗の位置と診断だけ。Classic が解析の対象外の文法で注釈を取り除くのと同じ |
+
+関数形式（`CAPTURE(` など）になるのは、名前と `(` が隣接しているときだけである。`CAPTURE ('x')` のように空白・
+コメントを挟めば、従来どおり参照と group になる（Classic と同じ）。宣言的 token の中の `CAPTURE` / `SAME_AS`
+（D-061）は従来どおり使える。
+
+### `@backref` / `@sameText` と同じ IR になる範囲
+
+**ない。** 規則の中の `SAME_AS(name)` は照合であり、一致しなければその選択肢が失敗して後戻りする。一方
+`@sameText(name=…)` は解析が成功した後の検査で、不一致は ERROR の診断になる（入力は受理される）。受理する
+言語が違うので、どちらかをもう一方に書き換えることはしない。`@symbolRef` / `@backref` は scope の表引きで、
+これも照合ではない。
+
+### Classic の検査コードとの対応
+
+Classic の綴りで書いた雛形には、Classic と同じ `E-PARAM-*` を使う（`<...>` の雛形は従来の `E-TEMPLATE-*`）。
+Classic の拒否例 25 件のうち 20 件を、ubnfc も同じ趣旨の code で拒否する（一覧は
+`classic_parameterized.rs` の `expected_rejection`）。違いは次のとおり。
+
+- `E-PARAM-NAME-COLLISION`: ubnfc は instance に名前を付けない（その場で展開する）ので起こらない。
+- `E-PARAM-UNDEFINED`（定義本体の未定義の名前）: 展開の後の resolve が `E-RULE-UNDEFINED` として拒否する。
+- `E-PARAM-RESERVED`: 構文エラー（本文の先頭が `E-PARAM-RESERVED:`）。
+- 展開の後の左再帰（CE-002 など）: ubnfc は脱糖できる左再帰（D-039）以外を `E-LOWER-D016` で拒否する。
+- `E-PARAM-LIMIT`: 要素数の上限 65536 は Classic と同じ。入れ子は、展開した本体の入れ子を構文解析と同じ
+  数え方で 128 までとする。Classic は instance の本体と呼び出しの連鎖も数えるので、Classic が拒否する 4 例
+  （平らな連鎖 128 段など）を ubnfc は受理する。この上限は `<...>` の雛形にも当たる（それまでは上限が無く、
+  指数的に成長する文法で展開が止まらず、深い入れ子でスタックが溢れた）。
 
 ## 実施順
 
@@ -357,3 +398,4 @@ tinyexpression P4 は 2026-10 にこの綴りへ移った（`pkg:std/layout` の
 7. ~~§7 code point クラス~~ **完了（D-063）**
 8. §6 の残り（P4 / P6 / P7-4）
 9. ~~§8 package の import~~ **完了（D-083）**
+10. ~~§9 Classic の綴り~~ **完了（D-084）**

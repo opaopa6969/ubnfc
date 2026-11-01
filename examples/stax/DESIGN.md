@@ -473,3 +473,34 @@ stax では `@recovery` を 1 つも使わない。エディタ向けの誤り�
 既存の `crosscheck.sh` / `crosscheck.py` と JSON Lines driver を harness の通常テストから呼び、
 20 本すべてで非空の Program AST を要求し、型・値・span を両 backend 間で比較する。
 `validate --strict` と 2 本の canonical AST golden も同じ経路で検証する。
+
+## 10. 段階 2 の仕様由来 corpus（#12）
+
+[`corpus/cases.json`](corpus/cases.json) は各入力と仕様の根拠、構文の受理/拒否、
+型検査とは分けた期待分類、注目する AST の型・値・ソース断片、警告の名前と位置を持つ。
+[`scripts/corpus.py`](scripts/corpus.py) はサンプルと同じ生成パーサを使い、両 backend の
+canonical AST 全体の一致と、手書きした仕様期待値をそれぞれ検査する。
+AST の span は半開区間で末尾 trivia を含む。ソース断片から Unicode code point 位置を算出する。
+同じ断片が複数あるときは先頭、`occurrence: last` なら最後を明示的に選ぶ。
+全受理入力で非空 Program AST、全拒否入力で syntax 診断を要求する。
+
+予約語/primitive/型の接頭辞、符号付き数値・小数・指数とフィールドの境界、長い比較記号、
+空/入れ子 quotation と引用型、前方/自己参照、局所束縛の宣言順と漏れ、
+同名フィールド、明示 import、コメント/文字列を扱う。型エラーを構文拒否として数えない。
+`cargo test -p ubnfc-harness --test stax` を通じ native CI で必須実行する。
+
+最小の非対応例:
+
+- `: >> ( Int -- Int ) dup ;` は現行 stax の IDENT 制約により拒否。
+  固定された記号列を受理するだけなら文法の変更で済むため、front の欠落とは扱わない。
+- `42 constant answer` は現行の固定した最上位構文では拒否。
+  `constant` の意味に応じ `answer` を宣言として解析するには語彙依存の契約（§5.4 X3）が要る。
+  単なる一般の語列の受理とは異なる。front は変更せず #16 で評価する。
+- `struct Box <T> { value: T }` と `type Option = | Some Int | None ;` は将来の stax 構文。
+  ジェネリクス/引数付き和の未実装であり、現行 UBNF がその固定構文を書けないという根拠にはしない。
+- `use "absent.stax" ( exported ) ; : main ( -- ) exported ;` は名前が解決しても
+  ファイルが存在するとは限らない。実在検査は #14、ファイル間の定義ジャンプは #15 の境界である。
+- 同名 struct フィールドは名前の存在だけ検査される。型から所有宣言を決めるのは #14 の責任。
+
+判断: 本段階では文法と front/backend を変更せず、既存契約を仕様から検証する。
+これにより並行作業への干渉を避け、検証追加だけの PR として可逆性を保つ。
