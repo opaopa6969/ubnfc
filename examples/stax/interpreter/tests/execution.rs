@@ -353,3 +353,20 @@ fn quote_assignment_cannot_weaken_the_receivers_effect() {
         "7",
     );
 }
+
+#[test]
+fn newly_bound_quote_locals_keep_one_type_across_the_shared_word_frame() {
+    let source = r#": main ( -- ) [ 1 let x [ x ] ] call let f [ "bad" let x ] call f call int_to_str print ;"#;
+    let files = Files::new(&[("main.stax", source)]);
+    failure(files.run(&["--check"]), "型不一致");
+    success(
+        run(
+            r#": main ( -- ) [ 1 let x [ x ] ] call let f [ 2 let x ] call f call int_to_str print ;"#,
+        ),
+        "2",
+    );
+    failure(
+        run(r#": main ( -- ) [ 1 let x ] drop "bad" let x ;"#),
+        "型不一致",
+    );
+}

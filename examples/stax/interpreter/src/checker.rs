@@ -15,6 +15,7 @@ struct Checker {
     bindings: Vec<Option<Ty>>,
     ranks: Vec<u8>,
     work: Cell<usize>,
+    binding_types: BTreeMap<String, Ty>,
     numeric: Vec<Ty>,
     equality: Vec<Ty>,
     steps: usize,
@@ -249,11 +250,16 @@ impl Checker {
                             return fail("macro 名は局所束縛で隠せない");
                         }
                         let t = self.pop(s)?;
-                        if let Some(old) = s.locals.get(&n.g_name) {
-                            self.assign(&t, old)?;
+                        // 引用ごとの可視性と、同一呼出し枠での単型性を分ける。
+                        let declared = if let Some(old) = self.binding_types.get(&n.g_name).cloned()
+                        {
+                            self.assign(&t, &old)?;
+                            old
                         } else {
-                            s.locals.insert(n.g_name.clone(), t);
-                        }
+                            self.binding_types.insert(n.g_name.clone(), t.clone());
+                            t
+                        };
+                        s.locals.insert(n.g_name.clone(), declared);
                     }
                     g_StaxAST_2e_FieldGet(n) => {
                         let t = self.pop(s)?;
