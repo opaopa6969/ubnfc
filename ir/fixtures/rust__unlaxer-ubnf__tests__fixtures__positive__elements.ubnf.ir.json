@@ -1217,6 +1217,293 @@
       }
     ],
     "lexical": [],
+    "ll1": [
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:86:97:body/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            1
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:87:96:body/0/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 97,
+                  "start": 97
+                }
+              ],
+              "target": 2
+            },
+            {
+              "ranges": [
+                {
+                  "end": 98,
+                  "start": 98
+                }
+              ],
+              "target": 3
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:87:90:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:93:96:body/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "b",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:101:108:body/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 5
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:103:106:body/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "c",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:112:119:body/2/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 7
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:114:117:body/2/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            8
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:114:117:body/2/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "d",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:127:132:body/3/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 1,
+          "target": 10
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:127:131:body/3/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:136:141:body/4/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": 1,
+          "min": 0,
+          "target": 12
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:136:140:body/4/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:145:150:body/5/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 14
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:145:149:body/5/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:154:161:body/6/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": 2,
+          "min": 2,
+          "target": 16
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:154:158:body/6/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:165:174:body/7/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": 3,
+          "min": 1,
+          "target": 18
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:165:169:body/7/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:182:190:body/8/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 2,
+          "target": 20
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:182:186:body/8/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/0",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            22,
+            23
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:198:body/9/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/1",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 24
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:194:204:body/9/separated/lower/separated/2",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            25,
+            22
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:201:204:body/9/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:219:223:body/10/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 27
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:269:272:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            28
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/elements.ubnf:269:272:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "root": false
+      }
+    ],
     "memo": {
       "entries": [
         {

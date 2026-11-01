@@ -1852,6 +1852,14 @@
             "optimized"
           ]
         },
+        "ll1": {
+          "description": "排他的 FIRST 上界で選択を確定する認識表。旧 IR は省略可能。",
+          "items": {
+            "$ref": "#/$defs/Ll1State"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
         "scans": {
           "description": "D-072 の一括走査。既存キーを変えない追加で、空のときはキーごと出力しない。",
           "items": {
@@ -3554,6 +3562,213 @@
         "from",
         "ranges",
         "to"
+      ],
+      "type": "object"
+    },
+    "Ll1Operation": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "sequence"
+            },
+            "targets": {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "targets"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "choice"
+            },
+            "transitions": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "ranges": {
+                    "items": {
+                      "$ref": "#/$defs/CharRange"
+                    },
+                    "type": "array"
+                  },
+                  "target": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ranges",
+                  "target"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "transitions"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "optional"
+            },
+            "target": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "target"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "repeat"
+            },
+            "max": {
+              "minimum": 0,
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "min": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "target": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "target",
+            "min",
+            "max"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "call"
+            },
+            "target": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "target"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "literal"
+            },
+            "value": {
+              "type": "string"
+            },
+            "wordBoundary": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "value",
+            "wordBoundary"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "class"
+            },
+            "ranges": {
+              "items": {
+                "$ref": "#/$defs/CharRange"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "ranges"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "eof"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "empty"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Ll1State": {
+      "additionalProperties": false,
+      "properties": {
+        "exprId": {
+          "$ref": "#/$defs/ExprId"
+        },
+        "operation": {
+          "$ref": "#/$defs/Ll1Operation"
+        },
+        "root": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "exprId",
+        "root",
+        "operation"
       ],
       "type": "object"
     }

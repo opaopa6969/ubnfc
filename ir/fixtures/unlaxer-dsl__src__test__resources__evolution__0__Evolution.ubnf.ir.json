@@ -616,6 +616,17 @@
         "tokenId": "Evolution::NUMBER"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/evolution/0/Evolution.ubnf:225:228:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

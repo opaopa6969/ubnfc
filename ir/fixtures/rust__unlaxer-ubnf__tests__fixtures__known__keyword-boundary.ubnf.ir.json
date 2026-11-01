@@ -122,6 +122,27 @@
   "plan": {
     "choices": [],
     "lexical": [],
+    "ll1": [
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/keyword-boundary.ubnf:33:36:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            1
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/known/keyword-boundary.ubnf:33:36:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "root": false
+      }
+    ],
     "memo": {
       "entries": [
         {

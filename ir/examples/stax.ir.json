@@ -9847,6 +9847,541 @@
         "tokenId": "Stax::EOF"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:1701:1706:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "use",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:1720:1723:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:1746:1749:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:1750:1753:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:3700:3703:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "|",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:3724:3727:body/2/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "|",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4364:4400:body/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            7
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4366:4398:body/0/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 73,
+                  "start": 73
+                }
+              ],
+              "target": 8
+            },
+            {
+              "ranges": [
+                {
+                  "end": 70,
+                  "start": 70
+                }
+              ],
+              "target": 9
+            },
+            {
+              "ranges": [
+                {
+                  "end": 66,
+                  "start": 66
+                }
+              ],
+              "target": 10
+            },
+            {
+              "ranges": [
+                {
+                  "end": 83,
+                  "start": 83
+                }
+              ],
+              "target": 11
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4366:4371:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Int",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4374:4381:body/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Float",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4384:4390:body/0/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Bool",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4393:4398:body/0/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Str",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4653:4656:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4677:4681:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "--",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4703:4706:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4956:4959:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:4980:4984:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "--",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:5006:5009:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:5556:5559:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:5575:5578:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:5849:5869:body/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            21
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:5851:5867:body/0/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 116,
+                  "start": 116
+                }
+              ],
+              "target": 22
+            },
+            {
+              "ranges": [
+                {
+                  "end": 102,
+                  "start": 102
+                }
+              ],
+              "target": 23
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:5851:5857:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "true",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:5860:5867:body/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "false",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6892:6897:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "dup",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6900:6906:body/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "drop",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6909:6915:body/0/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "swap",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6918:6924:body/0/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "over",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6927:6932:body/0/0/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "rot",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6935:6940:body/0/0/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "nip",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6947:6952:body/0/0/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "and",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6955:6959:body/0/0/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "or",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6962:6967:body/0/0/8/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "not",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6974:6979:body/0/0/9/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "mod",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6982:6987:body/0/0/10/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "neg",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:6994:7002:body/0/0/11/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "concat",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7005:7014:body/0/0/12/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "str_len",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7017:7029:body/0/0/13/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "int_to_str",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7036:7043:body/0/0/14/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "print",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7046:7055:body/0/0/15/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "newline",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7062:7068:body/0/0/16/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "call",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7071:7079:body/0/0/17/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "choose",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7082:7091:body/0/0/18/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "recurse",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7098:7102:body/0/0/19/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "<>",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7105:7109:body/0/0/20/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "<=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7112:7116:body/0/0/21/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ">=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7119:7122:body/0/0/22/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "<",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7125:7128:body/0/0/23/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ">",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7131:7134:body/0/0/24/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7141:7144:body/0/0/25/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7147:7150:body/0/0/26/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7153:7156:body/0/0/27/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stax/stax.ubnf:7159:7162:body/0/0/28/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {
