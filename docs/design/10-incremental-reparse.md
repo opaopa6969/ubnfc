@@ -15,7 +15,7 @@
 `ubnfc-lsp/src/main/resources/lsp-templates/LanguageServerImpl.java` は
 `TextDocumentSyncKind.Full` を広告し、`didOpen` / `didChange` ごとに全文を
 `Analysis.of()` で解析して `DocumentStore` に差し替える。
-同じ本文の definition / references / document symbols / hover などは解析結果を共有する。
+同じ本文の definition / references / document symbols / hover / rename / folding range などは解析結果を共有する。
 
 `Analysis` は primary と scoped を分ける。primary の認識経路が診断を要するときは
 生成パーサが D-023 の診断モードで再解析する。さらに失敗文書では主失敗位置までを別入力として
@@ -31,55 +31,57 @@ JSON-RPC の転送、エディタの描画、completion、遅延 lexical は含�
 
 ### 現在の master の再測定
 
-測定元は `66a18ff8e71839b893d2edabdad14825f8436dae`（2026-11-01 測定時点の master）。
-生成器・IR fixture・LSP テンプレートをこの commit から使い、実装を変更せずにサーバ jar を生成した。
+測定元は `1a51aadc9d13370743a72e83b047c0bc181aa964`（2026-11-01 の master、LSP 段階 5 の取り込み後）。
+この commit の Java/LSP 生成器と固定 P4 IR を使い、実装を変更せずサーバ jar を再生成した。
 外部 fixture の取得は不要で、リポジトリ内の IR と P4 fixture だけで再現できる。
 
 環境は AMD Ryzen 9 7950X（32 logical CPU）、WSL2 Linux x86_64、Oracle JDK 21.0.9、
 Maven 3.9.9。`taskset -c 28` で JVM を固定し、独立 JVM で 2 試行した。
-共有マシンは高負荷で、計測中の 1 分 load average の取得値は例として 46.8 / 58.6。
-初回には追加の Maven 検証も並走した。CPU 固定は他作業からの隔離ではなく、下表はこの負荷下での実測値である。
-cp は Unicode code point、KB は UTF-8 の 1,000 bytes。各時間欄は **試行 1 / 試行 2**、単位 ms。
+各 JVM の開始時と測定終了時の 1 分 load average は 14.71 / 21.13 / 19.46。共有マシン上では他の CI 等が並走し、
+CPU 固定は他作業からの隔離ではない。各時間欄は **試行 1 / 試行 2**、単位 ms。
+cp は Unicode code point、KB は UTF-8 の 1,000 bytes。
 
 | 入力 | UTF-8 bytes | cp | 診断数 | min | p50 | p90 |
 |---|---:|---:|---:|---:|---:|---:|
-| complex | 332 | 325 | 1 | 0.303 / 0.297 | 1.313 / 1.308 | 6.453 / 8.795 |
-| 合成x3 | 975 | 975 | 3 | 0.463 / 0.515 | 1.187 / 1.295 | 7.709 / 8.925 |
-| 合成x32 | 10,427 | 10,427 | 32 | 5.756 / 3.898 | 9.039 / 8.131 | 14.683 / 11.320 |
-| complex-x64 | 20,923 | 20,923 | 64 | 10.105 / 12.959 | 15.873 / 16.593 | 26.035 / 19.643 |
-| 合成x128 | 42,205 | 42,205 | 128 | 28.719 / 29.933 | 39.535 / 40.442 | 58.702 / 52.578 |
-| 合成x256 | 85,469 | 85,469 | 256 | 60.612 / 64.923 | 80.463 / 117.049 | 99.142 / 383.772 |
-| 合成x320 | 107,101 | 107,101 | 320 | 85.652 / 78.794 | 108.114 / 101.669 | 143.459 / 129.800 |
-| 合成x512 | 171,997 | 171,997 | 512 | 136.700 / 93.839 | 188.456 / 166.899 | 258.676 / 197.679 |
+| complex | 332 | 325 | 1 | 0.236 / 0.232 | 0.410 / 0.360 | 5.562 / 4.686 |
+| 合成x3 | 975 | 975 | 3 | 0.369 / 0.408 | 0.722 / 0.777 | 5.389 / 6.371 |
+| 合成x32 | 10,427 | 10,427 | 32 | 2.068 / 2.260 | 2.795 / 3.964 | 5.309 / 8.340 |
+| complex-x64 | 20,923 | 20,923 | 64 | 4.305 / 6.462 | 7.459 / 11.026 | 9.599 / 14.286 |
+| 合成x128 | 42,205 | 42,205 | 128 | 14.916 / 16.781 | 18.086 / 21.938 | 22.648 / 30.574 |
+| 合成x256 | 85,469 | 85,469 | 256 | 33.006 / 37.703 | 41.064 / 55.235 | 51.179 / 74.825 |
+| 合成x320 | 107,101 | 107,101 | 320 | 48.621 / 49.404 | 76.847 / 71.792 | 100.805 / 99.878 |
+| 合成x512 | 171,997 | 171,997 | 512 | 72.942 / 75.187 | 102.954 / 103.345 | 138.216 / 134.099 |
 
-計測出力は [CSV](../reports/2026-11-01-lsp-reparse.csv) に保存した。
-**20,923 bytes は p50 15.873 / 16.593 ms で 16 ms の境界にあり、42,205 bytes では両試行の最小値も 28.719 / 29.933 ms となり、明確に予算を超えた**。
-約 107 KB と約 172 KB も超過する。試した点の間の厳密な交差長や、他の文法・入力・負荷での閾値はこの測定から断定しない。
+今回試した点では、両試行の p50 が 16 ms を超える最小の長さは
+**42,205 bytes（18.086 / 21.938 ms）**だった。
+両試行の最小値も超える最小の点は **85,469 bytes（33.006 / 37.703 ms）**。
+点の間の厳密な交差長や、他の文法・入力・負荷での閾値は断定しない。
 同じ文書の全文を毎回解析する費用であり、まだ増分編集の速さを測ったものではない。
-診断数や構文形も長さとともに増えているので、すべての長文に対する比例係数とは解釈しない。
+診断数や構文形も長さとともに増えるため、すべての長文に対する比例係数とは解釈しない。
+
+初回測定と今回の全出力を [CSV](../reports/2026-11-01-lsp-reparse.csv) に測定元 commit ごとに保存した。
+初回は master `66a18ff8e71839b893d2edabdad14825f8436dae` で、load average の取得値は 46.8 / 58.6、追加の Maven 検証も一部並走していた。
+そのときの p50 は 975 bytes が 1.187 / 1.295 ms、10,427 bytes が 9.039 / 8.131 ms、
+20,923 bytes が 15.873 / 16.593 ms、42,205 bytes が 39.535 / 40.442 ms、
+107,101 bytes が 108.114 / 101.669 ms だった。測定元と負荷が異なるので速度比を最適化効果とは解釈しない。
 
 D-060 の旧測定は 325 cp の p50 **0.452 ms**、5,179 cp **2.856 ms**、
 20,923 cp **15.583 ms**（[段階 1 報告](../reports/2026-09-24-lsp-vsix-stage1.md) §6）。
 段階 3 では同じ順に **0.964 / 1.950 / 12.045 ms** だった。
-旧値は当時の生成器と負荷に対する記録として残し、新旧の比を最適化効果とは解釈しない。
+旧値は当時の生成器と負荷に対する記録として残す。
 
-### master 取り込み後の計測対象の同一性
+### 固定 P4 IR と測定元の区別
 
-その後の master `49d1a9d` では、P4 の旧文法を
+master `49d1a9d` 以降、`scripts/build-vsix.sh p4` は
 [`ir/frozen/tinyexpression-p4-f86ce8a5.ir.json`](../../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json)
-へ固定し、`scripts/build-vsix.sh p4` もそれを読むようになった。
-測定時の IR と現在の固定 IR は `plan`（Rust の LL(1) 認識表等の計画）だけが異なり、
+を読む。初回測定の IR とは `plan`（Rust の LL(1) 認識表等の計画）だけが異なり、
 `semantics` / `analysis` / `sources` 等は一致する。
-Java 生成器・runtime template・LSP 生成器の実装は測定時点から無変更である。
-
-同じ生成器で、測定時の IR と取り込み後の固定 IR から Java parser と LSP を生成し、
-**相対パス集合と全 32 ファイルの本文が byte 一致することを確認した**。
-Java は `--no-emit-driver`、package は `org.unlaxer.ubnfc.examples.p4.generated`、
-LSP は `--emit-lsp`、package は `org.unlaxer.ubnfc.examples.p4.lsp` とし、
-language id / scanner / server name は `scripts/build-vsix.sh p4` と同じ値で比較した。
-相対パス・NUL・本文・NUL をパス順に連結した SHA-256 は両者とも
+49d1a9d 時点では生成器も無変更で、両 IR から生成した Java parser/LSP の全 32 ファイルが byte 一致した。
+相対パス・NUL・本文・NUL をパス順に連結した SHA-256 は
 `88f32d0015bdb389b412b31b61c116301cebafc8b1bb7a615e2790347d08cc76`。
-したがって、上表は取り込み後も同じ P4 Java/LSP コードの計測値として参照できる。
+
+その後 LSP 段階 5 の rename / folding range が master に加わったため、上表は更新版をビルドして測り直した値である。
+旧版との生成物一致を現在版の根拠には使わない。入力は引き続き固定された旧 P4 文法であり、
 新しい外部文法そのものの性能を測ったという意味ではない。
 
 ### 再現手順
@@ -94,6 +96,7 @@ CPU=28 WARMUP=200 SAMPLES=201 scripts/measure-lsp-reparse.sh
 
 `MAVEN_FLAGS=''` は未取得の Maven 依存を取得するため。既定の `-o` は依存取得済みの場合に限る。
 `CPU` を省略すれば固定しない。番号は実行環境で利用可能な CPU を選ぶ。
+この計測コマンドを 2 回実行し、独立 JVM の 2 試行を採った。
 スクリプトは `mktemp -d` 内で計測用 Java をコンパイルし、終了時に一時ファイルを消す。
 `-Xms512m -Xmx2g -Xss16m`、入力ごとに 200 warmup、201 回の個別計測で min / p50 / p90 を出す。
 p50 はソート後の中央、p90 は nearest-rank。入力生成・事前の構文成功確認・UTF-8 長算出は計時外。
@@ -195,7 +198,7 @@ capture/lexical の観測は別の投影を持ち、木を残すだけでは診�
 | AST・capture・lexical | canonical AST、node/value span、catalog、採用枝、値、公開 occurrence/parent ID・完了順を完全一致。Java のオブジェクトアドレスだけは比較しない |
 | 診断 | kind、主 offset/length、farthest、expected/hints、deepest/rulePath、recovery/resource/mapping を配列順も含め全文と一致 |
 | scope・回復 | 宣言・参照・解決先・イベントと順序・警告・深さ、回復領域・同期点・skipped span・capture 投影を一致 |
-| LSP | diagnostics の code/message/severity/range、definition、references、symbols、hover、completion、semantic tokens の公開 JSON を一致 |
+| LSP | diagnostics の code/message/severity/range、definition、references、symbols、hover、completion、semantic tokens、rename の WorkspaceEdit、folding range の公開 JSON を一致 |
 | 版と寿命 | didClose/reopen、別 URI、古い Analysis の読取り、遅延 lexical の要求順、失敗から成功への復帰で結果が混ざらないこと |
 
 既存 `crates/ubnfc-fuzz` の文法・入力生成と縮小の方法、P4/UBNF の
