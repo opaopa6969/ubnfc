@@ -1,6 +1,6 @@
 # Java 直接 AST 構築の計測・検証記録
 
-性能・corpusの最終判定は **`after-long/`** を使用する。#44統合後の1,492行全一致（双方Pass1,328 / Fail3 / IR44）、共有Rust scanner更新後の全3セッションを収録。#33は解消済み、残るcorpus差分は#46。`post-ll1/` はLONG追加前の履歴。`final/` はleaf修正後・LL(1)統合前の履歴。pin更新直後の corpus 検証は **`integrated-pin/`**（1,492行の観測一致、双方 Pass1,315 / Fail3、既存差分は #46 / #33）を参照する。leaf fallback の参照経路に旧実装にはない空配列確保があったため、修正後に corpus と全 A/B を取り直した。初期の全記録はこのディレクトリ直下に保持し、[当時の報告](initial-report.md) とともに予備記録とする。初期の field 配列計数はこの余分な配列を含むため、最終 constructor 計数を参照する。
+SWAR追加前の性能・最新corpus検証は **`after-long/`** を使用する。#44統合後の1,492行全一致（双方Pass1,328 / Fail3 / IR44）、共有Rust scanner更新後の全3セッションを収録。#33は解消済み、残るcorpus差分は#46。`post-ll1/` はLONG追加前の履歴。`final/` はleaf修正後・LL(1)統合前の履歴。pin更新直後の corpus 検証は **`integrated-pin/`**（1,492行の観測一致、双方 Pass1,315 / Fail3、既存差分は #46 / #33）を参照する。leaf fallback の参照経路に旧実装にはない空配列確保があったため、修正後に corpus と全 A/B を取り直した。初期の全記録はこのディレクトリ直下に保持し、[当時の報告](initial-report.md) とともに予備記録とする。初期の field 配列計数はこの余分な配列を含むため、最終 constructor 計数を参照する。
 
 `final/` の `s1`〜`s3` は P4 → Rust → Operators を各1回行う同じ番号のセッション。7 run の中央値・全 sample・load と `uptime` を記録する。`source.sha256` は計測した AST 構築ソース、`ir.sha256` は正式な固定 IR。`corpus-comparison.json` は現行 front で旧生成器と修正版を再比較した結果（1,444行差分0）、`corpus.md` は修正版の出力。
 
@@ -23,3 +23,5 @@
 `after-long/reference-layout.json` はfield offsetとVM alignmentによる旧/参照Recipeの56 B一致。`source.sha256` は共有scanner・P4 lib/build等の依存も含む。`toolchains.txt` は今回の環境。基準生成器は最新master49d1a9dのarchiveからbuildした。
 
 `after-stage5/` はLSP15件とAST/計測ソース不変、`after-stax3/` はstax実行系12件とRust比較binaryのSHA一致を記録する。これらの統合で既存のcorpus/A/B対象は変更していない。
+
+性能の最新判定は **`after-swar/`**。master #32 / 12e5e80を統合し、Rust比較binaryを更新して同条件の交互3セッションを再測定した。Java・front・pin・harness不変なので、corpusはafter-longの全1,492行一致を維持する。
