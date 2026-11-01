@@ -1,0 +1,14 @@
+// 外部の固定 snapshot を replay 可能な効果で供給する例。@memoSafeToken は付けない。
+grammar Vocabulary {
+  @ubnf: 2
+  @whitespace: javaStyle
+  token SEED = extern 'boundary.ImmutableVocabulary'
+  token IDENT = IDENTIFIER
+  token EOF = END_OF_INPUT
+  @root
+  @scopeTree(mode=lexical)
+  Root ::= ( Seeded | Word ) EOF;
+  Seeded ::= SEED '+' Word;
+  @symbolRef(name=name)
+  Word ::= IDENT @name;
+}

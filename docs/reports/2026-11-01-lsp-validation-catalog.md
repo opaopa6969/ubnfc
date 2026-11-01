@@ -223,6 +223,10 @@ PR #58 の `--declaration-context` は宣言を補完する用途の生成時設
 今回の外部カタログを照合する実行時の `catalogs` 設定と併存する。
 D-094 / D-095 の衝突はない。統合後の LSP 全19テストと stax protocol / 回復検査が成功した。
 
+stax 段階5の境界検証（PR #53、master `ef4b238`）も取り込んだ。
+追加は stax の境界 fixture / 検査と説明であり、LSP / Java 生成部や protocol 検査への追加差分はない。
+D-094 / D-095 を維持し、最新 master を含む head の CI で全体を検証する。
+
 ## 引継ぎと取り消し
 
 #25 では `LanguageServerImpl` の capability と要求ハンドラを追加する際、

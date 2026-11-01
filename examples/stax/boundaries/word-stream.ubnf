@@ -1,0 +1,13 @@
+// Forth の意味を実装せず、一般の語列として受理できることだけを示す。
+grammar WordStream {
+  @ubnf: 2
+  @whitespace: javaStyle
+  // この再現は1行・ASCII空白区切り。Forth の完全な字句規則とは扱わない。
+  token WORD ::= NEGATION(' ')+;
+  token EOF = END_OF_INPUT
+  @root
+  @mapping(Words, params=[items])
+  Source ::= { Word @items } EOF;
+  @mapping(Word, params=[text])
+  Word ::= WORD @text;
+}
