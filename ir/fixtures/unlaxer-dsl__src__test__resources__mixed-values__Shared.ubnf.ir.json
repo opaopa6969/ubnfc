@@ -868,6 +868,224 @@
       }
     ],
     "lexical": [],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:79:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 102,
+                  "start": 102
+                }
+              ],
+              "target": 1
+            },
+            {
+              "ranges": [
+                {
+                  "end": 115,
+                  "start": 115
+                }
+              ],
+              "target": 2
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:65:70:body/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 3
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:73:79:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 6
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:135:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            4,
+            5
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:125:128:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "f",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:129:135:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 9
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:201:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            7,
+            8
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:189:192:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "s",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:193:201:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 14
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:255:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 97,
+                  "start": 97
+                }
+              ],
+              "target": 10
+            },
+            {
+              "ranges": [
+                {
+                  "end": 128512,
+                  "start": 128512
+                }
+              ],
+              "target": 11
+            },
+            {
+              "ranges": [
+                {
+                  "end": 120,
+                  "start": 120
+                }
+              ],
+              "target": 12
+            },
+            {
+              "ranges": [
+                {
+                  "end": 121,
+                  "start": 121
+                }
+              ],
+              "target": 13
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:223:226:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:229:232:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "😀",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:235:243:body/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 14
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:246:255:body/3/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 16
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            15
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:303:306:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            17
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Shared.ubnf:367:370:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "y",
+          "wordBoundary": false
+        },
+        "root": false
+      }
+    ],
     "memo": {
       "entries": [
         {

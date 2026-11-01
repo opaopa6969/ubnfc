@@ -433,6 +433,17 @@
         "tokenId": "Power::NUMBER"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/right-associative/Power.ubnf:211:214:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "^",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

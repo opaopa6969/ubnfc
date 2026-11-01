@@ -1,0 +1,11 @@
+既存の左再帰テスト: 3 passed / 0 failed
+既存の生成 golden テスト: 3 passed / 0 failed
+LL(1) 表の判定・実行テスト: 5 passed / 0 failed
+式 ID による部分表の照合、不一致の表の無効化に修正した後も、JSON の生成ソースは全ファイル byte 一致。
+計測経路に変更はない。
+
+2026-11-01 PR #40 統合（master 669c560）
+IR 27 件（固定 P4 を含む）は plan.ll1 以外 origin/master と byte 一致。
+JSON 生成ソース 14 ファイル、固定 P4 の全生成ソースは pin 統合前後で byte 一致。
+最新 P4: 388/1089 式、5/130 規則本体。固定 P4: 386/1043 式、5/124 規則本体。
+新 pin で pipeline_golden 10、LL(1) 5、P4 再生成 1、selfhost 再生成・固定点 2 テストが成功。

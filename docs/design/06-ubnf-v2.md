@@ -368,7 +368,7 @@ ubnfc の front は Classic の綴りを受け付ける。ubnfc 独自の綴り�
 
 ### Classic と違うところ（意図した差）
 
-- **`REGEX('pattern')` を受理し続ける（D-086）。** Classic は REGEX を廃止し（unlaxer-parser #612、開発版は
+- **`REGEX('pattern')` を受理し続ける（D-092）。** Classic は REGEX を廃止し（unlaxer-parser #612、開発版は
   `E-REGEX-RETIRED`、移行は宣言的 token）、仕様（`ubnf-syntax.md`「旧 `REGEX('pattern')` — 廃止」）からも
   受理の記述を消した。ubnfc は既存の文法を壊さないよう、v1 / v2 とも従来どおり正則部分集合の DFA
   （`analysis/regex.rs`）と Java fallback で受理する。綴りの正本は Classic なので、新しい文法では宣言的 token

@@ -133,6 +133,7 @@ pub(crate) fn tiny(path: &Path, fence: bool) -> Result<CorpusFile, LoadError> {
                 "org.example.tinyfence",
                 "token START = org.unlaxer.tinyexpression.parser.javalang.CodeStartParser\n\
                  token CLOSE = org.unlaxer.tinyexpression.parser.javalang.CodeEndParser\n\
+                 token LONG = org.unlaxer.tinyexpression.parser.javalang.LongCodeBlockParser\n\
                  token BODY = UNTIL('```')\ntoken CHAR = ANY\n",
                 if params.is_empty() {
                     "@mapping(Fence)".into()

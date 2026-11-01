@@ -1,4 +1,113 @@
 use super::*;
+
+#[test]
+fn long_fences_keep_width_line_boundaries_raw_span_and_atomic_failure() {
+    let class = "org.unlaxer.tinyexpression.parser.javalang.LongCodeBlockParser";
+    let prefix = "😀\n";
+    for nl in ["\n", "\r\n", "\r"] {
+        let block = format!(
+            "`````rust:p.Demo{nl}// 😀 ```{nl}````{nl}``````{nl}````` {nl}x `````{nl}`````{nl}"
+        );
+        for match_only in [false, true] {
+            for reset in [false, true] {
+                let (c, m) = if match_only {
+                    (0, prefix.len())
+                } else {
+                    (prefix.len(), 0)
+                };
+                let end = prefix.len() + block.len();
+                let r = scan(
+                    class,
+                    &format!("{prefix}{block}tail"),
+                    c,
+                    m,
+                    match_only,
+                    false,
+                    reset,
+                );
+                assert!(r.diagnostics.is_empty());
+                result(
+                    r,
+                    true,
+                    if match_only { c } else { end },
+                    end,
+                    [prefix.len(), end - nl.len()],
+                );
+                let r = scan(
+                    class,
+                    &format!("{prefix}{block}"),
+                    c,
+                    m,
+                    match_only,
+                    true,
+                    reset,
+                );
+                assert_eq!(
+                    r.diagnostics
+                        .iter()
+                        .map(|d| (d.offset, d.expected))
+                        .collect::<Vec<_>>(),
+                    [(prefix.len(), "long code block")]
+                );
+                result(r, false, c, m, [0, 0]);
+                for bad in [
+                    format!("````rust:A{nl}"),
+                    format!("```rust:A{nl}```"),
+                    format!("````型:A{nl}````"),
+                    format!("````rust:A.{nl}````"),
+                    "````rust:A".into(),
+                    format!("````rust:A{nl}`````{nl}"),
+                    format!("````rust:A{nl}```` {nl}"),
+                    format!("````rust:A{nl}x ````{nl}"),
+                ] {
+                    let r = scan(
+                        class,
+                        &format!("{prefix}{bad}"),
+                        c,
+                        m,
+                        match_only,
+                        false,
+                        reset,
+                    );
+                    assert_eq!(
+                        r.diagnostics
+                            .iter()
+                            .map(|d| (d.offset, d.expected))
+                            .collect::<Vec<_>>(),
+                        [(prefix.len(), "long code block")]
+                    );
+                    result(r, false, c, m, [0, 0]);
+                }
+            }
+        }
+    }
+    let empty = "````rust:A\n````";
+    result(
+        scan(class, empty, 0, 0, false, false, true),
+        true,
+        empty.len(),
+        empty.len(),
+        [0, empty.len()],
+    );
+    result(
+        scan(class, &format!("x{empty}"), 1, 0, false, false, true),
+        false,
+        1,
+        0,
+        [0, 0],
+    );
+    // host 文字列の途中でも同幅の単独行で終わる。
+    let opaque = "````rust:A\n\"string\n````\n";
+    result(
+        scan(class, &format!("{opaque}rest\""), 0, 0, false, false, true),
+        true,
+        opaque.len(),
+        opaque.len(),
+        [0, opaque.len() - 1],
+    );
+    assert!(Registry::new(&[("T", "other.LongCodeBlockParser")]).is_err());
+}
+
 fn scan(
     class: &'static str,
     input: &str,

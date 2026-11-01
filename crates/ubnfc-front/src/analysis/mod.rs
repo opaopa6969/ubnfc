@@ -11,6 +11,7 @@ mod cursor;
 mod facts;
 mod follow;
 mod graph;
+mod ll1;
 mod operators;
 mod planning;
 mod reachability;
@@ -276,6 +277,7 @@ pub fn analyze_with_choice_issues(
         operators,
         memo,
         scans: scan::plans(&cx),
+        ll1: ll1::plans(&cx),
         lexical: semantics.tokens.iter().map(regex::plan).collect(),
         trivia_cache: TriviaCache {
             enabled: false,
