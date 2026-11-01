@@ -51,9 +51,16 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
         Some(value) => Some(value.boolean()?),
         None => None,
     };
+    let ll1_ab = match options.get("ll1") {
+        Some(value) => Some(value.boolean()?),
+        None => None,
+    };
     let scan = scan_ab.unwrap_or(true);
-    let diagnostics = scan_ab.is_none();
-    let lexical = lexical && scan_ab.is_none();
+    // 各最適化を独立に比較する。scan A/B の両側では LL(1) を外す。
+    let ll1 = ll1_ab.unwrap_or(scan_ab.is_none());
+    let ab = scan_ab.is_some() || ll1_ab.is_some();
+    let diagnostics = !ab;
+    let lexical = lexical && !ab;
     let observations = request.get("observations").unwrap_or(&Json::Null);
     let family = observations.get("family").and_then(|v| v.string().ok());
     let max_depth = match options.get("maxDepth") {
@@ -74,6 +81,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             lexical_cache,
             max_depth,
             scan,
+            ll1,
             // driver は成功時も hints（投機的失敗）を出すので、診断を明示的に要求する。
             diagnostics,
             // prefix parse の出現は `lexical` のときだけ観測に出る。`lexical: true` が
@@ -92,6 +100,7 @@ fn execute(request: &Json) -> Result<Json, &'static str> {
             lexical_cache,
             max_depth,
             scan,
+            ll1,
             diagnostics,
             // AST が出たときは必ず texts / nodes / valueSpans を出すので value span を要求する。
             // 出現表は `lexical` のときだけ観測に出る（D-035。`lexical: true` が要求を含む）。

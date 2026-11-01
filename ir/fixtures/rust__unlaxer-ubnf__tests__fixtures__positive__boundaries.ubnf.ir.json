@@ -1241,6 +1241,144 @@
         "tokenId": "Boundaries::T"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:125:126:body/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 1114111,
+              "start": 0
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:132:133:body/2/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 1114111,
+              "start": 0
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:166:173:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "token",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:176:185:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "grammar",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:188:194:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "root",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:197:199:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:285:290:body/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 12
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:298:303:body/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 12
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:304:313:body/3/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            9
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:305:312:body/3/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            10,
+            11
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:305:308:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:309:312:body/3/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "b",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:327:330:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            13
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:rust/unlaxer-ubnf/tests/fixtures/positive/boundaries.ubnf:327:330:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "e",
+          "wordBoundary": false
+        },
+        "root": false
+      }
+    ],
     "memo": {
       "entries": [
         {

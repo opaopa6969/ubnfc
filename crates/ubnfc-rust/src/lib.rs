@@ -7,6 +7,7 @@ mod evaluator;
 mod expressions;
 mod factor;
 mod lexical;
+mod ll1;
 mod mapping;
 mod metadata;
 mod predict;

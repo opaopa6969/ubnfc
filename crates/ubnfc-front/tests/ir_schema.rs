@@ -237,6 +237,8 @@ fn every_definition_and_inline_enum_round_trips_and_rejects_invalid_structure() 
         JsonValue,
         LexicalExpression,
         LexicalPlan,
+        Ll1Operation,
+        Ll1State,
         MayStart,
         MemoEntry,
         MemoPlan,

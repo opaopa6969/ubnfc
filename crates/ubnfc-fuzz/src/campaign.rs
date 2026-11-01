@@ -122,6 +122,9 @@ pub struct Summary {
     /// そのうち Java backend（D-080）で比べた回数。
     pub java_scan_comparisons: usize,
     pub scan_findings: Vec<ScanFinding>,
+    /// Rust の LL(1) 表駆動 on/off 比較。
+    pub ll1_comparisons: usize,
+    pub ll1_findings: Vec<ScanFinding>,
     pub elapsed_seconds: f64,
 }
 
@@ -481,6 +484,26 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
             }
         }
     }
+    let ll1_on = engine.run_ll1(&built, &texts, true);
+    let ll1_off = engine.run_ll1(&built, &texts, false);
+    {
+        let mut summary = shared.summary.lock().expect("summary");
+        summary.ll1_comparisons += texts.len();
+        for ((text, on), off) in texts.iter().zip(ll1_on).zip(ll1_off) {
+            let difference = differences(&on, &off);
+            if !difference.is_empty() {
+                summary.ll1_findings.push(ScanFinding {
+                    backend: "rust",
+                    seed,
+                    grammar: grammar.render(),
+                    input: text.clone(),
+                    differences: difference,
+                    on,
+                    off,
+                });
+            }
+        }
+    }
     let mut new_findings = Vec::new();
     for (text, (java, rust)) in texts.iter().zip(pairs) {
         // 再試行を使い切ってもなお driver_timeout の比較は「未観測」であって、
@@ -665,6 +688,8 @@ pub fn markdown(summary: &Summary) -> String {
             summary.unobserved_timeouts,
         ),
         ("最小化済みの所見", summary.findings.len()),
+        ("LL(1) on/off 比較", summary.ll1_comparisons),
+        ("LL(1) on/off 差分", summary.ll1_findings.len()),
     ] {
         let _ = writeln!(out, "| {label} | {value} |");
     }

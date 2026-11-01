@@ -112,6 +112,12 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
             .map(|f| (f.backend, f.seed, f.input.clone(), f.differences.clone()))
             .collect::<Vec<_>>()
     );
+    assert!(summary.ll1_comparisons >= 10);
+    assert!(
+        summary.ll1_findings.is_empty(),
+        "表駆動 on/off の差分: {:#?}",
+        summary.ll1_findings
+    );
     let unknown: Vec<_> = summary
         .findings
         .iter()
@@ -173,6 +179,12 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
             .iter()
             .map(|f| (f.backend, f.seed, f.input.clone(), f.differences.clone()))
             .collect::<Vec<_>>()
+    );
+    assert!(summary.ll1_comparisons >= 10);
+    assert!(
+        summary.ll1_findings.is_empty(),
+        "表駆動 on/off の差分: {:#?}",
+        summary.ll1_findings
     );
     let unknown: Vec<_> = summary
         .findings
@@ -239,6 +251,12 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
             .iter()
             .map(|f| (f.backend, f.seed, f.input.clone(), f.differences.clone()))
             .collect::<Vec<_>>()
+    );
+    assert!(summary.ll1_comparisons >= 10);
+    assert!(
+        summary.ll1_findings.is_empty(),
+        "表駆動 on/off の差分: {:#?}",
+        summary.ll1_findings
     );
     let unknown: Vec<_> = summary
         .findings
@@ -310,6 +328,12 @@ fn e_v2_code_point_class_tokens_agree_across_backends() {
                 .iter()
                 .map(|f| (f.input.clone(), f.differences.clone()))
                 .collect::<Vec<_>>()
+        );
+        assert!(summary.ll1_comparisons >= 10);
+        assert!(
+            summary.ll1_findings.is_empty(),
+            "表駆動 on/off の差分: {:#?}",
+            summary.ll1_findings
         );
         let unknown: Vec<_> = summary
             .findings
@@ -468,6 +492,12 @@ fn g_direct_token_captures_agree_across_backends() {
             summary.driver_errors
         );
         accepted += summary.accepted_all;
+        assert!(summary.ll1_comparisons >= 10);
+        assert!(
+            summary.ll1_findings.is_empty(),
+            "表駆動 on/off の差分: {:#?}",
+            summary.ll1_findings
+        );
         let unknown: Vec<_> = summary
             .findings
             .iter()
@@ -537,6 +567,12 @@ fn h_text_group_captures_agree_across_backends() {
             summary.driver_errors
         );
         accepted += summary.accepted_all;
+        assert!(summary.ll1_comparisons >= 10);
+        assert!(
+            summary.ll1_findings.is_empty(),
+            "表駆動 on/off の差分: {:#?}",
+            summary.ll1_findings
+        );
         let unknown: Vec<_> = summary
             .findings
             .iter()

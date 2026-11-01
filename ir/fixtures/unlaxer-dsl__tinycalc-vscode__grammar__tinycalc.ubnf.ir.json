@@ -2334,6 +2334,152 @@
         "tokenId": "TinyCalc::IDENTIFIER"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:471:476:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "var",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:479:489:body/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "variable",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:530:535:body/2/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "set",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:560:563:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:875:884:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 43,
+                  "start": 43
+                }
+              ],
+              "target": 5
+            },
+            {
+              "ranges": [
+                {
+                  "end": 45,
+                  "start": 45
+                }
+              ],
+              "target": 6
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:875:878:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:881:884:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:900:909:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 42,
+                  "start": 42
+                }
+              ],
+              "target": 8
+            },
+            {
+              "ranges": [
+                {
+                  "end": 47,
+                  "start": 47
+                }
+              ],
+              "target": 9
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:900:903:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:906:909:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:935:938:body/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/tinycalc-vscode/grammar/tinycalc.ubnf:950:953:body/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {
