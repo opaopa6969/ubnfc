@@ -8,7 +8,8 @@ PR #44 の LONG 対応（`49d1a9d`）を取り込み、tiny-code-fence の 13 �
 `opaopa6969/ubnfc` の issue #46 に #45 の受け入れ条件を含める。
 `fix/issue-46-new-pin-corpus` の専用 worktree で実装し、共有の main 作業ツリーは編集していない。
 変更前は `origin/master` の `cd0516f`。全 corpus の実測対象は実装 `42e7a1b` と #44 を統合した `4211d9b`。
-その後 #30 の master `3152d57` を `ed1cef7` で取り込んだ。front・Rust / Java generator・harness のソースは実測対象から無変更で、この時点では D 行の番号衝突はなかった。`scripts/external-pins.env` は変更していない。
+並行 PR #30 / #42 / #43 を含む master `1a51aad` を最終的に `6028d1e` で取り込んだ。
+front・Rust / Java generator・harness のソースは実測対象から無変更。`scripts/external-pins.env` は変更していない。
 
 | 外部 fixture | pin |
 |---|---|
@@ -222,9 +223,10 @@ Rust / Cargo は stable 1.99.1（rustc `58cf8f9c3`）、Java は Oracle 21.0.9+7
 
 Java の `mvn -q -o test`、oracle の `verify.py`、Rust の生成物 semantics（all-features / clippy `-D warnings` を含む）、
 LL(1) と参照経路の比較、自己ホスト parity・再生成・固定点、既存 IR / 診断 golden を個別にも確認した。
-`cargo test --workspace --no-fail-fast` 全体は exit 0（599 tests 成功、失敗 0、ignored 0）。P4 の全 byte 再生成も通過した。
+#42 取り込み前の `cargo test --workspace --no-fail-fast` 全体は exit 0（599 tests 成功、失敗 0、ignored 0）。P4 の全 byte 再生成も通過した。
 #30 の取り込み後は追加された CI 手順と同じ
 `mvn -q -o -Plsp -pl ubnfc-lsp -am test "-Dtest=org.unlaxer.ubnfc.lsp.*Test" -Dsurefire.failIfNoSpecifiedTests=false`
-も exit 0。workspace 全体・LSP / DAP・wasm32 は下記 CI の最終 head でも検証する。
+も exit 0（15 tests）。#42 統合後の `cargo test -p ubnfc-stax --all-features` も 12 tests 成功。
+新しい stax crate を含む workspace 全体・LSP / DAP・wasm32 は下記 CI の最終 head でも検証する。
 
 [PR #47 の CI](https://github.com/opaopa6969/ubnfc/pull/47/checks)で最終 head の native / wasm32 検証を確認する。
