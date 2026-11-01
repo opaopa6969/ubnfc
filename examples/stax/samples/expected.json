@@ -1,7 +1,7 @@
 {
   "about": [
     "20 本のサンプルの期待判定。parse は stage 1 で検証できる（両 backend で同じであること）。",
-    "typecheck は stage 3（Rust インタプリタのスタック効果検査）の期待値で、いまは実行されない。",
+    "typecheck / stdout / errorContains は段階3の Rust 実行コマンドで照合する期待値。",
     "scopeWarnings は @scopeTree + @declares + @symbolRef が文法だけから出す未定義参照の一覧で、",
     "受理・AST には影響しない（構文は成功したまま WARNING が別に出る）。"
   ],
