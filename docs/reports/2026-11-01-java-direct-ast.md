@@ -108,7 +108,7 @@ AMD Ryzen 9 7950X / WSL2、core 28 固定、単一 thread。Java は `-Xms512m -
 
 ## master #40 統合後の最終検証
 
-`669c560` の pin / Classic front 対応を merge で取り込み、他担当の D-085 と自分の D-087 を保持した。
+`669c560` の pin / Classic front 対応を merge で取り込み、他担当の D-085 と自分の D-092 を保持した。
 Java AST source、生成 Rust、P4 benchmark IR の byte は不変。
 P4 の旧 golden は `ir/frozen/tinyexpression-p4-f86ce8a5.ir.json` へ移ったため、再現スクリプトの manifest もそのパスへ合わせた。
 SHA-256 は計測時と同じ `173e218d671a25184aba2342aa1579c1a4f33e160629384a89a7208ed7cf8868`。
@@ -140,7 +140,7 @@ corpus 終了後、同じ60秒上限の当該1件を再実行し **10.856秒で�
 
 ## LL(1) 統合後・LONG 追加前の検証・A/B（履歴）
 
-master `cd0516f`（#41、LL(1) 認識表）を merge し、D-091 と D-087 を保持した。Java AST 構築コードは不変。生成 Rust の API / runtime と固定 IR の任意 `plan.ll1` メタデータが増えたため、比較相手を更新した全3セッションを同じ条件で取り直した。先行の数値を消さず、判定にはこの節の最新値を使う。
+master `cd0516f`（#41、LL(1) 認識表）を merge し、D-091 と D-092 を保持した。Java AST 構築コードは不変。生成 Rust の API / runtime と固定 IR の任意 `plan.ll1` メタデータが増えたため、比較相手を更新した全3セッションを同じ条件で取り直した。先行の数値を消さず、判定にはこの節の最新値を使う。
 Java は LL(1) 表を使用しない。P4 / Operators / Power の生成 Java は統合前と byte 一致。IR の差は追加メタデータで、Java の認識・AST の実装や入力を変更していない。Rust P4 の生成 `ll1_scan` は `None` を返す（表被覆0）。Rust は追加後の既定 `ParseOptions` のまま rebuild し、参照経路への無効化で条件を変えていない。
 corpus 全260 build を統合前 front（669c560）と統合後 front（cd0516f）で読み、成功234 build は `plan.ll1` 以外の IR が完全一致した。旧生成器・修正版それぞれで、統合前後のIRから生成した全Javaファイルの byte / ファイル集合も一致。残る26 build の IR エラーは同一だった。これにより新pinの1,492行で実走確認済みの観測結果が保たれることを確認した。旧生成器と修正版のコード同士が同一という意味ではなく、各生成器に対する統合前後の不変を検証している。
 再実行範囲・全buildの照合・各生成器/front SHAは `post-ll1/java-projection-proof.json`、計測ソースは `post-ll1/source.sha256`。native / wasm の最新 HEAD CI も merge 前に確認する。
@@ -229,3 +229,10 @@ core28、同じJVM・warmup・反復数・交互順序、各cell7 run × 3セッ
 時間差は認識対照の変動と併記し、先行値との差を追加のJava最適化の効果とは主張しない。Recipe / field配列のconstructor計数はASTコード不変のため前掲と同じ。未達と残るcapture / Match費用は#35、corpusの既存差分は#46で追跡する。
 
 x64 S3は直接/旧が1.270、認識対照比は0.874で、対照が速い一方ASTは遅い。この値を安定した改善の根拠にはしない。遅延projectionがcapture graphの寿命・走査量・cache局所性へ与える影響も仮説として残し、#35でCPU自己時間・live graph・GC時間を割当byteと突き合わせる。現時点で保持graphやGCが原因だとは断定しない。
+
+## LSP段階5統合後の確認
+
+master `3152d57`（#30）をmergeで統合した。LSP側がD-087を使用したため、**自分のAST決定行だけD-092へ振り直した**。LSPのD-086 / D-087 / D-088とD-091は変更していない。
+AST構築部・P4/Rust/手書き/共有scannerを含む全計測ソースはSHA-256で不変、front・harness・pin・IR schemaも直前HEADと不変のため、全件同値と最新A/Bの結果を維持する。新しいLSP機能と直接AST経路の組み合わせはLSPテストと最新HEADのCIで確認する。
+
+CIと同じ `mvn -q -Plsp -pl ubnfc-lsp -am test "-Dtest=org.unlaxer.ubnfc.lsp.*Test" -Dsurefire.failIfNoSpecifiedTests=false` で **LSP15件すべて通過**。最初の単体module実行は古いMavenローカル依存のIrReaderを使い、declarativeTokens未対応の2 errorになったため、現在のbackendを使うreactor構成で再確認した。LSPのコード・期待値は変更していない。検証記録は `after-stage5/`。
