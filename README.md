@@ -358,6 +358,8 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   `--declaration-context Rule=context[,context]`（反復指定可）で宣言規則の補完種別を明示できる。
   参照側の `@catalog(context=…)` と照合し、scope event 上で可視の宣言だけを提案する。
   これは LSP 専用設定で、parser の名前空間や AST の契約は変えない。
+  生成 LSP は採用済み回復領域を成功時も Error 診断へ写し、全文失敗時は
+  単独で成功する正常前半の索引を部分解析として保持する（[stax の検証と制約](examples/stax/vscode/README.md)）。
   生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**capability は
   診断 / definition / references / document symbols / semantic tokens / completion / hover と
   TextMate 文法の生成**（[`docs/reports/2026-09-24-lsp-vsix-stage3.md`](docs/reports/2026-09-24-lsp-vsix-stage3.md) §1 の表）。

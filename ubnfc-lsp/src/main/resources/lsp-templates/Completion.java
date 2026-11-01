@@ -54,16 +54,6 @@ public final class Completion {
         var expectation = expectation(analysis.text(), start, scanners);
         var contexts = expectation.contexts();
         var symbols = analysis.symbols();
-        // 不完全な文書でも補完には、単独で成功する正常前半の宣言を利用できる。
-        if (analysis.scoped() == null) {
-            for (int cut = start; cut > 0; cut--) {
-                var prefixAnalysis = Analysis.of(analysis.uri(), Analysis.head(analysis.text(), cut), scanners);
-                if (prefixAnalysis.primary() != null && prefixAnalysis.primary().ok()) {
-                    symbols = prefixAnalysis.symbols();
-                    break;
-                }
-            }
-        }
         for (String label : expectation.labels()) {
             String literal = literal(label);
             if (literal == null || literal.isBlank() || Meta.TRIVIA_LITERALS.contains(literal)) continue;
@@ -78,7 +68,7 @@ public final class Completion {
             if (!matches) continue;
             var item = new CompletionItem(declaration.name());
             item.setKind(CompletionItemKind.Variable);
-            item.setDetail("宣言済みの記号");
+            item.setDetail(analysis.scopedIsPrefix() ? "宣言済みの記号（正常前半の部分索引）" : "宣言済みの記号");
             items.put(declaration.name(), item);
         }
         var out = new ArrayList<CompletionItem>();

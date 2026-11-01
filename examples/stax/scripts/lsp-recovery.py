@@ -27,7 +27,8 @@ public class RecoveryProbe {
     out.put("declarations", r.scope().declarations().stream().map(d -> d.name()).toList());
     out.put("recoveries", r.recoveries().stream().map(v -> Map.of(
       "rule", v.ruleId(), "span", List.of(v.span().start(), v.span().end()),
-      "skippedSpan", List.of(v.skippedSpan().start(), v.skippedSpan().end()))).toList());
+      "skippedSpan", List.of(v.skippedSpan().start(), v.skippedSpan().end()),
+      "mode", v.mode(), "expected", v.diagnostic().expected())).toList());
     out.put("diagnosticKind", r.diagnostics().kind());
     System.out.println(Json.write(out));
   }
@@ -96,13 +97,78 @@ def main():
                     initialized = client.request('initialize', {'capabilities': {}}, timeout=30)
                     assert initialized and 'error' not in initialized
                     client.notify('initialized', {})
-                    uri = 'file:///recovery.stax'
-                    client.notify('textDocument/didOpen', {'textDocument': {'uri': uri,
-                                  'languageId': 'stax', 'version': 1, 'text': cases['broken-then-word']}})
-                    message = client.wait(lambda m: m.get('method') == 'textDocument/publishDiagnostics', 30)
-                    assert message is not None
-                    report[variant]['lspDiagnostics'] = message['params']['diagnostics']
-                    assert report[variant]['lspDiagnostics'] == [], message
+                    def request(method, uri, pos):
+                        response = client.request('textDocument/' + method,
+                            {'textDocument': {'uri': uri}, 'position': pos}, timeout=30)
+                        assert response is not None and 'error' not in response, response
+                        return response['result']
+
+                    def opened(uri, text, version=1):
+                        if version == 1:
+                            client.notify('textDocument/didOpen', {'textDocument': {'uri': uri,
+                                'languageId': 'stax', 'version': version, 'text': text}})
+                        else:
+                            client.notify('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                                'contentChanges': [{'text': text}]})
+                        message = client.wait(lambda m: m.get('method') == 'textDocument/publishDiagnostics'
+                            and m['params']['uri'] == uri, 30)
+                        assert message is not None
+                        return message['params']
+
+                    recovery_cases = {
+                        'original': cases['broken-then-word'],
+                        'reference': cases['broken-then-word'] + ': use_after ( -- ) after ;\n',
+                        'unicode-multiple': ('/* 😀 */ : before ( -- ) ; : broken ( -- ) [ ; '
+                            ': after ( -- ) ; : use_after ( -- ) after ;\n'
+                            ': broken2 ( -- ) [ ;\n: last ( -- ) ;\n'),
+                    }
+                    lsp_report = {}
+                    for name, text in recovery_cases.items():
+                        path = work / ('lsp-' + name + '.stax')
+                        path.write_text(text)
+                        observed = json.loads(run('java', '-cp', classes, 'RecoveryProbe', path).stdout)
+                        assert observed['ok'] and observed['recoveries'], observed
+                        uri = 'file:///recovery-' + name + '.stax'
+                        published = opened(uri, text)
+                        diagnostics = published['diagnostics']
+                        assert len(diagnostics) == len(observed['recoveries']), published
+                        assert len(diagnostics) == (2 if name == 'unicode-multiple' else 1)
+                        for diagnostic, recovery in zip(diagnostics, observed['recoveries']):
+                            def at_cp(cp):
+                                return protocol.position(text[:cp] + '|', '|')
+                            expected_range = dict(zip(('start', 'end'), map(at_cp, recovery['span'])))
+                            skipped_range = dict(zip(('start', 'end'), map(at_cp, recovery['skippedSpan'])))
+                            assert diagnostic['severity'] == 1 and diagnostic['code'] == 'recovery', diagnostic
+                            assert diagnostic['range'] == expected_range
+                            assert diagnostic['relatedInformation'][0]['location'] == {'uri': uri, 'range': expected_range}
+                            data = diagnostic['data']
+                            assert data['origin'] == 'recovery' and data['ruleId'] == recovery['rule']
+                            assert data['expected'] == recovery['expected'] and data['expected']
+                            assert "']'" in data['expected']
+                            assert data['mode'] == recovery['mode'] and data['skippedRange'] == skipped_range
+                        target_pos = protocol.position(text, 'after', 2 if name != 'original' else 0, 1)
+                        targets = request('definition', uri, target_pos)
+                        assert len(targets) == 1 and targets[0]['uri'] == uri
+                        assert targets[0]['range']['start'] == protocol.position(text, 'after')
+                        # 壊れた定義を削り、同じ URI の全文修正で回復診断を消す。
+                        repaired = ': after ( -- ) ;\n: use_after ( -- ) after ;'
+                        fixed = opened(uri, repaired, version=2)
+                        assert fixed['diagnostics'] == [], fixed
+                        fixed_targets = request('definition', uri, protocol.position(repaired, 'after', 2, 1))
+                        assert fixed_targets and fixed_targets[0]['range']['start'] == protocol.position(repaired, 'after')
+                        # 修正で削除した before / last / broken の宣言が残らない。
+                        empty = opened(uri, '', version=3)
+                        assert empty['diagnostics'] == []
+                        assert request('definition', uri, target_pos) == []
+                        client.notify('textDocument/didClose', {'textDocument': {'uri': uri}})
+                        closed = client.wait(lambda m: m.get('method') == 'textDocument/publishDiagnostics'
+                            and m['params']['uri'] == uri, 30)
+                        assert closed and closed['params']['diagnostics'] == []
+                        assert request('definition', uri, target_pos) == []
+                        lsp_report[name] = {'parse': observed, 'published': published,
+                            'definition': targets, 'repaired': fixed, 'repairedDefinition': fixed_targets,
+                            'empty': empty, 'closed': closed['params']}
+                    report[variant]['lsp'] = lsp_report
                 finally:
                     client.close()
         original, word, top = (report[k] for k in ('original', 'word', 'top'))
@@ -121,7 +187,7 @@ def main():
             golden.write_text(encoded)
         else:
             assert encoded == golden.read_text(), '回復の実測 golden が変化した'
-        print('回復配置: 原文、WordDef の横取り、TopLevel の回復と後続宣言を確認')
+        print('回復配置: 原文、WordDef の横取り、TopLevel の全回復診断・UTF-16・後続宣言・修正と close を確認')
     finally:
         shutil.rmtree(work)
 
