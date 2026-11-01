@@ -1,0 +1,26 @@
+{
+  "information_for_contributors": ["ubnfc が Grammar IR から生成した TextMate 文法。手で編集しない。", "再生成: scripts/build-vsix.sh（ubnfc-lsp --emit-tmlanguage）"],
+  "name": "Stax",
+  "scopeName": "source.stax",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#numbers" },
+    { "include": "#keywords" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": { "patterns": [
+      { "name": "comment.line.stax", "match": "//.*$" },
+      { "name": "comment.block.stax", "begin": "/\\*", "end": "\\*/" }
+    ] },
+    "numbers": { "patterns": [
+      { "name": "constant.numeric.stax", "match": "\\b[0-9]+(?:\\.[0-9]+)?\\b" }
+    ] },
+    "keywords": { "patterns": [
+      { "name": "keyword.control.stax", "match": "\\b(?:Bool|Float|Int|Str|and|call|choose|concat|drop|dup|false|int_to_str|let|macro|mod|neg|newline|nip|not|or|over|print|recurse|rot|str_len|struct|swap|true|type|use)\\b" }
+    ] },
+    "operators": { "patterns": [
+      { "name": "keyword.operator.stax", "match": "(?:--|<=|<>|>=|!|\\(|\\)|\\*|\\+|-|\\.|/|:|;|<|=|>|\\[|\\]|\\{|\\||\\})" }
+    ] }
+  }
+}

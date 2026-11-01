@@ -1,0 +1,105 @@
+{
+  "original": {
+    "broken-then-word": {
+      "consumed": 0,
+      "declarations": [],
+      "diagnosticKind": "syntax",
+      "ok": false,
+      "recoveries": []
+    },
+    "choiceWarning": false,
+    "strictExit": 0,
+    "valid-struct": {
+      "consumed": 40,
+      "declarations": [
+        "x",
+        "Point",
+        "main"
+      ],
+      "diagnosticKind": "none",
+      "ok": true,
+      "recoveries": []
+    }
+  },
+  "top": {
+    "broken-then-word": {
+      "consumed": 37,
+      "declarations": [
+        "after"
+      ],
+      "diagnosticKind": "none",
+      "ok": true,
+      "recoveries": [
+        {
+          "rule": "Stax::TopLevel",
+          "skippedSpan": [
+            0,
+            18
+          ],
+          "span": [
+            0,
+            19
+          ]
+        }
+      ]
+    },
+    "choiceWarning": false,
+    "lspDiagnostics": [],
+    "strictExit": 0,
+    "valid-struct": {
+      "consumed": 40,
+      "declarations": [
+        "x",
+        "Point",
+        "main"
+      ],
+      "diagnosticKind": "none",
+      "ok": true,
+      "recoveries": []
+    }
+  },
+  "word": {
+    "broken-then-word": {
+      "consumed": 37,
+      "declarations": [
+        "after"
+      ],
+      "diagnosticKind": "none",
+      "ok": true,
+      "recoveries": [
+        {
+          "rule": "Stax::WordDef",
+          "skippedSpan": [
+            0,
+            18
+          ],
+          "span": [
+            0,
+            19
+          ]
+        }
+      ]
+    },
+    "choiceWarning": true,
+    "strictExit": 5,
+    "valid-struct": {
+      "consumed": 40,
+      "declarations": [],
+      "diagnosticKind": "none",
+      "ok": true,
+      "recoveries": [
+        {
+          "rule": "Stax::WordDef",
+          "skippedSpan": [
+            0,
+            38
+          ],
+          "span": [
+            0,
+            39
+          ]
+        }
+      ]
+    }
+  }
+}

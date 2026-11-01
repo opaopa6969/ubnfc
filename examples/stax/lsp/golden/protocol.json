@@ -1,0 +1,718 @@
+{
+  "after-close-definition": [],
+  "boundary-field-definition": [
+    {
+      "range": {
+        "end": {
+          "character": 12,
+          "line": 0
+        },
+        "start": {
+          "character": 11,
+          "line": 0
+        }
+      },
+      "uri": "fixture:///fields.stax"
+    },
+    {
+      "range": {
+        "end": {
+          "character": 12,
+          "line": 1
+        },
+        "start": {
+          "character": 11,
+          "line": 1
+        }
+      },
+      "uri": "fixture:///fields.stax"
+    }
+  ],
+  "boundary-field-diagnostics": [],
+  "boundary-outside-completion": [
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "!"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "*"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "+"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "-"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "."
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "/"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ";"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<>"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ">"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ">="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "["
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "]"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "and"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "call"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "choose"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "concat"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "drop"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "dup"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "false"
+    },
+    {
+      "detail": "宣言済みの記号",
+      "kind": 6,
+      "label": "first"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "int_to_str"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "let"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "mod"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "neg"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "newline"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "nip"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "not"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "or"
+    },
+    {
+      "detail": "宣言済みの記号",
+      "kind": 6,
+      "label": "outside"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "over"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "print"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "recurse"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "rot"
+    },
+    {
+      "detail": "宣言済みの記号",
+      "kind": 6,
+      "label": "second"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "str_len"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "swap"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "true"
+    },
+    {
+      "detail": "宣言済みの記号",
+      "kind": 6,
+      "label": "x"
+    }
+  ],
+  "boundary-shadow-definition": [
+    {
+      "range": {
+        "end": {
+          "character": 22,
+          "line": 0
+        },
+        "start": {
+          "character": 21,
+          "line": 0
+        }
+      },
+      "uri": "fixture:///shadow.stax"
+    },
+    {
+      "range": {
+        "end": {
+          "character": 23,
+          "line": 1
+        },
+        "start": {
+          "character": 22,
+          "line": 1
+        }
+      },
+      "uri": "fixture:///shadow.stax"
+    }
+  ],
+  "completion-body": [
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "!"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "*"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "+"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "-"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "."
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "/"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ";"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<>"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ">"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ">="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "["
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "]"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "and"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "call"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "choose"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "concat"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "drop"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "dup"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "false"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "int_to_str"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "let"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "mod"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "neg"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "newline"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "nip"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "not"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "or"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "over"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "print"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "recurse"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "rot"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "str_len"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "swap"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "true"
+    }
+  ],
+  "completion-field": [],
+  "completion-type": [
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "--"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Bool"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Float"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Int"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Str"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "["
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "]"
+    }
+  ],
+  "definition-field": [
+    {
+      "range": {
+        "end": {
+          "character": 16,
+          "line": 2
+        },
+        "start": {
+          "character": 15,
+          "line": 2
+        }
+      },
+      "uri": "fixture:///navigation.stax"
+    }
+  ],
+  "definition-import": [
+    {
+      "range": {
+        "end": {
+          "character": 29,
+          "line": 3
+        },
+        "start": {
+          "character": 21,
+          "line": 3
+        }
+      },
+      "uri": "fixture:///navigation.stax"
+    }
+  ],
+  "definition-local": [
+    {
+      "range": {
+        "end": {
+          "character": 23,
+          "line": 6
+        },
+        "start": {
+          "character": 18,
+          "line": 6
+        }
+      },
+      "uri": "fixture:///navigation.stax"
+    }
+  ],
+  "definition-type": [
+    {
+      "range": {
+        "end": {
+          "character": 19,
+          "line": 1
+        },
+        "start": {
+          "character": 14,
+          "line": 1
+        }
+      },
+      "uri": "fixture:///navigation.stax"
+    }
+  ],
+  "definition-word": [
+    {
+      "range": {
+        "end": {
+          "character": 8,
+          "line": 4
+        },
+        "start": {
+          "character": 2,
+          "line": 4
+        }
+      },
+      "uri": "fixture:///navigation.stax"
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "scope",
+      "message": "未定義のシンボル: 'missing'",
+      "range": {
+        "end": {
+          "character": 9,
+          "line": 10
+        },
+        "start": {
+          "character": 2,
+          "line": 10
+        }
+      },
+      "severity": 2,
+      "source": "ubnfc"
+    }
+  ],
+  "edit-after-definition": [
+    {
+      "range": {
+        "end": {
+          "character": 8,
+          "line": 0
+        },
+        "start": {
+          "character": 2,
+          "line": 0
+        }
+      },
+      "uri": "fixture:///editing.stax"
+    }
+  ],
+  "edit-broken": [
+    {
+      "code": "QuotType",
+      "message": "構文エラー: ' ' | '*/' | '--' | '/*' | '//' | 'Bool' | 'Float' | 'Int' ほか 8 件 を期待しました",
+      "range": {
+        "end": {
+          "character": 11,
+          "line": 1
+        },
+        "start": {
+          "character": 11,
+          "line": 1
+        }
+      },
+      "relatedInformation": [
+        {
+          "location": {
+            "range": {
+              "end": {
+                "character": 11,
+                "line": 1
+              },
+              "start": {
+                "character": 11,
+                "line": 1
+              }
+            },
+            "uri": "fixture:///editing.stax"
+          },
+          "message": "最深規則: QuotType"
+        }
+      ],
+      "severity": 1,
+      "source": "ubnfc"
+    }
+  ],
+  "edit-prefix-definition": [],
+  "edit-repaired": [],
+  "hover-primitive": {
+    "contents": {
+      "kind": "markdown",
+      "value": "`dup`\n\n規則: `Prim`\n\n組込み語。実行系が供給する固定語彙"
+    },
+    "range": {
+      "end": {
+        "character": 27,
+        "line": 4
+      },
+      "start": {
+        "character": 24,
+        "line": 4
+      }
+    }
+  },
+  "hover-reference": {
+    "contents": {
+      "kind": "markdown",
+      "value": "**square** — 参照\n\n宣言: 5 行 3 桁\n\n語の参照。宣言のある語だけが解決する。未定義なら WARNING が出る"
+    },
+    "range": {
+      "end": {
+        "character": 14,
+        "line": 7
+      },
+      "start": {
+        "character": 8,
+        "line": 7
+      }
+    }
+  },
+  "hover-word": {
+    "contents": {
+      "kind": "markdown",
+      "value": "**square** — 宣言\n\n種類: `WordDef`\n\n語の定義。`: name ( 入力 -- 出力 ) 本体 ;`。本体から自分の名前は見えない（recurse を使う）"
+    },
+    "range": {
+      "end": {
+        "character": 8,
+        "line": 4
+      },
+      "start": {
+        "character": 2,
+        "line": 4
+      }
+    }
+  },
+  "initialize": {
+    "capabilities": {
+      "completionProvider": {
+        "resolveProvider": false
+      },
+      "definitionProvider": true,
+      "documentSymbolProvider": true,
+      "foldingRangeProvider": true,
+      "hoverProvider": true,
+      "referencesProvider": true,
+      "renameProvider": true,
+      "semanticTokensProvider": {
+        "full": true,
+        "legend": {
+          "tokenModifiers": [],
+          "tokenTypes": [
+            "keyword",
+            "operator",
+            "string",
+            "number",
+            "variable"
+          ]
+        },
+        "range": false
+      },
+      "textDocumentSync": 1
+    },
+    "serverInfo": {
+      "name": "stax (ubnfc)",
+      "version": "0.1.0"
+    }
+  }
+}
