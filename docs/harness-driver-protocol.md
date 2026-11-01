@@ -452,3 +452,33 @@ farthestExpected` の比較は維持する（D-014）。Extern の失敗候補�
 - job 全体の timeout は GitHub Actions の既定のまま（native は通常 15 分前後）。
 - それでも `driver_timeout` だけで赤くなった場合は、失敗した job を 1 回だけ再実行する
   （`gh run rerun <id> --failed`）。2 回続けて落ちるなら負荷ではなく本物の不具合として調べる。
+
+### fuzz campaign の build 失敗を追跡する（issue #54）
+
+`Summary.discards` の理由コード別件数に加え、`discard_details` に seed、文法名
+（`grammar_name`）、内容識別子（`grammar_digest`）、backend、理由コード、
+`Discard.message` 全文、文法原文と import 原文を保存する。build 以外の discard は
+`backend: null`。詳細は seed 順に並べ、集計件数・機能別 discard 率・受け入れ条件は変えない。
+
+`ubnfc-fuzz --json report.json --report report.md` で JSON / Markdown を保存できる。
+Markdown にも seed・文法名・digest・backend・エラー全文を載せる。Cargo は
+`--message-format=json` で呼ぶため、rustc の診断が stdout の JSON に入る場合もある。
+harness が既に取得している stderr と stdout の両方を、省略・切り詰めなしで保持する。
+
+build 失敗は発生時にも `ビルド失敗の詳細: {JSON}` の 1 行として stderr に出す。
+改行は JSON の文字列としてエスケープされ、worker 間で本文が混ざらない。
+固定 seed テストは discard 詳細付きで従来どおり失敗するため、`cargo test` の
+失敗時ログからも追跡できる。失敗を既知差分や成功として扱う変更は行わない。
+CLI の終了コード規則も従来どおりで、discard の有無は report の件数で確認する。
+
+エラー中の一時パスは診断の原文としてそのまま残す。一時ディレクトリは従来どおり
+削除されるため、そのパスのファイルが後から存在するとは限らない。JSON / ログは
+文法原文も値として保持するので、削除後も seed と digest を照合し、同じ生成器・
+fixture pin・toolchain で `ubnfc-fuzz --start-seed SEED --seeds 1` を実行して調べられる。
+report は一時ディレクトリ外へ保存する。生成 crate や build キャッシュの永続化は行わない。
+
+回帰テスト `crates/ubnfc-fuzz/tests/build_discard.rs` は repo 内の合成生成器で
+`compile_error!` を含む依存なし crate を出し、実際の Cargo / rustc エラーを起こす。
+別ケースでは javac stub を失敗させる。両方とも外部開発者 tree を参照せず、
+seed・文法識別子・backend・本文が JSON、Markdown、stderr に残ること、および
+CLI の一時ディレクトリ削除後にも report が読めることを検証する。
