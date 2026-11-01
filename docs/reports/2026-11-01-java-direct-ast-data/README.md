@@ -25,3 +25,5 @@ SWAR追加前の性能・最新corpus検証は **`after-long/`** を使用する
 `after-stage5/` はLSP15件とAST/計測ソース不変、`after-stax3/` はstax実行系12件とRust比較binaryのSHA一致を記録する。これらの統合で既存のcorpus/A/B対象は変更していない。
 
 性能の最新判定は **`after-swar/`**。master #32 / 12e5e80を統合し、Rust比較binaryを更新して同条件の交互3セッションを再測定した。Java・front・pin・harness不変なので、corpusはafter-longの全1,492行一致を維持する。
+
+`python3 docs/reports/2026-11-01-java-direct-ast-data/after-swar/metrics.py` で同じディレクトリのCSVから再集計できる。任意の保存先は第1引数で指定する。保存済みmetrics.jsonと再集計結果のbyte一致を確認した。

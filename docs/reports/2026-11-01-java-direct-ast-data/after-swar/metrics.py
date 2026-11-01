@@ -1,6 +1,6 @@
 from pathlib import Path
-import json,re,statistics as st
-root=Path('/tmp/tmp.zkxXajBnzc/after-swar/bench/results')
+import json,re,statistics as st,sys
+root=Path(sys.argv[1]) if len(sys.argv)>1 else Path(__file__).resolve().parent
 def java(path):
  rows={}
  for line in path.read_text().splitlines():
