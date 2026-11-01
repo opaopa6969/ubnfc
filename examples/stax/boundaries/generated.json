@@ -1,0 +1,116 @@
+{
+  "externMemoExcluded": true,
+  "vocabulary": [
+    {
+      "declarations": [
+        "external"
+      ],
+      "input": "+ external",
+      "ok": true,
+      "scopeDepth": 0,
+      "snapshot": "external",
+      "warnings": 0
+    },
+    {
+      "declarations": [
+        "external"
+      ],
+      "input": "+ missing",
+      "ok": true,
+      "scopeDepth": 0,
+      "snapshot": "external",
+      "warnings": 1
+    },
+    {
+      "declarations": [],
+      "input": "external",
+      "ok": true,
+      "scopeDepth": 0,
+      "snapshot": "external",
+      "warnings": 1
+    },
+    {
+      "declarations": [
+        "other"
+      ],
+      "input": "+ external",
+      "ok": true,
+      "scopeDepth": 0,
+      "snapshot": "other",
+      "warnings": 1
+    },
+    {
+      "declarations": [
+        "other"
+      ],
+      "input": "+ missing",
+      "ok": true,
+      "scopeDepth": 0,
+      "snapshot": "other",
+      "warnings": 1
+    },
+    {
+      "declarations": [],
+      "input": "external",
+      "ok": true,
+      "scopeDepth": 0,
+      "snapshot": "other",
+      "warnings": 1
+    }
+  ],
+  "wordStream": [
+    {
+      "declarations": [],
+      "input": ": value ( 注釈) 2 3 + ; value",
+      "words": [
+        ":",
+        "value",
+        "(",
+        "注釈)",
+        "2",
+        "3",
+        "+",
+        ";",
+        "value"
+      ]
+    },
+    {
+      "declarations": [],
+      "input": ": greet .\" hello\" ; greet",
+      "words": [
+        ":",
+        "greet",
+        ".\"",
+        "hello\"",
+        ";",
+        "greet"
+      ]
+    },
+    {
+      "declarations": [],
+      "input": ": constant CREATE , DOES> @ ; 42 constant answer answer",
+      "words": [
+        ":",
+        "constant",
+        "CREATE",
+        ",",
+        "DOES>",
+        "@",
+        ";",
+        "42",
+        "constant",
+        "answer",
+        "answer"
+      ]
+    },
+    {
+      "declarations": [],
+      "input": "日本語 >> 2dup!",
+      "words": [
+        "日本語",
+        ">>",
+        "2dup!"
+      ]
+    }
+  ]
+}
