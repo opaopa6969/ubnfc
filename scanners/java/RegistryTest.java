@@ -20,6 +20,7 @@ public final class RegistryTest {
         else assert !r.diagnostics().isEmpty() : r;
     }
     public static void main(String[] args) {
+        longFences();
         String string = "org.unlaxer.tinyexpression.parser.StringLiteralParser";
         String start = "org.unlaxer.tinyexpression.parser.javalang.CodeStartParser";
         String end = "org.unlaxer.tinyexpression.parser.javalang.CodeEndParser";
@@ -53,5 +54,38 @@ public final class RegistryTest {
             result(scan(start, input, 0, 0, Mode.consumed, false, true), false, 0, 0, 0, 0);
         assert !Registry.scanners().containsKey("other.StringLiteralParser");
         assert Registry.PURE;
+    }
+    private static void longFences() {
+        String name = "org.unlaxer.tinyexpression.parser.javalang.LongCodeBlockParser";
+        String prefix = "😀\n";
+        for (String nl : List.of("\n", "\r\n", "\r")) {
+            String block = "`````rust:p.Demo" + nl + "// 😀 ```" + nl
+                + "````" + nl + "``````" + nl + "````` " + nl + "x `````" + nl + "`````" + nl;
+            for (Mode mode : Mode.values()) for (boolean reset : List.of(false, true)) {
+                int c = mode == Mode.matchOnly ? 0 : prefix.length();
+                int m = mode == Mode.matchOnly ? prefix.length() : 0;
+                var r = scan(name, prefix + block + "tail", c, m, mode, false, reset);
+                int end = prefix.length() + block.length();
+                result(r, true, mode == Mode.matchOnly ? c : end, end, prefix.length(), end - nl.length());
+                assert r.diagnostics().isEmpty() : r;
+                var inverted = scan(name, prefix + block, c, m, mode, true, reset);
+                result(inverted, false, c, m, 0, 0);
+                assert inverted.diagnostics().equals(List.of(new ScanDiagnostic(prefix.length(), "long code block"))) : inverted;
+                for (String bad : List.of("````rust:A" + nl, "```rust:A" + nl + "```", "````型:A" + nl + "````",
+                        "````rust:A." + nl + "````", "````rust:A", "````rust:A" + nl + "`````" + nl,
+                        "````rust:A" + nl + "```` " + nl, "````rust:A" + nl + "x ````" + nl)) {
+                    var failed = scan(name, prefix + bad, c, m, mode, false, reset);
+                    result(failed, false, c, m, 0, 0);
+                    assert failed.diagnostics().equals(List.of(new ScanDiagnostic(prefix.length(), "long code block"))) : failed;
+                }
+            }
+        }
+        String empty = "````rust:A\n````";
+        result(scan(name, empty, 0, 0, Mode.consumed, false, true), true, empty.length(), empty.length(), 0, empty.length());
+        result(scan(name, "x" + empty, 1, 0, Mode.consumed, false, true), false, 1, 0, 0, 0);
+        // 本文を host 言語として解析せず、文字列の途中でも同幅の単独行は終端。
+        String opaque = "````rust:A\n\"string\n````\n";
+        result(scan(name, opaque + "rest\"", 0, 0, Mode.consumed, false, true), true, opaque.length(), opaque.length(), 0, opaque.length() - 1);
+        assert !Registry.scanners().containsKey("other.LongCodeBlockParser");
     }
 }
