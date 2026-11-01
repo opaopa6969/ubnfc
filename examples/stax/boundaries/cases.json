@@ -1,0 +1,20 @@
+{
+  "forthReferences": [
+    {"id": "paren", "source": ": value ( 注釈) 2 3 + ; value", "expected": "スタックに5。注釈は最初の ) まで。", "classification": "固定構文で用途を代替", "executed": false},
+    {"id": "dot-quote", "source": ": greet .\" hello\" ; greet", "expected": "実行時にhelloを表示。", "classification": "quotation + macro で代替", "executed": false},
+    {"id": "create-does", "source": ": constant CREATE , DOES> @ ; 42 constant answer answer", "expected": "answerという新しい語を定義し、その実行で42を積む。", "classification": "現行staxのmacro/Loader契約では動的宣言は不可能", "executed": false}
+  ],
+  "stax": [
+    {"id": "fixed-comment", "source": ": main ( -- ) /* 注釈 */ 2 3 + int_to_str print ;", "parse": true, "exit": 0, "stdout": "5"},
+    {"id": "fixed-effect", "source": ": identity ( Int -- Int ) ; : main ( -- ) 7 identity int_to_str print ;", "parse": true, "exit": 0, "stdout": "7"},
+    {"id": "paren-is-not-comment", "source": ": main ( -- ) ( note ) 2 3 + int_to_str print ;", "parse": false, "exit": 1, "error": "構文エラー"},
+    {"id": "quote-macro-print", "source": "macro say ( [ -- Str ] -- [ -- ] ) let text [ text call print ] ; : main ( -- ) [ \"hello\" ] say call ;", "parse": true, "exit": 0, "stdout": "hello"},
+    {"id": "dot-quote-is-not-token", "source": ": main ( -- ) .\" hello\" ;", "parse": false, "exit": 1, "error": "構文エラー"},
+    {"id": "fixed-definition", "source": ": answer ( -- Int ) 42 ; : main ( -- ) answer int_to_str print ;", "parse": true, "exit": 0, "stdout": "42"},
+    {"id": "create-does-surface", "source": ": constant ( Int -- ) CREATE , DOES> @ ; 42 constant answer answer", "parse": false, "exit": 1, "error": "構文エラー"},
+    {"id": "words-are-not-definitions", "source": ": main ( -- ) 42 constant answer ;", "parse": true, "exit": 1, "error": "未定義"},
+    {"id": "definition-is-not-term", "source": "macro maker ( -- [ -- ] ) [ : answer ( -- Int ) 42 ; ] ; : main ( -- ) maker call ;", "parse": false, "exit": 1, "error": "構文エラー"},
+    {"id": "string-capture-is-not-ast-name", "source": "macro bad ( -- [ -- ] ) \"made\" let name [ name print ] ; : main ( -- ) bad call ;", "parse": true, "exit": 1, "error": "捕捉値は引用に限定"},
+    {"id": "compile-time-print-is-forbidden", "source": "macro bad ( -- [ -- ] ) \"hello\" print [ ] ; : main ( -- ) bad call ;", "parse": true, "exit": 1, "error": "展開時の I/O は禁止"}
+  ]
+}
