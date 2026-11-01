@@ -60,10 +60,23 @@ RUSTUP_TOOLCHAIN=stable cargo test --offline -p ubnfc-harness --test stax
 IR golden の byte 一致・strict 検証・manifest 対応の既存回帰は
 `RUSTUP_TOOLCHAIN=stable cargo test --offline -p ubnfc-front --test pipeline_golden` で確認できる。
 
+## Rust で検査・実行する（段階 3）
+
+```sh
+RUSTUP_TOOLCHAIN=stable cargo run -q -p ubnfc-stax --bin stax -- examples/stax/samples/05-fizzbuzz.stax
+RUSTUP_TOOLCHAIN=stable cargo run -q -p ubnfc-stax --bin stax -- --check examples/stax/samples/04-prelude.stax
+RUSTUP_TOOLCHAIN=stable cargo run -q -p ubnfc-stax --bin stax -- --expand examples/stax/samples/14-macro.stax
+RUSTUP_TOOLCHAIN=stable cargo test -p ubnfc-stax
+```
+
+build 時の生成も実行も JVM 不要。生成 typed AST を直接検査して実行する。
+通常の workspace テストで 20 本の期待出力・型エラーと、主要な意味規則・失敗の終了コードを検証する。
+`--max-steps N` / `--max-depth N` と macro の範囲、束縛の規則は [`DESIGN.md`](DESIGN.md) §11。
+
 ## サンプル 20 本
 
 `samples/expected.json` が期待判定を持つ。**parse** は stage 1 で検証でき、
-**typecheck** は stage 3（Rust インタプリタのスタック効果検査）の期待値である。
+**typecheck** と stdout / errorContains は段階 3 の Rust 実行コマンドで検証している。
 
 | 本数 | parse | typecheck | 内容 |
 |---:|---|---|---|
