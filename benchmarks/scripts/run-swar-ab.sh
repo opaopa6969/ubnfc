@@ -36,6 +36,17 @@ prepare() {
   "$work/target-after/release/ubnfc" ir --grammar "$ubnfc/examples/json/json.ubnf" --out "$work/ir/json.ir.json"
   cp "$ubnfc/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json" "$work/ir/p4.ir.json"
   cp "$ubnfc/ir/fixtures/unlaxer-dsl__src__test__resources__associative__Operators.ubnf.ir.json" "$work/ir/ops.ir.json"
+  # 後から追加された LL(1) 表は両側から外し、bulk scan 内部だけを比べる。
+  python3 - "$work/ir" <<'PY'
+import json
+import pathlib
+import sys
+for path in pathlib.Path(sys.argv[1]).glob('*.ir.json'):
+    ir = json.loads(path.read_text())
+    if 'll1' in ir['plan']:
+        del ir['plan']['ll1']
+        path.write_text(json.dumps(ir, ensure_ascii=False, indent=2) + '\n')
+PY
   for side in before after; do
     local gen=$work/target-$([ "$side" = before ] && echo base || echo after)/release/ubnfc-rust
     rm -rf "$work/$side" && mkdir -p "$work/$side"

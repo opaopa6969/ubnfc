@@ -94,6 +94,7 @@ WORK=$WORK CORE=30 RUNS=7 benchmarks/scripts/run-arena-ab.sh time
 
 Rust bulk scan 内の portable SWAR（issue #3）の A/B は `run-swar-ab.sh`。
 旧 #48 後の基準 revision と変更後の生成器へ同一 IR を渡し、認識のみを同じ binary に入れる。
+後から追加された `plan.ll1` は共通 IR から除き、bulk scan 内部の比較を保つ。
 各 round は before/after の先後を交替し、全 round の生データと load average（1/5/15 分）を CSV に残す。
 JSONTestSuite は `scripts/fetch-external-tools.sh` の固定 commit を使い、入力の sha256 を
 `examples/json/evidence/inputs.sha256` と照合する。中央値・最小値は入力と variant ごとに集計する。
