@@ -98,7 +98,8 @@ Java backend テストを重ねて走らせない。既存の Java jar build →
 `diff -qr` で byte 一致し、新機能を含むサーバの通常 golden も一致した。
 今回の実装による既存観測の変更として承認したものではなく、コミット済み IR と期待値のずれを補正した。
 
-pin 済み外部 fixture を使う `RUSTUP_TOOLCHAIN=stable cargo test --workspace --no-fail-fast`
+初回検証時点の pin（unlaxer-parser `08f2bc1c` / tinyexpression `f86ce8a5`）の外部 fixture を使う
+`RUSTUP_TOOLCHAIN=stable cargo test --workspace --no-fail-fast`
 は558成功・1失敗（exit 101）。失敗は `ubnfc-harness --test cli` の既定 fixture 探索であり、
 テストが環境変数を意図的に外したとき、worktree の sibling に `unlaxer-parser` が無かったため。
 共有ディレクトリにリンクを作らず、専用 `mktemp -d` の中へ同じ commit を展開し、
@@ -111,7 +112,17 @@ D-086〜D-088 の番号に衝突がないことを確認した。取り込み後
 CI の native job（[run 41255946676](https://github.com/opaopa6969/ubnfc/actions/runs/41255946676/job/124699007057)）も成功した。
 最終統合時には stax 段階2 / Classic 構文対応を含む master（`65a9edd`）も merge し、
 D-084 を保持して D-086〜D-088 と併存させ、小文法の再生成 IR の byte 一致も再確認した。
-最終結果は PR の Checks と issue #1 の完了コメントに記録し、CI 成功を merge の条件にする。
+この時点の head `406b05a` の [CI run 41264360635](https://github.com/opaopa6969/ubnfc/actions/runs/41264360635)
+では native（23分26秒）と WASM（2分46秒）がともに成功した。
+
+さらに pin 更新・LL(1) 認識表・長い fence 対応を含む master（`49d1a9d`）を merge で取り込んだ。
+外部 pin は親 PR の更新をそのまま保持し、今回の作業で変更していない。
+親 PR の frozen P4 fixture への切替も保持し、UBNF の capture site の期待値を現在の IR に合わせた。
+小文法の IR を現在の front で再生成した差分は `/plan/ll1` の2要素追加だけである。
+更新前後の IR から生成した Java / LSP / DAP の全ソースは `diff -qr` で byte 一致した。
+LSP 15テストを通常照合で再実行して成功し、4つの golden に変更はなかった。
+D-085・D-091 を保持し、今回の D-086〜D-088 に番号の重複がないことも確認した。
+最終 head の結果は PR の Checks と issue #1 の完了コメントに記録し、その CI 成功を merge の条件にする。
 
 ## 7. 未着手と理由
 

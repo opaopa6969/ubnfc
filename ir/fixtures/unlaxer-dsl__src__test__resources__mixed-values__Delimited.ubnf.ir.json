@@ -1155,6 +1155,80 @@
         "tokenId": "Mixed::STRING"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:186:189:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:207:210:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:241:244:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:252:255:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:270:273:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:276:279:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "😀",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:359:362:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Delimited.ubnf:423:426:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "y",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

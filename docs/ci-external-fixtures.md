@@ -65,6 +65,14 @@ front の構文対応）と同じ PR に入れる。pin だけを先に上げる
 5. PR 本文に「旧 pin → 新 pin」と、各 repository の間の差分（`git log --oneline 旧..新 -- <読むパス>`）の
    要点、直したテストを書く。
 
+## 外部 pin から切り離した IR（`ir/frozen/`）
+
+backend の回帰テスト・commit 済みの生成物（`examples/p4-rust` など）・ベンチマークは、外部文法の
+変化とは無関係に同じ文法を使う。そのため `ir/fixtures/` の golden ではなく `ir/frozen/` の固定 IR を
+読む（[`ir/frozen/README.md`](../ir/frozen/README.md)）。pin を上げて `ir/fixtures/` の golden が
+変わっても、これらは動かない。2026-11-01 の更新（issue #8）で、tinyexpression P4 の旧版（`f86ce8a5`）を
+ここへ移した。
+
 ## 注意
 
 - `scripts/external-pins.env` は `KEY=値` だけの単純な形式で、スクリプトは `source` せずに 1 行ずつ

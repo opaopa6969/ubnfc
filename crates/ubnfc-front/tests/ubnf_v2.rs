@@ -385,7 +385,7 @@ fn p4_v2_produces_the_same_ast_types_and_recipes_as_the_committed_p4_ir() {
 
     let v1: ubnfc_front::ir::GrammarIr = ubnfc_front::ir::from_json(
         &std::fs::read_to_string(root.join(
-            "ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json",
+            "ir/frozen/tinyexpression-p4-f86ce8a5.ir.json",
         ))
         .unwrap(),
     )

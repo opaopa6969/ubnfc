@@ -1,0 +1,2 @@
+ll1=false, ok=true, consumed_cp=992186, statistics=Statistics { rule_evaluations: 208727, memo_hits: 0, memo_entries: 0, recipes: 0, ast_nodes: 0, memo_max_probe: 0, lexical_runs: 0, lexical_probes: 0, trivia_skip_hits: 0, trivia_skip_misses: 0 }
+ll1=true, ok=true, consumed_cp=992186, statistics=Statistics { rule_evaluations: 1, memo_hits: 0, memo_entries: 0, recipes: 0, ast_nodes: 0, memo_max_probe: 0, lexical_runs: 0, lexical_probes: 0, trivia_skip_hits: 0, trivia_skip_misses: 0 }

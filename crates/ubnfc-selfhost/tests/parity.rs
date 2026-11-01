@@ -66,13 +66,26 @@ fn suffixes_escapes_comments_and_empty_sequences_match() {
     for source in [
         "", "// 文法😀\r\n", "grammar G {}",
         "grammar G { R ::= A+{2,3}% (B*) @xs; }",
-        "grammar G { R ::= ('a' | )+ {2,} % ',' @xs; }",
         "grammar G { R ::= @typeof(xs) [ A+ ] {B} ('😀\\n\\t\\r\\'\\\\\\q')*{2} % (C? | [D+]) @ys; }",
         "grammar G { R ::= A // +{2,3}% B\r\n @xs; } // 終端",
-        "grammar G { R ::= [ ] | { } | ( ); E ::= ; }",
         "grammar G { R ::= ' // \\' ' // 😀\n ; }",
         "grammar G { R ::= a // コメント\n . B {2,} % ','; }",
     ] { same(source); }
+}
+
+/// 空の選択肢（`( 'a' | )`、`E ::= ;`）。unlaxer-parser の自己記述文法は 2026-10 に
+/// `SequenceBody ::= AnnotatedElement+` へ変わり、生成した self-host frontend は空の選択肢を
+/// 拒否する。手書き frontend は既存の文法を壊さないよう従来どおり受理する（既知の差）。
+#[test]
+fn empty_alternatives_are_accepted_only_by_the_handwritten_frontend() {
+    for (source, at) in [
+        ("grammar G { R ::= ('a' | )+ {2,} % ',' @xs; }", 25),
+        ("grammar G { R ::= [ ] | { } | ( ); E ::= ; }", 20),
+    ] {
+        assert!(syntax::parse_file(source).is_ok(), "{source}");
+        let error = ubnfc_selfhost::parse_file(source).unwrap_err();
+        assert_eq!(error.span().map(|s| s.start), Some(at), "{source}");
+    }
 }
 
 const FILES: &[&str] = &[
@@ -114,7 +127,9 @@ const KNOWN_REJECTIONS: &[(&str, usize)] = &[
         32,
     ),
     ("unlaxer-dsl/examples/tinycalc.ubnf", 276),
-    (P4, 2595),
+    // P4 の `@whitespace(layout.SPACES_AND_COMMENTS)`（D-083）。自己記述文法の
+    // WhitespaceAnnotation は `IDENTIFIER @style` で、修飾名を書けない。
+    (P4, 921),
 ];
 
 #[test]

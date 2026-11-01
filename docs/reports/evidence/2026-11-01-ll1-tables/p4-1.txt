@@ -1,0 +1,12 @@
+   Compiling ubnfc-rust v0.1.0 (/home/opa/work/.wt/ubnfc-issue2/crates/ubnfc-rust)
+    Finished `release` profile [optimized] target(s) in 7.17s
+     Locking 1 package to highest compatible version
+      Adding ubnfc-p4-rust v0.1.0 (/home/opa/work/.wt/ubnfc-issue2/examples/p4-rust)
+   Compiling ubnfc-p4-rust v0.1.0 (/home/opa/work/.wt/ubnfc-issue2/examples/p4-rust)
+   Compiling gen-json v0.0.0 (/tmp/tmp.9CKelkRKYe/json)
+   Compiling ll1-bench v0.0.0 (/tmp/tmp.9CKelkRKYe/ll1-bench)
+    Finished `release` profile [optimized] target(s) in 1m 14s
+ 09:19:31 up 13 days, 15:44,  0 users,  load average: 34.06, 26.94, 23.69
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+Model name:                              AMD Ryzen 9 7950X 16-Core Processor
+ 09:19:37 up 13 days, 15:44,  0 users,  load average: 31.52, 26.64, 23.63

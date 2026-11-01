@@ -1516,6 +1516,116 @@
         "tokenId": "Operators::NUMBER"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:403:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 43,
+                  "start": 43
+                }
+              ],
+              "target": 1
+            },
+            {
+              "ranges": [
+                {
+                  "end": 45,
+                  "start": 45
+                }
+              ],
+              "target": 2
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:394:397:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:400:403:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:426:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 42,
+                  "start": 42
+                }
+              ],
+              "target": 4
+            },
+            {
+              "ranges": [
+                {
+                  "end": 47,
+                  "start": 47
+                }
+              ],
+              "target": 5
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:417:420:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:423:426:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:458:461:body/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/associative/Operators.ubnf:473:476:body/1/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

@@ -72,6 +72,19 @@ pub(super) fn validate(rule: &ResolvedRule, scope: bool, v2: bool, cx: &mut Cont
     // D-045: catch-all `@<任意の識別子>` は綴り間違いを黙って metadata にする。
     // 版に関係なく警告する（受理・AST・生成コードは変えない純粋な診断の追加）。
     for annotation in &rule.annotations {
+        // 既知の名前の Simple 注釈は Classic の plain form（`@ leftAssoc`、`(` の無い
+        // `@mapping`。unlaxer-parser #715）からしか生じない。Classic と同じく適用せず警告する。
+        if let Annotation::Simple { name, .. } = annotation {
+            if KNOWN_ANNOTATIONS.contains(&name.as_str()) && name != "autoCommit" {
+                cx.rule(
+                    rule,
+                    "W-ANNOTATION-IGNORED",
+                    format!("rule {} has @{name} written in a plain form, which is not applied", rule.name),
+                    format!("Write @{name} with no space after '@' (and with its arguments) to apply it."),
+                );
+                continue;
+            }
+        }
         if let Annotation::Simple { name: unknown, .. } = annotation {
             if !KNOWN_ANNOTATIONS.contains(&unknown.as_str()) {
                 cx.rule(

@@ -22,8 +22,8 @@ import org.unlaxer.ubnfc.java.ir.IrReader;
  * 表示の経路は {@code Meta.documentation()} で共通。
  */
 class MetadataTest {
-    private static final Path P4 = Path.of("..", "ir", "fixtures",
-        "tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json");
+    private static final Path P4 = Path.of("..", "ir", "frozen",
+        "tinyexpression-p4-f86ce8a5.ir.json");
     private static final Path UBNF = Path.of("..", "ir", "fixtures", "unlaxer-dsl__grammar__ubnf.ubnf.ir.json");
     private static final Path DOCS = Path.of("src", "test", "resources", "doc-demo.ir.json");
 
@@ -62,8 +62,8 @@ class MetadataTest {
     /** UBNF 自身の文法は {@code @backref} が {@code sameRuleText} なので ScopeStore に宣言が積まれない。 */
     @Test void ubnfDeclarationsComeFromCaptureSites() throws Exception {
         var emitter = emitter(UBNF);
-        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:5632:5642:body/1/tokenRef"), emitter.declareSites());
-        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:10865:10875:body/1/tokenRef"), emitter.useSites());
+        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:5911:5921:body/1/tokenRef"), emitter.declareSites());
+        assertEquals(java.util.Set.of("expr:unlaxer-dsl/grammar/ubnf.ubnf:13142:13152:body/2/tokenRef"), emitter.useSites());
     }
 
     @Test void triviaDelimitersAreExcludedFromCompletion() throws Exception {

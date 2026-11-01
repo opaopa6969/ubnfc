@@ -1,0 +1,1 @@
+JSONTestSuite: UTF-8 293 件同値（受理 116 / 拒否 177）、不正 UTF-8 25 件は &str API の対象外

@@ -1444,6 +1444,26 @@
         "tokenId": "Stage5::EOF"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "note",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

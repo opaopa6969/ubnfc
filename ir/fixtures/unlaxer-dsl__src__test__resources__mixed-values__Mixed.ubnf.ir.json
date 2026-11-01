@@ -1036,6 +1036,62 @@
         "tokenId": "Mixed::STRING"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Mixed.ubnf:187:190:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Mixed.ubnf:209:212:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Mixed.ubnf:245:248:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "a",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Mixed.ubnf:251:254:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "😀",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Mixed.ubnf:334:337:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/mixed-values/Mixed.ubnf:398:401:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "y",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

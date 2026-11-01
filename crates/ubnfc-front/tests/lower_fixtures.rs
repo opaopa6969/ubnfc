@@ -115,8 +115,8 @@ fn valid_external_fixtures() {
         &tiny,
         "tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf",
     );
-    assert_eq!(p4.semantics.rules.len(), 124);
-    assert_eq!(p4.semantics.captures.len(), 246);
+    assert_eq!(p4.semantics.rules.len(), 130);
+    assert_eq!(p4.semantics.captures.len(), 264);
     assert_eq!(count, 21);
 }
 #[test]
