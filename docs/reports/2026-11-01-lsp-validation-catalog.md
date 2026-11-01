@@ -205,7 +205,7 @@ master `bdd87bd`）が merge されたため取り込んだ。stax の protocol 
 その後、増分再解析設計の PR #18（master `06fa27b`）も取り込んだ。master の D-093 を保持し、今回の追加行だけを D-094 / D-095 へ振り直した。
 統合後は LSP 全18テスト、stax の protocol / 回復検査と Cargo 側の統合テスト1件が成功した。
 
-最新 head の native CI では fuzz campaign の4件が `build:rust` の discard で失敗した。
+stax 段階4を取り込んだ head `2a03b20` の native CI では fuzz campaign の4件が `build:rust` の discard で失敗した。
 同じ head のローカル再実行は8件すべて成功し、生成 Rust と campaign の実装に差分はない。
 CI は seed と Cargo / rustc のエラー本文を保持しておらず、正確な原因は確定できない。
 観測情報を保持する改善は受け入れ条件付きの [issue #54](https://github.com/opaopa6969/ubnfc/issues/54)
