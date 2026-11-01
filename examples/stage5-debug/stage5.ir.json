@@ -1,0 +1,3747 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Program:0",
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Block:1",
+          "scope:Stage5::Program:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            },
+            {
+              "end": 110,
+              "start": 110
+            },
+            {
+              "end": 117,
+              "start": 117
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "atEof"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Block:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:289:304:body/0/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            },
+            {
+              "end": 110,
+              "start": 110
+            },
+            {
+              "end": 117,
+              "start": 117
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Block:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            },
+            {
+              "end": 110,
+              "start": 110
+            },
+            {
+              "end": 117,
+              "start": 117
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "preserve",
+          "failure": "restore",
+          "flagEffect": "contextual",
+          "matchedMode": "preserve",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:305:308:body/1/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": true,
+          "includesTrivia": false,
+          "ranges": [],
+          "zeroConsumeCondition": "atEof"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Block:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            },
+            {
+              "end": 110,
+              "start": 110
+            },
+            {
+              "end": 117,
+              "start": 117
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Let:0"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:340:343:body/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 7,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Use:0"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:346:349:body/1/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 117,
+              "start": 117
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 5,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:352:357:body/2/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:360:364:body/3/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 110,
+              "start": 110
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 7,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Let:0"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 7,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:441:446:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 108,
+              "start": 108
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 3,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:459:462:body/2/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 61,
+              "start": 61
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 43,
+              "start": 43
+            },
+            {
+              "end": 46,
+              "start": 45
+            },
+            {
+              "end": 57,
+              "start": 48
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:477:480:body/4/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 59,
+              "start": 59
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Use:0"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 117,
+              "start": 117
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 5,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:549:554:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 117,
+              "start": 117
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 3,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:567:570:body/2/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 59,
+              "start": 59
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:647:650:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Block:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:651:666:body/1/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            },
+            {
+              "end": 110,
+              "start": 110
+            },
+            {
+              "end": 117,
+              "start": 117
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [
+          "scope:Stage5::Let:0",
+          "scope:Stage5::Use:0",
+          "scope:Stage5::Block:0",
+          "scope:Stage5::Block:1"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 108,
+              "start": 108
+            },
+            {
+              "end": 110,
+              "start": 110
+            },
+            {
+              "end": 117,
+              "start": 117
+            },
+            {
+              "end": 123,
+              "start": 123
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "effectful",
+          "reason": "保証された token と scope/recovery 効果を順序付きで再生。stateVersion を memo キーに含める。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:667:670:body/2/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 125,
+              "start": 125
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 110,
+              "start": 110
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 7,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 110,
+              "start": 110
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 4,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 34,
+              "start": 34
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 59,
+              "start": 59
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": false,
+        "ruleId": "Stage5::Program",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Stage5::Item",
+        "sccId": "scc:1"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Stage5::Let",
+        "sccId": "scc:2"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Stage5::Use",
+        "sccId": "scc:3"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Stage5::Block",
+        "sccId": "scc:1"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "Stage5::Note",
+        "sccId": "scc:4"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Stage5::Program"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "provedOmissions",
+        "recursive": true,
+        "ruleIds": [
+          "Stage5::Item",
+          "Stage5::Block"
+        ]
+      },
+      {
+        "id": "scc:2",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Stage5::Let"
+        ]
+      },
+      {
+        "id": "scc:3",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Stage5::Use"
+        ]
+      },
+      {
+        "id": "scc:4",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "Stage5::Note"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:Stage5",
+    "ruleId": "Stage5::Program"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:Stage5",
+      "name": "Stage5",
+      "package": null,
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": "javaStyle"
+      },
+      "source": {
+        "end": 744,
+        "sourceId": "examples/stage5-debug/stage5.ubnf",
+        "start": 51
+      },
+      "sourceId": "examples/stage5-debug/stage5.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "languageVersion": 1,
+  "plan": {
+    "choices": [
+      {
+        "candidateOrder": [
+          "expr:examples/stage5-debug/stage5.ubnf:340:343:body/0/ruleRef",
+          "expr:examples/stage5-debug/stage5.ubnf:346:349:body/1/ruleRef",
+          "expr:examples/stage5-debug/stage5.ubnf:352:357:body/2/ruleRef",
+          "expr:examples/stage5-debug/stage5.ubnf:360:364:body/3/ruleRef"
+        ],
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+        "fallback": "none",
+        "proof": null,
+        "strategy": "ordered",
+        "trieId": null
+      }
+    ],
+    "lexical": [
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Stage5::IDENT"
+      },
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Stage5::NUMBER"
+      },
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Stage5::STRING"
+      },
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "Stage5::EOF"
+      }
+    ],
+    "ll1": [
+      {
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "note",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:289:304:body/0/repeat",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:289:304:body/0/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:289:304:body/0/repeat",
+              "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:305:308:body/1/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:305:308:body/1/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:340:343:body/0/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+              "expr:examples/stage5-debug/stage5.ubnf:340:343:body/0/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:346:349:body/1/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+              "expr:examples/stage5-debug/stage5.ubnf:346:349:body/1/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:352:357:body/2/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+              "expr:examples/stage5-debug/stage5.ubnf:352:357:body/2/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:360:364:body/3/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+              "expr:examples/stage5-debug/stage5.ubnf:360:364:body/3/ruleRef"
+            ],
+            "kind": "exclusiveCandidates"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:441:446:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:441:446:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:459:462:body/2/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:459:462:body/2/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:477:480:body/4/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:477:480:body/4/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:549:554:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:549:554:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:567:570:body/2/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:567:570:body/2/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": true,
+          "cacheSuccess": true,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+          "omissionProof": null,
+          "reason": "defaultSafe"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:647:650:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:647:650:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:651:666:body/1/repeat",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:651:666:body/1/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:651:666:body/1/repeat",
+              "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:667:670:body/2/literal",
+          "omissionProof": {
+            "explanation": "rule 本体の memo を保持。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:667:670:body/2/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq",
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq",
+              "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "cursorFrameFlag",
+    "deferredMapping",
+    "dualCursor",
+    "memoReplay",
+    "orderedChoice",
+    "scopeUndo",
+    "structuredOccurrences",
+    "triviaInsertion"
+  ],
+  "semantics": {
+    "astTypes": [
+      {
+        "enclosingTypeId": null,
+        "id": "Stage5AST",
+        "kind": "transparentUnion",
+        "name": "Stage5AST",
+        "variants": [
+          "Stage5AST.Program",
+          "Stage5AST.Item"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "list",
+            "name": "items",
+            "valueType": {
+              "kind": "node",
+              "typeId": "Stage5AST.Item"
+            }
+          }
+        ],
+        "id": "Stage5AST.Program",
+        "implements": [
+          "Stage5AST"
+        ],
+        "kind": "record",
+        "name": "Program"
+      },
+      {
+        "enclosingTypeId": null,
+        "id": "Stage5AST.Item",
+        "kind": "transparentUnion",
+        "name": "Item",
+        "variants": [
+          "Stage5AST.Let",
+          "Stage5AST.Use",
+          "Stage5AST.Block",
+          "Stage5AST.Note"
+        ]
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "name",
+            "valueType": {
+              "kind": "text"
+            }
+          },
+          {
+            "cardinality": "scalar",
+            "name": "value",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "Stage5AST.Let",
+        "implements": [
+          "Stage5AST.Item"
+        ],
+        "kind": "record",
+        "name": "Let"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "name",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "Stage5AST.Use",
+        "implements": [
+          "Stage5AST.Item"
+        ],
+        "kind": "record",
+        "name": "Use"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "list",
+            "name": "items",
+            "valueType": {
+              "kind": "node",
+              "typeId": "Stage5AST.Item"
+            }
+          }
+        ],
+        "id": "Stage5AST.Block",
+        "implements": [
+          "Stage5AST.Item"
+        ],
+        "kind": "record",
+        "name": "Block"
+      },
+      {
+        "enclosingTypeId": null,
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "name": "text",
+            "valueType": {
+              "kind": "text"
+            }
+          }
+        ],
+        "id": "Stage5AST.Note",
+        "implements": [
+          "Stage5AST.Item"
+        ],
+        "kind": "record",
+        "name": "Note"
+      }
+    ],
+    "captures": [
+      {
+        "cardinality": "list",
+        "conversion": "node",
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef",
+        "name": "items",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Stage5::Program",
+        "siteId": "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "Stage5AST.Item"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef",
+        "name": "name",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Stage5::Let",
+        "siteId": "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef",
+        "name": "value",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Stage5::Let",
+        "siteId": "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef",
+        "name": "name",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Stage5::Use",
+        "siteId": "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      },
+      {
+        "cardinality": "list",
+        "conversion": "node",
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef",
+        "name": "items",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Stage5::Block",
+        "siteId": "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "node",
+          "typeId": "Stage5AST.Item"
+        }
+      },
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef",
+        "name": "text",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "Stage5::Note",
+        "siteId": "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      }
+    ],
+    "catalogs": [],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:441:446:body/0/literal",
+          "java": "'let'",
+          "rust": "let"
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:459:462:body/2/literal",
+          "java": "'='",
+          "rust": "="
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:477:480:body/4/literal",
+          "java": "';'",
+          "rust": ";"
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:549:554:body/0/literal",
+          "java": "'use'",
+          "rust": "use"
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:567:570:body/2/literal",
+          "java": "';'",
+          "rust": ";"
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:647:650:body/0/literal",
+          "java": "'{'",
+          "rust": "{"
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:667:670:body/2/literal",
+          "java": "'}'",
+          "rust": "}"
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal",
+          "java": "'note'",
+          "rust": "note"
+        },
+        {
+          "exprId": "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal",
+          "java": "';'",
+          "rust": ";"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq",
+        "node": {
+          "items": [
+            "expr:examples/stage5-debug/stage5.ubnf:289:304:body/0/repeat",
+            "expr:examples/stage5-debug/stage5.ubnf:305:308:body/1/tokenRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Stage5::Program",
+        "source": {
+          "end": 308,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 289
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:289:304:body/0/repeat",
+        "node": {
+          "child": "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "Stage5::Program",
+        "source": {
+          "end": 304,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 289
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Stage5::Item"
+        },
+        "ruleId": "Stage5::Program",
+        "source": {
+          "end": 295,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 291
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:305:308:body/1/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Stage5::EOF"
+        },
+        "ruleId": "Stage5::Program",
+        "source": {
+          "end": 308,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 305
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "perAlternative"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+        "node": {
+          "alternatives": [
+            "expr:examples/stage5-debug/stage5.ubnf:340:343:body/0/ruleRef",
+            "expr:examples/stage5-debug/stage5.ubnf:346:349:body/1/ruleRef",
+            "expr:examples/stage5-debug/stage5.ubnf:352:357:body/2/ruleRef",
+            "expr:examples/stage5-debug/stage5.ubnf:360:364:body/3/ruleRef"
+          ],
+          "kind": "choice",
+          "selection": "ordered",
+          "tieBreak": "declarationOrder"
+        },
+        "ruleId": "Stage5::Item",
+        "source": {
+          "end": 364,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 340
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:340:343:body/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Stage5::Let"
+        },
+        "ruleId": "Stage5::Item",
+        "source": {
+          "end": 343,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 340
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:346:349:body/1/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Stage5::Use"
+        },
+        "ruleId": "Stage5::Item",
+        "source": {
+          "end": 349,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 346
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:352:357:body/2/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Stage5::Block"
+        },
+        "ruleId": "Stage5::Item",
+        "source": {
+          "end": 357,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 352
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:360:364:body/3/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Stage5::Note"
+        },
+        "ruleId": "Stage5::Item",
+        "source": {
+          "end": 364,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 360
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+        "node": {
+          "items": [
+            "expr:examples/stage5-debug/stage5.ubnf:441:446:body/0/literal",
+            "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef",
+            "expr:examples/stage5-debug/stage5.ubnf:459:462:body/2/literal",
+            "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef",
+            "expr:examples/stage5-debug/stage5.ubnf:477:480:body/4/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Stage5::Let",
+        "source": {
+          "end": 480,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 441
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'let'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:441:446:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "let",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Let",
+        "source": {
+          "end": 446,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 441
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Stage5::IDENT"
+        },
+        "ruleId": "Stage5::Let",
+        "source": {
+          "end": 452,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 447
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'='",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:459:462:body/2/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Let",
+        "source": {
+          "end": 462,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 459
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Stage5::NUMBER"
+        },
+        "ruleId": "Stage5::Let",
+        "source": {
+          "end": 469,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 463
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "';'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:477:480:body/4/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Let",
+        "source": {
+          "end": 480,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 477
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq",
+        "node": {
+          "items": [
+            "expr:examples/stage5-debug/stage5.ubnf:549:554:body/0/literal",
+            "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef",
+            "expr:examples/stage5-debug/stage5.ubnf:567:570:body/2/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Stage5::Use",
+        "source": {
+          "end": 570,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 549
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'use'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:549:554:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "use",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Use",
+        "source": {
+          "end": 554,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 549
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Stage5::IDENT"
+        },
+        "ruleId": "Stage5::Use",
+        "source": {
+          "end": 560,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 555
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "';'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:567:570:body/2/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Use",
+        "source": {
+          "end": 570,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 567
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+        "node": {
+          "items": [
+            "expr:examples/stage5-debug/stage5.ubnf:647:650:body/0/literal",
+            "expr:examples/stage5-debug/stage5.ubnf:651:666:body/1/repeat",
+            "expr:examples/stage5-debug/stage5.ubnf:667:670:body/2/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Stage5::Block",
+        "source": {
+          "end": 670,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 647
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'{'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:647:650:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Block",
+        "source": {
+          "end": 650,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 647
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:651:666:body/1/repeat",
+        "node": {
+          "child": "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "Stage5::Block",
+        "source": {
+          "end": 666,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 651
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "Stage5::Item"
+        },
+        "ruleId": "Stage5::Block",
+        "source": {
+          "end": 657,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 653
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'}'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:667:670:body/2/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Block",
+        "source": {
+          "end": 670,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 667
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq",
+        "node": {
+          "items": [
+            "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal",
+            "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef",
+            "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "Stage5::Note",
+        "source": {
+          "end": 740,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 717
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "'note'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:717:723:body/0/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": "note",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Note",
+        "source": {
+          "end": 723,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 717
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "Stage5::STRING"
+        },
+        "ruleId": "Stage5::Note",
+        "source": {
+          "end": 730,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 724
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "';'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:examples/stage5-debug/stage5.ubnf:737:740:body/2/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "ruleId": "Stage5::Note",
+        "source": {
+          "end": 740,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 737
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [
+      {
+        "fields": [
+          {
+            "cardinality": "list",
+            "conversion": "node",
+            "field": "items",
+            "siteIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:291:295:body/0/0/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Program",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "Stage5AST.Program",
+        "ruleId": "Stage5::Program",
+        "transformId": null
+      },
+      {
+        "fields": [],
+        "id": "recipe:Item",
+        "kind": "transparent",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "Stage5AST.Item",
+        "ruleId": "Stage5::Item",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "name",
+            "siteIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef/capture/0"
+            ]
+          },
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "value",
+            "siteIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:463:469:body/3/tokenRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Let",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "Stage5AST.Let",
+        "ruleId": "Stage5::Let",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "name",
+            "siteIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Use",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "Stage5AST.Use",
+        "ruleId": "Stage5::Use",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "list",
+            "conversion": "node",
+            "field": "items",
+            "siteIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:653:657:body/1/0/ruleRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Block",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "Stage5AST.Block",
+        "ruleId": "Stage5::Block",
+        "transformId": null
+      },
+      {
+        "fields": [
+          {
+            "cardinality": "scalar",
+            "conversion": "text",
+            "field": "text",
+            "siteIds": [
+              "expr:examples/stage5-debug/stage5.ubnf:724:730:body/1/tokenRef/capture/0"
+            ]
+          }
+        ],
+        "id": "recipe:Note",
+        "kind": "construct",
+        "leafFallback": null,
+        "onFailure": "mappingFailure",
+        "phase": "selectedMapping",
+        "resultTypeId": "Stage5AST.Note",
+        "ruleId": "Stage5::Note",
+        "transformId": null
+      }
+    ],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 211,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 206
+            }
+          },
+          {
+            "arguments": {
+              "mode": "lexical"
+            },
+            "name": "scopeTree",
+            "source": {
+              "end": 238,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 214
+            }
+          },
+          {
+            "arguments": {
+              "className": "Program",
+              "params": [
+                "items"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 274,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 241
+            }
+          }
+        ],
+        "body": "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "items"
+        ],
+        "mappingTypeId": "Stage5AST.Program",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Stage5::Program",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Item",
+              "params": []
+            },
+            "name": "mapping",
+            "source": {
+              "end": 328,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 314
+            }
+          }
+        ],
+        "body": "expr:examples/stage5-debug/stage5.ubnf:340:364:body/choice",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": "Stage5AST.Item",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Stage5::Item",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "description": null,
+              "symbol": "name"
+            },
+            "name": "declares",
+            "source": {
+              "end": 392,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 370
+            }
+          },
+          {
+            "arguments": {
+              "className": "Let",
+              "params": [
+                "name",
+                "value"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 430,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 395
+            }
+          }
+        ],
+        "body": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "name",
+          "value"
+        ],
+        "mappingTypeId": "Stage5AST.Let",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Stage5::Let",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "name": "name"
+            },
+            "name": "symbolRef",
+            "source": {
+              "end": 507,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 486
+            }
+          },
+          {
+            "arguments": {
+              "className": "Use",
+              "params": [
+                "name"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 538,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 510
+            }
+          }
+        ],
+        "body": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "name"
+        ],
+        "mappingTypeId": "Stage5AST.Use",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Stage5::Use",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "mode": "lexical"
+            },
+            "name": "scopeTree",
+            "source": {
+              "end": 600,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 576
+            }
+          },
+          {
+            "arguments": {
+              "className": "Block",
+              "params": [
+                "items"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 634,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 603
+            }
+          }
+        ],
+        "body": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "items"
+        ],
+        "mappingTypeId": "Stage5AST.Block",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Stage5::Block",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "className": "Note",
+              "params": [
+                "text"
+              ]
+            },
+            "name": "mapping",
+            "source": {
+              "end": 705,
+              "sourceId": "examples/stage5-debug/stage5.ubnf",
+              "start": 676
+            }
+          }
+        ],
+        "body": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq",
+        "eval": null,
+        "mappingParams": [
+          "text"
+        ],
+        "mappingTypeId": "Stage5AST.Note",
+        "operator": null,
+        "skip": false,
+        "symbolId": "Stage5::Note",
+        "triviaPolicyId": "trivia:javaStyle"
+      }
+    ],
+    "scope": {
+      "effects": [
+        {
+          "events": [
+            {
+              "action": "enter",
+              "captureSiteId": null,
+              "name": "Program",
+              "when": "entry"
+            },
+            {
+              "action": "leave",
+              "captureSiteId": null,
+              "name": "Program",
+              "when": "successBeforeLeave"
+            }
+          ],
+          "mode": "lexical",
+          "ruleId": "Stage5::Program"
+        },
+        {
+          "events": [
+            {
+              "action": "declare",
+              "captureSiteId": "expr:examples/stage5-debug/stage5.ubnf:447:452:body/1/tokenRef/capture/0",
+              "name": "name",
+              "when": "successAfterLeave"
+            }
+          ],
+          "mode": "lexical",
+          "ruleId": "Stage5::Let"
+        },
+        {
+          "events": [
+            {
+              "action": "use",
+              "captureSiteId": "expr:examples/stage5-debug/stage5.ubnf:555:560:body/1/tokenRef/capture/0",
+              "name": "name",
+              "when": "afterDeclarations"
+            }
+          ],
+          "mode": "lexical",
+          "ruleId": "Stage5::Use"
+        },
+        {
+          "events": [
+            {
+              "action": "enter",
+              "captureSiteId": null,
+              "name": "Block",
+              "when": "entry"
+            },
+            {
+              "action": "leave",
+              "captureSiteId": null,
+              "name": "Block",
+              "when": "successBeforeLeave"
+            }
+          ],
+          "mode": "lexical",
+          "ruleId": "Stage5::Block"
+        }
+      ],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::IDENT",
+        "kind": "token",
+        "name": "IDENT",
+        "originalName": "IDENT",
+        "qualifiedSymbolId": "Stage5::IDENT",
+        "source": {
+          "end": 119,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 95
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::NUMBER",
+        "kind": "token",
+        "name": "NUMBER",
+        "originalName": "NUMBER",
+        "qualifiedSymbolId": "Stage5::NUMBER",
+        "source": {
+          "end": 143,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 122
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::STRING",
+        "kind": "token",
+        "name": "STRING",
+        "originalName": "STRING",
+        "qualifiedSymbolId": "Stage5::STRING",
+        "source": {
+          "end": 174,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 146
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::EOF",
+        "kind": "token",
+        "name": "EOF",
+        "originalName": "EOF",
+        "qualifiedSymbolId": "Stage5::EOF",
+        "source": {
+          "end": 202,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 178
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::Program",
+        "kind": "rule",
+        "name": "Program",
+        "originalName": "Program",
+        "qualifiedSymbolId": "Stage5::Program",
+        "source": {
+          "end": 310,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 277
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::Item",
+        "kind": "rule",
+        "name": "Item",
+        "originalName": "Item",
+        "qualifiedSymbolId": "Stage5::Item",
+        "source": {
+          "end": 366,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 331
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::Let",
+        "kind": "rule",
+        "name": "Let",
+        "originalName": "Let",
+        "qualifiedSymbolId": "Stage5::Let",
+        "source": {
+          "end": 482,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 433
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::Use",
+        "kind": "rule",
+        "name": "Use",
+        "originalName": "Use",
+        "qualifiedSymbolId": "Stage5::Use",
+        "source": {
+          "end": 572,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 541
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::Block",
+        "kind": "rule",
+        "name": "Block",
+        "originalName": "Block",
+        "qualifiedSymbolId": "Stage5::Block",
+        "source": {
+          "end": 672,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 637
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      },
+      {
+        "grammarId": "grammar:Stage5",
+        "id": "Stage5::Note",
+        "kind": "rule",
+        "name": "Note",
+        "originalName": "Note",
+        "qualifiedSymbolId": "Stage5::Note",
+        "source": {
+          "end": 742,
+          "sourceId": "examples/stage5-debug/stage5.ubnf",
+          "start": 708
+        },
+        "sourceId": "examples/stage5-debug/stage5.ubnf"
+      }
+    ],
+    "tokens": [
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaIdentifier",
+          "rust": "legacyRustIdentifier"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token IDENT = IDENTIFIER",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "組込み語彙 IDENTIFIER の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Identifier"
+        },
+        "symbolId": "Stage5::IDENT"
+      },
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaNumber",
+          "rust": "legacyRustNumber"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token NUMBER = NUMBER",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "組込み語彙 NUMBER の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Number"
+        },
+        "symbolId": "Stage5::NUMBER"
+      },
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaQuoted",
+          "rust": "legacyRustQuoted"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token STRING = DOUBLE_QUOTED",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "組込み語彙 DOUBLE_QUOTED の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Quoted"
+        },
+        "symbolId": "Stage5::STRING"
+      },
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaEndOfSource",
+          "rust": "legacyRustEndOfSource"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token EOF = END_OF_INPUT",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "組込み語彙 END_OF_INPUT の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "EndOfSource"
+        },
+        "symbolId": "Stage5::EOF"
+      }
+    ],
+    "trivia": {
+      "insertionPlan": [
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:289:308:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 2,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 3,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 4,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:441:480:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 2,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:549:570:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 2,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:647:670:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 2,
+            "ownerExprId": "expr:examples/stage5-debug/stage5.ubnf:717:740:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        }
+      ],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [
+            {
+              "codePoints": [
+                9,
+                10,
+                11,
+                12,
+                13,
+                32
+              ],
+              "kind": "characters"
+            },
+            {
+              "kind": "lineComment",
+              "lineEndProfile": "legacyLineTerminator",
+              "open": "//"
+            },
+            {
+              "close": "*/",
+              "kind": "blockComment",
+              "open": "/*"
+            }
+          ],
+          "id": "trivia:javaStyle",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": "javaStyle"
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 745,
+      "id": "examples/stage5-debug/stage5.ubnf",
+      "path": "examples/stage5-debug/stage5.ubnf",
+      "sha256": "8effb43ef3e3191447fd8b1d476e96ef764bbdbe1c9f53c389a5b12ca30e7d0e"
+    }
+  ],
+  "version": 1
+}

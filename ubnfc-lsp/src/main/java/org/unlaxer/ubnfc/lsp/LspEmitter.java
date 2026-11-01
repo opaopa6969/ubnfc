@@ -40,7 +40,7 @@ public final class LspEmitter {
 
     private static final List<String> TEMPLATES = List.of(
         "Positions", "Meta", "Analysis", "Symbols", "Diagnostics", "DocumentStore",
-        "Completion", "Hovers", "SemanticTokens", "LanguageServerImpl", "ServerMain");
+        "Completion", "Hovers", "SemanticTokens", "FoldingRanges", "LanguageServerImpl", "ServerMain");
 
     private final GrammarIr ir;
     private final String pkg;
@@ -128,7 +128,8 @@ public final class LspEmitter {
             .replace("__DECLARE_SITES__", list(declareSites()))
             .replace("__USE_SITES__", list(useSites()))
             .replace("__KEYWORDS__", list(keywords()))
-            .replace("__TRIVIA_LITERALS__", list(triviaLiterals()));
+            .replace("__TRIVIA_LITERALS__", list(triviaLiterals()))
+            .replace("__COMMENT_DELIMITERS__", commentDelimiters());
     }
 
     // ---- IR から畳み込む表 -------------------------------------------------
@@ -234,6 +235,18 @@ public final class LspEmitter {
                 if (delimiter.close() != null) result.add(delimiter.close());
             }
         return result;
+    }
+
+    /** trivia の順序付きコメント区切り。パーサと同じく最初の close で閉じる。 */
+    private String commentDelimiters() {
+        var result = new LinkedHashSet<String>();
+        for (var policy : ir.semantics().trivia().policies())
+            for (var delimiter : policy.effectiveDelimiterSet())
+                if (("lineComment".equals(delimiter.kind()) || "blockComment".equals(delimiter.kind()))
+                    && delimiter.open() != null && !delimiter.open().isEmpty())
+                    result.add("new CommentDelimiter(" + q(delimiter.open()) + ", "
+                        + (delimiter.close() == null ? "null" : q(delimiter.close())) + ")");
+        return String.join(", ", result);
     }
 
     /** 記号でない literal（演算子・区切り）。TextMate 文法の operator パターンに使う。 */
