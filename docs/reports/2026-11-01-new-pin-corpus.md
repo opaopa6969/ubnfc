@@ -7,9 +7,10 @@ PR #44 の LONG 対応（`49d1a9d`）を取り込み、tiny-code-fence の 13 �
 
 `opaopa6969/ubnfc` の issue #46 に #45 の受け入れ条件を含める。
 `fix/issue-46-new-pin-corpus` の専用 worktree で実装し、共有の main 作業ツリーは編集していない。
-変更前は `origin/master` の `cd0516f`。全 corpus の実測対象は実装 `42e7a1b` と #44 を統合した `4211d9b`。
-並行 PR #18 / #30 / #42 / #43 / #51 を含む master `06fa27b` を取り込んだ。
-front・Rust / Java generator・harness 本体のソースは実測対象から無変更。`scripts/external-pins.env` は変更していない。
+変更前は `origin/master` の `cd0516f`。Java の全件実測は実装 `42e7a1b` と #44 を統合した `4211d9b`。
+Rust は #32 の SWAR を含む master `12e5e80` を取り込んだ `8fd9759` で再実測した。
+並行 PR #18 / #30 / #32 / #42 / #43 / #51 を統合済み。front と Java generator は前回実測の binary SHA と完全一致し、harness 本体も無変更。
+Rust generator の変更を再実測で確認した。`scripts/external-pins.env` は変更していない。
 
 | 外部 fixture | pin |
 |---|---|
@@ -29,6 +30,7 @@ front・Rust / Java generator・harness 本体のソースは実測対象から�
 Classic の `docs/zero-repetition.md` に従い、通常の `{0}` / `{0,0}` は子も terminator も実行せず成功する。
 begin、内部 trivia、consumed / matched cursor、reset、子の capture と診断に触れない。
 Rust の通常経路と純粋な走査は、上限 0 を 1 に読み替える処理を除いた。
+#32 の SWAR 統合後も走査のゼロ上限は子の参照・判定より前に `Some(0)` を返す。
 LL(1) の証明と表はゼロ上限を子への辺を持たない `empty` 命令にし、runtime の Repeat でも子に入る前に上限を判定する。
 Java の通常経路と一括走査も同じ契約に揃えた。
 
@@ -212,7 +214,7 @@ rule-trivia の未観測 2 件は公開診断の照合を実装して Pass へ�
 
 変更前 front SHA-256: `d4c6cebb6aa634a79d53338f80c6389b7a4f70608ac4d96bcb2d70fc74cbe92a`。生成器 SHA-256: `a2fa844f771fca3b2bbcfa4d51fe6d3b36774ff911c3ca8686998244c0eae505`。
 
-修正後 front SHA-256: `b30ebda069797bd293a798f9d254ba7245411f7a8f71607b2f1028e59af2970e`。生成器 SHA-256: `f5c1025350b78d6867211af9a00eebb453ef13725d7cb141a064a94e3048547f`。
+SWAR 統合後 front SHA-256: `b30ebda069797bd293a798f9d254ba7245411f7a8f71607b2f1028e59af2970e`。生成器 SHA-256: `21e2a5ec564d1e544bfccbec76881cbc185de8c0986268026add3c00f92a4dd7`。
 
 [全 case の比較結果](2026-11-01-new-pin-corpus-data/rust-after.json)。
 
@@ -229,5 +231,9 @@ LL(1) と参照経路の比較、自己ホスト parity・再生成・固定点�
 も exit 0（15 tests）。#42 統合後の `cargo test -p ubnfc-stax --all-features` も 12 tests 成功。
 #51 統合後の追加テスト `cargo test -p ubnfc-harness --test stax_lsp` も成功し、LSP プロトコル・回復 golden が一致した。
 追加テストと stax crate を含む workspace 全体・LSP / DAP・wasm32 は下記 CI の最終 head でも検証する。
+
+#32 統合後も Rust の lib / scan / LL(1) / 生成物 semantics（all-features / clippy を含む）、
+SWAR の Unicode・word 境界比較、P4 / 自己ホストの全 byte 再現・固定点を再確認した。
+Rust の全 1,492 件は再実行でも exit 0、SWAR 統合前後で case ごとの outcome・差・未観測はすべて一致した。
 
 [PR #47 の CI](https://github.com/opaopa6969/ubnfc/pull/47/checks)で最終 head の native / wasm32 検証を確認する。

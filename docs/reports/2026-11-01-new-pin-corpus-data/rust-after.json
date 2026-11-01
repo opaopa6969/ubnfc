@@ -1,7 +1,7 @@
 {
   "backend": "rust",
   "front_sha256": "b30ebda069797bd293a798f9d254ba7245411f7a8f71607b2f1028e59af2970e",
-  "generator_sha256": "f5c1025350b78d6867211af9a00eebb453ef13725d7cb141a064a94e3048547f",
+  "generator_sha256": "21e2a5ec564d1e544bfccbec76881cbc185de8c0986268026add3c00f92a4dd7",
   "corpus_files": 127,
   "source_cases": 1279,
   "grammar_variants": 307,
