@@ -2,7 +2,7 @@
 
 ## 実装と観測契約
 
-作業開始時の基準は `66a18ff8e71839b893d2edabdad14825f8436dae`。並行変更は merge で取り込み、最終計測時の front は `65a9edd`。本 PR は front・外部 pin・IR・LSP / DAP を変更しない。
+作業開始時の基準は `66a18ff8e71839b893d2edabdad14825f8436dae`。並行変更は merge で取り込み、最終計測時の front は `65a9edd`。その後 `669c560`（#40 の pin / Classic 対応）も merge し、新 pin で corpus を再比較した（末尾参照）。本 PR は front・外部 pin・IR・LSP / DAP を変更しない。
 規則完了時に field ごとの `List<Value>` を詰めた `Recipe` を作る段を除いた。認識順の capture と静的 `Fields` を持つ `AstEvent` を、生成 `build` / `bN` が直接読む。scalar / optional は最初の値を列の確保なしで読み、list だけ必要時に平坦化する。leaf fallback も capture から typed record を直接作り、中間 event を作らない。既定経路の Recipe は 0。
 Rust D-035 と同様、公開 capture 出現表と AST が読む規則直下の capture を区別する。`Match` / `Occurrence` / `Value` は認識の出来事として残す。rightAssoc の trivia 区間補正は従来と同じ射影で最大終端を求め、その一時的な値列は event に保持しない。
 AST は構文成功・全入力条件の確定後、選択された event から構築する。規則成功ごとの即時構築では、memo や longest で後から捨てる枝の数値変換失敗や span を公開してしまうためである。recovery・memo 再生・変換例外・公開 span の契約を維持する。`-Dubnfc.directAst=false` / `Session.directAst=false` は同値比較と交互 A/B 用の参照経路。
@@ -81,7 +81,7 @@ AMD Ryzen 9 7950X / WSL2、core 28 固定、単一 thread。Java は `-Xms512m -
 | 条件 | 代表中央値・検証 | 判定 |
 |---|---|---|
 | Recipe を経由せず直接構築、golden 13 件不変 | Recipe 153 / 9,477 → 0、全13件通過 | 達成 |
-| 同値5本、Java corpus、IR golden 不変 | 既存5本＋10,632比較、1,444行の観測一致、Pass 1,316 / Fail 0、IR差分なし | Java無退行を達成。既存IR失敗13件は #33 |
+| 同値5本、Java corpus、IR golden 不変 | 既存5本＋10,632比較、旧pin 1,444行と新pin 1,492行の観測一致、IRの本PR差分なし | 観測不変を達成。新pinは双方Pass 1,315 / Fail3（Fail0未達、#46）。IR失敗は #33 / #46 |
 | complex AST ≤0.15 ms | **0.164443 ms** | 未達 |
 | x64 AST ≤15 ms | **17.101437 ms** | 未達 |
 | Operators AST ≤手書き | **0.431362 ≤ 0.706948 ms** | 達成 |
@@ -91,7 +91,7 @@ AMD Ryzen 9 7950X / WSL2、core 28 固定、単一 thread。Java は `-Xms512m -
 残る Match / Occurrence / Value の計数は CPU の時間割合ではない。CPU / 割当プロファイルと突き合わせて `wrap` / `combine`、capture の連続 arena、memo の event handle、読まれない Match の省略から最大項を確定する。未達目標・原因分析・次の手・受け入れ条件は [後続 #35](https://github.com/opaopa6969/ubnfc/issues/35) で追跡する。
 今回は field 中間変換の除去を1つの意味単位とする。backtrack 全経路の arena 化や認識構造の変更は混ぜず、観測不変を確認した可逆な範囲を選んだ。merge commit の `git revert -m 1` で戻せる。
 
-## 最終検証
+## AST 変更確定時の検証（pin 更新前）
 
 - P4 Java **34テスト通過**。canonical JSON golden **13件を変更せず通過**。既存同値テスト5本（Factor / TwoMode / AstBypass / Predict / Exclusive）を維持。
 - `DirectAstEquivalenceTest` は886入力×入口3×AST有無×出現表有無の **10,632比較**に加え、leaf fallback の公開 span 表全体の同値を確認。`DirectAstTest` 3件は ordered / longest の捨てる overflow、捨てた AST の span、選んだ overflow の結果・位置・メッセージ・原因を memo 有無で検証。
@@ -103,3 +103,35 @@ AMD Ryzen 9 7950X / WSL2、core 28 固定、単一 thread。Java は `-Xms512m -
 - 初期 master では `cargo fmt --all --check` が通過。後に取り込んだ #24 の front 等には未整形箇所があり、最終の同コマンドはそこで失敗する。本 PR の Rust benchmark は整形確認済み。範囲外の front は変更しない。
 
 固定 pin: unlaxer-parser `08f2bc1c918a34b84c333a8178c990383fdffb8d` / tinyexpression `f86ce8a5ab0ab7d23fdba2cd477187df8aa7607c`。外部 fixture は `scripts/fetch-external-fixtures.sh` で専用一時ディレクトリへ取得した。最終の generator / front / 原始JSON SHA-256 は `final/corpus-comparison.json`、計測した AST source は `final/source.sha256`、固定IRは `final/ir.sha256` に記録する。
+
+## master #40 統合後の最終検証
+
+`669c560` の pin / Classic front 対応を merge で取り込み、他担当の D-085 と自分の D-087 を保持した。
+Java AST source、生成 Rust、P4 benchmark IR の byte は不変。
+P4 の旧 golden は `ir/frozen/tinyexpression-p4-f86ce8a5.ir.json` へ移ったため、再現スクリプトの manifest もそのパスへ合わせた。
+SHA-256 は計測時と同じ `173e218d671a25184aba2342aa1579c1a4f33e160629384a89a7208ed7cf8868`。
+原始データの旧 `ir/fixtures/…` 表記は測定当時のパスである。固定入力を維持し、A/B 値を変える理由はない。
+IR / front / pin の更新は #40 に由来し、本 PR の差分では変更していない。
+
+統合後の pin は unlaxer-parser `d3ea73e8cfa440df8bdbb70abb29e06259435ba2` / tinyexpression `c736c2c66e4569ebc5e22f1f0c5125a045679d35`。
+専用一時ディレクトリへ再取得し、同じ現行 front と旧生成器 / 修正版で全 corpus を再実行した。
+**1,492 case×variant の観測と全集計が完全一致**。入力母集団は1,231→1,279へ48件増えた。
+両方とも **Java Pass 1,315 / 期待拒否 Pass27 / Known29 / Fail3 / 未観測61 / IR段階失敗57**。
+生成拒否・javac失敗・build失敗・driver error は全て0。run-all は双方 exit1。
+これは直接AST経路の退行ではないが、現在の pin では受け入れ条件の **Fail0を満たしていない**。
+旧pinの Pass1,316 / Fail0 と区別し、この未達を隠さない。
+
+Fail3件は `primitives` の EMPTY / ANY を使った `T{0,0}` 2件と、`rule-trivia` の `BuiltinNoneReserved/reserved-alias-wins` 1件。
+認識で拒否され AST に到達せず、旧生成器も同じ観測になる。
+追加IR失敗44件は `rule-trivia` の名前付き whitespace 未対応や import fixture の未解決など。
+原因の帰属・最小回帰・Fail0への復帰・IR失敗の分類と解消を、受け入れ条件付きの
+[後続 #46](https://github.com/opaopa6969/ubnfc/issues/46) へ切り出した。残る LONG13件は引き続き #33。
+front や harness の別機能修正を AST の PR に混ぜず、基準生成器との同値を維持した範囲で完了する判断である。
+
+統合後も生成物 byte 一致・P4 **34テスト通過**。
+generator 全 **11,888件**は既存 P4 コンパイル検証1件が60秒 timeout、それ以外は通過。
+corpus 終了後、同じ60秒上限の当該1件を再実行し **10.856秒で通過**。上限や判定は変更していない。
+並走中の load average は約62〜86で、再実行前は29.48まで下がっていた。
+これらはテストの実行状況で、前掲の性能 A/B セッションとは区別する。
+[統合後のデータ](2026-11-01-java-direct-ast-data/integrated-pin/) に全case観測SHA、生成器/front SHA、原始JSON SHA、
+3件の actual / expected / differences と44件のIR診断、テストの初回集計・再実行結果を保存した。

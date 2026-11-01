@@ -32,7 +32,7 @@ edition = "2021"
 [dependencies]
 ubnfc-p4-rust = { path = "$repo/examples/p4-rust" }
 TOML
-  sha256sum "$repo/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json" \
+  sha256sum "$repo/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json" \
     "$repo/ir/fixtures/unlaxer-dsl__src__test__resources__associative__Operators.ubnf.ir.json" \
     "$repo/ir/fixtures/unlaxer-dsl__src__test__resources__right-associative__Power.ubnf.ir.json" > "$work/ir.sha256"
   cargo build --release --manifest-path "$work/rust/Cargo.toml"
