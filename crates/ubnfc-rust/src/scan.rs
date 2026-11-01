@@ -285,7 +285,7 @@ fn body(g: &Generator<'_>, scans: &Scans, i: usize) -> Option<String> {
                 s.push_str("let mut count=0usize;\n");
             }
             let bulk = table.map(|class| {
-                let word = word_failure_mask(class).map(|condition| format!(
+                let word = word_failure_mask(class).filter(|_| cfg!(feature = "swar")).map(|condition| format!(
                     "if first<0x80 {{if (if first<64 {{{:#x}u64>>first}} else {{{:#x}u64>>(first-64)}})&1==0 {{break;}}\nwhile let Some(chunk)=bytes.get(p..).and_then(|tail|tail.get(..8)) {{\nlet w=u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"));\nlet x=w&0x7f7f7f7f7f7f7f7fu64;let _=x;\nlet bad={condition};let n=(bad.trailing_zeros()/8) as usize;p+=n;{}if bad!=0 {{break;}}\n}}}}\n",
                     class.ascii_low, class.ascii_high,
                     if counted {"count+=n;"} else {""}

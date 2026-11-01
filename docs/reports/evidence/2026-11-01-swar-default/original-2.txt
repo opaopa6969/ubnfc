@@ -1,0 +1,7 @@
+# host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64, core=30, runs=7, run_seconds=0.5
+# before=66a18ff8e71839b893d2edabdad14825f8436dae after=3fa69b5c8e4e438c76a4679c634ef382ef2b1cb6
+ 22:45:42 up 14 days,  5:10,  0 users,  load average: 24.86, 23.30, 21.25
+# load average (開始): 24.86 23.30 21.25
+ 22:47:02 up 14 days,  5:12,  0 users,  load average: 23.12, 23.13, 21.35
+# load average (終了): 23.12 23.13 21.35
+# /home/opa/work/.wt/ubnfc-perf-31/target/perf31-original-7jQhlk/session2/swar-time.csv
