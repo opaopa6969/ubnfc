@@ -34,6 +34,10 @@ public final class Meta {
     /** 参照を読む capture site を持つ式。 */
     public static final Set<String> USE_SITES = Set.of(__USE_SITES__);
 
+    /** close が null のものは行コメント。文法の trivia policy から生成する。 */
+    public record CommentDelimiter(String open, String close) {}
+    public static final List<CommentDelimiter> COMMENT_DELIMITERS = List.of(__COMMENT_DELIMITERS__);
+
     /** 語として読める literal。completion の候補と TextMate 文法の keyword。 */
     public static final List<String> KEYWORDS = List.of(__KEYWORDS__);
 

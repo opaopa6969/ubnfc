@@ -1,0 +1,22 @@
+{
+  "evaluate": {
+    "result": "5",
+    "type": "number",
+    "variablesReference": 0
+  },
+  "variables": [
+    {
+      "name": "total",
+      "value": "5",
+      "type": "number",
+      "variablesReference": 0
+    }
+  ],
+  "unknownExpression": "evaluate は文法デバッガでは未対応です（値を計算する評価器を持っていません）。言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください（生成された EvaluatorBridge.java の Javadoc に例があります）。",
+  "relaunch": {
+    "result": "7",
+    "type": "number",
+    "variablesReference": 0
+  },
+  "noop": "evaluate は文法デバッガでは未対応です（値を計算する評価器を持っていません）。言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください（生成された EvaluatorBridge.java の Javadoc に例があります）。"
+}

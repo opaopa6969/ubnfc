@@ -366,6 +366,17 @@ ubnfc の front は Classic の綴りを受け付ける。ubnfc 独自の綴り�
 | token adapter `ADAPTER('id', version=N)`（#158） | その位置で `E-TOKEN-ADAPTER-UNSUPPORTED`（D-085） | Classic の adapter registry は ubnfc の extern registry（D-041）と別物なので読み替えない |
 | 宣言的 token の `CHAR_RANGE` / `NEGATION` の `\uXXXX` / `\u{X…}` | code point 1 個へ展開する（D-085） | D-063 を宣言的 token にも当てる。Classic と同じ |
 
+### Classic と違うところ（意図した差）
+
+- **`REGEX('pattern')` を受理し続ける（D-092）。** Classic は REGEX を廃止し（unlaxer-parser #612、開発版は
+  `E-REGEX-RETIRED`、移行は宣言的 token）、仕様（`ubnf-syntax.md`「旧 `REGEX('pattern')` — 廃止」）からも
+  受理の記述を消した。ubnfc は既存の文法を壊さないよう、v1 / v2 とも従来どおり正則部分集合の DFA
+  （`analysis/regex.rs`）と Java fallback で受理する。綴りの正本は Classic なので、新しい文法では宣言的 token
+  （`token NAME ::= …;`）を使うこと。ubnfc が REGEX を拒否するかどうかは、REGEX を使う利用者の移行が
+  済んでから改めて決める（そのとき code は Classic と同じ `E-REGEX-RETIRED` にする）。
+- 空の選択肢（`( 'a' | )`、`E ::= ;`）を手書き front は受理し続ける。Classic の自己記述文法は
+  `SequenceBody ::= AnnotatedElement+` になったので、self-host frontend は拒否する（`crates/ubnfc-selfhost/tests/parity.rs` が既知の差として固定）。
+
 関数形式（`CAPTURE(` など）になるのは、名前と `(` が隣接しているときだけである。`CAPTURE ('x')` のように空白・
 コメントを挟めば、従来どおり参照と group になる（Classic と同じ）。宣言的 token の中の `CAPTURE` / `SAME_AS`
 （D-061）は従来どおり使える。
