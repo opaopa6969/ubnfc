@@ -53846,6 +53846,3830 @@
         "tokenId": "TinyExpressionP4::EOF"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1767:1775:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "import",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1799:1802:body/2/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "#",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1824:1828:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1847:1850:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1940:1943:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3654:3662:body/0/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 6
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3656:3660:body/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3663:3758:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            8
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3665:3756:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 110,
+                  "start": 110
+                }
+              ],
+              "target": 9
+            },
+            {
+              "ranges": [
+                {
+                  "end": 78,
+                  "start": 78
+                }
+              ],
+              "target": 10
+            },
+            {
+              "ranges": [
+                {
+                  "end": 115,
+                  "start": 115
+                }
+              ],
+              "target": 11
+            },
+            {
+              "ranges": [
+                {
+                  "end": 83,
+                  "start": 83
+                }
+              ],
+              "target": 12
+            },
+            {
+              "ranges": [
+                {
+                  "end": 98,
+                  "start": 98
+                }
+              ],
+              "target": 13
+            },
+            {
+              "ranges": [
+                {
+                  "end": 66,
+                  "start": 66
+                }
+              ],
+              "target": 14
+            },
+            {
+              "ranges": [
+                {
+                  "end": 111,
+                  "start": 111
+                }
+              ],
+              "target": 15
+            },
+            {
+              "ranges": [
+                {
+                  "end": 79,
+                  "start": 79
+                }
+              ],
+              "target": 16
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3665:3673:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "number",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3676:3684:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Number",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3687:3695:body/1/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "string",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3698:3706:body/1/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "String",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3713:3722:body/1/0/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "boolean",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3725:3734:body/1/0/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Boolean",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3737:3745:body/1/0/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "object",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3748:3756:body/1/0/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Object",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3783:3791:body/0/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 18
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3785:3789:body/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3792:3835:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            20
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3794:3833:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 110,
+                  "start": 110
+                }
+              ],
+              "target": 21
+            },
+            {
+              "ranges": [
+                {
+                  "end": 78,
+                  "start": 78
+                }
+              ],
+              "target": 22
+            },
+            {
+              "ranges": [
+                {
+                  "end": 102,
+                  "start": 102
+                }
+              ],
+              "target": 23
+            },
+            {
+              "ranges": [
+                {
+                  "end": 70,
+                  "start": 70
+                }
+              ],
+              "target": 24
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3794:3802:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "number",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3805:3813:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Number",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3816:3823:body/1/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "float",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3826:3833:body/1/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Float",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3859:3867:body/0/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 26
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3861:3865:body/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3868:3891:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            28
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3870:3889:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 115,
+                  "start": 115
+                }
+              ],
+              "target": 29
+            },
+            {
+              "ranges": [
+                {
+                  "end": 83,
+                  "start": 83
+                }
+              ],
+              "target": 30
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3870:3878:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "string",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3881:3889:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "String",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3916:3924:body/0/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 32
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3918:3922:body/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3925:3950:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            34
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3927:3948:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 98,
+                  "start": 98
+                }
+              ],
+              "target": 35
+            },
+            {
+              "ranges": [
+                {
+                  "end": 66,
+                  "start": 66
+                }
+              ],
+              "target": 36
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3927:3936:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "boolean",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3939:3948:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Boolean",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3974:3982:body/0/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 38
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3976:3980:body/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3983:4006:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            40
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3985:4004:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 111,
+                  "start": 111
+                }
+              ],
+              "target": 41
+            },
+            {
+              "ranges": [
+                {
+                  "end": 79,
+                  "start": 79
+                }
+              ],
+              "target": 42
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3985:3993:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "object",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:3996:4004:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Object",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4058:4062:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "if",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4063:4068:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "not",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4069:4077:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "exists",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4099:4112:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "description",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4113:4116:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4144:4147:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4159:4162:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4188:4191:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4243:4246:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:4308:4311:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:5881:5884:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6120:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 110,
+                  "start": 110
+                }
+              ],
+              "target": 55
+            },
+            {
+              "ranges": [
+                {
+                  "end": 102,
+                  "start": 102
+                }
+              ],
+              "target": 56
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6102:6110:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "number",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6113:6120:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "float",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6146:6154:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "string",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6181:6190:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "boolean",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6216:6224:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "object",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6244:6260:body/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 54
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6644:6654:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "external",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6657:6668:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "returning",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6669:6677:body/1/0/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 64
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6671:6675:body/1/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6702:6709:body/3/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 66
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6704:6707:body/3/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6737:6740:body/4/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "#",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6783:6786:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6807:6810:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6922:6932:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "external",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6941:6952:body/1/0/0/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "returning",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6953:6961:body/1/0/0/0/0/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 73
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6955:6959:body/1/0/0/0/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6964:6980:body/1/0/0/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 54
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6981:6988:body/1/0/0/2/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 76
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6983:6986:body/1/0/0/2/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6991:6998:body/1/0/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 78
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:6993:6996:body/1/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7028:7031:body/2/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "#",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7074:7077:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7098:7101:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7213:7223:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "external",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7226:7237:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "returning",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7238:7246:body/1/0/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 85
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7240:7244:body/1/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7270:7277:body/3/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 87
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7272:7275:body/3/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7305:7308:body/4/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "#",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7351:7354:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7375:7378:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7490:7500:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "external",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7503:7514:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "returning",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7515:7523:body/1/0/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 94
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7517:7521:body/1/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7547:7554:body/3/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 96
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7549:7552:body/3/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7582:7585:body/4/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "#",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7628:7631:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7652:7655:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7860:7866:body/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "call",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7867:7881:body/0/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 102
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7869:7879:body/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "internal",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:7884:7894:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "internal",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8260:8263:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "?",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8291:8294:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:8619:8622:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9078:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 43,
+                  "start": 43
+                }
+              ],
+              "target": 108
+            },
+            {
+              "ranges": [
+                {
+                  "end": 45,
+                  "start": 45
+                }
+              ],
+              "target": 109
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9069:9072:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9075:9078:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9102:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 42,
+                  "start": 42
+                }
+              ],
+              "target": 111
+            },
+            {
+              "ranges": [
+                {
+                  "end": 47,
+                  "start": 47
+                }
+              ],
+              "target": 112
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9093:9096:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9099:9102:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9520:9525:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "sin",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9526:9529:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9554:9557:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9613:9618:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "cos",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9619:9622:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9647:9650:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9706:9711:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "tan",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9712:9715:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9740:9743:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9801:9807:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "sqrt",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9808:9811:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9836:9839:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9903:9908:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "min",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9909:9912:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9941:9944:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:9972:9975:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10039:10044:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "max",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10045:10048:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10077:10080:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10108:10111:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10159:10167:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "random",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10168:10171:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10172:10175:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10231:10236:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "abs",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10237:10240:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10265:10268:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10328:10335:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "round",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10336:10339:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10364:10367:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10425:10431:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "ceil",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10432:10435:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10460:10463:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10523:10530:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "floor",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10531:10534:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10559:10562:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10629:10634:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "pow",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10635:10638:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10664:10667:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10697:10700:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10756:10761:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "log",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10762:10765:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10790:10793:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10849:10854:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "exp",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10855:10858:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:10883:10886:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11040:11047:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "toNum",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11048:11051:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11076:11079:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11113:11116:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11401:11404:body/12/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11422:11425:body/12/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11578:11591:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "toUpperCase",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11592:11595:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11620:11623:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11697:11710:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "toLowerCase",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11711:11714:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11739:11742:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11802:11808:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "trim",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11809:11812:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11837:11840:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11904:11912:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "length",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11913:11916:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:11941:11944:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12005:12010:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "len",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12011:12014:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12039:12042:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12386:12400:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".toUpperCase",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12401:12404:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12405:12408:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12505:12519:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".toLowerCase",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12520:12523:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12524:12527:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12610:12617:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".trim",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12618:12621:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12622:12625:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12712:12721:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".length",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12722:12725:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12726:12729:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12949:12961:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "startsWith",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12962:12965:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:12990:12993:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13027:13030:body/5/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13060:13063:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13141:13151:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "endsWith",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13152:13155:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13180:13183:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13217:13220:body/5/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13250:13253:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13331:13341:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "contains",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13342:13345:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13370:13373:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13407:13410:body/5/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13440:13443:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13533:13538:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".in",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13539:13542:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13574:13577:body/4/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13609:13612:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13808:13821:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".startsWith",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13822:13825:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13859:13862:body/4/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:13892:13895:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14008:14019:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".endsWith",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14020:14023:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14057:14060:body/4/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14090:14093:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14206:14217:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".contains",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14218:14221:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14255:14258:body/4/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14288:14291:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14544:14555:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "isPresent",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14556:14559:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14579:14582:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14746:14759:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "inTimeRange",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14760:14763:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14792:14795:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14822:14825:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14936:14952:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "inDayTimeRange",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14953:14956:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:14977:14980:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15009:15012:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15031:15034:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15061:15064:body/9/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15084:15092:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "MONDAY",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15095:15104:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "TUESDAY",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15107:15118:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "WEDNESDAY",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15121:15131:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "THURSDAY",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15134:15142:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "FRIDAY",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15145:15155:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "SATURDAY",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15158:15166:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "SUNDAY",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15365:15368:body/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:15381:15384:body/1/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16334:16337:body/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16361:16364:body/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16384:16387:body/0/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16409:16412:body/0/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16444:16447:body/1/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16471:16474:body/1/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16494:16497:body/1/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16529:16532:body/2/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16556:16559:body/2/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16560:16563:body/2/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16585:16588:body/2/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16620:16623:body/3/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16647:16650:body/3/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16651:16654:body/3/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16686:16689:body/4/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16690:16693:body/4/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16713:16716:body/4/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16738:16741:body/4/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16773:16776:body/5/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16777:16780:body/5/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16800:16803:body/5/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16835:16838:body/6/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16839:16842:body/6/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16843:16846:body/6/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16868:16871:body/6/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16903:16906:body/7/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16907:16910:body/7/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:16911:16914:body/7/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17035:17038:body/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17062:17065:body/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17085:17088:body/0/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17110:17113:body/0/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17147:17150:body/1/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17174:17177:body/1/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17197:17200:body/1/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17234:17237:body/2/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17261:17264:body/2/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17265:17268:body/2/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17290:17293:body/2/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17327:17330:body/3/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17354:17357:body/3/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17358:17361:body/3/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17395:17398:body/4/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17399:17402:body/4/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17422:17425:body/4/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17447:17450:body/4/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17484:17487:body/5/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17488:17491:body/5/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17511:17514:body/5/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17548:17551:body/6/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17552:17555:body/6/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17556:17559:body/6/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17581:17584:body/6/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17618:17621:body/7/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17622:17625:body/7/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17626:17629:body/7/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17918:17921:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:17985:17988:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18006:18009:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18661:18664:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18665:18688:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            305
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18667:18686:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 115,
+                  "start": 115
+                }
+              ],
+              "target": 306
+            },
+            {
+              "ranges": [
+                {
+                  "end": 83,
+                  "start": 83
+                }
+              ],
+              "target": 307
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18667:18675:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "string",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18678:18686:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "String",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18689:18692:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18693:18696:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "$",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18797:18800:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "$",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18818:18822:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "as",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18823:18846:body/3/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            313
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18825:18844:body/3/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 115,
+                  "start": 115
+                }
+              ],
+              "target": 314
+            },
+            {
+              "ranges": [
+                {
+                  "end": 83,
+                  "start": 83
+                }
+              ],
+              "target": 315
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18825:18833:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "string",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:18836:18844:body/3/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "String",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19106:19109:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "|",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19309:19312:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "&",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19505:19508:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "^",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19673:19678:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "not",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19679:19682:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:19708:19711:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20084:20090:body/14/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "true",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20097:20104:body/15/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "false",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20152:20155:body/18/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20174:20177:body/18/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20295:20305:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 328
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20827:20837:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 328
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20896:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 61,
+                  "start": 61
+                }
+              ],
+              "target": 329
+            },
+            {
+              "ranges": [
+                {
+                  "end": 33,
+                  "start": 33
+                }
+              ],
+              "target": 330
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20885:20889:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "==",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:20892:20896:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "!=",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21059:21063:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "==",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21066:21070:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "!=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21073:21077:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "<=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21080:21084:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ">=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21087:21090:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "<",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21093:21096:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ">",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21595:21599:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "if",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21600:21603:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21633:21636:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21641:21644:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21672:21675:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21680:21686:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "else",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21691:21694:body/8/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:21722:21725:body/10/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22232:22235:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22265:22268:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "?",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22296:22299:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22327:22330:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22520:22527:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "match",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22528:22531:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22562:22565:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22596:22599:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22635:22638:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22742:22746:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "->",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22846:22855:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "default",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:22856:22860:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "->",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23087:23094:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "match",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23095:23098:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23129:23132:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23163:23166:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23202:23205:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23309:23313:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "->",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23413:23422:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "default",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23423:23427:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "->",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23656:23663:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "match",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23664:23667:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23699:23702:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23734:23737:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23774:23777:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23883:23887:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "->",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:23990:23999:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "default",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24000:24004:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "->",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24517:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 110,
+                  "start": 110
+                }
+              ],
+              "target": 374
+            },
+            {
+              "ranges": [
+                {
+                  "end": 78,
+                  "start": 78
+                }
+              ],
+              "target": 375
+            },
+            {
+              "ranges": [
+                {
+                  "end": 102,
+                  "start": 102
+                }
+              ],
+              "target": 376
+            },
+            {
+              "ranges": [
+                {
+                  "end": 70,
+                  "start": 70
+                }
+              ],
+              "target": 377
+            },
+            {
+              "ranges": [
+                {
+                  "end": 115,
+                  "start": 115
+                }
+              ],
+              "target": 378
+            },
+            {
+              "ranges": [
+                {
+                  "end": 83,
+                  "start": 83
+                }
+              ],
+              "target": 379
+            },
+            {
+              "ranges": [
+                {
+                  "end": 98,
+                  "start": 98
+                }
+              ],
+              "target": 380
+            },
+            {
+              "ranges": [
+                {
+                  "end": 66,
+                  "start": 66
+                }
+              ],
+              "target": 381
+            },
+            {
+              "ranges": [
+                {
+                  "end": 111,
+                  "start": 111
+                }
+              ],
+              "target": 382
+            },
+            {
+              "ranges": [
+                {
+                  "end": 79,
+                  "start": 79
+                }
+              ],
+              "target": 383
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24406:24414:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "number",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24417:24425:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Number",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24428:24435:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "float",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24438:24445:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Float",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24452:24460:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "string",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24463:24471:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "String",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24474:24483:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "boolean",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24486:24495:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Boolean",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24498:24506:body/8/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "object",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24509:24517:body/9/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "Object",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:24987:24990:body/5/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:25009:25012:body/5/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

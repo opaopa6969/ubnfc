@@ -1793,6 +1793,123 @@
         "tokenId": "TinyCalcLR::EOF"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:229:232:body/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:345:348:body/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:360:363:body/1/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:378:387:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 43,
+                  "start": 43
+                }
+              ],
+              "target": 4
+            },
+            {
+              "ranges": [
+                {
+                  "end": 45,
+                  "start": 45
+                }
+              ],
+              "target": 5
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:378:381:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:384:387:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:402:411:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 42,
+                  "start": 42
+                }
+              ],
+              "target": 7
+            },
+            {
+              "ranges": [
+                {
+                  "end": 47,
+                  "start": 47
+                }
+              ],
+              "target": 8
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:402:405:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:story/code/calc-leftrec.ubnf:408:411:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "root": false
+      }
+    ],
     "memo": {
       "entries": [
         {

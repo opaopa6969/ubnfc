@@ -27,6 +27,7 @@ pub(crate) struct Generator<'a> {
     /// D-072: 観測を残さない終端領域の走査計画と、その走査関数の生成結果。
     pub scans: crate::scan::Scans,
     pub scan_source: String,
+    pub ll1_roots: BTreeMap<usize, usize>,
     /// D-078: 意味値を持つ選択（`M+ | '='`）の、意味値を持たない候補。その候補が採用されたら
     /// 一致範囲の字句を 1 つの意味値にする（旧実装の `#semantic:text`、Java `SemanticShape`）。
     pub text_alternatives: BTreeSet<usize>,
@@ -76,6 +77,7 @@ impl<'a> Generator<'a> {
             lexicon: crate::lexical::Lexicon::new(ir),
             scans: crate::scan::Scans::empty(),
             scan_source: String::new(),
+            ll1_roots: BTreeMap::new(),
             text_alternatives: BTreeSet::new(),
         };
         g.text_alternatives = crate::expressions::text_alternatives(&g);
@@ -151,6 +153,7 @@ impl<'a> Generator<'a> {
         let mut scans = crate::scan::Scans::new(&g);
         g.scan_source = crate::scan::generate(&g, &mut scans);
         g.scans = scans;
+        g.ll1_roots = crate::ll1::roots(&g);
         g
     }
     fn visit(&mut self, i: usize, mode: bool) {
@@ -257,6 +260,7 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         runtime.push_str(include_str!("../templates/declarative.rs").trim_start_matches("//! Atomic lexical programs generated from UBNF. Matching has no host-context side effects.\n"));
         runtime.push_str("\n}\n");
     }
+    runtime.push_str(&crate::ll1::generate(&g));
     runtime.push_str(&crate::lexical::generate(&g));
     runtime.push_str(&crate::mapping::generate(&g)?);
     files.insert("runtime.rs".into(), runtime);
@@ -447,6 +451,7 @@ if result.ok || !stack_exhausted {return Ok(result);}\n\
 impl<const DIAG: bool> Session<'_, DIAG> {\n",
     );
     p.push_str(&g.scan_source);
+    p.push_str(&crate::ll1::scanners(&g));
     for (i, rule) in ir.semantics.rules.iter().enumerate() {
         for mode in [false, true] {
             if !g.modes.contains(&(g.expr[rule.body.as_str()], mode)) {

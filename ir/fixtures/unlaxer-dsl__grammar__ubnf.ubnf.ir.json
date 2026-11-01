@@ -18821,6 +18821,1600 @@
         "tokenId": "UBNF::UNSIGNED_INTEGER"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1523:1532:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@import",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1551:1557:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "from",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1704:1713:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "grammar",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1736:1739:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1879:1882:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:1982:1985:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2002:2005:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2281:2284:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2311:2314:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2402:2405:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2554:2561:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "token",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2585:2588:body/2/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2609:2614:body/2/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "::=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2748:2751:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:2853:2856:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "|",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3168:3171:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "?",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3174:3177:body/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3180:3183:body/0/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3190:3193:body/0/0/3/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3213:3216:body/0/0/3/2/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3240:3243:body/0/0/3/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3331:3334:body/0/0/1/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3347:3350:body/0/0/1/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3357:3360:body/0/0/2/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3373:3376:body/0/0/2/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3383:3386:body/0/0/3/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3399:3402:body/0/0/3/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3409:3447:body/0/0/4/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            28
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3411:3445:body/0/0/4/0/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 76,
+                  "start": 76
+                }
+              ],
+              "target": 29
+            },
+            {
+              "ranges": [
+                {
+                  "end": 78,
+                  "start": 78
+                }
+              ],
+              "target": 30
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3411:3422:body/0/0/4/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "LOOKAHEAD",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3425:3445:body/0/0/4/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "NEGATIVE_LOOKAHEAD",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3448:3451:body/0/0/4/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3464:3467:body/0/0/4/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3474:3483:body/0/0/5/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "CAPTURE",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3484:3487:body/0/0/5/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3499:3502:body/0/0/5/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3515:3518:body/0/0/5/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3525:3534:body/0/0/6/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "SAME_AS",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3535:3538:body/0/0/6/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3550:3553:body/0/0/6/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3560:3572:body/0/0/7/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "CHAR_RANGE",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3573:3576:body/0/0/7/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3584:3587:body/0/0/7/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3595:3598:body/0/0/7/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3605:3615:body/0/0/8/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "NEGATION",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3616:3619:body/0/0/8/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:3627:3630:body/0/0/8/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4104:4111:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "UNTIL",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4112:4115:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4135:4138:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4241:4251:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "NEGATION",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4252:4255:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4270:4273:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4383:4394:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "LOOKAHEAD",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4395:4398:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4415:4418:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4553:4573:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "NEGATIVE_LOOKAHEAD",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4574:4577:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4594:4597:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4707:4719:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "CHAR_RANGE",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4720:4723:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4736:4739:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4752:4755:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4841:4845:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "CI",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4846:4849:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4863:4866:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4964:4971:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "REGEX",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4972:4975:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:4992:4995:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5124:5133:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "ADAPTER",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5134:5137:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5149:5152:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5153:5162:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "version",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5163:5166:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5193:5196:body/7/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5259:5264:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "ANY",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5327:5332:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "EOF",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:5401:5408:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "EMPTY",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6306:6313:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@root",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6411:6421:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@mapping",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6422:6425:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6464:6467:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6468:6476:body/3/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "params",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6477:6480:body/3/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6481:6484:body/3/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6510:6513:body/3/0/5/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6539:6542:body/3/0/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6550:6553:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6626:6633:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@eval",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6634:6637:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6662:6665:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6690:6693:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6776:6789:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@whitespace",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6792:6795:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6814:6817:body/1/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6904:6917:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@interleave",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6918:6921:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6922:6931:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "profile",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6932:6935:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:6956:6959:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7035:7045:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@backref",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7046:7049:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7050:7056:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "name",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7057:7060:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7078:7081:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7161:7173:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@scopeTree",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7174:7177:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7178:7184:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "mode",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7185:7188:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7206:7209:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7302:7313:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@declares",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7314:7317:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7318:7326:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "symbol",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7327:7330:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7352:7355:body/5/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7356:7369:body/5/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "description",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7370:7373:body/5/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7396:7399:body/6/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7478:7488:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@catalog",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7489:7492:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7493:7502:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "context",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7503:7506:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7523:7526:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7591:7603:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@leftAssoc",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7670:7683:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@rightAssoc",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7756:7772:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@longestChoice",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7851:7870:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@predictiveChoice",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7953:7966:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@precedence",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7967:7970:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7971:7978:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "level",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:7979:7982:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8007:8010:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8078:8084:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@doc",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8085:8088:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8102:8105:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8195:8206:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@recovery",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8207:8210:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8213:8219:body/2/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "sync",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8220:8223:body/2/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "=",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8264:8267:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8322:8329:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@skip",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8492:8506:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@commonField",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8507:8510:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8536:8539:body/3/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8565:8568:body/4/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8676:8683:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@enum",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8757:8760:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:8920:8923:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "|",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9295:9316:body/2/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 149
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9297:9314:body/2/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 151
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9378:9381:body/5/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9456:9471:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 43,
+                  "start": 43
+                }
+              ],
+              "target": 152
+            },
+            {
+              "ranges": [
+                {
+                  "end": 63,
+                  "start": 63
+                }
+              ],
+              "target": 153
+            },
+            {
+              "ranges": [
+                {
+                  "end": 42,
+                  "start": 42
+                }
+              ],
+              "target": 154
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9456:9459:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9462:9465:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "?",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9468:9471:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9520:9523:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "%",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9595:9598:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9608:9611:body/2/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:9625:9628:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10019:10022:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10038:10041:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10131:10134:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10150:10153:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10244:10247:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10263:10266:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10366:10373:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "ERROR",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10374:10377:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:10394:10397:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:11002:11011:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "@typeof",
+          "wordBoundary": true
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:11012:11015:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:11040:11043:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/grammar/ubnf.ubnf:11167:11170:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

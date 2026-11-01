@@ -1796,6 +1796,512 @@ if name.is_empty()
         self.give_stack(stack);
     }
 }
+// LL(1) 認識専用 VM。失敗・予算超過では Session を変更せず参照経路へ戻す。
+type Ll1Ranges = &'static [(u32, u32)];
+#[derive(Clone, Copy)]
+enum Ll1Op {
+    Sequence(&'static [usize]),
+    Choice(&'static [(Ll1Ranges, usize)]),
+    Optional(usize),
+    Repeat(usize, u64, Option<u64>),
+    Call(usize),
+    Literal(&'static str, bool),
+    Class(Ll1Ranges),
+    Eof,
+}
+#[derive(Clone, Copy)]
+enum Ll1Frame {
+    Sequence(&'static [usize], usize),
+    Optional(usize),
+    Repeat { target: usize, min: u64, max: Option<u64>, count: u64, last: usize },
+    Call,
+}
+fn ll1_contains(ranges: Ll1Ranges, cp: u32) -> bool {
+    ranges.iter().any(|&(lo, hi)| lo <= cp && cp <= hi)
+}
+impl<const DIAG: bool> Session<'_, DIAG> {
+    pub fn ll1_run(&self, root: usize, start: usize, scan: impl Fn(usize,usize)->Option<Option<usize>>) -> Option<usize> {
+        let mut p = start;
+        let mut current = root;
+        let mut frames = Vec::with_capacity(32);
+        let mut calls = 0usize;
+        'enter: loop {
+            // 明示 stack の作業量を制限。深い再帰の資源診断は従来経路で確定する。
+            if frames.len() >= 256 { return None; }
+            let mut ok = true;
+            if let Some(end) = scan(current, p) {
+                match end { Some(end) => p = end, None => ok = false }
+            } else {
+            match LL1_TABLE[current] {
+                Ll1Op::Sequence(items) => {
+                    if let Some(&first) = items.first() {
+                        frames.push(Ll1Frame::Sequence(items, 1));
+                        current = first;
+                        continue;
+                    }
+                }
+                Ll1Op::Choice(rows) => {
+                    let cp = self.input.cp_at(p).map(|(c, _)| c as u32);
+                    if let Some((_, target)) = rows.iter().find(|(rs, _)| cp.is_some_and(|c| ll1_contains(rs, c))) {
+                        current = *target;
+                        continue;
+                    }
+                    ok = false;
+                }
+                Ll1Op::Optional(target) => {
+                    frames.push(Ll1Frame::Optional(p));
+                    current = target;
+                    continue;
+                }
+                Ll1Op::Repeat(target, min, max) => {
+                    frames.push(Ll1Frame::Repeat { target, min, max, count: 0, last: p });
+                    current = target;
+                    continue;
+                }
+                Ll1Op::Call(target) => {
+                    if calls >= 32 || self.depth.saturating_add(calls) >= self.options.max_depth { return None; }
+                    calls += 1;
+                    frames.push(Ll1Frame::Call);
+                    current = target;
+                    continue;
+                }
+                Ll1Op::Literal(word, boundary) => {
+                    ok = self.input.starts_with(p, word)
+                        && !(boundary && self.input.identifier_byte_at(p + word.len()));
+                    if ok { p += word.len(); }
+                }
+                Ll1Op::Class(ranges) => {
+                    if let Some((c, n)) = self.input.cp_at(p).filter(|(c, _)| ll1_contains(ranges, *c as u32)) {
+                        let _ = c;
+                        p += n;
+                    } else { ok = false; }
+                }
+                Ll1Op::Eof => ok = p == self.text.len(),
+            }
+            }
+            loop {
+                match frames.pop() {
+                    None => return ok.then_some(p),
+                    Some(Ll1Frame::Call) => calls -= 1,
+                    Some(Ll1Frame::Sequence(items, next)) => {
+                        if ok && next < items.len() {
+                            frames.push(Ll1Frame::Sequence(items, next + 1));
+                            current = items[next];
+                            continue 'enter;
+                        }
+                    }
+                    Some(Ll1Frame::Optional(start)) => {
+                        if !ok { p = start; ok = true; }
+                    }
+                    Some(Ll1Frame::Repeat { target, min, max, count, last }) => {
+                        if ok {
+                            if p == last { return None; }
+                            let count = count + 1;
+                            if max.is_none_or(|max| count < max) {
+                                frames.push(Ll1Frame::Repeat { target, min, max, count, last: p });
+                                current = target;
+                                continue 'enter;
+                            }
+                            ok = count >= min;
+                        } else {
+                            p = last;
+                            ok = count >= min;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+static LL1_TABLE:&[Ll1Op]=&[
+Ll1Op::Literal("import",false),
+Ll1Op::Literal("#",false),
+Ll1Op::Literal("as",false),
+Ll1Op::Literal(";",false),
+Ll1Op::Literal(".",false),
+Ll1Op::Optional(6),
+Ll1Op::Literal("as",false),
+Ll1Op::Sequence(&[8]),
+Ll1Op::Choice(&[(&[(110, 110)], 9),(&[(78, 78)], 10),(&[(115, 115)], 11),(&[(83, 83)], 12),(&[(98, 98)], 13),(&[(66, 66)], 14),(&[(111, 111)], 15),(&[(79, 79)], 16)]),
+Ll1Op::Literal("number",false),
+Ll1Op::Literal("Number",false),
+Ll1Op::Literal("string",false),
+Ll1Op::Literal("String",false),
+Ll1Op::Literal("boolean",false),
+Ll1Op::Literal("Boolean",false),
+Ll1Op::Literal("object",false),
+Ll1Op::Literal("Object",false),
+Ll1Op::Optional(18),
+Ll1Op::Literal("as",false),
+Ll1Op::Sequence(&[20]),
+Ll1Op::Choice(&[(&[(110, 110)], 21),(&[(78, 78)], 22),(&[(102, 102)], 23),(&[(70, 70)], 24)]),
+Ll1Op::Literal("number",false),
+Ll1Op::Literal("Number",false),
+Ll1Op::Literal("float",false),
+Ll1Op::Literal("Float",false),
+Ll1Op::Optional(26),
+Ll1Op::Literal("as",false),
+Ll1Op::Sequence(&[28]),
+Ll1Op::Choice(&[(&[(115, 115)], 29),(&[(83, 83)], 30)]),
+Ll1Op::Literal("string",false),
+Ll1Op::Literal("String",false),
+Ll1Op::Optional(32),
+Ll1Op::Literal("as",false),
+Ll1Op::Sequence(&[34]),
+Ll1Op::Choice(&[(&[(98, 98)], 35),(&[(66, 66)], 36)]),
+Ll1Op::Literal("boolean",false),
+Ll1Op::Literal("Boolean",false),
+Ll1Op::Optional(38),
+Ll1Op::Literal("as",false),
+Ll1Op::Sequence(&[40]),
+Ll1Op::Choice(&[(&[(111, 111)], 41),(&[(79, 79)], 42)]),
+Ll1Op::Literal("object",false),
+Ll1Op::Literal("Object",false),
+Ll1Op::Literal("if",false),
+Ll1Op::Literal("not",false),
+Ll1Op::Literal("exists",false),
+Ll1Op::Literal("description",false),
+Ll1Op::Literal("=",false),
+Ll1Op::Literal("@",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal("=",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Choice(&[(&[(110, 110)], 55),(&[(102, 102)], 56)]),
+Ll1Op::Literal("number",false),
+Ll1Op::Literal("float",false),
+Ll1Op::Literal("string",false),
+Ll1Op::Literal("boolean",false),
+Ll1Op::Literal("object",false),
+Ll1Op::Call(54),
+Ll1Op::Literal("external",false),
+Ll1Op::Literal("returning",false),
+Ll1Op::Optional(64),
+Ll1Op::Literal("as",false),
+Ll1Op::Optional(66),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("#",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("external",false),
+Ll1Op::Literal("returning",false),
+Ll1Op::Optional(73),
+Ll1Op::Literal("as",false),
+Ll1Op::Call(54),
+Ll1Op::Optional(76),
+Ll1Op::Literal(":",false),
+Ll1Op::Optional(78),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("#",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("external",false),
+Ll1Op::Literal("returning",false),
+Ll1Op::Optional(85),
+Ll1Op::Literal("as",false),
+Ll1Op::Optional(87),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("#",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("external",false),
+Ll1Op::Literal("returning",false),
+Ll1Op::Optional(94),
+Ll1Op::Literal("as",false),
+Ll1Op::Optional(96),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("#",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("call",false),
+Ll1Op::Optional(102),
+Ll1Op::Literal("internal",false),
+Ll1Op::Literal("internal",false),
+Ll1Op::Literal("?",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Choice(&[(&[(43, 43)], 108),(&[(45, 45)], 109)]),
+Ll1Op::Literal("+",false),
+Ll1Op::Literal("-",false),
+Ll1Op::Choice(&[(&[(42, 42)], 111),(&[(47, 47)], 112)]),
+Ll1Op::Literal("*",false),
+Ll1Op::Literal("/",false),
+Ll1Op::Literal("sin",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("cos",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("tan",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("sqrt",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("min",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("max",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("random",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("abs",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("round",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("ceil",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("floor",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("pow",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("log",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("exp",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("toNum",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("toUpperCase",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("toLowerCase",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("trim",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("length",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("len",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".toUpperCase",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".toLowerCase",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".trim",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".length",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("startsWith",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("endsWith",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("contains",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".in",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".startsWith",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".endsWith",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal(".contains",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("isPresent",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("inTimeRange",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("inDayTimeRange",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("MONDAY",false),
+Ll1Op::Literal("TUESDAY",false),
+Ll1Op::Literal("WEDNESDAY",false),
+Ll1Op::Literal("THURSDAY",false),
+Ll1Op::Literal("FRIDAY",false),
+Ll1Op::Literal("SATURDAY",false),
+Ll1Op::Literal("SUNDAY",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("[",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal("]",false),
+Ll1Op::Literal("+",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Sequence(&[305]),
+Ll1Op::Choice(&[(&[(115, 115)], 306),(&[(83, 83)], 307)]),
+Ll1Op::Literal("string",false),
+Ll1Op::Literal("String",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("$",false),
+Ll1Op::Literal("$",false),
+Ll1Op::Literal("as",false),
+Ll1Op::Sequence(&[313]),
+Ll1Op::Choice(&[(&[(115, 115)], 314),(&[(83, 83)], 315)]),
+Ll1Op::Literal("string",false),
+Ll1Op::Literal("String",false),
+Ll1Op::Literal("|",false),
+Ll1Op::Literal("&",false),
+Ll1Op::Literal("^",false),
+Ll1Op::Literal("not",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("true",false),
+Ll1Op::Literal("false",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Call(328),
+Ll1Op::Call(328),
+Ll1Op::Choice(&[(&[(61, 61)], 329),(&[(33, 33)], 330)]),
+Ll1Op::Literal("==",false),
+Ll1Op::Literal("!=",false),
+Ll1Op::Literal("==",false),
+Ll1Op::Literal("!=",false),
+Ll1Op::Literal("<=",false),
+Ll1Op::Literal(">=",false),
+Ll1Op::Literal("<",false),
+Ll1Op::Literal(">",false),
+Ll1Op::Literal("if",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("{",false),
+Ll1Op::Literal("}",false),
+Ll1Op::Literal("else",false),
+Ll1Op::Literal("{",false),
+Ll1Op::Literal("}",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal("?",false),
+Ll1Op::Literal(":",false),
+Ll1Op::Literal(")",false),
+Ll1Op::Literal("match",false),
+Ll1Op::Literal("{",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal("}",false),
+Ll1Op::Literal("->",false),
+Ll1Op::Literal("default",false),
+Ll1Op::Literal("->",false),
+Ll1Op::Literal("match",false),
+Ll1Op::Literal("{",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal("}",false),
+Ll1Op::Literal("->",false),
+Ll1Op::Literal("default",false),
+Ll1Op::Literal("->",false),
+Ll1Op::Literal("match",false),
+Ll1Op::Literal("{",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal(",",false),
+Ll1Op::Literal("}",false),
+Ll1Op::Literal("->",false),
+Ll1Op::Literal("default",false),
+Ll1Op::Literal("->",false),
+Ll1Op::Choice(&[(&[(110, 110)], 374),(&[(78, 78)], 375),(&[(102, 102)], 376),(&[(70, 70)], 377),(&[(115, 115)], 378),(&[(83, 83)], 379),(&[(98, 98)], 380),(&[(66, 66)], 381),(&[(111, 111)], 382),(&[(79, 79)], 383)]),
+Ll1Op::Literal("number",false),
+Ll1Op::Literal("Number",false),
+Ll1Op::Literal("float",false),
+Ll1Op::Literal("Float",false),
+Ll1Op::Literal("string",false),
+Ll1Op::Literal("String",false),
+Ll1Op::Literal("boolean",false),
+Ll1Op::Literal("Boolean",false),
+Ll1Op::Literal("object",false),
+Ll1Op::Literal("Object",false),
+Ll1Op::Literal("(",false),
+Ll1Op::Literal(")",false),
+];
 /// 統合 DFA の bitset 語数（literal 98 個）。0 なら cache を作らない。
 const LEX_WORDS:usize=2;
 /// 診断を記録しない読み飛ばし cache を持つ trivia policy 数（区切り集合で正規化済み）。

@@ -5165,6 +5165,573 @@
         "tokenId": "FormulaInfo::NOT_END"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:2939:2942:body/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:3558:3561:body/1/0/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:3838:3859:body/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            3
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:3840:3857:body/0/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            4,
+            5
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:3840:3843:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "#",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:3844:3857:body/0/0/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 6
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:3846:3855:body/0/0/1/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 9,
+              "start": 0
+            },
+            {
+              "end": 12,
+              "start": 11
+            },
+            {
+              "end": 1114111,
+              "start": 14
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:3880:3883:body/1/0/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4083:4100:body/0/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            9
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4085:4098:body/0/0/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            10
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4085:4098:body/0/0/0/0/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 11
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4087:4096:body/0/0/0/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 19
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4133:4170:body/1/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            13,
+            18
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4133:4160:body/1/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            14
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4135:4158:body/1/0/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            15,
+            16
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4135:4144:body/1/0/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 19
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4145:4158:body/1/0/0/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 17
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4147:4156:body/1/0/0/1/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 19
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4167:4170:body/1/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4190:4208:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 32,
+                  "start": 32
+                }
+              ],
+              "target": 20
+            },
+            {
+              "ranges": [
+                {
+                  "end": 9,
+                  "start": 9
+                }
+              ],
+              "target": 21
+            },
+            {
+              "ranges": [
+                {
+                  "end": 12,
+                  "start": 11
+                }
+              ],
+              "target": 22
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4190:4193:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": " ",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4196:4200:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\t",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4203:4208:body/2/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 12,
+              "start": 11
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4544:4547:body/0/0/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4563:4566:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4995:5008:body/0/0/0/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 26
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:4997:5006:body/0/0/0/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 9,
+              "start": 0
+            },
+            {
+              "end": 12,
+              "start": 11
+            },
+            {
+              "end": 1114111,
+              "start": 14
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5466:5491:body/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            28,
+            29
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5466:5477:body/0/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 9,
+              "start": 0
+            },
+            {
+              "end": 12,
+              "start": 11
+            },
+            {
+              "end": 64,
+              "start": 14
+            },
+            {
+              "end": 94,
+              "start": 91
+            },
+            {
+              "end": 96,
+              "start": 96
+            },
+            {
+              "end": 1114111,
+              "start": 123
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5478:5491:body/0/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 30
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5480:5489:body/0/1/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 9,
+              "start": 0
+            },
+            {
+              "end": 12,
+              "start": 11
+            },
+            {
+              "end": 1114111,
+              "start": 14
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5516:5519:body/1/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5530:5553:body/1/2/0/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            33,
+            34
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5530:5539:body/1/2/0/0/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 9,
+              "start": 0
+            },
+            {
+              "end": 12,
+              "start": 11
+            },
+            {
+              "end": 57,
+              "start": 14
+            },
+            {
+              "end": 1114111,
+              "start": 59
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5540:5553:body/1/2/0/0/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 35
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5542:5551:body/1/2/0/0/1/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 9,
+              "start": 0
+            },
+            {
+              "end": 12,
+              "start": 11
+            },
+            {
+              "end": 1114111,
+              "start": 14
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5629:5632:body/2/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5916:5935:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "---END_OF_PART---",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5942:5955:body/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 39
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5944:5953:body/1/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 41
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5970:5973:body/2/0/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5995:6005:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 32,
+                  "start": 32
+                }
+              ],
+              "target": 42
+            },
+            {
+              "ranges": [
+                {
+                  "end": 9,
+                  "start": 9
+                }
+              ],
+              "target": 43
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:5995:5998:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": " ",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:6001:6005:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\t",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:6025:6031:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\r\n",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:6034:6038:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\r",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/formula-info/formula-info.ubnf:6041:6045:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\n",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

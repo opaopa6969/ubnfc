@@ -189,6 +189,7 @@ if result.ok || !stack_exhausted {return Ok(result);}
 /*STACK_ESCALATION*/parse_entry_escalated(grammar,entry,text,options)/*STACK_ESCALATION*/
 }
 impl<const DIAG: bool> Session<'_, DIAG> {
+fn ll1_scan(&self,i:usize,p:usize)->Option<Option<usize>> {let _=(i,p);None}
 fn r0_c(&mut self,state:State)->Step { if let Some(limit)=self.enter_rule(state) {return limit;}self.statistics.rule_evaluations+=1;let mark=self.mark();
 let mut out=self.e0_c(state);
 if out.ok {

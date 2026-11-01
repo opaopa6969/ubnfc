@@ -1698,6 +1698,148 @@
         "tokenId": "TinyCalcVar::EOF"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:303:306:body/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:386:391:body/1/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 6
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:484:489:body/1/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 9
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:549:552:body/2/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "(",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:564:567:body/2/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ")",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:623:626:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "$",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:659:668:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 43,
+                  "start": 43
+                }
+              ],
+              "target": 7
+            },
+            {
+              "ranges": [
+                {
+                  "end": 45,
+                  "start": 45
+                }
+              ],
+              "target": 8
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:659:662:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:665:668:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:683:692:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 42,
+                  "start": 42
+                }
+              ],
+              "target": 10
+            },
+            {
+              "ranges": [
+                {
+                  "end": 47,
+                  "start": 47
+                }
+              ],
+              "target": 11
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:683:686:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "*",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:story/code/calc-var.ubnf:689:692:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "root": false
+      }
+    ],
     "memo": {
       "entries": [
         {
