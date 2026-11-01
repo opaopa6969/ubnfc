@@ -40,7 +40,7 @@ build_one() {
   local target=$1 ir example lsp_package parser_package language_id scanner_class server_name jar vsix scanner_source
   case "$target" in
     p4)
-      ir="$repo/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
+      ir="$repo/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json"
       example="$repo/examples/p4-vscode"
       parser_package=org.unlaxer.ubnfc.examples.p4.generated
       lsp_package=org.unlaxer.ubnfc.examples.p4.lsp

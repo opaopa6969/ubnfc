@@ -28,7 +28,6 @@ Ast::g_UBNFAST_2e_LookaheadExpression(node)=>self.eval_g_UBNFAST_2e_LookaheadExp
 Ast::g_UBNFAST_2e_NegativeLookaheadExpression(node)=>self.eval_g_UBNFAST_2e_NegativeLookaheadExpression(node),
 Ast::g_UBNFAST_2e_CharRangeExpression(node)=>self.eval_g_UBNFAST_2e_CharRangeExpression(node),
 Ast::g_UBNFAST_2e_CIExpression(node)=>self.eval_g_UBNFAST_2e_CIExpression(node),
-Ast::g_UBNFAST_2e_RegexExpression(node)=>self.eval_g_UBNFAST_2e_RegexExpression(node),
 Ast::g_UBNFAST_2e_AdapterExpression(node)=>self.eval_g_UBNFAST_2e_AdapterExpression(node),
 Ast::g_UBNFAST_2e_AnyExpression(node)=>self.eval_g_UBNFAST_2e_AnyExpression(node),
 Ast::g_UBNFAST_2e_EofExpression(node)=>self.eval_g_UBNFAST_2e_EofExpression(node),
@@ -38,6 +37,7 @@ Ast::g_UBNFAST_2e_RootAnnotation(node)=>self.eval_g_UBNFAST_2e_RootAnnotation(no
 Ast::g_UBNFAST_2e_MappingAnnotation(node)=>self.eval_g_UBNFAST_2e_MappingAnnotation(node),
 Ast::g_UBNFAST_2e_EvalAnnotation(node)=>self.eval_g_UBNFAST_2e_EvalAnnotation(node),
 Ast::g_UBNFAST_2e_WhitespaceAnnotation(node)=>self.eval_g_UBNFAST_2e_WhitespaceAnnotation(node),
+Ast::g_UBNFAST_2e_LexicalContextAnnotation(node)=>self.eval_g_UBNFAST_2e_LexicalContextAnnotation(node),
 Ast::g_UBNFAST_2e_InterleaveAnnotation(node)=>self.eval_g_UBNFAST_2e_InterleaveAnnotation(node),
 Ast::g_UBNFAST_2e_BackrefAnnotation(node)=>self.eval_g_UBNFAST_2e_BackrefAnnotation(node),
 Ast::g_UBNFAST_2e_ScopeTreeAnnotation(node)=>self.eval_g_UBNFAST_2e_ScopeTreeAnnotation(node),
@@ -46,6 +46,9 @@ Ast::g_UBNFAST_2e_CatalogAnnotation(node)=>self.eval_g_UBNFAST_2e_CatalogAnnotat
 Ast::g_UBNFAST_2e_LeftAssocAnnotation(node)=>self.eval_g_UBNFAST_2e_LeftAssocAnnotation(node),
 Ast::g_UBNFAST_2e_RightAssocAnnotation(node)=>self.eval_g_UBNFAST_2e_RightAssocAnnotation(node),
 Ast::g_UBNFAST_2e_LongestChoiceAnnotation(node)=>self.eval_g_UBNFAST_2e_LongestChoiceAnnotation(node),
+Ast::g_UBNFAST_2e_UniqueLongestChoiceAnnotation(node)=>self.eval_g_UBNFAST_2e_UniqueLongestChoiceAnnotation(node),
+Ast::g_UBNFAST_2e_NamePredicateAnnotation(node)=>self.eval_g_UBNFAST_2e_NamePredicateAnnotation(node),
+Ast::g_UBNFAST_2e_PredicateAnnotation(node)=>self.eval_g_UBNFAST_2e_PredicateAnnotation(node),
 Ast::g_UBNFAST_2e_PredictiveChoiceAnnotation(node)=>self.eval_g_UBNFAST_2e_PredictiveChoiceAnnotation(node),
 Ast::g_UBNFAST_2e_PrecedenceAnnotation(node)=>self.eval_g_UBNFAST_2e_PrecedenceAnnotation(node),
 Ast::g_UBNFAST_2e_DocAnnotation(node)=>self.eval_g_UBNFAST_2e_DocAnnotation(node),
@@ -57,6 +60,12 @@ Ast::g_UBNFAST_2e_SimpleAnnotation(node)=>self.eval_g_UBNFAST_2e_SimpleAnnotatio
 Ast::g_UBNFAST_2e_ChoiceBody(node)=>self.eval_g_UBNFAST_2e_ChoiceBody(node),
 Ast::g_UBNFAST_2e_SequenceBody(node)=>self.eval_g_UBNFAST_2e_SequenceBody(node),
 Ast::g_UBNFAST_2e_AnnotatedElement(node)=>self.eval_g_UBNFAST_2e_AnnotatedElement(node),
+Ast::g_UBNFAST_2e_OwnedCaptureElement(node)=>self.eval_g_UBNFAST_2e_OwnedCaptureElement(node),
+Ast::g_UBNFAST_2e_ReplayElement(node)=>self.eval_g_UBNFAST_2e_ReplayElement(node),
+Ast::g_UBNFAST_2e_CaptureScopeElement(node)=>self.eval_g_UBNFAST_2e_CaptureScopeElement(node),
+Ast::g_UBNFAST_2e_CommitElement(node)=>self.eval_g_UBNFAST_2e_CommitElement(node),
+Ast::g_UBNFAST_2e_LabelElement(node)=>self.eval_g_UBNFAST_2e_LabelElement(node),
+Ast::g_UBNFAST_2e_CatchElement(node)=>self.eval_g_UBNFAST_2e_CatchElement(node),
 Ast::g_UBNFAST_2e_GroupElement(node)=>self.eval_g_UBNFAST_2e_GroupElement(node),
 Ast::g_UBNFAST_2e_OptionalElement(node)=>self.eval_g_UBNFAST_2e_OptionalElement(node),
 Ast::g_UBNFAST_2e_RepeatElement(node)=>self.eval_g_UBNFAST_2e_RepeatElement(node),
@@ -85,7 +94,6 @@ fn eval_g_UBNFAST_2e_LookaheadExpression(&mut self,node:&g_UBNFAST_2e_LookaheadE
 fn eval_g_UBNFAST_2e_NegativeLookaheadExpression(&mut self,node:&g_UBNFAST_2e_NegativeLookaheadExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_CharRangeExpression(&mut self,node:&g_UBNFAST_2e_CharRangeExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_CIExpression(&mut self,node:&g_UBNFAST_2e_CIExpression)->EvalResult;
-fn eval_g_UBNFAST_2e_RegexExpression(&mut self,node:&g_UBNFAST_2e_RegexExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_AdapterExpression(&mut self,node:&g_UBNFAST_2e_AdapterExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_AnyExpression(&mut self,node:&g_UBNFAST_2e_AnyExpression)->EvalResult;
 fn eval_g_UBNFAST_2e_EofExpression(&mut self,node:&g_UBNFAST_2e_EofExpression)->EvalResult;
@@ -95,6 +103,7 @@ fn eval_g_UBNFAST_2e_RootAnnotation(&mut self,node:&g_UBNFAST_2e_RootAnnotation)
 fn eval_g_UBNFAST_2e_MappingAnnotation(&mut self,node:&g_UBNFAST_2e_MappingAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_EvalAnnotation(&mut self,node:&g_UBNFAST_2e_EvalAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_WhitespaceAnnotation(&mut self,node:&g_UBNFAST_2e_WhitespaceAnnotation)->EvalResult;
+fn eval_g_UBNFAST_2e_LexicalContextAnnotation(&mut self,node:&g_UBNFAST_2e_LexicalContextAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_InterleaveAnnotation(&mut self,node:&g_UBNFAST_2e_InterleaveAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_BackrefAnnotation(&mut self,node:&g_UBNFAST_2e_BackrefAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_ScopeTreeAnnotation(&mut self,node:&g_UBNFAST_2e_ScopeTreeAnnotation)->EvalResult;
@@ -103,6 +112,9 @@ fn eval_g_UBNFAST_2e_CatalogAnnotation(&mut self,node:&g_UBNFAST_2e_CatalogAnnot
 fn eval_g_UBNFAST_2e_LeftAssocAnnotation(&mut self,node:&g_UBNFAST_2e_LeftAssocAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_RightAssocAnnotation(&mut self,node:&g_UBNFAST_2e_RightAssocAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_LongestChoiceAnnotation(&mut self,node:&g_UBNFAST_2e_LongestChoiceAnnotation)->EvalResult;
+fn eval_g_UBNFAST_2e_UniqueLongestChoiceAnnotation(&mut self,node:&g_UBNFAST_2e_UniqueLongestChoiceAnnotation)->EvalResult;
+fn eval_g_UBNFAST_2e_NamePredicateAnnotation(&mut self,node:&g_UBNFAST_2e_NamePredicateAnnotation)->EvalResult;
+fn eval_g_UBNFAST_2e_PredicateAnnotation(&mut self,node:&g_UBNFAST_2e_PredicateAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_PredictiveChoiceAnnotation(&mut self,node:&g_UBNFAST_2e_PredictiveChoiceAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_PrecedenceAnnotation(&mut self,node:&g_UBNFAST_2e_PrecedenceAnnotation)->EvalResult;
 fn eval_g_UBNFAST_2e_DocAnnotation(&mut self,node:&g_UBNFAST_2e_DocAnnotation)->EvalResult;
@@ -114,6 +126,12 @@ fn eval_g_UBNFAST_2e_SimpleAnnotation(&mut self,node:&g_UBNFAST_2e_SimpleAnnotat
 fn eval_g_UBNFAST_2e_ChoiceBody(&mut self,node:&g_UBNFAST_2e_ChoiceBody)->EvalResult;
 fn eval_g_UBNFAST_2e_SequenceBody(&mut self,node:&g_UBNFAST_2e_SequenceBody)->EvalResult;
 fn eval_g_UBNFAST_2e_AnnotatedElement(&mut self,node:&g_UBNFAST_2e_AnnotatedElement)->EvalResult;
+fn eval_g_UBNFAST_2e_OwnedCaptureElement(&mut self,node:&g_UBNFAST_2e_OwnedCaptureElement)->EvalResult;
+fn eval_g_UBNFAST_2e_ReplayElement(&mut self,node:&g_UBNFAST_2e_ReplayElement)->EvalResult;
+fn eval_g_UBNFAST_2e_CaptureScopeElement(&mut self,node:&g_UBNFAST_2e_CaptureScopeElement)->EvalResult;
+fn eval_g_UBNFAST_2e_CommitElement(&mut self,node:&g_UBNFAST_2e_CommitElement)->EvalResult;
+fn eval_g_UBNFAST_2e_LabelElement(&mut self,node:&g_UBNFAST_2e_LabelElement)->EvalResult;
+fn eval_g_UBNFAST_2e_CatchElement(&mut self,node:&g_UBNFAST_2e_CatchElement)->EvalResult;
 fn eval_g_UBNFAST_2e_GroupElement(&mut self,node:&g_UBNFAST_2e_GroupElement)->EvalResult;
 fn eval_g_UBNFAST_2e_OptionalElement(&mut self,node:&g_UBNFAST_2e_OptionalElement)->EvalResult;
 fn eval_g_UBNFAST_2e_RepeatElement(&mut self,node:&g_UBNFAST_2e_RepeatElement)->EvalResult;
@@ -131,9 +149,12 @@ fn eval_g_UBNFAST_2e_AnyExpression(&mut self,node:&g_UBNFAST_2e_AnyExpression)->
 fn eval_g_UBNFAST_2e_BackrefAnnotation(&mut self,node:&g_UBNFAST_2e_BackrefAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_BackrefAnnotation".into()))}
 fn eval_g_UBNFAST_2e_BlockSettingValue(&mut self,node:&g_UBNFAST_2e_BlockSettingValue)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_BlockSettingValue".into()))}
 fn eval_g_UBNFAST_2e_CIExpression(&mut self,node:&g_UBNFAST_2e_CIExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CIExpression".into()))}
+fn eval_g_UBNFAST_2e_CaptureScopeElement(&mut self,node:&g_UBNFAST_2e_CaptureScopeElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CaptureScopeElement".into()))}
 fn eval_g_UBNFAST_2e_CatalogAnnotation(&mut self,node:&g_UBNFAST_2e_CatalogAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CatalogAnnotation".into()))}
+fn eval_g_UBNFAST_2e_CatchElement(&mut self,node:&g_UBNFAST_2e_CatchElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CatchElement".into()))}
 fn eval_g_UBNFAST_2e_CharRangeExpression(&mut self,node:&g_UBNFAST_2e_CharRangeExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CharRangeExpression".into()))}
 fn eval_g_UBNFAST_2e_ChoiceBody(&mut self,node:&g_UBNFAST_2e_ChoiceBody)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_ChoiceBody".into()))}
+fn eval_g_UBNFAST_2e_CommitElement(&mut self,node:&g_UBNFAST_2e_CommitElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CommitElement".into()))}
 fn eval_g_UBNFAST_2e_CommonFieldAnnotation(&mut self,node:&g_UBNFAST_2e_CommonFieldAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_CommonFieldAnnotation".into()))}
 fn eval_g_UBNFAST_2e_DeclarativeTokenValue(&mut self,node:&g_UBNFAST_2e_DeclarativeTokenValue)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_DeclarativeTokenValue".into()))}
 fn eval_g_UBNFAST_2e_DeclaresAnnotation(&mut self,node:&g_UBNFAST_2e_DeclaresAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_DeclaresAnnotation".into()))}
@@ -150,23 +171,28 @@ fn eval_g_UBNFAST_2e_GroupElement(&mut self,node:&g_UBNFAST_2e_GroupElement)->Ev
 fn eval_g_UBNFAST_2e_ImportDecl(&mut self,node:&g_UBNFAST_2e_ImportDecl)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_ImportDecl".into()))}
 fn eval_g_UBNFAST_2e_InterleaveAnnotation(&mut self,node:&g_UBNFAST_2e_InterleaveAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_InterleaveAnnotation".into()))}
 fn eval_g_UBNFAST_2e_KeyValuePair(&mut self,node:&g_UBNFAST_2e_KeyValuePair)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_KeyValuePair".into()))}
+fn eval_g_UBNFAST_2e_LabelElement(&mut self,node:&g_UBNFAST_2e_LabelElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LabelElement".into()))}
 fn eval_g_UBNFAST_2e_LeftAssocAnnotation(&mut self,node:&g_UBNFAST_2e_LeftAssocAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LeftAssocAnnotation".into()))}
 fn eval_g_UBNFAST_2e_LexicalAtom(&mut self,node:&g_UBNFAST_2e_LexicalAtom)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalAtom".into()))}
 fn eval_g_UBNFAST_2e_LexicalChoice(&mut self,node:&g_UBNFAST_2e_LexicalChoice)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalChoice".into()))}
+fn eval_g_UBNFAST_2e_LexicalContextAnnotation(&mut self,node:&g_UBNFAST_2e_LexicalContextAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalContextAnnotation".into()))}
 fn eval_g_UBNFAST_2e_LexicalElement(&mut self,node:&g_UBNFAST_2e_LexicalElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalElement".into()))}
 fn eval_g_UBNFAST_2e_LexicalSequence(&mut self,node:&g_UBNFAST_2e_LexicalSequence)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalSequence".into()))}
 fn eval_g_UBNFAST_2e_LexicalSuffix(&mut self,node:&g_UBNFAST_2e_LexicalSuffix)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LexicalSuffix".into()))}
 fn eval_g_UBNFAST_2e_LongestChoiceAnnotation(&mut self,node:&g_UBNFAST_2e_LongestChoiceAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LongestChoiceAnnotation".into()))}
 fn eval_g_UBNFAST_2e_LookaheadExpression(&mut self,node:&g_UBNFAST_2e_LookaheadExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_LookaheadExpression".into()))}
 fn eval_g_UBNFAST_2e_MappingAnnotation(&mut self,node:&g_UBNFAST_2e_MappingAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_MappingAnnotation".into()))}
+fn eval_g_UBNFAST_2e_NamePredicateAnnotation(&mut self,node:&g_UBNFAST_2e_NamePredicateAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_NamePredicateAnnotation".into()))}
 fn eval_g_UBNFAST_2e_NegationExpression(&mut self,node:&g_UBNFAST_2e_NegationExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_NegationExpression".into()))}
 fn eval_g_UBNFAST_2e_NegativeLookaheadExpression(&mut self,node:&g_UBNFAST_2e_NegativeLookaheadExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_NegativeLookaheadExpression".into()))}
 fn eval_g_UBNFAST_2e_OptionalElement(&mut self,node:&g_UBNFAST_2e_OptionalElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_OptionalElement".into()))}
+fn eval_g_UBNFAST_2e_OwnedCaptureElement(&mut self,node:&g_UBNFAST_2e_OwnedCaptureElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_OwnedCaptureElement".into()))}
 fn eval_g_UBNFAST_2e_PrecedenceAnnotation(&mut self,node:&g_UBNFAST_2e_PrecedenceAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_PrecedenceAnnotation".into()))}
+fn eval_g_UBNFAST_2e_PredicateAnnotation(&mut self,node:&g_UBNFAST_2e_PredicateAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_PredicateAnnotation".into()))}
 fn eval_g_UBNFAST_2e_PredictiveChoiceAnnotation(&mut self,node:&g_UBNFAST_2e_PredictiveChoiceAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_PredictiveChoiceAnnotation".into()))}
 fn eval_g_UBNFAST_2e_RecoveryAnnotation(&mut self,node:&g_UBNFAST_2e_RecoveryAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_RecoveryAnnotation".into()))}
-fn eval_g_UBNFAST_2e_RegexExpression(&mut self,node:&g_UBNFAST_2e_RegexExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_RegexExpression".into()))}
 fn eval_g_UBNFAST_2e_RepeatElement(&mut self,node:&g_UBNFAST_2e_RepeatElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_RepeatElement".into()))}
+fn eval_g_UBNFAST_2e_ReplayElement(&mut self,node:&g_UBNFAST_2e_ReplayElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_ReplayElement".into()))}
 fn eval_g_UBNFAST_2e_RightAssocAnnotation(&mut self,node:&g_UBNFAST_2e_RightAssocAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_RightAssocAnnotation".into()))}
 fn eval_g_UBNFAST_2e_RootAnnotation(&mut self,node:&g_UBNFAST_2e_RootAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_RootAnnotation".into()))}
 fn eval_g_UBNFAST_2e_RuleDecl(&mut self,node:&g_UBNFAST_2e_RuleDecl)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_RuleDecl".into()))}
@@ -179,6 +205,7 @@ fn eval_g_UBNFAST_2e_TerminalElement(&mut self,node:&g_UBNFAST_2e_TerminalElemen
 fn eval_g_UBNFAST_2e_TokenDecl(&mut self,node:&g_UBNFAST_2e_TokenDecl)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_TokenDecl".into()))}
 fn eval_g_UBNFAST_2e_TypeofElement(&mut self,node:&g_UBNFAST_2e_TypeofElement)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_TypeofElement".into()))}
 fn eval_g_UBNFAST_2e_UBNFFile(&mut self,node:&g_UBNFAST_2e_UBNFFile)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_UBNFFile".into()))}
+fn eval_g_UBNFAST_2e_UniqueLongestChoiceAnnotation(&mut self,node:&g_UBNFAST_2e_UniqueLongestChoiceAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_UniqueLongestChoiceAnnotation".into()))}
 fn eval_g_UBNFAST_2e_UntilExpression(&mut self,node:&g_UBNFAST_2e_UntilExpression)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_UntilExpression".into()))}
 fn eval_g_UBNFAST_2e_WhitespaceAnnotation(&mut self,node:&g_UBNFAST_2e_WhitespaceAnnotation)->EvalResult {let _=(node,);Err(EvalError("callback required: eval_g_UBNFAST_2e_WhitespaceAnnotation".into()))}
 }

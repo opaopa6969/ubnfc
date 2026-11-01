@@ -130,7 +130,7 @@ fn p4_matches_cli_golden_and_typed_round_trip() {
     let root = fixture_root("TINYEXPRESSION_DIR", "../../../tinyexpression");
     let bytes = check_ir(&root, P4);
     let typed = ir::from_json(std::str::from_utf8(&bytes).unwrap()).unwrap();
-    assert_eq!(typed.semantics.rules.len(), 124);
+    assert_eq!(typed.semantics.rules.len(), 130);
 }
 
 #[test]

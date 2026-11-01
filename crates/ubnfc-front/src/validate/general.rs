@@ -376,6 +376,9 @@ pub(super) const KNOWN_SETTINGS: &[&str] = &[
     "memoSafeToken",
     "ubnf",
     "literalBoundary",
+    // Classic の opt-in（`@feature: declarativeTokensV1`）。ubnfc は宣言的 token を
+    // `@ubnf: v2` で受け付けるので、追加の意味は無い（tinyexpression P4 が書く）。
+    "feature",
 ];
 
 fn key(setting: &GlobalSetting) -> &str {

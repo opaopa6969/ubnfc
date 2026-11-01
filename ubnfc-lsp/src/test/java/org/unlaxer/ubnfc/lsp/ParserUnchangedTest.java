@@ -27,8 +27,8 @@ import org.junit.jupiter.api.io.TempDir;
  * </ul>
  */
 class ParserUnchangedTest {
-    private static final Path IR = Path.of("..", "ir", "fixtures",
-        "tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json");
+    private static final Path IR = Path.of("..", "ir", "frozen",
+        "tinyexpression-p4-f86ce8a5.ir.json");
 
     @Test void lspEmissionOnlyAddsFiles(@TempDir Path out) throws Exception {
         org.unlaxer.ubnfc.java.Main.main(new String[]{

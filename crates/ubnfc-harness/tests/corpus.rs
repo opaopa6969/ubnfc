@@ -24,7 +24,8 @@ fn every_required_file_loads_with_the_measured_counts() {
     use Family::*;
     let expected = [
         ("nested-captures/corpus.json", InlineAst, 10),
-        ("rule-trivia/corpus.json", InlineAst, 33),
+        // unlaxer-parser の rule-trivia corpus は 2026-10 に 33 → 81 件へ増えた。
+        ("rule-trivia/corpus.json", InlineAst, 81),
         ("scope-annotations/corpus.json", InlineAst, 14),
         ("primitives/corpus.json", Token, 115),
         ("lexical/corpus.json", Token, 78),
@@ -45,10 +46,17 @@ fn every_required_file_loads_with_the_measured_counts() {
         ("catalog/corpus.json", Operations, 2),
     ];
     assert_eq!(corpus().len(), expected.len() + 107);
-    for (suffix, family, count) in expected {
-        let file = file(suffix);
-        assert_eq!((file.family, file.cases.len()), (family, count), "{suffix}");
-    }
+    // 不一致をまとめて報告する（pin を上げたときに 1 件ずつ直さなくて済むように）。
+    let mismatches: Vec<_> = expected
+        .iter()
+        .filter_map(|(suffix, family, count)| {
+            let file = file(suffix);
+            ((file.family, file.cases.len()) != (*family, *count)).then(|| {
+                format!("{suffix}: {:?} {} (expected {family:?} {count})", file.family, file.cases.len())
+            })
+        })
+        .collect();
+    assert!(mismatches.is_empty(), "{mismatches:#?}");
     for file in corpus() {
         let mut ids = BTreeSet::new();
         for case in &file.cases {
@@ -72,7 +80,7 @@ fn every_required_file_loads_with_the_measured_counts() {
                 InlineAst,
                 Counts {
                     files: 3,
-                    cases: 57
+                    cases: 105
                 }
             ),
             (
@@ -113,7 +121,7 @@ fn every_required_file_loads_with_the_measured_counts() {
         ])
     );
     let total: usize = corpus().iter().map(|file| file.cases.len()).sum();
-    assert_eq!(total, 1231);
+    assert_eq!(total, 1279);
 }
 
 // 各元 row の期待値キーを正規化側と照合。型付けによるキーや null の欠落を検出する。
@@ -220,7 +228,9 @@ fn prefix_full_acceptance_null_and_backend_specific_expectations_stay_distinct()
     let Expectation::Diagnostics(e) = &diagnostic.expect else {
         panic!()
     };
-    assert_eq!((&*e.kind, e.java_offset, e.rust_offset), ("syntax", 7, 5));
+    // Classic は 2026-10 に生成 Rust の診断位置を Java に揃えた（unlaxer-parser #753 ほか、
+    // docs/migration-after-3.3.0.md）。Java と Rust の期待値は同じ 7 になった。
+    assert_eq!((&*e.kind, e.java_offset, e.rust_offset), ("syntax", 7, 7));
     for case in &file("numeric-capture/conformance.json").cases {
         let Expectation::Numeric(e) = &case.expect else {
             panic!()

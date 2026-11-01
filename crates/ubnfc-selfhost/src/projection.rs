@@ -118,10 +118,6 @@ pub(crate) fn project<'a>(ast: &'a Ast, out: &mut MappedNodes<'a>) {
             out.node("CIExpression", node.span)
                 .field("word", [node.g_word.as_str()]);
         }
-        Ast::g_UBNFAST_2e_RegexExpression(node) => {
-            out.node("RegexExpression", node.span)
-                .field("pattern", [node.g_pattern.as_str()]);
-        }
         Ast::g_UBNFAST_2e_AnyExpression(node) => {
             out.node("AnyExpression", node.span);
         }
@@ -213,6 +209,25 @@ pub(crate) fn project<'a>(ast: &'a Ast, out: &mut MappedNodes<'a>) {
         Ast::g_UBNFAST_2e_EnumAnnotation(node) => {
             out.node("EnumAnnotation", node.span);
         }
+        Ast::g_UBNFAST_2e_LexicalContextAnnotation(node) => {
+            out.node("LexicalContextAnnotation", node.span)
+                .field("tokens", node.g_tokens.iter().map(String::as_str))
+                .field("literals", node.g_literals.iter().map(String::as_str));
+        }
+        Ast::g_UBNFAST_2e_UniqueLongestChoiceAnnotation(node) => {
+            out.node("UniqueLongestChoiceAnnotation", node.span);
+        }
+        Ast::g_UBNFAST_2e_NamePredicateAnnotation(node) => {
+            out.node("NamePredicateAnnotation", node.span)
+                .field("snapshot", [node.g_snapshot.as_str()])
+                .field("version", [node.g_version.as_str()])
+                .field("name", [node.g_name.as_str()])
+                .field("kind", [node.g_kind.as_str()]);
+        }
+        Ast::g_UBNFAST_2e_PredicateAnnotation(node) => {
+            out.node("PredicateAnnotation", node.span)
+                .field("name", [node.g_name.as_str()]);
+        }
         Ast::g_UBNFAST_2e_SimpleAnnotation(node) => {
             out.node("SimpleAnnotation", node.span)
                 .field("name", [node.g_name.as_str()]);
@@ -236,6 +251,35 @@ pub(crate) fn project<'a>(ast: &'a Ast, out: &mut MappedNodes<'a>) {
             }
             out.node("AnnotatedElement", node.span)
                 .field("captureName", node.g_captureName.as_deref());
+        }
+        Ast::g_UBNFAST_2e_OwnedCaptureElement(node) => {
+            project(&node.g_body, out);
+            out.node("OwnedCaptureElement", node.span)
+                .field("name", [node.g_name.as_str()]);
+        }
+        Ast::g_UBNFAST_2e_ReplayElement(node) => {
+            out.node("ReplayElement", node.span)
+                .field("name", [node.g_name.as_str()]);
+        }
+        Ast::g_UBNFAST_2e_CaptureScopeElement(node) => {
+            project(&node.g_body, out);
+            out.node("CaptureScopeElement", node.span);
+        }
+        Ast::g_UBNFAST_2e_CommitElement(node) => {
+            project(&node.g_body, out);
+            out.node("CommitElement", node.span)
+                .field("message", node.g_message.as_deref());
+        }
+        Ast::g_UBNFAST_2e_LabelElement(node) => {
+            project(&node.g_body, out);
+            out.node("LabelElement", node.span)
+                .field("label", [node.g_label.as_str()]);
+        }
+        Ast::g_UBNFAST_2e_CatchElement(node) => {
+            project(&node.g_body, out);
+            project(&node.g_alternative, out);
+            out.node("CatchElement", node.span)
+                .field("labels", node.g_labels.iter().map(String::as_str));
         }
         Ast::g_UBNFAST_2e_GroupElement(node) => {
             project(&node.g_body, out);

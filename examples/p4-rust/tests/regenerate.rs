@@ -32,7 +32,7 @@ fn files(root: &Path, current: &Path, result: &mut Vec<PathBuf>) {
 #[test]
 fn p4_ir_regenerates_every_committed_byte() {
     let ir = ubnfc_front::ir::from_json(include_str!(
-        "../../../ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
+        "../../../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json"
     ))
     .unwrap();
     let options = ubnfc_rust::EmitOptions {
