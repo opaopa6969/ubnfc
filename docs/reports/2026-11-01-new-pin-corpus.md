@@ -8,7 +8,7 @@ PR #44 の LONG 対応（`49d1a9d`）を取り込み、tiny-code-fence の 13 �
 `opaopa6969/ubnfc` の issue #46 に #45 の受け入れ条件を含める。
 `fix/issue-46-new-pin-corpus` の専用 worktree で実装し、共有の main 作業ツリーは編集していない。
 変更前は `origin/master` の `cd0516f`。全 corpus の実測対象は実装 `42e7a1b` と #44 を統合した `4211d9b`。
-並行 PR #30 / #42 / #43 / #51 を含む master `bdd87bd` を `5d65f88` で取り込んだ。
+並行 PR #18 / #30 / #42 / #43 / #51 を含む master `06fa27b` を取り込んだ。
 front・Rust / Java generator・harness 本体のソースは実測対象から無変更。`scripts/external-pins.env` は変更していない。
 
 | 外部 fixture | pin |
@@ -115,7 +115,7 @@ Classic `v2` の prefix 一致を正すための差で、その他の既存 IR g
 入力・文法は無変更で、ubnfc の実測から期待値を作っていない。
 `empty-zero` / `repeat-zero` の新しい prefix 成功と trailing-input 診断を保存した。
 他の採取物は旧 revision を維持する。`verify.py` はこの 2 ファイルだけの記録済みの revision 差を認め、未記録の混在は拒否する。
-設計判断は D-093 に記録した。REGEX 方針の #43 が先に D-092 として merge されたため、自分の追加行だけを振り直した。
+設計判断は D-094 に記録した。先行した REGEX 方針の #43（D-092）と増分再解析設計の #18（D-093）を維持し、自分の追加行と参照だけを振り直した。
 
 ## 再現
 

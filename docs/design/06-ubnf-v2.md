@@ -112,7 +112,7 @@ PEG の順序付き選択は、候補順を誤ると黙って前の候補が勝�
 ### 設定と版
 
 `@literalBoundary: word|none`（grammar ごと、1 回）。既定は数値版 `@ubnf: 1` で `none`、数値版 `@ubnf: 2` で `word`。
-Classic の綴り `@ubnf: v2` は Classic と同じ prefix 一致を保ち、暗黙の単語境界を加えない（D-093）。
+Classic の綴り `@ubnf: v2` は Classic と同じ prefix 一致を保ち、暗黙の単語境界を加えない（D-094）。
 明示的な `@literalBoundary` はどちらの綴りでも優先する。
 IR は既存キー `ExprNode.literal.wordBoundary` を固定値 `false` から真の bool に変え、
 `TokenSpec.caseInsensitive` に同名キーを足した（追加キー）。**backend は flag しか見ない**。
@@ -334,7 +334,7 @@ tinyexpression P4 は 2026-10 にこの綴りへ移った（`pkg:std/layout` の
   SHA-256 が lock と一致するときだけ使う。
 - resolve は `pkg:ID` を仮想パス `<grammar のディレクトリ>/.ubnf-packages/ID` に写す。IR の `sources[]` には
   この論理パスと entry 本文の SHA-256 が載る。
-- `@whitespace` の値（設定・規則注釈とも）には宣言的 token を書ける（D-093）。
+- `@whitespace` の値（設定・規則注釈とも）には宣言的 token を書ける（D-094）。
   **std/layout 1.0.0 と構文木が同一の import の `SPACES_AND_COMMENTS` だけ**は
   javaStyle と同じ区切り集合（ASCII space と TAB〜CR、`//` から
   CR / LF の直前まで、`/*` から最初の `*/` まで）なので、IR では javaStyle と同じ `effectiveDelimiterSet` になる。
