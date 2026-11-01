@@ -1,0 +1,1098 @@
+{
+  "analysis": {
+    "expressions": [
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "atEof"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "mayAdvance",
+          "failure": "restore",
+          "flagEffect": "preserve",
+          "matchedMode": "mayAdvance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:164:body/0/repeat",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": true,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "always"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:157:162:body/0/0/ruleRef",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "preserve",
+          "failure": "restore",
+          "flagEffect": "contextual",
+          "matchedMode": "preserve",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:165:168:body/1/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": true,
+          "includesTrivia": false,
+          "ranges": [],
+          "zeroConsumeCondition": "atEof"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 0,
+        "nullable": true,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "restore",
+          "flagEffect": "setFalse",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq",
+        "mayStart": {
+          "certainty": "conservative",
+          "eof": false,
+          "includesTrivia": true,
+          "ranges": [
+            {
+              "end": 13,
+              "start": 9
+            },
+            {
+              "end": 32,
+              "start": 32
+            },
+            {
+              "end": 47,
+              "start": 47
+            },
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 2,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "contextual",
+          "flagEffect": "contextual",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 90,
+              "start": 65
+            },
+            {
+              "end": 95,
+              "start": 95
+            },
+            {
+              "end": 122,
+              "start": 97
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      },
+      {
+        "cursorTransition": {
+          "consumedMode": "advance",
+          "failure": "mayResetMatched",
+          "flagEffect": "preserve",
+          "matchedMode": "advance",
+          "matchedOnConsume": "resetToConsumed"
+        },
+        "effects": [],
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:223:226:body/1/literal",
+        "mayStart": {
+          "certainty": "exact",
+          "eof": false,
+          "includesTrivia": false,
+          "ranges": [
+            {
+              "end": 59,
+              "start": 59
+            }
+          ],
+          "zeroConsumeCondition": "never"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": null,
+          "provenance": "derivedProof",
+          "purity": "pure",
+          "reason": "既知組込み token と純粋な規則のみ。scope、Extern、recovery はない。",
+          "success": true
+        },
+        "minConsume": 1,
+        "nullable": false,
+        "prefixTrieId": null
+      }
+    ],
+    "prefixTries": [],
+    "rules": [
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": false,
+        "ruleId": "CatalogDemo::Program",
+        "sccId": "scc:0"
+      },
+      {
+        "followSyncPatterns": null,
+        "leftRecursion": "none",
+        "progressProven": true,
+        "ruleId": "CatalogDemo::Value",
+        "sccId": "scc:1"
+      }
+    ],
+    "sccs": [
+      {
+        "id": "scc:0",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "CatalogDemo::Program"
+        ]
+      },
+      {
+        "id": "scc:1",
+        "memoPolicy": "provedOmissions",
+        "recursive": false,
+        "ruleIds": [
+          "CatalogDemo::Value"
+        ]
+      }
+    ]
+  },
+  "analysisVersion": "ubnfc-analysis.v1-draft1",
+  "entry": {
+    "grammarId": "grammar:CatalogDemo",
+    "ruleId": "CatalogDemo::Program"
+  },
+  "grammarUnits": [
+    {
+      "annotations": [],
+      "id": "grammar:CatalogDemo",
+      "name": "CatalogDemo",
+      "package": null,
+      "rawSettings": {
+        "comment": null,
+        "interleave": null,
+        "whitespace": "javaStyle"
+      },
+      "source": {
+        "end": 230,
+        "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+        "start": 32
+      },
+      "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf"
+    }
+  ],
+  "importEdges": [],
+  "languageVersion": 1,
+  "plan": {
+    "choices": [],
+    "lexical": [
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "CatalogDemo::IDENT"
+      },
+      {
+        "dfa": null,
+        "strategy": "scalar",
+        "tokenId": "CatalogDemo::EOF"
+      }
+    ],
+    "ll1": [
+      {
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:165:168:body/1/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:223:226:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
+    "memo": {
+      "entries": [
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq",
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:164:body/0/repeat",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq",
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:164:body/0/repeat"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:157:162:body/0/0/ruleRef",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq",
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:164:body/0/repeat",
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:157:162:body/0/0/ruleRef"
+            ],
+            "kind": "monotoneNoRollback"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:165:168:body/1/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq",
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:165:168:body/1/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq",
+          "omissionProof": {
+            "explanation": "巻戻しで開始位置が一致し得る兄弟の組（choice の候補、0 消費要素の後続、反復の周回境界と脱出、先読み）のどれからも、この規則が同じ位置で 2 度試されることはない。memo は保存するだけで当たらないので成功・失敗とも省略する。",
+            "exprIds": [
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq"
+            ],
+            "kind": "unreachableRevisit"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq",
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        },
+        {
+          "cacheFailure": false,
+          "cacheSuccess": false,
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:223:226:body/1/literal",
+          "omissionProof": {
+            "explanation": "rule 自体が同じ位置へ再入し得ないので本体 memo も省略した。本体の局所木で単一所有の部分式は本体 1 回の評価内で同じ key を再訪しない（choice の候補は 1 回、反復の各周回は消費前進、予測 fallback 付き choice の下は保持）。",
+            "exprIds": [
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq",
+              "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:223:226:body/1/literal"
+            ],
+            "kind": "singleExecutionPath"
+          },
+          "reason": "provedOmission"
+        }
+      ],
+      "referenceMode": "allEligible",
+      "replay": [
+        "endCursors",
+        "frameFlagEffects",
+        "constructionRecipe",
+        "captureOccurrences",
+        "lexicalOccurrences",
+        "scopeEffects",
+        "localDiagnostics",
+        "rebasedRuleStack"
+      ],
+      "requiredKey": [
+        "exprId",
+        "consumed",
+        "matched",
+        "mode",
+        "invertMatch",
+        "resetMatchedWithConsumed",
+        "stateVersion"
+      ]
+    },
+    "operators": [],
+    "profile": "optimized",
+    "triviaCache": {
+      "enabled": false,
+      "key": [
+        "policyId",
+        "consumed",
+        "matched",
+        "mode",
+        "resetMatchedWithConsumed"
+      ]
+    }
+  },
+  "requiredFeatures": [
+    "backendDiagnostics",
+    "captures",
+    "catalog",
+    "cursorFrameFlag",
+    "dualCursor",
+    "memoReplay",
+    "structuredOccurrences",
+    "triviaInsertion"
+  ],
+  "semantics": {
+    "astTypes": [],
+    "captures": [
+      {
+        "cardinality": "scalar",
+        "conversion": "text",
+        "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef",
+        "name": "name",
+        "occurrenceOrder": "completionInnerBeforeOuter",
+        "ruleId": "CatalogDemo::Value",
+        "siteId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef/capture/0",
+        "skip": false,
+        "spanRule": "consumedExtent",
+        "valueType": {
+          "kind": "text"
+        }
+      }
+    ],
+    "catalogs": [
+      {
+        "captureSiteId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef/capture/0",
+        "context": "names",
+        "ruleId": "CatalogDemo::Value"
+      }
+    ],
+    "commonFields": [],
+    "contracts": {
+      "choice": "orderedFirstSuccess",
+      "cursor": {
+        "begin": "copy;M=flag?C:M",
+        "commit": "copyChildCursorsOnly",
+        "consume": "C+=length;M=C",
+        "coordinate": "codePoint",
+        "frameFlag": "resetMatchedWithConsumed",
+        "internalJava": "utf16",
+        "internalRust": "utf8Byte",
+        "matchOnly": "M+=length",
+        "mode": [
+          "consumed",
+          "matchOnly"
+        ],
+        "positions": [
+          "consumed",
+          "matched"
+        ],
+        "rollback": "restoreParentFrame"
+      },
+      "leftRecursion": "directRewriteExtensionIndirectError",
+      "longest": "maxConsumedThenDeclarationOrder",
+      "mappingFailure": "syntaxSuccessMappingFailure",
+      "mappingPhase": "selectedResultOnly",
+      "occurrences": {
+        "captureFields": [
+          "occurrenceId",
+          "siteId",
+          "span",
+          "completionOrder"
+        ],
+        "diagnostics": true,
+        "lexicalFields": [
+          "occurrenceId",
+          "parentOccurrenceId",
+          "ruleId",
+          "exprId",
+          "span",
+          "completionOrder"
+        ],
+        "lexicalOutput": "optional",
+        "nodeSpans": true,
+        "scopeEvents": true,
+        "selfHostTransform": "selectedStructuredOccurrences"
+      },
+      "predictive": "conservativeFilterThenFullFallback",
+      "regexPolicy": "regularDfaJavaPatternFallbackRustReject",
+      "repeat": "terminatorThenChildThenCountThenActiveCursorProgressThenMaxThenBounds",
+      "repeatZeroMax": "attemptChildBeforeCheckingMax",
+      "spanUnit": "codePoint"
+    },
+    "diagnostics": {
+      "deepestRule": "javaTrialMaxConsumedElseDeepestStack",
+      "expectedDisplay": [
+        {
+          "exprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:223:226:body/1/literal",
+          "java": "';'",
+          "rust": ";"
+        }
+      ],
+      "javaSyntaxOffset": "maxFailedFrameConsumedMatched",
+      "merge": "farthestThenUnionHints",
+      "negativeLookahead": "discardChildFailuresOnSuccess",
+      "offsetUnit": "codePoint",
+      "retainFarthestSeparately": true,
+      "rustSyntaxOffset": "legacyRustFailureSite",
+      "successfulRuleFailures": "retain",
+      "trailingInputOffset": "acceptedConsumedEnd"
+    },
+    "expressions": [
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq",
+        "node": {
+          "items": [
+            "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:164:body/0/repeat",
+            "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:165:168:body/1/tokenRef"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "CatalogDemo::Program",
+        "source": {
+          "end": 168,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 155
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "occurs"
+        },
+        "id": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:164:body/0/repeat",
+        "node": {
+          "child": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:157:162:body/0/0/ruleRef",
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "terminator": null
+        },
+        "ruleId": "CatalogDemo::Program",
+        "source": {
+          "end": 164,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 155
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:157:162:body/0/0/ruleRef",
+        "node": {
+          "kind": "ruleRef",
+          "symbolId": "CatalogDemo::Value"
+        },
+        "ruleId": "CatalogDemo::Program",
+        "source": {
+          "end": 162,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 157
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:165:168:body/1/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "CatalogDemo::EOF"
+        },
+        "ruleId": "CatalogDemo::Program",
+        "source": {
+          "end": 168,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 165
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "setFalse",
+          "failureCursor": "restoreTransaction",
+          "primitiveProfile": null,
+          "transaction": "once"
+        },
+        "id": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq",
+        "node": {
+          "items": [
+            "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef",
+            "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:223:226:body/1/literal"
+          ],
+          "kind": "seq"
+        },
+        "ruleId": "CatalogDemo::Value",
+        "source": {
+          "end": 226,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 211
+        }
+      },
+      {
+        "captureSiteIds": [
+          "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef/capture/0"
+        ],
+        "diagnosticLabel": null,
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "delegate",
+          "primitiveProfile": null,
+          "transaction": "delegate"
+        },
+        "id": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:216:body/0/tokenRef",
+        "node": {
+          "kind": "tokenRef",
+          "symbolId": "CatalogDemo::IDENT"
+        },
+        "ruleId": "CatalogDemo::Value",
+        "source": {
+          "end": 216,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 211
+        }
+      },
+      {
+        "captureSiteIds": [],
+        "diagnosticLabel": "';'",
+        "execution": {
+          "childMode": "inherit",
+          "entryFlag": "preserve",
+          "failureCursor": "primitiveMayResetMatched",
+          "primitiveProfile": "legacyWord",
+          "transaction": "none"
+        },
+        "id": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:223:226:body/1/literal",
+        "node": {
+          "caseSensitive": true,
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "ruleId": "CatalogDemo::Value",
+        "source": {
+          "end": 226,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 223
+        }
+      }
+    ],
+    "normalizations": [],
+    "recipes": [],
+    "recovery": [],
+    "rules": [
+      {
+        "annotations": [
+          {
+            "arguments": {},
+            "name": "root",
+            "source": {
+              "end": 140,
+              "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+              "start": 135
+            }
+          }
+        ],
+        "body": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "CatalogDemo::Program",
+        "triviaPolicyId": "trivia:javaStyle"
+      },
+      {
+        "annotations": [
+          {
+            "arguments": {
+              "context": "names"
+            },
+            "name": "catalog",
+            "source": {
+              "end": 198,
+              "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+              "start": 173
+            }
+          }
+        ],
+        "body": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq",
+        "eval": null,
+        "mappingParams": [],
+        "mappingTypeId": null,
+        "operator": null,
+        "skip": false,
+        "symbolId": "CatalogDemo::Value",
+        "triviaPolicyId": "trivia:javaStyle"
+      }
+    ],
+    "scope": {
+      "effects": [],
+      "rollback": "undoLog",
+      "trimMaxCodePoint": 32,
+      "versionChanges": [
+        "enter",
+        "leave",
+        "declare",
+        "clear"
+      ]
+    },
+    "symbols": [
+      {
+        "grammarId": "grammar:CatalogDemo",
+        "id": "CatalogDemo::IDENT",
+        "kind": "token",
+        "name": "IDENT",
+        "originalName": "IDENT",
+        "qualifiedSymbolId": "CatalogDemo::IDENT",
+        "source": {
+          "end": 105,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 81
+        },
+        "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf"
+      },
+      {
+        "grammarId": "grammar:CatalogDemo",
+        "id": "CatalogDemo::EOF",
+        "kind": "token",
+        "name": "EOF",
+        "originalName": "EOF",
+        "qualifiedSymbolId": "CatalogDemo::EOF",
+        "source": {
+          "end": 132,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 108
+        },
+        "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf"
+      },
+      {
+        "grammarId": "grammar:CatalogDemo",
+        "id": "CatalogDemo::Program",
+        "kind": "rule",
+        "name": "Program",
+        "originalName": "Program",
+        "qualifiedSymbolId": "CatalogDemo::Program",
+        "source": {
+          "end": 170,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 143
+        },
+        "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf"
+      },
+      {
+        "grammarId": "grammar:CatalogDemo",
+        "id": "CatalogDemo::Value",
+        "kind": "rule",
+        "name": "Value",
+        "originalName": "Value",
+        "qualifiedSymbolId": "CatalogDemo::Value",
+        "source": {
+          "end": 228,
+          "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+          "start": 201
+        },
+        "sourceId": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf"
+      }
+    ],
+    "tokens": [
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaIdentifier",
+          "rust": "legacyRustIdentifier"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token IDENT = IDENTIFIER",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "組込み語彙 IDENTIFIER の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "Identifier"
+        },
+        "symbolId": "CatalogDemo::IDENT"
+      },
+      {
+        "annotations": [],
+        "diagnosticProfiles": {
+          "java": "legacyJavaEndOfSource",
+          "rust": "legacyRustEndOfSource"
+        },
+        "memoSafety": {
+          "assertedAlias": null,
+          "failure": true,
+          "originalDeclaration": "token EOF = END_OF_INPUT",
+          "provenance": "builtinProof",
+          "purity": "pure",
+          "reason": "組込み語彙 END_OF_INPUT の専用スキャナ。受理と診断を組込み契約で再現する。",
+          "success": true
+        },
+        "spec": {
+          "codePoints": [],
+          "kind": "builtin",
+          "which": "EndOfSource"
+        },
+        "symbolId": "CatalogDemo::EOF"
+      }
+    ],
+    "trivia": {
+      "insertionPlan": [
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:155:168:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "entry",
+            "childIndex": null,
+            "ownerExprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 0,
+            "ownerExprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        },
+        {
+          "boundary": {
+            "at": "afterChild",
+            "childIndex": 1,
+            "ownerExprId": "expr:ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf:211:226:body/seq"
+          },
+          "policyId": "trivia:javaStyle"
+        }
+      ],
+      "policies": [
+        {
+          "effectiveDelimiterSet": [
+            {
+              "codePoints": [
+                9,
+                10,
+                11,
+                12,
+                13,
+                32
+              ],
+              "kind": "characters"
+            },
+            {
+              "kind": "lineComment",
+              "lineEndProfile": "legacyLineTerminator",
+              "open": "//"
+            },
+            {
+              "close": "*/",
+              "kind": "blockComment",
+              "open": "/*"
+            }
+          ],
+          "id": "trivia:javaStyle",
+          "precedence": "ruleWhitespaceThenRuleInterleaveThenGrammar",
+          "rawSettings": {
+            "comment": null,
+            "interleave": null,
+            "whitespace": "javaStyle"
+          }
+        }
+      ]
+    },
+    "typeofConstraints": []
+  },
+  "serialization": "ubnfc-json.v1",
+  "sources": [
+    {
+      "codePointLength": 231,
+      "id": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+      "path": "ubnfc-lsp/src/test/resources/validation/catalog-demo.ubnf",
+      "sha256": "9a93f58f72828bb0001afc493117c84463bc04192a9ae015a7e4014b4ce1842c"
+    }
+  ],
+  "version": 1
+}

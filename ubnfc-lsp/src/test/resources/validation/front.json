@@ -1,0 +1,141 @@
+{
+  "normal": [],
+  "warning": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "W-GENERAL-NO-ROOT"
+      },
+      "source": "ubnfc-front",
+      "message": "grammar Demo has no @root rule（Add @root to at least one entry rule.）"
+    }
+  ],
+  "undefined": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "E-RULE-UNDEFINED"
+      },
+      "source": "ubnfc-front",
+      "message": "rule Start references undefined rule or token \u0027Missing\u0027（Define a rule or token named \u0027Missing\u0027.）"
+    }
+  ],
+  "mapping": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "E-MAPPING-MISSING-CAPTURE"
+      },
+      "source": "ubnfc-front",
+      "message": "rule Start @mapping(Node) param \u0027missing\u0027 has no matching capture（Add @missing capture in the rule body or remove it from params.）"
+    }
+  ],
+  "leftRecursion": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "W-LEFT-RECURSION"
+      },
+      "source": "ubnfc-front",
+      "message": "left-recursive cycle detected: Start -\u003e Start（Rewrite using repetition (e.g. A ::\u003d B { Op B }) or right recursion.）"
+    }
+  ],
+  "syntax": [
+    {
+      "range": {
+        "start": {
+          "line": 1,
+          "character": 21
+        },
+        "end": {
+          "line": 1,
+          "character": 21
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "TerminalElement"
+      },
+      "source": "ubnfc",
+      "message": "構文エラー（余分な入力）: \u0027 \u0027 | \u0027%\u0027 | \u0027(\u0027 | \u0027)\u0027 | \u0027*\u0027 | \u0027*/\u0027 | \u0027+\u0027 | \u0027,\u0027 ほか 25 件 を期待しました",
+      "relatedInformation": [
+        {
+          "location": {
+            "uri": "file:///validation/demo.ubnf",
+            "range": {
+              "start": {
+                "line": 1,
+                "character": 21
+              },
+              "end": {
+                "line": 1,
+                "character": 21
+              }
+            }
+          },
+          "message": "最深規則: TerminalElement"
+        }
+      ]
+    },
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "E-SYNTAX"
+      },
+      "source": "ubnfc-front",
+      "message": "予期しないトークン: Eof (bytes 44..44); expected ;（UBNF の構文を修正してください。）"
+    }
+  ],
+  "updated": [],
+  "closed": []
+}

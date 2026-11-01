@@ -40,7 +40,8 @@ public final class LspEmitter {
 
     private static final List<String> TEMPLATES = List.of(
         "Positions", "Meta", "Analysis", "Symbols", "Diagnostics", "DocumentStore",
-        "Completion", "Hovers", "SemanticTokens", "FoldingRanges", "LanguageServerImpl", "ServerMain");
+        "Completion", "Hovers", "SemanticTokens", "FoldingRanges", "FrontValidation", "CatalogDiagnostics",
+        "LanguageServerImpl", "ServerMain");
 
     private final GrammarIr ir;
     private final String pkg;
