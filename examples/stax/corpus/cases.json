@@ -1,0 +1,540 @@
+[
+  {
+    "id": "prefixes",
+    "source": "type Integer = Int ; : duplicate ( Integer -- Integer ) dup ; : main ( -- ) 1 duplicate drop true_value letter ;",
+    "parse": "accept",
+    "typecheck": "未定義語",
+    "reason": "§3.1: Int/dup/true/let の接頭辞は識別子を横取りしない。未定義語も構文は受理。",
+    "checks": [
+      {
+        "type": "NamedType",
+        "fields": {
+          "name": "Integer"
+        },
+        "slice": "Integer ",
+        "occurrence": "last"
+      },
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "duplicate"
+        },
+        "slice": "duplicate ",
+        "occurrence": "last"
+      },
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "true_value"
+        },
+        "slice": "true_value ",
+        "occurrence": "last"
+      },
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "letter"
+        },
+        "slice": "letter ",
+        "occurrence": "last"
+      }
+    ],
+    "warnings": [
+      {
+        "name": "true_value",
+        "offset": 93
+      },
+      {
+        "name": "letter",
+        "offset": 104
+      }
+    ]
+  },
+  {
+    "id": "reserved-prefixes",
+    "source": ": use_more ( -- ) ; : struct_more ( -- ) ; : type_more ( -- ) ; : macro_more ( -- ) ; : main ( -- ) use_more struct_more type_more macro_more ;",
+    "parse": "accept",
+    "typecheck": "対象外",
+    "reason": "§3: 予約語を接頭辞に持つ利用者名は語の定義/参照。",
+    "checks": [
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "use_more"
+        },
+        "slice": "use_more ",
+        "occurrence": "last"
+      },
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "struct_more"
+        },
+        "slice": "struct_more ",
+        "occurrence": "last"
+      },
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "type_more"
+        },
+        "slice": "type_more ",
+        "occurrence": "last"
+      },
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "macro_more"
+        },
+        "slice": "macro_more ",
+        "occurrence": "last"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "numbers-fields",
+    "source": "struct P { x: Float } : main ( -- ) -5 +2 .5 1. 2e-3 .x !x ;",
+    "parse": "accept",
+    "typecheck": "構文のみ（不整合）",
+    "reason": "§3/Term: NUMBER を Prim/FieldGet より先に試す。負数/小数/指数と .x/!x を分離。型整合は別段階。",
+    "checks": [
+      {
+        "type": "NumLit",
+        "fields": {
+          "text": "-5"
+        },
+        "slice": "-5 "
+      },
+      {
+        "type": "NumLit",
+        "fields": {
+          "text": "+2"
+        },
+        "slice": "+2 "
+      },
+      {
+        "type": "NumLit",
+        "fields": {
+          "text": ".5"
+        },
+        "slice": ".5 "
+      },
+      {
+        "type": "NumLit",
+        "fields": {
+          "text": "1."
+        },
+        "slice": "1. "
+      },
+      {
+        "type": "NumLit",
+        "fields": {
+          "text": "2e-3"
+        },
+        "slice": "2e-3 "
+      },
+      {
+        "type": "FieldGet",
+        "fields": {
+          "name": "x"
+        },
+        "slice": ".x "
+      },
+      {
+        "type": "FieldSet",
+        "fields": {
+          "name": "x"
+        },
+        "slice": "!x "
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "operator-prefixes",
+    "source": ": main ( -- ) 1 2 <= 1 2 >= 1 2 <> 1 2 < 1 2 > 1 2 = ;",
+    "parse": "accept",
+    "typecheck": "構文のみ（効果不一致）",
+    "reason": "§3/Prim: 記号 primitive は長い接頭辞を先に置く。",
+    "checks": [
+      {
+        "type": "Prim",
+        "fields": {
+          "name": "<="
+        },
+        "slice": "<= ",
+        "occurrence": "last"
+      },
+      {
+        "type": "Prim",
+        "fields": {
+          "name": ">="
+        },
+        "slice": ">= ",
+        "occurrence": "last"
+      },
+      {
+        "type": "Prim",
+        "fields": {
+          "name": "<>"
+        },
+        "slice": "<> ",
+        "occurrence": "last"
+      },
+      {
+        "type": "Prim",
+        "fields": {
+          "name": "<"
+        },
+        "slice": "< ",
+        "occurrence": "last"
+      },
+      {
+        "type": "Prim",
+        "fields": {
+          "name": ">"
+        },
+        "slice": "> ",
+        "occurrence": "last"
+      },
+      {
+        "type": "Prim",
+        "fields": {
+          "name": "="
+        },
+        "slice": "= ",
+        "occurrence": "last"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "empty-nested-quotes",
+    "source": ": main ( -- ) [ ] [ [ 1 ] [ ] ] ;",
+    "parse": "accept",
+    "typecheck": "効果不一致",
+    "reason": "§3/Quotation: 空と入れ子は受理。引用値を残すため main の効果は不一致。",
+    "checks": [
+      {
+        "type": "Quotation",
+        "fields": {
+          "body": []
+        },
+        "slice": "[ ] "
+      },
+      {
+        "type": "NumLit",
+        "fields": {
+          "text": "1"
+        },
+        "slice": "1 "
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "quote-types",
+    "source": ": f ( [ Int -- [ Bool -- Str ] ] -- ) drop ;",
+    "parse": "accept",
+    "typecheck": "対象外",
+    "reason": "§4.1: 引用型も再帰的な TypeRef。",
+    "checks": [
+      {
+        "type": "BuiltinType",
+        "fields": {
+          "name": "Bool"
+        },
+        "slice": "Bool "
+      },
+      {
+        "type": "BuiltinType",
+        "fields": {
+          "name": "Str"
+        },
+        "slice": "Str "
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "declaration-order",
+    "source": ": early ( -- ) late ; : late ( -- ) ; : main ( -- ) early late ;",
+    "parse": "accept",
+    "typecheck": "前方参照",
+    "reason": "§3.2: 前方参照は未解決。後続の参照は解決。",
+    "checks": [
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "late"
+        },
+        "slice": "late "
+      }
+    ],
+    "warnings": [
+      {
+        "name": "late",
+        "offset": 15
+      }
+    ]
+  },
+  {
+    "id": "self-reference",
+    "source": ": self ( -- ) self recurse ;",
+    "parse": "accept",
+    "typecheck": "未定義語",
+    "reason": "§3.2: 定義中の自名は未解決、recurse は primitive。",
+    "checks": [
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "self"
+        },
+        "slice": "self ",
+        "occurrence": "last"
+      },
+      {
+        "type": "Prim",
+        "fields": {
+          "name": "recurse"
+        },
+        "slice": "recurse "
+      }
+    ],
+    "warnings": [
+      {
+        "name": "self",
+        "offset": 14
+      }
+    ]
+  },
+  {
+    "id": "local-leak",
+    "source": ": a ( -- ) 1 let x x drop ; : b ( -- ) x drop ;",
+    "parse": "accept",
+    "typecheck": "局所束縛の漏れ",
+    "reason": "§4.6: let は語のスコープに登録し他の語へ漏れない。",
+    "checks": [
+      {
+        "type": "LetBind",
+        "fields": {
+          "name": "x"
+        },
+        "slice": "let x "
+      }
+    ],
+    "warnings": [
+      {
+        "name": "x",
+        "offset": 39
+      }
+    ]
+  },
+  {
+    "id": "local-before-binding",
+    "source": ": main ( -- ) x drop 1 let x x drop ;",
+    "parse": "accept",
+    "typecheck": "未束縛",
+    "reason": "§4.6: let より前の参照は未解決。",
+    "checks": [
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "x"
+        },
+        "slice": "x "
+      }
+    ],
+    "warnings": [
+      {
+        "name": "x",
+        "offset": 14
+      }
+    ]
+  },
+  {
+    "id": "quotation-local",
+    "source": ": main ( -- ) 1 let x [ x 1 + let x ] call x drop ;",
+    "parse": "accept",
+    "typecheck": "対象外",
+    "reason": "§4.6: 引用は同一語スコープの既存 let を参照/更新できる。",
+    "checks": [
+      {
+        "type": "LetBind",
+        "fields": {
+          "name": "x"
+        },
+        "slice": "let x "
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "same-fields",
+    "source": "struct A { x: Int } struct B { x: Str } : fa ( A -- Int ) .x ; : fb ( B -- Str ) .x ;",
+    "parse": "accept",
+    "typecheck": "対象外",
+    "reason": "§4.4: 同名フィールドは名前として解決するが、所有 struct は型検査の仕事。",
+    "checks": [
+      {
+        "type": "FieldDecl",
+        "fields": {
+          "name": "x"
+        },
+        "slice": "x: Int "
+      },
+      {
+        "type": "FieldDecl",
+        "fields": {
+          "name": "x"
+        },
+        "slice": "x: Str "
+      },
+      {
+        "type": "FieldGet",
+        "fields": {
+          "name": "x"
+        },
+        "slice": ".x "
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "missing-field",
+    "source": "struct A { x: Int } : main ( -- ) .missing ;",
+    "parse": "accept",
+    "typecheck": "未知フィールド",
+    "reason": "§4.4: 未宣言フィールドの参照は WARNING、構文は受理。 診断位置は . ではなく @name capture の先頭。",
+    "checks": [
+      {
+        "type": "FieldGet",
+        "fields": {
+          "name": "missing"
+        },
+        "slice": ".missing "
+      }
+    ],
+    "warnings": [
+      {
+        "name": "missing",
+        "offset": 35
+      }
+    ]
+  },
+  {
+    "id": "import-explicit",
+    "source": "use \"absent.stax\" ( exported ) ; : main ( -- ) exported ;",
+    "parse": "accept",
+    "typecheck": "欠落ファイル",
+    "reason": "§3.3: import の列挙はソース上の宣言。相手ファイルの実在は型検査で確認。",
+    "checks": [
+      {
+        "type": "ImportName",
+        "fields": {
+          "name": "exported"
+        },
+        "slice": "exported "
+      },
+      {
+        "type": "WordRef",
+        "fields": {
+          "name": "exported"
+        },
+        "slice": "exported ",
+        "occurrence": "last"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "strings-comments",
+    "source": ": main ( -- ) /* 😀 引用の記号 [] ; */ \"a\\n\\\"b\" print ; // end\n",
+    "parse": "accept",
+    "typecheck": "対象外",
+    "reason": "§3: javaStyle のコメントは trivia。STRING capture は引用符を除く原文（escape を保持）。",
+    "checks": [
+      {
+        "type": "StrLit",
+        "fields": {
+          "text": "a\\n\\\"b"
+        },
+        "slice": "\"a\\n\\\"b\" "
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "id": "unclosed-quote",
+    "source": ": main ( -- ) [ 1 ;",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "Quotation の閉じ ] は必須。",
+    "checks": [],
+    "warnings": []
+  },
+  {
+    "id": "missing-effect",
+    "source": ": main 1 ;",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "WordDef の Effect は必須。",
+    "checks": [],
+    "warnings": []
+  },
+  {
+    "id": "missing-effect-close",
+    "source": ": main ( -- 1 ;",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "Effect の閉じ ) は必須。",
+    "checks": [],
+    "warnings": []
+  },
+  {
+    "id": "missing-semicolon",
+    "source": ": main ( -- )",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "WordDef の終端 ; は必須。",
+    "checks": [],
+    "warnings": []
+  },
+  {
+    "id": "symbol-word",
+    "source": ": >> ( Int -- Int ) dup ;",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "§3.1: 利用者語名は IDENT、記号語は固定 primitive のみ。",
+    "checks": [],
+    "warnings": []
+  },
+  {
+    "id": "generic-future",
+    "source": "struct Box <T> { value: T }",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "§4.7: ジェネリクスは将来案。",
+    "checks": [],
+    "warnings": []
+  },
+  {
+    "id": "dynamic-definition",
+    "source": "42 constant answer",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "§5.3: 動的 defining word は現行の最上位構文に無い。",
+    "checks": [],
+    "warnings": []
+  },
+  {
+    "id": "sum-payload",
+    "source": "type Option = | Some Int | None ;",
+    "parse": "reject",
+    "typecheck": "構文拒否",
+    "reason": "§4.1: 和の枝は引数を取らない。",
+    "checks": [],
+    "warnings": []
+  }
+]

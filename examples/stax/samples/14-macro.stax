@@ -2,7 +2,8 @@
 // 語と構文は同じで、検査と実行の段が違う。これが stax の自己拡張の口である。
 
 // unless は cond を反転して if_else に渡すだけの構文糖。
-macro unless ( [ -- ] -- [ -- ] )
+// 返す引用の先頭の not が Bool を消費するので、引用の入力にも Bool を宣言する。
+macro unless ( [ -- ] -- [ Bool -- ] )
   let body
   [ not body [ ] choose call ] ;
 
