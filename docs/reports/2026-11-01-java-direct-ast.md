@@ -236,3 +236,8 @@ master `3152d57`（#30）をmergeで統合した。LSP側がD-087を使用した
 AST構築部・P4/Rust/手書き/共有scannerを含む全計測ソースはSHA-256で不変、front・harness・pin・IR schemaも直前HEADと不変のため、全件同値と最新A/Bの結果を維持する。新しいLSP機能と直接AST経路の組み合わせはLSPテストと最新HEADのCIで確認する。
 
 CIと同じ `mvn -q -Plsp -pl ubnfc-lsp -am test "-Dtest=org.unlaxer.ubnfc.lsp.*Test" -Dsurefire.failIfNoSpecifiedTests=false` で **LSP15件すべて通過**。最初の単体module実行は古いMavenローカル依存のIrReaderを使い、declarativeTokens未対応の2 errorになったため、現在のbackendを使うreactor構成で再確認した。LSPのコード・期待値は変更していない。検証記録は `after-stage5/`。
+
+## stax段階3統合後の確認
+
+master `a0d4bb1`（#42）をmergeし、独立したRust実行系のworkspace追加を取り込んだ。Java backend・front・harness・scanner・pin・IR・P4と手書きを含む全計測ソースは不変。`cargo test -p ubnfc-stax --no-fail-fast` の **12件が通過**した。
+standaloneのRust比較crateも再buildし、binary SHA-256が前後とも `92aab9e13b40680162aac6697b2c5a0ad266c5f656f4007c768c15b87d65f1ab` で一致した。ソースと比較binaryが不変のため、corpus全件同値・最新A/B値を維持する。記録は `after-stax3/`。D-092と他担当の設計行は保持し、最終判定は統合後HEADのCIを確認する。

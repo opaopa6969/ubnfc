@@ -21,3 +21,5 @@
 `post-ll1/java-projection-proof.json` は新pin全260buildについて、LL(1)統合前後で234buildのIR（plan.ll1以外）と各Java生成器の全ファイルが同一、26buildのIRエラーが同一である検証記録。`post-ll1/ir.sha256` は追加メタデータを持つ統合後IRで、生成Javaは統合前とbyte不変。
 
 `after-long/reference-layout.json` はfield offsetとVM alignmentによる旧/参照Recipeの56 B一致。`source.sha256` は共有scanner・P4 lib/build等の依存も含む。`toolchains.txt` は今回の環境。基準生成器は最新master49d1a9dのarchiveからbuildした。
+
+`after-stage5/` はLSP15件とAST/計測ソース不変、`after-stax3/` はstax実行系12件とRust比較binaryのSHA一致を記録する。これらの統合で既存のcorpus/A/B対象は変更していない。
