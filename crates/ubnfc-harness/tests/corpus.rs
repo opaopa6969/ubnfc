@@ -20,6 +20,42 @@ fn file(suffix: &str) -> &'static CorpusFile {
 }
 
 #[test]
+fn tiny_fence_keeps_the_pinned_long_token_declaration_and_all_86_cases() {
+    // scripts/external-pins.env: unlaxer-parser d3ea73e8 の
+    // TinyCodeFenceConformanceTest.grammar と同じ宣言を全 variant に付ける。
+    let fence = file("tiny-code-fence/corpus.json");
+    assert_eq!(fence.grammars.len(), 14);
+    assert_eq!(fence.cases.len(), 86);
+    for grammar in &fence.grammars {
+        let GrammarSource::Inline { source, .. } = grammar else {
+            panic!("tiny fence は合成文法であること");
+        };
+        assert!(source.contains(
+            "token LONG = org.unlaxer.tinyexpression.parser.javalang.LongCodeBlockParser\n"
+        ));
+    }
+    let long: Vec<_> = fence
+        .cases
+        .iter()
+        .filter(|c| {
+            c.grammar_ref.iter().any(|&i| {
+                matches!(
+                    &fence.grammars[i],
+                    GrammarSource::Inline { name, .. } if name.starts_with("long-block")
+                )
+            })
+        })
+        .collect();
+    assert_eq!(long.len(), 13);
+    assert_eq!(
+        long.iter()
+            .filter(|c| matches!(&c.expect, Expectation::Accept(e) if e.accepted))
+            .count(),
+        6
+    );
+}
+
+#[test]
 fn every_required_file_loads_with_the_measured_counts() {
     use Family::*;
     let expected = [
@@ -52,7 +88,11 @@ fn every_required_file_loads_with_the_measured_counts() {
         .filter_map(|(suffix, family, count)| {
             let file = file(suffix);
             ((file.family, file.cases.len()) != (*family, *count)).then(|| {
-                format!("{suffix}: {:?} {} (expected {family:?} {count})", file.family, file.cases.len())
+                format!(
+                    "{suffix}: {:?} {} (expected {family:?} {count})",
+                    file.family,
+                    file.cases.len()
+                )
             })
         })
         .collect();
