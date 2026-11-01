@@ -1,53 +1,108 @@
 use crate::{generated::ast::Ast, model::*};
-use std::collections::BTreeMap;
+use std::{
+    cell::Cell,
+    collections::{BTreeMap, VecDeque},
+};
 
 struct State {
     stack: Vec<Ty>,
-    required: Vec<Ty>,
+    required: VecDeque<Ty>,
     locals: BTreeMap<String, Ty>,
     infer: bool,
 }
 #[derive(Default)]
 struct Checker {
     bindings: Vec<Option<Ty>>,
+    ranks: Vec<u8>,
+    work: Cell<usize>,
     numeric: Vec<Ty>,
     equality: Vec<Ty>,
     steps: usize,
 }
 impl Checker {
+    fn charge(&self, n: usize) -> Result<()> {
+        let used = self
+            .work
+            .get()
+            .checked_add(n)
+            .ok_or_else(|| Error("型検査の操作上限".into()))?;
+        if used > 1_000_000 {
+            return fail("型検査の操作上限");
+        }
+        self.work.set(used);
+        Ok(())
+    }
     fn fresh(&mut self) -> Ty {
         let id = self.bindings.len();
         self.bindings.push(None);
+        self.ranks.push(0);
         Ty::Var(id)
     }
-    fn resolve(&self, t: &Ty) -> Ty {
-        match t {
-            Ty::Var(i) => self.bindings[*i]
-                .as_ref()
-                .map(|t| self.resolve(t))
-                .unwrap_or(t.clone()),
+    fn resolve(&self, t: &Ty) -> Result<Ty> {
+        self.resolve_at(t, 0)
+    }
+    fn resolve_at<'a>(&'a self, mut t: &'a Ty, depth: usize) -> Result<Ty> {
+        if depth > 64 {
+            return fail("引用型の深さ上限");
+        }
+        self.charge(1)?;
+        // 型変数の親は host の再帰を使わずにたどる。
+        while let Ty::Var(id) = t {
+            self.charge(1)?;
+            match &self.bindings[*id] {
+                Some(parent) => t = parent,
+                None => return Ok(t.clone()),
+            }
+        }
+        Ok(match t {
             Ty::Quote(e) => Ty::Quote(Effect {
-                input: e.input.iter().map(|t| self.resolve(t)).collect(),
-                output: e.output.iter().map(|t| self.resolve(t)).collect(),
+                input: e
+                    .input
+                    .iter()
+                    .map(|t| self.resolve_at(t, depth + 1))
+                    .collect::<Result<_>>()?,
+                output: e
+                    .output
+                    .iter()
+                    .map(|t| self.resolve_at(t, depth + 1))
+                    .collect::<Result<_>>()?,
             }),
             _ => t.clone(),
-        }
+        })
     }
-    fn occurs(&self, id: usize, t: &Ty) -> bool {
-        match self.resolve(t) {
-            Ty::Var(i) => i == id,
-            Ty::Quote(e) => e.input.iter().chain(&e.output).any(|t| self.occurs(id, t)),
-            _ => false,
+    fn occurs(&self, id: usize, t: &Ty) -> Result<bool> {
+        let t = self.resolve(t)?;
+        let mut pending = vec![&t];
+        while let Some(t) = pending.pop() {
+            match t {
+                Ty::Var(other) if *other == id => return Ok(true),
+                Ty::Quote(e) => pending.extend(e.input.iter().chain(&e.output)),
+                _ => {}
+            }
         }
+        Ok(false)
     }
     fn unify(&mut self, a: &Ty, b: &Ty) -> Result<()> {
-        let (a, b) = (self.resolve(a), self.resolve(b));
+        let (a, b) = (self.resolve(a)?, self.resolve(b)?);
         if a == b {
             return Ok(());
         }
         match (&a, &b) {
+            (Ty::Var(a), Ty::Var(b)) => {
+                // 小さい木を大きい木へ結合し、変数連鎖の二乗時間を避ける。
+                let (a, b) = (*a, *b);
+                if self.ranks[a] < self.ranks[b] {
+                    self.bindings[a] = Some(Ty::Var(b));
+                } else {
+                    self.bindings[b] = Some(Ty::Var(a));
+                    if self.ranks[a] == self.ranks[b] {
+                        self.ranks[a] += 1;
+                    }
+                }
+                Ok(())
+            }
             (Ty::Var(id), t) | (t, Ty::Var(id)) => {
-                if self.occurs(*id, t) {
+                if self.occurs(*id, t)? {
                     return fail("無限の引用型は作れない");
                 }
                 self.bindings[*id] = Some(t.clone());
@@ -87,7 +142,7 @@ impl Checker {
             Ok(t)
         } else if s.infer {
             let t = self.fresh();
-            s.required.insert(0, t.clone());
+            s.required.push_front(t.clone());
             Ok(t)
         } else {
             fail("スタック深さが不足")
@@ -105,7 +160,7 @@ impl Checker {
         Ok(())
     }
     fn quote(&self, t: Ty) -> Result<Effect> {
-        if let Ty::Quote(e) = self.resolve(&t) {
+        if let Ty::Quote(e) = self.resolve(&t)? {
             Ok(e)
         } else {
             fail("call / choose には効果が分かる引用が必要")
@@ -133,17 +188,20 @@ impl Checker {
                     }
                     g_StaxAST_2e_BoolLit(_) => s.stack.push(Ty::Bool),
                     g_StaxAST_2e_Quotation(n) => {
+                        self.charge(s.locals.len())?;
                         let mut q = State {
                             stack: vec![],
-                            required: vec![],
+                            required: VecDeque::new(),
                             locals: s.locals.clone(),
                             infer: true,
                         };
                         self.body(&n.g_body, &mut q, w, depth + 1)?;
-                        s.stack.push(Ty::Quote(Effect {
-                            input: q.required,
+                        let inferred = Ty::Quote(Effect {
+                            input: q.required.into_iter().collect(),
                             output: q.stack,
-                        }));
+                        });
+                        self.resolve(&inferred)?;
+                        s.stack.push(inferred);
                     }
                     g_StaxAST_2e_LetBind(n) => {
                         if n.g_name.len() > 256 {
@@ -236,10 +294,10 @@ impl Checker {
         Ok(())
     }
     fn structure(&mut self, t: &Ty, field: &str, env: &Env) -> Result<std::rc::Rc<Structure>> {
-        if let Ty::Struct(s) = self.resolve(t) {
+        if let Ty::Struct(s) = self.resolve(t)? {
             return Ok(s);
         }
-        if matches!(self.resolve(t), Ty::Var(_)) {
+        if matches!(self.resolve(t)?, Ty::Var(_)) {
             let mut candidates = BTreeMap::new();
             for symbol in env.values() {
                 if let Symbol::Constructor(s) = symbol {
@@ -376,7 +434,7 @@ pub(crate) fn check(word: &Word) -> Result<()> {
     let mut c = Checker::default();
     let mut s = State {
         stack: word.effect.input.clone(),
-        required: vec![],
+        required: VecDeque::new(),
         locals: BTreeMap::new(),
         infer: false,
     };
@@ -389,13 +447,13 @@ pub(crate) fn check(word: &Word) -> Result<()> {
         ))
     })?;
     for t in &c.numeric {
-        if !matches!(c.resolve(t), Ty::Int | Ty::Float | Ty::Var(_)) {
+        if !matches!(c.resolve(t)?, Ty::Int | Ty::Float | Ty::Var(_)) {
             return fail("算術には同じ数値型が必要");
         }
     }
     for t in &c.equality {
         if !matches!(
-            c.resolve(t),
+            c.resolve(t)?,
             Ty::Int | Ty::Float | Ty::Bool | Ty::Str | Ty::Enum(_) | Ty::Var(_)
         ) {
             return fail("この型は等価比較できない");

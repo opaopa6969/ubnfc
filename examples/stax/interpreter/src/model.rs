@@ -69,7 +69,11 @@ pub(crate) fn type_ref(ast: &Ast, env: &Env) -> Result<Ty> {
             Some(Symbol::Constructor(s)) => Ok(Ty::Struct(s.clone())),
             _ => fail(format!("未知の型: {}", n.g_name)),
         },
-        g_StaxAST_2e_QuotType(n) => Ok(Ty::Quote(effect(&n.g_inputs, &n.g_outputs, env)?)),
+        g_StaxAST_2e_QuotType(n) => {
+            let ty = Ty::Quote(effect(&n.g_inputs, &n.g_outputs, env)?);
+            ty.check_depth(0)?;
+            Ok(ty)
+        }
         _ => fail("型の AST が必要"),
     }
 }
@@ -157,5 +161,19 @@ impl fmt::Display for Ty {
                 f.write_str(" ]")
             }
         }
+    }
+}
+
+impl Ty {
+    fn check_depth(&self, depth: usize) -> Result<()> {
+        if depth > 64 {
+            return fail("引用型の深さ上限");
+        }
+        if let Ty::Quote(e) = self {
+            for t in e.input.iter().chain(&e.output) {
+                t.check_depth(depth + 1)?;
+            }
+        }
+        Ok(())
     }
 }

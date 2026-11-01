@@ -293,3 +293,24 @@ fn bounded_machine_runs_finite_loops_without_a_jvm_and_stops_infinite_recursion(
     fs::write(files.0.join("main.stax"), ": main ( -- ) [ ;").unwrap();
     failure(files.run(&[]), "構文エラー");
 }
+
+#[test]
+fn quotation_type_graphs_are_bounded_and_merges_do_not_form_long_chains() {
+    let mut source = String::from(": main ( -- ) [ dup ] ");
+    source.push_str(&" true swap [ dup ] choose ".repeat(5000));
+    source.push_str(" drop ;");
+    success(run(&source), "");
+    let mut source = String::from("type T0 = Int ;\n");
+    for i in 1..=70 {
+        source.push_str(&format!("type T{i} = [ -- T{} ] ;\n", i - 1));
+    }
+    source.push_str(": main ( -- ) ;");
+    failure(run(&source), "引用型の深さ上限");
+    let types = "Int ".repeat(1000);
+    let source = format!(
+        ": identity ( {types} -- {types} ) ; : main ( -- ) {} {} ;",
+        "1 ".repeat(1000),
+        "identity ".repeat(1000)
+    );
+    failure(run(&source), "型検査の操作上限");
+}
