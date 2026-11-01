@@ -1,0 +1,12 @@
+// 😀 UTF-16 の座標変換も検証する。
+/* 😀 */ type Count = Int ;
+struct Point { x: Count }
+use "library.stax" ( imported ) ;
+: square ( Int -- Int ) dup * ;
+: main ( -- )
+  "😀" drop 1 let local
+  local square drop
+  1 Point .x drop
+  imported
+  missing
+;

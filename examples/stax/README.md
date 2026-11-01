@@ -22,6 +22,7 @@ struct Point { x: Int y: Int }
 | [`samples/`](samples/) | サンプル 20 本と [`samples/expected.json`](samples/expected.json)（期待判定） |
 | [`rejects/`](rejects/) | 20 本とは別に置く構文拒否ケースと期待判定 |
 | [`scripts/crosscheck.sh`](scripts/crosscheck.sh) | 検証 → 両 backend 生成 → 20 本を突き合わせ |
+| [`vscode/README.md`](vscode/README.md) | 生成 LSP・VSIX の作成、protocol golden、実機確認手順と現行制約 |
 | `ir/examples/stax.ir.json` | commit した Grammar IR の golden（repository ルート） |
 
 生成物は commit しない（`examples/json` / `examples/p4-v2` と同じ方針）。
@@ -129,7 +130,9 @@ harness テストで、20 本のサンプルおよび構文拒否と同時に実
 
 ## 次の段
 
-段階 2 の仕様由来 corpus と段階 3 の Rust インタプリタを実装済み。
-次は段階 4 の LSP・VSIX と段階 5 の自己拡張の境界レポート・UBNF v3 提案。
+段階 2 の仕様由来 corpus、段階 3 の Rust インタプリタ、段階 4 の LSP・VSIX 生成と
+headless protocol 検証を実装済み。実機確認と生成 LSP の精度に残る条件は
+[`vscode/README.md`](vscode/README.md) に分けて記録した。
+次は段階 5 の自己拡張の境界レポート・UBNF v3 提案。
 段階 2〜5 の受け入れ条件とリンクは [`DESIGN.md`](DESIGN.md) §9。
 ジェネリクス（行変数）は将来案であり、段階 2 の必須範囲には含めない。
