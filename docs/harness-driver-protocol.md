@@ -251,6 +251,7 @@ Extern probe の先読み前を表現する。
 | `tinyexpression.parser.StringLiteralParser` | 上記2種の選択 | `tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/StringLiteralParser.java:19` |
 | `tinyexpression.parser.javalang.CodeStartParser` | 行頭、3 backtick、ASCII identifier、colon、dot 区切り ASCII identifier、CRLF/CR/LF/EOF | `tinyexpression/src/main/java/org/unlaxer/tinyexpression/parser/javalang/CodeStartParser.java:32`、`parser/javatype/JavaClassNameParser.java:28` |
 | `tinyexpression.parser.javalang.CodeEndParser` | 行頭、3 backtick、CRLF/CR/LF/EOF | 同ディレクトリ `CodeEndParser.java:21` |
+| `tinyexpression.parser.javalang.LongCodeBlockParser`（完全名のみ） | 行頭、4 個以上の backtick、ASCII scheme/class、必須改行、同幅の単独終端行。LF/CRLF/CR、終端 EOF、opaque な本文 | tinyexpression pin `c736c2c6` の `codeblock/LongCodeFence.java`、`parser/javalang/LongCodeBlockParser.java` |
 | `oracle.ExternalCursorParser`（完全名） | 😀 を消費し、続く x を先読み | `corpus/oracle/tools/ExternalCursorParser.java:8` |
 
 `unlaxer-common` の根拠は隣接 `unlaxer-parser` checkout、tinyexpression の根拠は
@@ -263,6 +264,13 @@ Extern probe の先読み前を表現する。
 tiny-string-token の single quote 内容抽出は残る Fail として報告する。
 scanner 自体の value span は両言語の契約テストで検証し、登録 E2E は corpus の
 `direct-eof` 文法の double quote 入力と拒否入力を使う。期待値・oracle・乖離登録は変更しない。
+
+長い fence の mapped 値は元 mapper の strip 契約に合わせ、scanner の value span を
+終端 backtick までにする。cursor は終端改行も消費し、capture 原文・公開 span は
+終端改行を含む。失敗時の診断は token の開始位置の `long code block`、cursor は入口を維持する。
+`runall` の回帰テストは固定 pin の fence 全 86 件を両 backend で実行し、長い fence の
+13 件では capture 原文・code point span と診断も明示照合する
+（[issue #33 報告書](reports/2026-11-01-tiny-code-fence-long.md)）。
 
 ### Extern scanner の先頭文字宣言（M5 round 3）
 

@@ -18,7 +18,7 @@ else
   jar="$scratch/ubnfc-java/target/ubnfc-java-0.1.0-SNAPSHOT.jar"
 fi
 java -cp "$jar" org.unlaxer.ubnfc.java.Main \
-  --ir "$repo/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json" \
+  --ir "$repo/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json" \
   --out "$scratch/generated" --package org.unlaxer.ubnfc.examples.p4.generated
 case "${1:---check}" in
   --check) diff -qr "$module/src/main/java/org/unlaxer/ubnfc/examples/p4/generated" "$scratch/generated/org/unlaxer/ubnfc/examples/p4/generated" ;;

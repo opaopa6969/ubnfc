@@ -145,6 +145,15 @@ pub(super) fn classify(value: &TokenValue, v2: bool) -> (ResolvedTokenValue, boo
         }
         // 明示された host 実装。未解決警告（W-TOKEN-UNRESOLVED）は綴り間違いを
         // 拾うためのもので、明示宣言には出さない。registry の有無は ir/gen が見る。
+        // resolve が位置付きで拒否する（`E-TOKEN-ADAPTER-UNSUPPORTED`）。ここは型を埋めるだけ。
+        TokenValue::Adapter { id, version, .. } => {
+            return (
+                R::Extern {
+                    class_name: format!("ADAPTER({id}, version={version})"),
+                },
+                false,
+            )
+        }
         TokenValue::Extern { name, .. } => {
             return (
                 R::Extern {

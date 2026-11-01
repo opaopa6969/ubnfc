@@ -1,0 +1,2010 @@
+{
+  "説明": "現 pin の変更前後。通常 Pass と期待拒否 Pass は排他的。比較対象の fixture・期待値・台帳は不変。",
+  "unlaxer_parser_commit": "d3ea73e8cfa440df8bdbb70abb29e06259435ba2",
+  "tinyexpression_commit": "c736c2c66e4569ebc5e22f1f0c5125a045679d35",
+  "旧現_fence_corpus_blob": "852a3efe2de965a0eeae34bf9388b4142177164d",
+  "変更前_java": {
+    "exit_code": 1,
+    "backend": "java",
+    "front_sha256": "b4cb71d87feaf2468da13c26703fcfaf19668f5c27ac0025b53ff6138113caa2",
+    "generator_sha256": "a75c89bfd881b8cd61f8c83b1ee48b2c66557eaa781636aa765049100ecaac4d",
+    "corpus_files": 127,
+    "source_cases": 1279,
+    "grammar_variants": 307,
+    "unique_builds": 260,
+    "totals": {
+      "ir_failure": 57,
+      "generation_rejected": 0,
+      "javac_failure": 0,
+      "build_failure": 0,
+      "driver_error": 0,
+      "pass": 1315,
+      "expected_rejection_pass": 27,
+      "known_divergence": 29,
+      "fail": 3,
+      "unobserved": 61
+    },
+    "families": {
+      "associative": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 24,
+        "expected_rejection_pass": 24,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "cardinality": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 70,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "catalog": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 2,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "evolution": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 140,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 16
+      },
+      "lexical": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 78,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "mixed-values": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 98,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "nested-captures": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 10,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "numeric-capture": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 13,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "oracle": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 332,
+        "expected_rejection_pass": 3,
+        "known_divergence": 29,
+        "fail": 0,
+        "unobserved": 34
+      },
+      "primitives": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 113,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 2,
+        "unobserved": 0
+      },
+      "right-associative": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 112,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "rule-trivia": {
+        "ir_failure": 44,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 34,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 1,
+        "unobserved": 2
+      },
+      "scope-annotations": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 14,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "scope-store": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 0,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 9
+      },
+      "semantic-cardinality": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 163,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "tiny-code-fence": {
+        "ir_failure": 13,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 73,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "tiny-string-token": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 39,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      }
+    },
+    "kinds": {
+      "external-grammar": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 359,
+        "expected_rejection_pass": 24,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 16
+      },
+      "inline-ast": {
+        "ir_failure": 44,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 58,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 1,
+        "unobserved": 2
+      },
+      "operations": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 2,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 9
+      },
+      "oracle": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 332,
+        "expected_rejection_pass": 3,
+        "known_divergence": 29,
+        "fail": 0,
+        "unobserved": 34
+      },
+      "rule": {
+        "ir_failure": 13,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 373,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "token": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 191,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 2,
+        "unobserved": 0
+      }
+    }
+  },
+  "変更後_java": {
+    "exit_code": 1,
+    "backend": "java",
+    "front_sha256": "b4cb71d87feaf2468da13c26703fcfaf19668f5c27ac0025b53ff6138113caa2",
+    "generator_sha256": "a75c89bfd881b8cd61f8c83b1ee48b2c66557eaa781636aa765049100ecaac4d",
+    "corpus_files": 127,
+    "source_cases": 1279,
+    "grammar_variants": 307,
+    "unique_builds": 260,
+    "totals": {
+      "ir_failure": 44,
+      "generation_rejected": 0,
+      "javac_failure": 0,
+      "build_failure": 0,
+      "driver_error": 0,
+      "pass": 1328,
+      "expected_rejection_pass": 27,
+      "known_divergence": 29,
+      "fail": 3,
+      "unobserved": 61
+    },
+    "families": {
+      "associative": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 24,
+        "expected_rejection_pass": 24,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "cardinality": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 70,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "catalog": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 2,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "evolution": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 140,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 16
+      },
+      "lexical": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 78,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "mixed-values": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 98,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "nested-captures": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 10,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "numeric-capture": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 13,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "oracle": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 332,
+        "expected_rejection_pass": 3,
+        "known_divergence": 29,
+        "fail": 0,
+        "unobserved": 34
+      },
+      "primitives": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 113,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 2,
+        "unobserved": 0
+      },
+      "right-associative": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 112,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "rule-trivia": {
+        "ir_failure": 44,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 34,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 1,
+        "unobserved": 2
+      },
+      "scope-annotations": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 14,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "scope-store": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 0,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 9
+      },
+      "semantic-cardinality": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 163,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "tiny-code-fence": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 86,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "tiny-string-token": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 39,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      }
+    },
+    "kinds": {
+      "external-grammar": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 359,
+        "expected_rejection_pass": 24,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 16
+      },
+      "inline-ast": {
+        "ir_failure": 44,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 58,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 1,
+        "unobserved": 2
+      },
+      "operations": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 2,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 9
+      },
+      "oracle": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 332,
+        "expected_rejection_pass": 3,
+        "known_divergence": 29,
+        "fail": 0,
+        "unobserved": 34
+      },
+      "rule": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 386,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      },
+      "token": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 191,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 2,
+        "unobserved": 0
+      }
+    }
+  },
+  "変更後_rust_fence": {
+    "exit_code": 0,
+    "backend": "rust",
+    "front_sha256": "b4cb71d87feaf2468da13c26703fcfaf19668f5c27ac0025b53ff6138113caa2",
+    "generator_sha256": "0dcbd761a0ca9b0b04df2807feb3b202a72047ea67d9ff7cd10be2ab8a8ba1fa",
+    "corpus_files": 1,
+    "source_cases": 86,
+    "grammar_variants": 14,
+    "unique_builds": 14,
+    "totals": {
+      "ir_failure": 0,
+      "generation_rejected": 0,
+      "javac_failure": 0,
+      "build_failure": 0,
+      "driver_error": 0,
+      "pass": 86,
+      "expected_rejection_pass": 0,
+      "known_divergence": 0,
+      "fail": 0,
+      "unobserved": 0
+    },
+    "families": {
+      "tiny-code-fence": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 86,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      }
+    },
+    "kinds": {
+      "rule": {
+        "ir_failure": 0,
+        "generation_rejected": 0,
+        "javac_failure": 0,
+        "build_failure": 0,
+        "driver_error": 0,
+        "pass": 86,
+        "expected_rejection_pass": 0,
+        "known_divergence": 0,
+        "fail": 0,
+        "unobserved": 0
+      }
+    }
+  },
+  "不変性の検証": {
+    "展開後の同一_case_variant数": 1492,
+    "LONGのIR失敗からPassへの変更数": 13,
+    "その他のoutcome_differences_missing完全一致数": 1479,
+    "既存fenceのactual一致数_wire_idとexprIdを除く": 73,
+    "Java_RustのLONGの受理_cursor_AST_capture一致数": 13
+  },
+  "long_cases_java": [
+    {
+      "case_id": "long-block-shifted/unicode-prefix",
+      "variant": "long-block-shifted",
+      "input": "😀\n````rust:A\r\n// 😀 ```\r\n````\r\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            30,
+            30
+          ],
+          "span": [
+            0,
+            30
+          ],
+          "fields": {
+            "value": "````rust:A\r\n// 😀 ```\r\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 30,
+        "matched": 30,
+        "fullConsumed": 30,
+        "fullMatched": 30,
+        "ast": {
+          "fields": {
+            "value": "````rust:A\r\n// 😀 ```\r\n````"
+          },
+          "span": [
+            0,
+            30
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              2,
+              30
+            ],
+            "text": "````rust:A\r\n// 😀 ```\r\n````\r\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/bad-label",
+      "variant": "long-block",
+      "input": "````rust:../bad\nx\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "expected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/bad-scheme",
+      "variant": "long-block",
+      "input": "````型:Demo\nx\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "expected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/cr",
+      "variant": "long-block",
+      "input": "`````rust:raw\rr#\"````\"#\r`````\r",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            30,
+            30
+          ],
+          "span": [
+            0,
+            30
+          ],
+          "fields": {
+            "value": "`````rust:raw\rr#\"````\"#\r`````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 30,
+        "matched": 30,
+        "fullConsumed": 30,
+        "fullMatched": 30,
+        "ast": {
+          "fields": {
+            "value": "`````rust:raw\rr#\"````\"#\r`````"
+          },
+          "span": [
+            0,
+            30
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              30
+            ],
+            "text": "`````rust:raw\rr#\"````\"#\r`````\r"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/crlf",
+      "variant": "long-block",
+      "input": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````\r\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            45,
+            45
+          ],
+          "span": [
+            0,
+            45
+          ],
+          "fields": {
+            "value": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 45,
+        "matched": 45,
+        "fullConsumed": 45,
+        "fullMatched": 45,
+        "ast": {
+          "fields": {
+            "value": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````"
+          },
+          "span": [
+            0,
+            45
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              45
+            ],
+            "text": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````\r\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/empty",
+      "variant": "long-block",
+      "input": "````rust:empty\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            20,
+            20
+          ],
+          "span": [
+            0,
+            20
+          ],
+          "fields": {
+            "value": "````rust:empty\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 20,
+        "matched": 20,
+        "fullConsumed": 20,
+        "fullMatched": 20,
+        "ast": {
+          "fields": {
+            "value": "````rust:empty\n````"
+          },
+          "span": [
+            0,
+            20
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              20
+            ],
+            "text": "````rust:empty\n````\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/eof",
+      "variant": "long-block",
+      "input": "````rust:empty\n````",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            19,
+            19
+          ],
+          "span": [
+            0,
+            19
+          ],
+          "fields": {
+            "value": "````rust:empty\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 19,
+        "matched": 19,
+        "fullConsumed": 19,
+        "fullMatched": 19,
+        "ast": {
+          "fields": {
+            "value": "````rust:empty\n````"
+          },
+          "span": [
+            0,
+            19
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              19
+            ],
+            "text": "````rust:empty\n````"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/inline",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx ````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "expected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/lf",
+      "variant": "long-block",
+      "input": "````rust:Demo\nlet s = \"```\";\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            34,
+            34
+          ],
+          "span": [
+            0,
+            34
+          ],
+          "fields": {
+            "value": "````rust:Demo\nlet s = \"```\";\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 34,
+        "matched": 34,
+        "fullConsumed": 34,
+        "fullMatched": 34,
+        "ast": {
+          "fields": {
+            "value": "````rust:Demo\nlet s = \"```\";\n````"
+          },
+          "span": [
+            0,
+            34
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              34
+            ],
+            "text": "````rust:Demo\nlet s = \"```\";\n````\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/long",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n`````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "expected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/missing",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "expected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/short",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n```\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "expected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/space",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n```` \n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "expected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose"
+          }
+        ]
+      }
+    }
+  ],
+  "long_cases_rust": [
+    {
+      "case_id": "long-block-shifted/unicode-prefix",
+      "variant": "long-block-shifted",
+      "input": "😀\n````rust:A\r\n// 😀 ```\r\n````\r\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            30,
+            30
+          ],
+          "span": [
+            0,
+            30
+          ],
+          "fields": {
+            "value": "````rust:A\r\n// 😀 ```\r\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 30,
+        "matched": 30,
+        "fullConsumed": 30,
+        "fullMatched": 30,
+        "ast": {
+          "fields": {
+            "value": "````rust:A\r\n// 😀 ```\r\n````"
+          },
+          "span": [
+            0,
+            30
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              2,
+              30
+            ],
+            "text": "````rust:A\r\n// 😀 ```\r\n````\r\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/bad-label",
+      "variant": "long-block",
+      "input": "````rust:../bad\nx\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "deepestRule": "TinyFence::Root",
+            "expected": [
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose",
+            "rulePath": [
+              "TinyFence::Root"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/bad-scheme",
+      "variant": "long-block",
+      "input": "````型:Demo\nx\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "deepestRule": "TinyFence::Root",
+            "expected": [
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose",
+            "rulePath": [
+              "TinyFence::Root"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/cr",
+      "variant": "long-block",
+      "input": "`````rust:raw\rr#\"````\"#\r`````\r",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            30,
+            30
+          ],
+          "span": [
+            0,
+            30
+          ],
+          "fields": {
+            "value": "`````rust:raw\rr#\"````\"#\r`````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 30,
+        "matched": 30,
+        "fullConsumed": 30,
+        "fullMatched": 30,
+        "ast": {
+          "fields": {
+            "value": "`````rust:raw\rr#\"````\"#\r`````"
+          },
+          "span": [
+            0,
+            30
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              30
+            ],
+            "text": "`````rust:raw\rr#\"````\"#\r`````\r"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/crlf",
+      "variant": "long-block",
+      "input": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````\r\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            45,
+            45
+          ],
+          "span": [
+            0,
+            45
+          ],
+          "fields": {
+            "value": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 45,
+        "matched": 45,
+        "fullConsumed": 45,
+        "fullMatched": 45,
+        "ast": {
+          "fields": {
+            "value": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````"
+          },
+          "span": [
+            0,
+            45
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              45
+            ],
+            "text": "````java:p.Demo\r\n// 😀 ```\r\n```\r\n`````\r\n````\r\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/empty",
+      "variant": "long-block",
+      "input": "````rust:empty\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            20,
+            20
+          ],
+          "span": [
+            0,
+            20
+          ],
+          "fields": {
+            "value": "````rust:empty\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 20,
+        "matched": 20,
+        "fullConsumed": 20,
+        "fullMatched": 20,
+        "ast": {
+          "fields": {
+            "value": "````rust:empty\n````"
+          },
+          "span": [
+            0,
+            20
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              20
+            ],
+            "text": "````rust:empty\n````\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/eof",
+      "variant": "long-block",
+      "input": "````rust:empty\n````",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            19,
+            19
+          ],
+          "span": [
+            0,
+            19
+          ],
+          "fields": {
+            "value": "````rust:empty\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 19,
+        "matched": 19,
+        "fullConsumed": 19,
+        "fullMatched": 19,
+        "ast": {
+          "fields": {
+            "value": "````rust:empty\n````"
+          },
+          "span": [
+            0,
+            19
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              19
+            ],
+            "text": "````rust:empty\n````"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/inline",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx ````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "deepestRule": "TinyFence::Root",
+            "expected": [
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose",
+            "rulePath": [
+              "TinyFence::Root"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/lf",
+      "variant": "long-block",
+      "input": "````rust:Demo\nlet s = \"```\";\n````\n",
+      "expected": {
+        "Accept": {
+          "accepted": true,
+          "prefix": [
+            true,
+            34,
+            34
+          ],
+          "span": [
+            0,
+            34
+          ],
+          "fields": {
+            "value": "````rust:Demo\nlet s = \"```\";\n````"
+          }
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": true,
+        "allConsumed": true,
+        "consumed": 34,
+        "matched": 34,
+        "fullConsumed": 34,
+        "fullMatched": 34,
+        "ast": {
+          "fields": {
+            "value": "````rust:Demo\nlet s = \"```\";\n````"
+          },
+          "span": [
+            0,
+            34
+          ],
+          "type": "Fence"
+        },
+        "captures": [
+          {
+            "name": "value",
+            "span": [
+              0,
+              34
+            ],
+            "text": "````rust:Demo\nlet s = \"```\";\n````\n"
+          }
+        ],
+        "mappingError": null,
+        "diagnostics": []
+      }
+    },
+    {
+      "case_id": "long-block/long",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n`````\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "deepestRule": "TinyFence::Root",
+            "expected": [
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose",
+            "rulePath": [
+              "TinyFence::Root"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/missing",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "deepestRule": "TinyFence::Root",
+            "expected": [
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose",
+            "rulePath": [
+              "TinyFence::Root"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/short",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n```\n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "deepestRule": "TinyFence::Root",
+            "expected": [
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose",
+            "rulePath": [
+              "TinyFence::Root"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "long-block/space",
+      "variant": "long-block",
+      "input": "````rust:Demo\nx\n```` \n",
+      "expected": {
+        "Accept": {
+          "accepted": false,
+          "prefix": [
+            false,
+            0,
+            0
+          ],
+          "span": null,
+          "fields": null
+        }
+      },
+      "outcome": "pass",
+      "differences": [],
+      "missing": [],
+      "actual": {
+        "accepted": false,
+        "allConsumed": false,
+        "consumed": 0,
+        "matched": 0,
+        "fullConsumed": 0,
+        "fullMatched": 0,
+        "ast": null,
+        "captures": [],
+        "mappingError": null,
+        "diagnostics": [
+          {
+            "deepestRule": "TinyFence::Root",
+            "expected": [
+              "long code block"
+            ],
+            "farthestExpected": [
+              "RootParser",
+              "long code block"
+            ],
+            "farthestOffset": 0,
+            "kind": "syntax",
+            "offset": 0,
+            "origin": "Mapper.diagnose",
+            "rulePath": [
+              "TinyFence::Root"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

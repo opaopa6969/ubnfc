@@ -42,6 +42,85 @@ fn build_front() -> PathBuf {
     workspace
 }
 
+#[test]
+fn tiny_fence_all_86_cases_pass_both_backends_with_raw_long_captures_and_diagnostics() {
+    let workspace = build_front();
+    let files: Vec<_> = ubnfc_harness::load_all(ubnfc_harness::default_root())
+        .unwrap()
+        .into_iter()
+        .filter(|f| f.path.ends_with("tiny-code-fence/corpus.json"))
+        .collect();
+    assert_eq!(files.len(), 1);
+    for backend in [Backend::Java, Backend::Rust] {
+        let report = runall::run(
+            &files,
+            &Config {
+                backend,
+                front: workspace.join("target/debug/ubnfc"),
+                rust_generator: Some(workspace.join("target/debug/ubnfc-rust")),
+                cargo_jobs: Some(2),
+                ..Config::default()
+            },
+        )
+        .unwrap();
+        // 元の 73 Pass と LONG の 13 件を、期待値・台帳の変更なしで全件照合する。
+        assert_eq!(report.totals.total(), 86);
+        assert_eq!(report.totals.pass, 86, "{}", report.markdown());
+        let long: Vec<_> = report
+            .cases
+            .iter()
+            .filter(|c| c.variant.starts_with("long-block"))
+            .collect();
+        assert_eq!(long.len(), 13);
+        for case in long {
+            let actual = case.actual.as_ref().unwrap();
+            let ubnfc_harness::Expectation::Accept(expected) = &case.expected else {
+                panic!("tiny fence の期待値は Accept");
+            };
+            if expected.accepted {
+                // AST 値は終端改行なし。capture は LF/CRLF/CR・非 BMP を含む原文のまま。
+                let start = if case.variant == "long-block-shifted" {
+                    2
+                } else {
+                    0
+                };
+                let raw: String = case.input.chars().skip(start).collect();
+                assert_eq!(
+                    actual["captures"],
+                    serde_json::json!([{
+                        "name": "value", "span": [start, case.input.chars().count()], "text": raw
+                    }]),
+                    "{:?}: {}",
+                    backend,
+                    case.case_id
+                );
+                assert_eq!(actual["diagnostics"], serde_json::json!([]));
+            } else {
+                assert_eq!(actual["captures"], serde_json::json!([]));
+                let diagnostics = actual["diagnostics"].as_array().unwrap();
+                assert_eq!(diagnostics.len(), 1);
+                assert_eq!(diagnostics[0]["kind"], "syntax");
+                assert_eq!(diagnostics[0]["offset"], 0);
+                assert_eq!(diagnostics[0]["farthestOffset"], 0);
+                // Java は rule の候補も公開し、Rust の primary expected は terminal のみ。
+                assert_eq!(
+                    diagnostics[0]["expected"],
+                    match backend {
+                        Backend::Java => serde_json::json!(["RootParser", "long code block"]),
+                        Backend::Rust => serde_json::json!(["long code block"]),
+                    }
+                );
+                assert_eq!(
+                    diagnostics[0]["farthestExpected"],
+                    serde_json::json!(["RootParser", "long code block"])
+                );
+                assert_eq!(actual["consumed"], 0);
+                assert_eq!(actual["matched"], 0);
+            }
+        }
+    }
+}
+
 fn associative(backend: &str) {
     let workspace = build_front();
     let jar = Config::default().java_generator;

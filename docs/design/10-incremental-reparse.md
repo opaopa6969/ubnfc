@@ -8,7 +8,7 @@
 
 既存の [D-023・D-060・D-062](03-design-v1.md) と
 [二重カーソル・診断の契約](04-cursor-and-diagnostics-contract.md) を維持する。
-本決定は D-085。D-060 の「現時点では全文再解析」を継続し、導入の条件を具体化する。
+本決定は D-092。D-060 の「現時点では全文再解析」を継続し、導入の条件を具体化する。
 
 ## 1. 現状と測定範囲
 
@@ -62,6 +62,25 @@ D-060 の旧測定は 325 cp の p50 **0.452 ms**、5,179 cp **2.856 ms**、
 20,923 cp **15.583 ms**（[段階 1 報告](../reports/2026-09-24-lsp-vsix-stage1.md) §6）。
 段階 3 では同じ順に **0.964 / 1.950 / 12.045 ms** だった。
 旧値は当時の生成器と負荷に対する記録として残し、新旧の比を最適化効果とは解釈しない。
+
+### master 取り込み後の計測対象の同一性
+
+その後の master `49d1a9d` では、P4 の旧文法を
+[`ir/frozen/tinyexpression-p4-f86ce8a5.ir.json`](../../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json)
+へ固定し、`scripts/build-vsix.sh p4` もそれを読むようになった。
+測定時の IR と現在の固定 IR は `plan`（Rust の LL(1) 認識表等の計画）だけが異なり、
+`semantics` / `analysis` / `sources` 等は一致する。
+Java 生成器・runtime template・LSP 生成器の実装は測定時点から無変更である。
+
+同じ生成器で、測定時の IR と取り込み後の固定 IR から Java parser と LSP を生成し、
+**相対パス集合と全 32 ファイルの本文が byte 一致することを確認した**。
+Java は `--no-emit-driver`、package は `org.unlaxer.ubnfc.examples.p4.generated`、
+LSP は `--emit-lsp`、package は `org.unlaxer.ubnfc.examples.p4.lsp` とし、
+language id / scanner / server name は `scripts/build-vsix.sh p4` と同じ値で比較した。
+相対パス・NUL・本文・NUL をパス順に連結した SHA-256 は両者とも
+`88f32d0015bdb389b412b31b61c116301cebafc8b1bb7a615e2790347d08cc76`。
+したがって、上表は取り込み後も同じ P4 Java/LSP コードの計測値として参照できる。
+新しい外部文法そのものの性能を測ったという意味ではない。
 
 ### 再現手順
 

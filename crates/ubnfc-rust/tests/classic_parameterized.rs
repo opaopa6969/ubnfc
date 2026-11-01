@@ -157,12 +157,12 @@ fn rejections_are_rejected_with_the_listed_codes() {
     assert_eq!(checked, 20);
 }
 
-/// 受理だけを比べ、AST は比べない例（共通の部分集合の外）とその理由。
+/// 共通の部分集合の外にある受理例と、ubnfc が返す拒否の code。
 fn outside_common_subset(name: &str) -> Option<&'static str> {
     match name {
         // `@nestedCaptures`（unlaxer-parser #699）は引数付き規則とは別の Classic の機能で、
-        // ubnfc には無い（W-ANNOTATION-UNKNOWN）。capture の値が list ではなく text になる。
-        "nested-captures-through-instances" => Some("@nestedCaptures は ubnfc に無い"),
+        // ubnfc には無い。AST が変わるので黙って無視せず拒否する（D-085）。
+        "nested-captures-through-instances" => Some("E-ANNOTATION-UNSUPPORTED"),
         _ => None,
     }
 }
@@ -184,6 +184,11 @@ fn accepted_grammars_accept_the_same_inputs_with_the_same_ast() {
     let mut mismatches = BTreeMap::new();
     for case in &accepted {
         let name = case["name"].as_str().unwrap();
+        if let Some(code) = outside_common_subset(name) {
+            let codes = rejection_codes(case["grammar"].as_str().unwrap());
+            assert!(codes.iter().any(|c| c == code), "{name}: {code} を期待したが {codes:?}");
+            continue;
+        }
         let compiled =
             compile(case["grammar"].as_str().unwrap()).unwrap_or_else(|e| panic!("{name}: {e}"));
         let temp = Temp::new();
@@ -215,8 +220,7 @@ fn accepted_grammars_accept_the_same_inputs_with_the_same_ast() {
             let expected = &input["expected"];
             let accepted = row["accepted"] == true && row["allConsumed"] == true;
             let ok = expected["status"] == "ok";
-            let compare_ast = ok && outside_common_subset(name).is_none();
-            if accepted != ok || (compare_ast && project(&row["ast"]) != expected["value"]) {
+            if accepted != ok || (ok && project(&row["ast"]) != expected["value"]) {
                 mismatches.insert(
                     format!("{name}: {}", input["input"]),
                     format!("expected {expected}\n  ubnfc {row}"),
@@ -225,5 +229,6 @@ fn accepted_grammars_accept_the_same_inputs_with_the_same_ast() {
         }
     }
     assert!(mismatches.is_empty(), "{mismatches:#?}");
-    assert_eq!(rows, 26);
+    // 26 入力のうち、@nestedCaptures を使う 1 文法の 2 入力を除く。
+    assert_eq!(rows, 24);
 }

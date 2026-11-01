@@ -42,7 +42,8 @@ fn bodies(ir: &GrammarIr) -> Vec<(String, MemoEntry, MemoEntry)> {
 
 const OPERATORS: &str = "unlaxer-dsl__src__test__resources__associative__Operators.ubnf.ir.json";
 const POWER: &str = "unlaxer-dsl__src__test__resources__right-associative__Power.ubnf.ir.json";
-const P4: &str = "tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json";
+// 旧 P4（tinyexpression f86ce8a5）の固定 IR。memo 計画の回帰を文法の変化から切り離す。
+const P4: &str = "../frozen/tinyexpression-p4-f86ce8a5.ir.json";
 
 #[test]
 fn operators_and_power_drop_every_rule_body_memo() {

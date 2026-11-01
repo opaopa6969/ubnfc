@@ -89,22 +89,6 @@
       }
     },
     {
-      "id": "token/regex",
-      "scope": "parse",
-      "citation": {
-        "file": "unlaxer-dsl/specs/ubnf-syntax.md",
-        "heading": "## 形式的な文法定義",
-        "sentence": "| REGEX('pattern')"
-      },
-      "input": "grammar G { token I=REGEX('[0-9]+') R ::= I; }",
-      "expectation": {
-        "verdict": "accept",
-        "canonicalContains": [
-          "[\"Regex\",\"I\",\"[0-9]+\"]"
-        ]
-      }
-    },
-    {
       "id": "token/negation-empty-set",
       "scope": "parse",
       "citation": {

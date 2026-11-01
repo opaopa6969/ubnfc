@@ -156,12 +156,17 @@ impl Engine {
         inputs: &[String],
         scan: bool,
     ) -> Vec<Value> {
-        self.run_with(built, backend, inputs, Some(scan))
+        self.run_with(built, backend, inputs, Some(scan), None)
+    }
+
+    /// Rust の表駆動 on/off を同一 binary・同一入力で比較する。
+    pub fn run_ll1(&mut self, built: &Built, inputs: &[String], enabled: bool) -> Vec<Value> {
+        self.run_with(built, Backend::Rust, inputs, None, Some(enabled))
     }
 
     /// 全入力を 1 プロセスに流す。応答は入力順に返り、欠落は error 応答になる。
     pub fn run(&mut self, built: &Built, backend: Backend, inputs: &[String]) -> Vec<Value> {
-        self.run_with(built, backend, inputs, None)
+        self.run_with(built, backend, inputs, None, None)
     }
 
     fn run_with(
@@ -170,6 +175,7 @@ impl Engine {
         backend: Backend,
         inputs: &[String],
         scan: Option<bool>,
+        ll1: Option<bool>,
     ) -> Vec<Value> {
         let executable = match backend {
             Backend::Java => &built.java,
@@ -178,7 +184,7 @@ impl Engine {
         let requests: Vec<Value> = inputs
             .iter()
             .enumerate()
-            .map(|(id, input)| request(id, &built.grammar_name, input, scan))
+            .map(|(id, input)| request(id, &built.grammar_name, input, scan, ll1))
             .collect();
         let factor = crate::load::factor();
         if factor > self.max_load_factor {
@@ -221,10 +227,13 @@ pub fn is_driver_timeout(value: &Value) -> bool {
 }
 
 /// `docs/harness-driver-protocol.md` のリクエスト 1 行。
-fn request(id: usize, grammar: &str, input: &str, scan: Option<bool>) -> Value {
+fn request(id: usize, grammar: &str, input: &str, scan: Option<bool>, ll1: Option<bool>) -> Value {
     let mut options = json!({"lexical": true, "scope": true});
     if let Some(scan) = scan {
         options["scan"] = json!(scan);
+    }
+    if let Some(ll1) = ll1 {
+        options["ll1"] = json!(ll1);
     }
     json!({"id": id, "grammar": grammar, "entry": Value::Null, "input": input,
         "options": options,

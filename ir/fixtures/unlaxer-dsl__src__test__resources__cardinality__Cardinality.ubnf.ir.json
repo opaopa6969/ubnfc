@@ -846,6 +846,70 @@
         "tokenId": "Cardinality::NUMBER"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:206:209:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:227:230:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:231:238:body/4/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 3
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:233:236:body/4/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "!",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:245:248:body/5/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:251:254:body/6/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "x",
+          "wordBoundary": false
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:unlaxer-dsl/src/test/resources/cardinality/Cardinality.ubnf:325:328:body/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ";",
+          "wordBoundary": false
+        },
+        "root": true
+      }
+    ],
     "memo": {
       "entries": [
         {

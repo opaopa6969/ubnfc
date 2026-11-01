@@ -28,7 +28,7 @@ echo "== 生成器を build =="
 ubnfc="$root/target/release/ubnfc"
 ubnfc_rust="$root/target/release/ubnfc-rust"
 
-v1_ir="$root/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
+v1_ir="$root/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json"
 v2_ir="$work/p4-v2.ir.json"
 echo "== P4-v2 の IR =="
 (cd "$root" && "$ubnfc" ir --grammar examples/p4-v2/tinyexpression-p4-v2.ubnf \

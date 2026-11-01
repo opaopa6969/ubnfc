@@ -42,6 +42,9 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             | ExprNode::Error { .. }
     );
     let mut s = format!("fn e{i}_{suf}(&mut self,state:State)->Step {{\n");
+    if let Some(fast) = crate::ll1::fast_path(g, i, mode) {
+        s.push_str(&fast);
+    }
     if memoized {
         s.push_str("let mark=self.mark();\n");
         // scope を読み書きしない（effects が空の）expression は stateVersion に依存しない。
