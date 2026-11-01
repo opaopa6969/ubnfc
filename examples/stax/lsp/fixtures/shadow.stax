@@ -1,0 +1,3 @@
+: first ( -- ) 1 let x x drop ;
+: second ( -- ) 2 let x x drop ;
+: outside ( -- ) ;
