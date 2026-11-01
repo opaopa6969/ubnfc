@@ -30,6 +30,10 @@ const KNOWN_ANNOTATIONS: &[&str] = &[
     "skip",
     "commonField",
     "enum",
+    // Classic の `@autoCommit`（unlaxer-parser #702）。FIRST 集合で「入れても受理と AST が
+    // 変わらない」位置にだけ COMMIT を挿入する注釈で、変わるのは失敗の位置と診断だけ。
+    // ubnfc は COMMIT を持たないので、Classic が解析の対象外の文法でするのと同じく何も挿入しない。
+    "autoCommit",
 ];
 
 /// v2 で非推奨になった綴りの警告（D-046 / D-048 / D-049）。v1 では旧綴りが唯一の綴り
