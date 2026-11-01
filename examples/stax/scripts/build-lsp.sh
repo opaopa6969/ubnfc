@@ -34,6 +34,10 @@ java -cp "$root/ubnfc-lsp/target/ubnfc-lsp-0.1.0-SNAPSHOT.jar:$root/ubnfc-java/t
   org.unlaxer.ubnfc.lsp.Main --emit-lsp --ir "$work/stax.ir.json" --out "$generated" \
   --package org.example.stax.lsp --parser-package org.example.stax --language-id stax \
   --server-name 'stax (ubnfc)' --server-version 0.1.0 \
+  --declaration-context WordDef=word --declaration-context MacroDef=word \
+  --declaration-context LetBind=word --declaration-context ImportName=word \
+  --declaration-context Variant=word --declaration-context StructDef=type,word \
+  --declaration-context TypeDef=type --declaration-context FieldDecl=field \
   --emit-tmlanguage "$example/syntaxes/stax.tmLanguage.json"
 python3 - "$generated" "$work/parser.json" <<'PY'
 import hashlib, json, pathlib, sys
