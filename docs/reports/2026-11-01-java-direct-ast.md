@@ -305,3 +305,8 @@ Recipeとfield配列の除去後もMatch / Occurrence / Valueの確保・capture
 
 master `2328689`（#55）のseed・build error保持をmergeで取り込んだ。差分はfuzzのcampaignとテスト・説明に限られ、Java / front / corpus / pin / IR golden / 計測ソースは不変。`after-swar/source.sha256` 全件一致で、最新中央値・全1,492行の基準同値を維持する。
 `cargo test -p ubnfc-fuzz --test build_discard --test campaign --no-fail-fast` は **10件成功・0失敗**（build_discard2件3.43秒、campaign8件73.81秒）。両backendの固定seed・直接token / group capture等も通過した。D-094とmaster全設計行を保持し、設計番号重複はない。証拠は `after-fuzz-build/`。統合後HEADのCI成功を確認してmergeする。
+
+## LSP scope・catalog解決の統合後の確認
+
+master `38efae7`（#58）の生成LSPの定義解決・補完修正をmergeで取り込んだ。変更はopt-in LSPとstaxのprotocol検証・説明に限られ、Java AST構築部 / front / corpus / pin / IR golden / 共有scannerは不変。`after-swar/source.sha256` 全件一致で、最新のA/B値と全1,492行の基準同値を維持する。
+CIと同じreactorで **LSP16件成功・失敗/エラー/skip 0**（Metadata8件・ParserUnchanged7件・Stage5Golden1件）。直接AST経路から生成したstax LSPのprotocol・recovery・TextMate goldenも **1件成功（49.69秒）**。D-094とmasterの全設計行を保持し、設計番号重複はない。証拠は `after-lsp-scope/`。統合後HEADのnative / wasm CI成功を確認してmergeする。

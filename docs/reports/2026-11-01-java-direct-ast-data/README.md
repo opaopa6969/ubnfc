@@ -29,3 +29,5 @@ SWAR追加前の性能・最新corpus検証は **`after-long/`** を使用する
 `python3 docs/reports/2026-11-01-java-direct-ast-data/after-swar/metrics.py` で同じディレクトリのCSVから再集計できる。任意の保存先は第1引数で指定する。保存済みmetrics.jsonと再集計結果のbyte一致を確認した。
 
 `after-fuzz-build/` はmaster #55の統合後に、計測対象の不変とfuzzの追加検証10件の成功を確認した記録。性能はafter-swar、corpusはafter-longの結果を維持する。
+
+`after-lsp-scope/` はmaster #58統合後のLSP16件・stax protocol等1件の成功と計測ソース不変の記録。最新の性能・corpus判定を維持する。

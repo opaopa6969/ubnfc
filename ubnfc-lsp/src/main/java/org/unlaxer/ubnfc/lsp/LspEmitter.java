@@ -42,6 +42,25 @@ public final class LspEmitter {
         "Positions", "Meta", "Analysis", "Symbols", "Diagnostics", "DocumentStore",
         "Completion", "Hovers", "SemanticTokens", "FoldingRanges", "LanguageServerImpl", "ServerMain");
 
+    private final Map<String, String> declarationContexts = new LinkedHashMap<>();
+
+    /** LSP だけの種別対応。parser の名前空間・IR・AST の契約は変えない。 */
+    public LspEmitter declarationContext(String specification) {
+        String[] parts = specification.split("=", -1);
+        if (parts.length != 2 || parts[1].isBlank())
+            throw new IllegalArgumentException("宣言 context は Rule=context[,context] で指定してください");
+        String rule = parts[0].contains("::") ? parts[0] : grammar + "::" + parts[0];
+        boolean declaration = ir.semantics().scope().effects().stream().anyMatch(effect ->
+            effect.ruleId().equals(rule) && effect.events().stream().anyMatch(event -> event.action().equals("declare")));
+        if (!declaration) throw new IllegalArgumentException("宣言規則ではありません: " + rule);
+        for (String context : parts[1].split(",", -1))
+            if (ir.semantics().catalogs().stream().noneMatch(catalog -> catalog.context().equals(context)))
+                throw new IllegalArgumentException("catalog に無い context です: " + context);
+        if (declarationContexts.putIfAbsent(rule, parts[1]) != null)
+            throw new IllegalArgumentException("宣言 context の重複: " + rule);
+        return this;
+    }
+
     private final GrammarIr ir;
     private final String pkg;
     private final String parserPackage;
@@ -125,6 +144,10 @@ public final class LspEmitter {
             .replace("__RULE_DESCRIPTION__", pairs(ruleDescriptions()))
             .replace("__RULE_KIND__", pairs(ruleKinds()))
             .replace("__TOKEN_TYPE__", pairs(tokenTypes()))
+            .replace("__RULE_BODIES__", pairs(ruleBodies()))
+            .replace("__DECLARE_RULES__", pairs(declareRules()))
+            .replace("__RULE_CONTEXTS__", pairs(ruleContexts()))
+            .replace("__DECLARATION_CONTEXTS__", pairs(declarationContexts))
             .replace("__DECLARE_SITES__", list(declareSites()))
             .replace("__USE_SITES__", list(useSites()))
             .replace("__KEYWORDS__", list(keywords()))
@@ -207,6 +230,27 @@ public final class LspEmitter {
 
     /** {@code @backref} / {@code use} が読む capture site を持つ式。 */
     public Set<String> useSites() { return sites("use"); }
+
+    public Map<String, String> ruleBodies() {
+        var result = new LinkedHashMap<String, String>();
+        for (var rule : ir.semantics().rules()) result.put(rule.symbolId(), rule.body());
+        return result;
+    }
+
+    public Map<String, String> declareRules() {
+        var result = new LinkedHashMap<String, String>();
+        for (var effect : ir.semantics().scope().effects())
+            for (var event : effect.events())
+                if (event.action().equals("declare") && event.captureSiteId() != null)
+                    result.put(event.captureSiteId().replaceAll("/capture/\\d+$", ""), effect.ruleId());
+        return result;
+    }
+
+    public Map<String, String> ruleContexts() {
+        var result = new LinkedHashMap<String, String>();
+        for (var catalog : ir.semantics().catalogs()) result.put(catalog.ruleId(), catalog.context());
+        return result;
+    }
 
     private Set<String> sites(String action) {
         var result = new LinkedHashSet<String>();

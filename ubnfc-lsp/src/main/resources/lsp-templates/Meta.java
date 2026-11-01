@@ -31,6 +31,14 @@ public final class Meta {
     /** 宣言を読む capture site を持つ式。scope 効果が記号表を作らない文法（{@code sameRuleText}）の逃げ道。 */
     public static final Set<String> DECLARE_SITES = Set.of(__DECLARE_SITES__);
 
+    /** 宣言 capture の式 → 宣言を登録する規則。登録時点はその規則の完了時点。 */
+    public static final Map<String, String> RULE_BODIES = map(__RULE_BODIES__);
+    public static final Map<String, String> DECLARE_RULES = map(__DECLARE_RULES__);
+    /** catalog 規則 → 参照 context。 */
+    public static final Map<String, String> RULE_CONTEXTS = map(__RULE_CONTEXTS__);
+    /** 明示された宣言規則 → context（複数ならカンマ区切り）。未指定は従来の無分類。 */
+    public static final Map<String, String> DECLARATION_CONTEXTS = map(__DECLARATION_CONTEXTS__);
+
     /** 参照を読む capture site を持つ式。 */
     public static final Set<String> USE_SITES = Set.of(__USE_SITES__);
 

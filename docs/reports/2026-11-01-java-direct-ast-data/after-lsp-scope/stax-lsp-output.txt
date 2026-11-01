@@ -1,0 +1,7 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running tests/stax_lsp.rs (target/debug/deps/stax_lsp-3cac32d562f6bedc)
+
+running 1 test
+test generated_stax_lsp_matches_protocol_and_recovery_goldens ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 49.69s
