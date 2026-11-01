@@ -27,14 +27,26 @@ public final class FoldingRanges {
             var terminals = analysis.lexical().stream().filter(item -> item.token() != null)
                 .sorted(Comparator.comparingInt((__API_PACKAGE__.ParseResult.Lexical item) -> item.span().start()))
                 .toList();
+            String text = analysis.text();
             int previous = 0;
+            int previousChar = 0;
             for (var terminal : terminals) {
                 int start = terminal.span().start();
-                if (start > previous) comments(analysis, previous, start, out);
-                previous = Math.max(previous, terminal.span().end());
+                if (start > previous) {
+                    int startChar = text.offsetByCodePoints(previousChar, start - previous);
+                    comments(analysis, previousChar, startChar, previous, out);
+                    previous = start;
+                    previousChar = startChar;
+                }
+                int end = terminal.span().end();
+                if (end > previous) {
+                    previousChar = text.offsetByCodePoints(previousChar, end - previous);
+                    previous = end;
+                }
             }
             int end = analysis.scoped().consumedCp();
-            if (end > previous) comments(analysis, previous, end, out);
+            if (end > previous)
+                comments(analysis, previousChar, text.offsetByCodePoints(previousChar, end - previous), previous, out);
         }
         out.sort(Comparator.comparingInt(FoldingRange::getStartLine)
             .thenComparingInt(FoldingRange::getStartCharacter)
@@ -43,13 +55,12 @@ public final class FoldingRanges {
     }
 
     /** 終端間の隙間。途中に未知の文字があれば推測で先へ進まない。 */
-    private static void comments(Analysis analysis, int startCp, int endCp, List<FoldingRange> out) {
+    private static void comments(Analysis analysis, int start, int end, int startCp, List<FoldingRange> out) {
         String text = analysis.text();
-        int start = text.offsetByCodePoints(0, startCp);
-        int end = text.offsetByCodePoints(0, endCp);
+        int atCp = startCp;
         for (int at = start; at < end;) {
             int point = text.codePointAt(at);
-            if (Character.isWhitespace(point)) { at += Character.charCount(point); continue; }
+            if (Character.isWhitespace(point)) { at += Character.charCount(point); atCp++; continue; }
             int next = at;
             for (var delimiter : Meta.COMMENT_DELIMITERS) {
                 if (!text.startsWith(delimiter.open(), at)) continue;
@@ -60,12 +71,12 @@ public final class FoldingRanges {
                     int close = text.indexOf(delimiter.close(), at + delimiter.open().length());
                     if (close < 0 || close + delimiter.close().length() > end) return;
                     next = close + delimiter.close().length();
-                    add(out, analysis.positions(), text.codePointCount(0, at), text.codePointCount(0, next),
-                        FoldingRangeKind.Comment);
+                    add(out, analysis.positions(), atCp, atCp + text.codePointCount(at, next), FoldingRangeKind.Comment);
                 }
                 break;
             }
             if (next <= at) return;
+            atCp += text.codePointCount(at, next);
             at = next;
         }
     }
