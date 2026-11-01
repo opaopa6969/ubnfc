@@ -1014,6 +1014,14 @@ impl<'a> Converter<'a> {
             "AnyExpression" => TokenValue::Any { span },
             "EofExpression" => TokenValue::Eof { span },
             "EmptyExpression" => TokenValue::Empty { span },
+            "AdapterExpression" => TokenValue::Adapter {
+                id: self.string(i, "id")?,
+                version: self
+                    .value(i, "version")?
+                    .parse()
+                    .map_err(|_| self.error(i, "整数が u64 の範囲外です"))?,
+                span,
+            },
             "DottedIdentifier" => TokenValue::ClassRef {
                 dotted: self.dotted(i)?,
                 span,
@@ -1098,6 +1106,23 @@ impl<'a> Converter<'a> {
                 span,
             },
             "EnumAnnotation" => Annotation::Enum { span },
+            // Classic にあって ubnfc に無い意味の注釈（D-085）。手書き parser と同じく名前だけ残す。
+            "LexicalContextAnnotation" => Annotation::Unsupported {
+                name: "lexicalContext".into(),
+                span,
+            },
+            "UniqueLongestChoiceAnnotation" => Annotation::Unsupported {
+                name: "uniqueLongestChoice".into(),
+                span,
+            },
+            "NamePredicateAnnotation" => Annotation::Unsupported {
+                name: "namePredicate".into(),
+                span,
+            },
+            "PredicateAnnotation" => Annotation::Unsupported {
+                name: "predicate".into(),
+                span,
+            },
             "SimpleAnnotation" => Annotation::Simple {
                 name: self.value(i, "name")?,
                 span,
@@ -1225,6 +1250,57 @@ impl<'a> Converter<'a> {
                 raw: self.raw_string(j, "value")?,
                 span,
             },
+            // 規則の中の Classic の関数形式（D-084）。
+            "OwnedCaptureElement" => Atom::Builtin {
+                call: BuiltinCall::Capture {
+                    name: self.value(j, "name")?,
+                    body: self.body(self.child(j, "RuleBody")?)?,
+                },
+                span,
+            },
+            "ReplayElement" => Atom::Builtin {
+                call: BuiltinCall::SameAs {
+                    name: self.value(j, "name")?,
+                },
+                span,
+            },
+            "CaptureScopeElement" => Atom::Builtin {
+                call: BuiltinCall::CaptureScope {
+                    body: self.body(self.child(j, "RuleBody")?)?,
+                },
+                span,
+            },
+            "CommitElement" => Atom::Builtin {
+                call: BuiltinCall::Commit {
+                    body: self.body(self.child(j, "RuleBody")?)?,
+                    message: self.optional_string(j, "message")?,
+                },
+                span,
+            },
+            "LabelElement" => Atom::Builtin {
+                call: BuiltinCall::Label {
+                    label: self.value(j, "label")?,
+                    body: self.body(self.child(j, "RuleBody")?)?,
+                },
+                span,
+            },
+            "CatchElement" => {
+                let bodies = self
+                    .children(j, "RuleBody")
+                    .map(|k| self.body(k))
+                    .collect::<Result<Vec<_>>>()?;
+                let [body, alternative]: [RuleBody; 2] = bodies
+                    .try_into()
+                    .map_err(|_| self.error(j, "CATCH の本体と代替が 2 個ではありません"))?;
+                Atom::Builtin {
+                    call: BuiltinCall::Catch {
+                        body,
+                        alternative,
+                        labels: self.strings(j, "labels")?,
+                    },
+                    span,
+                }
+            }
             "QuantifiedRef" => Atom::Ref {
                 namespace: self.namespace(j)?,
                 name: self.value(j, "name")?,

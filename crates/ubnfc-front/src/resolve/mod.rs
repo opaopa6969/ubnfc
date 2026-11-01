@@ -211,6 +211,22 @@ impl Resolver<'_> {
     ) {
         let unit = self.unit(path, index, ast);
         if self.checked.insert(unit) {
+            // Classic にあって ubnfc に無い意味の注釈は、黙って無視せず位置付きで拒否する。
+            for rule in &ast.rules {
+                for annotation in &rule.annotations {
+                    if let Annotation::Unsupported { name, span } = annotation {
+                        self.error(
+                            &ast.name,
+                            Some(&rule.name),
+                            path,
+                            *span,
+                            "E-ANNOTATION-UNSUPPORTED",
+                            format!("rule {}: @{name} は ubnfc では使えません（受理または AST が Classic と変わるため）", rule.name),
+                            "Classic で生成してください。ubnfc にこの機能を足すときは issue を立ててください。",
+                        );
+                    }
+                }
+            }
             let roots: Vec<_> = ast
                 .rules
                 .iter()
@@ -492,6 +508,18 @@ impl Resolver<'_> {
         for (unit, prefix, token) in pending.tokens {
             let name = qualify(&prefix, &token.name);
             let id = self.result.lookup(pending.id, &name).unwrap();
+            if let TokenValue::Adapter { id: adapter, .. } = &token.value {
+                let path = self.result.units[unit.0].path.clone();
+                self.error(
+                    &pending.name,
+                    None,
+                    &path,
+                    token.span,
+                    "E-TOKEN-ADAPTER-UNSUPPORTED",
+                    format!("token {name}: Classic の版付き token adapter ADAPTER('{adapter}', ...) は ubnfc では使えません"),
+                    "ubnfc の host 実装は `token X = extern 'id'`（scanner registry、D-041）で宣言してください。Classic の adapter registry とは別物なので読み替えません。",
+                );
+            }
             let (mut value, unresolved) =
                 tokens::classify(&token.value, crate::escape::declares_v2(&grammar.settings));
             if matches!(value, ResolvedTokenValue::Declarative { .. }) {

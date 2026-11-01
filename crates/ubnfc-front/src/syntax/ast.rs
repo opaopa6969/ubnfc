@@ -150,6 +150,14 @@ pub enum TokenValue {
         name: String,
         span: Span,
     },
+    /// Classic の版付き token adapter（`ADAPTER('tinyexpression.string', version=1)`、
+    /// unlaxer-parser #158）。ubnfc の extern registry とは別物なので、resolve が位置付きで
+    /// 拒否する（`E-TOKEN-ADAPTER-UNSUPPORTED`）。
+    Adapter {
+        id: String,
+        version: u64,
+        span: Span,
+    },
     /// host 実装の明示宣言（`token CODE = extern 'CodeStartParser'`）。
     /// 名前は scanner registry が解決する ID で、FQN でなくてよい（D-041）。
     Extern {
@@ -253,6 +261,13 @@ pub enum Annotation {
         span: Span,
     },
     Simple {
+        name: String,
+        span: Span,
+    },
+    /// Classic にあって ubnfc に無い、受理・AST を変える規則注釈（`@lexicalContext(...)`、
+    /// `@predicate(...)`、`@namePredicate(...)`、`@uniqueLongestChoice`、`@nestedCaptures`）。
+    /// 黙って意味を変えないよう、resolve が位置付きで拒否する（`E-ANNOTATION-UNSUPPORTED`）。
+    Unsupported {
         name: String,
         span: Span,
     },
@@ -447,9 +462,9 @@ macro_rules! impl_span {
 
 impl_span!(GlobalSetting: String, Block);
 impl_span!(TokenValue: Declarative, Until, Negation, Lookahead, NegativeLookahead, CharRange,
-    CaseInsensitive, Regex, Any, Eof, Empty, ClassRef, Builtin, Extern);
+    CaseInsensitive, Regex, Any, Eof, Empty, ClassRef, Builtin, Extern, Adapter);
 impl_span!(Annotation: Root, Mapping, Eval, Whitespace, Interleave, Backref, ScopeTree,
     Declares, Catalog, LeftAssoc, RightAssoc, LongestChoice, PredictiveChoice,
-    Precedence, Doc, Recovery, Skip, CommonField, Enum, Simple);
+    Precedence, Doc, Recovery, Skip, CommonField, Enum, Simple, Unsupported);
 impl_span!(Quantifier: Plus, Question, Star, Bounded);
 impl_span!(Atom: Group, Optional, Repeat, Error, Literal, Ref, Instantiate, Builtin);

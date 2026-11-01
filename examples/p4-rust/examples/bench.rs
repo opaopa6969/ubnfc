@@ -224,7 +224,7 @@ fn timing(cases: &[&Case]) {
 fn counters(cases: &[&Case]) {
     use ubnfc_p4_rust::counters;
     let ir = ubnfc_front::ir::from_json(include_str!(
-        "../../../ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"
+        "../../../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json"
     ))
     .unwrap();
     let symbol = |id: &str| {

@@ -133,9 +133,16 @@ fn all_unlaxer_ubnf_files_parse() {
         {
             // core's versioned ADAPTER registry is distinct from ubnfc's extern
             // registry and is deliberately not silently reinterpreted here.
+            // The spelling parses (Classic is the canonical spelling, D-084) and resolve
+            // rejects it at its position (E-TOKEN-ADAPTER-UNSUPPORTED, D-085).
+            let file = parse_fixture(&read(path), path);
             assert!(
-                parse_file(&read(path)).is_err(),
-                "ADAPTER is not implemented by ubnfc"
+                file.grammars
+                    .iter()
+                    .flat_map(|g| &g.tokens)
+                    .any(|t| matches!(t.value, TokenValue::Adapter { .. })),
+                "{}",
+                path.display()
             );
             continue;
         }
@@ -153,15 +160,17 @@ fn all_unlaxer_ubnf_files_parse() {
 }
 
 #[test]
-fn self_description_has_six_tokens_and_66_rules() {
+fn self_description_has_seven_tokens_and_75_rules() {
     let path = unlaxer_root().join("unlaxer-dsl/grammar/ubnf.ubnf");
     let source = read(&path);
     let file = parse_fixture(&source, &path);
     assert_eq!(file.grammars.len(), 1);
     let grammar = &file.grammars[0];
     assert_eq!(grammar.name, "UBNF");
-    assert_eq!(grammar.tokens.len(), 6);
-    assert_eq!(grammar.rules.len(), 66);
+    // 2026-10 の更新（REGEX 廃止、CAPTURE( などの関数形式、NOT_OWNED_CALL / XID_IDENTIFIER、
+    // @lexicalContext などの注釈）で 6 token / 66 規則から 7 token / 75 規則になった。
+    assert_eq!(grammar.tokens.len(), 7);
+    assert_eq!(grammar.rules.len(), 75);
     // 行頭の独立した宣言を数える。文字列内の '::=' は数えない。
     let declarations = source
         .lines()
@@ -186,12 +195,20 @@ fn all_token_variants_import_settings_and_escapes_are_preserved() {
     let grammar = &file.grammars[0];
     assert_eq!(grammar.imports[0].alias, "json");
     assert_eq!(grammar.imports[0].path, "json.ubnf");
+    // 2026-10 に先頭へ `@ubnf: v2` が入った。設定の位置ではなく key で引く。
+    let setting = |name: &str| {
+        grammar
+            .settings
+            .iter()
+            .find(|s| matches!(s, GlobalSetting::String { key, .. } | GlobalSetting::Block { key, .. } if key == name))
+            .unwrap_or_else(|| panic!("@{name} がありません"))
+    };
     assert!(
-        matches!(&grammar.settings[0], GlobalSetting::String { key, value, .. }
+        matches!(setting("package"), GlobalSetting::String { key, value, .. }
         if key == "package" && value == "org.example.tokens")
     );
     assert!(
-        matches!(&grammar.settings[1], GlobalSetting::Block { key, entries, .. }
+        matches!(setting("comment"), GlobalSetting::Block { key, entries, .. }
         if key == "comment" && entries.iter().map(|e| (e.key.as_str(), e.value.as_str())).collect::<Vec<_>>()
             == [("line", "//"), ("blockOpen", "/*"), ("blockClose", "*/")])
     );
@@ -201,10 +218,11 @@ fn all_token_variants_import_settings_and_escapes_are_preserved() {
         TokenValue::Negation { chars, .. }, TokenValue::Lookahead { pattern: lookahead, .. },
         TokenValue::NegativeLookahead { pattern: negative, .. }, TokenValue::Any { .. },
         TokenValue::Eof { .. }, TokenValue::Empty { .. }, TokenValue::CharRange { min, max, .. },
-        TokenValue::CaseInsensitive { word, .. }, TokenValue::Regex { pattern: regex, .. },
+        // REGEX は Classic で廃止され（unlaxer-parser #612）、fixture も宣言的 token になった。
+        TokenValue::CaseInsensitive { word, .. }, TokenValue::Declarative { .. },
     ] if dotted == "org.unlaxer.parser.elementary.NumberParser" && terminator == "*/"
         && chars == "😀\n\t" && lookahead == ":" && negative == "//" && min == "a" && max == "z"
-        && word == "select" && regex == r"\d+\.\d+"));
+        && word == "select"));
     let second = &file.grammars[1];
     assert_eq!(second.name, "Second");
     let Atom::Literal { value, raw, span } =
@@ -258,10 +276,10 @@ fn annotations_fixture_is_structured_without_inventing_defaults() {
 }
 
 #[test]
-fn tinyexpression_p4_has_124_rules() {
+fn tinyexpression_p4_has_130_rules() {
     let path = fixture_root("TINYEXPRESSION_DIR", "../../../tinyexpression")
         .join("tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf");
     let file = parse_fixture(&read(&path), &path);
     assert_eq!(file.grammars.len(), 1);
-    assert_eq!(file.grammars[0].rules.len(), 124);
+    assert_eq!(file.grammars[0].rules.len(), 130);
 }
