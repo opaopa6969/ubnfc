@@ -650,6 +650,34 @@ impl Resolver<'_> {
                 body: self.body(pending, unit, prefix, rule, body),
                 span,
             },
+            // Classic の規則中の関数形式。ubnfc の IR（ExprNode）には owned capture も cut も
+            // 無いので、位置付きで拒否する（`docs/design/06-ubnf-v2.md` §9）。
+            Atom::Builtin { call, .. } => {
+                let keyword = call.keyword();
+                let (code, message, hint) = match call {
+                    BuiltinCall::Capture { .. }
+                    | BuiltinCall::SameAs { .. }
+                    | BuiltinCall::CaptureScope { .. } => (
+                        "E-OWNED-CAPTURE-UNSUPPORTED",
+                        format!(
+                            "rule {rule}: 規則の中の {keyword}(...) は ubnfc の IR で表せません（owned capture は未対応）"
+                        ),
+                        "宣言的 token の中の CAPTURE / SAME_AS は使えます。値渡しの引数（F(=x)）もこの形に展開されます。@sameText(name=...) は照合ではなく解析後の検査（不一致は ERROR）なので、同じ意味にはなりません。",
+                    ),
+                    BuiltinCall::Commit { .. }
+                    | BuiltinCall::Label { .. }
+                    | BuiltinCall::Catch { .. } => (
+                        "E-CUT-UNSUPPORTED",
+                        format!(
+                            "rule {rule}: {keyword}(...) は ubnfc の IR で表せません（cut とラベル付き失敗は未対応）"
+                        ),
+                        "COMMIT は後戻りを止めるので、取り除くと受理する言語が変わることがあります。Classic で生成してください。",
+                    ),
+                };
+                let path = self.result.units[unit.0].path.clone();
+                self.error(&pending.name, Some(rule), &path, span, code, message, hint);
+                return None;
+            }
         })
     }
 }

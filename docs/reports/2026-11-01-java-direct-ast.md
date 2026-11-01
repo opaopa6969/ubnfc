@@ -5,8 +5,9 @@
 基準は `66a18ff8e71839b893d2edabdad14825f8436dae`（作業開始時の `origin/master`）。
 仕上げに `origin/master` `763eb5c`（並行する #17 / #19）を merge で取り込んだ。
 取り込んだ front / stax の変更はそのまま保持し、本 PR からの front・pin の差分はない。
-CI 待機中に `caf02ce`（#23 の帰属計測基盤）、`0850aeb`（#34 の stax corpus）も merge で取り込んだ。
-AST の実装と計測条件は変わらない。
+CI 待機中に `caf02ce`（#23 の帰属計測基盤）、`0850aeb`（#34 の stax corpus）、
+`65a9edd`（#24 の Classic 関数形式）も merge で取り込んだ。
+Java の AST 構築コードと固定 benchmark IR は変わらない。
 D-079 の `Match → Recipe（field ごとの List<Value>）→ typed AST` から、
 規則完了時の `AstEvent`（規則 ID・区間・静的な field plan・認識順の capture 出来事）を
 生成された `build` / `bN` が直接読む方式へ変更した。既定経路では **Recipe を生成しない**。

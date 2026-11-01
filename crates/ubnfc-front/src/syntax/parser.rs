@@ -1,5 +1,7 @@
 //! 自己記述文法 ubnf.ubnf に沿う再帰下降。fixture との互換拡張は各箇所に記す。
 
+use std::collections::BTreeSet;
+
 use super::ast::*;
 use super::lexer::{Kind, Token};
 use super::SyntaxError;
@@ -18,6 +20,7 @@ pub(super) fn parse(source: &str, tokens: Vec<Token<'_>>) -> ParseResult<UbnfFil
         tokens,
         cursor: 0,
         depth: 0,
+        callables: BTreeSet::new(),
     };
     let mut grammars = Vec::new();
     while !matches!(parser.peek(0).kind, Kind::Eof) {
@@ -40,7 +43,22 @@ struct Parser<'a> {
     tokens: Vec<Token<'a>>,
     cursor: usize,
     depth: usize,
+    /// 解析中の grammar ブロックに `Name(params) ::=`（Classic の引数付き規則、
+    /// unlaxer-parser #701）の定義がある名前。隣接した `Name(` が呼び出しになるのは
+    /// この名前だけで、それ以外の `Foo('a')` は従来どおり参照と group。
+    callables: BTreeSet<String>,
 }
+
+/// 規則の中で関数形式になる Classic の綴り。引数付き規則の名前にはできない。
+const BUILTIN_CALLS: [&str; 7] = [
+    "CAPTURE",
+    "SAME_AS",
+    "CAPTURE_SCOPE",
+    "COMMIT",
+    "LABEL",
+    "CATCH",
+    "ERROR",
+];
 
 impl Parser<'_> {
     fn peek(&self, ahead: usize) -> &Token<'_> {
@@ -54,6 +72,66 @@ impl Parser<'_> {
             Kind::Define => text == "::=",
             _ => false,
         }
+    }
+
+    /// `ahead` 番目の字句と次の字句の間に空白・コメントが無いか。
+    fn adjacent(&self, ahead: usize) -> bool {
+        let i = (self.cursor + ahead).min(self.tokens.len() - 1);
+        self.tokens
+            .get(i + 1)
+            .is_some_and(|next| self.tokens[i].span.end == next.span.start)
+    }
+
+    /// 現在位置が `Name(` で、名前と `(` が隣接しているか。
+    fn at_call(&self) -> bool {
+        matches!(self.peek(0).kind, Kind::Identifier(_)) && self.is_at(1, "(") && self.adjacent(0)
+    }
+
+    /// grammar ブロック（`{` の直後から対応する `}` まで）の `Name(p, =q) ::=` を集める。
+    /// 定義の形の検査は `rule_or_template` が行う。ここは名前を予約するだけ。
+    fn scan_callables(&self) -> BTreeSet<String> {
+        let mut names = BTreeSet::new();
+        let mut depth = 0usize;
+        let mut i = self.cursor;
+        while i < self.tokens.len() {
+            match &self.tokens[i].kind {
+                Kind::Eof => break,
+                Kind::Punct('{') => depth += 1,
+                Kind::Punct('}') if depth == 0 => break,
+                Kind::Punct('}') => depth -= 1,
+                Kind::Identifier(name)
+                    if matches!(self.tokens.get(i + 1).map(|t| &t.kind), Some(Kind::Punct('(')))
+                        && self.tokens[i].span.end == self.tokens[i + 1].span.start =>
+                {
+                    // `(` [`=`] 名前 { `,` [`=`] 名前 } `)` `::=`
+                    let mut j = i + 2;
+                    let mut ok = false;
+                    loop {
+                        if matches!(self.tokens.get(j).map(|t| &t.kind), Some(Kind::Punct('='))) {
+                            j += 1;
+                        }
+                        if !matches!(self.tokens.get(j).map(|t| &t.kind), Some(Kind::Identifier(_))) {
+                            break;
+                        }
+                        j += 1;
+                        match self.tokens.get(j).map(|t| &t.kind) {
+                            Some(Kind::Punct(',')) => j += 1,
+                            Some(Kind::Punct(')')) => {
+                                ok = matches!(self.tokens.get(j + 1).map(|t| &t.kind), Some(Kind::Define));
+                                break;
+                            }
+                            _ => break,
+                        }
+                    }
+                    if ok {
+                        names.insert((*name).to_owned());
+                    }
+                }
+                _ => {}
+            }
+            i += 1;
+        }
+        names
     }
 
     fn consume(&mut self, text: &str) -> bool {
@@ -163,6 +241,7 @@ impl Parser<'_> {
         self.require("grammar")?;
         let name = self.identifier()?;
         self.require("{")?;
+        self.callables = self.scan_callables();
         let mut imports = Vec::new();
         // @import: value はグローバル設定なので import 宣言と区別する。
         while self.is_at(0, "@")
@@ -524,9 +603,36 @@ impl Parser<'_> {
         while self.is_at(0, "@") {
             annotations.push(self.annotation()?);
         }
+        let name_span = self.peek(0).span;
         let name = self.identifier()?;
         if self.is_at(0, "<") {
             let params = self.template_params()?;
+            self.require("::=")?;
+            let body = self.body()?;
+            self.require(";")?;
+            let by_value = vec![false; params.len()];
+            return Ok(Declaration::Template(TemplateDecl {
+                annotations,
+                name,
+                params,
+                classic: false,
+                by_value,
+                body,
+                span: self.span_from(start),
+            }));
+        }
+        // Classic の引数付き規則（unlaxer-parser #701 / #704）。`F (x) ::=` は従来どおり構文エラー。
+        if self.is_at(0, "(") && name_span.end == self.peek(0).span.start {
+            if BUILTIN_CALLS.contains(&name.as_str()) {
+                return Err(SyntaxError {
+                    message: format!(
+                        "E-PARAM-RESERVED: {name} は既存の関数形式の綴りなので、引数付き規則の名前にできません"
+                    ),
+                    span: name_span,
+                    expected: vec!["rule name"],
+                });
+            }
+            let (params, by_value) = self.classic_params()?;
             self.require("::=")?;
             let body = self.body()?;
             self.require(";")?;
@@ -534,6 +640,8 @@ impl Parser<'_> {
                 annotations,
                 name,
                 params,
+                classic: true,
+                by_value,
                 body,
                 span: self.span_from(start),
             }));
@@ -547,6 +655,148 @@ impl Parser<'_> {
             body,
             span: self.span_from(start),
         }))
+    }
+
+    /// Classic の `(p, =q)`。空・末尾 `,`・literal・`==x`・`=)` は構文エラー。
+    fn classic_params(&mut self) -> ParseResult<(Vec<String>, Vec<bool>)> {
+        self.require("(")?;
+        let mut params = Vec::new();
+        let mut by_value = Vec::new();
+        loop {
+            by_value.push(self.consume("="));
+            params.push(self.identifier()?);
+            if !self.consume(",") {
+                break;
+            }
+        }
+        self.require(")")?;
+        Ok((params, by_value))
+    }
+
+    /// Classic の呼び出しの実引数 `(e1, ..., en)`。各引数は空でない規則本体で、`|` も書ける。
+    /// 1 個の要素だけ（量指定子・区切り・capture・`@typeof` なし）ならその atom、
+    /// それ以外は group として渡す（unlaxer-parser `docs/parameterized-rules.md`「展開の規則」）。
+    fn classic_args(&mut self) -> ParseResult<Vec<Atom>> {
+        if self.depth == DEPTH_LIMIT {
+            return Err(SyntaxError {
+                message: format!("引数付き規則の実引数の入れ子が上限{DEPTH_LIMIT}を超えています"),
+                span: self.peek(0).span,
+                expected: vec!["shallower call arguments"],
+            });
+        }
+        self.depth += 1;
+        self.require("(")?;
+        let mut args = Vec::new();
+        loop {
+            args.push(self.classic_argument()?);
+            if !self.consume(",") {
+                break;
+            }
+        }
+        self.require(")")?;
+        self.depth -= 1;
+        Ok(args)
+    }
+
+    fn classic_argument(&mut self) -> ParseResult<Atom> {
+        let start = self.start();
+        let body = self.nonempty_body()?;
+        let span = self.span_from(start);
+        if let [only] = body.alternatives() {
+            if let [element] = only.elements.as_slice() {
+                if element.quantifier.is_none()
+                    && element.postfix_quantifier.is_none()
+                    && element.separator.is_none()
+                    && element.capture.is_none()
+                    && element.typeof_constraint.is_none()
+                    && only.annotations.is_empty()
+                {
+                    return Ok(element.atom.clone());
+                }
+            }
+        }
+        Ok(Atom::Group { body, span })
+    }
+
+    /// 関数形式の引数の規則本体。空の本体（`F()`、`CAPTURE(x, )`）は構文エラー。
+    fn nonempty_body(&mut self) -> ParseResult<RuleBody> {
+        let at = self.peek(0).span;
+        let body = self.body()?;
+        if body.alternatives().iter().all(|s| s.elements.is_empty()) {
+            return Err(SyntaxError {
+                message: "空の引数は書けません".into(),
+                span: at,
+                expected: vec!["rule body"],
+            });
+        }
+        Ok(body)
+    }
+
+    /// 規則の中の `CAPTURE(` などの関数形式（名前と `(` が隣接しているときだけ）。
+    fn builtin_call(&mut self) -> ParseResult<Atom> {
+        let start = self.start();
+        let keyword = self.identifier()?;
+        self.require("(")?;
+        let call = match keyword.as_str() {
+            "CAPTURE" => {
+                let name = self.identifier()?;
+                self.require(",")?;
+                BuiltinCall::Capture {
+                    name,
+                    body: self.nonempty_body()?,
+                }
+            }
+            "SAME_AS" => BuiltinCall::SameAs {
+                name: self.identifier()?,
+            },
+            "CAPTURE_SCOPE" => BuiltinCall::CaptureScope {
+                body: self.nonempty_body()?,
+            },
+            "COMMIT" => {
+                let body = self.nonempty_body()?;
+                let message = if self.consume(",") {
+                    Some(self.string()?)
+                } else {
+                    None
+                };
+                BuiltinCall::Commit { body, message }
+            }
+            "LABEL" => {
+                let label = self.identifier()?;
+                self.require(",")?;
+                BuiltinCall::Label {
+                    label,
+                    body: self.nonempty_body()?,
+                }
+            }
+            "CATCH" => {
+                let body = self.nonempty_body()?;
+                self.require(",")?;
+                let alternative = self.nonempty_body()?;
+                let mut labels = Vec::new();
+                // label の無い CATCH も構文としては受ける（Classic は validator が拒否する）。
+                while self.consume(",") {
+                    labels.push(self.identifier()?);
+                }
+                BuiltinCall::Catch {
+                    body,
+                    alternative,
+                    labels,
+                }
+            }
+            _ => unreachable!("at_builtin_call が綴りを確かめている"),
+        };
+        self.require(")")?;
+        Ok(Atom::Builtin {
+            call,
+            span: self.span_from(start),
+        })
+    }
+
+    fn at_builtin_call(&self) -> bool {
+        self.at_call()
+            && matches!(self.peek(0).kind, Kind::Identifier(word)
+                if BUILTIN_CALLS[..6].contains(&word))
     }
 
     /// `<P1, P2>`。パラメータは識別子のみ（`desugar` が規則名との衝突を検査する）。
@@ -923,6 +1173,22 @@ impl Parser<'_> {
         if !matches!(self.peek(0).kind, Kind::Identifier(_)) {
             return Err(self.error(&["identifier", "single-quoted string", "(", "[", "{"]));
         }
+        if self.at_builtin_call() {
+            return self.builtin_call();
+        }
+        // Classic の呼び出し `Name(args)`。同じ grammar に `Name(params) ::=` があるときだけ。
+        if self.at_call()
+            && matches!(self.peek(0).kind, Kind::Identifier(word) if self.callables.contains(word))
+        {
+            let name = self.identifier()?;
+            let args = self.classic_args()?;
+            return Ok(Atom::Instantiate {
+                name,
+                args,
+                classic: true,
+                span: self.span_from(start),
+            });
+        }
         let dotted = self.dotted()?;
         // パラメータ化ルールの実体化（D-043）。v1 では参照の直後に `<` は来られない。
         if self.is_at(0, "<") && !dotted.contains('.') {
@@ -930,6 +1196,7 @@ impl Parser<'_> {
             return Ok(Atom::Instantiate {
                 name: dotted,
                 args,
+                classic: false,
                 span: self.span_from(start),
             });
         }
