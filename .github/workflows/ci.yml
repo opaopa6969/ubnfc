@@ -75,6 +75,11 @@ jobs:
           rustup target list --installed | grep -q wasm32-unknown-unknown
           java -version 2>&1 | head -1 && mvn -v | head -1
 
+      - name: '帰属レポートの構文と集計を検証（issue #6）'
+        run: |
+          bash -n benchmarks/attribution/prepare.sh benchmarks/attribution/run.sh
+          python3 -m unittest discover -s benchmarks/attribution -p 'test_*.py'
+
       # Shallow-fetch exactly the pinned commits (git fetch --depth 1 origin <sha>) into
       # $RUNNER_TEMP/external and export UNLAXER_PARSER_DIR / UNLAXER_PARSER_ROOT /
       # TINYEXPRESSION_DIR to the following steps via $GITHUB_ENV.
