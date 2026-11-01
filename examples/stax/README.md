@@ -23,6 +23,8 @@ struct Point { x: Int y: Int }
 | [`rejects/`](rejects/) | 20 本とは別に置く構文拒否ケースと期待判定 |
 | [`scripts/crosscheck.sh`](scripts/crosscheck.sh) | 検証 → 両 backend 生成 → 20 本を突き合わせ |
 | [`vscode/README.md`](vscode/README.md) | 生成 LSP・VSIX の作成、protocol golden、実機確認手順と現行制約 |
+| [`boundaries/`](boundaries/) | 自己拡張の11ケース、一般語列と外部語彙の両 backend 再現 |
+| [自己拡張の境界レポート](../../docs/reports/2026-11-01-stax-boundaries.md) | Forth 3例の分類、現行契約、X1〜X3 の再評価と未実装の v3 最小提案 |
 | `ir/examples/stax.ir.json` | commit した Grammar IR の golden（repository ルート） |
 
 生成物は commit しない（`examples/json` / `examples/p4-v2` と同じ方針）。
@@ -128,11 +130,25 @@ build 時の生成も実行も JVM 不要。生成 typed AST を直接検査し�
 harness テストで、20 本のサンプルおよび構文拒否と同時に実行する。根拠と非対応例は
 [`DESIGN.md`](DESIGN.md) §10。型検査の分類は期待値であり、実行結果とは区別する。
 
-## 次の段
+## 自己拡張の境界（段階5）
+
+```sh
+RUSTUP_TOOLCHAIN=stable cargo test --offline -p ubnfc-stax --test boundaries
+RUSTUP_TOOLCHAIN=stable cargo test --offline -p ubnfc-harness --test stax_boundaries
+```
+
+固定コメントと効果、引用 macro による表示、固定定義の代替と現行 stax の拒否理由を検証する。
+一般の語列を受理できることと、動的な宣言や実行意味が生じることを区別する。
+不変な外部語彙の宣言効果と rollback は既存機能で両 backend を実測した。
+Forth 実装そのものはこのマシンで未実行（gforth 不在）。標準上の期待、stax の実測、
+未実装の v3 提案は [境界レポート](../../docs/reports/2026-11-01-stax-boundaries.md) で分けている。
+
+## 段階の成果
 
 段階 2 の仕様由来 corpus、段階 3 の Rust インタプリタ、段階 4 の LSP・VSIX 生成と
 headless protocol 検証を実装済み。実機確認と生成 LSP の精度に残る条件は
 [`vscode/README.md`](vscode/README.md) に分けて記録した。
-次は段階 5 の自己拡張の境界レポート・UBNF v3 提案。
+段階5の境界レポートと v3 最小提案も文書化した。今回 front の追加は不要と判断し、
+X1 の出所付き初期語彙 API、X2・X3 は未実装の提案として扱う。
 段階 2〜5 の受け入れ条件とリンクは [`DESIGN.md`](DESIGN.md) §9。
 ジェネリクス（行変数）は将来案であり、段階 2 の必須範囲には含めない。
