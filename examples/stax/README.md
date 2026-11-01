@@ -107,6 +107,13 @@ IR golden の byte 一致・strict 検証・manifest 対応の既存回帰は
 これは #71 / D-073 で `validate` の警告 `W-RECOVERY-IN-CHOICE` になった
 （`--strict` で exit 5）。[`DESIGN.md`](DESIGN.md) §7.1。
 
+## 仕様由来の境界ケース
+
+[`corpus/cases.json`](corpus/cases.json) と [`scripts/corpus.py`](scripts/corpus.py) は
+仕様からの AST 型・値・位置とスコープ診断を検証する。`crosscheck.sh` と通常の
+harness テストで、20 本のサンプルおよび構文拒否と同時に実行する。根拠と非対応例は
+[`DESIGN.md`](DESIGN.md) §10。型検査の分類は期待値であり、実行結果とは区別する。
+
 ## 次の段
 
 stage 2 仕様由来 corpus・語境界の検証 / stage 3 Rust インタプリタ /
