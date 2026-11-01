@@ -17,6 +17,7 @@ public final class Main {
           --scanner-class <fqcn>   extern token scanner を持つクラス（public static Map<String,TokenScanner> ALL）
           --server-name <name>     initialize が返す serverInfo.name
           --server-version <v>     initialize が返す serverInfo.version
+          --declaration-context <Rule=context[,context]> 宣言の補完種別（反復指定可。catalog の context を使う）
           --emit-tmlanguage <path> TextMate 文法（*.tmLanguage.json）も書く（生成物・毎回上書き）
           --emit-dap               DAP（文法デバッガ）も出す（既定 off。--emit-lsp と併用する）
           --dap-package <x.y>      DAP の出力パッケージ（既定: <package>.dap）
@@ -29,6 +30,7 @@ public final class Main {
         if (args.length == 0 || args.length == 1 && args[0].equals("--help")) { System.out.println(USAGE); return; }
         String ir = null, out = null, pkg = null, parserPkg = null, languageId = null;
         String scannerClass = null, serverName = null, serverVersion = null, tmLanguage = null, dapPkg = null;
+        var declarationContexts = new java.util.ArrayList<String>();
         boolean emitLsp = false;
         boolean emitDap = false;
         for (int i = 0; i < args.length; i++) {
@@ -38,6 +40,7 @@ public final class Main {
             if (i + 1 == args.length) throw new IllegalArgumentException("Missing value for " + option);
             String value = args[++i];
             switch (option) {
+                case "--declaration-context" -> declarationContexts.add(value);
                 case "--ir" -> { if (ir != null) throw new IllegalArgumentException("Duplicate --ir"); ir = value; }
                 case "--out" -> { if (out != null) throw new IllegalArgumentException("Duplicate --out"); out = value; }
                 case "--package" -> { if (pkg != null) throw new IllegalArgumentException("Duplicate --package"); pkg = value; }
@@ -59,6 +62,7 @@ public final class Main {
         if (ir == null || out == null) throw new IllegalArgumentException("--ir と --out が要ります");
         var grammarIr = IrReader.read(Path.of(ir));
         var emitter = new LspEmitter(grammarIr, pkg, parserPkg, languageId, scannerClass, serverName, serverVersion);
+        for (String context : declarationContexts) emitter.declarationContext(context);
         emitter.write(Path.of(out));
         if (emitDap) new DapEmitter(emitter, dapPkg).write(Path.of(out));
         if (tmLanguage != null) {

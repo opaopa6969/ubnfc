@@ -68,18 +68,24 @@ code point から UTF-16 への変換も期待位置と照合する。
 - `use "library.stax" ( imported ) ;` の参照は、**同じ文書の ImportName** へ跳ぶ。
   実際の library を開いても別ファイルの定義へは跳ばない。ファイルの実在・明示名の
   実在・循環は段階3の checker が検査する。
-- 同じ文書の同じ綴りを集める索引なので、別の語にある `let x` が2か所あれば、
-  `x` の definition は2候補を返す。別の語の本体の completion にも `x` が残る。
-  自分の語名が本体で提案される例もある。parser の語彙 scope の規則とは区別する。
+- definition / hover / completion は scope event の順序と宣言規則の完了位置に従う。
+  他の語の局所名・登録前の自己名・前方名は候補に出さない。同じ語の let 更新は後勝ち。
+  引用は独立 scope ではなく、入れ子内の let もその語の束縛を更新する。
 - 2つの struct に同名 `x` があると `.x` の definition は2候補。
   文法だけではスタック上の型から1候補を決められない。重複名でもこの例の scope 診断は空。
-- 補完は前半の期待終端と文書内の宣言を使う。現行 LSP は `@catalog(context=…)` を
-  文脈ごとの記号絞り込みには使わない。IR の catalog があることと補完精度を同一視しない。
+- 補完位置は期待規則の `@catalog(context=…)` で分類し、可視宣言の種別を照合する。
+  catalog は宣言の型を記録していないため、build-lsp.sh が
+  `--declaration-context Rule=context[,context]` を反復指定する。
+  型は TypeDef / StructDef、語は WordDef / MacroDef / LetBind / ImportName / Variant / StructDef、
+  フィールドは FieldDecl。未指定の文法では従来の無分類候補を維持する。
+  設定は LSP 生成器だけが解釈し、parser / IR / 本番文法は変わらない。
+- references / rename は既存の文書内の綴り単位。型によるフィールドの一意解決は提供しない。
 - `: before ( -- ) ;\n: broken ( ` の不完全入力では正常前半の定義索引も空になる。
   全文修正後の復帰は検証済み。失敗位置で切る既存の前半再解析では、この例を保持できない。
 
-局所 scope・catalog context に沿った解決精度は [#49](https://github.com/opaopa6969/ubnfc/issues/49)
-へ切り出した。実ファイルへの横断解決や型によるフィールド解決は、その issue の範囲にも含めない。
+[#49](https://github.com/opaopa6969/ubnfc/issues/49) の語を跨ぐ束縛・入れ子引用・同名更新・
+宣言順・型/語/フィールド補完は protocol golden で検証する。
+実ファイルへの横断解決や型によるフィールド解決は範囲外。
 
 ## 回復配置の評価
 

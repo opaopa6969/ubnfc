@@ -32,7 +32,7 @@ public final class Hovers {
             endCp = symbol.endCp();
             lines.add("**" + symbol.name() + "** — " + (symbol.declaration() ? "宣言" : "参照"));
             String ruleId = symbols.ruleAt(symbol.offsetCp());
-            var declarations = symbols.declarationsOf(symbol.name());
+            var declarations = symbols.definitions(symbol);
             if (!symbol.declaration()) {
                 if (declarations.isEmpty()) lines.add("宣言が見つかりません。");
                 else for (var declaration : declarations) {
