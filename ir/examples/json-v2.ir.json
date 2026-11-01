@@ -5474,6 +5474,1479 @@
         "tokenId": "Json::SAFE_SUPP"
       }
     ],
+    "ll1": [
+      {
+        "exprId": "expr:examples/json/json.ubnf:2042:2064:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2042:2044:body/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2045:2050:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 12
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2058:2060:body/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2061:2064:body/3/tokenRef",
+        "operation": {
+          "kind": "eof"
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2131:2159:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            6
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2131:2159:body/0/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 7
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2133:2157:body/0/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 32,
+                  "start": 32
+                }
+              ],
+              "target": 8
+            },
+            {
+              "ranges": [
+                {
+                  "end": 9,
+                  "start": 9
+                }
+              ],
+              "target": 9
+            },
+            {
+              "ranges": [
+                {
+                  "end": 10,
+                  "start": 10
+                }
+              ],
+              "target": 10
+            },
+            {
+              "ranges": [
+                {
+                  "end": 13,
+                  "start": 13
+                }
+              ],
+              "target": 11
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2133:2136:body/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": " ",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2139:2143:body/0/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\t",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2146:2150:body/0/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\n",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2153:2157:body/0/0/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\r",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2175:2229:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 123,
+                  "start": 123
+                }
+              ],
+              "target": 13
+            },
+            {
+              "ranges": [
+                {
+                  "end": 91,
+                  "start": 91
+                }
+              ],
+              "target": 14
+            },
+            {
+              "ranges": [
+                {
+                  "end": 34,
+                  "start": 34
+                }
+              ],
+              "target": 15
+            },
+            {
+              "ranges": [
+                {
+                  "end": 45,
+                  "start": 45
+                },
+                {
+                  "end": 57,
+                  "start": 48
+                }
+              ],
+              "target": 16
+            },
+            {
+              "ranges": [
+                {
+                  "end": 116,
+                  "start": 116
+                }
+              ],
+              "target": 17
+            },
+            {
+              "ranges": [
+                {
+                  "end": 102,
+                  "start": 102
+                }
+              ],
+              "target": 18
+            },
+            {
+              "ranges": [
+                {
+                  "end": 110,
+                  "start": 110
+                }
+              ],
+              "target": 19
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2175:2181:body/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 20
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2184:2189:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 40
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2192:2198:body/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 54
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2201:2207:body/3/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 83
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2210:2214:body/4/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 114
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2217:2222:body/5/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 116
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2225:2229:body/6/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 118
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2287:2350:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            21,
+            22,
+            23,
+            33
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2287:2290:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "{",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2291:2293:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2294:2346:body/2/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 24
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2296:2344:body/2/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            25,
+            26,
+            32
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2296:2302:body/2/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 34
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2312:2341:body/2/0/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 27
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2314:2330:body/2/0/1/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2314:2316:body/2/0/1/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2317:2320:body/2/0/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2321:2323:body/2/0/1/0/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2324:2330:body/2/0/1/0/3/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 34
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2342:2344:body/2/0/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2347:2350:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "}",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2411:2438:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            35,
+            36,
+            37,
+            38,
+            39
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2411:2417:body/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 54
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2423:2425:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2426:2429:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ":",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2430:2432:body/3/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2433:2438:body/4/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 12
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2499:2556:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            41,
+            42,
+            43,
+            53
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2499:2502:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "[",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2503:2505:body/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2506:2552:body/2/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 44
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2508:2550:body/2/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            45,
+            46,
+            52
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2508:2513:body/2/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 12
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2521:2547:body/2/0/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 47
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2523:2538:body/2/0/1/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            48,
+            49,
+            50,
+            51
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2523:2525:body/2/0/1/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2526:2529:body/2/0/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ",",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2530:2532:body/2/0/1/0/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2533:2538:body/2/0/1/0/3/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 12
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2548:2550:body/2/0/2/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 5
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2553:2556:body/3/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "]",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2611:2637:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            55,
+            56,
+            60
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2611:2614:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\"",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2615:2627:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            57
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2617:2625:body/1/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            58
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2617:2625:body/1/0/0/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 59
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2619:2623:body/1/0/0/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 61
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2634:2637:body/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\"",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2652:2702:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 92,
+                  "start": 92
+                }
+              ],
+              "target": 62
+            },
+            {
+              "ranges": [
+                {
+                  "end": 33,
+                  "start": 32
+                }
+              ],
+              "target": 63
+            },
+            {
+              "ranges": [
+                {
+                  "end": 91,
+                  "start": 35
+                }
+              ],
+              "target": 64
+            },
+            {
+              "ranges": [
+                {
+                  "end": 55295,
+                  "start": 93
+                }
+              ],
+              "target": 65
+            },
+            {
+              "ranges": [
+                {
+                  "end": 1114111,
+                  "start": 57344
+                }
+              ],
+              "target": 66
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2652:2658:body/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 67
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2661:2668:body/1/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 33,
+              "start": 32
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2671:2679:body/2/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 91,
+              "start": 35
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2682:2690:body/3/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 55295,
+              "start": 93
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2693:2702:body/4/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 1114111,
+              "start": 57344
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2776:2856:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            68,
+            69
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2776:2780:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\\",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2781:2856:body/1/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            70
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2783:2854:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 34,
+                  "start": 34
+                }
+              ],
+              "target": 71
+            },
+            {
+              "ranges": [
+                {
+                  "end": 92,
+                  "start": 92
+                }
+              ],
+              "target": 72
+            },
+            {
+              "ranges": [
+                {
+                  "end": 47,
+                  "start": 47
+                }
+              ],
+              "target": 73
+            },
+            {
+              "ranges": [
+                {
+                  "end": 98,
+                  "start": 98
+                }
+              ],
+              "target": 74
+            },
+            {
+              "ranges": [
+                {
+                  "end": 102,
+                  "start": 102
+                }
+              ],
+              "target": 75
+            },
+            {
+              "ranges": [
+                {
+                  "end": 110,
+                  "start": 110
+                }
+              ],
+              "target": 76
+            },
+            {
+              "ranges": [
+                {
+                  "end": 114,
+                  "start": 114
+                }
+              ],
+              "target": 77
+            },
+            {
+              "ranges": [
+                {
+                  "end": 116,
+                  "start": 116
+                }
+              ],
+              "target": 78
+            },
+            {
+              "ranges": [
+                {
+                  "end": 117,
+                  "start": 117
+                }
+              ],
+              "target": 79
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2783:2786:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\"",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2789:2793:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "\\",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2796:2799:body/1/0/2/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "/",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2802:2807:body/1/0/3/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 98,
+              "start": 98
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2810:2815:body/1/0/4/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 102,
+              "start": 102
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2818:2823:body/1/0/5/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 110,
+              "start": 110
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2826:2831:body/1/0/6/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 114,
+              "start": 114
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2834:2839:body/1/0/7/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 116,
+              "start": 116
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2842:2854:body/1/0/8/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            80,
+            81
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2842:2847:body/1/0/8/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 117,
+              "start": 117
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2848:2854:body/1/0/8/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": 4,
+          "min": 4,
+          "target": 82
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2848:2851:body/1/0/8/1/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 57,
+              "start": 48
+            },
+            {
+              "end": 70,
+              "start": 65
+            },
+            {
+              "end": 102,
+              "start": 97
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2965:2997:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            84
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2965:2997:body/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            85
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2967:2995:body/0/0/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            86,
+            88,
+            89,
+            91
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2967:2974:body/0/0/0/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 87
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2969:2972:body/0/0/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2975:2978:body/0/0/1/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 93
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2979:2987:body/0/0/2/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 90
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2981:2985:body/0/0/2/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 99
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2988:2995:body/0/0/3/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 92
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:2990:2993:body/0/0/3/0/ruleRef",
+        "operation": {
+          "kind": "call",
+          "target": 103
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3018:3042:body/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 48,
+                  "start": 48
+                }
+              ],
+              "target": 94
+            },
+            {
+              "ranges": [
+                {
+                  "end": 57,
+                  "start": 49
+                }
+              ],
+              "target": 95
+            }
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3018:3022:body/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 48,
+              "start": 48
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3025:3042:body/1/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            96,
+            97
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3025:3032:body/1/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 57,
+              "start": 49
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3033:3042:body/1/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 0,
+          "target": 98
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3035:3040:body/1/1/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 57,
+              "start": 48
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3056:3066:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            100,
+            101
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3056:3059:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": ".",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3060:3066:body/1/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 1,
+          "target": 102
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3060:3065:body/1/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 57,
+              "start": 48
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3080:3122:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            104,
+            108,
+            112
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3080:3101:body/0/group",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            105
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3082:3099:body/0/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 101,
+                  "start": 101
+                }
+              ],
+              "target": 106
+            },
+            {
+              "ranges": [
+                {
+                  "end": 69,
+                  "start": 69
+                }
+              ],
+              "target": 107
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3082:3089:body/0/0/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 101,
+              "start": 101
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3092:3099:body/0/0/1/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 69,
+              "start": 69
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3102:3115:body/1/optional",
+        "operation": {
+          "kind": "optional",
+          "target": 109
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3104:3113:body/1/0/choice",
+        "operation": {
+          "kind": "choice",
+          "transitions": [
+            {
+              "ranges": [
+                {
+                  "end": 43,
+                  "start": 43
+                }
+              ],
+              "target": 110
+            },
+            {
+              "ranges": [
+                {
+                  "end": 45,
+                  "start": 45
+                }
+              ],
+              "target": 111
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3104:3107:body/1/0/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "+",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3110:3113:body/1/0/1/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "-",
+          "wordBoundary": false
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3116:3122:body/2/repeat",
+        "operation": {
+          "kind": "repeat",
+          "max": null,
+          "min": 1,
+          "target": 113
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3116:3121:body/2/0/tokenRef",
+        "operation": {
+          "kind": "class",
+          "ranges": [
+            {
+              "end": 57,
+              "start": 48
+            }
+          ]
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3158:3164:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            115
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3158:3164:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "true",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3199:3206:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            117
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3199:3206:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "false",
+          "wordBoundary": true
+        },
+        "root": false
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3241:3247:body/seq",
+        "operation": {
+          "kind": "sequence",
+          "targets": [
+            119
+          ]
+        },
+        "root": true
+      },
+      {
+        "exprId": "expr:examples/json/json.ubnf:3241:3247:body/0/literal",
+        "operation": {
+          "kind": "literal",
+          "value": "null",
+          "wordBoundary": true
+        },
+        "root": false
+      }
+    ],
     "memo": {
       "entries": [
         {

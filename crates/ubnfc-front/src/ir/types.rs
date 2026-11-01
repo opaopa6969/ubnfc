@@ -1126,7 +1126,65 @@ pub struct Plan {
     /// 一括走査（D-072）。既存キーを変えない追加であり、空のときは出力しない。
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub scans: Vec<ScanPlan>,
+    /// LL(1) で選択を確定できる認識領域。旧 IR では省略可能。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub ll1: Vec<Ll1State>,
     pub trivia_cache: TriviaCache,
+}
+
+/// 表駆動認識の状態。target は同じ表内の 0 起点 index。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Ll1State {
+    pub expr_id: ExprId,
+    pub root: bool,
+    pub operation: Ll1Operation,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Ll1Transition {
+    pub ranges: Vec<CharRange>,
+    pub target: u64,
+}
+
+/// Choice の行は nullable でない候補の排他的 FIRST 上界。Optional / Repeat は
+/// 局所的な失敗で入口位置に戻す。規則再帰は Call と明示 stack で実行する。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase",
+    deny_unknown_fields
+)]
+pub enum Ll1Operation {
+    Sequence {
+        targets: Vec<u64>,
+    },
+    Choice {
+        transitions: Vec<Ll1Transition>,
+    },
+    Optional {
+        target: u64,
+    },
+    Repeat {
+        target: u64,
+        min: u64,
+        #[serde(deserialize_with = "super::json::required_nullable")]
+        max: Option<u64>,
+    },
+    Call {
+        target: u64,
+    },
+    Literal {
+        value: String,
+        word_boundary: bool,
+    },
+    Class {
+        ranges: Vec<CharRange>,
+    },
+    Eof {},
+    Empty {},
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]

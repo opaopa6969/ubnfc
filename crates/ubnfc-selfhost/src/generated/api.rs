@@ -29,6 +29,8 @@ pub struct ParseOptions {
     /// diagnostics and occurrences are those of the reference path by construction;
     /// `false` is the reference path. Both produce the same result and diagnostics.
     pub scan: bool,
+    /// LL(1) 表による認識。診断・AST・出現表を要求すると参照経路を使う。
+    pub ll1: bool,
     /// Reuse the session's large buffers (memo table, diagnostics arena, event arena)
     /// across parses on the same thread instead of allocating them per parse. The
     /// retained set is bounded (`POOL_RETAIN_BYTES`) and only affects allocation
@@ -142,6 +144,7 @@ impl Default for ParseOptions {
             predict: true,
             factor: true,
             scan: true,
+            ll1: true,
             reuse_buffers: true,
             lexical_cache: false,
             diagnostics: false,
