@@ -147,6 +147,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ubnfc-stax"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "ubnfc-front",
+ "ubnfc-rust",
+]
+
+[[package]]
 name = "ubnfc-target-rust"
 version = "0.1.0"
 dependencies = [

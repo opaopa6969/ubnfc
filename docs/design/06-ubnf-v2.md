@@ -112,7 +112,7 @@ PEG の順序付き選択は、候補順を誤ると黙って前の候補が勝�
 ### 設定と版
 
 `@literalBoundary: word|none`（grammar ごと、1 回）。既定は数値版 `@ubnf: 1` で `none`、数値版 `@ubnf: 2` で `word`。
-Classic の綴り `@ubnf: v2` は Classic と同じ prefix 一致を保ち、暗黙の単語境界を加えない（D-092）。
+Classic の綴り `@ubnf: v2` は Classic と同じ prefix 一致を保ち、暗黙の単語境界を加えない（D-093）。
 明示的な `@literalBoundary` はどちらの綴りでも優先する。
 IR は既存キー `ExprNode.literal.wordBoundary` を固定値 `false` から真の bool に変え、
 `TokenSpec.caseInsensitive` に同名キーを足した（追加キー）。**backend は flag しか見ない**。
@@ -334,7 +334,7 @@ tinyexpression P4 は 2026-10 にこの綴りへ移った（`pkg:std/layout` の
   SHA-256 が lock と一致するときだけ使う。
 - resolve は `pkg:ID` を仮想パス `<grammar のディレクトリ>/.ubnf-packages/ID` に写す。IR の `sources[]` には
   この論理パスと entry 本文の SHA-256 が載る。
-- `@whitespace` の値（設定・規則注釈とも）には宣言的 token を書ける（D-092）。
+- `@whitespace` の値（設定・規則注釈とも）には宣言的 token を書ける（D-093）。
   **std/layout 1.0.0 と構文木が同一の import の `SPACES_AND_COMMENTS` だけ**は
   javaStyle と同じ区切り集合（ASCII space と TAB〜CR、`//` から
   CR / LF の直前まで、`/*` から最初の `*/` まで）なので、IR では javaStyle と同じ `effectiveDelimiterSet` になる。
@@ -368,6 +368,17 @@ ubnfc の front は Classic の綴りを受け付ける。ubnfc 独自の綴り�
 | `@lexicalContext(...)` / `@predicate(...)` / `@namePredicate(...)` / `@uniqueLongestChoice` / `@nestedCaptures` | その位置で `E-ANNOTATION-UNSUPPORTED`（D-085） | 受理または AST が変わる機能で、ubnfc に無い。以前は未知の注釈として警告だけ出して無視していた |
 | token adapter `ADAPTER('id', version=N)`（#158） | その位置で `E-TOKEN-ADAPTER-UNSUPPORTED`（D-085） | Classic の adapter registry は ubnfc の extern registry（D-041）と別物なので読み替えない |
 | 宣言的 token の `CHAR_RANGE` / `NEGATION` の `\uXXXX` / `\u{X…}` | code point 1 個へ展開する（D-085） | D-063 を宣言的 token にも当てる。Classic と同じ |
+
+### Classic と違うところ（意図した差）
+
+- **`REGEX('pattern')` を受理し続ける（D-092）。** Classic は REGEX を廃止し（unlaxer-parser #612、開発版は
+  `E-REGEX-RETIRED`、移行は宣言的 token）、仕様（`ubnf-syntax.md`「旧 `REGEX('pattern')` — 廃止」）からも
+  受理の記述を消した。ubnfc は既存の文法を壊さないよう、v1 / v2 とも従来どおり正則部分集合の DFA
+  （`analysis/regex.rs`）と Java fallback で受理する。綴りの正本は Classic なので、新しい文法では宣言的 token
+  （`token NAME ::= …;`）を使うこと。ubnfc が REGEX を拒否するかどうかは、REGEX を使う利用者の移行が
+  済んでから改めて決める（そのとき code は Classic と同じ `E-REGEX-RETIRED` にする）。
+- 空の選択肢（`( 'a' | )`、`E ::= ;`）を手書き front は受理し続ける。Classic の自己記述文法は
+  `SequenceBody ::= AnnotatedElement+` になったので、self-host frontend は拒否する（`crates/ubnfc-selfhost/tests/parity.rs` が既知の差として固定）。
 
 関数形式（`CAPTURE(` など）になるのは、名前と `(` が隣接しているときだけである。`CAPTURE ('x')` のように空白・
 コメントを挟めば、従来どおり参照と group になる（Classic と同じ）。宣言的 token の中の `CAPTURE` / `SAME_AS`
