@@ -109,20 +109,55 @@ impl Checker {
                 Ok(())
             }
             (Ty::Quote(a), Ty::Quote(b)) => {
-                // 共通のスタック接頭辞は保存する。空引用は任意の接頭辞上の恒等関数。
-                let mut a = a.clone();
-                let mut b = b.clone();
-                let count = a.input.len().max(b.input.len());
-                for e in [&mut a, &mut b] {
-                    let prefix: Vec<_> = (e.input.len()..count).map(|_| self.fresh()).collect();
-                    e.input.splice(0..0, prefix.clone());
-                    e.output.splice(0..0, prefix);
-                }
                 self.same(&a.input, &b.input)?;
                 self.same(&a.output, &b.output)
             }
             _ => fail(format!("型不一致: {a} と {b}")),
         }
+    }
+    fn assign(&mut self, actual: &Ty, expected: &Ty) -> Result<()> {
+        let (a, b) = (self.resolve(actual)?, self.resolve(expected)?);
+        if let (Ty::Quote(a), Ty::Quote(b)) = (&a, &b) {
+            // より少ない入力で動く値を、接頭辞を保存する限定的な型へ渡す向きだけ許す。
+            if a.input.len() > b.input.len() {
+                return fail("引用の入力効果が不一致");
+            }
+            let mut a = a.clone();
+            let prefix: Vec<_> = (a.input.len()..b.input.len())
+                .map(|_| self.fresh())
+                .collect();
+            a.input.splice(0..0, prefix.clone());
+            a.output.splice(0..0, prefix);
+            self.same(&a.input, &b.input)?;
+            self.same(&a.output, &b.output)
+        } else {
+            self.unify(&a, &b)
+        }
+    }
+    fn combine(&mut self, a: &Effect, b: &Effect) -> Result<Effect> {
+        // 両方の枝が要求する共通の入力を残す。空引用側の型だけを返すと入力を失う。
+        let mut a = a.clone();
+        let mut b = b.clone();
+        let count = a.input.len().max(b.input.len());
+        for e in [&mut a, &mut b] {
+            let prefix: Vec<_> = (e.input.len()..count).map(|_| self.fresh()).collect();
+            e.input.splice(0..0, prefix.clone());
+            e.output.splice(0..0, prefix);
+        }
+        self.same(&a.input, &b.input)?;
+        self.same(&a.output, &b.output)?;
+        Ok(Effect {
+            input: a
+                .input
+                .iter()
+                .map(|t| self.resolve(t))
+                .collect::<Result<_>>()?,
+            output: a
+                .output
+                .iter()
+                .map(|t| self.resolve(t))
+                .collect::<Result<_>>()?,
+        })
     }
     fn same(&mut self, a: &[Ty], b: &[Ty]) -> Result<()> {
         if a.len() != b.len() {
@@ -150,7 +185,7 @@ impl Checker {
     }
     fn expect(&mut self, s: &mut State, t: &Ty) -> Result<()> {
         let actual = self.pop(s)?;
-        self.unify(&actual, t)
+        self.assign(&actual, t)
     }
     fn apply(&mut self, s: &mut State, e: &Effect) -> Result<()> {
         for t in e.input.iter().rev() {
@@ -215,7 +250,7 @@ impl Checker {
                         }
                         let t = self.pop(s)?;
                         if let Some(old) = s.locals.get(&n.g_name) {
-                            self.unify(old, &t)?;
+                            self.assign(&t, old)?;
                         } else {
                             s.locals.insert(n.g_name.clone(), t);
                         }
@@ -242,7 +277,7 @@ impl Checker {
                             .find(|(name, _)| name == &n.g_name)
                             .ok_or_else(|| Error(format!("未知のフィールド: {}", n.g_name)))?
                             .1;
-                        self.unify(t, &value)?;
+                        self.assign(&value, t)?;
                         s.stack.push(Ty::Struct(def));
                     }
                     g_StaxAST_2e_Prim(n) => self.primitive(&n.g_name, s, w)?,
@@ -419,11 +454,11 @@ impl Checker {
             "choose" => {
                 let b = self.pop(s)?;
                 let a = self.pop(s)?;
-                self.quote(a.clone())?;
-                self.quote(b.clone())?;
-                self.unify(&a, &b)?;
+                let a = self.quote(a)?;
+                let b = self.quote(b)?;
+                let common = self.combine(&a, &b)?;
                 self.expect(s, &Ty::Bool)?;
-                s.stack.push(a);
+                s.stack.push(Ty::Quote(common));
             }
             _ => return fail(format!("未知の primitive: {name}")),
         }

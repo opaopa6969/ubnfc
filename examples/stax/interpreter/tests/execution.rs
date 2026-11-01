@@ -314,3 +314,42 @@ fn quotation_type_graphs_are_bounded_and_merges_do_not_form_long_chains() {
     );
     failure(run(&source), "型検査の操作上限");
 }
+
+#[test]
+fn choose_keeps_inputs_required_by_either_branch() {
+    for source in [
+        ": main ( -- ) false [ ] [ 1 + ] choose call ;",
+        ": main ( -- ) true [ 1 + ] [ ] choose call ;",
+    ] {
+        let files = Files::new(&[("main.stax", source)]);
+        failure(files.run(&["--check"]), "スタック深さ");
+    }
+    success(
+        run(r#": main ( -- ) 7 false [ ] [ 1 + ] choose call int_to_str print ;"#),
+        "8",
+    );
+    success(
+        run(r#": main ( -- ) 7 true [ ] [ 1 + ] choose call int_to_str print ;"#),
+        "7",
+    );
+}
+
+#[test]
+fn quote_assignment_cannot_weaken_the_receivers_effect() {
+    for source in [
+        ": run ( [ -- ] -- ) call ; : main ( -- ) [ 1 + ] run ;",
+        ": main ( -- ) [ ] let f [ 1 + ] let f f call ;",
+        ": main ( -- ) [ ] let f [ f call ] let g [ 1 + ] let f g call ;",
+        "struct F { q: [ -- ] } : main ( -- ) [ 1 + ] F drop ;",
+        "struct F { q: [ -- ] } : main ( -- ) [ ] F [ 1 + ] !q drop ;",
+    ] {
+        let files = Files::new(&[("main.stax", source)]);
+        failure(files.run(&["--check"]), "引用の入力効果");
+    }
+    success(
+        run(
+            r#": apply ( Int [ Int -- Int ] -- Int ) call ; : main ( -- ) 7 [ ] apply int_to_str print ;"#,
+        ),
+        "7",
+    );
+}
