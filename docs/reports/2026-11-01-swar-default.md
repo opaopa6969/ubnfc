@@ -135,11 +135,11 @@ UTF-8 / escape / 構造規則に残る仕事と inline / 配置の影響があ�
 [SWAR 全関数](evidence/2026-11-01-swar-default/callgrind-after.tsv)、
 [scalar 元データ](evidence/2026-11-01-swar-default/before.callgrind.gz)・
 [SWAR 元データ](evidence/2026-11-01-swar-default/after.callgrind.gz)。
-各負荷と simulator の構成は `callgrind-*.load.txt` / `callgrind-*.txt` に残す。
+各負荷と simulator の構成は `callgrind-*.load.txt` / `callgrind-*.txt.gz` に残す。
 
 ## scalar 既定復帰版と両基準の比較
 
-現行の生成器（親 `12e5e80` と evidence の `final-generator.diff`）で scalar を生成し、
+現行の生成器（親 `12e5e80` と evidence の `final-generator.diff.gz`）で scalar を生成し、
 旧 scalar `66a18ff` / 旧 SWAR `3fa69b5` の双方と同じ IR・入力・compiler・CPU で交互測定した。
 現行生成器には既に統合済みの LL(1) の API / 未使用 runtime も含まれるが、共通 IR の `plan.ll1` は空。
 歴史的 commit から現行までの差が全て SWAR だけだとは解釈しない。
