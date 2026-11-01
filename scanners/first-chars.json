@@ -11,6 +11,7 @@
     "CodeStartParser": ["`"],
     "org.unlaxer.tinyexpression.parser.javalang.CodeEndParser": ["`"],
     "CodeEndParser": ["`"],
+    "org.unlaxer.tinyexpression.parser.javalang.LongCodeBlockParser": ["`"],
     "oracle.ExternalCursorParser": ["😀"]
   }
 }

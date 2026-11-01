@@ -9,6 +9,7 @@ enum Kind {
     String,
     Start,
     End,
+    Long,
     External,
 }
 fn kind(class: &str) -> Option<Kind> {
@@ -22,6 +23,7 @@ fn kind(class: &str) -> Option<Kind> {
             Kind::Start
         }
         "CodeEndParser" | "org.unlaxer.tinyexpression.parser.javalang.CodeEndParser" => Kind::End,
+        "org.unlaxer.tinyexpression.parser.javalang.LongCodeBlockParser" => Kind::Long,
         "oracle.ExternalCursorParser" => Kind::External,
         _ => return None,
     })
@@ -187,6 +189,67 @@ impl Scan<'_> {
         }
         true
     }
+    fn long_fence(&mut self) -> bool {
+        let start = self.p;
+        if !self.scan_long_fence() {
+            self.p = start;
+            return self.fail("long code block");
+        }
+        true
+    }
+    fn scan_long_fence(&mut self) -> bool {
+        // tinyexpression c736c2c6: LongCodeFence.scan / LongCodeBlockParser.getToken。
+        // 内部は UTF-8、公開 cursor/span への code point 変換は driver が行う。
+        let sol = self.p == 0 || matches!(self.input.as_bytes()[self.p - 1], b'\r' | b'\n');
+        if !sol || self.state.invert {
+            return false;
+        }
+        let start = self.p;
+        while self.cp() == Some('`') {
+            self.p += 1;
+        }
+        let width = self.p - start;
+        if width < 4 || !self.identifier() || !self.word(":", "':'") || !self.identifier() {
+            return false;
+        }
+        while self.cp() == Some('.') {
+            self.p += 1;
+            if !self.identifier() {
+                return false;
+            }
+        }
+        if !matches!(self.cp(), Some('\r' | '\n')) {
+            return false;
+        }
+        if self.cp() == Some('\r') {
+            self.p += 1;
+        }
+        if self.cp() == Some('\n') {
+            self.p += 1;
+        }
+        while let Some(c) = self.cp() {
+            if matches!(self.input.as_bytes()[self.p - 1], b'\r' | b'\n') && c == '`' {
+                let close = self.p;
+                while self.cp() == Some('`') {
+                    self.p += 1;
+                }
+                if self.p - close == width && matches!(self.cp(), None | Some('\r' | '\n')) {
+                    // mapper の値は strip 後、capture 原文と cursor は改行を含む。
+                    self.value_end = self.p;
+                    if self.cp() == Some('\r') {
+                        self.p += 1;
+                    }
+                    if self.cp() == Some('\n') {
+                        self.p += 1;
+                    }
+                    return true;
+                }
+            } else {
+                self.p += c.len_utf8();
+            }
+        }
+        false
+    }
     fn run(mut self, kind: Kind) -> ScanResult {
         // ChainInterface.java:17 は reset=false、ChoiceInterface.java:28-29 は begin の reset を参照。
         if matches!(kind, Kind::String) && self.match_only && self.state.reset {
@@ -200,6 +263,7 @@ impl Scan<'_> {
             Kind::String => self.quoted(if self.cp() == Some('"') { '"' } else { '\'' }),
             Kind::Start => self.fence(true),
             Kind::End => self.fence(false),
+            Kind::Long => self.long_fence(),
             // corpus/oracle/tools/ExternalCursorParser.java:8-10: 😀 消費 + x の MatchOnly。
             Kind::External => self.word("😀", "'😀'"),
         };
