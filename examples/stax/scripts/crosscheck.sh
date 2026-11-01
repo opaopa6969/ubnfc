@@ -7,6 +7,7 @@
 # 作業場所は mktemp -d の専用ディレクトリで、終了時に消す。
 set -euo pipefail
 export RUSTUP_TOOLCHAIN=stable
+export PYTHONDONTWRITEBYTECODE=1
 module=$(cd "$(dirname "$0")/.." && pwd)
 root=$(cd "$module/../.." && pwd)
 
@@ -39,3 +40,6 @@ javac --release 17 -encoding UTF-8 -d "$work/java-classes" @"$work/java-sources.
 echo "== 受理サンプル 20 本と構文拒否ケースを両 backend へ =="
 python3 "$module/scripts/crosscheck.py" \
   "$work/rust-target/debug/driver" "$work/java-classes" "$module/samples"
+
+# 同じ生成パーサで仕様由来の境界ケースを検証する。
+python3 "$module/scripts/corpus.py" "$work/rust-target/debug/driver" "$work/java-classes"
