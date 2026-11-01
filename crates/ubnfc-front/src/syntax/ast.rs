@@ -40,6 +40,13 @@ pub struct TemplateDecl {
     pub annotations: Vec<Annotation>,
     pub name: String,
     pub params: Vec<String>,
+    /// Classic の綴り `Name(p, =q) ::=`（unlaxer-parser #701 / #704）で書いた雛形か。
+    /// `<...>` の雛形（D-043）は `false`。Classic の検査（`E-PARAM-*`）はこちらだけに当てる。
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub classic: bool,
+    /// 値渡しの引数（`=q`）の印。`params` と同じ長さ。`<...>` の雛形では常に全部 `false`。
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub by_value: Vec<bool>,
     pub body: RuleBody,
     pub span: Span,
 }
@@ -345,11 +352,84 @@ pub enum Atom {
         span: Span,
     },
     /// `Name<A, B>`。`desugar::templates` が展開して消すので resolve 以降は現れない。
+    /// Classic の呼び出し `Name(a, b)` もここに入る（`classic = true`）。
     Instantiate {
         name: String,
         args: Vec<Atom>,
+        #[serde(skip_serializing_if = "std::ops::Not::not")]
+        classic: bool,
         span: Span,
     },
+    /// Classic の規則中の関数形式（unlaxer-parser `docs/general-owned-capture-syntax.md`、
+    /// `docs/cut-and-labeled-failures.md`）。名前と `(` が隣接するときだけこの形になる。
+    /// ubnfc の IR はこれらを表せないので、resolve が位置付きで拒否する（`E-OWNED-CAPTURE-UNSUPPORTED`
+    /// / `E-CUT-UNSUPPORTED`）。構文木に残すのは、その位置と Classic の構文木の形を保つため。
+    Builtin {
+        call: BuiltinCall,
+        span: Span,
+    },
+}
+
+/// 規則の中の Classic の関数形式。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum BuiltinCall {
+    /// `CAPTURE(name, body)`
+    Capture { name: String, body: RuleBody },
+    /// `SAME_AS(name)`
+    SameAs { name: String },
+    /// `CAPTURE_SCOPE(body)`
+    CaptureScope { body: RuleBody },
+    /// `COMMIT(body[, 'message'])`
+    Commit { body: RuleBody, message: Option<String> },
+    /// `LABEL(label, body)`
+    Label { label: String, body: RuleBody },
+    /// `CATCH(body, alternative {, label})`。label の無い形は Classic の validator が拒否する。
+    Catch {
+        body: RuleBody,
+        alternative: RuleBody,
+        labels: Vec<String>,
+    },
+}
+
+impl BuiltinCall {
+    /// 綴り（`CAPTURE` など）。
+    pub fn keyword(&self) -> &'static str {
+        match self {
+            Self::Capture { .. } => "CAPTURE",
+            Self::SameAs { .. } => "SAME_AS",
+            Self::CaptureScope { .. } => "CAPTURE_SCOPE",
+            Self::Commit { .. } => "COMMIT",
+            Self::Label { .. } => "LABEL",
+            Self::Catch { .. } => "CATCH",
+        }
+    }
+
+    /// 中に書いた規則本体（走査用）。
+    pub fn bodies(&self) -> Vec<&RuleBody> {
+        match self {
+            Self::Capture { body, .. }
+            | Self::CaptureScope { body }
+            | Self::Commit { body, .. }
+            | Self::Label { body, .. } => vec![body],
+            Self::Catch {
+                body, alternative, ..
+            } => vec![body, alternative],
+            Self::SameAs { .. } => vec![],
+        }
+    }
+
+    pub fn bodies_mut(&mut self) -> Vec<&mut RuleBody> {
+        match self {
+            Self::Capture { body, .. }
+            | Self::CaptureScope { body }
+            | Self::Commit { body, .. }
+            | Self::Label { body, .. } => vec![body],
+            Self::Catch {
+                body, alternative, ..
+            } => vec![body, alternative],
+            Self::SameAs { .. } => vec![],
+        }
+    }
 }
 
 // enum の利用側でも共通の範囲取得を行えるようにする。
@@ -372,4 +452,4 @@ impl_span!(Annotation: Root, Mapping, Eval, Whitespace, Interleave, Backref, Sco
     Declares, Catalog, LeftAssoc, RightAssoc, LongestChoice, PredictiveChoice,
     Precedence, Doc, Recovery, Skip, CommonField, Enum, Simple);
 impl_span!(Quantifier: Plus, Question, Star, Bounded);
-impl_span!(Atom: Group, Optional, Repeat, Error, Literal, Ref, Instantiate);
+impl_span!(Atom: Group, Optional, Repeat, Error, Literal, Ref, Instantiate, Builtin);
