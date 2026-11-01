@@ -1,0 +1,24 @@
+[package]
+name = "ubnfc-stax"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+json = ["dep:serde", "dep:serde_json"]
+
+[dependencies]
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+[[bin]]
+name = "stax"
+path = "src/main.rs"
+
+[build-dependencies]
+ubnfc-front = { path = "../../../crates/ubnfc-front" }
+ubnfc-rust = { path = "../../../crates/ubnfc-rust" }
+
+[dev-dependencies]
+serde_json.workspace = true
