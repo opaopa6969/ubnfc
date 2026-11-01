@@ -148,7 +148,7 @@ fn round2_generated_contracts_and_m3() {
         generated.write_to(dir.join("src").join(&name)).unwrap();
         lib.push_str(&format!("pub mod {name};\n"));
     }
-    let p4=ubnfc_front::ir::from_json(include_str!("../../../ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json")).unwrap();
+    let p4=ubnfc_front::ir::from_json(include_str!("../../../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json")).unwrap();
     ubnfc_rust::emit(
         &p4,
         &ubnfc_rust::EmitOptions {

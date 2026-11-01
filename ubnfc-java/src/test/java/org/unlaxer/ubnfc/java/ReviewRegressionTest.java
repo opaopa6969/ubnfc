@@ -190,7 +190,7 @@ class ReviewRegressionTest {
     }
 
     @Test void p4HasOnlyFrontRecipeMismatchesAndAllStatefulExternsCompile() throws Exception {
-        var raw = Json.object(Json.read(Files.readString(Path.of("../ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json"))));
+        var raw = Json.object(Json.read(Files.readString(Path.of("../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json"))));
         var semantics = Json.object(raw.get("semantics")); raw.put("semantics", semantics);
         var tokens = Json.array(semantics.get("tokens")).stream().map(Json::object).filter(t -> Json.object(t.get("spec")).get("kind").equals("extern")).toList();
         assertEquals(List.of("TinyExpressionP4::STRING", "TinyExpressionP4::CODE_START", "TinyExpressionP4::CODE_END"), tokens.stream().map(t -> t.get("symbolId")).toList());

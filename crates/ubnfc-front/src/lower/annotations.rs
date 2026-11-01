@@ -57,7 +57,8 @@ pub(super) fn annotation(cx: &Context<'_>, unit: r::UnitId, a: &A) -> Annotation
         A::Skip { .. } => ("skip", vec![]),
         A::CommonField { fields, .. } => ("commonField", vec![("fields", json(fields))]),
         A::Enum { .. } => ("enum", vec![]),
-        A::Simple { name, .. } => (name, vec![]),
+        // Unsupported は resolve が拒否するので lower には来ない。
+        A::Simple { name, .. } | A::Unsupported { name, .. } => (name, vec![]),
     };
     Annotation {
         name: name.into(),
