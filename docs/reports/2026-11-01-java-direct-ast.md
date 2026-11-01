@@ -241,3 +241,7 @@ CIと同じ `mvn -q -Plsp -pl ubnfc-lsp -am test "-Dtest=org.unlaxer.ubnfc.lsp.*
 
 master `a0d4bb1`（#42）をmergeし、独立したRust実行系のworkspace追加を取り込んだ。Java backend・front・harness・scanner・pin・IR・P4と手書きを含む全計測ソースは不変。`cargo test -p ubnfc-stax --no-fail-fast` の **12件が通過**した。
 standaloneのRust比較crateも再buildし、binary SHA-256が前後とも `92aab9e13b40680162aac6697b2c5a0ad266c5f656f4007c768c15b87d65f1ab` で一致した。ソースと比較binaryが不変のため、corpus全件同値・最新A/B値を維持する。記録は `after-stax3/`。D-092と他担当の設計行は保持し、最終判定は統合後HEADのCIを確認する。
+
+## REGEX方針の文書統合
+
+master `1a51aad`（#43）の変更は設計文書2件だけで、実装・golden・corpus・計測ソースは不変。masterのREGEX方針D-092を保持し、自分のAST決定行だけ **D-093** へ振り直した。上の履歴節・保存した検証記録のD-092は統合当時の番号で、現在のAST方針はD-093を参照する。数値の再計測を要する変更はなく、最新A/B値と全1,492行の同値結果を維持する。
