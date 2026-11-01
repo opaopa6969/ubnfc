@@ -62,7 +62,7 @@ prepare() {
   # 6. ubnfc Rust（生成）。scope あり / scope 無効化 IR の 2 本。
   #    scope を切る ParseOptions は存在しないので、IR の semantics.scope.effects と
   #    semantics.catalogs を空にして生成し直したものを 2 本目にする。
-  local ir=$ubnfc/ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json
+  local ir=$ubnfc/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json
   mkdir -p "$work/noscope"
   python3 - "$ir" "$work/noscope/ir.json" <<'PY_EOF'
 import json, sys

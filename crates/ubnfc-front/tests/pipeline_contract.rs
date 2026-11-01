@@ -189,25 +189,9 @@ fn p4_shared_and_selfhost_recipes_agree_with_ast_fields() {
                     }
                 })
                 .collect();
-            assert_eq!(externs.len(), 3);
-            for (id, state) in externs {
-                assert!([
-                    "TinyExpressionP4::STRING",
-                    "TinyExpressionP4::CODE_START",
-                    "TinyExpressionP4::CODE_END"
-                ]
-                .contains(&id));
-                assert_eq!(
-                    state,
-                    &[
-                        "consumed",
-                        "matched",
-                        "mode",
-                        "invertMatch",
-                        "resetMatchedWithConsumed"
-                    ]
-                );
-            }
+            // 2026-10 に P4 の token は lexical module の宣言的 token へ移り、host 実装
+            // （extern）は無くなった。
+            assert!(externs.is_empty(), "{externs:?}");
         } else if path.ends_with("Shared.ubnf") {
             assert_eq!(
                 recipe(&ir, "recipe:Second", "value").conversion,
@@ -219,7 +203,8 @@ fn p4_shared_and_selfhost_recipes_agree_with_ast_fields() {
             let ValueType::Mixed { members } = &annotations.value_type else {
                 panic!("annotation variants");
             };
-            assert_eq!(members.len(), 20);
+            // 2026-10 に @lexicalContext / @uniqueLongestChoice / @namePredicate / @predicate が増えた。
+            assert_eq!(members.len(), 24);
             assert!(members.iter().all(|m| matches!(m, ValueType::Node { .. })));
             assert_eq!(
                 recipe(&ir, "recipe:RuleDecl", "annotations").conversion,

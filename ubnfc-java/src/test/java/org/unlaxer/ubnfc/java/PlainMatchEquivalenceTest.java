@@ -114,7 +114,7 @@ class PlainMatchEquivalenceTest {
         String operators = new JavaEmitter(IrReader.read(Path.of("src/test/resources/ir/operators.ir.json")), "probe.operators")
             .sources().get("probe/operators/OperatorsParser.java");
         assertTrue(operators.contains("new Session(source, options, K0, true, true)"), operators.lines().filter(l -> l.contains("new Session")).toList().toString());
-        Path scoped = Path.of("../ir/fixtures/tools__tinyexpression-p4-lsp-vscode__grammar__tinyexpression-p4.ubnf.ir.json");
+        Path scoped = Path.of("../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json");
         String p4 = new JavaEmitter(IrReader.read(scoped), "probe.p4").sources().get("probe/p4/TinyExpressionP4Parser.java");
         assertTrue(p4.contains("new Session(source, options, K0, true, false)"), p4.lines().filter(l -> l.contains("new Session")).toList().toString());
     }
