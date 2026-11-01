@@ -1,0 +1,2 @@
+[ perf record: Woken up 417 times to write data ]
+[ perf record: Captured and wrote 104.187 MB /tmp/tmp.MXwAhUNyJV/results/perf-p4-ast.data (6568 samples) ]

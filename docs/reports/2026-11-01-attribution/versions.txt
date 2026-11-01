@@ -1,0 +1,9 @@
+66a18ff8e71839b893d2edabdad14825f8436dae
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+java version "21.0.9" 2025-10-21 LTS
+Java(TM) SE Runtime Environment (build 21.0.9+7-LTS-338)
+Java HotSpot(TM) 64-Bit Server VM (build 21.0.9+7-LTS-338, mixed mode, sharing)
+Linux silver-hawk 6.18.33.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+bc7f46e3b93179d67cbdd51b20f6bc74dfe960d8edf6b86e34f46a195fe8e500  /tmp/tmp.MXwAhUNyJV/inputs/complex.tiny
+d7a4d32f25212e517f1a4e48cf684326c3874fb49e566f2f541911e9798d2ee1  /tmp/tmp.MXwAhUNyJV/inputs/json-100k.json
+ae519464b6325bad6a4fb73ca1003a24fbd9fb594214134b1c629078b8911cf0  /tmp/tmp.MXwAhUNyJV/target/release/attribution
