@@ -37,7 +37,7 @@
     {"line": 3, "char": 8, "length": 3, "type": "operator"},
     {"line": 3, "char": 12, "length": 4, "type": "variable"},
     {"line": 3, "char": 17, "length": 1, "type": "operator"},
-    {"line": 3, "char": 19, "length": 3, "type": "string"},
+    {"line": 3, "char": 19, "length": 3, "type": "variable"},
     {"line": 3, "char": 23, "length": 4, "type": "variable"},
     {"line": 3, "char": 28, "length": 1, "type": "operator"},
     {"line": 3, "char": 30, "length": 1, "type": "operator"},

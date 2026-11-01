@@ -28,6 +28,15 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- 生成サーバをテスト内でコンパイルして実際の応答を golden 化する。生成器の実行依存にはしない。 -->
+    <dependency>
+      <groupId>org.eclipse.lsp4j</groupId><artifactId>org.eclipse.lsp4j</artifactId>
+      <version>${lsp4j.version}</version><scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.lsp4j</groupId><artifactId>org.eclipse.lsp4j.debug</artifactId>
+      <version>${lsp4j.version}</version><scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <resources>

@@ -61,10 +61,11 @@ class ParserUnchangedTest {
         }
     }
 
-    @Test void emitLspIsRequired(@TempDir Path out) {
+    @Test void emitLspIsRequired(@TempDir Path out) throws IOException {
         var error = assertThrows(IllegalArgumentException.class, () -> Main.main(new String[]{
             "--ir", IR.toString(), "--out", out.toString()}));
         assertTrue(error.getMessage().contains("--emit-lsp"), error.getMessage());
+        assertTrue(snapshot(out).isEmpty(), "feature off でファイルが生成された");
     }
 
     @Test void dapRequiresLsp(@TempDir Path out) {
@@ -75,7 +76,7 @@ class ParserUnchangedTest {
 
     /**
      * DAP は opt-in（D-067）。{@code --emit-dap} を足しても
-     * <b>パーサも LSP の 11 ファイルも 1 byte も変わらず</b>、
+     * <b>パーサも LSP のファイルも 1 byte も変わらず</b>、
      * {@code <lsp-package>.dap} にファイルが増えるだけ。
      */
     @Test void dapEmissionOnlyAddsFiles(@TempDir Path out) throws Exception {
@@ -131,7 +132,7 @@ class ParserUnchangedTest {
         var emitter = new LspEmitter(org.unlaxer.ubnfc.java.ir.IrReader.read(IR), "org.unlaxer.ubnfc.examples.p4.lsp",
             "org.unlaxer.ubnfc.examples.p4.generated", "tinyexpression-p4", "org.unlaxer.ubnfc.examples.p4.P4Scanners", null, null);
         var sources = emitter.sources();
-        assertEquals(11, sources.size());
+        assertEquals(12, sources.size());
         assertEquals("TinyExpressionP4", emitter.grammar());
         assertEquals("Formula", emitter.entry());
         assertEquals("org.unlaxer.ubnfc.examples.p4.lsp.ServerMain", emitter.serverMainClass());
