@@ -197,6 +197,14 @@ baseline の実応答から golden を採取し、補完候補と期待集合の
 Rust のソースや期待値は変更していない。CI での workspace 全体検証の最終結果は
 本 PR の checks と issue #26 の完了コメントに記録する。
 
+配置を揃えて Java package から同じ順序で全体を再実行し、602成功・失敗0・skip0・終了値0を確認した。
+最初の head の native CI も23分35秒で成功した。その待機中に stax 段階4（PR #51、
+master `bdd87bd`）が merge されたため取り込んだ。stax の protocol 検査は `textDocumentSync` の
+整数 `1` を前提としていたので、Full 同期を検査しつつ openClose / save の明示通知も検査する形へ追従した。
+既存の protocol golden も同期の通知形式だけを更新し、言語の振る舞いは変更しない。
+master の D 行の最大値は引き続き D-092 で、今回の D-093 / D-094 に衝突はない。
+統合後は LSP 全18テスト、stax の protocol / 回復検査と Cargo 側の統合テスト1件が成功した。
+
 ## 引継ぎと取り消し
 
 #25 では `LanguageServerImpl` の capability と要求ハンドラを追加する際、

@@ -708,7 +708,13 @@
         },
         "range": false
       },
-      "textDocumentSync": 1
+      "textDocumentSync": {
+        "change": 1,
+        "openClose": true,
+        "save": {
+          "includeText": false
+        }
+      }
     },
     "serverInfo": {
       "name": "stax (ubnfc)",

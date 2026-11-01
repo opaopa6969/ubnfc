@@ -58,7 +58,10 @@ def main():
         client.notify('initialized', {})
         report['initialize'] = init
         caps = init['capabilities']
-        assert caps['textDocumentSync'] == 1
+        sync = caps['textDocumentSync']
+        assert (sync['change'] if isinstance(sync, dict) else sync) == 1
+        assert isinstance(sync, dict)
+        assert sync['openClose'] and sync['save']['includeText'] is False
         assert caps['definitionProvider'] and caps['hoverProvider'] and caps['completionProvider']
         text = (MODULE / 'lsp/fixtures/navigation.stax').read_text()
         uri, report['diagnostics'] = opened('navigation.stax', text)
