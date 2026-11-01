@@ -1,0 +1,15 @@
+{
+  "統合前": "41821c0455a95fca08e1bb292251757168fa9df0",
+  "統合master": "06fa27b6a716822b55232a06677b68fe4eee84dd",
+  "変更範囲": [
+    "docs/design/03-design-v1.md",
+    "docs/design/10-incremental-reparse.md",
+    "docs/reports/2026-11-01-lsp-reparse.csv",
+    "scripts/measure-lsp-reparse.sh"
+  ],
+  "計測ソースSHA一致": 85,
+  "AST設計番号": "D-094",
+  "master設計行": "D-093を保持",
+  "設計番号重複": false,
+  "再計測": "AST・認識・生成器・入力・pinは不変のため既存値を維持"
+}

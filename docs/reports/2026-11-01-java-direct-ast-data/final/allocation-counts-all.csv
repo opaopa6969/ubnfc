@@ -1,0 +1,8 @@
+complex,ast=true,direct=false,ok=true,Match=997,Event=153,Recipe=153,Occurrence=279,Value=479,fieldArrays=142,nodeSpans=154
+complex,ast=true,direct=true,ok=true,Match=997,Event=142,Recipe=0,Occurrence=279,Value=479,fieldArrays=0,nodeSpans=154
+complex,ast=false,direct=false,ok=true,Match=658,Event=0,Recipe=0,Occurrence=13,Value=13,fieldArrays=0,nodeSpans=0
+complex,ast=false,direct=true,ok=true,Match=658,Event=0,Recipe=0,Occurrence=13,Value=13,fieldArrays=0,nodeSpans=0
+complex-x64,ast=true,direct=false,ok=true,Match=60343,Event=9477,Recipe=9477,Occurrence=17478,Value=29585,fieldArrays=8773,nodeSpans=9730
+complex-x64,ast=true,direct=true,ok=true,Match=60343,Event=8773,Recipe=0,Occurrence=17478,Value=29585,fieldArrays=0,nodeSpans=9730
+complex-x64,ast=false,direct=false,ok=true,Match=39844,Event=0,Recipe=0,Occurrence=832,Value=832,fieldArrays=0,nodeSpans=0
+complex-x64,ast=false,direct=true,ok=true,Match=39844,Event=0,Recipe=0,Occurrence=832,Value=832,fieldArrays=0,nodeSpans=0

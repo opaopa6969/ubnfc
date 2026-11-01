@@ -1,0 +1,17 @@
+{
+  "統合前": "fb93407089c8e9df0fcf040a8879b75516dc0be5",
+  "統合master": "2328689508982229a5afa956525070180a23d035",
+  "変更範囲": [
+    "crates/ubnfc-fuzz/src/campaign.rs",
+    "crates/ubnfc-fuzz/tests/build_discard.rs",
+    "crates/ubnfc-fuzz/tests/campaign.rs",
+    "crates/ubnfc-fuzz/tests/fixtures/failing-rust-generator.sh",
+    "docs/harness-driver-protocol.md",
+    "docs/reports/2026-11-01-fuzz-build-errors.md"
+  ],
+  "計測ソースSHA一致": 103,
+  "Java_front_corpus_pin_golden変更": false,
+  "AST設計": "D-094",
+  "master全設計行保持": true,
+  "設計番号重複": false
+}

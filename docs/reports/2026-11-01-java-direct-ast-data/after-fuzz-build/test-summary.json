@@ -1,0 +1,8 @@
+{
+  "command": "RUSTUP_TOOLCHAIN=stable cargo test -p ubnfc-fuzz --test build_discard --test campaign --no-fail-fast",
+  "build_discard成功": 2,
+  "campaign成功": 8,
+  "失敗": 0,
+  "campaign秒": 73.81,
+  "build_discard秒": 3.43
+}
