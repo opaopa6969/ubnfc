@@ -178,7 +178,7 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
             var symbols = analysis.symbols();
             var symbol = symbols.at(analysis.positions().offsetOf(params.getPosition()));
             if (symbol != null)
-                for (var declaration : symbols.declarationsOf(symbol.name()))
+                for (var declaration : symbols.definitions(symbol))
                     out.add(new Location(analysis.uri(),
                         analysis.positions().rangeOf(declaration.offsetCp(), declaration.endCp())));
         }

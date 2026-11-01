@@ -70,8 +70,8 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
     // （2026-09-23 の所見 D、修正済み）。`validate` を通った文法は必ず IR まで通る。
     assert_eq!(
         summary.discarded, 0,
-        "front の discard: {:?}",
-        summary.discards
+        "discard の詳細: {:#?}",
+        summary.discard_details
     );
     assert!(
         summary.compiled >= 3,
@@ -155,8 +155,8 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
     });
     assert_eq!(
         summary.discarded, 0,
-        "front の discard: {:?}",
-        summary.discards
+        "discard の詳細: {:#?}",
+        summary.discard_details
     );
     assert!(summary.compiled >= 2, "文法が build できていない");
     assert!(
@@ -227,8 +227,8 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
     });
     assert_eq!(
         summary.discarded, 0,
-        "front の discard: {:?}",
-        summary.discards
+        "discard の詳細: {:#?}",
+        summary.discard_details
     );
     assert!(summary.compiled >= 2, "文法が build できていない");
     assert!(
@@ -304,8 +304,8 @@ fn e_v2_code_point_class_tokens_agree_across_backends() {
         });
         assert_eq!(
             summary.discarded, 0,
-            "front の discard: {:?}",
-            summary.discards
+            "discard の詳細: {:#?}",
+            summary.discard_details
         );
         assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
         assert!(
@@ -390,8 +390,8 @@ fn f_v2_recovery_diagnostics_agree_across_backends() {
     });
     assert_eq!(
         summary.discarded, 0,
-        "front の discard: {:?}",
-        summary.discards
+        "discard の詳細: {:#?}",
+        summary.discard_details
     );
     assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
     assert!(
@@ -481,8 +481,8 @@ fn g_direct_token_captures_agree_across_backends() {
         });
         assert_eq!(
             summary.discarded, 0,
-            "front の discard: {:?}",
-            summary.discards
+            "discard の詳細: {:#?}",
+            summary.discard_details
         );
         assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
         assert!(
@@ -556,8 +556,8 @@ fn h_text_group_captures_agree_across_backends() {
         });
         assert_eq!(
             summary.discarded, 0,
-            "front の discard: {:?}",
-            summary.discards
+            "discard の詳細: {:#?}",
+            summary.discard_details
         );
         assert_eq!(summary.compiled, 1, "seed {seed} が build できていない");
         assert!(

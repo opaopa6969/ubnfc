@@ -216,6 +216,13 @@ Rust SWAR 化の PR #32（master `12e5e80`）も CI 待機中に取り込んだ�
 LSP / Java 生成部には追加差分がなく、master の D 行の最大値は D-093 のため
 今回の D-094 / D-095 を維持した。統合後の検査結果は PR checks と完了コメントに記録する。
 
+その後、PR #55（#54 の詳細ログ保持）と PR #58（scope / catalog context に従う
+定義解決・補完）の master `38efae7` も取り込んだ。#54 は別 PR で close 済みであり、
+当初の CI build 失敗の原因が確定したという意味ではない。今後の再発時に seed と実エラーを追跡できる。
+PR #58 の `--declaration-context` は宣言を補完する用途の生成時設定であり、
+今回の外部カタログを照合する実行時の `catalogs` 設定と併存する。
+D-094 / D-095 の衝突はない。統合後の LSP 全19テストと stax protocol / 回復検査が成功した。
+
 ## 引継ぎと取り消し
 
 #25 では `LanguageServerImpl` の capability と要求ハンドラを追加する際、

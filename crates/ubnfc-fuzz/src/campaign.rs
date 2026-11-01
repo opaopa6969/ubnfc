@@ -85,6 +85,19 @@ pub struct ScanFinding {
     pub off: Value,
 }
 
+/// discard ごとの再現情報。一時ディレクトリが消えても本文を辿れるよう値で保持する。
+#[derive(Clone, Debug, Serialize)]
+pub struct DiscardDetail {
+    pub seed: u64,
+    pub grammar_name: String,
+    pub grammar_digest: String,
+    pub backend: Option<String>,
+    pub code: String,
+    pub message: String,
+    pub grammar: String,
+    pub imported: Option<String>,
+}
+
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct Summary {
     pub seeds: usize,
@@ -93,6 +106,8 @@ pub struct Summary {
     pub discarded: usize,
     /// discard 理由コード → 件数。
     pub discards: BTreeMap<String, usize>,
+    /// seed 順の詳細。理由コードの集計・受け入れ判定とは独立して保存する。
+    pub discard_details: Vec<DiscardDetail>,
     /// 機能 → その機能を含む生成文法の数 / うち discard された数。
     pub feature_grammars: BTreeMap<String, usize>,
     pub feature_discarded: BTreeMap<String, usize>,
@@ -411,11 +426,30 @@ pub fn run(config: &Config) -> Summary {
     let mut summary = shared.summary.lock().expect("summary").clone();
     summary.elapsed_seconds = shared.start.elapsed().as_secs_f64();
     summary.findings.sort_by(|a, b| a.slug.cmp(&b.slug));
+    summary.discard_details.sort_by_key(|detail| detail.seed);
     summary
 }
 
-fn record_discard(shared: &Shared, grammar: &Grammar, discard: &Discard) {
+fn record_discard(shared: &Shared, seed: u64, grammar: &Grammar, discard: &Discard) {
+    let detail = DiscardDetail {
+        seed,
+        grammar_name: grammar.name.clone(),
+        grammar_digest: grammar.digest(),
+        backend: discard.code.strip_prefix("build:").map(str::to_owned),
+        code: discard.code.clone(),
+        message: discard.message.clone(),
+        grammar: grammar.render(),
+        imported: grammar.imported_source().map(|(_, source)| source),
+    };
+    if detail.backend.is_some() {
+        // 1 行の JSON にして worker 間の混在を防ぐ。cargo test の失敗時にも出力される。
+        eprintln!(
+            "ビルド失敗の詳細: {}",
+            serde_json::to_string(&detail).expect("discard json")
+        );
+    }
     let mut summary = shared.summary.lock().expect("summary");
+    summary.discard_details.push(detail);
     summary.discarded += 1;
     *summary.discards.entry(discard.code.clone()).or_default() += 1;
     for feature in &grammar.features {
@@ -440,7 +474,7 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
     }
     let built = match engine.prepare(&grammar) {
         Ok(built) => built,
-        Err(discard) => return record_discard(shared, &grammar, &discard),
+        Err(discard) => return record_discard(shared, seed, &grammar, &discard),
     };
     shared.summary.lock().expect("summary").compiled += 1;
     let mut rng = crate::rng::Rng::new(seed ^ 0xF00D_BEEF);
@@ -725,6 +759,25 @@ pub fn markdown(summary: &Summary) -> String {
         rows.sort_by(|a, b| b.1.cmp(a.1).then(a.0.cmp(b.0)));
         for (code, count) in rows {
             let _ = writeln!(out, "| `{code}` | {count} |");
+        }
+    }
+    if !summary.discard_details.is_empty() {
+        let _ = writeln!(out, "\n## discard の詳細\n");
+        for detail in &summary.discard_details {
+            let _ = writeln!(
+                out,
+                "### seed {} / `{}` / `{}`\n\n- 文法 digest: `{}`\n- backend: `{}`\n\nエラー本文（省略なし）:\n",
+                detail.seed,
+                detail.grammar_name,
+                detail.code,
+                detail.grammar_digest,
+                detail.backend.as_deref().unwrap_or("該当なし")
+            );
+            // 本文中の fence によって Markdown が壊れないよう字下げコードブロックにする。
+            for line in detail.message.split('\n') {
+                let _ = writeln!(out, "    {line}");
+            }
+            let _ = writeln!(out);
         }
     }
     if !summary.violation_counts.is_empty() {

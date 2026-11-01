@@ -15,11 +15,10 @@ import __API_PACKAGE__.TokenScanner;
  *
  * <p>生成パーサは「この位置で何が来られるか」を返す API を持たない。<b>契約を変えずに</b>同じものを得るため、
  * <b>カーソル直前の識別子を取り除いた前半だけを 1 つの文書として解析する</b>。
- * 前半は必ずカーソル位置で失敗するので（全入力要求つき）、主診断の {@code expected} ラベルが
- * そのまま「ここに書ける終端」になる（D-023 の二段構えで、失敗時の診断は生成パーサ自身が
+ * 前半の最遠診断の {@code expected} ラベルを「ここに書ける終端」として使う（D-023 の二段構えで、失敗時の診断は生成パーサ自身が
  * 決定的に再解析して返すものと一致する）。
  *
- * <p>それに、カーソルより前で宣言済みの記号（{@code scope().declarations()}）を足し、
+ * <p>それに、scope event の順序で可視な宣言を取り出し、catalog context が適合する候補を足して、
  * カーソル下の識別子の綴りで絞る。
  */
 public final class Completion {
@@ -52,7 +51,20 @@ public final class Completion {
         int start = wordStart(analysis.text(), cursor);
         String prefix = word(analysis.text(), start, cursor);
         var items = new LinkedHashMap<String, CompletionItem>();
-        for (String label : expected(analysis.text(), start, scanners)) {
+        var expectation = expectation(analysis.text(), start, scanners);
+        var contexts = expectation.contexts();
+        var symbols = analysis.symbols();
+        // 不完全な文書でも補完には、単独で成功する正常前半の宣言を利用できる。
+        if (analysis.scoped() == null) {
+            for (int cut = start; cut > 0; cut--) {
+                var prefixAnalysis = Analysis.of(analysis.uri(), Analysis.head(analysis.text(), cut), scanners);
+                if (prefixAnalysis.primary() != null && prefixAnalysis.primary().ok()) {
+                    symbols = prefixAnalysis.symbols();
+                    break;
+                }
+            }
+        }
+        for (String label : expectation.labels()) {
             String literal = literal(label);
             if (literal == null || literal.isBlank() || Meta.TRIVIA_LITERALS.contains(literal)) continue;
             var item = new CompletionItem(literal);
@@ -60,8 +72,10 @@ public final class Completion {
             item.setDetail("ここに書ける終端");
             items.putIfAbsent(literal, item);
         }
-        for (var declaration : analysis.symbols().all()) {
-            if (!declaration.declaration() || declaration.offsetCp() >= start) continue;
+        for (var declaration : symbols.visibleAt(start)) {
+            boolean matches = Meta.DECLARATION_CONTEXTS.isEmpty();
+            for (String context : contexts) matches |= symbols.inContext(declaration, context);
+            if (!matches) continue;
             var item = new CompletionItem(declaration.name());
             item.setKind(CompletionItemKind.Variable);
             item.setDetail("宣言済みの記号");
@@ -83,16 +97,48 @@ public final class Completion {
      * 入口が {@code { X }} のような 0 回以上の繰返しだと前半が「0 件で成功 → 末尾入力」になり、
      * 主 {@code expected} が {@code end of input} だけになるため。
      */
+    record Expectation(List<String> labels, java.util.Set<String> contexts) {}
+
     static List<String> expected(String text, int cutCp, Map<String, TokenScanner> scanners) {
+        return expectation(text, cutCp, scanners).labels();
+    }
+
+    static Expectation expectation(String text, int cutCp, Map<String, TokenScanner> scanners) {
         String head = Analysis.head(text, cutCp);
         try {
             var result = __PARSER_CLASS__.parseEntry(LanguageServerImpl.GRAMMAR, LanguageServerImpl.ENTRY, head,
                 new ParseOptions(false, true, false, true, scanners, ParseOptions.DEFAULT_MAX_DEPTH, false, true));
             var diagnostic = result.diagnostics();
-            if (diagnostic == null) return List.of();
-            return diagnostic.farthestExpected().isEmpty() ? diagnostic.expected() : diagnostic.farthestExpected();
+            if (diagnostic == null) return new Expectation(List.of(), java.util.Set.of());
+            var labels = diagnostic.farthestExpected().isEmpty() ? diagnostic.expected() : diagnostic.farthestExpected();
+            var contexts = new java.util.LinkedHashSet<String>();
+            // 診断の規則名はローカル名、IR の catalog は修飾名。選択の期待規則も照合する。
+            for (var entry : Meta.RULE_CONTEXTS.entrySet()) {
+                String rule = Meta.localName(entry.getKey());
+                if (rule.equals(diagnostic.deepestRule()) || diagnostic.ruleStack().contains(rule)
+                    || labels.contains(rule + "Parser")) contexts.add(entry.getValue());
+            }
+            // 同じ最遠位置に NumLit と FieldGet などが失敗すると、deepestRule は一方だけ。
+            // 直前の記号 + 仮の識別子を catalog 規則自身で解析して参照規則を確かめる。
+            int[] points = head.codePoints().toArray();
+            int begin = points.length;
+            while (begin > 0 && !Character.isWhitespace(points[begin - 1]) && !identifier(points[begin - 1])) begin--;
+            if (begin < points.length) {
+                String marker = "ubnfc_completion_probe";
+                String candidate = new String(points, begin, points.length - begin) + marker;
+                var probed = new java.util.LinkedHashSet<String>();
+                for (var entry : Meta.RULE_CONTEXTS.entrySet()) {
+                    var probe = __PARSER_CLASS__.parseEntry(LanguageServerImpl.GRAMMAR, Meta.localName(entry.getKey()), candidate,
+                        new ParseOptions(false, true, false, true, scanners, ParseOptions.DEFAULT_MAX_DEPTH, false, false));
+                    if (probe.ok() && probe.recoveries().isEmpty()
+                        && probe.scope().references().stream().anyMatch(reference -> marker.equals(reference.name())))
+                        probed.add(entry.getValue());
+                }
+                if (!probed.isEmpty()) { contexts.clear(); contexts.addAll(probed); }
+            }
+            return new Expectation(labels, contexts);
         } catch (RuntimeException error) {
-            return List.of();
+            return new Expectation(List.of(), java.util.Set.of());
         }
     }
 
