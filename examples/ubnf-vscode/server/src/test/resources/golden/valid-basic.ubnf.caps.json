@@ -23,7 +23,7 @@
     {"line": 2, "char": 7, "length": 3, "type": "operator"},
     {"line": 2, "char": 11, "length": 4, "type": "variable"},
     {"line": 2, "char": 16, "length": 1, "type": "operator"},
-    {"line": 2, "char": 18, "length": 3, "type": "string"},
+    {"line": 2, "char": 18, "length": 3, "type": "variable"},
     {"line": 2, "char": 22, "length": 4, "type": "variable"},
     {"line": 2, "char": 27, "length": 1, "type": "operator"},
     {"line": 2, "char": 29, "length": 1, "type": "operator"},
