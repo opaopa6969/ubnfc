@@ -1,0 +1,80 @@
+{
+  "name": "ubnfc-stax",
+  "displayName": "stax (ubnfc)",
+  "description": "stax の文法注釈から生成した LSP による診断・定義・補完・hover",
+  "version": "0.1.0",
+  "publisher": "ubnfc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opaopa6969/ubnfc.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onLanguage:stax"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "stax",
+        "aliases": [
+          "stax"
+        ],
+        "extensions": [
+          ".stax"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "stax",
+        "scopeName": "source.stax",
+        "path": "./syntaxes/stax.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "stax (ubnfc)",
+      "properties": {
+        "ubnfcStax.java.path": {
+          "type": "string",
+          "default": "java",
+          "description": "JDK 21 以上の java 実行ファイル"
+        },
+        "ubnfcStax.server.jarPath": {
+          "type": "string",
+          "default": "",
+          "description": "空なら同梱 server-dist/ubnfc-stax-lsp-server.jar"
+        },
+        "ubnfcStax.server.jvmArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "サーバ JVM の追加引数"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "3.9.2",
+    "typescript": "5.4.5"
+  }
+}
