@@ -1,0 +1,37 @@
+{
+  "source": "d3ea73e8cfa440df8bdbb70abb29e06259435ba2",
+  "cases": [
+    {
+      "input": "n1e+;",
+      "diagnostic": {
+        "kind": "syntax",
+        "offset": 4,
+        "expected": [
+          "DigitParser",
+          "OneOrMore"
+        ],
+        "farthestOffset": 4,
+        "farthestExpected": [
+          "DigitParser",
+          "OneOrMore"
+        ]
+      }
+    },
+    {
+      "input": "neg(1e+)",
+      "diagnostic": {
+        "kind": "syntax",
+        "offset": 7,
+        "expected": [
+          "DigitParser",
+          "OneOrMore"
+        ],
+        "farthestOffset": 7,
+        "farthestExpected": [
+          "DigitParser",
+          "OneOrMore"
+        ]
+      }
+    }
+  ]
+}

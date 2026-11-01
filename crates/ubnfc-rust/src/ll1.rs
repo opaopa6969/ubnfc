@@ -6,6 +6,11 @@ use ubnfc_front::ir::*;
 
 fn targets(op: &Ll1Operation) -> Vec<u64> {
     match op {
+        Ll1Operation::Repeat {
+            min: 0,
+            max: Some(0),
+            ..
+        } => vec![],
         Ll1Operation::Sequence { targets } => targets.clone(),
         Ll1Operation::Choice { transitions } => transitions.iter().map(|t| t.target).collect(),
         Ll1Operation::Optional { target }
@@ -88,6 +93,11 @@ pub(crate) fn generate(g: &Generator<'_>) -> String {
                     .join(",")
             ),
             Ll1Operation::Optional { target } => format!("Ll1Op::Optional({target})"),
+            Ll1Operation::Repeat {
+                min: 0,
+                max: Some(0),
+                ..
+            } => "Ll1Op::Sequence(&[])".into(),
             Ll1Operation::Repeat { target, min, max } => {
                 format!("Ll1Op::Repeat({target},{min},{max:?})")
             }
@@ -147,6 +157,16 @@ fn sets_false(g: &Generator<'_>, i: usize, seen: &mut BTreeSet<usize>) -> bool {
         return false;
     }
     let e = &g.ir.semantics.expressions[i];
+    if matches!(
+        e.node,
+        ExprNode::Repeat {
+            min: 0,
+            max: Some(0),
+            ..
+        }
+    ) {
+        return false;
+    }
     if e.execution.entry_flag == ExecutionEntryFlag::SetFalse {
         return true;
     }

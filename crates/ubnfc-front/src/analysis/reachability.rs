@@ -125,6 +125,11 @@ impl Reach<'_, '_> {
     /// `lead` が `lead` を呼ぶ子式の並び。再帰版の match の各腕と同じ順・同じ打切り。
     fn lead_deps(&self, i: usize) -> Vec<usize> {
         match self.node(i) {
+            ExprNode::Repeat {
+                min: 0,
+                max: Some(0),
+                ..
+            } => Vec::new(),
             ExprNode::RuleRef { symbol_id } => vec![self.body(symbol_id)],
             ExprNode::Seq { items } => {
                 let mut deps = Vec::new();
@@ -158,6 +163,11 @@ impl Reach<'_, '_> {
         let outer = self.entry[i].clone();
         let mut out = LeadMap::new();
         match self.node(i).clone() {
+            ExprNode::Repeat {
+                min: 0,
+                max: Some(0),
+                ..
+            } => {}
             ExprNode::RuleRef { symbol_id } => {
                 out.insert(
                     symbol_id.clone(),

@@ -23,8 +23,8 @@ use crate::resolve::{self as r, ResolvedGrammar};
 use crate::syntax::ast as a;
 use serde::Serialize;
 
-pub use source::SourceInput;
 pub(crate) use source::sha256;
+pub use source::SourceInput;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LowerError {
@@ -259,7 +259,20 @@ impl Context<'_> {
                     }
                     _ => None,
                 }),
-                raw_settings: trivia::settings(&unit.ast.settings),
+                raw_settings: {
+                    let mut settings = trivia::settings(&unit.ast.settings);
+                    if let Some(grammar) = self.grammar.grammars.iter().find(|g| g.unit == unit.id)
+                    {
+                        if let Some(SettingsWhitespace::Named(name)) = &settings.whitespace {
+                            if crate::packages::whitespace_profiles(self.grammar, grammar)
+                                .contains(name)
+                            {
+                                settings.whitespace = Some(SettingsWhitespace::JavaStyle);
+                            }
+                        }
+                    }
+                    settings
+                },
             });
         }
         let mut groups = Vec::new();

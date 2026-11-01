@@ -65,6 +65,53 @@ class ReviewRegressionTest {
         try (var h = f.compile()) { cursors(h.parse("ab", h.options(false, false, false, true, Map.of())), true, 0, 0); }
     }
 
+    @Test void zeroBoundsPreserveEveryFrameFlagAndNeverCallChildOrTerminator() throws Exception {
+        var f = new IrFixture(); f.rule("Root", f.expression("Root", "any"));
+        try (var h = f.compile()) {
+            Class<?> sessionType = h.loader.loadClass(h.pkg + ".internal.Session"), frameType = h.loader.loadClass(h.pkg + ".internal.Session$Frame");
+            Class<?> callType = h.loader.loadClass(h.pkg + ".internal.Session$Call"), triviaType = h.loader.loadClass(h.pkg + ".internal.Session$Trivia");
+            Object unexecuted = Proxy.newProxyInstance(h.loader, new Class<?>[]{callType}, (proxy, method, args) -> { throw new AssertionError("上限ゼロで子を実行しました"); });
+            var repeat = sessionType.getMethod("repeat", frameType, callType, int.class, int.class, callType, triviaType);
+            for (boolean memo : List.of(false, true)) for (boolean matched : List.of(false, true))
+                for (boolean invert : List.of(false, true)) for (boolean reset : List.of(false, true)) {
+                    Object session = sessionType.getConstructor(CharSequence.class, h.options, String[].class)
+                        .newInstance("abc", h.options(false, false, false, memo, Map.of()), new String[]{"Root"});
+                    Object frame = frameType.getConstructor().newInstance();
+                    frameType.getField("c").setInt(frame, 1); frameType.getField("m").setInt(frame, 2);
+                    frameType.getField("matched").setBoolean(frame, matched); frameType.getField("invert").setBoolean(frame, invert); frameType.getField("reset").setBoolean(frame, reset);
+                    assertNotNull(repeat.invoke(session, frame, unexecuted, 0, 0, unexecuted, triviaType.getField("NONE").get(null)));
+                    assertEquals(1, frameType.getField("c").getInt(frame)); assertEquals(2, frameType.getField("m").getInt(frame));
+                    assertEquals(matched, frameType.getField("matched").getBoolean(frame)); assertEquals(invert, frameType.getField("invert").getBoolean(frame)); assertEquals(reset, frameType.getField("reset").getBoolean(frame));
+                }
+        }
+        for (String kind : List.of("empty", "any", "literal")) {
+            var g = new IrFixture();
+            String child = kind.equals("literal") ? g.literal("Root", "a") : g.expression("Root", kind);
+            String zero = g.expression("Root", "repeat", "child", child, "min", 0, "max", 0, "terminator", null);
+            g.rule("Root", g.seq("Root", zero, g.literal("Root", "ab")));
+            try (var h = g.compile()) { for (boolean memo : List.of(false, true)) cursors(h.parse("ab", h.options(false, true, true, memo, Map.of())), true, 2, 2); }
+        }
+    }
+
+    @Test void nullableLexicalTriviaStopsWithoutRegisteringAFailureHint() throws Exception {
+        var f = new IrFixture(); String body = f.seq("Root", f.literal("Root", "ab")); f.rule("Root", body);
+        f.root.put("requiredFeatures", List.of("lexicalTrivia"));
+        var trivia = Json.object(f.semantics.get("trivia"));
+        var policy = Json.object(Json.array(trivia.get("policies")).getFirst());
+        policy.put("effectiveDelimiterSet", List.of(obj("kind", "lexical", "label", "GAP", "expression",
+            obj("op", "LOOK", "text", "", "min", 0, "max", 0, "children", List.of(
+                obj("op", "LITERAL", "text", "a", "min", 0, "max", 0, "children", List.of()))))));
+        trivia.put("policies", List.of(policy));
+        trivia.put("insertionPlan", List.of(obj("boundary", obj("ownerExprId", body, "at", "entry", "childIndex", null), "policyId", policy.get("id"))));
+        f.semantics.put("trivia", trivia);
+        try (var h = f.compile()) { for (boolean memo : List.of(false, true)) {
+            Object result = h.parse("aX", h.options(false, true, true, memo, Map.of()));
+            cursors(result, false, 0, 0);
+            assertTrue(((List<?>) get(get(result, "diagnostics"), "expected")).contains("'ab'"));
+            assertFalse(((List<?>) get(get(result, "diagnostics"), "farthestExpected")).contains("GAP"));
+        } }
+    }
+
     @Test void emptyWordLookaheadsFollowLegacyLengthZeroFailure() throws Exception {
         for (String kind : List.of("lookahead", "negativeLookahead")) {
             var f = new IrFixture(); f.rule("Root", f.token("Root", "T", obj("kind", kind, "pattern", "")));
@@ -75,7 +122,7 @@ class ReviewRegressionTest {
     }
 
     @Test void repeatAndEofFailuresMatchOracleDiagnostics() throws Exception {
-        for (int bound : List.of(0, 2)) {
+        for (int bound : List.of(2)) {
             var f = new IrFixture();
             f.rule("Root", f.expression("Root", "repeat", "child", f.expression("Root", "empty"), "min", bound, "max", bound, "terminator", null));
             try (var h = f.compile()) {

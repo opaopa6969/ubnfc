@@ -71,14 +71,18 @@ pub fn mode_of(settings: &[GlobalSetting], version: u64) -> Mode {
         let (GlobalSetting::String { key, .. } | GlobalSetting::Block { key, .. }) = s;
         key == SETTING_KEY
     });
+    // Classic の v2 は単語境界を暗黙に追加しない。数値版 2 は D-040 の既定を保つ。
+    let default = if settings.iter().any(|s| matches!(s, GlobalSetting::String { key, value, .. } if key == "ubnf" && value.trim() == "v2")) {
+        Mode::None
+    } else { Mode::default_for(version) };
     match declared {
         Some(setting) => setting_value(setting)
             .and_then(Mode::parse)
-            .unwrap_or_else(|| Mode::default_for(version)),
+            .unwrap_or(default),
         None => std::env::var(OVERRIDE_ENV)
             .ok()
             .and_then(|v| Mode::parse(&v))
-            .unwrap_or_else(|| Mode::default_for(version)),
+            .unwrap_or(default),
     }
 }
 

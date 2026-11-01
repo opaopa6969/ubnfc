@@ -36,9 +36,9 @@ mod review {
             assert!(r.ok);
             assert_eq!((r.consumed_cp, r.matched_cp), (0, 0));
             let r = parse!(empty_zero, "ab", memo);
-            assert!(!r.ok);
-            assert_eq!(r.diagnostics[0].offset_cp, 0);
-            assert!(!r.diagnostics[0].expected.is_empty());
+            assert!(r.ok);
+            assert_eq!((r.consumed_cp, r.matched_cp), (0, 0));
+            assert!(r.diagnostics.is_empty());
             let r = parse!(empty_two, "ab", memo);
             assert!(!r.ok);
             assert_eq!(r.diagnostics[0].offset_cp, 0);
@@ -96,10 +96,10 @@ mod review {
             assert_eq!((d.offset_cp, d.farthest_cp), (1, 2));
             assert_eq!(d.expected, vec!["end of input"]);
             assert_eq!(d.farthest_expected, vec!["'x'"]);
-            // D-014: Rust fail_at remains 5, not Java's incomplete-exponent reach 7.
+            // 現 pin の Classic は仮数への rollback 後も不完全指数の失敗位置を保つ。
             let r = parse!(number, "neg(1e+)", memo);
             assert!(!r.ok);
-            assert_eq!(r.diagnostics[0].offset_cp, 5);
+            assert_eq!(r.diagnostics[0].offset_cp, 7);
             for (input, offset) in [
                 ("a//x\nb", 5),
                 ("a//x\r\nb", 6),

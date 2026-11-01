@@ -24010,7 +24010,7 @@
         "operation": {
           "kind": "literal",
           "value": "@import",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24019,7 +24019,7 @@
         "operation": {
           "kind": "literal",
           "value": "from",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24028,7 +24028,7 @@
         "operation": {
           "kind": "literal",
           "value": "grammar",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24073,7 +24073,7 @@
         "operation": {
           "kind": "literal",
           "value": "2",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24109,7 +24109,7 @@
         "operation": {
           "kind": "literal",
           "value": "token",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24299,7 +24299,7 @@
         "operation": {
           "kind": "literal",
           "value": "LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": false
       },
@@ -24308,7 +24308,7 @@
         "operation": {
           "kind": "literal",
           "value": "NEGATIVE_LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": false
       },
@@ -24335,7 +24335,7 @@
         "operation": {
           "kind": "literal",
           "value": "CAPTURE",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24371,7 +24371,7 @@
         "operation": {
           "kind": "literal",
           "value": "SAME_AS",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24398,7 +24398,7 @@
         "operation": {
           "kind": "literal",
           "value": "CHAR_RANGE",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24434,7 +24434,7 @@
         "operation": {
           "kind": "literal",
           "value": "NEGATION",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24461,7 +24461,7 @@
         "operation": {
           "kind": "literal",
           "value": "XID_IDENTIFIER",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24470,7 +24470,7 @@
         "operation": {
           "kind": "literal",
           "value": "XID_IDENTIFIER",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24479,7 +24479,7 @@
         "operation": {
           "kind": "literal",
           "value": "UNTIL",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24506,7 +24506,7 @@
         "operation": {
           "kind": "literal",
           "value": "NEGATION",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24533,7 +24533,7 @@
         "operation": {
           "kind": "literal",
           "value": "LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24560,7 +24560,7 @@
         "operation": {
           "kind": "literal",
           "value": "NEGATIVE_LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24587,7 +24587,7 @@
         "operation": {
           "kind": "literal",
           "value": "CHAR_RANGE",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24623,7 +24623,7 @@
         "operation": {
           "kind": "literal",
           "value": "CI",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24650,7 +24650,7 @@
         "operation": {
           "kind": "literal",
           "value": "ADAPTER",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24677,7 +24677,7 @@
         "operation": {
           "kind": "literal",
           "value": "version",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24704,7 +24704,7 @@
         "operation": {
           "kind": "literal",
           "value": "ANY",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24713,7 +24713,7 @@
         "operation": {
           "kind": "literal",
           "value": "EOF",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24722,7 +24722,7 @@
         "operation": {
           "kind": "literal",
           "value": "EMPTY",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24731,7 +24731,7 @@
         "operation": {
           "kind": "literal",
           "value": "@root",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24740,7 +24740,7 @@
         "operation": {
           "kind": "literal",
           "value": "@mapping",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24767,7 +24767,7 @@
         "operation": {
           "kind": "literal",
           "value": "params",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24821,7 +24821,7 @@
         "operation": {
           "kind": "literal",
           "value": "@eval",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24857,7 +24857,7 @@
         "operation": {
           "kind": "literal",
           "value": "@whitespace",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24884,7 +24884,7 @@
         "operation": {
           "kind": "literal",
           "value": "@lexicalContext",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24902,7 +24902,7 @@
         "operation": {
           "kind": "literal",
           "value": "tokens",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -24956,7 +24956,7 @@
         "operation": {
           "kind": "literal",
           "value": "literals",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25010,7 +25010,7 @@
         "operation": {
           "kind": "literal",
           "value": "@interleave",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25028,7 +25028,7 @@
         "operation": {
           "kind": "literal",
           "value": "profile",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25055,7 +25055,7 @@
         "operation": {
           "kind": "literal",
           "value": "@backref",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25073,7 +25073,7 @@
         "operation": {
           "kind": "literal",
           "value": "name",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25100,7 +25100,7 @@
         "operation": {
           "kind": "literal",
           "value": "@scopeTree",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25118,7 +25118,7 @@
         "operation": {
           "kind": "literal",
           "value": "mode",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25145,7 +25145,7 @@
         "operation": {
           "kind": "literal",
           "value": "@declares",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25163,7 +25163,7 @@
         "operation": {
           "kind": "literal",
           "value": "symbol",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25190,7 +25190,7 @@
         "operation": {
           "kind": "literal",
           "value": "description",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25217,7 +25217,7 @@
         "operation": {
           "kind": "literal",
           "value": "@catalog",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25235,7 +25235,7 @@
         "operation": {
           "kind": "literal",
           "value": "context",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25262,7 +25262,7 @@
         "operation": {
           "kind": "literal",
           "value": "@leftAssoc",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25271,7 +25271,7 @@
         "operation": {
           "kind": "literal",
           "value": "@rightAssoc",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25280,7 +25280,7 @@
         "operation": {
           "kind": "literal",
           "value": "@longestChoice",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25289,7 +25289,7 @@
         "operation": {
           "kind": "literal",
           "value": "@uniqueLongestChoice",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25298,7 +25298,7 @@
         "operation": {
           "kind": "literal",
           "value": "@namePredicate",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25316,7 +25316,7 @@
         "operation": {
           "kind": "literal",
           "value": "snapshot",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25343,7 +25343,7 @@
         "operation": {
           "kind": "literal",
           "value": "version",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25370,7 +25370,7 @@
         "operation": {
           "kind": "literal",
           "value": "name",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25397,7 +25397,7 @@
         "operation": {
           "kind": "literal",
           "value": "kind",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25424,7 +25424,7 @@
         "operation": {
           "kind": "literal",
           "value": "@predicate",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25451,7 +25451,7 @@
         "operation": {
           "kind": "literal",
           "value": "@predictiveChoice",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25460,7 +25460,7 @@
         "operation": {
           "kind": "literal",
           "value": "@precedence",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25478,7 +25478,7 @@
         "operation": {
           "kind": "literal",
           "value": "level",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25505,7 +25505,7 @@
         "operation": {
           "kind": "literal",
           "value": "@doc",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25532,7 +25532,7 @@
         "operation": {
           "kind": "literal",
           "value": "@recovery",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25550,7 +25550,7 @@
         "operation": {
           "kind": "literal",
           "value": "sync",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25577,7 +25577,7 @@
         "operation": {
           "kind": "literal",
           "value": "@skip",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25586,7 +25586,7 @@
         "operation": {
           "kind": "literal",
           "value": "@commonField",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25622,7 +25622,7 @@
         "operation": {
           "kind": "literal",
           "value": "@enum",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -25980,7 +25980,7 @@
         "operation": {
           "kind": "literal",
           "value": "ERROR",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -26007,7 +26007,7 @@
         "operation": {
           "kind": "literal",
           "value": "@typeof",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "root": true
       },
@@ -38229,7 +38229,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@import",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::ImportDecl",
         "source": {
@@ -38277,7 +38277,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "from",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::ImportDecl",
         "source": {
@@ -38356,7 +38356,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "grammar",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::GrammarDecl",
         "source": {
@@ -38939,7 +38939,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "2",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::StringSettingValue",
         "source": {
@@ -39210,7 +39210,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "token",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::TokenDecl",
         "source": {
@@ -40672,7 +40672,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalAtom",
         "source": {
@@ -40696,7 +40696,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "NEGATIVE_LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalAtom",
         "source": {
@@ -40819,7 +40819,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "CAPTURE",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalAtom",
         "source": {
@@ -40986,7 +40986,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "SAME_AS",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalAtom",
         "source": {
@@ -41109,7 +41109,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "CHAR_RANGE",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalAtom",
         "source": {
@@ -41276,7 +41276,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "NEGATION",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalAtom",
         "source": {
@@ -41370,7 +41370,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "XID_IDENTIFIER",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalAtom",
         "source": {
@@ -41673,7 +41673,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "XID_IDENTIFIER",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::TokenValue",
         "source": {
@@ -41746,7 +41746,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "UNTIL",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::UntilExpression",
         "source": {
@@ -41869,7 +41869,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "NEGATION",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::NegationExpression",
         "source": {
@@ -41992,7 +41992,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LookaheadExpression",
         "source": {
@@ -42115,7 +42115,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "NEGATIVE_LOOKAHEAD",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::NegativeLookaheadExpression",
         "source": {
@@ -42240,7 +42240,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "CHAR_RANGE",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::CharRangeExpression",
         "source": {
@@ -42411,7 +42411,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "CI",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::CIExpression",
         "source": {
@@ -42538,7 +42538,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "ADAPTER",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::AdapterExpression",
         "source": {
@@ -42634,7 +42634,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "version",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::AdapterExpression",
         "source": {
@@ -42754,7 +42754,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "ANY",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::AnyExpression",
         "source": {
@@ -42802,7 +42802,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "EOF",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::EofExpression",
         "source": {
@@ -42850,7 +42850,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "EMPTY",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::EmptyExpression",
         "source": {
@@ -43648,7 +43648,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@root",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::RootAnnotation",
         "source": {
@@ -43700,7 +43700,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@mapping",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::MappingAnnotation",
         "source": {
@@ -43848,7 +43848,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "params",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::MappingAnnotation",
         "source": {
@@ -44118,7 +44118,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@eval",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::EvalAnnotation",
         "source": {
@@ -44337,7 +44337,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@whitespace",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::WhitespaceAnnotation",
         "source": {
@@ -44513,7 +44513,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@lexicalContext",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalContextAnnotation",
         "source": {
@@ -44561,7 +44561,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "tokens",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalContextAnnotation",
         "source": {
@@ -44901,7 +44901,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "literals",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LexicalContextAnnotation",
         "source": {
@@ -45219,7 +45219,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@interleave",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::InterleaveAnnotation",
         "source": {
@@ -45267,7 +45267,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "profile",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::InterleaveAnnotation",
         "source": {
@@ -45392,7 +45392,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@backref",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::BackrefAnnotation",
         "source": {
@@ -45440,7 +45440,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "name",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::BackrefAnnotation",
         "source": {
@@ -45565,7 +45565,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@scopeTree",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::ScopeTreeAnnotation",
         "source": {
@@ -45613,7 +45613,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "mode",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::ScopeTreeAnnotation",
         "source": {
@@ -45739,7 +45739,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@declares",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::DeclaresAnnotation",
         "source": {
@@ -45787,7 +45787,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "symbol",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::DeclaresAnnotation",
         "source": {
@@ -45932,7 +45932,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "description",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::DeclaresAnnotation",
         "source": {
@@ -46057,7 +46057,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@catalog",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::CatalogAnnotation",
         "source": {
@@ -46105,7 +46105,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "context",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::CatalogAnnotation",
         "source": {
@@ -46225,7 +46225,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@leftAssoc",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LeftAssocAnnotation",
         "source": {
@@ -46273,7 +46273,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@rightAssoc",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::RightAssocAnnotation",
         "source": {
@@ -46321,7 +46321,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@longestChoice",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::LongestChoiceAnnotation",
         "source": {
@@ -46369,7 +46369,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@uniqueLongestChoice",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::UniqueLongestChoiceAnnotation",
         "source": {
@@ -46434,7 +46434,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@namePredicate",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::NamePredicateAnnotation",
         "source": {
@@ -46482,7 +46482,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "snapshot",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::NamePredicateAnnotation",
         "source": {
@@ -46578,7 +46578,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "version",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::NamePredicateAnnotation",
         "source": {
@@ -46674,7 +46674,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "name",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::NamePredicateAnnotation",
         "source": {
@@ -46770,7 +46770,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "kind",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::NamePredicateAnnotation",
         "source": {
@@ -46893,7 +46893,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@predicate",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::PredicateAnnotation",
         "source": {
@@ -47013,7 +47013,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@predictiveChoice",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::PredictiveChoiceAnnotation",
         "source": {
@@ -47066,7 +47066,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@precedence",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::PrecedenceAnnotation",
         "source": {
@@ -47114,7 +47114,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "level",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::PrecedenceAnnotation",
         "source": {
@@ -47237,7 +47237,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@doc",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::DocAnnotation",
         "source": {
@@ -47360,7 +47360,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@recovery",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::RecoveryAnnotation",
         "source": {
@@ -47483,7 +47483,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "sync",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::RecoveryAnnotation",
         "source": {
@@ -47627,7 +47627,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@skip",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::SkipAnnotation",
         "source": {
@@ -47679,7 +47679,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@commonField",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::CommonFieldAnnotation",
         "source": {
@@ -47897,7 +47897,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@enum",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::EnumAnnotation",
         "source": {
@@ -50524,7 +50524,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "ERROR",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::ErrorElement",
         "source": {
@@ -50865,7 +50865,7 @@
           "caseSensitive": true,
           "kind": "literal",
           "value": "@typeof",
-          "wordBoundary": true
+          "wordBoundary": false
         },
         "ruleId": "UBNF::TypeofElement",
         "source": {

@@ -98,6 +98,9 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
             let mut diag = String::new();
             for d in &p.effective_delimiter_set {
                 match d {
+                    Delimiter::Lexical { .. } => {
+                        unreachable!("字句 program は先頭 byte で除外しない")
+                    }
                     Delimiter::Characters { .. } => labels.push("' '".to_owned()),
                     Delimiter::LineComment { open, .. } => {
                         labels.push(format!("'{open}'"));
@@ -126,6 +129,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         for d in &p.effective_delimiter_set {
             s.push_str("{let start=out.state.position::<MATCH>();let mut p=start;\n");
             match d {
+                Delimiter::Lexical{expression,..}=>writeln!(s,"let _=&mut p;if let Some(end)=({}).match_at(self.text,start) {{if end>start {{out.state.advance::<MATCH>(end-start);continue;}}break;}}",lexical_program(expression)).unwrap(),
                 Delimiter::Characters{code_points}=>writeln!(s,"while let Some((c,n))=self.input.cp_at(p) {{if !{:?}.contains(&(c as u64)) {{break;}}p+=n;}}if p>start {{out.state.advance::<MATCH>(p-start);continue;}}",code_points).unwrap(),
                 Delimiter::LineComment{open,..}=>{
                     writeln!(s,"if self.input.starts_with(p,{open:?}) {{p+={};while let Some((c,n))=self.input.cp_at(p) {{if matches!(c,'\\n'|'\\r') {{break;}}p+=n;}}let end=if self.input.starts_with(p,\"\\r\\n\") {{p+2}} else {{self.input.cp_at(p).map_or(p,|(_,n)|p+n)}};out.state.advance::<MATCH>(p-start);if !MATCH {{out.state.matched=end;}}continue;}}",open.len()).unwrap();
@@ -137,6 +141,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
                 Delimiter::BlockComment{open,close}=>writeln!(s,"if self.input.starts_with(p,{open:?}) {{let body=p+{};if let Some(n)=self.text[body..].find({close:?}) {{p=body+n+{};out.state.advance::<MATCH>(p-start);continue;}}}}",open.len(),close.len()).unwrap(),
             }
             match d {
+                Delimiter::Lexical { label, .. } => writeln!(s,"self.display_fail(out.state.consumed.max(out.state.matched),{label:?});").unwrap(),
                 Delimiter::Characters { .. } => s.push_str("self.display_fail(out.state.consumed.max(out.state.matched),\"' '\");\n"),
                 Delimiter::LineComment { open, .. } => writeln!(s,"self.display_fail(out.state.consumed.max(out.state.matched),{:?});",format!("'{open}'")).unwrap(),
                 Delimiter::BlockComment { open, close } => writeln!(s,"if self.input.starts_with(start,{open:?}) {{self.display_fail(self.text.len(),{:?});self.display_fail(self.text.len(),\"WildCardStringParser\");}} else {{self.display_fail(out.state.consumed.max(out.state.matched),{:?});self.display_fail(out.state.consumed.max(out.state.matched),{:?});}}",format!("'{close}'"),format!("'{open}'"),format!("'{close}'")).unwrap(),
@@ -182,6 +187,7 @@ pub(crate) fn generate(g: &Generator<'_>) -> Result<String, EmitError> {
         for d in &p.effective_delimiter_set {
             s.push_str("{let start=out.position::<MATCH>();let mut p=start;\n");
             match d {
+                Delimiter::Lexical{expression,..}=>writeln!(s,"let _=&mut p;if let Some(end)=({}).match_at(self.text,start) {{if end>start {{out.advance::<MATCH>(end-start);continue;}}break;}}",lexical_program(expression)).unwrap(),
                 Delimiter::Characters{code_points}=>writeln!(s,"while let Some((c,n))=self.input.cp_at(p) {{if !{:?}.contains(&(c as u64)) {{break;}}p+=n;}}if p>start {{out.advance::<MATCH>(p-start);continue;}}",code_points).unwrap(),
                 Delimiter::LineComment{open,..}=>writeln!(s,"if self.input.starts_with(p,{open:?}) {{p+={};while let Some((c,n))=self.input.cp_at(p) {{if matches!(c,'\\n'|'\\r') {{break;}}p+=n;}}let end=if self.input.starts_with(p,\"\\r\\n\") {{p+2}} else {{self.input.cp_at(p).map_or(p,|(_,n)|p+n)}};out.advance::<MATCH>(p-start);if !MATCH {{out.matched=end;}}continue;}}",open.len()).unwrap(),
                 Delimiter::BlockComment{open,close}=>writeln!(s,"if self.input.starts_with(p,{open:?}) {{let body=p+{};if let Some(n)=self.text[body..].find({close:?}) {{p=body+n+{};out.advance::<MATCH>(p-start);continue;}}}}",open.len(),close.len()).unwrap(),

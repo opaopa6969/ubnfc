@@ -111,6 +111,18 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         "out\n}}\nfn b{i}_{suf}(&mut self,mut state:State)->Step {{"
     )
     .unwrap();
+    // 上限ゼロは begin・trivia・子・terminator より前に成功する。
+    if matches!(
+        expr.node,
+        ExprNode::Repeat {
+            min: 0,
+            max: Some(0),
+            ..
+        }
+    ) {
+        s.push_str("Step::yes(state)\n}\n");
+        return Ok(s);
+    }
     if expr.execution.entry_flag == ExecutionEntryFlag::SetFalse {
         s.push_str("state.reset=false;\n");
     }
@@ -227,7 +239,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
             s.push_str(&capture_events(g, expr, "before", "child"));
             writeln!(s,"out.events=self.join(out.events,child.events);count+=1;\nif before.position::<{mode}>()==out.state.position::<{mode}>() {{break;}}").unwrap();
             if let Some(max) = max {
-                writeln!(s, "if count>={} {{break;}}", max.max(1)).unwrap();
+                writeln!(s, "if count>={} {{break;}}", max).unwrap();
             }
             s.push_str("}\n");
             s.push_str("let _=count;\n");

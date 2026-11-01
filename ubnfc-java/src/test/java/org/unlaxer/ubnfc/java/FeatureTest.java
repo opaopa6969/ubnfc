@@ -19,7 +19,7 @@ class FeatureTest {
             f.rule("Root", f.expression("Root", "repeat", "child", empty, "min", bounds[0], "max", bounds[1], "terminator", null));
             try (var h = f.compile()) {
                 Object result = h.parse("ab", h.options(false, false, false, true, Map.of()));
-                assertEquals(bounds[0] == 1, ok(result)); assertEquals(0, get(result, "consumedCp"));
+                assertEquals(bounds[0] <= 1, ok(result)); assertEquals(0, get(result, "consumedCp"));
                 assertEquals(bounds[0] == 1 ? 1 : 0, get(result, "matchedCp"));
             }
         }

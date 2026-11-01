@@ -245,7 +245,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             numeric7.rust_oracle.as_ref().unwrap().diagnostics[0]["offset"],
-            json!(2)
+            json!(4)
         );
     }
 

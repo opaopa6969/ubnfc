@@ -1204,8 +1204,8 @@ if name.is_empty()
         }
     }
     pub fn number<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
-        // NumberParser.java の失敗試行を表示用に記録する。Rust の主 fail_at は
-        // 仮数なしの場合のみ進め、不完全指数のロールバック位置は維持する。
+        // 現 pin の Classic と同じく、不完全指数は仮数まで受理しても
+        // 指数内の失敗位置を診断へ残す（unlaxer-parser #717/#752）。
         let start = state.position::<MATCH>();
         let bytes = self.text.as_bytes();
         let mut p = start;
@@ -1234,6 +1234,7 @@ if name.is_empty()
             if !out.ok { out.diag = self.diag_fail(p,label); }
             return out;
         }
+        let mut exponent_failure = None;
         if matches!(bytes.get(p), Some(b'e' | b'E')) {
             let exponent = p;
             p += 1;
@@ -1242,9 +1243,11 @@ if name.is_empty()
             let digits = p;
             while bytes.get(p).is_some_and(u8::is_ascii_digit) { p += 1; }
             self.display_fail(p,"DigitParser");
-            if digits == p { self.display_fail(p,"OneOrMore"); p = exponent; }
+            if digits == p { self.display_fail(p,"OneOrMore"); exponent_failure = Some(self.diag_fail(p,label)); p = exponent; }
         } else { self.display_fail(p,"EParser"); self.display_fail(p,"ExponentParser"); }
-        self.primitive::<MATCH>(state, Some(p - start), label)
+        let mut out = self.primitive::<MATCH>(state, Some(p - start), label);
+        if let Some(failure) = exponent_failure { out.diag = self.diag_join(out.diag, failure); }
+        out
     }
     pub fn identifier<const MATCH: bool>(&mut self, state: State, label: &'static str) -> Step {
         let start = state.position::<MATCH>();
@@ -1854,9 +1857,12 @@ impl<const DIAG: bool> Session<'_, DIAG> {
                     continue;
                 }
                 Ll1Op::Repeat(target, min, max) => {
-                    frames.push(Ll1Frame::Repeat { target, min, max, count: 0, last: p });
-                    current = target;
-                    continue;
+                    if max == Some(0) { ok = min == 0; }
+                    else {
+                        frames.push(Ll1Frame::Repeat { target, min, max, count: 0, last: p });
+                        current = target;
+                        continue;
+                    }
                 }
                 Ll1Op::Call(target) => {
                     if calls >= 32 || self.depth.saturating_add(calls) >= self.options.max_depth { return None; }

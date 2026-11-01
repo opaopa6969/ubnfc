@@ -19,7 +19,7 @@ public record GrammarIr(Analysis analysis, String analysisVersion, GrammarIrEntr
     public record Contracts(String choice, CursorContract cursor, String leftRecursion, String longest, String mappingFailure, String mappingPhase, OccurrenceContract occurrences, String predictive, String regexPolicy, String repeat, String repeatZeroMax, String spanUnit) {}
     public record CursorContract(String begin, String commit, String consume, String coordinate, String frameFlag, String internalJava, String internalRust, String matchOnly, List<String> mode, List<String> positions, String rollback) {}
     public record CursorTransition(String consumedMode, String failure, String flagEffect, String matchedMode, String matchedOnConsume) {}
-    public record Delimiter(List<Integer> codePoints, String kind, String lineEndProfile, String open, String close) {}
+    public record Delimiter(List<Integer> codePoints, String kind, String lineEndProfile, String open, String close, LexicalExpression expression, String label) {}
     public record Diagnostics(String deepestRule, List<DiagnosticsExpectedDisplayItem> expectedDisplay, String javaSyntaxOffset, String merge, String negativeLookahead, String offsetUnit, Boolean retainFarthestSeparately, String rustSyntaxOffset, String successfulRuleFailures, String trailingInputOffset) {}
     public record DiagnosticsExpectedDisplayItem(String exprId, String java_, String rust) {}
     public record Eval(String kind, Map<String, Object> params, String strategy) {}

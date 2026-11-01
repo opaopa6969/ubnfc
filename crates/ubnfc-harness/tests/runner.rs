@@ -590,3 +590,32 @@ fn explicit_null_ast_is_not_missing_rule_observations_and_scope_uses_wire_events
         ["/scope/depth", "/scope/resolved"]
     );
 }
+
+#[test]
+fn rule_trivia_diagnostic_tuples_compare_category_and_code_point_offset() {
+    let case = case(json!({"Ast":{"accepted":false,"ast":null,"diagnostic":["syntax",1]}}));
+    for backend in [Backend::Java, Backend::Rust] {
+        let response = json!({"allConsumed":false,"ast":null,"diagnostics":[{"kind":"syntax","offset":1,"expected":["GAP","'b'"]}]});
+        let observed = actual(backend, response.clone());
+        assert_eq!(compare(&case, &observed, &[]), Verdict::Pass);
+        assert!(unobserved(&case, &observed).is_empty());
+        for diagnostic in [
+            json!([]),
+            json!([{"kind":"syntax","offset":2}]),
+            json!([{"kind":"trailing_input","offset":1}]),
+        ] {
+            let mut wrong = response.clone();
+            wrong["diagnostics"] = diagnostic;
+            assert!(matches!(
+                compare(&case, &actual(backend, wrong), &[]),
+                Verdict::Fail(_)
+            ));
+        }
+        let mut missing = response;
+        missing.as_object_mut().unwrap().remove("diagnostics");
+        assert_eq!(
+            unobserved(&case, &actual(backend, missing)),
+            vec!["/diagnostic"]
+        );
+    }
+}

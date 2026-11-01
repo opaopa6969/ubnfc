@@ -257,6 +257,11 @@ pub(crate) fn generate(ir: &GrammarIr, options: &EmitOptions) -> Result<Generate
         .tokens
         .iter()
         .any(|t| matches!(t.spec, TokenSpec::Declarative { .. }))
+        || ir.semantics.trivia.policies.iter().any(|p| {
+            p.effective_delimiter_set
+                .iter()
+                .any(|d| matches!(d, Delimiter::Lexical { .. }))
+        })
     {
         runtime.push_str("\npub mod lexical_program {\n");
         runtime.push_str(include_str!("../templates/declarative.rs").trim_start_matches("//! Atomic lexical programs generated from UBNF. Matching has no host-context side effects.\n"));

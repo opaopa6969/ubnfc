@@ -1,4 +1,8 @@
-use std::{fs, path::PathBuf, process::Command};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    process::Command,
+};
 use ubnfc_harness::{default_root, load_all};
 
 struct Scratch(PathBuf);
@@ -53,12 +57,23 @@ fn list_uses_explicit_root_and_environment_and_rejects_missing_corpus() {
         .current_dir(&scratch.0)
         .output()
         .unwrap();
-    assert!(
-        default.status.success(),
-        "{}",
-        String::from_utf8_lossy(&default.stderr)
-    );
-    assert_eq!(String::from_utf8(default.stdout).unwrap(), stdout);
+    let default_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../unlaxer-parser");
+    if default_root.is_dir() {
+        assert!(
+            default.status.success(),
+            "{}",
+            String::from_utf8_lossy(&default.stderr)
+        );
+        assert_eq!(String::from_utf8(default.stdout).unwrap(), stdout);
+    } else {
+        // 隔離 worktree では sibling が無い。既定パスの明示エラーを検証する。
+        // 実 corpus の成功は上の --root / 環境変数の両経路で検証済み。
+        assert!(!default.status.success());
+        assert!(default.stdout.is_empty());
+        let expected =
+            default_root.join("unlaxer-dsl/src/test/resources/nested-captures/corpus.json");
+        assert!(String::from_utf8_lossy(&default.stderr).contains(&expected.display().to_string()));
+    }
     let missing = Command::new(binary)
         .arg("list")
         .env("UNLAXER_PARSER_DIR", &scratch.0)

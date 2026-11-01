@@ -55,6 +55,7 @@ def verify(directory):
     executed = collections.Counter()
     stages = collections.Counter()
     revisions = set()
+    sources = {}
     ids = set()
     total = 0
     mapping_errors = 0
@@ -66,6 +67,7 @@ def verify(directory):
         require(d.get('imports') == spec.get('imports'), f'{path}: import の原文')
         require(re.fullmatch('[0-9a-f]{40}', d['source']), f'{path}: revision')
         revisions.add(d['source'])
+        sources[path.name] = d['source']
         require([(c['id'], c['input']) for c in d['cases']] == [(c['id'], c['input']) for c in spec['cases']], f'{path}: 入力の欠落')
         require(d['stage'] in {'executed', 'generation_failed', 'compilation_failed'}, f'{path}: stage')
         stages[d['stage']] += len(d['cases'])
@@ -99,9 +101,15 @@ def verify(directory):
             for diag in c['diagnostics']:
                 require(isinstance(diag['kind'], str) and type(diag['offset']) is int and isinstance(diag['expected'], list), f'{path}: 診断')
     require(set(counts) == REQUIRED | EXTRA, '機能網羅の不一致')
-    require(len(revisions) == 1, '採取 revision が混在')
+    if len(revisions) != 1:
+        # issue #46: 入力無変更で独立再採取した 2 ファイルだけを現 pin へ更新する。
+        legacy = 'ed4178e673f93e719b62a7bd181f3a219abf8ed1'
+        current = 'd3ea73e8cfa440df8bdbb70abb29e06259435ba2'
+        updated = {'empty-zero.json', 'repeat-zero.json'}
+        require(all(revision == (current if name in updated else legacy)
+                    for name, revision in sources.items()), '記録されていない採取 revision の混在')
     require(all(3 <= counts[f] <= 10 for f in counts), '機能ごとの件数が 3〜10 外')
-    print(f"{len(specs)} ファイル / {len(counts)} 機能群 / {total} ケース / {next(iter(revisions))}")
+    print(f"{len(specs)} ファイル / {len(counts)} 機能群 / {total} ケース / {', '.join(sorted(revisions))}")
     print('段階:', dict(stages), 'mapping 例外:', mapping_errors, 'parse 例外:', parse_errors)
     for feature, n in counts.items():
         print(f'{feature}: {n} (実行 {executed[feature]})')
