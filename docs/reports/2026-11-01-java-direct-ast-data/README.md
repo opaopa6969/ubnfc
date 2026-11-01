@@ -1,6 +1,6 @@
 # Java 直接 AST 構築の計測・検証記録
 
-性能の最終判定は **`post-ll1/`** の統合後3セッションを使用する。`final/` はleaf修正後・LL(1)統合前の履歴。corpus の最終検証は master #40 統合後の **`integrated-pin/`**（1,492行の観測一致、双方 Pass1,315 / Fail3、既存差分は #46 / #33）を参照する。leaf fallback の参照経路に旧実装にはない空配列確保があったため、修正後に corpus と全 A/B を取り直した。初期の全記録はこのディレクトリ直下に保持し、[当時の報告](initial-report.md) とともに予備記録とする。初期の field 配列計数はこの余分な配列を含むため、最終 constructor 計数を参照する。
+性能・corpusの最終判定は **`after-long/`** を使用する。#44統合後の1,492行全一致（双方Pass1,328 / Fail3 / IR44）、共有Rust scanner更新後の全3セッションを収録。#33は解消済み、残るcorpus差分は#46。`post-ll1/` はLONG追加前の履歴。`final/` はleaf修正後・LL(1)統合前の履歴。pin更新直後の corpus 検証は **`integrated-pin/`**（1,492行の観測一致、双方 Pass1,315 / Fail3、既存差分は #46 / #33）を参照する。leaf fallback の参照経路に旧実装にはない空配列確保があったため、修正後に corpus と全 A/B を取り直した。初期の全記録はこのディレクトリ直下に保持し、[当時の報告](initial-report.md) とともに予備記録とする。初期の field 配列計数はこの余分な配列を含むため、最終 constructor 計数を参照する。
 
 `final/` の `s1`〜`s3` は P4 → Rust → Operators を各1回行う同じ番号のセッション。7 run の中央値・全 sample・load と `uptime` を記録する。`source.sha256` は計測した AST 構築ソース、`ir.sha256` は正式な固定 IR。`corpus-comparison.json` は現行 front で旧生成器と修正版を再比較した結果（1,444行差分0）、`corpus.md` は修正版の出力。
 
@@ -19,3 +19,5 @@
 `final/ir.sha256` のP4は測定当時のパス。#40がbyte同一のIRを `ir/frozen/tinyexpression-p4-f86ce8a5.ir.json` に移したため、現在の再現スクリプトはその固定IRを参照する。性能の入力条件は変えていない。
 
 `post-ll1/java-projection-proof.json` は新pin全260buildについて、LL(1)統合前後で234buildのIR（plan.ll1以外）と各Java生成器の全ファイルが同一、26buildのIRエラーが同一である検証記録。`post-ll1/ir.sha256` は追加メタデータを持つ統合後IRで、生成Javaは統合前とbyte不変。
+
+`after-long/reference-layout.json` はfield offsetとVM alignmentによる旧/参照Recipeの56 B一致。`source.sha256` は共有scanner・P4 lib/build等の依存も含む。`toolchains.txt` は今回の環境。基準生成器は最新master49d1a9dのarchiveからbuildした。

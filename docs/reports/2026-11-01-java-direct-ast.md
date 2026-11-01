@@ -1,6 +1,6 @@
 # Java の認識 event から typed AST を直接構築する（issue #4）
 
-> 最終判定は末尾「LL(1) 統合後の最終検証・A/B」。先行する全測定値は履歴として保持する。
+> 最終判定は末尾「LONG 統合後の最終検証・A/B」。先行する全測定値は履歴として保持する。
 
 ## 実装と観測契約
 
@@ -138,7 +138,7 @@ corpus 終了後、同じ60秒上限の当該1件を再実行し **10.856秒で�
 [統合後のデータ](2026-11-01-java-direct-ast-data/integrated-pin/) に全case観測SHA、生成器/front SHA、原始JSON SHA、
 3件の actual / expected / differences と44件のIR診断、テストの初回集計・再実行結果を保存した。
 
-## LL(1) 統合後の最終検証・A/B（最終判定）
+## LL(1) 統合後・LONG 追加前の検証・A/B（履歴）
 
 master `cd0516f`（#41、LL(1) 認識表）を merge し、D-091 と D-087 を保持した。Java AST 構築コードは不変。生成 Rust の API / runtime と固定 IR の任意 `plan.ll1` メタデータが増えたため、比較相手を更新した全3セッションを同じ条件で取り直した。先行の数値を消さず、判定にはこの節の最新値を使う。
 Java は LL(1) 表を使用しない。P4 / Operators / Power の生成 Java は統合前と byte 一致。IR の差は追加メタデータで、Java の認識・AST の実装や入力を変更していない。Rust P4 の生成 `ll1_scan` は `None` を返す（表被覆0）。Rust は追加後の既定 `ParseOptions` のまま rebuild し、参照経路への無効化で条件を変えていない。
@@ -184,3 +184,48 @@ corpus 全260 build を統合前 front（669c560）と統合後 front（cd0516f�
 AST層の代表値は2倍以内だが、complexのS2は約2.098倍。全セッションの安定した達成とは区別し、先行測定の未達・対照の変動も#35の検討材料として保持する。JavaのASTコードは今回の再測定前後で不変のため、先行値との差を追加のJava最適化効果とは主張しない。
 
 統合後schemaに対し、既存の未知の任意キー・未対応requiredFeatures・未知の言語version・JSON厳密性の4テストも通過（9.876秒）。結果は `post-ll1/schema-tests.json`。
+
+## LONG 統合後の最終検証・A/B（最終判定）
+
+最新 master `49d1a9d`（#44、LONG scanner / 宣言の修正）を統合。最新 master のソースから基準Java生成器を新たにbuildし、修正版と同じ現行front・pinで全corpusを比較した。**1,492行の観測と全集計が完全一致**。双方 **Java Pass1,328 / 期待拒否Pass27 / Known29 / Fail3 / 未観測61 / IR失敗44**。生成拒否・javac失敗・build失敗・driver errorは全て0。run-allは双方exit1。
+LONGの13件は新たにPassとなり、tiny-code-fence全86件がPass。**#33はPR #44で解消・close済み**。残るFail3件とrule-triviaのIR失敗44件は#46。現行pinでFail0は未達だが、本PRのAST変更による退行はない。旧pin・途中版の件数とは区別する。
+JavaのAST構築コード・P4専用Java scanner・固定IRは不変。ただしRust P4は共有 `scanners/rust/scanners.rs` を取り込むため、LONG追加後の比較対象を使って**全3セッションを再測定**した。共有scannerを見落として影響なしとする扱いを避け、source SHAに推移的なscanner依存・P4 lib/build・手書き実装も含めた。先行する全記録は履歴として保持する。
+参照経路のobject layoutも同一JVM条件で点検した。`Unsafe.objectFieldOffset` とVMのObjectAlignmentInBytesによるinstance footprintは、最新基準のRecipeとA/B用Recipeがともに**56 B**（参照幅4 B、alignment8 B）。参照側のサイズ増加で割当差を作っていない。これはfield offsetからの算定で、constructor計数・ThreadMXBean計時とは別に行った。
+
+core28、同じJVM・warmup・反復数・交互順序、各cell7 run × 3セッション。以下はms、loadは実計測runの1分値。
+
+| セッション | fixture | 旧 AST | 直接 AST | 直接 / 旧 | 認識対照比 | load |
+|---|---|---:|---:|---:|---:|---|
+| S1 | complex | 0.264608 | 0.223698 | 0.845 | 1.090 | 28.35–33.85 |
+| S1 | complex-x64 | 26.125228 | 25.053068 | 0.959 | 0.940 | 28.35–33.85 |
+| S2 | complex | 0.189802 | 0.184191 | 0.970 | 1.036 | 22.99–26.92 |
+| S2 | complex-x64 | 19.685927 | 17.834915 | 0.906 | 0.869 | 22.99–26.92 |
+| S3 | complex | 0.181994 | 0.174436 | 0.958 | 0.961 | 17.03–17.89 |
+| S3 | complex-x64 | 17.830447 | 22.639997 | 1.270 | 0.874 | 17.03–17.89 |
+
+| セッション | fixture | Java層 | Rust層 | Java / Rust | Rust load |
+|---|---|---:|---:|---:|---|
+| S1 | complex | 0.077575 | 0.029802 | 2.603 | 27.61–29.15 |
+| S1 | complex-x64 | 8.553793 | 2.824336 | 3.029 | 27.61–29.15 |
+| S2 | complex | 0.067433 | 0.030679 | 2.198 | 20.54–21.20 |
+| S2 | complex-x64 | 8.178856 | 4.013281 | 2.038 | 20.54–21.20 |
+| S3 | complex | 0.072829 | 0.032660 | 2.230 | 16.91–16.92 |
+| S3 | complex-x64 | 12.072257 | 4.749286 | 2.542 | 16.91–16.92 |
+
+| セッション | 旧 Operators | 直接 Operators | 手書き | 直接 / 手書き | 認識対照比 | load |
+|---|---:|---:|---:|---:|---:|---|
+| S1 | 0.437786 | 0.428260 | 0.628949 | 0.681 | 1.115 | 22.58–23.87 |
+| S2 | 0.533998 | 0.470104 | 0.669061 | 0.703 | 1.002 | 21.95–22.97 |
+| S3 | 0.570369 | 0.496549 | 0.825007 | 0.602 | 0.923 | 16.71–18.05 |
+
+| 受け入れ条件 | 最終代表中央値 | 判定 |
+|---|---|---|
+| complex AST ≤0.15 ms | 0.184191 ms | 未達 |
+| x64 AST ≤15 ms | 22.639997 ms | 未達 |
+| Operators AST ≤手書き | 0.470104 ≤ 0.669061 ms | 達成 |
+| AST層 ≤Rustの2倍 | complex 2.374倍 / x64 2.131倍 | 代表値で未達 |
+
+認識のみの代表中央値はcomplex 0.116758 / x64 10.567740 ms。AST層の代表値はJava 0.072829 / Rust 0.030679（complex）、Java 8.553793 / Rust 4.013281（x64）。層費用の各3セッション中央値の比で、比自体の中央値とは区別する。
+時間差は認識対照の変動と併記し、先行値との差を追加のJava最適化の効果とは主張しない。Recipe / field配列のconstructor計数はASTコード不変のため前掲と同じ。未達と残るcapture / Match費用は#35、corpusの既存差分は#46で追跡する。
+
+x64 S3は直接/旧が1.270、認識対照比は0.874で、対照が速い一方ASTは遅い。この値を安定した改善の根拠にはしない。遅延projectionがcapture graphの寿命・走査量・cache局所性へ与える影響も仮説として残し、#35でCPU自己時間・live graph・GC時間を割当byteと突き合わせる。現時点で保持graphやGCが原因だとは断定しない。
