@@ -212,6 +212,10 @@ CI は seed と Cargo / rustc のエラー本文を保持しておらず、正�
 へ分離した。診断条件を弱めず、最新 master を含む head の CI を通す。最終結果は PR checks と
 issue #26 の完了コメントを参照する。
 
+Rust SWAR 化の PR #32（master `12e5e80`）も CI 待機中に取り込んだ。
+LSP / Java 生成部には追加差分がなく、master の D 行の最大値は D-093 のため
+今回の D-094 / D-095 を維持した。統合後の検査結果は PR checks と完了コメントに記録する。
+
 ## 引継ぎと取り消し
 
 #25 では `LanguageServerImpl` の capability と要求ハンドラを追加する際、
