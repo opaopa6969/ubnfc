@@ -49,6 +49,19 @@ class MetadataTest {
         assertEquals("desc", emitter.ruleDescriptions().get("TinyExpressionP4::NumberVariableDeclaration"));
     }
 
+    @Test void declarationContextsAreExplicitAndValidated() throws Exception {
+        var emitter = emitter(Path.of("../ir/examples/stax.ir.json"));
+        emitter.declarationContext("StructDef=type,word").declarationContext("FieldDecl=field");
+        String meta = emitter.sources().get(emitter.packageName().replace('.', '/') + "/Meta.java");
+        assertTrue(meta.contains("Stax::StructDef\", \"type,word"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+            () -> emitter.declarationContext("WordRef=word"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+            () -> emitter.declarationContext("WordDef=unknown"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+            () -> emitter.declarationContext("StructDef=type"));
+    }
+
     @Test void semanticTokenTypesComeFromTheGrammar() throws Exception {
         var types = emitter(P4).tokenTypes();
         assertEquals("keyword", types.get("expr:tools/tinyexpression-p4-lsp-vscode/grammar/tinyexpression-p4.ubnf:1767:1775:body/0/literal"));

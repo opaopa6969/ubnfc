@@ -99,15 +99,16 @@ def main():
         body_labels = {v['label'] for v in report['completion-body']}
         assert 'Int' in type_labels and 'dup' not in type_labels
         assert 'dup' in body_labels and 'Int' not in body_labels
+        assert {v['label'] for v in report['completion-field']} == {'x'}
 
         shadow = (MODULE / 'lsp/fixtures/shadow.stax').read_text()
         shadow_uri, diagnostics = opened('shadow.stax', shadow)
         assert not diagnostics
         ambiguous = at('definition', shadow_uri, position(shadow, 'x drop', 1))
-        assert len(ambiguous) == 2, ambiguous
+        assert len(ambiguous) == 1 and ambiguous[0]['range']['start'] == position(shadow, 'x x', 1), ambiguous
         report['boundary-shadow-definition'] = ambiguous
         outside = at('completion', shadow_uri, position(shadow, ': outside ( -- ) ', within=len(': outside ( -- ) ')))
-        assert any(v['label'] == 'x' for v in outside), outside
+        assert not any(v['label'] in ('x', 'outside') for v in outside), outside
         report['boundary-outside-completion'] = outside
 
         fields = (MODULE / 'lsp/fixtures/fields.stax').read_text()
@@ -116,6 +117,34 @@ def main():
         field_targets = at('definition', fields_uri, position(fields, '.x', within=1))
         assert len(field_targets) == 2, field_targets
         report['boundary-field-definition'] = field_targets
+
+        scoped = ('type Count = Int ;\nstruct Point { field: Count }\n'
+                  ': earlier ( -- ) ;\n'
+                  ': current ( Count -- ) 1 let x x drop [ 2 let x [ x drop ] ] x drop .field ;\n'
+                  ': later ( -- ) ;')
+        scoped_uri, diagnostics = opened('scope-context.stax', scoped)
+        assert not diagnostics, diagnostics
+        for label, occurrence, declaration in [('before-update', 0, 0), ('nested', 1, 1), ('after-quote', 2, 1)]:
+            targets = at('definition', scoped_uri, position(scoped, 'x drop', occurrence))
+            assert len(targets) == 1 and targets[0]['range']['start'] == position(scoped, 'let x', declaration, 4), targets
+            report['scope-' + label] = targets
+        # 引用は独立 scope ではない。内側の let が同じ語 scope の x を更新する。
+        for label, needle, within, required, forbidden in [
+            ('type', 'Count --', 0, {'Count', 'Point', 'Int'}, {'earlier', 'current', 'later', 'field', 'x'}),
+            ('word', '1 let', 0, {'earlier', 'Point', 'dup'}, {'Count', 'field', 'current', 'later', 'x'}),
+            ('local', 'x drop', 0, {'x', 'earlier'}, {'current', 'later', 'Count', 'field'}),
+            ('field', '.field', 1, {'field'}, {'x', 'earlier', 'current', 'later', 'Count', 'Point', 'dup'}),
+        ]:
+            items = at('completion', scoped_uri, position(scoped, needle, within=within))
+            labels = {item['label'] for item in items}
+            assert required <= labels and not forbidden & labels, (label, labels)
+            report['context-' + label] = items
+        order = ': early ( -- ) early future ;\n: future ( -- ) ;'
+        order_uri, _ = opened('declaration-order.stax', order)
+        report['scope-forward-definition'] = at('definition', order_uri, position(order, 'future'))
+        assert report['scope-forward-definition'] == []
+        report['scope-self-definition'] = at('definition', order_uri, position(order, 'early', 1))
+        assert report['scope-self-definition'] == []
 
         broken = ': before ( -- ) ;\n: broken ( '
         edit_uri, report['edit-broken'] = opened('editing.stax', broken)

@@ -410,7 +410,7 @@ Rust の小さなインタプリタ（stage 3）。JVM は要らない。
 | `@declares(symbol=…)` | 8 箇所（語・macro・struct・struct のフィールド・型・和の枝・取込み名・`let`） | 「定義」の 7 種類すべて。記号表のコードは 1 行も書いていない |
 | `@symbolRef(name=…)`（D-046 の v2 綴り） | 4 箇所（語の参照・型の参照・`.f` / `!f`） | 未定義参照が WARNING で出る。旧綴りの `@backref` は「文法中に `@scopeTree` があるか」という非局所判定で意味が変わるので使わない |
 | `@mapping(...)` | 27 箇所（**AST を作るすべての規則**） | typed AST。選択だけの規則（`TopLevel` / `Term` / `TypeRef`）にも付けて、sealed interface + record の和型を出している |
-| `@catalog(context=…)` | 6 箇所（組込み語・組込み型・利用者の語・型・フィールド 2 種） | IR の静的カタログ。context の区分はあるが、現行 LSP の記号補完がこれを使って厳密に絞るわけではない（§12） |
+| `@catalog(context=…)` | 6 箇所（組込み語・組込み型・利用者の語・型・フィールド 2 種） | 期待規則と catalog の context で補完位置を分類。宣言の種別対応は LSP 生成設定で明示（§12） |
 | `@doc('…')` | 17 箇所（主要な規則すべて） | `--emit-lsp` の hover（D-062）。§8 |
 
 **使わなかったもの**と、その理由:
@@ -453,8 +453,8 @@ stax の本番文法では `@recovery` を使わない。段階4では選択全�
 | 注釈 | LSP で何になるか |
 |---|---|
 | `@declares` + `@symbolRef` | **定義ジャンプ**（語・型・フィールド・取込み名・局所束縛）と**未定義語の波線** |
-| `@scopeTree` | parser の局所 scope と未定義参照診断。現行 LSP の補完には他の語の局所名も残る |
-| `@catalog(context=…)` | IR の静的メタデータ。現行補完は期待終端と文書内宣言を使い、型/本体位置で差があるが、フィールド専用候補は保証しない |
+| `@scopeTree` | scope event に基づく定義解決・可視宣言の補完・未定義参照診断 |
+| `@catalog(context=…)` | 期待規則の context と明示された宣言種別を照合。型・語・フィールド位置を区別する |
 | `@doc('…')` | **hover の説明文**（生成される `Meta.RULE_DOC`） |
 
 つまり「型定義のできる Forth」を作ると、**定義ジャンプと補完と hover が付いてくる**。
@@ -595,8 +595,15 @@ VM は Rust の再帰呼出しで語を評価せず、明示的な作業スタ�
 `@doc` hover、型/本体位置での補完の違いを headless で実証した。`😀` と同じ行の
 宣言の UTF-16 range、壊れた全文を修正した後の復帰、close 後の索引破棄も検証する。
 
-parser の scope 規則と、文書内の綴り単位で記号を集める現行 LSP 索引の精度を区別する。
-同名局所束縛の複数候補、他の語の局所名が残る補完は #49 に切り出した。
+#49 で definition / hover / completion は採用済み scope event を順に再生する。
+宣言登録は capture の開始位置ではなく宣言規則の lexical 完了位置を使うため、
+他の語の局所名・自己名・前方名を補完に出さない。同名 let は後勝ち。
+引用は新しい scope を作らず、入れ子引用内の let も語 scope を更新する。
+既存 catalog は参照側の context しか持たないため、宣言側の分類は
+`--declaration-context Rule=context[,context]` で明示する。StructDef は type と word、
+FieldDecl は field、TypeDef は type、語・macro・let・import・和の枝は word。
+これは LSP だけの設定であり、IR / parser の名前空間・rollback・memo・AST を変えない。
+未指定の文法は従来の無分類候補を維持する。references / rename の綴り単位の契約は維持する。
 `use` は同じ文書の ImportName までのジャンプであり、実ファイル解決ではない。
 同名 struct フィールドを型から選ぶことも文法注釈だけでは提供しない。
 

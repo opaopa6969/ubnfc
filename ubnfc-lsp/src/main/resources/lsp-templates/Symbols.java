@@ -92,6 +92,83 @@ public final class Symbols {
         return named(name).stream().filter(Symbol::declaration).toList();
     }
 
+    /** 採用された scope event を順に再生する。use はその時点の lookup、同名更新は後勝ち。 */
+    public List<Symbol> definitions(Symbol symbol) {
+        if (symbol.declaration()) return List.of(symbol);
+        if (fromLexical || analysis.scope() == null || analysis.scope().events().isEmpty())
+            return declarationsOf(symbol.name());
+        return replay(symbol.offsetCp(), symbol.name()).stream().filter(s -> s.name().equals(symbol.name())).toList();
+    }
+
+    public List<Symbol> visibleAt(int offsetCp) {
+        if (fromLexical || analysis.scope() == null || analysis.scope().events().isEmpty())
+            return symbols.stream().filter(s -> s.declaration() && s.endCp() <= offsetCp).toList();
+        return replay(offsetCp, null);
+    }
+
+    private List<Symbol> replay(int offsetCp, String reference) {
+        var stack = new ArrayList<LinkedHashMap<String, List<Symbol>>>();
+        stack.add(new LinkedHashMap<>());
+        int clock = 0;
+        for (var event : analysis.scope().events()) {
+            int time = event.action().equals("declare") ? registeredAt(event.offsetCp()) : event.offsetCp();
+            clock = Math.max(clock, time);
+            if (clock > offsetCp) break;
+            if (event.action().equals("use") && event.offsetCp() == offsetCp && reference != null) break;
+            switch (event.action()) {
+                case "enter" -> stack.add(new LinkedHashMap<>());
+                case "leave" -> {
+                    boolean entryEnd = reference == null && event.name().equals(LanguageServerImpl.ENTRY)
+                        && event.offsetCp() == analysis.positions().lengthCp();
+                    if (!entryEnd && stack.size() > 1) stack.remove(stack.size() - 1);
+                }
+                case "declare" -> {
+                    var declaration = new Symbol(event.name(), event.offsetCp(), event.lengthCp(), true);
+                    var current = stack.get(stack.size() - 1);
+                    // field context は型検査前の候補集合。型による一意解決とは区別する。
+                    var previous = current.getOrDefault(event.name(), List.of());
+                    var values = new ArrayList<Symbol>();
+                    if (hasContext(declaration, "field"))
+                        previous.stream().filter(s -> hasContext(s, "field")).forEach(values::add);
+                    values.add(declaration);
+                    current.put(event.name(), values);
+                }
+                default -> { }
+            }
+        }
+        var visible = new LinkedHashMap<String, List<Symbol>>();
+        for (var frame : stack) visible.putAll(frame);
+        return visible.values().stream().flatMap(List::stream).toList();
+    }
+
+    private String declarationRule(int offsetCp) {
+        for (var item : analysis.lexical())
+            if (item.token() != null && item.span().start() <= offsetCp && offsetCp < item.span().end() && Meta.DECLARE_RULES.containsKey(item.exprId()))
+                return Meta.DECLARE_RULES.get(item.exprId());
+        return null;
+    }
+
+    private int registeredAt(int offsetCp) {
+        String rule = declarationRule(offsetCp);
+        int end = Integer.MAX_VALUE;
+        for (var item : analysis.lexical())
+            if (item.token() == null && java.util.Objects.equals(item.exprId(), Meta.RULE_BODIES.get(rule))
+                && item.span().start() <= offsetCp && offsetCp < item.span().end())
+                end = Math.min(end, item.span().end());
+        // scanner が直接宣言する場合は event の座標を使用する。
+        return end == Integer.MAX_VALUE ? offsetCp : end;
+    }
+
+    public boolean hasContext(Symbol symbol, String context) {
+        String contexts = Meta.DECLARATION_CONTEXTS.get(declarationRule(symbol.offsetCp()));
+        return contexts != null && List.of(contexts.split(",")).contains(context);
+    }
+
+    public boolean inContext(Symbol symbol, String context) {
+        if (Meta.DECLARATION_CONTEXTS.isEmpty()) return true;
+        return context != null && hasContext(symbol, context);
+    }
+
     public List<Symbol> referencesOf(String name) {
         return named(name).stream().filter(symbol -> !symbol.declaration()).toList();
     }

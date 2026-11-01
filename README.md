@@ -355,6 +355,9 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   差分再解析・部分木の再利用は設計にも実装にも無い。
 - **LSP は opt-in の feature**（D-060 / D-062、issue #28）。既定のビルドには入らない（Maven profile `lsp`）。
   有効にすると `ubnfc-lsp --emit-lsp` が生成パーサを包む LSP サーバを**別パッケージへ追加**する。
+  `--declaration-context Rule=context[,context]`（反復指定可）で宣言規則の補完種別を明示できる。
+  参照側の `@catalog(context=…)` と照合し、scope event 上で可視の宣言だけを提案する。
+  これは LSP 専用設定で、parser の名前空間や AST の契約は変えない。
   生成パーサ本体は依存ゼロのままで、lsp4j に依存するのは包み側だけ。**capability は
   診断 / definition / references / document symbols / semantic tokens / completion / hover と
   TextMate 文法の生成**（[`docs/reports/2026-09-24-lsp-vsix-stage3.md`](docs/reports/2026-09-24-lsp-vsix-stage3.md) §1 の表）。
