@@ -92,6 +92,15 @@ WORK=$WORK CORE=30 RUNS=7 benchmarks/scripts/run-arena-ab.sh time
 - `java/UbnfLegacyBench.java` … family C の旧 Java `UBNFParsers`（反射）
 - family A の Java は既存の `examples/p4-java` の `Benchmark` / `LegacyBenchmark` をそのまま使う
 
+## 関数別の帰属（perf / callgrind / JFR）
+
+P4 complex と JSON 100 KB の認識／所有 AST を、自己 CPU 時間・命令数・分岐ミス・cache miss に
+分けて調べる道具と再現手順は [`attribution/README.md`](attribution/README.md)。Docker 内の
+perf / valgrind と、暖機後の Java JFR / PrintInlining を使う。実機カウンタと模擬値は区別する。
+初回の結果は [`2026-11-01-attribution.md`](../docs/reports/2026-11-01-attribution.md)。
+
+## Java 直接 AST 構築の A/B
+
 Java の規則完了 event からの直接 AST 構築（issue #4）の A/B は `run-java-direct-ast.sh`。
 同じ JVM で `Session.directAst` を cell ごとに切り替え、旧 `Recipe` 経路と直接構築、
 AST を作らない対照を交互に測る。Operators は同じ JVM の手書き Java も比較する。

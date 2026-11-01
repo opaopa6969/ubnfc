@@ -1,0 +1,82 @@
+関数	自己CPU時間ns/parse（標本推定）	自己CPU%	命令数	分岐ミス	cache miss
+[.] <gen_json::runtime::Session<false>>::finish_checked	5528256.469	36.63	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::build_values_into	2792785.549	18.50	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::semantic_text	945090.173	6.26	callgrind参照	callgrind参照	callgrind参照
+[.] __memmove_avx512_unaligned_erms	596392.781	3.95	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::build_rule	576352.701	3.82	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r5_c	561523.042	3.72	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r6_c	355511.019	2.36	callgrind参照	callgrind参照	callgrind参照
+[.] core::str::converts::from_utf8	339879.757	2.25	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::input::Input>::cp_at	334268.534	2.21	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r2_c	244889.778	1.62	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r3_c	234068.134	1.55	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::ast::tree::AstTree>::project	211623.245	1.40	callgrind参照	callgrind参照	callgrind参照
+[.] _int_malloc	200801.602	1.33	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::node_values	183567.133	1.22	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::input::Input>::byte_to_cp	181162.323	1.20	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r4_c	154308.616	1.02	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::relabel_token_copy	135871.742	0.90	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::primitive::<false>	133466.933	0.88	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::vec::Vec<gen_json::ast::Ast> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<gen_json::ast::Ast, core::iter::adapters::map::Map<core::slice::iter::Iter<u32>, <gen_json::ast::tree::AstTree>::project_g_JsonAST_2e_ObjectNode::{closure#0}>>>::from_iter	127855.710	0.85	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::ast::tree::AstTree>::push_node_spans	96593.186	0.64	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::literal::<false>	74549.098	0.49	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::span	73747.494	0.49	callgrind参照	callgrind参照	callgrind参照
+[.] _int_free	72144.288	0.48	callgrind参照	callgrind参照	callgrind参照
+[.] __memcmp_evex_movbe	72144.288	0.48	callgrind参照	callgrind参照	callgrind参照
+[.] malloc_consolidate	66933.867	0.44	callgrind参照	callgrind参照	callgrind参照
+[.] unlink_chunk.constprop.0	66132.264	0.44	callgrind参照	callgrind参照	callgrind参照
+[.] malloc	63727.454	0.42	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::input::Input>::new	61723.446	0.41	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::ast::tree::AstTree>::project_g_JsonAST_2e_StringNode	61723.446	0.41	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::scope::ScopeStore>::restore	60921.843	0.40	callgrind参照	callgrind参照	callgrind参照
+[.] core::ptr::drop_glue::<gen_json::ast::Ast>	54509.018	0.36	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r9_c	44088.176	0.29	callgrind参照	callgrind参照	callgrind参照
+[.] <core::slice::iter::Iter<u32> as core::iter::traits::iterator::Iterator>::all::<<gen_json::runtime::Session<false>>::map_rule_4::{closure#1}>	39278.557	0.26	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::s79	36873.747	0.24	callgrind参照	callgrind参照	callgrind参照
+[.] cfree@GLIBC_2.2.5	35270.541	0.23	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::s67	34068.136	0.23	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::vec::Vec<alloc::vec::Vec<(usize, [usize; 2], gen_json::runtime::EventId)>>>::push_mut	27655.310	0.18	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::limit	23246.493	0.15	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::s61	18036.072	0.12	callgrind参照	callgrind参照	callgrind参照
+[.] gen_json::ast::tree::to_u32	16032.064	0.11	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::ast::tree::AstTree>::project_g_JsonAST_2e_MemberNode	16032.064	0.11	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::record_event	14428.858	0.10	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::ast::tree::AstTree>::record	12825.651	0.08	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::ast::tree::AstTree>::project_g_JsonAST_2e_NumberNode	12825.651	0.08	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::vec::Vec<alloc::vec::Vec<u32>>>::push_mut	11222.445	0.07	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r15_c	10420.842	0.07	callgrind参照	callgrind参照	callgrind参照
+[.] <str>::trim_start_matches::<<gen_json::runtime::Session<false>>::trimmed_range::{closure#0}>	7214.429	0.05	callgrind参照	callgrind参照	callgrind参照
+[.] <str>::trim_end_matches::<<gen_json::runtime::Session<false>>::trimmed_range::{closure#0}>	7214.429	0.05	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::guard_e18_c	6412.826	0.04	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::s93	6012.024	0.04	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::s103	5210.421	0.03	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::diag::DisplayDiagnostics>::new	5210.421	0.03	callgrind参照	callgrind参照	callgrind参照
+[.] __rustc::__rust_no_alloc_shim_is_unstable_v2	4809.619	0.03	callgrind参照	callgrind参照	callgrind参照
+[.] alloc_perturb	4408.818	0.03	callgrind参照	callgrind参照	callgrind参照
+[.] __rustc::__rdl_alloc	3607.214	0.02	callgrind参照	callgrind参照	callgrind参照
+[.] __rustc::__rust_alloc	2805.611	0.02	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::vec::splice::Splice<alloc::vec::into_iter::IntoIter<gen_json::api::Diagnostic>> as core::ops::drop::Drop>::drop	2805.611	0.02	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::new	2404.810	0.02	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::ast::tree::AstTree>::list	2404.810	0.02	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::r0_c	2004.008	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::diag::Diagnostics>::summary	1603.206	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] attribution::main::{closure#1}	1202.405	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::diag::DisplayDiagnostics>::summary	1202.405	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::vec::Vec<gen_json::runtime::Effect>>::truncate	1202.405	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::raw_vec::RawVecInner>::finish_grow	1202.405	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] _int_realloc	801.603	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] __rustc::__rust_dealloc	801.603	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] __rustc::__rdl_dealloc	801.603	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::vec::Vec<gen_json::api::ScopeEvent> as alloc::vec::spec_from_iter::SpecFromIter<gen_json::api::ScopeEvent, core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<gen_json::runtime::Effect>>, <gen_json::runtime::Session<false>>::finish_checked::{closure#5}>>>::from_iter	801.603	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::raw_vec::RawVec<(gen_json::runtime::EventId, bool)>>::grow_one	801.603	0.01	callgrind参照	callgrind参照	callgrind参照
+[.] realloc	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] gen_json::parser::parse_with_scanner_budget	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] core::ptr::drop_glue::<gen_json::api::ParseResult>	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] attribution::measured	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] <std::thread::local::LocalKey<core::cell::RefCell<core::option::Option<gen_json::runtime::Buffers>>>>::with::<<gen_json::runtime::Session<false>>::recycle::{closure#0}, ()>	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::Session<false>>::restore	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::runtime::POOL::{K#0}::{closure#0} as core::ops::function::FnOnce<(core::option::Option<&mut core::option::Option<core::cell::RefCell<core::option::Option<gen_json::runtime::Buffers>>>>,)>>::call_once	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::memo::Memo<gen_json::runtime::Saved>>::reset	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] <gen_json::rt::lexcache::SkipCache>::reset	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] <core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<gen_json::runtime::Effect>>, <gen_json::runtime::Session<false>>::finish_checked::{closure#5}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<gen_json::api::ScopeEvent, <alloc::vec::Vec<gen_json::api::ScopeEvent>>::extend_trusted<core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<gen_json::runtime::Effect>>, <gen_json::runtime::Session<false>>::finish_checked::{closure#5}>>::{closure#0}>::{closure#0}>	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
+[.] <alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>	400.802	0.00	callgrind参照	callgrind参照	callgrind参照
