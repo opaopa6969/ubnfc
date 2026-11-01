@@ -28,6 +28,7 @@ pub(crate) struct Generator<'a> {
     pub scans: crate::scan::Scans,
     pub scan_source: String,
     pub ll1_roots: BTreeMap<usize, usize>,
+    pub ll1_proven: bool,
     /// D-078: 意味値を持つ選択（`M+ | '='`）の、意味値を持たない候補。その候補が採用されたら
     /// 一致範囲の字句を 1 つの意味値にする（旧実装の `#semantic:text`、Java `SemanticShape`）。
     pub text_alternatives: BTreeSet<usize>,
@@ -78,6 +79,7 @@ impl<'a> Generator<'a> {
             scans: crate::scan::Scans::empty(),
             scan_source: String::new(),
             ll1_roots: BTreeMap::new(),
+            ll1_proven: crate::ll1::validate(ir).is_ok(),
             text_alternatives: BTreeSet::new(),
         };
         g.text_alternatives = crate::expressions::text_alternatives(&g);

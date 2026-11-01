@@ -1,0 +1,5 @@
+既存の左再帰テスト: 3 passed / 0 failed
+既存の生成 golden テスト: 3 passed / 0 failed
+LL(1) 表の判定・実行テスト: 5 passed / 0 failed
+式 ID による部分表の照合、不一致の表の無効化に修正した後も、JSON の生成ソースは全ファイル byte 一致。
+計測経路に変更はない。

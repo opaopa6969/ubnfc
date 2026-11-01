@@ -56,10 +56,41 @@ fn scope_grammars_keep_the_reference_path_even_when_static_regions_exist() {
 }
 
 #[test]
-fn a_tampered_table_is_rejected_before_codegen() {
+fn a_tampered_table_is_not_generated_or_executed() {
     let mut ir = grammar("@root Root ::= D+ ;");
     ir.plan.ll1[0].operation = Ll1Operation::Call { target: u64::MAX };
-    assert!(ubnfc_rust::emit(&ir, &Default::default()).is_err());
+    let generated = ubnfc_rust::emit(&ir, &Default::default()).unwrap();
+    assert!(!generated.files["parser.rs"].contains("self.options.ll1"));
+    assert!(generated.files["runtime.rs"].contains("static LL1_TABLE:&[Ll1Op]=&[\n];"));
+}
+
+#[test]
+fn a_reordered_table_retains_its_proof_by_expression_id() {
+    let mut ir = grammar("@root Root ::= '(' D+ ')' ;");
+    let size = ir.plan.ll1.len() as u64;
+    ir.plan.ll1.reverse();
+    for state in &mut ir.plan.ll1 {
+        let remap = |target: &mut u64| *target = size - 1 - *target;
+        match &mut state.operation {
+            Ll1Operation::Sequence { targets } => {
+                for target in targets {
+                    remap(target);
+                }
+            }
+            Ll1Operation::Choice { transitions } => {
+                for row in transitions {
+                    remap(&mut row.target);
+                }
+            }
+            Ll1Operation::Optional { target }
+            | Ll1Operation::Repeat { target, .. }
+            | Ll1Operation::Call { target } => remap(target),
+            _ => {}
+        }
+    }
+    let generated =
+        ubnfc_rust::emit(&ir, &Default::default()).expect("配列順ではなく命令を検証する");
+    assert!(generated.files["parser.rs"].contains("self.options.ll1"));
 }
 
 struct Temp(PathBuf);

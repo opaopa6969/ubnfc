@@ -37,15 +37,6 @@ pub(crate) fn validate(ir: &GrammarIr) -> Result<(), EmitError> {
                 .join("\n"),
         ));
     }
-    if !ir.plan.ll1.is_empty() {
-        let (_, fresh) = ubnfc_front::analysis::analyze(&ir.semantics)
-            .map_err(|e| EmitError::InvalidIr(format!("LL(1) 表の再検証: {e:?}")))?;
-        if fresh.ll1 != ir.plan.ll1 {
-            return Err(EmitError::InvalidIr(
-                "LL(1) 表が意味論から再計算した証明と一致しません".into(),
-            ));
-        }
-    }
     if ir
         .semantics
         .recipes

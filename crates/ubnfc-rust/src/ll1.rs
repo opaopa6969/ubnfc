@@ -19,7 +19,10 @@ fn targets(op: &Ll1Operation) -> Vec<u64> {
 pub(crate) fn roots(g: &Generator<'_>) -> BTreeMap<usize, usize> {
     // 現実装は Session が事象を全く記録しない文法に限定する。
     // 効果を持つ別規則の capture が子孫の事象を読む場合も保守的に除外する。
-    if !g.ir.semantics.scope.effects.is_empty() || !g.ir.semantics.recovery.is_empty() {
+    if !g.ll1_proven
+        || !g.ir.semantics.scope.effects.is_empty()
+        || !g.ir.semantics.recovery.is_empty()
+    {
         return BTreeMap::new();
     }
     let table = &g.ir.plan.ll1;
@@ -69,6 +72,10 @@ fn ranges(rs: &[CharRange]) -> String {
 pub(crate) fn generate(g: &Generator<'_>) -> String {
     let mut s = String::from(include_str!("../templates/ll1.rs"));
     s.push_str("\nstatic LL1_TABLE:&[Ll1Op]=&[\n");
+    if !g.ll1_proven {
+        s.push_str("];\n");
+        return s;
+    }
     for state in &g.ir.plan.ll1 {
         let op = match &state.operation {
             Ll1Operation::Sequence { targets } => format!("Ll1Op::Sequence(&{targets:?})"),
@@ -114,6 +121,10 @@ pub(crate) fn fast_path(g: &Generator<'_>, i: usize, mode: bool) -> Option<Strin
 
 /// 既存の純粋な一括走査を表の辺として呼ぶ。scan の実装・SWAR 化は変更しない。
 pub(crate) fn scanners(g: &Generator<'_>) -> String {
+    if !g.ll1_proven {
+        return "fn ll1_scan(&self,i:usize,p:usize)->Option<Option<usize>> {let _=(i,p);None}\n"
+            .into();
+    }
     let mut s = String::from("fn ll1_scan(&self,i:usize,p:usize)->Option<Option<usize>> {let _=p;if !self.options.scan {return None;}match i {\n");
     for (state, row) in g.ir.plan.ll1.iter().enumerate() {
         let i = g.expr[row.expr_id.as_str()];
@@ -150,4 +161,63 @@ fn sets_false(g: &Generator<'_>, i: usize, seen: &mut BTreeSet<usize>) -> bool {
         ),
         _ => false,
     }
+}
+
+/// 式 ID で照合し、保守的な部分表・配列の並べ替えも受け付ける。
+/// lowering の履歴を省いても、実行する式と命令が同じなら証明は失われない。
+/// 意味論を加工した IR では古い計画が残り得る。不一致の表は IR 自体を拒否せず、
+/// 生成・実行を無効にして参照経路へ戻す。既存の意味論の検証と診断を優先する。
+pub(crate) fn validate(ir: &GrammarIr) -> Result<(), crate::EmitError> {
+    if ir.plan.ll1.is_empty() {
+        return Ok(());
+    }
+    let invalid = || {
+        crate::EmitError::InvalidIr(
+            "LL(1) 表の命令または参照先が意味論からの証明と一致しません".into(),
+        )
+    };
+    let (_, fresh) = ubnfc_front::analysis::analyze(&ir.semantics)
+        .map_err(|e| crate::EmitError::InvalidIr(format!("LL(1) 表の再検証: {e:?}")))?;
+    let by_expr: BTreeMap<_, _> = fresh
+        .ll1
+        .iter()
+        .enumerate()
+        .map(|(i, s)| (&s.expr_id, i as u64))
+        .collect();
+    let mut seen = BTreeSet::new();
+    let mut mapping = Vec::new();
+    for state in &ir.plan.ll1 {
+        if !seen.insert(&state.expr_id) {
+            return Err(invalid());
+        }
+        mapping.push(*by_expr.get(&state.expr_id).ok_or_else(invalid)?);
+    }
+    for (i, state) in ir.plan.ll1.iter().enumerate() {
+        let mut op = state.operation.clone();
+        let remap = |target: &mut u64| -> Result<(), crate::EmitError> {
+            let index = usize::try_from(*target).map_err(|_| invalid())?;
+            *target = *mapping.get(index).ok_or_else(invalid)?;
+            Ok(())
+        };
+        match &mut op {
+            Ll1Operation::Sequence { targets } => {
+                for target in targets {
+                    remap(target)?;
+                }
+            }
+            Ll1Operation::Choice { transitions } => {
+                for row in transitions {
+                    remap(&mut row.target)?;
+                }
+            }
+            Ll1Operation::Optional { target }
+            | Ll1Operation::Repeat { target, .. }
+            | Ll1Operation::Call { target } => remap(target)?,
+            _ => {}
+        }
+        if op != fresh.ll1[mapping[i] as usize].operation {
+            return Err(invalid());
+        }
+    }
+    Ok(())
 }
