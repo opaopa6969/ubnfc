@@ -30,7 +30,7 @@
     {"line": 3, "char": 0, "length": 1, "type": "operator"}
   ],
   "probes": [
-    {"at": [2, 11], "definition": [[2, 29, 2, 33]], "references": [[2, 11, 2, 15], [2, 29, 2, 33]], "referencesOnly": [[2, 11, 2, 15]], "hover": {"range": [2, 11, 2, 15], "markdown": "**Word** — 参照\n\n宣言: 3 行 30 桁"}, "completion": ["(", ")", ".", ";", "@typeof", "ERROR", "Expr", "[", "]", "{", "|", "}"], "completionCount": 12},
-    {"at": [2, 29], "definition": [[2, 29, 2, 33]], "references": [[2, 11, 2, 15], [2, 29, 2, 33]], "referencesOnly": [[2, 11, 2, 15]], "hover": {"range": [2, 29, 2, 33], "markdown": "**Word** — 宣言\n\n種類: `RuleDecl`"}, "completion": ["(", ")", "::=", ";", "=", "@", "@backref", "@catalog", "@commonField", "@declares", "@doc", "@enum", "@eval", "@interleave", "@leftAssoc", "@longestChoice", "@mapping", "@precedence", "@predictiveChoice", "@recovery"], "completionCount": 33}
+    {"at": [2, 11], "definition": [[2, 29, 2, 33]], "references": [[2, 11, 2, 15], [2, 29, 2, 33]], "referencesOnly": [[2, 11, 2, 15]], "hover": {"range": [2, 11, 2, 15], "markdown": "**Word** — 参照\n\n宣言: 3 行 30 桁"}, "completion": ["(", ")", ",", ".", "@typeof", "CAPTURE(", "CAPTURE_SCOPE(", "CATCH(", "COMMIT(", "ERROR", "Expr", "LABEL(", "SAME_AS(", "[", "]", "{", "}"], "completionCount": 17},
+    {"at": [2, 29], "definition": [[2, 29, 2, 33]], "references": [[2, 11, 2, 15], [2, 29, 2, 33]], "referencesOnly": [[2, 11, 2, 15]], "hover": {"range": [2, 29, 2, 33], "markdown": "**Word** — 宣言\n\n種類: `RuleDecl`"}, "completion": ["(", ")", ",", "::=", ";", "=", "@", "@backref", "@catalog", "@commonField", "@declares", "@doc", "@enum", "@eval", "@interleave", "@leftAssoc", "@lexicalContext", "@longestChoice", "@mapping", "@namePredicate"], "completionCount": 44}
   ]
 }

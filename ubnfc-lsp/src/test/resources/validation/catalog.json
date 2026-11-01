@@ -1,0 +1,199 @@
+{
+  "normal": [],
+  "prefix": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 10
+        },
+        "end": {
+          "line": 0,
+          "character": 15
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-unknown"
+      },
+      "source": "ubnfc-catalog",
+      "message": "カタログにない値: item_（names）"
+    },
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 17
+        },
+        "end": {
+          "line": 0,
+          "character": 21
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-unknown"
+      },
+      "source": "ubnfc-catalog",
+      "message": "カタログにない値: item（names）"
+    }
+  ],
+  "unknown": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 9
+        },
+        "end": {
+          "line": 0,
+          "character": 16
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-unknown"
+      },
+      "source": "ubnfc-catalog",
+      "message": "カタログにない値: unknown（names）"
+    },
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 18
+        },
+        "end": {
+          "line": 0,
+          "character": 23
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-unknown"
+      },
+      "source": "ubnfc-catalog",
+      "message": "カタログにない値: other（names）"
+    }
+  ],
+  "updated": [],
+  "invalid": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-invalid"
+      },
+      "source": "ubnfc-catalog",
+      "message": "カタログの内容が不正です: names"
+    }
+  ],
+  "missing": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-missing"
+      },
+      "source": "ubnfc-catalog",
+      "message": "カタログが見つかりません: names"
+    }
+  ],
+  "disabled": [],
+  "badConfig": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-config"
+      },
+      "source": "ubnfc-catalog",
+      "message": "catalogs は context と .tecatalog の絶対パスの対応表で指定してください"
+    }
+  ],
+  "syntax": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 18
+        },
+        "end": {
+          "line": 0,
+          "character": 18
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "Value"
+      },
+      "source": "ubnfc",
+      "message": "構文エラー: \u0027 \u0027 | \u0027*/\u0027 | \u0027/*\u0027 | \u0027//\u0027 | \u0027;\u0027 | AlphabetUnderScoreParser | EndOfSourceParser | IdentifierParser ほか 1 件 を期待しました",
+      "relatedInformation": [
+        {
+          "location": {
+            "uri": "file:///validation/demo.ubnf",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 18
+              },
+              "end": {
+                "line": 0,
+                "character": 18
+              }
+            }
+          },
+          "message": "最深規則: Value"
+        }
+      ]
+    },
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 9
+        },
+        "end": {
+          "line": 0,
+          "character": 16
+        }
+      },
+      "severity": "Warning",
+      "code": {
+        "left": "catalog-prefix"
+      },
+      "source": "ubnfc-catalog",
+      "message": "カタログにない値: unknown（names）（構文エラーより前の範囲だけを見た結果）"
+    }
+  ],
+  "repaired": [],
+  "closed": []
+}

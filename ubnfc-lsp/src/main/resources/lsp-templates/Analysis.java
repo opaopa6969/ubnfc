@@ -46,6 +46,7 @@ public final class Analysis {
     private final RuntimeException failure;
     private volatile Symbols symbols;
     private volatile List<ParseResult.Lexical> lexical;
+    private volatile Map<String, List<__API_PACKAGE__.Capture>> catalogs;
 
     private Analysis(String uri, String text, Positions positions, Map<String, TokenScanner> scanners,
                      ParseResult<?> primary, ParseResult<?> scoped, String scopedText, boolean scopedIsPrefix,
@@ -122,5 +123,13 @@ public final class Analysis {
     public Symbols symbols() {
         if (symbols == null) symbols = Symbols.of(this);
         return symbols;
+    }
+
+    /** 外部カタログを指定したときだけ公開 capture 出現表を要求する。 */
+    public Map<String, List<__API_PACKAGE__.Capture>> catalogs() {
+        if (catalogs != null) return catalogs;
+        if (scoped == null) return catalogs = Map.of();
+        return catalogs = parse(scopedText, options(scanners, !scopedIsPrefix, false)
+            .withObservations(true, false)).catalogs();
     }
 }
