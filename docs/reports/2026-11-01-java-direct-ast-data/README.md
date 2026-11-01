@@ -27,3 +27,5 @@ SWAR追加前の性能・最新corpus検証は **`after-long/`** を使用する
 性能の最新判定は **`after-swar/`**。master #32 / 12e5e80を統合し、Rust比較binaryを更新して同条件の交互3セッションを再測定した。Java・front・pin・harness不変なので、corpusはafter-longの全1,492行一致を維持する。
 
 `python3 docs/reports/2026-11-01-java-direct-ast-data/after-swar/metrics.py` で同じディレクトリのCSVから再集計できる。任意の保存先は第1引数で指定する。保存済みmetrics.jsonと再集計結果のbyte一致を確認した。
+
+`after-fuzz-build/` はmaster #55の統合後に、計測対象の不変とfuzzの追加検証10件の成功を確認した記録。性能はafter-swar、corpusはafter-longの結果を維持する。

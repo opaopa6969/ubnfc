@@ -1,6 +1,6 @@
 # Java の認識 event から typed AST を直接構築する（issue #4）
 
-> 最終判定は末尾「SWAR 統合後の最終検証・A/B」。先行する全測定値は履歴として保持する。
+> 最終判定は「SWAR 統合後の最終検証・A/B」節。先行する全測定値は履歴として保持する。
 
 ## 実装と観測契約
 
@@ -300,3 +300,8 @@ x64のAST層は代表値1.522倍で達成だが、S3は3.009倍で未達。全�
 各代表中央値の直接/旧の比はcomplex 1.259、x64 0.886。complexは直接が遅い代表値であり、安定したJavaの速度改善は主張しない。セッションごとの認識対照と併記し、保持capture graphやGCが原因だとは断定しない。
 Recipeとfield配列の除去後もMatch / Occurrence / Valueの確保・capture graphの走査が残る。遅延projectionによる保持期間・cache局所性・GCへの影響は仮説で、原因と断定しない。#35でCPU自己時間とlive graph・GC・割当を突き合わせ、最大項を特定して小さい改善から同条件A/Bする。
 全生データ・SHA・統合検証は `after-swar/`。`source.sha256` は従来の計測依存にRust backend emitterの全src/*.rsも追加して記録する。履歴のSHAは当時の対象を示すものとして保持する。
+
+## fuzzのビルド失敗記録の統合後の確認
+
+master `2328689`（#55）のseed・build error保持をmergeで取り込んだ。差分はfuzzのcampaignとテスト・説明に限られ、Java / front / corpus / pin / IR golden / 計測ソースは不変。`after-swar/source.sha256` 全件一致で、最新中央値・全1,492行の基準同値を維持する。
+`cargo test -p ubnfc-fuzz --test build_discard --test campaign --no-fail-fast` は **10件成功・0失敗**（build_discard2件3.43秒、campaign8件73.81秒）。両backendの固定seed・直接token / group capture等も通過した。D-094とmaster全設計行を保持し、設計番号重複はない。証拠は `after-fuzz-build/`。統合後HEADのCI成功を確認してmergeする。
