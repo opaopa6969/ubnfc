@@ -3,8 +3,8 @@
 ## 完了範囲と設計判断
 
 段階 3 §5.2 に残した GrammarValidator 相当の検査を、既存 front の
-`ubnfc validate --format json` を呼ぶ生成 `FrontValidation.java` で提供する（D-093）。
-外部 `.tecatalog` は生成 `CatalogDiagnostics.java` が `ParseResult.catalogs()` の capture と照合する（D-094）。
+`ubnfc validate --format json` を呼ぶ生成 `FrontValidation.java` で提供する（D-094）。
+外部 `.tecatalog` は生成 `CatalogDiagnostics.java` が `ParseResult.catalogs()` の capture と照合する（D-095）。
 生成される LSP ソースは 12 → 14 ファイルになる。
 
 **LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP / DAP はない。**
@@ -202,8 +202,15 @@ Rust のソースや期待値は変更していない。CI での workspace 全�
 master `bdd87bd`）が merge されたため取り込んだ。stax の protocol 検査は `textDocumentSync` の
 整数 `1` を前提としていたので、Full 同期を検査しつつ openClose / save の明示通知も検査する形へ追従した。
 既存の protocol golden も同期の通知形式だけを更新し、言語の振る舞いは変更しない。
-master の D 行の最大値は引き続き D-092 で、今回の D-093 / D-094 に衝突はない。
+その後、増分再解析設計の PR #18（master `06fa27b`）も取り込んだ。master の D-093 を保持し、今回の追加行だけを D-094 / D-095 へ振り直した。
 統合後は LSP 全18テスト、stax の protocol / 回復検査と Cargo 側の統合テスト1件が成功した。
+
+最新 head の native CI では fuzz campaign の4件が `build:rust` の discard で失敗した。
+同じ head のローカル再実行は8件すべて成功し、生成 Rust と campaign の実装に差分はない。
+CI は seed と Cargo / rustc のエラー本文を保持しておらず、正確な原因は確定できない。
+観測情報を保持する改善は受け入れ条件付きの [issue #54](https://github.com/opaopa6969/ubnfc/issues/54)
+へ分離した。診断条件を弱めず、最新 master を含む head の CI を通す。最終結果は PR checks と
+issue #26 の完了コメントを参照する。
 
 ## 引継ぎと取り消し
 
