@@ -1,0 +1,11 @@
+{
+  "統合前": "9e6714869c81a0282129dd758d398dee7a5949cb",
+  "統合master": "38efae74239c1e4696a2dd4e73db0110d0d22f57",
+  "計測ソースSHA一致": 103,
+  "AST_front_pin_IRgolden_共有scanner変更": false,
+  "AST設計": "D-094",
+  "master全設計行保持": true,
+  "設計番号重複": false,
+  "測定値": "after-swarの全3セッションを維持",
+  "corpus": "Java/front/pin/driver不変、after-longの全1492行基準同値を維持"
+}

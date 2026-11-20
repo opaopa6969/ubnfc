@@ -31,6 +31,64 @@
       "ok": true,
       "recoveries": [
         {
+          "expected": [
+            "' '",
+            "'!'",
+            "'*'",
+            "'*/'",
+            "'+'",
+            "'-'",
+            "'.'",
+            "'/'",
+            "'/*'",
+            "'//'",
+            "'<'",
+            "'<='",
+            "'<>'",
+            "'='",
+            "'>'",
+            "'>='",
+            "'['",
+            "']'",
+            "'and'",
+            "'call'",
+            "'choose'",
+            "'concat'",
+            "'drop'",
+            "'dup'",
+            "'false'",
+            "'int_to_str'",
+            "'let'",
+            "'mod'",
+            "'neg'",
+            "'newline'",
+            "'nip'",
+            "'not'",
+            "'or'",
+            "'over'",
+            "'print'",
+            "'recurse'",
+            "'rot'",
+            "'str_len'",
+            "'swap'",
+            "'true'",
+            "AlphabetUnderScoreParser",
+            "BoolLitParser",
+            "Chain",
+            "DigitParser",
+            "IdentifierParser",
+            "NumLitParser",
+            "NumberParser",
+            "OneOrMore",
+            "PrimParser",
+            "Quoted",
+            "STRINGParser",
+            "SignParser",
+            "StrLitParser",
+            "WordRefParser",
+            "__CaptureSite"
+          ],
+          "mode": "SYNC",
           "rule": "Stax::TopLevel",
           "skippedSpan": [
             0,
@@ -44,7 +102,889 @@
       ]
     },
     "choiceWarning": false,
-    "lspDiagnostics": [],
+    "lsp": {
+      "original": {
+        "closed": {
+          "diagnostics": [],
+          "uri": "file:///recovery-original.stax"
+        },
+        "definition": [
+          {
+            "range": {
+              "end": {
+                "character": 7,
+                "line": 1
+              },
+              "start": {
+                "character": 2,
+                "line": 1
+              }
+            },
+            "uri": "file:///recovery-original.stax"
+          }
+        ],
+        "empty": {
+          "diagnostics": [],
+          "uri": "file:///recovery-original.stax"
+        },
+        "parse": {
+          "consumed": 37,
+          "declarations": [
+            "after"
+          ],
+          "diagnosticKind": "none",
+          "ok": true,
+          "recoveries": [
+            {
+              "expected": [
+                "' '",
+                "'!'",
+                "'*'",
+                "'*/'",
+                "'+'",
+                "'-'",
+                "'.'",
+                "'/'",
+                "'/*'",
+                "'//'",
+                "'<'",
+                "'<='",
+                "'<>'",
+                "'='",
+                "'>'",
+                "'>='",
+                "'['",
+                "']'",
+                "'and'",
+                "'call'",
+                "'choose'",
+                "'concat'",
+                "'drop'",
+                "'dup'",
+                "'false'",
+                "'int_to_str'",
+                "'let'",
+                "'mod'",
+                "'neg'",
+                "'newline'",
+                "'nip'",
+                "'not'",
+                "'or'",
+                "'over'",
+                "'print'",
+                "'recurse'",
+                "'rot'",
+                "'str_len'",
+                "'swap'",
+                "'true'",
+                "AlphabetUnderScoreParser",
+                "BoolLitParser",
+                "Chain",
+                "DigitParser",
+                "IdentifierParser",
+                "NumLitParser",
+                "NumberParser",
+                "OneOrMore",
+                "PrimParser",
+                "Quoted",
+                "STRINGParser",
+                "SignParser",
+                "StrLitParser",
+                "WordRefParser",
+                "__CaptureSite"
+              ],
+              "mode": "SYNC",
+              "rule": "Stax::TopLevel",
+              "skippedSpan": [
+                0,
+                18
+              ],
+              "span": [
+                0,
+                19
+              ]
+            }
+          ]
+        },
+        "published": {
+          "diagnostics": [
+            {
+              "code": "recovery",
+              "data": {
+                "expected": [
+                  "' '",
+                  "'!'",
+                  "'*'",
+                  "'*/'",
+                  "'+'",
+                  "'-'",
+                  "'.'",
+                  "'/'",
+                  "'/*'",
+                  "'//'",
+                  "'<'",
+                  "'<='",
+                  "'<>'",
+                  "'='",
+                  "'>'",
+                  "'>='",
+                  "'['",
+                  "']'",
+                  "'and'",
+                  "'call'",
+                  "'choose'",
+                  "'concat'",
+                  "'drop'",
+                  "'dup'",
+                  "'false'",
+                  "'int_to_str'",
+                  "'let'",
+                  "'mod'",
+                  "'neg'",
+                  "'newline'",
+                  "'nip'",
+                  "'not'",
+                  "'or'",
+                  "'over'",
+                  "'print'",
+                  "'recurse'",
+                  "'rot'",
+                  "'str_len'",
+                  "'swap'",
+                  "'true'",
+                  "AlphabetUnderScoreParser",
+                  "BoolLitParser",
+                  "Chain",
+                  "DigitParser",
+                  "IdentifierParser",
+                  "NumLitParser",
+                  "NumberParser",
+                  "OneOrMore",
+                  "PrimParser",
+                  "Quoted",
+                  "STRINGParser",
+                  "SignParser",
+                  "StrLitParser",
+                  "WordRefParser",
+                  "__CaptureSite"
+                ],
+                "mode": "SYNC",
+                "origin": "recovery",
+                "ruleId": "Stax::TopLevel",
+                "skippedRange": {
+                  "end": {
+                    "character": 18,
+                    "line": 0
+                  },
+                  "start": {
+                    "character": 0,
+                    "line": 0
+                  }
+                }
+              },
+              "message": "回復した領域: 構文エラー: ' ' | '!' | '*' | '*/' | '+' | '-' | '.' | '/' ほか 47 件 を期待しました",
+              "range": {
+                "end": {
+                  "character": 19,
+                  "line": 0
+                },
+                "start": {
+                  "character": 0,
+                  "line": 0
+                }
+              },
+              "relatedInformation": [
+                {
+                  "location": {
+                    "range": {
+                      "end": {
+                        "character": 19,
+                        "line": 0
+                      },
+                      "start": {
+                        "character": 0,
+                        "line": 0
+                      }
+                    },
+                    "uri": "file:///recovery-original.stax"
+                  },
+                  "message": "回復規則: Stax::TopLevel"
+                }
+              ],
+              "severity": 1,
+              "source": "ubnfc"
+            }
+          ],
+          "uri": "file:///recovery-original.stax"
+        },
+        "repaired": {
+          "diagnostics": [],
+          "uri": "file:///recovery-original.stax"
+        },
+        "repairedDefinition": [
+          {
+            "range": {
+              "end": {
+                "character": 7,
+                "line": 0
+              },
+              "start": {
+                "character": 2,
+                "line": 0
+              }
+            },
+            "uri": "file:///recovery-original.stax"
+          }
+        ]
+      },
+      "reference": {
+        "closed": {
+          "diagnostics": [],
+          "uri": "file:///recovery-reference.stax"
+        },
+        "definition": [
+          {
+            "range": {
+              "end": {
+                "character": 7,
+                "line": 1
+              },
+              "start": {
+                "character": 2,
+                "line": 1
+              }
+            },
+            "uri": "file:///recovery-reference.stax"
+          }
+        ],
+        "empty": {
+          "diagnostics": [],
+          "uri": "file:///recovery-reference.stax"
+        },
+        "parse": {
+          "consumed": 64,
+          "declarations": [
+            "after",
+            "use_after"
+          ],
+          "diagnosticKind": "none",
+          "ok": true,
+          "recoveries": [
+            {
+              "expected": [
+                "' '",
+                "'!'",
+                "'*'",
+                "'*/'",
+                "'+'",
+                "'-'",
+                "'.'",
+                "'/'",
+                "'/*'",
+                "'//'",
+                "'<'",
+                "'<='",
+                "'<>'",
+                "'='",
+                "'>'",
+                "'>='",
+                "'['",
+                "']'",
+                "'and'",
+                "'call'",
+                "'choose'",
+                "'concat'",
+                "'drop'",
+                "'dup'",
+                "'false'",
+                "'int_to_str'",
+                "'let'",
+                "'mod'",
+                "'neg'",
+                "'newline'",
+                "'nip'",
+                "'not'",
+                "'or'",
+                "'over'",
+                "'print'",
+                "'recurse'",
+                "'rot'",
+                "'str_len'",
+                "'swap'",
+                "'true'",
+                "AlphabetUnderScoreParser",
+                "BoolLitParser",
+                "Chain",
+                "DigitParser",
+                "IdentifierParser",
+                "NumLitParser",
+                "NumberParser",
+                "OneOrMore",
+                "PrimParser",
+                "Quoted",
+                "STRINGParser",
+                "SignParser",
+                "StrLitParser",
+                "WordRefParser",
+                "__CaptureSite"
+              ],
+              "mode": "SYNC",
+              "rule": "Stax::TopLevel",
+              "skippedSpan": [
+                0,
+                18
+              ],
+              "span": [
+                0,
+                19
+              ]
+            }
+          ]
+        },
+        "published": {
+          "diagnostics": [
+            {
+              "code": "recovery",
+              "data": {
+                "expected": [
+                  "' '",
+                  "'!'",
+                  "'*'",
+                  "'*/'",
+                  "'+'",
+                  "'-'",
+                  "'.'",
+                  "'/'",
+                  "'/*'",
+                  "'//'",
+                  "'<'",
+                  "'<='",
+                  "'<>'",
+                  "'='",
+                  "'>'",
+                  "'>='",
+                  "'['",
+                  "']'",
+                  "'and'",
+                  "'call'",
+                  "'choose'",
+                  "'concat'",
+                  "'drop'",
+                  "'dup'",
+                  "'false'",
+                  "'int_to_str'",
+                  "'let'",
+                  "'mod'",
+                  "'neg'",
+                  "'newline'",
+                  "'nip'",
+                  "'not'",
+                  "'or'",
+                  "'over'",
+                  "'print'",
+                  "'recurse'",
+                  "'rot'",
+                  "'str_len'",
+                  "'swap'",
+                  "'true'",
+                  "AlphabetUnderScoreParser",
+                  "BoolLitParser",
+                  "Chain",
+                  "DigitParser",
+                  "IdentifierParser",
+                  "NumLitParser",
+                  "NumberParser",
+                  "OneOrMore",
+                  "PrimParser",
+                  "Quoted",
+                  "STRINGParser",
+                  "SignParser",
+                  "StrLitParser",
+                  "WordRefParser",
+                  "__CaptureSite"
+                ],
+                "mode": "SYNC",
+                "origin": "recovery",
+                "ruleId": "Stax::TopLevel",
+                "skippedRange": {
+                  "end": {
+                    "character": 18,
+                    "line": 0
+                  },
+                  "start": {
+                    "character": 0,
+                    "line": 0
+                  }
+                }
+              },
+              "message": "回復した領域: 構文エラー: ' ' | '!' | '*' | '*/' | '+' | '-' | '.' | '/' ほか 47 件 を期待しました",
+              "range": {
+                "end": {
+                  "character": 19,
+                  "line": 0
+                },
+                "start": {
+                  "character": 0,
+                  "line": 0
+                }
+              },
+              "relatedInformation": [
+                {
+                  "location": {
+                    "range": {
+                      "end": {
+                        "character": 19,
+                        "line": 0
+                      },
+                      "start": {
+                        "character": 0,
+                        "line": 0
+                      }
+                    },
+                    "uri": "file:///recovery-reference.stax"
+                  },
+                  "message": "回復規則: Stax::TopLevel"
+                }
+              ],
+              "severity": 1,
+              "source": "ubnfc"
+            }
+          ],
+          "uri": "file:///recovery-reference.stax"
+        },
+        "repaired": {
+          "diagnostics": [],
+          "uri": "file:///recovery-reference.stax"
+        },
+        "repairedDefinition": [
+          {
+            "range": {
+              "end": {
+                "character": 7,
+                "line": 0
+              },
+              "start": {
+                "character": 2,
+                "line": 0
+              }
+            },
+            "uri": "file:///recovery-reference.stax"
+          }
+        ]
+      },
+      "unicode-multiple": {
+        "closed": {
+          "diagnostics": [],
+          "uri": "file:///recovery-unicode-multiple.stax"
+        },
+        "definition": [
+          {
+            "range": {
+              "end": {
+                "character": 54,
+                "line": 0
+              },
+              "start": {
+                "character": 49,
+                "line": 0
+              }
+            },
+            "uri": "file:///recovery-unicode-multiple.stax"
+          }
+        ],
+        "empty": {
+          "diagnostics": [],
+          "uri": "file:///recovery-unicode-multiple.stax"
+        },
+        "parse": {
+          "consumed": 127,
+          "declarations": [
+            "before",
+            "after",
+            "use_after",
+            "last"
+          ],
+          "diagnosticKind": "none",
+          "ok": true,
+          "recoveries": [
+            {
+              "expected": [
+                "' '",
+                "'!'",
+                "'*'",
+                "'*/'",
+                "'+'",
+                "'-'",
+                "'.'",
+                "'/'",
+                "'/*'",
+                "'//'",
+                "'<'",
+                "'<='",
+                "'<>'",
+                "'='",
+                "'>'",
+                "'>='",
+                "'['",
+                "']'",
+                "'and'",
+                "'call'",
+                "'choose'",
+                "'concat'",
+                "'drop'",
+                "'dup'",
+                "'false'",
+                "'int_to_str'",
+                "'let'",
+                "'mod'",
+                "'neg'",
+                "'newline'",
+                "'nip'",
+                "'not'",
+                "'or'",
+                "'over'",
+                "'print'",
+                "'recurse'",
+                "'rot'",
+                "'str_len'",
+                "'swap'",
+                "'true'",
+                "AlphabetUnderScoreParser",
+                "BoolLitParser",
+                "Chain",
+                "DigitParser",
+                "IdentifierParser",
+                "NumLitParser",
+                "NumberParser",
+                "OneOrMore",
+                "PrimParser",
+                "Quoted",
+                "STRINGParser",
+                "SignParser",
+                "StrLitParser",
+                "WordRefParser",
+                "__CaptureSite"
+              ],
+              "mode": "SYNC",
+              "rule": "Stax::TopLevel",
+              "skippedSpan": [
+                26,
+                44
+              ],
+              "span": [
+                26,
+                45
+              ]
+            },
+            {
+              "expected": [
+                "' '",
+                "'!'",
+                "'*'",
+                "'*/'",
+                "'+'",
+                "'-'",
+                "'.'",
+                "'/'",
+                "'/*'",
+                "'//'",
+                "'<'",
+                "'<='",
+                "'<>'",
+                "'='",
+                "'>'",
+                "'>='",
+                "'['",
+                "']'",
+                "'and'",
+                "'call'",
+                "'choose'",
+                "'concat'",
+                "'drop'",
+                "'dup'",
+                "'false'",
+                "'int_to_str'",
+                "'let'",
+                "'mod'",
+                "'neg'",
+                "'newline'",
+                "'nip'",
+                "'not'",
+                "'or'",
+                "'over'",
+                "'print'",
+                "'recurse'",
+                "'rot'",
+                "'str_len'",
+                "'swap'",
+                "'true'",
+                "AlphabetUnderScoreParser",
+                "BoolLitParser",
+                "Chain",
+                "DigitParser",
+                "IdentifierParser",
+                "NumLitParser",
+                "NumberParser",
+                "OneOrMore",
+                "PrimParser",
+                "Quoted",
+                "STRINGParser",
+                "SignParser",
+                "StrLitParser",
+                "WordRefParser",
+                "__CaptureSite"
+              ],
+              "mode": "SYNC",
+              "rule": "Stax::TopLevel",
+              "skippedSpan": [
+                90,
+                109
+              ],
+              "span": [
+                90,
+                110
+              ]
+            }
+          ]
+        },
+        "published": {
+          "diagnostics": [
+            {
+              "code": "recovery",
+              "data": {
+                "expected": [
+                  "' '",
+                  "'!'",
+                  "'*'",
+                  "'*/'",
+                  "'+'",
+                  "'-'",
+                  "'.'",
+                  "'/'",
+                  "'/*'",
+                  "'//'",
+                  "'<'",
+                  "'<='",
+                  "'<>'",
+                  "'='",
+                  "'>'",
+                  "'>='",
+                  "'['",
+                  "']'",
+                  "'and'",
+                  "'call'",
+                  "'choose'",
+                  "'concat'",
+                  "'drop'",
+                  "'dup'",
+                  "'false'",
+                  "'int_to_str'",
+                  "'let'",
+                  "'mod'",
+                  "'neg'",
+                  "'newline'",
+                  "'nip'",
+                  "'not'",
+                  "'or'",
+                  "'over'",
+                  "'print'",
+                  "'recurse'",
+                  "'rot'",
+                  "'str_len'",
+                  "'swap'",
+                  "'true'",
+                  "AlphabetUnderScoreParser",
+                  "BoolLitParser",
+                  "Chain",
+                  "DigitParser",
+                  "IdentifierParser",
+                  "NumLitParser",
+                  "NumberParser",
+                  "OneOrMore",
+                  "PrimParser",
+                  "Quoted",
+                  "STRINGParser",
+                  "SignParser",
+                  "StrLitParser",
+                  "WordRefParser",
+                  "__CaptureSite"
+                ],
+                "mode": "SYNC",
+                "origin": "recovery",
+                "ruleId": "Stax::TopLevel",
+                "skippedRange": {
+                  "end": {
+                    "character": 45,
+                    "line": 0
+                  },
+                  "start": {
+                    "character": 27,
+                    "line": 0
+                  }
+                }
+              },
+              "message": "回復した領域: 構文エラー: ' ' | '!' | '*' | '*/' | '+' | '-' | '.' | '/' ほか 47 件 を期待しました",
+              "range": {
+                "end": {
+                  "character": 46,
+                  "line": 0
+                },
+                "start": {
+                  "character": 27,
+                  "line": 0
+                }
+              },
+              "relatedInformation": [
+                {
+                  "location": {
+                    "range": {
+                      "end": {
+                        "character": 46,
+                        "line": 0
+                      },
+                      "start": {
+                        "character": 27,
+                        "line": 0
+                      }
+                    },
+                    "uri": "file:///recovery-unicode-multiple.stax"
+                  },
+                  "message": "回復規則: Stax::TopLevel"
+                }
+              ],
+              "severity": 1,
+              "source": "ubnfc"
+            },
+            {
+              "code": "recovery",
+              "data": {
+                "expected": [
+                  "' '",
+                  "'!'",
+                  "'*'",
+                  "'*/'",
+                  "'+'",
+                  "'-'",
+                  "'.'",
+                  "'/'",
+                  "'/*'",
+                  "'//'",
+                  "'<'",
+                  "'<='",
+                  "'<>'",
+                  "'='",
+                  "'>'",
+                  "'>='",
+                  "'['",
+                  "']'",
+                  "'and'",
+                  "'call'",
+                  "'choose'",
+                  "'concat'",
+                  "'drop'",
+                  "'dup'",
+                  "'false'",
+                  "'int_to_str'",
+                  "'let'",
+                  "'mod'",
+                  "'neg'",
+                  "'newline'",
+                  "'nip'",
+                  "'not'",
+                  "'or'",
+                  "'over'",
+                  "'print'",
+                  "'recurse'",
+                  "'rot'",
+                  "'str_len'",
+                  "'swap'",
+                  "'true'",
+                  "AlphabetUnderScoreParser",
+                  "BoolLitParser",
+                  "Chain",
+                  "DigitParser",
+                  "IdentifierParser",
+                  "NumLitParser",
+                  "NumberParser",
+                  "OneOrMore",
+                  "PrimParser",
+                  "Quoted",
+                  "STRINGParser",
+                  "SignParser",
+                  "StrLitParser",
+                  "WordRefParser",
+                  "__CaptureSite"
+                ],
+                "mode": "SYNC",
+                "origin": "recovery",
+                "ruleId": "Stax::TopLevel",
+                "skippedRange": {
+                  "end": {
+                    "character": 19,
+                    "line": 1
+                  },
+                  "start": {
+                    "character": 0,
+                    "line": 1
+                  }
+                }
+              },
+              "message": "回復した領域: 構文エラー: ' ' | '!' | '*' | '*/' | '+' | '-' | '.' | '/' ほか 47 件 を期待しました",
+              "range": {
+                "end": {
+                  "character": 20,
+                  "line": 1
+                },
+                "start": {
+                  "character": 0,
+                  "line": 1
+                }
+              },
+              "relatedInformation": [
+                {
+                  "location": {
+                    "range": {
+                      "end": {
+                        "character": 20,
+                        "line": 1
+                      },
+                      "start": {
+                        "character": 0,
+                        "line": 1
+                      }
+                    },
+                    "uri": "file:///recovery-unicode-multiple.stax"
+                  },
+                  "message": "回復規則: Stax::TopLevel"
+                }
+              ],
+              "severity": 1,
+              "source": "ubnfc"
+            }
+          ],
+          "uri": "file:///recovery-unicode-multiple.stax"
+        },
+        "repaired": {
+          "diagnostics": [],
+          "uri": "file:///recovery-unicode-multiple.stax"
+        },
+        "repairedDefinition": [
+          {
+            "range": {
+              "end": {
+                "character": 7,
+                "line": 0
+              },
+              "start": {
+                "character": 2,
+                "line": 0
+              }
+            },
+            "uri": "file:///recovery-unicode-multiple.stax"
+          }
+        ]
+      }
+    },
     "strictExit": 0,
     "valid-struct": {
       "consumed": 40,
@@ -68,6 +1008,64 @@
       "ok": true,
       "recoveries": [
         {
+          "expected": [
+            "' '",
+            "'!'",
+            "'*'",
+            "'*/'",
+            "'+'",
+            "'-'",
+            "'.'",
+            "'/'",
+            "'/*'",
+            "'//'",
+            "'<'",
+            "'<='",
+            "'<>'",
+            "'='",
+            "'>'",
+            "'>='",
+            "'['",
+            "']'",
+            "'and'",
+            "'call'",
+            "'choose'",
+            "'concat'",
+            "'drop'",
+            "'dup'",
+            "'false'",
+            "'int_to_str'",
+            "'let'",
+            "'mod'",
+            "'neg'",
+            "'newline'",
+            "'nip'",
+            "'not'",
+            "'or'",
+            "'over'",
+            "'print'",
+            "'recurse'",
+            "'rot'",
+            "'str_len'",
+            "'swap'",
+            "'true'",
+            "AlphabetUnderScoreParser",
+            "BoolLitParser",
+            "Chain",
+            "DigitParser",
+            "IdentifierParser",
+            "NumLitParser",
+            "NumberParser",
+            "OneOrMore",
+            "PrimParser",
+            "Quoted",
+            "STRINGParser",
+            "SignParser",
+            "StrLitParser",
+            "WordRefParser",
+            "__CaptureSite"
+          ],
+          "mode": "SYNC",
           "rule": "Stax::WordDef",
           "skippedSpan": [
             0,
@@ -89,6 +1087,15 @@
       "ok": true,
       "recoveries": [
         {
+          "expected": [
+            "' '",
+            "'*/'",
+            "'/*'",
+            "'//'",
+            "':'",
+            "';'"
+          ],
+          "mode": "SYNC",
           "rule": "Stax::WordDef",
           "skippedSpan": [
             0,

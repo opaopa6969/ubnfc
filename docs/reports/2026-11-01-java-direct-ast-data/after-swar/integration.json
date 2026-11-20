@@ -1,0 +1,13 @@
+{
+  "統合master": "12e5e80641c16c5cd98ccb91e92dc656d35fcbb9",
+  "既存計測ソースSHA一致": 85,
+  "Java_front_pin_harness_golden_差分": 0,
+  "Rust比較binary前": "92aab9e13b40680162aac6697b2c5a0ad266c5f656f4007c768c15b87d65f1ab",
+  "Rust比較binary後": "4a91cc2c4a3d73ec6d25136a2ccc2455f45645c93c6fa3600b1b761643bcbbbe",
+  "追加source記録": "Rust backend emitterのsrc/*.rsも含める",
+  "corpus": "Javaとfront/pin/harnessは不変。after-longの全1492行の基準同値とPass1328/Fail3/IR44を維持",
+  "AST設計": "D-094",
+  "SWAR設計": "masterのD-100を保持",
+  "Rust回帰成功": 6,
+  "SWAR差分成功": 1
+}

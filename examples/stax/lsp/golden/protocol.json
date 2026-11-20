@@ -430,7 +430,7 @@
   ],
   "completion-field": [
     {
-      "detail": "宣言済みの記号",
+      "detail": "宣言済みの記号（正常前半の部分索引）",
       "kind": 6,
       "label": "x"
     }
@@ -1036,7 +1036,11 @@
   "edit-broken": [
     {
       "code": "QuotType",
-      "message": "構文エラー: ' ' | '*/' | '--' | '/*' | '//' | 'Bool' | 'Float' | 'Int' ほか 8 件 を期待しました",
+      "data": {
+        "analysis": "prefix",
+        "indexedThroughCp": 18
+      },
+      "message": "構文エラー: ' ' | '*/' | '--' | '/*' | '//' | 'Bool' | 'Float' | 'Int' ほか 8 件 を期待しました（正常な前半だけを索引化）",
       "range": {
         "end": {
           "character": 11,
@@ -1069,7 +1073,42 @@
       "source": "ubnfc"
     }
   ],
-  "edit-prefix-definition": [],
+  "edit-empty": [],
+  "edit-prefix-definition": [
+    {
+      "range": {
+        "end": {
+          "character": 8,
+          "line": 0
+        },
+        "start": {
+          "character": 2,
+          "line": 0
+        }
+      },
+      "uri": "fixture:///editing.stax"
+    }
+  ],
+  "edit-removed-definition": [],
+  "edit-reopened": [
+    {
+      "code": "scope",
+      "message": "未定義のシンボル: 'before'",
+      "range": {
+        "end": {
+          "character": 21,
+          "line": 0
+        },
+        "start": {
+          "character": 15,
+          "line": 0
+        }
+      },
+      "severity": 2,
+      "source": "ubnfc"
+    }
+  ],
+  "edit-reopened-definition": [],
   "edit-repaired": [],
   "hover-primitive": {
     "contents": {
@@ -1151,6 +1190,366 @@
       "version": "0.1.0"
     }
   },
+  "prefix-body-completion": [
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "!"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "*"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "+"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "-"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "."
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "/"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ";"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "<>"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ">"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": ">="
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "["
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "]"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "and"
+    },
+    {
+      "detail": "宣言済みの記号（正常前半の部分索引）",
+      "kind": 6,
+      "label": "before"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "call"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "choose"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "concat"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "drop"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "dup"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "false"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "int_to_str"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "let"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "mod"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "neg"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "newline"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "nip"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "not"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "or"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "over"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "print"
+    },
+    {
+      "detail": "宣言済みの記号（正常前半の部分索引）",
+      "kind": 6,
+      "label": "prior"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "recurse"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "rot"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "str_len"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "swap"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "true"
+    }
+  ],
+  "prefix-body-diagnostics": [
+    {
+      "code": "Quotation",
+      "data": {
+        "analysis": "prefix",
+        "indexedThroughCp": 42
+      },
+      "message": "構文エラー: ' ' | '!' | '*' | '*/' | '+' | '-' | '.' | '/' ほか 48 件 を期待しました（正常な前半だけを索引化）",
+      "range": {
+        "end": {
+          "character": 16,
+          "line": 2
+        },
+        "start": {
+          "character": 16,
+          "line": 2
+        }
+      },
+      "relatedInformation": [
+        {
+          "location": {
+            "range": {
+              "end": {
+                "character": 16,
+                "line": 2
+              },
+              "start": {
+                "character": 16,
+                "line": 2
+              }
+            },
+            "uri": "fixture:///prefix-body.stax"
+          },
+          "message": "最深規則: Quotation"
+        }
+      ],
+      "severity": 1,
+      "source": "ubnfc"
+    }
+  ],
+  "prefix-completion": [
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "--"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Bool"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Float"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Int"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 14,
+      "label": "Str"
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "["
+    },
+    {
+      "detail": "ここに書ける終端",
+      "kind": 24,
+      "label": "]"
+    }
+  ],
+  "prefix-reference-definition": [
+    {
+      "range": {
+        "end": {
+          "character": 8,
+          "line": 0
+        },
+        "start": {
+          "character": 2,
+          "line": 0
+        }
+      },
+      "uri": "fixture:///prefix-body.stax"
+    }
+  ],
+  "prefix-scope-diagnostics": [
+    {
+      "code": "QuotType",
+      "data": {
+        "analysis": "prefix",
+        "indexedThroughCp": 34
+      },
+      "message": "構文エラー: ' ' | '*/' | '--' | '/*' | '//' | 'Bool' | 'Float' | 'Int' ほか 8 件 を期待しました（正常な前半だけを索引化）",
+      "range": {
+        "end": {
+          "character": 11,
+          "line": 1
+        },
+        "start": {
+          "character": 11,
+          "line": 1
+        }
+      },
+      "relatedInformation": [
+        {
+          "location": {
+            "range": {
+              "end": {
+                "character": 11,
+                "line": 1
+              },
+              "start": {
+                "character": 11,
+                "line": 1
+              }
+            },
+            "uri": "fixture:///prefix-unicode.stax"
+          },
+          "message": "最深規則: QuotType"
+        }
+      ],
+      "severity": 1,
+      "source": "ubnfc"
+    },
+    {
+      "code": "scope-prefix",
+      "message": "未定義のシンボル: 'missing'（構文エラーより前の範囲だけを見た結果）",
+      "range": {
+        "end": {
+          "character": 32,
+          "line": 0
+        },
+        "start": {
+          "character": 25,
+          "line": 0
+        }
+      },
+      "severity": 2,
+      "source": "ubnfc"
+    }
+  ],
+  "prefix-unicode-definition": [
+    {
+      "range": {
+        "end": {
+          "character": 17,
+          "line": 0
+        },
+        "start": {
+          "character": 11,
+          "line": 0
+        }
+      },
+      "uri": "fixture:///prefix-unicode.stax"
+    }
+  ],
   "scope-after-quote": [
     {
       "range": {
