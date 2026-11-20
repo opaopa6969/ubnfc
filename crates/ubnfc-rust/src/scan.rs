@@ -285,13 +285,25 @@ fn body(g: &Generator<'_>, scans: &Scans, i: usize) -> Option<String> {
                 s.push_str("let mut count=0usize;\n");
             }
             let bulk = table.map(|class| {
-                let word = word_failure_mask(class).filter(|_| cfg!(feature = "swar")).map(|condition| format!(
-                    "if first<0x80 {{if (if first<64 {{{:#x}u64>>first}} else {{{:#x}u64>>(first-64)}})&1==0 {{break;}}\nwhile let Some(chunk)=bytes.get(p..).and_then(|tail|tail.get(..8)) {{\nlet w=u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"));\nlet x=w&0x7f7f7f7f7f7f7f7fu64;let _=x;\nlet bad={condition};let n=(bad.trailing_zeros()/8) as usize;p+=n;{}if bad!=0 {{break;}}\n}}}}\n",
-                    class.ascii_low, class.ascii_high,
-                    if counted {"count+=n;"} else {""}
-                )).unwrap_or_default();
-                let byte = if word.is_empty() { "let b=first;" } else { "let Some(&b)=bytes.get(p) else {break;};" };
-                format!("let bytes=self.text.as_bytes();while let Some(&first)=bytes.get(p) {{\n{word}{byte}\nif b<0x80 {{if (if b<64 {{{:#x}u64>>b}} else {{{:#x}u64>>(b-64)}})&1==0 {{break;}}p+=1;}}\nelse {{let Some((c,n))=self.input.cp_at(p) else {{break;}};if !{} {{break;}}p+=n;}}\n{}}}\n",class.ascii_low,class.ascii_high,class_condition(class),if counted {"count+=1;"} else {""})
+                let increment = if counted { "count+=1;" } else { "" };
+                let (prefix, word, restart) = if let Some(condition) = cfg!(feature = "swar")
+                    .then(|| word_failure_mask(class))
+                    .flatten()
+                {
+                    // 短い ASCII 区間は表引きのまま進み、連続して 2 byte 消費したときだけ
+                    // word loop に入る。末尾の端数は表引きに戻し、UTF-8 の後で再試行する。
+                    let count_word = if counted { "count+=n;" } else { "" };
+                    let word = format!(
+                        "if p-ascii_start==2 {{\nwhile let Some(chunk)=bytes.get(p..).and_then(|tail|tail.get(..8)) {{\nlet w=u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"));\nlet x=w&0x7f7f7f7f7f7f7f7fu64;let _=x;\nlet bad={condition};let n=(bad.trailing_zeros()/8) as usize;p+=n;{count_word}if bad!=0 {{break;}}\n}}}}\n"
+                    );
+                    ("let mut ascii_start=p;\n", word, "ascii_start=p;")
+                } else {
+                    ("", String::new(), "")
+                };
+                format!(
+                    "{prefix}let bytes=self.text.as_bytes();while let Some(&first)=bytes.get(p) {{\nlet b=first;\nif b<0x80 {{if (if b<64 {{{:#x}u64>>b}} else {{{:#x}u64>>(b-64)}})&1==0 {{break;}}p+=1;{word}}}\nelse {{let Some((c,n))=self.input.cp_at(p) else {{break;}};if !{} {{break;}}p+=n;{restart}}}\n{increment}}}\n",
+                    class.ascii_low, class.ascii_high, class_condition(class)
+                )
             });
             if complete {
                 s.push_str(bulk.as_deref().expect("complete implies a table"));
