@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -144,6 +145,7 @@ public final class LspEmitter {
             .replace("__RULE_DESCRIPTION__", pairs(ruleDescriptions()))
             .replace("__RULE_KIND__", pairs(ruleKinds()))
             .replace("__TOKEN_TYPE__", pairs(tokenTypes()))
+            .replace("__INLAY_LABELS__", pairs(inlayLabels()))
             .replace("__RULE_BODIES__", pairs(ruleBodies()))
             .replace("__DECLARE_RULES__", pairs(declareRules()))
             .replace("__RULE_CONTEXTS__", pairs(ruleContexts()))
@@ -205,6 +207,20 @@ public final class LspEmitter {
             if (type != null) result.put(expression.id(), type);
         }
         return result;
+    }
+
+    /** 終端 token を直接 capture する式の表示名。複数の名前は文法順でまとめる。 */
+    private Map<String, String> inlayLabels() {
+        var tokenRefs = new HashSet<String>();
+        for (var expression : ir.semantics().expressions())
+            if (expression.node().kind().equals("tokenRef")) tokenRefs.add(expression.id());
+        var names = new LinkedHashMap<String, LinkedHashSet<String>>();
+        for (var capture : ir.semantics().captures())
+            if (!Boolean.TRUE.equals(capture.skip()) && tokenRefs.contains(capture.exprId()))
+                names.computeIfAbsent(capture.exprId(), key -> new LinkedHashSet<>()).add(capture.name());
+        var labels = new LinkedHashMap<String, String>();
+        names.forEach((expr, captures) -> labels.put(expr, String.join(", ", captures) + ":"));
+        return labels;
     }
 
     private static String tokenType(GrammarIr.TokenSpec spec) {

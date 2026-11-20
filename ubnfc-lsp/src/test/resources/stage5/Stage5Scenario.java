@@ -9,6 +9,7 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.debug.*;
 import org.eclipse.lsp4j.debug.launch.DSPLauncher;
 import org.eclipse.lsp4j.debug.services.*;
+import org.eclipse.lsp4j.jsonrpc.json.MessageJsonHandler;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.*;
 import org.unlaxer.ubnfc.examples.stage5.SumEvaluatorBridge;
@@ -27,9 +28,22 @@ public final class Stage5Scenario {
             var caps = wire.lsp.initialize(new InitializeParams()).get(30, TimeUnit.SECONDS).getCapabilities();
             assertTrue(caps.getRenameProvider().getLeft());
             assertTrue(caps.getFoldingRangeProvider().getLeft());
+            assertTrue(caps.getInlayHintProvider().getLeft());
+            assertNull(caps.getSignatureHelpProvider());
+            assertNull(caps.getDocumentFormattingProvider());
+            assertNull(caps.getCodeActionProvider());
             // 直接解析で fixture の成立を検証し、RPC の didOpen 後の要求は診断通知を待って送る。
             assertTrue(((LanguageServerImpl) wire.local).analysis(URI, TEXT).primary().ok());
             wire.open(TEXT);
+            var hints = new LinkedHashMap<String, Object>();
+            hints.put("provider", caps.getInlayHintProvider().getLeft());
+            var complete = server.inlayHint(hints(0, 0, 12, 0)).get(30, TimeUnit.SECONDS);
+            assertEquals(List.of("name:", "value:", "name:", "name:", "value:", "name:", "text:"),
+                complete.stream().map(hint -> hint.getLabel().getLeft()).toList());
+            hints.put("complete", complete);
+            var utf16 = server.inlayHint(hints(1, 13, 1, 21)).get(30, TimeUnit.SECONDS);
+            assertEquals(List.of(new Position(1, 13)), utf16.stream().map(InlayHint::getPosition).toList());
+            hints.put("utf16Range", utf16);
             var rename = new LinkedHashMap<String, Object>();
             rename.put("reference", server.rename(rename(2, 5, "renamed")).get(30, TimeUnit.SECONDS));
             rename.put("declaration", server.rename(rename(1, 15, "renamed")).get(30, TimeUnit.SECONDS));
@@ -45,6 +59,9 @@ public final class Stage5Scenario {
             // 壊れた文書では部分 rename を返さない。folding は成功した前半だけを使う。
             wire.closeDocument();
             wire.open(TEXT + "let broken =");
+            var incomplete = server.inlayHint(hints(0, 0, 12, 12)).get(30, TimeUnit.SECONDS);
+            assertTrue(incomplete.isEmpty());
+            hints.put("incomplete", incomplete);
             rename.put("invalid", server.rename(rename(2, 5, "renamed")).get(30, TimeUnit.SECONDS));
             assertTrue(((WorkspaceEdit) rename.get("invalid")).getChanges().isEmpty());
             rename.put("prefixFolding", server.foldingRange(new FoldingRangeRequestParams(id())).get(30, TimeUnit.SECONDS));
@@ -52,8 +69,18 @@ public final class Stage5Scenario {
             rename.put("closed", server.rename(rename(2, 5, "renamed")).get(30, TimeUnit.SECONDS));
             rename.put("closedFolding", server.foldingRange(new FoldingRangeRequestParams(id())).get(30, TimeUnit.SECONDS));
             out.put("rename-scope", json(rename));
+            var closed = server.inlayHint(hints(0, 0, 12, 0)).get(30, TimeUnit.SECONDS);
+            assertTrue(closed.isEmpty());
+            hints.put("closed", closed);
             wire.open("let a = 1; use a; { note \"/* 偽 */\"; } /* 単一行 */");
             assertTrue(server.foldingRange(new FoldingRangeRequestParams(id())).get(30, TimeUnit.SECONDS).isEmpty());
+            wire.closeDocument();
+            wire.open("let = 1;");
+            var invalid = server.inlayHint(hints(0, 0, 0, 8)).get(30, TimeUnit.SECONDS);
+            assertTrue(invalid.isEmpty());
+            hints.put("invalid", invalid);
+            var protocolJson = new MessageJsonHandler(Map.of()).getGson().newBuilder().setPrettyPrinting().create();
+            out.put("inlay-hints", protocolJson.toJson(hints) + "\n");
             wire.closeDocument();
             wire.open("/* 未完了\r\nコメント");
             assertTrue(server.foldingRange(new FoldingRangeRequestParams(id())).get(30, TimeUnit.SECONDS).isEmpty());
@@ -118,6 +145,10 @@ public final class Stage5Scenario {
     }
     private static String json(Object value) { return new GsonBuilder().setPrettyPrinting().create().toJson(value) + "\n"; }
     private static TextDocumentIdentifier id() { return new TextDocumentIdentifier(URI); }
+    private static InlayHintParams hints(int startLine, int startColumn, int endLine, int endColumn) {
+        return new InlayHintParams(id(), new Range(new Position(startLine, startColumn), new Position(endLine, endColumn)));
+    }
+
     private static RenameParams rename(int line, int column, String name) {
         return new RenameParams(id(), new Position(line, column), name);
     }

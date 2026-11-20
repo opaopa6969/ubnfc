@@ -28,6 +28,9 @@ public final class Meta {
     /** 式 → semantic token 種別。{@code ParseResult.Lexical.exprId()} で引く。 */
     public static final Map<String, String> TOKEN_TYPE = map(__TOKEN_TYPE__);
 
+    /** 終端 token の式 → capture の inlay hint ラベル。 */
+    public static final Map<String, String> INLAY_LABELS = map(__INLAY_LABELS__);
+
     /** 宣言を読む capture site を持つ式。scope 効果が記号表を作らない文法（{@code sameRuleText}）の逃げ道。 */
     public static final Set<String> DECLARE_SITES = Set.of(__DECLARE_SITES__);
 
