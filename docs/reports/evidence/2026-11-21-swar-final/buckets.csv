@@ -1,0 +1,13 @@
+variant,length,escape,calls,self_Ir,self_Ir_per_call
+short,0,False,203439,7695021,37.825
+short,0,True,58139,2674394,46.000
+short,1-7,False,91156,6427093,70.507
+short,1-7,True,5285,577345,109.242
+short,8+,False,6605,1421396,215.200
+short,8+,True,0,0,
+candidate,0,False,203439,6726698,33.065
+candidate,0,True,58139,1976726,34.000
+candidate,1-7,False,91156,5061101,55.521
+candidate,1-7,True,5285,413519,78.244
+candidate,8+,False,6605,1231172,186.400
+candidate,8+,True,0,0,
