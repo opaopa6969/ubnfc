@@ -100,6 +100,7 @@ public final class Stage5Scenario {
         out.put("evaluator", evaluator(work));
         out.put("dap-queries", dapQueries(work));
         out.put("dap-conditions", dapConditions(work));
+        out.put("dap-hit-condition", dapHitCondition(work));
         return out;
     }
 
@@ -195,7 +196,7 @@ public final class Stage5Scenario {
             var caps = dap.initialize(init).get(30, TimeUnit.SECONDS);
             assertTrue(caps.getSupportsBreakpointLocationsRequest());
             assertFalse(caps.getSupportsConditionalBreakpoints());
-            assertFalse(caps.getSupportsHitConditionalBreakpoints());
+            assertTrue(caps.getSupportsHitConditionalBreakpoints());
             assertFalse(caps.getSupportsLogPoints());
             assertFalse(caps.getSupportsSetExpression());
             assertFalse(caps.getSupportsStepBack());
@@ -239,7 +240,7 @@ public final class Stage5Scenario {
             logpoint.setLogMessage("total={total}");
             var registered = setBreakpoints(dap, source, exactBreakpoint, sourceBreakpoint(0, betaColumn - 1),
                 condition, hitCondition, logpoint);
-            assertEquals(List.of(true, false, false, false, false),
+            assertEquals(List.of(true, false, false, true, false),
                 Arrays.stream(registered).map(Breakpoint::isVerified).toList());
             out.put("registered", registered);
             var foreignRegistration = setBreakpoints(dap, other, exactBreakpoint);
@@ -377,6 +378,86 @@ public final class Stage5Scenario {
     private static SourceBreakpoint conditionalBreakpoint(int line, Integer column, String expression) {
         var breakpoint = sourceBreakpoint(line, column);
         breakpoint.setCondition(expression);
+        return breakpoint;
+    }
+
+    private static String dapHitCondition(Path work) throws Exception {
+        Path file = work.resolve("hits.demo");
+        Files.writeString(file, "let a = 1; let b = 2; let c = 3;\n");
+        var source = new Source();
+        source.setPath(file.toString());
+        var launch = Map.<String, Object>of("program", file.toString(), "stopOnEntry", false);
+        var resume = new ContinueArguments();
+        resume.setThreadId(1);
+        var out = new LinkedHashMap<String, Object>();
+
+        try (var wire = new DapWire(new DebugAdapter(Map.of()))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertTrue(caps.getSupportsHitConditionalBreakpoints());
+            out.put("supportsHitConditionalBreakpoints", caps.getSupportsHitConditionalBreakpoints());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            var first = setBreakpoints(dap, source, hitBreakpoint("3"), hitBreakpoint("0"),
+                hitBreakpoint(">= 3"), hitBreakpoint("2147483648"), hitBreakpoint("３"), hitBreakpoint(""));
+            assertEquals(List.of(true, false, false, false, false, false),
+                Arrays.stream(first).map(Breakpoint::isVerified).toList());
+            out.put("registrations", first);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            // Program と let a は同じ (1,1) で、第 1・2 回。let b が第 3 回。
+            var third = topFrame(dap);
+            assertEquals(12, third.getColumn());
+            out.put("thirdHit", List.of(third.getLine(), third.getColumn()));
+            dap.continue_(resume).get(30, TimeUnit.SECONDS);
+            assertEquals(0, dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames());
+
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var frames = dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames();
+            assertEquals(0, frames);
+            out.put("relaunchedFrames", frames);
+
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            setBreakpoints(dap, source, hitBreakpoint("2"));
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var second = topFrame(dap);
+            assertEquals(1, second.getColumn());
+            assertEquals(2, dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames());
+            setBreakpoints(dap, source, hitBreakpoint("2"));
+            dap.continue_(resume).get(30, TimeUnit.SECONDS);
+            var afterReset = topFrame(dap);
+            assertEquals(23, afterReset.getColumn());
+            out.put("afterReregistration", List.of(afterReset.getLine(), afterReset.getColumn()));
+            assertEquals(List.of("stopped:breakpoint", "stopped:breakpoint", "stopped:breakpoint"), wire.breakpointEvents);
+            out.put("events", List.copyOf(wire.breakpointEvents));
+        }
+
+        EvaluatorBridge bridge = new EvaluatorBridge() {
+            @Override public boolean supportsConditionalBreakpoints() { return true; }
+
+            @Override public Optional<Boolean> evaluateCondition(String expression, Object node) {
+                if (node instanceof Stage5AST.Let value && value.name().equals("b"))
+                    return Optional.of(expression.equals("b"));
+                throw new IllegalArgumentException("回数に達するまでは条件を評価しない");
+            }
+        };
+        try (var wire = new DapWire(new DebugAdapter(Map.of(), bridge))) {
+            var dap = wire.proxy;
+            dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            var both = hitBreakpoint("3");
+            both.setCondition("b");
+            assertTrue(setBreakpoints(dap, source, both)[0].isVerified());
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            assertEquals(12, topFrame(dap).getColumn());
+            assertEquals(List.of("stopped:breakpoint"), wire.breakpointEvents);
+            out.put("combinedEvents", List.copyOf(wire.breakpointEvents));
+        }
+        return json(out);
+    }
+
+    private static SourceBreakpoint hitBreakpoint(String threshold) {
+        var breakpoint = sourceBreakpoint(1, null);
+        breakpoint.setHitCondition(threshold);
         return breakpoint;
     }
 
