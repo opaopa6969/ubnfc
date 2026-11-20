@@ -24,3 +24,24 @@
 [テストで動くアダプター例](../ubnfc-lsp/src/test/resources/stage5/DemoSignatureHelp.java)は、
 `sum(1, |` で `sum(left, right)` の第 2 引数を選ぶ。
 `sum(1, inc(|2))` では、内側の `inc(value)` の第 1 引数を選ぶ。
+
+## Document formatting
+
+言語側で生成 LSP パッケージの `DocumentFormatter` を実装する。公開の引数なし
+コンストラクターを持つクラスをサーバーのクラスパスに置き、
+`java -jar server.jar --formatter 完全修飾クラス名` で指定する。組み込み時は
+`LanguageServerImpl(scanners, validator, signatures, formatter)` に渡せる。
+設定すると `documentFormattingProvider` を通知する。
+
+`format(Analysis document)` はコメント、文字列、意味を保持した整形後の全文を返す。
+適用できない場合は `null`、整形済みの場合は元の文字列を返す。
+書式規則は言語側で固定する。生成サーバーは入力の全文解析が回復なしで成功した
+ときにだけ呼び出し、出力の全文解析と位置を除いた構文・トークン列の一致を確認する。
+空白によって意味が変わる文法では、整形規則がその意味を保持する必要がある。
+変更が必要なら文書全体を置換する UTF-16 範囲の編集を 1 件返す。
+
+[Stage5 用のサンプル](../ubnfc-lsp/src/test/resources/stage5/DemoDocumentFormatter.java)では
+`let  total=5;` を `let total = 5;` に整形する。文のトークンは半角空白 1 個で
+区切り、セミコロンの直前に空白を入れない。文末や波括弧の位置で行を分け、
+ブロック 1 段につき半角空白 2 個で字下げする。各コメントをその深さの独立した行に置き、
+文字列とコメントは字句の内容と出現順を保持する。字句の外の改行には LF を使う。

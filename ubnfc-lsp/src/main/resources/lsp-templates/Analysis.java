@@ -126,6 +126,23 @@ public final class Analysis {
         return lexical;
     }
 
+    /** 整形前後の構文とトークンを、ソース座標を除いて照合する。 */
+    boolean preservesSyntax(String candidate) {
+        try {
+            var next = parse(candidate, options(scanners, true, true));
+            return next.ok() && next.recoveries().isEmpty()
+                && syntax(lexical()).equals(syntax(next.lexical()));
+        } catch (RuntimeException error) {
+            return false;
+        }
+    }
+
+    private record SyntaxItem(String expression, String token) {}
+
+    private static List<SyntaxItem> syntax(List<ParseResult.Lexical> items) {
+        return items.stream().map(item -> new SyntaxItem(item.exprId(), item.token())).toList();
+    }
+
     public Symbols symbols() {
         if (symbols == null) symbols = Symbols.of(this);
         return symbols;

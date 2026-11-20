@@ -14,6 +14,8 @@ import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.*;
 import org.unlaxer.ubnfc.examples.stage5.SumEvaluatorBridge;
 import org.unlaxer.ubnfc.examples.stage5.generated.Stage5AST;
+import org.unlaxer.ubnfc.examples.stage5.generated.Stage5Parser;
+import org.unlaxer.ubnfc.examples.stage5.generated.api.ParseOptions;
 import org.unlaxer.ubnfc.examples.stage5.lsp.LanguageServerImpl;
 import org.unlaxer.ubnfc.examples.stage5.lsp.dap.*;
 
@@ -38,6 +40,7 @@ public final class Stage5Scenario {
             // 直接解析で fixture の成立を検証し、RPC の didOpen 後の要求は診断通知を待って送る。
             assertTrue(((LanguageServerImpl) wire.local).analysis(URI, TEXT).primary().ok());
             wire.open(TEXT);
+            assertTrue(format(wire).isEmpty());
             var hints = new LinkedHashMap<String, Object>();
             hints.put("provider", caps.getInlayHintProvider().getLeft());
             var complete = server.inlayHint(hints(0, 0, 12, 0)).get(30, TimeUnit.SECONDS);
@@ -97,6 +100,7 @@ public final class Stage5Scenario {
             out.put("rename-lexical", json(edit));
         }
         out.put("signature-help", signatureHelp());
+        out.put("formatting", formatting());
         out.put("evaluator", evaluator(work));
         out.put("dap-queries", dapQueries(work));
         out.put("dap-conditions", dapConditions(work));
@@ -139,6 +143,55 @@ public final class Stage5Scenario {
             assertEquals(argument, response.getActiveParameter());
         }
         return response;
+    }
+
+    private static String formatting() throws Exception {
+        var out = new LinkedHashMap<String, Object>();
+        try (var wire = new Wire(new LanguageServerImpl(Map.of(), null, null, new DemoDocumentFormatter()))) {
+            var capability = wire.lsp.initialize(new InitializeParams()).get(30, TimeUnit.SECONDS)
+                .getCapabilities().getDocumentFormattingProvider();
+            assertTrue(capability.getLeft());
+            out.put("provider", capability.getLeft());
+
+            out.put("complete", checkFormatting(wire, "let  total=5;", "let total = 5;\n", new Position(0, 13)));
+            String last = "note  \"😀 // keep  /* spaces */\";}";
+            String source = "{\r\n/* keep  😀\r\n x */ let  total=5; // keep trailing spaces  \r\n" + last;
+            String formatted = "{\n  /* keep  😀\r\n x */\n  let total = 5;\n  // keep trailing spaces  \n"
+                + "  note \"😀 // keep  /* spaces */\";\n}\n";
+            out.put("utf16", checkFormatting(wire, source, formatted, new Position(3, last.length())));
+            out.put("alreadyFormatted", checkFormatting(wire, formatted, null, null));
+            out.put("incomplete", checkFormatting(wire, "let total =", null, null));
+            out.put("invalid", checkFormatting(wire, "let = 5;", null, null));
+            assertTrue(format(wire).isEmpty(), "閉じた文書");
+        }
+        try (var wire = new Wire(new LanguageServerImpl(Map.of(), null, null, document -> "let total = 6;"))) {
+            wire.lsp.initialize(new InitializeParams()).get(30, TimeUnit.SECONDS);
+            out.put("changedToken", checkFormatting(wire, "let  total=5;", null, null));
+        }
+        return json(out);
+    }
+
+    private static List<? extends TextEdit> checkFormatting(Wire wire, String source, String formatted, Position end)
+            throws Exception {
+        wire.open(source);
+        var edits = format(wire);
+        wire.closeDocument();
+        if (formatted == null) {
+            assertTrue(edits.isEmpty());
+        } else {
+            assertEquals(List.of(new TextEdit(new Range(new Position(0, 0), end), formatted)), edits);
+            var before = Stage5Parser.parseEntry("Stage5", "Program", source, ParseOptions.DEFAULT);
+            var after = Stage5Parser.parseEntry("Stage5", "Program", formatted, ParseOptions.DEFAULT);
+            assertTrue(before.ok() && after.ok());
+            assertTrue(before.ast().isPresent());
+            assertEquals(before.ast(), after.ast());
+        }
+        return edits;
+    }
+
+    private static List<? extends TextEdit> format(Wire wire) throws Exception {
+        var params = new DocumentFormattingParams(id(), new FormattingOptions(2, true));
+        return wire.lsp.getTextDocumentService().formatting(params).get(30, TimeUnit.SECONDS);
     }
 
     private static String evaluator(Path work) throws Exception {
