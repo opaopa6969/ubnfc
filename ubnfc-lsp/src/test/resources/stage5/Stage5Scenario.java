@@ -101,6 +101,7 @@ public final class Stage5Scenario {
         }
         out.put("signature-help", signatureHelp());
         out.put("formatting", formatting());
+        out.put("syntax-quick-fix", QuickFixScenario.run());
         out.put("evaluator", evaluator(work));
         out.put("dap-queries", dapQueries(work));
         out.put("dap-conditions", dapConditions(work));
@@ -580,13 +581,13 @@ public final class Stage5Scenario {
     }
 
     /** パイプと専用 executor は最後に閉じ、テストが通信スレッドを残さないようにする。 */
-    private static final class Wire implements AutoCloseable, LanguageClient {
+    static final class Wire implements AutoCloseable, LanguageClient {
         final LanguageServer local, lsp;
         final PipedInputStream serverIn = new PipedInputStream(), clientIn = new PipedInputStream();
         final PipedOutputStream clientOut = new PipedOutputStream(serverIn), serverOut = new PipedOutputStream(clientIn);
         final ExecutorService executor = Executors.newCachedThreadPool();
         final Future<?> serverListening, clientListening;
-        volatile CompletableFuture<Void> diagnostic = new CompletableFuture<>();
+        volatile CompletableFuture<PublishDiagnosticsParams> diagnostic = new CompletableFuture<>();
         Wire(LanguageServer local) throws Exception {
             this.local = local;
             var s = LSPLauncher.createServerLauncher(local, serverIn, serverOut, executor, consumer -> consumer);
@@ -594,17 +595,30 @@ public final class Stage5Scenario {
             var c = LSPLauncher.createClientLauncher(this, clientIn, clientOut, executor, consumer -> consumer);
             serverListening = s.startListening(); clientListening = c.startListening(); lsp = c.getRemoteProxy();
         }
-        void open(String text) throws Exception {
+        List<Diagnostic> open(String text) throws Exception { return open(URI, text); }
+        List<Diagnostic> open(String uri, String text) throws Exception {
             diagnostic = new CompletableFuture<>();
-            lsp.getTextDocumentService().didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(URI, "demo", 1, text)));
-            diagnostic.get(30, TimeUnit.SECONDS);
+            lsp.getTextDocumentService().didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(uri, "demo", 1, text)));
+            return diagnostics(uri);
+        }
+        List<Diagnostic> change(String text, int version) throws Exception {
+            diagnostic = new CompletableFuture<>();
+            var document = new VersionedTextDocumentIdentifier(URI, version);
+            var changes = List.of(new TextDocumentContentChangeEvent(text));
+            lsp.getTextDocumentService().didChange(new DidChangeTextDocumentParams(document, changes));
+            return diagnostics(URI);
+        }
+        private List<Diagnostic> diagnostics(String uri) throws Exception {
+            var published = diagnostic.get(30, TimeUnit.SECONDS);
+            assertEquals(uri, published.getUri());
+            return published.getDiagnostics();
         }
         void closeDocument() throws Exception {
             diagnostic = new CompletableFuture<>();
             lsp.getTextDocumentService().didClose(new DidCloseTextDocumentParams(id()));
             diagnostic.get(30, TimeUnit.SECONDS);
         }
-        public void publishDiagnostics(PublishDiagnosticsParams params) { diagnostic.complete(null); }
+        public void publishDiagnostics(PublishDiagnosticsParams params) { diagnostic.complete(params); }
         public void telemetryEvent(Object value) {}
         public void logMessage(MessageParams params) {}
         public void showMessage(MessageParams params) {}

@@ -1,0 +1,197 @@
+{
+  "provider": {
+    "codeActionKinds": [
+      "quickfix"
+    ]
+  },
+  "before": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 9
+        },
+        "end": {
+          "line": 0,
+          "character": 9
+        }
+      },
+      "severity": 1,
+      "code": "Let",
+      "source": "ubnfc",
+      "message": "構文エラー: \u0027 \u0027 | \u0027*/\u0027 | \u0027.\u0027 | \u0027/*\u0027 | \u0027//\u0027 | \u0027;\u0027 | DigitParser | EParser ほか 1 件 を期待しました",
+      "relatedInformation": [
+        {
+          "location": {
+            "uri": "file:///stage5.demo",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 9
+              },
+              "end": {
+                "line": 0,
+                "character": 9
+              }
+            }
+          },
+          "message": "最深規則: Let"
+        }
+      ],
+      "data": {
+        "quickFixDiagnosticId": "1"
+      }
+    }
+  ],
+  "fix": {
+    "title": "末尾に ; を挿入",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 9
+          },
+          "end": {
+            "line": 0,
+            "character": 9
+          }
+        },
+        "severity": 1,
+        "code": "Let",
+        "source": "ubnfc",
+        "message": "構文エラー: \u0027 \u0027 | \u0027*/\u0027 | \u0027.\u0027 | \u0027/*\u0027 | \u0027//\u0027 | \u0027;\u0027 | DigitParser | EParser ほか 1 件 を期待しました",
+        "relatedInformation": [
+          {
+            "location": {
+              "uri": "file:///stage5.demo",
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 9
+                },
+                "end": {
+                  "line": 0,
+                  "character": 9
+                }
+              }
+            },
+            "message": "最深規則: Let"
+          }
+        ],
+        "data": {
+          "quickFixDiagnosticId": "1"
+        }
+      }
+    ],
+    "edit": {
+      "changes": {},
+      "documentChanges": [
+        {
+          "textDocument": {
+            "version": 1,
+            "uri": "file:///stage5.demo"
+          },
+          "edits": [
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 9
+                },
+                "end": {
+                  "line": 0,
+                  "character": 9
+                }
+              },
+              "newText": ";"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "wrongRange": [],
+  "wrongKind": [],
+  "withoutDiagnostic": [],
+  "otherDocument": [],
+  "after": [],
+  "normal": [],
+  "stale": [],
+  "ambiguous": [],
+  "repairStillInvalid": [],
+  "utf16": {
+    "title": "末尾に ; を挿入",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 20
+          },
+          "end": {
+            "line": 0,
+            "character": 20
+          }
+        },
+        "severity": 1,
+        "code": "Let",
+        "source": "ubnfc",
+        "message": "構文エラー: \u0027 \u0027 | \u0027*/\u0027 | \u0027.\u0027 | \u0027/*\u0027 | \u0027//\u0027 | \u0027;\u0027 | DigitParser | EParser ほか 1 件 を期待しました（正常な前半だけを索引化）",
+        "relatedInformation": [
+          {
+            "location": {
+              "uri": "file:///stage5.demo",
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 20
+                },
+                "end": {
+                  "line": 0,
+                  "character": 20
+                }
+              }
+            },
+            "message": "最深規則: Let"
+          }
+        ],
+        "data": {
+          "analysis": "prefix",
+          "indexedThroughCp": 10,
+          "quickFixDiagnosticId": "7"
+        }
+      }
+    ],
+    "edit": {
+      "changes": {},
+      "documentChanges": [
+        {
+          "textDocument": {
+            "version": 6,
+            "uri": "file:///stage5.demo"
+          },
+          "edits": [
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 20
+                },
+                "end": {
+                  "line": 0,
+                  "character": 20
+                }
+              },
+              "newText": ";"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "closed": [],
+  "reopened": []
+}

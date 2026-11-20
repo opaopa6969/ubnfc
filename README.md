@@ -364,8 +364,9 @@ v2 の表層機能は front が v1 の正規形へ脱糖するので、backend �
   診断 / definition / references / document symbols / semantic tokens / completion / hover と
   TextMate 文法の生成**（[`docs/reports/2026-09-24-lsp-vsix-stage3.md`](docs/reports/2026-09-24-lsp-vsix-stage3.md) §1 の表）。
   **無いもの**: 増分解析、rename、文法の意味検査（`GrammarValidator` 相当。ubnfc では front が持つ）、
-  外部カタログの照合、folding / inlay hints / code actions。
-  signature help と document formatting は[言語アダプター](docs/lsp-language-adapters.md)を指定して有効にする。
+  外部カタログの照合、folding / inlay hints。
+  signature help、document formatting、構文診断の quick fix は
+  [言語アダプター](docs/lsp-language-adapters.md)を指定して有効にする。
   打鍵ごとに全文を再解析する（同報告 §8 に実測。P4 の 325 code point で 0.29 ms、20,923 code point で 6.6 ms、
   解析に失敗する文書は前半の再解析ぶん最大 2.8 倍）。VSIX は P4（`examples/p4-vscode`）と
   UBNF 自身（`examples/ubnf-vscode`）の 2 つを `scripts/build-vsix.sh` で組む。

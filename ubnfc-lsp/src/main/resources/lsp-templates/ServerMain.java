@@ -13,6 +13,7 @@ public final class ServerMain {
         java.nio.file.Path validator = null;
         String signatureHelpClass = null;
         String formatterClass = null;
+        String quickFixClass = null;
         for (int i = 0; i < args.length; i++) {
             String option = args[i];
             if (++i == args.length) throw new IllegalArgumentException(option + " の値が必要です");
@@ -21,6 +22,7 @@ public final class ServerMain {
                 case "--validator" -> validator = java.nio.file.Path.of(args[i]);
                 case "--signature-help" -> signatureHelpClass = args[i];
                 case "--formatter" -> formatterClass = args[i];
+                case "--syntax-quick-fix" -> quickFixClass = args[i];
                 default -> throw new IllegalArgumentException("不明な引数: " + option);
             }
         }
@@ -31,7 +33,8 @@ public final class ServerMain {
             java.nio.charset.StandardCharsets.UTF_8));
         var server = new LanguageServerImpl(LanguageServerImpl.scanners(scannerClass), validator,
             loadProvider(signatureHelpClass, SignatureHelpProvider.class),
-            loadProvider(formatterClass, DocumentFormatter.class));
+            loadProvider(formatterClass, DocumentFormatter.class),
+            loadProvider(quickFixClass, SyntaxQuickFix.class));
         var launcher = LSPLauncher.createServerLauncher(server, in, out);
         server.connect(launcher.getRemoteProxy());
         launcher.startListening().get();
