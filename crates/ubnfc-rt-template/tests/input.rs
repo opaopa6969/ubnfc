@@ -63,6 +63,22 @@ fn code_point_access_and_invalid_spans() {
 }
 
 #[test]
+fn code_point_access_matches_utf8_boundaries() {
+    let ascii: String = (0..=0x7f).map(char::from).collect();
+    let mixed = format!("\u{80}\u{7ff}\u{800}\u{ffff}\u{10000}\u{10ffff}{ascii}é日😀");
+    for text in ["", ascii.as_str(), mixed.as_str()] {
+        let input = Input::new(text);
+        for byte in (0..=text.len() + 1).chain([usize::MAX]) {
+            let expected = text
+                .get(byte..)
+                .and_then(|tail| tail.chars().next())
+                .map(|ch| (ch, ch.len_utf8()));
+            assert_eq!(input.cp_at(byte), expected, "byte {byte} in {text:?}");
+        }
+    }
+}
+
+#[test]
 fn literals_match_prefixes_without_word_boundaries() {
     let input = Input::new("😀letter");
     assert!(input.starts_with(0, "😀"));
