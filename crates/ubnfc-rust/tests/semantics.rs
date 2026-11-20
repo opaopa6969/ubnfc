@@ -14,6 +14,24 @@ fn generated_semantic_contracts() {
     add("empty_two", repeat(json!({"kind":"empty"}), 2, 2));
     add("empty_once", repeat(json!({"kind":"empty"}), 1, 2));
     add("zero_max", repeat(json!({"kind":"any"}), 0, 0));
+    add(
+        "zero_literal",
+        seq(vec![
+            repeat(capture("unexecuted", literal("a")), 0, 0),
+            literal("ab"),
+        ]),
+    );
+    add(
+        "zero_matched",
+        seq(vec![
+            unary("lookahead", literal("ab")),
+            repeat(capture("unexecuted", literal("a")), 0, 0),
+        ]),
+    );
+    add(
+        "zero_terminator",
+        json!({"kind":"repeat","child":literal("a"),"min":0,"max":0,"terminator":literal("ab")}),
+    );
     add("look", unary("lookahead", literal("😀")));
     add(
         "look_consume",
@@ -164,6 +182,33 @@ fn generated_semantic_contracts() {
         },
     ];
     grammars.push(("scope", scope));
+    let mut nullable_trivia = grammar(vec![("Root", seq(vec![literal("ab")]))], None);
+    nullable_trivia.semantics.trivia.policies[0].effective_delimiter_set =
+        vec![Delimiter::Lexical {
+            expression: ubnfc_front::declarative::LexicalExpression::node(
+                ubnfc_front::declarative::Op::LOOK,
+                vec![ubnfc_front::declarative::LexicalExpression::leaf(
+                    ubnfc_front::declarative::Op::LITERAL,
+                    "a".into(),
+                )],
+            ),
+            label: "GAP".into(),
+        }];
+    nullable_trivia
+        .required_features
+        .push(RequiredFeature::LexicalTrivia);
+    nullable_trivia
+        .required_features
+        .sort_by_cached_key(|f| serde_json::to_string(f).unwrap());
+    nullable_trivia.semantics.trivia.insertion_plan = vec![TriviaInsertion {
+        boundary: Boundary {
+            owner_expr_id: nullable_trivia.semantics.rules[0].body.clone(),
+            at: BoundaryAt::Entry,
+            child_index: None,
+        },
+        policy_id: nullable_trivia.semantics.trivia.policies[0].id.clone(),
+    }];
+    grammars.push(("nullable_trivia", nullable_trivia));
     let ext = json!({"kind":"extern","logicalId":"custom","originalClassName":"Custom","javaBinding":null,"rustBinding":null,"inputState":["consumed","matched","mode","invertMatch","resetMatchedWithConsumed","stateVersion"],"resultFields":["ok","consumedEnd","matchedEnd","valueSpan","diagnostics","effects"]});
     grammars.push(("external", grammar(vec![("Root", token())], Some(ext))));
     let mut dfa = grammar(
@@ -421,7 +466,14 @@ fn generated_semantic_contracts() {
     let dir = PathBuf::from(String::from_utf8(out.stdout).unwrap().trim());
     let mut lib = String::from("#![allow(dead_code)]\n");
     for (name, ir) in grammars {
-        let output = emit(&ir, &Default::default()).unwrap_or_else(|e| panic!("{name}: {e}"));
+        let mut output = emit(&ir, &Default::default()).unwrap_or_else(|e| panic!("{name}: {e}"));
+        if name == "zero_max" {
+            output
+                .files
+                .get_mut("parser.rs")
+                .unwrap()
+                .push_str(include_str!("support/zero_frame_assertions.rs"));
+        }
         if name == "predict" {
             assert!(output.files["parser.rs"].contains("let predicted=match"));
         }

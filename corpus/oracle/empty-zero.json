@@ -1,12 +1,12 @@
 {
   "feature": "bounded-repeat",
   "grammar": "grammar Probe {\n \n @package: org.example.oracle\n token T=EMPTY @root @mapping(Value) Root ::= T{0,0};\n}\n",
-  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "source": "d3ea73e8cfa440df8bdbb70abb29e06259435ba2",
   "cases": [
     {
       "id": "empty-zero/1",
       "input": "ab",
-      "accepted": false,
+      "accepted": true,
       "allConsumed": false,
       "consumed": 0,
       "matched": 0,
@@ -17,29 +17,22 @@
       "references": [],
       "diagnostics": [
         {
-          "kind": "syntax",
+          "kind": "trailing_input",
           "offset": 0,
           "expected": [
-            "Repeat",
-            "RootParser"
+            "end of input"
           ],
           "farthestOffset": 0,
-          "farthestExpected": [
-            "Repeat",
-            "RootParser"
-          ],
+          "farthestExpected": [],
           "origin": "Mapper.diagnose"
         }
       ],
-      "parsedStatus": "failed",
+      "parsedStatus": "succeeded",
       "nativeFailure": {
         "offset": 0,
         "consumed": 0,
-        "matched": 1,
-        "expected": [
-          "Repeat",
-          "RootParser"
-        ]
+        "matched": 0,
+        "expected": []
       },
       "scopeDepth": 0
     }
@@ -53,8 +46,8 @@
   },
   "generatedSourceSha256": {
     "org/example/oracle/ProbeAST.java": "6b9b3da481fd3775c5f73ff74ac859fcfe5d62d5937edbf09e3699191daf53b7",
-    "org/example/oracle/ProbeMapper.java": "825ba9c35b81b5d78ae63a388e34513a721cfe24cedebfe1f1300e7cb1ed5fe7",
-    "org/example/oracle/ProbeParsers.java": "2bf1ef4016547474dbaa2846734be6eb0f2b8e699b4e2b42536420b4e6ac197a"
+    "org/example/oracle/ProbeMapper.java": "715e0cfe298f12ac4bbfbcad6a7257a0fb8bdcdf1c1dca4ea40a026b2ef67233",
+    "org/example/oracle/ProbeParsers.java": "d3f6e40cccc308a50a009801f1cf9736b66604a6eda4a9d2bc91201c86513335"
   },
   "compilation": {
     "success": true,

@@ -128,6 +128,7 @@ pub(crate) fn trivia_first_bytes(policy: &TriviaPolicy) -> Option<BTreeSet<u8>> 
     let mut bytes = BTreeSet::new();
     for d in &policy.effective_delimiter_set {
         match d {
+            Delimiter::Lexical { .. } => return None,
             Delimiter::Characters { code_points } => {
                 for &cp in code_points {
                     bytes.insert(leading_byte(cp)?);

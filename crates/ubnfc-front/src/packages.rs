@@ -14,8 +14,8 @@
 //! pipeline の loader（[`loader`]）がその仮想パスを上の手順で読む。IR の `sources[]` には
 //! この論理パスと entry の本文の SHA-256 が載る。
 //!
-//! 範囲外（位置付きの `E-IMPORT-UNRESOLVED` になる）: package の中からの import
-//! （package 内の相対 import と推移的な package 依存）。std/layout はどちらも持たない。
+//! package 内の相対 import と推移的依存も、検証済み artifact の files / dependencies
+//! だけから読む。生成時の取得や、artifact の外へ出る相対 import は行わない。
 
 use std::io;
 use std::path::{Component, Path, PathBuf};
@@ -120,116 +120,194 @@ fn schema_v1(value: &Value, what: &str) -> io::Result<()> {
     Ok(())
 }
 
-/// manifest → lock → artifact の順に照合し、entry の本文を返す。
-fn read(dir: &Path, id: &str, base: &dyn Fn(&Path) -> io::Result<String>) -> io::Result<String> {
-    check_id(id).map_err(invalid)?;
-    let manifest_path = dir.join("ubnf.json");
-    let manifest = json(
-        &base(&manifest_path).map_err(|e| {
-            io::Error::new(
-                e.kind(),
-                format!(
-                    "{}: package '{id}' の manifest を読めません（{e}）",
-                    manifest_path.display()
-                ),
-            )
-        })?,
-        &manifest_path,
-    )?;
-    schema_v1(&manifest, "ubnf.json")?;
-    let dependency = field(&manifest, "dependencies", "ubnf.json")?
-        .get(id)
-        .ok_or_else(|| {
-            invalid(format!(
-                "ubnf.json: package '{id}' が dependencies にありません"
-            ))
-        })?;
-    let version = string(dependency, "version", "ubnf.json")?;
-    let source = string(dependency, "source", "ubnf.json")?;
+/// package 内の import を、同じ artifact の相対 member または明示依存へ写す。
+/// marker は package ID と区別し、entry の実パスは検証済み artifact から求める。
+pub fn import_path(path: &Path, import: &str) -> Option<Result<PathBuf, String>> {
+    let (root, descriptor) = split(path)?;
+    let (owner, member) = descriptor
+        .split_once("/.entry-relative/")
+        .unwrap_or((&descriptor, "__entry__"));
+    if let Some(id) = import.strip_prefix("pkg:") {
+        return Some(
+            check_id(id).map(|()| root.join(VIRTUAL_DIR).join(owner).join(".deps").join(id)),
+        );
+    }
+    let relative = Path::new(import);
+    if relative.is_absolute() || import.contains('\\') {
+        return Some(Err(
+            "package 内の import は相対パスで指定してください".into()
+        ));
+    }
+    let mut member_path = Path::new(member)
+        .parent()
+        .unwrap_or(Path::new(""))
+        .to_path_buf();
+    for component in relative.components() {
+        match component {
+            Component::Normal(value) => member_path.push(value),
+            Component::CurDir => {}
+            Component::ParentDir => {
+                // entry が入れ子の場合の ../ は、検証済み entry の位置を読むまで保留する。
+                if member_path.file_name().is_some_and(|name| name != ":up") {
+                    member_path.pop();
+                } else {
+                    member_path.push(":up");
+                }
+            }
+            _ => return Some(Err("package の外へ出る相対 import は使えません".into())),
+        }
+    }
+    Some(Ok(root
+        .join(VIRTUAL_DIR)
+        .join(owner)
+        .join(".entry-relative")
+        .join(member_path)))
+}
 
+fn safe_member(path: &Path) -> io::Result<()> {
+    if path.as_os_str().is_empty()
+        || path
+            .components()
+            .any(|c| !matches!(c, Component::Normal(_)))
+    {
+        return Err(invalid("artifact の file path が不正です".into()));
+    }
+    Ok(())
+}
+
+/// manifest → lock → artifact を照合する。依存の source は取得時だけの情報であり、
+/// 生成では builtin または lock の raw bytes cache のみを読み、外部へ取得しない。
+fn read(
+    dir: &Path,
+    descriptor: &str,
+    base: &dyn Fn(&Path) -> io::Result<String>,
+) -> io::Result<String> {
+    let manifest_path = dir.join("ubnf.json");
+    let manifest = json(&base(&manifest_path)?, &manifest_path)?;
+    schema_v1(&manifest, "ubnf.json")?;
     let lock_path = dir.join("ubnf.lock.json");
-    let lock = json(&base(&lock_path).map_err(|e| {
-        io::Error::new(
-            e.kind(),
-            format!(
-                "{}: lock を読めません（{e}）。Classic の `unlaxer deps resolve --manifest ubnf.json` で作ってください",
-                lock_path.display()
-            ),
-        )
-    })?, &lock_path)?;
+    let lock = json(&base(&lock_path).map_err(|e| io::Error::new(e.kind(), format!("lock を読めません: {e}。unlaxer deps resolve --manifest ubnf.json で作ってください")))?, &lock_path)?;
     schema_v1(&lock, "ubnf.lock.json")?;
     let roots = field(&lock, "roots", "ubnf.lock.json")?;
-    if roots.get(id).and_then(Value::as_str) != Some(version) {
-        return Err(invalid(format!(
-            "ubnf.lock.json: package '{id}' の版が manifest（{version}）と一致しません（stale lock）"
-        )));
-    }
-    let locked = field(&lock, "packages", "ubnf.lock.json")?
-        .get(id)
-        .ok_or_else(|| invalid(format!("ubnf.lock.json: package '{id}' がありません")))?;
-    if string(locked, "id", "ubnf.lock.json")? != id
-        || string(locked, "version", "ubnf.lock.json")? != version
-    {
-        return Err(invalid(format!(
-            "ubnf.lock.json: package '{id}' の ID / 版が一致しません"
-        )));
-    }
-    let sha = string(locked, "sha256", "ubnf.lock.json")?;
-
-    let artifact = if let Some(builtin) = source.strip_prefix("builtin:") {
-        let (_, _, text) = BUILTIN
-            .iter()
-            .find(|(bid, bversion, _)| {
-                builtin == format!("{bid}@{bversion}") && *bid == id && *bversion == version
-            })
-            .ok_or_else(|| {
-                invalid(format!(
-                    "ubnf.json: ubnfc に同梱していない builtin package です: '{source}'"
-                ))
-            })?;
-        (*text).to_owned()
-    } else {
-        let cache = dir
-            .join(".ubnf-cache")
-            .join("packages")
-            .join(format!("{sha}.json"));
-        base(&cache).map_err(|e| {
-            io::Error::new(
-                e.kind(),
-                format!(
-                    "{}: package '{id}' の cache がありません（{e}）",
-                    cache.display()
-                ),
-            )
-        })?
-    };
-    let actual = crate::lower::sha256(artifact.as_bytes());
-    if actual != sha {
-        return Err(invalid(format!(
-            "package '{id}' の SHA-256 が lock と一致しません（lock {sha}、実際 {actual}）"
-        )));
-    }
-    let envelope = json(&artifact, Path::new(id))?;
-    schema_v1(&envelope, "artifact")?;
-    if string(&envelope, "id", "artifact")? != id
-        || string(&envelope, "version", "artifact")? != version
-    {
-        return Err(invalid(format!(
-            "artifact: package '{id}' の ID / 版が lock と一致しません"
-        )));
-    }
-    if field(&envelope, "dependencies", "artifact")?
+    let dependencies = field(&manifest, "dependencies", "ubnf.json")?
         .as_object()
-        .is_some_and(|d| !d.is_empty())
-    {
-        return Err(invalid(format!(
-            "artifact: package '{id}' の推移的な package 依存は ubnfc ではまだ扱えません"
-        )));
+        .ok_or_else(|| invalid("manifest dependencies は object が必要です".into()))?;
+    let expected: serde_json::Map<String, Value> = dependencies
+        .iter()
+        .map(|(id, dep)| {
+            Ok((
+                id.clone(),
+                Value::String(string(dep, "version", "manifest dependency")?.into()),
+            ))
+        })
+        .collect::<io::Result<_>>()?;
+    if roots != &Value::Object(expected) {
+        return Err(invalid(
+            "stale lock: manifest と roots が一致しません".into(),
+        ));
     }
-    let entry = string(&envelope, "entry", "artifact")?;
+    let (chain, member) = descriptor
+        .split_once("/.entry-relative/")
+        .map_or((descriptor, None), |(c, m)| (c, Some(m)));
+    let mut available = Value::Object(dependencies.clone());
+    let mut envelope = Value::Null;
+    let mut visiting = std::collections::BTreeSet::new();
+    for id in chain.split("/.deps/") {
+        check_id(id).map_err(invalid)?;
+        if !visiting.insert(id) || visiting.len() > 64 {
+            return Err(invalid("package 依存が循環しています".into()));
+        }
+        let dependency = available
+            .get(id)
+            .ok_or_else(|| invalid(format!("package '{id}' が dependencies にありません")))?;
+        let version = string(dependency, "version", "dependency")?;
+        let source = string(dependency, "source", "dependency")?;
+        let locked = field(&lock, "packages", "lock")?
+            .get(id)
+            .ok_or_else(|| invalid(format!("lock に package '{id}' がありません")))?;
+        if string(locked, "id", "lock")? != id || string(locked, "version", "lock")? != version {
+            return Err(invalid(format!(
+                "package '{id}' の ID / 版が lock と一致しません"
+            )));
+        }
+        let sha = string(locked, "sha256", "lock")?;
+        if sha.len() != 64 || !sha.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(invalid("lock の SHA-256 が不正です".into()));
+        }
+        let artifact = if let Some(builtin) = source.strip_prefix("builtin:") {
+            BUILTIN
+                .iter()
+                .find(|(bid, bv, _)| {
+                    *bid == id && *bv == version && builtin == format!("{bid}@{bv}")
+                })
+                .map(|(_, _, text)| (*text).to_owned())
+                .ok_or_else(|| invalid(format!("未同梱の builtin: {source}")))?
+        } else {
+            base(&dir.join(".ubnf-cache/packages").join(format!("{sha}.json")))?
+        };
+        let actual = crate::lower::sha256(artifact.as_bytes());
+        if actual != sha {
+            return Err(invalid(format!(
+                "package '{id}' の SHA-256 が lock と一致しません"
+            )));
+        }
+        envelope = json(&artifact, Path::new(id))?;
+        schema_v1(&envelope, "artifact")?;
+        if string(&envelope, "id", "artifact")? != id
+            || string(&envelope, "version", "artifact")? != version
+        {
+            return Err(invalid(format!(
+                "artifact '{id}' の ID / 版が lock と一致しません"
+            )));
+        }
+        available = field(&envelope, "dependencies", "artifact")?.clone();
+        let refs: serde_json::Map<String, Value> = available
+            .as_object()
+            .ok_or_else(|| invalid("artifact dependencies は object が必要です".into()))?
+            .iter()
+            .map(|(id, dep)| {
+                Ok((
+                    id.clone(),
+                    Value::String(string(dep, "version", "artifact dependency")?.into()),
+                ))
+            })
+            .collect::<io::Result<_>>()?;
+        if field(locked, "dependencies", "lock")? != &Value::Object(refs) {
+            return Err(invalid("artifact の依存が lock と一致しません".into()));
+        }
+        let files = field(&envelope, "files", "artifact")?
+            .as_object()
+            .ok_or_else(|| invalid("artifact files は object が必要です".into()))?;
+        for name in files.keys() {
+            safe_member(Path::new(name))?;
+        }
+    }
+    let entry = Path::new(string(&envelope, "entry", "artifact")?);
+    safe_member(entry)?;
+    let file = match member {
+        Some(member) => {
+            let mut file = entry.parent().unwrap_or(Path::new("")).to_path_buf();
+            for component in Path::new(member).components() {
+                match component {
+                    Component::Normal(name) if name == ":up" => {
+                        if !file.pop() {
+                            return Err(invalid(
+                                "package の外へ出る相対 import は使えません".into(),
+                            ));
+                        }
+                    }
+                    Component::Normal(name) => file.push(name),
+                    _ => return Err(invalid("package の相対 import が不正です".into())),
+                }
+            }
+            file
+        }
+        None => entry.to_path_buf(),
+    };
+    safe_member(&file)?;
     string(
         field(&envelope, "files", "artifact")?,
-        entry,
+        &file.to_string_lossy(),
         "artifact files",
     )
     .map(str::to_owned)
@@ -242,8 +320,8 @@ fn read(dir: &Path, id: &str, base: &dyn Fn(&Path) -> io::Result<String>) -> io:
 /// TAB〜CR、`//` から CR / LF の直前まで、`/*` から最初の `*/` まで。未閉鎖の block comment
 /// は trivia として成功しない）であり、Classic も javaStyle の 11 文法・24 入力を明示 import に
 /// 置き換えて同値を確かめている（unlaxer-parser `docs/ubnf-packages.md`）。そこで ubnfc は
-/// 同梱物と**構文木が同一の** import だけを javaStyle として扱い、それ以外の token を profile に
-/// する綴りは従来どおり `E-WHITESPACE-*-STYLE` で拒否する。
+/// 同梱物と**構文木が同一の** import だけを javaStyle として扱う。その他の宣言的 token は
+/// javaStyle に読み替えず、Delimiter::Lexical で原来の program を走査する。
 pub fn whitespace_profiles(
     resolved: &crate::resolve::ResolvedGrammar,
     grammar: &crate::resolve::Grammar,
@@ -403,5 +481,38 @@ mod tests {
             );
         }
         assert!(virtual_path(Path::new("/g"), "lexical/x.ubnf").is_none());
+    }
+    #[test]
+    fn package_members_use_the_entry_directory_and_cannot_escape_the_artifact() {
+        let artifact = serde_json::json!({"schemaVersion":1,"id":"team/layout","version":"1.0.0",
+            "entry":"nested/layout.ubnf","files":{"nested/layout.ubnf":"entry","gap.ubnf":"gap"},"dependencies":{}}).to_string();
+        let sha = crate::lower::sha256(artifact.as_bytes());
+        let manifest = r#"{"schemaVersion":1,"dependencies":{"team/layout":{"version":"1.0.0","source":"local:layout.json"}}}"#;
+        let lock = serde_json::json!({"schemaVersion":1,"roots":{"team/layout":"1.0.0"},"packages":{"team/layout":{
+            "id":"team/layout","version":"1.0.0","sha256":sha,"dependencies":{}}}}).to_string();
+        let fs = files(&[
+            ("/g/ubnf.json", manifest.into()),
+            ("/g/ubnf.lock.json", lock),
+            (&format!("/g/.ubnf-cache/packages/{sha}.json"), artifact),
+        ]);
+        let base = |p: &Path| {
+            fs.get(p)
+                .cloned()
+                .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, p.display().to_string()))
+        };
+        let load = loader(&base);
+        let entry = virtual_path(Path::new("/g"), "pkg:team/layout")
+            .unwrap()
+            .unwrap();
+        assert_eq!(load(&entry).unwrap(), "entry");
+        let gap = import_path(&entry, "../gap.ubnf").unwrap().unwrap();
+        assert_eq!(load(&gap).unwrap(), "gap");
+        let outside = import_path(&entry, "../../outside.ubnf").unwrap().unwrap();
+        assert!(load(&outside).unwrap_err().to_string().contains("外へ"));
+        let undeclared = import_path(&entry, "pkg:other/layout").unwrap().unwrap();
+        assert!(load(&undeclared)
+            .unwrap_err()
+            .to_string()
+            .contains("dependencies"));
     }
 }

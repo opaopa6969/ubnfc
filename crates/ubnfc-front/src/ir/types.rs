@@ -19,6 +19,8 @@ pub enum JsonValue {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum RequiredFeature {
+    #[serde(rename = "lexicalTrivia")]
+    LexicalTrivia,
     #[serde(rename = "declarativeTokens")]
     DeclarativeTokens,
     #[serde(rename = "dualCursor")]
@@ -513,13 +515,15 @@ pub enum ScopeEffectMode {
     SameRuleText,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum SettingsWhitespace {
     #[serde(rename = "none")]
     None,
     #[serde(rename = "javaStyle")]
     JavaStyle,
+    #[serde(untagged)]
+    Named(String),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -784,6 +788,10 @@ pub struct CursorTransition {
     deny_unknown_fields
 )]
 pub enum Delimiter {
+    Lexical {
+        expression: crate::declarative::LexicalExpression,
+        label: String,
+    },
     Characters {
         code_points: Vec<u64>,
     },

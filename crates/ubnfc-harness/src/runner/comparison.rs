@@ -79,6 +79,18 @@ fn projection(case: &RunCase, actual: &Actual) -> Projection {
                 p.prefix(prefix, response);
             }
             p.wire("ast", json!(e.ast), response);
+            if let Some(diagnostic) = &e.diagnostic {
+                // Classic の singular diagnostic は公開診断の category/location だけを観測する。
+                // 配列が空なら不一致、キー自体が無い場合だけ未観測とする。
+                p.field(
+                    "diagnostic",
+                    json!(diagnostic),
+                    response.get("diagnostics").map(|items| {
+                        let first = &items[0];
+                        json!([first["kind"], first["offset"]])
+                    }),
+                );
+            }
             if let Some(captures) = &e.captures {
                 // NestedCaptureConformanceTest.java:283-284,320-327:
                 // fixture.captureNames で絞り、完了順と重複はそのまま比較する。

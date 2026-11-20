@@ -53,13 +53,15 @@
       "diagnostics": [
         {
           "kind": "syntax",
-          "offset": 2,
+          "offset": 4,
           "expected": [
-            ";"
+            "DigitParser",
+            "OneOrMore"
           ],
-          "farthestOffset": 2,
+          "farthestOffset": 4,
           "farthestExpected": [
-            ";"
+            "DigitParser",
+            "OneOrMore"
           ]
         }
       ]
@@ -168,5 +170,11 @@
         }
       ]
     }
-  ]
+  ],
+  "reobservations": {
+    "numeric.json:numeric/7": {
+      "source": "d3ea73e8cfa440df8bdbb70abb29e06259435ba2",
+      "procedure": "unlaxer-runtime::parse_detailed の直接実走。docs/reports/2026-11-01-new-pin-corpus.md 参照"
+    }
+  }
 }
