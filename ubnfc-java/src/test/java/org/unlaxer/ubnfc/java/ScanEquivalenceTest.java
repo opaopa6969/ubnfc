@@ -38,12 +38,12 @@ class ScanEquivalenceTest {
     }
     @AfterAll static void close() throws Exception { for (var harness : harnesses.values()) harness.close(); }
 
-    private static void scanning(CompilerHarness h, boolean value) throws Exception {
+    static void scanning(CompilerHarness h, boolean value) throws Exception {
         h.loader.loadClass(h.pkg + ".internal.Session").getField("scanning").setBoolean(null, value);
     }
 
     /** 公開される観測を 1 本にまとめる（受理・cursor・主診断・失敗位置・出現表・scope・typed AST と span）。 */
-    private static Object observe(CompilerHarness h, String input, Object options) throws Exception {
+    static Object observe(CompilerHarness h, String input, Object options) throws Exception {
         Object result;
         try { result = h.parse(input, options); }
         catch (java.lang.reflect.InvocationTargetException mapping) { return "throws " + mapping.getCause(); }
@@ -109,7 +109,7 @@ class ScanEquivalenceTest {
         return List.copyOf(out);
     }
 
-    private static List<Object> optionsOf(CompilerHarness h) throws Exception {
+    static List<Object> optionsOf(CompilerHarness h) throws Exception {
         Object recognize = h.options.getField("RECOGNIZE").get(null);
         Object ast = h.options.getField("DEFAULT").get(null);
         var method = h.options.getMethod("withObservations", boolean.class, boolean.class);
