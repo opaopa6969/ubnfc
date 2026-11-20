@@ -99,12 +99,41 @@ Rust bulk scan 内の portable SWAR（issue #3）の A/B は `run-swar-ab.sh`。
 JSONTestSuite は `scripts/fetch-external-tools.sh` の固定 commit を使い、入力の sha256 を
 `examples/json/evidence/inputs.sha256` と照合する。中央値・最小値は入力と variant ごとに集計する。
 
+SWAR の生成は #31 以降 **opt-in**（生成器の `swar` feature）。既定は scalar の表引きで、
+`options.scan` による領域走査自体は有効のまま。生成ライブラリに feature や依存は増えない。
+
 ```sh
 export RUSTUP_TOOLCHAIN=stable
-export WORK=$(mktemp -d)
-BASE=66a18ff JSON_TEST_SUITE=/path/to/JSONTestSuite benchmarks/scripts/run-swar-ab.sh prepare
-CORE=30 RUNS=7 benchmarks/scripts/run-swar-ab.sh time
+mkdir -p target
+export WORK=$(mktemp -d "$PWD/target/swar-ab-XXXXXX")
+BASE=66a18ff BASE_WORKTREE=/path/to/detached-before AFTER_FEATURES=ubnfc-rust/swar \
+  JSON_TEST_SUITE=/path/to/JSONTestSuite benchmarks/scripts/run-swar-ab.sh prepare
+CORE=30 RUNS=7 benchmarks/scripts/run-swar-ab.sh time "$WORK/session1"
+CORE=30 RUNS=7 benchmarks/scripts/run-swar-ab.sh time "$WORK/session2"
 ```
+
+`AFTER_WORKTREE` は比較する生成器の checkout（省略時は現在の checkout）。
+scalar を比較する際は `AFTER_FEATURES` を指定しない。各 run の uptime は stderr に出る。
+`BASE_WORKTREE` を省略すると従来どおり BASE の archive を WORK 内で build する。
+`CARGO_BUILD_JOBS` の既定は 8。WORK と全 target は専用 worktree 内に置く。
+基準 commit ごとに target を分け、別 worktree の古い生成器を再利用しない。
+`build-options.txt` に compiler・入力・生成器 binary・parser の hash を記録する。
+
+走査長・escape 別の補助計数と全体命令数は、同じ prepare 結果から別実行で採る。
+前者の時間は子走査を引いた**計装中の壁時間**であり、timer・集計・preemption の影響を受ける。
+通常の A/B や非計装の自己 CPU 時間へ読み替えない。bulk の 1 区間は ID 10000 以上で、
+関数全体の成功長とは分ける。bucket 0 / 1 / 2 は 0 / 1..7 / 8 byte 以上、
+escape は区間終了時の次の文字が `\\` か（通常関数では入口が `\\` か）を表す。
+
+```sh
+PROFILE_SIDE=before benchmarks/scripts/profile-scans.sh
+PROFILE_SIDE=after benchmarks/scripts/profile-scans.sh
+IMAGE=/name/of/own-image benchmarks/scripts/profile-scan-cost.sh
+```
+
+image は `docker build -t <自分専用名> benchmarks/attribution` で用意する。
+計装は専用 WORK の生成物の複製にだけ追加し、通常 A/B の生成物を変更しない。
+[判断と実測](../docs/reports/2026-11-01-swar-default.md) に制約・未達条件も記録する。
 
 ## 関数別の帰属（perf / callgrind / JFR）
 
