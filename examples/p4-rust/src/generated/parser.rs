@@ -1442,12 +1442,12 @@ self.depth-=1;out.diag=self.diag_rule(123,out.diag);out
 }
 fn e0_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:0,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:0,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b0_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b0_c(&mut self,mut state:State)->Step {
@@ -1656,11 +1656,11 @@ out
 }
 fn e13_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:13,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:13,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b13_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b13_c(&mut self,mut state:State)->Step {
@@ -1964,11 +1964,11 @@ out
 }
 fn e33_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:33,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:33,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b33_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b33_c(&mut self,mut state:State)->Step {
@@ -2033,12 +2033,12 @@ out
 }
 fn e38_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:38,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:38,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b38_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b38_c(&mut self,mut state:State)->Step {
@@ -2321,12 +2321,12 @@ out
 }
 fn e56_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:56,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:56,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b56_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b56_c(&mut self,mut state:State)->Step {
@@ -2609,12 +2609,12 @@ out
 }
 fn e74_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:74,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:74,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b74_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b74_c(&mut self,mut state:State)->Step {
@@ -2897,12 +2897,12 @@ out
 }
 fn e92_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:92,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:92,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b92_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b92_c(&mut self,mut state:State)->Step {
@@ -3889,11 +3889,11 @@ out
 }
 fn e157_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:157,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:157,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b157_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b157_c(&mut self,mut state:State)->Step {
@@ -3950,12 +3950,12 @@ out
 }
 fn e161_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:161,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:161,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b161_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b161_c(&mut self,mut state:State)->Step {
@@ -4061,12 +4061,12 @@ out
 }
 fn e168_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:168,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:168,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b168_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b168_c(&mut self,mut state:State)->Step {
@@ -4157,12 +4157,12 @@ out
 }
 fn e174_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:174,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:174,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b174_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b174_c(&mut self,mut state:State)->Step {
@@ -4217,11 +4217,11 @@ out
 }
 fn e178_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:178,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:178,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b178_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b178_c(&mut self,mut state:State)->Step {
@@ -4285,12 +4285,12 @@ out
 }
 fn e183_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:183,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:183,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b183_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b183_c(&mut self,mut state:State)->Step {
@@ -4440,12 +4440,12 @@ out
 }
 fn e193_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:193,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:193,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b193_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b193_c(&mut self,mut state:State)->Step {
@@ -4595,12 +4595,12 @@ out
 }
 fn e203_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:203,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:203,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b203_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b203_c(&mut self,mut state:State)->Step {
@@ -4750,12 +4750,12 @@ out
 }
 fn e213_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:213,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:213,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b213_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b213_c(&mut self,mut state:State)->Step {
@@ -4905,12 +4905,12 @@ out
 }
 fn e223_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:223,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:223,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b223_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b223_c(&mut self,mut state:State)->Step {
@@ -5003,11 +5003,11 @@ out
 }
 fn e229_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:229,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:229,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b229_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b229_c(&mut self,mut state:State)->Step {
@@ -5245,11 +5245,11 @@ out
 }
 fn e245_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:245,state,matched_mode:false,version:0};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:245,state,matched_mode:false,version:0});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b245_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b245_c(&mut self,mut state:State)->Step {
@@ -5315,12 +5315,12 @@ out
 }
 fn e250_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:250,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:250,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b250_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b250_c(&mut self,mut state:State)->Step {
@@ -5652,12 +5652,12 @@ out
 }
 fn e271_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:271,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:271,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b271_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b271_c(&mut self,mut state:State)->Step {
@@ -6066,12 +6066,12 @@ out
 }
 fn e297_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:297,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:297,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b297_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b297_c(&mut self,mut state:State)->Step {
@@ -6403,12 +6403,12 @@ out
 }
 fn e318_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:318,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:318,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b318_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b318_c(&mut self,mut state:State)->Step {
@@ -6835,12 +6835,12 @@ out
 }
 fn e345_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:345,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:345,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b345_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b345_c(&mut self,mut state:State)->Step {
@@ -6946,12 +6946,12 @@ out
 }
 fn e352_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:352,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:352,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b352_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b352_c(&mut self,mut state:State)->Step {
@@ -7036,11 +7036,11 @@ out
 }
 fn e358_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:358,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:358,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b358_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b358_c(&mut self,mut state:State)->Step {
@@ -7109,12 +7109,12 @@ out
 }
 fn e363_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:363,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:363,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b363_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b363_c(&mut self,mut state:State)->Step {
@@ -7207,12 +7207,12 @@ out
 }
 fn e369_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:369,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:369,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b369_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b369_c(&mut self,mut state:State)->Step {
@@ -7304,12 +7304,12 @@ out
 }
 fn e375_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:375,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:375,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b375_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b375_c(&mut self,mut state:State)->Step {
@@ -7511,11 +7511,11 @@ out
 }
 fn e387_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:387,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:387,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b387_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b387_c(&mut self,mut state:State)->Step {
@@ -7710,12 +7710,12 @@ out
 }
 fn e402_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:402,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:402,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b402_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b402_c(&mut self,mut state:State)->Step {
@@ -7787,12 +7787,12 @@ out
 }
 fn e407_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:407,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:407,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b407_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b407_c(&mut self,mut state:State)->Step {
@@ -7864,12 +7864,12 @@ out
 }
 fn e412_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:412,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:412,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b412_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b412_c(&mut self,mut state:State)->Step {
@@ -7941,12 +7941,12 @@ out
 }
 fn e417_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:417,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:417,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b417_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b417_c(&mut self,mut state:State)->Step {
@@ -8018,12 +8018,12 @@ out
 }
 fn e422_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:422,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:422,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b422_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b422_c(&mut self,mut state:State)->Step {
@@ -8161,12 +8161,12 @@ out
 }
 fn e431_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:431,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:431,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b431_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b431_c(&mut self,mut state:State)->Step {
@@ -8363,12 +8363,12 @@ out
 }
 fn e444_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:444,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:444,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b444_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b444_c(&mut self,mut state:State)->Step {
@@ -8440,12 +8440,12 @@ out
 }
 fn e449_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:449,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:449,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b449_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b449_c(&mut self,mut state:State)->Step {
@@ -8517,12 +8517,12 @@ out
 }
 fn e454_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:454,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:454,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b454_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b454_c(&mut self,mut state:State)->Step {
@@ -8594,12 +8594,12 @@ out
 }
 fn e459_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:459,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:459,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b459_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b459_c(&mut self,mut state:State)->Step {
@@ -8671,12 +8671,12 @@ out
 }
 fn e464_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:464,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:464,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b464_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b464_c(&mut self,mut state:State)->Step {
@@ -8777,12 +8777,12 @@ out
 }
 fn e471_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:471,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:471,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b471_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b471_c(&mut self,mut state:State)->Step {
@@ -8854,12 +8854,12 @@ out
 }
 fn e476_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:476,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:476,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b476_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b476_c(&mut self,mut state:State)->Step {
@@ -8931,12 +8931,12 @@ out
 }
 fn e481_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:481,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:481,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b481_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b481_c(&mut self,mut state:State)->Step {
@@ -9037,11 +9037,11 @@ out
 }
 fn e488_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:488,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:488,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b488_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b488_c(&mut self,mut state:State)->Step {
@@ -9272,12 +9272,12 @@ out
 }
 fn e505_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:505,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:505,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b505_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b505_c(&mut self,mut state:State)->Step {
@@ -9349,12 +9349,12 @@ out
 }
 fn e510_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:510,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:510,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b510_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b510_c(&mut self,mut state:State)->Step {
@@ -9426,12 +9426,12 @@ out
 }
 fn e515_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:515,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:515,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b515_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b515_c(&mut self,mut state:State)->Step {
@@ -9503,12 +9503,12 @@ out
 }
 fn e520_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:520,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:520,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b520_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b520_c(&mut self,mut state:State)->Step {
@@ -9580,12 +9580,12 @@ out
 }
 fn e525_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:525,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:525,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b525_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b525_c(&mut self,mut state:State)->Step {
@@ -9657,12 +9657,12 @@ out
 }
 fn e530_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:530,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:530,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b530_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b530_c(&mut self,mut state:State)->Step {
@@ -9734,12 +9734,12 @@ out
 }
 fn e535_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:535,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:535,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b535_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b535_c(&mut self,mut state:State)->Step {
@@ -9811,12 +9811,12 @@ out
 }
 fn e540_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:540,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:540,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b540_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b540_c(&mut self,mut state:State)->Step {
@@ -9888,12 +9888,12 @@ out
 }
 fn e545_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:545,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:545,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b545_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b545_c(&mut self,mut state:State)->Step {
@@ -9965,12 +9965,12 @@ out
 }
 fn e550_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:550,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:550,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b550_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b550_c(&mut self,mut state:State)->Step {
@@ -10137,12 +10137,12 @@ out
 }
 fn e561_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:561,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:561,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b561_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b561_c(&mut self,mut state:State)->Step {
@@ -10309,12 +10309,12 @@ out
 }
 fn e572_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:572,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:572,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b572_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b572_c(&mut self,mut state:State)->Step {
@@ -10481,12 +10481,12 @@ out
 }
 fn e583_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:583,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:583,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b583_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b583_c(&mut self,mut state:State)->Step {
@@ -10638,12 +10638,12 @@ out
 }
 fn e593_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:593,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:593,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b593_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b593_c(&mut self,mut state:State)->Step {
@@ -10795,12 +10795,12 @@ out
 }
 fn e603_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:603,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:603,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b603_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b603_c(&mut self,mut state:State)->Step {
@@ -10952,12 +10952,12 @@ out
 }
 fn e613_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:613,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:613,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b613_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b613_c(&mut self,mut state:State)->Step {
@@ -11109,11 +11109,11 @@ out
 }
 fn e623_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:623,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:623,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b623_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b623_c(&mut self,mut state:State)->Step {
@@ -11178,12 +11178,12 @@ out
 }
 fn e628_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:628,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:628,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b628_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b628_c(&mut self,mut state:State)->Step {
@@ -11255,12 +11255,12 @@ out
 }
 fn e633_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:633,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:633,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b633_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b633_c(&mut self,mut state:State)->Step {
@@ -11361,12 +11361,12 @@ out
 }
 fn e640_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:640,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:640,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b640_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b640_c(&mut self,mut state:State)->Step {
@@ -11643,11 +11643,11 @@ out
 }
 fn e659_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:659,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:659,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b659_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b659_c(&mut self,mut state:State)->Step {
@@ -11865,12 +11865,12 @@ out
 }
 fn e675_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:675,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:675,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b675_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b675_c(&mut self,mut state:State)->Step {
@@ -11896,12 +11896,12 @@ out
 }
 fn e677_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:677,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:677,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b677_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b677_c(&mut self,mut state:State)->Step {
@@ -11927,12 +11927,12 @@ out
 }
 fn e679_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:679,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:679,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b679_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b679_c(&mut self,mut state:State)->Step {
@@ -11958,11 +11958,11 @@ out
 }
 fn e681_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:681,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:681,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b681_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b681_c(&mut self,mut state:State)->Step {
@@ -13013,11 +13013,11 @@ out
 }
 fn e738_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:738,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:738,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b738_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b738_c(&mut self,mut state:State)->Step {
@@ -14067,11 +14067,11 @@ out
 }
 fn e795_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:795,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:795,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b795_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b795_c(&mut self,mut state:State)->Step {
@@ -14109,12 +14109,12 @@ out
 }
 fn e798_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:798,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:798,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b798_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b798_c(&mut self,mut state:State)->Step {
@@ -14208,12 +14208,12 @@ out
 }
 fn e804_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:804,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:804,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b804_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b804_c(&mut self,mut state:State)->Step {
@@ -14269,11 +14269,11 @@ out
 }
 fn e808_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:808,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:808,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b808_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b808_c(&mut self,mut state:State)->Step {
@@ -14741,12 +14741,12 @@ out
 }
 fn e842_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:842,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:842,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b842_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b842_c(&mut self,mut state:State)->Step {
@@ -14840,12 +14840,12 @@ out
 }
 fn e848_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:848,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:848,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b848_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b848_c(&mut self,mut state:State)->Step {
@@ -14939,12 +14939,12 @@ out
 }
 fn e854_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:854,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:854,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b854_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b854_c(&mut self,mut state:State)->Step {
@@ -15038,12 +15038,12 @@ out
 }
 fn e860_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:860,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:860,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b860_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b860_c(&mut self,mut state:State)->Step {
@@ -15115,11 +15115,11 @@ out
 }
 fn e865_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:865,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:865,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b865_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b865_c(&mut self,mut state:State)->Step {
@@ -15432,12 +15432,12 @@ out
 }
 fn e888_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:888,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:888,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b888_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b888_c(&mut self,mut state:State)->Step {
@@ -15492,11 +15492,11 @@ out
 }
 fn e892_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:892,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:892,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b892_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b892_c(&mut self,mut state:State)->Step {
@@ -15565,12 +15565,12 @@ out
 }
 fn e897_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:897,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:897,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b897_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b897_c(&mut self,mut state:State)->Step {
@@ -15668,12 +15668,12 @@ out
 }
 fn e904_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:904,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:904,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b904_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b904_c(&mut self,mut state:State)->Step {
@@ -15831,11 +15831,11 @@ out
 }
 fn e915_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:915,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:915,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b915_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b915_c(&mut self,mut state:State)->Step {
@@ -15932,12 +15932,12 @@ out
 }
 fn e922_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:922,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:922,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b922_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b922_c(&mut self,mut state:State)->Step {
@@ -16112,11 +16112,11 @@ out
 }
 fn e934_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:934,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:934,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b934_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b934_c(&mut self,mut state:State)->Step {
@@ -16241,12 +16241,12 @@ out
 }
 fn e943_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:943,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:943,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b943_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b943_c(&mut self,mut state:State)->Step {
@@ -16361,12 +16361,12 @@ out
 }
 fn e951_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:951,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:951,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b951_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b951_c(&mut self,mut state:State)->Step {
@@ -16533,12 +16533,12 @@ out
 }
 fn e962_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:962,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:962,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b962_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b962_c(&mut self,mut state:State)->Step {
@@ -16594,12 +16594,12 @@ out
 }
 fn e966_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:966,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:966,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b966_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b966_c(&mut self,mut state:State)->Step {
@@ -16656,12 +16656,12 @@ out
 }
 fn e970_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:970,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:970,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b970_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b970_c(&mut self,mut state:State)->Step {
@@ -16688,12 +16688,12 @@ out
 }
 fn e972_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:972,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:972,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b972_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b972_c(&mut self,mut state:State)->Step {
@@ -16860,12 +16860,12 @@ out
 }
 fn e983_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:983,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:983,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b983_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b983_c(&mut self,mut state:State)->Step {
@@ -16921,12 +16921,12 @@ out
 }
 fn e987_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:987,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:987,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b987_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b987_c(&mut self,mut state:State)->Step {
@@ -16983,12 +16983,12 @@ out
 }
 fn e991_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:991,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:991,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b991_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b991_c(&mut self,mut state:State)->Step {
@@ -17015,12 +17015,12 @@ out
 }
 fn e993_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:993,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:993,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b993_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b993_c(&mut self,mut state:State)->Step {
@@ -17187,12 +17187,12 @@ out
 }
 fn e1004_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:1004,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:1004,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1004_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:false,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b1004_c(&mut self,mut state:State)->Step {
@@ -17248,12 +17248,12 @@ out
 }
 fn e1008_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:1008,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:1008,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1008_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b1008_c(&mut self,mut state:State)->Step {
@@ -17310,12 +17310,12 @@ out
 }
 fn e1012_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:1012,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:1012,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1012_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 out.events=self.event(Event::Values{span:[state.consumed,out.state.consumed],child:out.events,wrap:true,text:false});
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b1012_c(&mut self,mut state:State)->Step {
@@ -17342,11 +17342,11 @@ out
 }
 fn e1014_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:1014,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:1014,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1014_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b1014_c(&mut self,mut state:State)->Step {
@@ -17637,11 +17637,11 @@ out
 }
 fn e1033_c(&mut self,state:State)->Step {
 let mark=self.mark();
-let key=Key {expression:1033,state,matched_mode:false,version:self.scope.state_version()};if let Some(hit)=self.lookup(key) {return hit;}
+let key=self.memo_key(Key {expression:1033,state,matched_mode:false,version:self.scope.state_version()});if let Some(hit)=self.lookup(key.as_ref()) {return hit;}
 self.display_enter(state.consumed.max(state.matched));let mut out=self.b1033_c(state);self.display_reach(out.state.consumed.max(out.state.matched));
 if out.ok {
 } else {self.restore(mark);self.display_failures(state.consumed.max(state.matched),&[]);}
-if (out.ok && true) || (!out.ok && true) {self.store(key,out,mark);}self.display_leave();
+if (out.ok && true) || (!out.ok && true) {self.store(key.as_ref(),out,mark);}self.display_leave();
 out
 }
 fn b1033_c(&mut self,mut state:State)->Step {

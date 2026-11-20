@@ -8,6 +8,25 @@ pub struct Key {
     pub matched_mode: bool,
     pub version: u32,
 }
+impl Key {
+    #[inline]
+    #[doc(hidden)]
+    pub fn prepare(self) -> Option<PreparedKey> {
+        let packed = PackedKey::pack(self)?;
+        Some(PreparedKey {
+            hash: packed.hash(),
+            packed,
+        })
+    }
+}
+
+// Slot の位置は表の拡張で変わる。再利用するのは表の容量に依存しない値だけ。
+#[doc(hidden)]
+pub struct PreparedKey {
+    packed: PackedKey,
+    hash: u64,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 struct PackedKey {
     expression: u32,
@@ -105,8 +124,16 @@ impl<T: Copy> Memo<T> {
         if self.slots.is_empty() {
             return None;
         }
-        let key = PackedKey::pack(key)?;
-        let mut index = key.hash() as usize & (self.slots.len() - 1);
+        self.get_prepared(key.prepare().as_ref())
+    }
+
+    #[doc(hidden)]
+    pub fn get_prepared(&self, key: Option<&PreparedKey>) -> Option<T> {
+        if self.slots.is_empty() {
+            return None;
+        }
+        let key = key?;
+        let mut index = key.hash as usize & (self.slots.len() - 1);
         let mut probes = 0;
         loop {
             probes += 1;
@@ -116,13 +143,18 @@ impl<T: Copy> Memo<T> {
                 return None;
             }
             let (found, value) = self.entries[slot as usize - 1];
-            if found == key {
+            if found == key.packed {
                 return Some(value);
             }
             index = (index + 1) & (self.slots.len() - 1);
         }
     }
     pub fn insert(&mut self, key: Key, value: T) {
+        self.insert_prepared(key.prepare().as_ref(), value);
+    }
+
+    #[doc(hidden)]
+    pub fn insert_prepared(&mut self, key: Option<&PreparedKey>, value: T) {
         if self.entries.len() >= u32::MAX as usize - 1 {
             return;
         }
@@ -140,23 +172,23 @@ impl<T: Copy> Memo<T> {
                 self.slots[index] = (i + 1) as u32;
             }
         }
-        let Some(key) = PackedKey::pack(key) else {
+        let Some(key) = key else {
             return;
         };
-        let mut index = key.hash() as usize & (self.slots.len() - 1);
+        let mut index = key.hash as usize & (self.slots.len() - 1);
         let mut probes = 1;
         while self.slots[index] != 0 {
             probes += 1;
             self.max_probe.set(self.max_probe.get().max(probes));
             let entry = &mut self.entries[self.slots[index] as usize - 1];
-            if entry.0 == key {
+            if entry.0 == key.packed {
                 entry.1 = value;
                 return;
             }
             index = (index + 1) & (self.slots.len() - 1);
         }
         self.max_probe.set(self.max_probe.get().max(probes));
-        self.entries.push((key, value));
+        self.entries.push((key.packed, value));
         self.slots[index] = self.entries.len() as u32;
     }
 }
