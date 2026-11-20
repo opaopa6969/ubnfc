@@ -77,6 +77,33 @@ fn memo_growth_collisions_and_every_key_component() {
     assert_eq!(table.get(variant), None);
 }
 #[test]
+fn prepared_memo_key_survives_growth_between_lookup_and_insert() {
+    let key = |expression| memo::Key {
+        expression,
+        state: State::default(),
+        matched_mode: true,
+        version: 1,
+    };
+    let outer = key(1000);
+    let prepared = outer.prepare();
+    let mut table = memo::Memo::with_capacity(0);
+    table.insert(key(0), 0);
+    assert_eq!(table.get_prepared(prepared.as_ref()), None);
+
+    // Evaluating the outer expression can publish other entries and rehash the table.
+    for expression in 1..1000 {
+        table.insert(key(expression), expression);
+    }
+    table.insert_prepared(prepared.as_ref(), 1000);
+
+    assert_eq!(table.len(), 1001);
+    assert_eq!(table.get(outer), Some(1000));
+    assert_eq!(table.get_prepared(prepared.as_ref()), Some(1000));
+    for expression in 0..1000 {
+        assert_eq!(table.get(key(expression)), Some(expression));
+    }
+}
+#[test]
 fn diagnostic_replay_rebases_without_copying_caller_stacks() {
     let mut d = diag::Diagnostics::new();
     let leaf = d.fail(3, "number");

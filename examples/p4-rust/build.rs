@@ -199,8 +199,8 @@ fn instrument_runtime(runtime: &mut String) {
         index + hit.len(),
         "        crate::counters::bump(crate::counters::MEMO_HIT);\n",
     );
-    let insert = "        self.memo.insert(key, Saved::new(";
-    let index = runtime.find(insert).expect("memo.insert");
+    let insert = "        self.memo\n            .insert_prepared(key, Saved::new(";
+    let index = runtime.find(insert).expect("memo.insert_prepared");
     runtime.insert_str(
         index,
         "        crate::counters::bump(crate::counters::MEMO_INSERT);\n",
