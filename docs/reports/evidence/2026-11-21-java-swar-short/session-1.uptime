@@ -1,0 +1,62 @@
+# session=1 core=28
+java version "21.0.9" 2025-10-21 LTS
+Java(TM) SE Runtime Environment (build 21.0.9+7-LTS-338)
+Java HotSpot(TM) 64-Bit Server VM (build 21.0.9+7-LTS-338, mixed mode, sharing)
+ 04:09:35 up 11 days,  6:06,  2 users,  load average: 11.77, 10.39, 10.54
+round=1 variant=scalar start  04:09:35 up 11 days,  6:06,  2 users,  load average: 11.77, 10.39, 10.54
+round=1 variant=scalar end  04:09:48 up 11 days,  6:06,  2 users,  load average: 11.35, 10.34, 10.52
+round=1 variant=before start  04:09:48 up 11 days,  6:06,  2 users,  load average: 11.35, 10.34, 10.52
+round=1 variant=before end  04:10:01 up 11 days,  6:06,  2 users,  load average: 10.03, 10.10, 10.44
+round=1 variant=candidate start  04:10:01 up 11 days,  6:06,  2 users,  load average: 10.03, 10.10, 10.44
+round=1 variant=candidate end  04:10:15 up 11 days,  6:06,  2 users,  load average: 9.15, 9.90, 10.37
+round=1 variant=old start  04:10:15 up 11 days,  6:06,  2 users,  load average: 9.15, 9.90, 10.37
+round=1 variant=old end  04:10:18 up 11 days,  6:06,  2 users,  load average: 9.15, 9.90, 10.37
+round=2 variant=candidate start  04:10:18 up 11 days,  6:06,  2 users,  load average: 9.15, 9.90, 10.37
+round=2 variant=candidate end  04:10:31 up 11 days,  6:06,  2 users,  load average: 8.77, 9.77, 10.32
+round=2 variant=before start  04:10:31 up 11 days,  6:06,  2 users,  load average: 8.77, 9.77, 10.32
+round=2 variant=before end  04:10:44 up 11 days,  6:07,  2 users,  load average: 8.04, 9.58, 10.25
+round=2 variant=scalar start  04:10:44 up 11 days,  6:07,  2 users,  load average: 8.04, 9.58, 10.25
+round=2 variant=scalar end  04:10:56 up 11 days,  6:07,  2 users,  load average: 8.35, 9.57, 10.24
+round=2 variant=old start  04:10:56 up 11 days,  6:07,  2 users,  load average: 8.35, 9.57, 10.24
+round=2 variant=old end  04:11:02 up 11 days,  6:07,  2 users,  load average: 9.12, 9.71, 10.28
+round=3 variant=candidate start  04:11:02 up 11 days,  6:07,  2 users,  load average: 9.12, 9.71, 10.28
+round=3 variant=candidate end  04:11:17 up 11 days,  6:07,  2 users,  load average: 10.42, 10.00, 10.36
+round=3 variant=old start  04:11:17 up 11 days,  6:07,  2 users,  load average: 10.42, 10.00, 10.36
+round=3 variant=old end  04:11:20 up 11 days,  6:07,  2 users,  load average: 11.11, 10.14, 10.41
+round=3 variant=scalar start  04:11:20 up 11 days,  6:07,  2 users,  load average: 11.11, 10.14, 10.41
+round=3 variant=scalar end  04:11:32 up 11 days,  6:08,  2 users,  load average: 10.17, 9.97, 10.35
+round=3 variant=before start  04:11:32 up 11 days,  6:08,  2 users,  load average: 10.17, 9.97, 10.35
+round=3 variant=before end  04:11:46 up 11 days,  6:08,  2 users,  load average: 9.03, 9.73, 10.27
+round=4 variant=scalar start  04:11:46 up 11 days,  6:08,  2 users,  load average: 9.03, 9.73, 10.27
+round=4 variant=scalar end  04:12:00 up 11 days,  6:08,  2 users,  load average: 9.36, 9.76, 10.27
+round=4 variant=old start  04:12:00 up 11 days,  6:08,  2 users,  load average: 9.36, 9.76, 10.27
+round=4 variant=old end  04:12:03 up 11 days,  6:08,  2 users,  load average: 9.36, 9.76, 10.27
+round=4 variant=candidate start  04:12:03 up 11 days,  6:08,  2 users,  load average: 9.36, 9.76, 10.27
+round=4 variant=candidate end  04:12:16 up 11 days,  6:08,  2 users,  load average: 9.89, 9.86, 10.29
+round=4 variant=before start  04:12:16 up 11 days,  6:08,  2 users,  load average: 9.89, 9.86, 10.29
+round=4 variant=before end  04:12:29 up 11 days,  6:08,  2 users,  load average: 9.51, 9.78, 10.26
+round=5 variant=scalar start  04:12:29 up 11 days,  6:08,  2 users,  load average: 9.51, 9.78, 10.26
+round=5 variant=scalar end  04:12:41 up 11 days,  6:09,  2 users,  load average: 8.13, 9.46, 10.15
+round=5 variant=before start  04:12:41 up 11 days,  6:09,  2 users,  load average: 8.13, 9.46, 10.15
+round=5 variant=before end  04:12:55 up 11 days,  6:09,  2 users,  load average: 7.61, 9.28, 10.07
+round=5 variant=candidate start  04:12:55 up 11 days,  6:09,  2 users,  load average: 7.61, 9.28, 10.07
+round=5 variant=candidate end  04:13:07 up 11 days,  6:09,  2 users,  load average: 6.82, 9.05, 9.99
+round=5 variant=old start  04:13:07 up 11 days,  6:09,  2 users,  load average: 6.82, 9.05, 9.99
+round=5 variant=old end  04:13:10 up 11 days,  6:09,  2 users,  load average: 6.51, 8.95, 9.96
+round=6 variant=candidate start  04:13:10 up 11 days,  6:09,  2 users,  load average: 6.51, 8.95, 9.96
+round=6 variant=candidate end  04:13:23 up 11 days,  6:09,  2 users,  load average: 6.19, 8.80, 9.90
+round=6 variant=before start  04:13:23 up 11 days,  6:09,  2 users,  load average: 6.19, 8.80, 9.90
+round=6 variant=before end  04:13:35 up 11 days,  6:10,  2 users,  load average: 5.68, 8.57, 9.80
+round=6 variant=scalar start  04:13:35 up 11 days,  6:10,  2 users,  load average: 5.68, 8.57, 9.80
+round=6 variant=scalar end  04:13:47 up 11 days,  6:10,  2 users,  load average: 5.34, 8.40, 9.73
+round=6 variant=old start  04:13:47 up 11 days,  6:10,  2 users,  load average: 5.34, 8.40, 9.73
+round=6 variant=old end  04:13:50 up 11 days,  6:10,  2 users,  load average: 5.07, 8.29, 9.69
+round=7 variant=candidate start  04:13:50 up 11 days,  6:10,  2 users,  load average: 5.07, 8.29, 9.69
+round=7 variant=candidate end  04:14:03 up 11 days,  6:10,  2 users,  load average: 4.67, 8.10, 9.61
+round=7 variant=old start  04:14:03 up 11 days,  6:10,  2 users,  load average: 4.67, 8.10, 9.61
+round=7 variant=old end  04:14:06 up 11 days,  6:10,  2 users,  load average: 4.62, 8.03, 9.58
+round=7 variant=scalar start  04:14:06 up 11 days,  6:10,  2 users,  load average: 4.62, 8.03, 9.58
+round=7 variant=scalar end  04:14:18 up 11 days,  6:10,  2 users,  load average: 4.99, 8.00, 9.56
+round=7 variant=before start  04:14:18 up 11 days,  6:10,  2 users,  load average: 4.99, 8.00, 9.56
+round=7 variant=before end  04:14:31 up 11 days,  6:10,  2 users,  load average: 5.25, 7.90, 9.50
+ 04:14:31 up 11 days,  6:10,  2 users,  load average: 5.25, 7.90, 9.50

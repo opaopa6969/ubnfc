@@ -1,0 +1,11 @@
+variant,method,lane0,lane1,lane2,lane3,lane4,skip_nonascii,skip_ascii
+before,scan6,183623,52843,0,0,0,0,0
+before,scan58,81918,17175,2642,15852,34347,0,0
+before,scan97,6605,1321,0,0,0,0,0
+before,scan101,0,2642,1321,0,25099,0,0
+before,scan112,0,0,2642,0,0,0,0
+candidate,scan6,0,52843,0,0,0,0,183623
+candidate,scan58,0,17175,2642,15852,34347,3963,77955
+candidate,scan97,0,1321,0,0,0,0,6605
+candidate,scan101,0,2642,1321,0,25099,0,0
+candidate,scan112,0,0,2642,0,0,0,0

@@ -41,7 +41,7 @@ final class Scanning {
     private final Set<String> members = new LinkedHashSet<>();
     /** 反復ごとの一括走査表。 */
     private final Map<String, ScanClass> classes = new LinkedHashMap<>();
-    private final Map<String, String> wordMasks = new LinkedHashMap<>();
+    private final Map<String, WordClass> wordClasses = new LinkedHashMap<>();
 
     Scanning(GrammarIr ir, Map<String, Expr> expressions, Map<String, Rule> rules, Map<String, Token> tokens,
              Map<String, GrammarIr.Recipe> recipes, Map<String, Integer> exprIds, BiFunction<String, String, String> constant,
@@ -62,8 +62,8 @@ final class Scanning {
                 ExprNode node = expressions.get(id).node();
                 ScanClass table = classes.get(id);
                 if (node.kind().equals("repeat") && node.max() == null && table != null) {
-                    String mask = asciiWordMask(table);
-                    if (mask != null) wordMasks.put(id, mask);
+                    WordClass wordClass = asciiWordClass(table);
+                    if (wordClass != null) wordClasses.put(id, wordClass);
                 }
             }
         }
@@ -190,7 +190,7 @@ final class Scanning {
             out.append("    /** D-080: 観測を残さない終端領域の走査。{@code (終了位置 << 1) | 値なし}、失敗は -1。 */\n")
                 .append("    private static long ").append(scan(id)).append("(char[] t, int p) {\n        ")
                 .append(body(id).replace("\n", "\n        ")).append("\n    }\n");
-        if (!wordMasks.isEmpty()) out.append(SWAR_HELPERS);
+        if (!wordClasses.isEmpty()) out.append(SWAR_HELPERS);
         return out.toString();
     }
 
@@ -210,6 +210,12 @@ final class Scanning {
         String mask() {
             if (start == 0) return "SCAN_LANE_HIGH ^ " + ge(end + 1);
             return ge(start) + " & ~" + ge(end + 1);
+        }
+        String containsFirst() {
+            if (start == end) return "first == " + start;
+            if (start == 0) return "first <= " + end;
+            if (end >= 127) return "first >= " + start;
+            return "first >= " + start + " && first <= " + end;
         }
         private static String ge(int value) {
             return "scanSwarGe(word, 0x" + Long.toHexString(value * 0x0001000100010001L) + "L)";
@@ -232,8 +238,24 @@ final class Scanning {
         return ranges;
     }
 
+    private record WordClass(List<AsciiRange> ranges, boolean complement) {
+        String mismatch() {
+            String mask = ranges.stream()
+                .map(r -> r.end() == Character.MAX_VALUE ? AsciiRange.ge(r.start()) : r.mask())
+                .map(term -> "(" + term + ")").collect(Collectors.joining(" | "));
+            return complement ? mask : "SCAN_LANE_HIGH ^ (" + mask + ")";
+        }
+        String firstMismatch() {
+            String member = ranges.stream().filter(r -> r.start() < 128)
+                .map(AsciiRange::containsFirst).map(term -> "(" + term + ")")
+                .collect(Collectors.joining(" || "));
+            if (member.isEmpty()) return "false";
+            return complement ? member : "!(" + member + ")";
+        }
+    }
+
     /** 簡単な ASCII 表だけを word 化する。非 ASCII は必ず scalar の code point 判定に戻る。 */
-    private static String asciiWordMask(ScanClass table) {
+    private static WordClass asciiWordClass(ScanClass table) {
         var included = asciiRanges(table, true);
         if (included.isEmpty()) return null;
         // 補集合は U+0080 以上を含めて不一致側の区間を作る。
@@ -247,14 +269,15 @@ final class Scanning {
         boolean complement = excluded.size() <= included.size();
         var ranges = complement ? excluded : included;
         if (ranges.size() > 3) return null;
-        String mask = ranges.stream().map(r -> r.end() == Character.MAX_VALUE ? AsciiRange.ge(r.start()) : r.mask())
-            .map(term -> "(" + term + ")").collect(Collectors.joining(" | "));
-        return complement ? mask : "SCAN_LANE_HIGH ^ (" + mask + ")";
+        return new WordClass(ranges, complement);
     }
 
-    private static String wordLoop(String mismatch) {
+    private static String wordLoop(WordClass wordClass) {
         return """
                 while (p <= t.length - 4) {
+                    char first = t[p];
+                    if (first >= 128) break;
+                    if (%s) break asciiScan;
                     long word = scanSwarWord(t, p);
                     long mismatch = %s;
                     if (mismatch == 0) { p += 4; count += 4; continue; }
@@ -264,7 +287,7 @@ final class Scanning {
                     break;
                 }
                 if (p == t.length) break;
-            """.formatted(mismatch).indent(4);
+            """.formatted(wordClass.firstMismatch(), wordClass.mismatch()).indent(4);
     }
 
     private String body(String id) {
@@ -324,9 +347,9 @@ final class Scanning {
             long low = table.asciiLow().toBigInteger().longValue(), high = table.asciiHigh().toBigInteger().longValue();
             String ranges = table.ranges().isEmpty() ? "false" : table.ranges().stream()
                 .map(r -> "c >= " + r.start() + " && c <= " + r.end()).collect(Collectors.joining(" || "));
-            String mismatch = wordMasks.get(id);
-            String bulk = "while (p < t.length) {\n"
-                + (mismatch == null ? "" : wordLoop(mismatch))
+            WordClass wordClass = wordClasses.get(id);
+            String bulk = (wordClass == null ? "" : "asciiScan: ") + "while (p < t.length) {\n"
+                + (wordClass == null ? "" : wordLoop(wordClass))
                 + "    char ch = t[p];\n"
                 + "    if (ch < 128) { if (((ch < 64 ? 0x" + Long.toHexString(low) + "L >>> ch : 0x" + Long.toHexString(high) + "L >>> (ch - 64)) & 1L) == 0) break; p++; }\n"
                 + "    else { int c = Session.cpAt(t, p); if (!(" + ranges + ")) break; p += Character.charCount(c); }\n"
