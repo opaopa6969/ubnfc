@@ -51,6 +51,11 @@ runner は生成器を呼ばず、指定済み artifact のコンパイル・実
   `ParseOptions.withObservations(false, false)` と `lexical: false` で解析する。キーが無い要求は
   起動時の `-Dubnfc.scan` の値へ戻す）。他の backend はこのキーを無視してよい。
 
+- `options.ll1`（任意、Rust / Java 生成 driver）は、認識用の `plan.ll1` を
+  true / false で比較する。指定時の観測条件は `options.scan` と同じ。表が実行できるのは
+  AST を要求しない prefix 解析で、full 解析の AST と canonical JSON は引き続き生成する。
+  Java では両キーを同時に指定して走査と表を独立に切り替えられる。
+
 artifact は一つの文法 variant を実装する。runner の既定は各ケースの先頭 grammar_ref。
 `--variant NAME` は artifact が実装する variant を指定する比較用オプションであり、
 リクエストの文法を変換する機能ではない。`modes` はその variant の受理期待値に使う。

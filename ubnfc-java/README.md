@@ -38,6 +38,11 @@ namespace `org.unlaxer` の下に置く）。生成パーサを自分のプロ�
 `{Grammar}Parser.parse(CharSequence[, ParseOptions]) -> ParseResult<{Grammar}AST>`。
 `ParseOptions` で AST 構築、全消費、lexical 出力、memo、Extern scanner、`maxDepth` を指定できる。
 
+`ParseOptions.RECOGNIZE.withLl1(true)` は、検証済みの `plan.ll1` を持つ閉領域で認識表を試す。
+旧 IR や未対応の表、scope / recovery を持つ文法では従来の式評価を使う。
+同じ API で `withLl1(false)` にすると表駆動を切り替えられる。既定は false。
+適用条件と計測は [Java LL(1) の報告](../docs/reports/2026-11-20-java-ll1.md) を参照。
+
 `maxDepth` は同時に実行する rule 呼出し数の上限（正の整数、既定 `10_000`）。既存実装にはない安全策で、
 上限到達時は解析全体を中断し、C=M=0、`syntax` 診断、空の AST/capture/scope を返す。
 optional や choice に包まれていても成功へ変換しない。既存の2引数・5引数コンストラクタは既定値を使う。

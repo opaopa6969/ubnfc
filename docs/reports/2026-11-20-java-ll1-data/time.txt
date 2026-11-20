@@ -1,0 +1,113 @@
+java version "21.0.9" 2025-10-21 LTS
+Java(TM) SE Runtime Environment (build 21.0.9+7-LTS-338)
+Java HotSpot(TM) 64-Bit Server VM (build 21.0.9+7-LTS-338, mixed mode, sharing)
+# base=cdd17a8f9da9990d124e104029047970917af19a cpu=28 rounds=6
+task,variant,bytes,warmup,iterations,median_ms,us_per_byte,allocated_bytes_per_parse
+# round=1 task=json variant=before start  20:50:49 up 10 days, 22:47,  2 users,  load average: 9.60, 14.12, 22.50
+json,before,1000112,200,22,9.582979,0.00958191,1986992
+# round=1 task=json variant=before end  20:50:53 up 10 days, 22:47,  2 users,  load average: 9.31, 13.98, 22.42
+# round=1 task=json variant=off start  20:50:53 up 10 days, 22:47,  2 users,  load average: 9.31, 13.98, 22.42
+json,off,1000112,200,22,9.379196,0.00937815,1986992
+# round=1 task=json variant=off end  20:50:57 up 10 days, 22:47,  2 users,  load average: 8.89, 13.81, 22.32
+# round=1 task=json variant=on start  20:50:57 up 10 days, 22:47,  2 users,  load average: 8.89, 13.81, 22.32
+json,on,1000112,200,30,6.786948,0.00678619,1990112
+# round=1 task=json variant=on end  20:51:00 up 10 days, 22:47,  2 users,  load average: 8.89, 13.81, 22.32
+# round=1 task=p4 variant=before start  20:51:00 up 10 days, 22:47,  2 users,  load average: 8.89, 13.81, 22.32
+p4,before,20923,200,21,10.517348,0.50266920,4045016
+# round=1 task=p4 variant=before end  20:51:06 up 10 days, 22:47,  2 users,  load average: 9.55, 13.79, 22.22
+# round=1 task=p4 variant=off start  20:51:06 up 10 days, 22:47,  2 users,  load average: 9.55, 13.79, 22.22
+p4,off,20923,200,29,6.191989,0.29594176,4045016
+# round=1 task=p4 variant=off end  20:51:12 up 10 days, 22:47,  2 users,  load average: 9.10, 13.63, 22.12
+# round=1 task=p4 variant=on start  20:51:12 up 10 days, 22:47,  2 users,  load average: 9.10, 13.63, 22.12
+p4,on,20923,200,15,16.693470,0.79785260,4045016
+# round=1 task=p4 variant=on end  20:51:19 up 10 days, 22:47,  2 users,  load average: 9.41, 13.62, 22.07
+# round=2 task=json variant=off start  20:51:19 up 10 days, 22:47,  2 users,  load average: 9.41, 13.62, 22.07
+json,off,1000112,200,20,10.917050,0.01091583,1986992
+# round=2 task=json variant=off end  20:51:23 up 10 days, 22:47,  2 users,  load average: 9.94, 13.66, 22.04
+# round=2 task=json variant=on start  20:51:23 up 10 days, 22:47,  2 users,  load average: 9.94, 13.66, 22.04
+json,on,1000112,200,25,7.364948,0.00736412,1990112
+# round=2 task=json variant=on end  20:51:26 up 10 days, 22:47,  2 users,  load average: 9.63, 13.53, 21.95
+# round=2 task=json variant=before start  20:51:26 up 10 days, 22:47,  2 users,  load average: 9.63, 13.53, 21.95
+json,before,1000112,200,15,8.979589,0.00897858,1986992
+# round=2 task=json variant=before end  20:51:29 up 10 days, 22:47,  2 users,  load average: 9.63, 13.53, 21.95
+# round=2 task=p4 variant=off start  20:51:29 up 10 days, 22:47,  2 users,  load average: 9.63, 13.53, 21.95
+p4,off,20923,200,27,6.024599,0.28794146,4045016
+# round=2 task=p4 variant=off end  20:51:35 up 10 days, 22:48,  2 users,  load average: 10.91, 13.69, 21.91
+# round=2 task=p4 variant=on start  20:51:35 up 10 days, 22:48,  2 users,  load average: 10.91, 13.69, 21.91
+p4,on,20923,200,24,5.278581,0.25228606,4045016
+# round=2 task=p4 variant=on end  20:51:41 up 10 days, 22:48,  2 users,  load average: 10.36, 13.53, 21.82
+# round=2 task=p4 variant=before start  20:51:41 up 10 days, 22:48,  2 users,  load average: 10.36, 13.53, 21.82
+p4,before,20923,200,29,4.679436,0.22365033,4045016
+# round=2 task=p4 variant=before end  20:51:46 up 10 days, 22:48,  2 users,  load average: 9.93, 13.39, 21.73
+# round=3 task=json variant=on start  20:51:46 up 10 days, 22:48,  2 users,  load average: 9.93, 13.39, 21.73
+json,on,1000112,200,31,6.298340,0.00629763,1990112
+# round=3 task=json variant=on end  20:51:49 up 10 days, 22:48,  2 users,  load average: 9.93, 13.39, 21.73
+# round=3 task=json variant=before start  20:51:49 up 10 days, 22:48,  2 users,  load average: 9.93, 13.39, 21.73
+json,before,1000112,200,22,9.211361,0.00921033,1986992
+# round=3 task=json variant=before end  20:51:52 up 10 days, 22:48,  2 users,  load average: 9.45, 13.23, 21.63
+# round=3 task=json variant=off start  20:51:52 up 10 days, 22:48,  2 users,  load average: 9.45, 13.23, 21.63
+json,off,1000112,200,22,10.106957,0.01010583,1986992
+# round=3 task=json variant=off end  20:51:56 up 10 days, 22:48,  2 users,  load average: 9.10, 13.09, 21.54
+# round=3 task=p4 variant=on start  20:51:56 up 10 days, 22:48,  2 users,  load average: 9.10, 13.09, 21.54
+p4,on,20923,200,32,5.827110,0.27850258,4045016
+# round=3 task=p4 variant=on end  20:52:02 up 10 days, 22:48,  2 users,  load average: 8.69, 12.94, 21.45
+# round=3 task=p4 variant=before start  20:52:02 up 10 days, 22:48,  2 users,  load average: 8.69, 12.94, 21.45
+p4,before,20923,200,35,7.862302,0.37577317,4045016
+# round=3 task=p4 variant=before end  20:52:08 up 10 days, 22:48,  2 users,  load average: 9.35, 13.01, 21.42
+# round=3 task=p4 variant=off start  20:52:08 up 10 days, 22:48,  2 users,  load average: 9.35, 13.01, 21.42
+p4,off,20923,200,21,10.807102,0.51651782,4045016
+# round=3 task=p4 variant=off end  20:52:15 up 10 days, 22:48,  2 users,  load average: 9.00, 12.88, 21.33
+# round=4 task=json variant=before start  20:52:15 up 10 days, 22:48,  2 users,  load average: 9.00, 12.88, 21.33
+json,before,1000112,200,21,10.431146,0.01042998,1986992
+# round=4 task=json variant=before end  20:52:19 up 10 days, 22:48,  2 users,  load average: 8.92, 12.80, 21.26
+# round=4 task=json variant=off start  20:52:19 up 10 days, 22:48,  2 users,  load average: 8.92, 12.80, 21.26
+json,off,1000112,200,22,9.326406,0.00932536,1986992
+# round=4 task=json variant=off end  20:52:22 up 10 days, 22:48,  2 users,  load average: 8.69, 12.68, 21.18
+# round=4 task=json variant=on start  20:52:22 up 10 days, 22:48,  2 users,  load average: 8.69, 12.68, 21.18
+json,on,1000112,200,26,7.487400,0.00748656,1990112
+# round=4 task=json variant=on end  20:52:25 up 10 days, 22:48,  2 users,  load average: 8.79, 12.64, 21.12
+# round=4 task=p4 variant=before start  20:52:25 up 10 days, 22:48,  2 users,  load average: 8.79, 12.64, 21.12
+p4,before,20923,200,22,14.478820,0.69200495,3963000
+# round=4 task=p4 variant=before end  20:52:31 up 10 days, 22:48,  2 users,  load average: 8.73, 12.56, 21.05
+# round=4 task=p4 variant=off start  20:52:31 up 10 days, 22:48,  2 users,  load average: 8.73, 12.56, 21.05
+p4,off,20923,200,24,7.961935,0.38053504,4045016
+# round=4 task=p4 variant=off end  20:52:37 up 10 days, 22:49,  2 users,  load average: 8.83, 12.52, 20.99
+# round=4 task=p4 variant=on start  20:52:37 up 10 days, 22:49,  2 users,  load average: 8.83, 12.52, 20.99
+p4,on,20923,200,25,5.735583,0.27412812,4045016
+# round=4 task=p4 variant=on end  20:52:44 up 10 days, 22:49,  2 users,  load average: 8.93, 12.47, 20.93
+# round=5 task=json variant=off start  20:52:44 up 10 days, 22:49,  2 users,  load average: 8.93, 12.47, 20.93
+json,off,1000112,200,22,9.163793,0.00916277,1986992
+# round=5 task=json variant=off end  20:52:48 up 10 days, 22:49,  2 users,  load average: 8.93, 12.42, 20.87
+# round=5 task=json variant=on start  20:52:48 up 10 days, 22:49,  2 users,  load average: 8.93, 12.42, 20.87
+json,on,1000112,200,31,6.703516,0.00670277,1990112
+# round=5 task=json variant=on end  20:52:50 up 10 days, 22:49,  2 users,  load average: 8.54, 12.28, 20.78
+# round=5 task=json variant=before start  20:52:50 up 10 days, 22:49,  2 users,  load average: 8.54, 12.28, 20.78
+json,before,1000112,200,19,9.767319,0.00976623,1986992
+# round=5 task=json variant=before end  20:52:54 up 10 days, 22:49,  2 users,  load average: 8.54, 12.28, 20.78
+# round=5 task=p4 variant=off start  20:52:54 up 10 days, 22:49,  2 users,  load average: 8.54, 12.28, 20.78
+p4,off,20923,200,11,29.799511,1.42424658,4045016
+# round=5 task=p4 variant=off end  20:53:05 up 10 days, 22:49,  2 users,  load average: 26.11, 15.91, 21.82
+# round=5 task=p4 variant=on start  20:53:05 up 10 days, 22:49,  2 users,  load average: 26.11, 15.91, 21.82
+p4,on,20923,200,8,27.816090,1.32945034,4045016
+# round=5 task=p4 variant=on end  20:53:16 up 10 days, 22:49,  2 users,  load average: 38.42, 18.88, 22.73
+# round=5 task=p4 variant=before start  20:53:16 up 10 days, 22:49,  2 users,  load average: 38.42, 18.88, 22.73
+p4,before,20923,200,9,21.307485,1.01837618,4045016
+# round=5 task=p4 variant=before end  20:53:28 up 10 days, 22:49,  2 users,  load average: 48.87, 21.76, 23.62
+# round=6 task=json variant=on start  20:53:28 up 10 days, 22:49,  2 users,  load average: 48.87, 21.76, 23.62
+json,on,1000112,200,15,12.813314,0.01281188,1990112
+# round=6 task=json variant=on end  20:53:32 up 10 days, 22:49,  2 users,  load average: 53.12, 23.09, 24.05
+# round=6 task=json variant=before start  20:53:32 up 10 days, 22:49,  2 users,  load average: 53.12, 23.09, 24.05
+json,before,1000112,200,9,19.661568,0.01965937,1986992
+# round=6 task=json variant=before end  20:53:38 up 10 days, 22:50,  2 users,  load average: 59.76, 24.97, 24.65
+# round=6 task=json variant=off start  20:53:38 up 10 days, 22:50,  2 users,  load average: 59.76, 24.97, 24.65
+json,off,1000112,200,10,20.243217,0.02024095,1986992
+# round=6 task=json variant=off end  20:53:45 up 10 days, 22:50,  2 users,  load average: 63.89, 27.00, 25.31
+# round=6 task=p4 variant=on start  20:53:45 up 10 days, 22:50,  2 users,  load average: 63.89, 27.00, 25.31
+p4,on,20923,200,8,27.481095,1.31343952,4045016
+# round=6 task=p4 variant=on end  20:53:57 up 10 days, 22:50,  2 users,  load average: 70.51, 29.62, 26.18
+# round=6 task=p4 variant=before start  20:53:57 up 10 days, 22:50,  2 users,  load average: 70.51, 29.62, 26.18
+p4,before,20923,200,9,22.769996,1.08827588,4045016
+# round=6 task=p4 variant=before end  20:54:07 up 10 days, 22:50,  2 users,  load average: 76.95, 32.35, 27.11
+# round=6 task=p4 variant=off start  20:54:07 up 10 days, 22:50,  2 users,  load average: 76.95, 32.35, 27.11
+p4,off,20923,200,10,24.145286,1.15400690,4045016
+# round=6 task=p4 variant=off end  20:54:19 up 10 days, 22:50,  2 users,  load average: 81.93, 34.87, 27.98

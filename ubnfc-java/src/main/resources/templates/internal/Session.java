@@ -347,6 +347,7 @@ public final class Session {
      * 返すので、生成 parser が解析前にこれを false にする（走査は {@code reached} を更新しない）。
      */
     public boolean scan;
+    public boolean ll1;
     /** 入力の UTF-16 列（{@link Input#chars()} と同じ実体）。生成走査関数が直に読む。書き換えない。 */
     public final char[] chars;
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false, false); }
@@ -361,6 +362,7 @@ public final class Session {
         this.bypassWrap = !this.occ && !this.diag && !options.lexical() && (astBypass || !this.tree);
         this.factor = factoring && !this.diag && !options.lexical();
         this.plain = plainMatch && plainRecognition && !this.tree;
+        this.ll1 = options.ll1() && !this.tree && !this.diag;
         this.scan = scanning && !this.diag && !this.occ && !options.lexical();
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         this.chars = input.chars();
@@ -474,6 +476,14 @@ public final class Session {
         f.c = end; f.m = end;
         if (!tree) return success(start, end);
         return (r & 1) == 0 ? Match.empty(start, end) : new Match(List.of(), List.of(), List.of(), List.of(), start, end, false, List.of(), List.of(), null, List.of());
+    }
+    public Match recognizeLl1(Ll1Machine.Op[] ops, int root, Frame f) {
+        int start = f.c;
+        int end = Ll1Machine.run(ops, root, chars, start, options.maxDepth() - depth, scan);
+        if (end < 0) return null;
+        f.c = end; f.m = end;
+        progressAt(end);
+        return success(start, end);
     }
     /** D-080: {@link Input#codePointAt} と同じ読み（孤立 surrogate はその UTF-16 値）。{@code p} は範囲内。 */
     public static int cpAt(char[] t, int p) {
@@ -1250,7 +1260,7 @@ public final class Session {
         f.advance(word.length()); return success(at, at + word.length());
     }
     /** ASCII [A-Za-z0-9_]。組込み IdentifierParser の継続文字集合（D-040）。 */
-    private static boolean identifierChar(int c) {
+    static boolean identifierChar(int c) {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
     }
     public Match any(Frame f, String label) { return any(f, Label.of(label)); }
