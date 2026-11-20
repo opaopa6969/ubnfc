@@ -150,19 +150,52 @@ def main():
         edit_uri, report['edit-broken'] = opened('editing.stax', broken)
         assert any(v['severity'] == 1 for v in report['edit-broken'])
         report['edit-prefix-definition'] = at('definition', edit_uri, position(broken, 'before', within=1))
-        # 全文が失敗すると、主失敗位置が0となり既存の前半再解析が働かない例。
-        assert report['edit-prefix-definition'] == []
+        # 主失敗位置が0でも、単独で成功する正常前半の索引を保持する。
+        assert len(report['edit-prefix-definition']) == 1
+        assert report['edit-prefix-definition'][0]['range']['start'] == position(broken, 'before')
+        assert report['edit-broken'][0]['data']['analysis'] == 'prefix'
+        assert report['edit-broken'][0]['data']['indexedThroughCp'] == broken.index(': broken')
         repaired = ': before ( -- ) ;\n: repaired ( -- ) before ;'
         _, report['edit-repaired'] = opened('editing.stax', repaired, version=2)
         assert not report['edit-repaired']
         report['edit-after-definition'] = at('definition', edit_uri, position(repaired, 'before', 1, 1))
         assert report['edit-after-definition']
+        _, report['edit-empty'] = opened('editing.stax', '', version=3)
+        assert not report['edit-empty']
+        report['edit-removed-definition'] = at('definition', edit_uri, position(repaired, 'before', 1, 1))
+        assert report['edit-removed-definition'] == []
+        assert all(not node.get('children') for node in request(
+            'textDocument/documentSymbol', {'textDocument': {'uri': edit_uri}}))
         client.notify('textDocument/didClose', {'textDocument': {'uri': edit_uri}})
         closed = client.wait(lambda m: m.get('method') == 'textDocument/publishDiagnostics'
                              and m['params']['uri'] == edit_uri, timeout=30)
         assert closed and closed['params']['diagnostics'] == []
         report['after-close-definition'] = at('definition', edit_uri, position(repaired, 'before', 1, 1))
         assert report['after-close-definition'] == []
+        reopened = ': fresh ( -- ) before ;'
+        _, report['edit-reopened'] = opened('editing.stax', reopened)
+        report['edit-reopened-definition'] = at('definition', edit_uri, position(reopened, 'before', within=1))
+        assert report['edit-reopened-definition'] == []
+        # 正常前半の未定義参照も部分観測と区別し、UTF-16 の座標を保つ。
+        unicode_prefix = '/* 😀 */ : before ( -- ) missing ;\n: broken ( '
+        prefix_uri, report['prefix-scope-diagnostics'] = opened('prefix-unicode.stax', unicode_prefix)
+        assert any(d['code'] == 'scope-prefix' for d in report['prefix-scope-diagnostics'])
+        report['prefix-unicode-definition'] = at('definition', prefix_uri, position(unicode_prefix, 'before', within=1))
+        assert report['prefix-unicode-definition'][0]['range']['start'] == position(unicode_prefix, 'before')
+        completions = at('completion', prefix_uri, position(unicode_prefix + '|', '|'))
+        report['prefix-completion'] = completions
+        # 型位置には before（語）は提案しない。
+        assert not any(item['label'] == 'before' for item in completions)
+
+        body_prefix = ': before ( -- ) ;\n: prior ( -- ) before ;\n: broken ( -- ) '
+        body_uri, report['prefix-body-diagnostics'] = opened('prefix-body.stax', body_prefix)
+        report['prefix-reference-definition'] = at('definition', body_uri, position(body_prefix, 'before', 1, 1))
+        assert report['prefix-reference-definition'][0]['range']['start'] == position(body_prefix, 'before')
+        body_completion = at('completion', body_uri, position(body_prefix + '|', '|'))
+        report['prefix-body-completion'] = body_completion
+        before_item = next(item for item in body_completion if item['label'] == 'before')
+        assert '部分索引' in before_item['detail']
+        assert not any(item['label'] == 'broken' for item in body_completion)
 
         # 絶対 URI だけを fixture 名へ正規化し、range・診断・候補は加工しない。
         encoded = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True)
