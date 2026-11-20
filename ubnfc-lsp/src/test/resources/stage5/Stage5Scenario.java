@@ -94,6 +94,7 @@ public final class Stage5Scenario {
             out.put("rename-lexical", json(edit));
         }
         out.put("evaluator", evaluator(work));
+        out.put("dap-queries", dapQueries(work));
         return out;
     }
 
@@ -132,6 +133,192 @@ public final class Stage5Scenario {
             answer.put("noop", rejected(() -> noop.evaluate(eval).get(30, TimeUnit.SECONDS)));
             return json(answer);
         }
+    }
+
+    private static String dapQueries(Path work) throws Exception {
+        Path file = work.resolve("queries.demo");
+        String text = "/* 😀 */ let alpha = 2; let beta = 3;\r\n\r\nnote \"ok\";\r\n";
+        Files.writeString(file, text);
+        var source = new Source();
+        source.setPath(file.toString());
+        var other = new Source();
+        other.setPath(work.resolve("other.demo").toString());
+        int betaColumn = text.indexOf("let beta");
+        var out = new LinkedHashMap<String, Object>();
+        try (var wire = new DapWire(new DebugAdapter(Map.of(), new SumEvaluatorBridge()))) {
+            var dap = wire.proxy;
+            var init = new InitializeRequestArguments();
+            init.setLinesStartAt1(false);
+            init.setColumnsStartAt1(false);
+            var caps = dap.initialize(init).get(30, TimeUnit.SECONDS);
+            assertTrue(caps.getSupportsBreakpointLocationsRequest());
+            assertFalse(caps.getSupportsConditionalBreakpoints());
+            assertFalse(caps.getSupportsHitConditionalBreakpoints());
+            assertFalse(caps.getSupportsLogPoints());
+            assertFalse(caps.getSupportsSetExpression());
+            assertFalse(caps.getSupportsStepBack());
+            assertFalse(caps.getSupportsEvaluateForHovers());
+            out.put("capabilities", caps);
+            var beforeLaunch = locations(dap, source, 0, null, null, null);
+            assertEquals(0, beforeLaunch.length);
+            out.put("beforeLaunch", beforeLaunch);
+
+            dap.launch(Map.of("program", file.toString())).get(30, TimeUnit.SECONDS);
+            var all = locations(dap, source, 0, null, 2, null);
+            var columns = Arrays.stream(all).filter(site -> site.getLine() == 0).map(BreakpointLocation::getColumn).toList();
+            assertTrue(columns.contains(betaColumn));
+            assertEquals(columns.stream().distinct().sorted().toList(), columns);
+            out.put("locations", all);
+            var exact = locations(dap, source, 0, betaColumn, null, betaColumn);
+            assertEquals(1, exact.length);
+            assertEquals(betaColumn, exact[0].getColumn());
+            out.put("utf16Range", exact);
+            var emptyLine = locations(dap, source, 1, null, null, null);
+            var foreignLocations = locations(dap, other, 0, null, null, null);
+            var reversed = locations(dap, source, 2, null, 0, null);
+            assertEquals(0, emptyLine.length);
+            assertEquals(0, foreignLocations.length);
+            assertEquals(0, reversed.length);
+            out.put("emptyLine", emptyLine);
+            out.put("foreignSource", foreignLocations);
+            out.put("reversedRange", reversed);
+
+            var watch = new EvaluateArguments();
+            watch.setContext("watch");
+            watch.setExpression("total");
+            out.put("watchBeforeStop", rejected(() -> dap.evaluate(watch).get(30, TimeUnit.SECONDS)));
+
+            var exactBreakpoint = sourceBreakpoint(0, betaColumn);
+            var condition = sourceBreakpoint(0, betaColumn);
+            condition.setCondition("total > 0");
+            var hitCondition = sourceBreakpoint(0, betaColumn);
+            hitCondition.setHitCondition("3");
+            var logpoint = sourceBreakpoint(0, betaColumn);
+            logpoint.setLogMessage("total={total}");
+            var registered = setBreakpoints(dap, source, exactBreakpoint, sourceBreakpoint(0, betaColumn - 1),
+                condition, hitCondition, logpoint);
+            assertEquals(List.of(true, false, false, false, false),
+                Arrays.stream(registered).map(Breakpoint::isVerified).toList());
+            out.put("registered", registered);
+            var foreignRegistration = setBreakpoints(dap, other, exactBreakpoint);
+            assertFalse(foreignRegistration[0].isVerified());
+            out.put("foreignRegistration", foreignRegistration);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var resume = new ContinueArguments();
+            resume.setThreadId(1);
+            dap.continue_(resume).get(30, TimeUnit.SECONDS);
+            var stopped = topFrame(dap);
+            assertEquals(betaColumn, stopped.getColumn());
+            out.put("stoppedAt", List.of(stopped.getLine(), stopped.getColumn()));
+            watch.setFrameId(1); // 現在の let から見える親の Program 枠
+            var value = dap.evaluate(watch).get(30, TimeUnit.SECONDS);
+            assertEquals("5", value.getResult());
+            out.put("watch", value);
+
+            watch.setFrameId(2); // 存在するが現在のスタックにはない alpha の枠
+            out.put("watchForeignFrame", rejected(() -> dap.evaluate(watch).get(30, TimeUnit.SECONDS)));
+            watch.setFrameId(null);
+            watch.setExpression("unknown");
+            out.put("watchUnknown", rejected(() -> dap.evaluate(watch).get(30, TimeUnit.SECONDS)));
+            watch.setExpression("total");
+            rejectedStepBack(dap, out);
+            out.put("watchAfterStepBack", dap.evaluate(watch).get(30, TimeUnit.SECONDS));
+            assertEquals(value, dap.evaluate(watch).get(30, TimeUnit.SECONDS));
+
+            setBreakpoints(dap, source, sourceBreakpoint(0, null));
+            Files.writeString(file, "let broken =");
+            dap.launch(Map.of("program", file.toString())).get(30, TimeUnit.SECONDS);
+            var failedLocations = locations(dap, source, 0, null, null, null);
+            assertEquals(0, failedLocations.length);
+            out.put("failedLaunchLocations", failedLocations);
+            out.put("failedLaunchWatch", rejected(() -> dap.evaluate(watch).get(30, TimeUnit.SECONDS)));
+
+            Files.writeString(file, "let single = 7;");
+            dap.launch(Map.of("program", file.toString())).get(30, TimeUnit.SECONDS);
+            var relaunched = locations(dap, source, 0, null, null, null);
+            assertEquals(1, relaunched.length);
+            out.put("relaunchedLocations", relaunched);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var resetValue = dap.evaluate(watch).get(30, TimeUnit.SECONDS);
+            assertEquals("7", resetValue.getResult());
+            out.put("relaunchedWatch", resetValue);
+            dap.continue_(resume).get(30, TimeUnit.SECONDS);
+            assertEquals(0, dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames());
+            dap.disconnect(new DisconnectArguments()).get(30, TimeUnit.SECONDS);
+        }
+        try (var wire = new DapWire(new DebugAdapter(Map.of()))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertTrue(caps.getSupportsBreakpointLocationsRequest());
+            assertFalse(caps.getSupportsStepBack());
+            dap.launch(Map.of("program", file.toString())).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var next = new StepInArguments();
+            next.setThreadId(1);
+            dap.stepIn(next).get(30, TimeUnit.SECONDS);
+            var all = locations(dap, source, 1, 1, null, 1);
+            assertEquals(1, all.length);
+            assertEquals(1, all[0].getColumn());
+            var noop = new LinkedHashMap<String, Object>();
+            noop.put("locations", all);
+            var watch = new EvaluateArguments();
+            watch.setContext("watch");
+            watch.setExpression("total");
+            var noWatch = rejected(() -> dap.evaluate(watch).get(30, TimeUnit.SECONDS));
+            noop.put("watch", noWatch);
+            rejectedStepBack(dap, noop);
+            var afterStepBack = rejected(() -> dap.evaluate(watch).get(30, TimeUnit.SECONDS));
+            assertEquals(noWatch, afterStepBack);
+            noop.put("watchAfterStepBack", afterStepBack);
+            out.put("noop", noop);
+        }
+        return json(out);
+    }
+
+    private static BreakpointLocation[] locations(IDebugProtocolServer dap, Source source,
+            int line, Integer column, Integer endLine, Integer endColumn) throws Exception {
+        var args = new BreakpointLocationsArguments();
+        args.setSource(source);
+        args.setLine(line);
+        args.setColumn(column);
+        args.setEndLine(endLine);
+        args.setEndColumn(endColumn);
+        return dap.breakpointLocations(args).get(30, TimeUnit.SECONDS).getBreakpoints();
+    }
+
+    private static SourceBreakpoint sourceBreakpoint(int line, Integer column) {
+        var breakpoint = new SourceBreakpoint();
+        breakpoint.setLine(line);
+        breakpoint.setColumn(column);
+        return breakpoint;
+    }
+
+    private static Breakpoint[] setBreakpoints(IDebugProtocolServer dap, Source source,
+            SourceBreakpoint... breakpoints) throws Exception {
+        var args = new SetBreakpointsArguments();
+        args.setSource(source);
+        args.setBreakpoints(breakpoints);
+        return dap.setBreakpoints(args).get(30, TimeUnit.SECONDS).getBreakpoints();
+    }
+
+    private static StackTraceArguments stackRequest() {
+        var args = new StackTraceArguments();
+        args.setThreadId(1);
+        return args;
+    }
+
+    private static StackFrame topFrame(IDebugProtocolServer dap) throws Exception {
+        return dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getStackFrames()[0];
+    }
+
+    private static void rejectedStepBack(IDebugProtocolServer dap, Map<String, Object> out) throws Exception {
+        var before = topFrame(dap);
+        var stepBack = new StepBackArguments();
+        stepBack.setThreadId(1);
+        out.put("stepBack", rejected(() -> dap.stepBack(stepBack).get(30, TimeUnit.SECONDS)));
+        var after = topFrame(dap);
+        assertEquals(before, after);
+        out.put("unchangedFrame", List.of(after.getId(), after.getLine(), after.getColumn()));
     }
 
     private static String rejected(Callable<?> action) throws Exception {
