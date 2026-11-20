@@ -235,13 +235,24 @@ impl PackedEvent {
         p
     }
     #[inline(always)]
+    fn span_at(&self, i: usize) -> Span {
+        [self.w[i] as usize, self.w[i + 1] as usize]
+    }
+    #[inline(always)]
+    fn token_rule(&self) -> usize {
+        if self.rule == NO_RULE {
+            usize::MAX
+        } else {
+            self.rule as usize
+        }
+    }
+    #[inline(always)]
     fn unpack(self) -> Event {
         let w = self.w;
-        let span = |i: usize| [w[i] as usize, w[i + 1] as usize];
         match self.tag {
             EV_JOIN => Event::Join(EventId(w[0] as usize), EventId(w[1] as usize)),
             EV_VALUES => Event::Values {
-                span: span(0),
+                span: self.span_at(0),
                 child: EventId(w[2] as usize),
                 wrap: self.flags & 1 != 0,
                 text: self.flags & 2 != 0,
@@ -249,28 +260,24 @@ impl PackedEvent {
             EV_CAPTURE => Event::Capture {
                 token_extent: self.flags != 0,
                 site: w[0] as usize,
-                span: span(1),
+                span: self.span_at(1),
                 child: EventId(w[3] as usize),
             },
             EV_RULE => Event::Rule {
                 rule: w[0] as usize,
-                span: span(1),
+                span: self.span_at(1),
                 child: EventId(w[3] as usize),
                 caps: (w[4], w[5]),
             },
             EV_TOKEN => Event::Token {
-                text_span: (self.flags & 1 != 0).then(|| span(2)),
-                content_span: (self.flags & 2 != 0).then(|| span(4)),
+                text_span: (self.flags & 1 != 0).then(|| self.span_at(2)),
+                content_span: (self.flags & 2 != 0).then(|| self.span_at(4)),
                 expr: wide(w[6]),
-                rule: if self.rule == NO_RULE {
-                    usize::MAX
-                } else {
-                    self.rule as usize
-                },
-                span: span(0),
+                rule: self.token_rule(),
+                span: self.span_at(0),
             },
             EV_RECOVERY => Event::Recovery {
-                span: span(0),
+                span: self.span_at(0),
                 detail: w[2],
             },
             _ => Event::Empty,
