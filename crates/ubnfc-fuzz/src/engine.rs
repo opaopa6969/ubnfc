@@ -14,6 +14,8 @@ use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant};
 use ubnfc_harness::runner::{Artifact, Backend, Executable, Runner};
 
+pub(crate) const LL1_PROBE_MAX_DEPTH: u64 = 2;
+
 /// 文法が実行段階に到達しなかった理由。機能別の discard 率に使う。
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Discard {
@@ -159,9 +161,15 @@ impl Engine {
         self.run_with(built, backend, inputs, Some(scan), None)
     }
 
-    /// Rust の表駆動 on/off を同一 binary・同一入力で比較する。
-    pub fn run_ll1(&mut self, built: &Built, inputs: &[String], enabled: bool) -> Vec<Value> {
-        self.run_with(built, Backend::Rust, inputs, None, Some(enabled))
+    /// 表駆動 on/off を同一 binary・同一入力で比較する。
+    pub fn run_ll1(
+        &mut self,
+        built: &Built,
+        backend: Backend,
+        inputs: &[String],
+        enabled: bool,
+    ) -> Vec<Value> {
+        self.run_with(built, backend, inputs, None, Some(enabled))
     }
 
     /// 全入力を 1 プロセスに流す。応答は入力順に返り、欠落は error 応答になる。
@@ -181,18 +189,26 @@ impl Engine {
             Backend::Java => &built.java,
             Backend::Rust => &built.rust,
         };
-        let requests: Vec<Value> = inputs
+        let mut requests: Vec<Value> = inputs
             .iter()
             .enumerate()
             .map(|(id, input)| request(id, &built.grammar_name, input, scan, ll1))
             .collect();
+        if matches!(backend, Backend::Java) && ll1.is_some() {
+            // 同じ driver 交換で、浅い上限でも受理・失敗・資源診断を比べる。
+            for (index, input) in inputs.iter().take(4).enumerate() {
+                let mut row = request(inputs.len() + index, &built.grammar_name, input, scan, ll1);
+                row["options"]["maxDepth"] = json!(LL1_PROBE_MAX_DEPTH);
+                requests.push(row);
+            }
+        }
         let factor = crate::load::factor();
         if factor > self.max_load_factor {
             self.max_load_factor = factor;
         }
         let effective_timeout = self.timeout.mul_f64(factor);
         match exchange(executable, &requests, effective_timeout) {
-            Ok(mut rows) => (0..inputs.len())
+            Ok(mut rows) => (0..requests.len())
                 .map(|id| {
                     rows.remove(&id)
                         .unwrap_or_else(|| json!({"error": "応答行がありません"}))
@@ -203,7 +219,7 @@ impl Engine {
                 if timed_out {
                     self.timeouts += 1;
                 }
-                inputs
+                requests
                     .iter()
                     .map(|_| {
                         let mut value = json!({ "error": error.clone() });

@@ -41,7 +41,12 @@ public record GrammarIr(Analysis analysis, String analysisVersion, GrammarIrEntr
     public record OccurrenceContract(List<String> captureFields, Boolean diagnostics, List<String> lexicalFields, String lexicalOutput, Boolean nodeSpans, Boolean scopeEvents, String selfHostTransform) {}
     public record Operator(String associativity, String baseRuleId, String canonicalForm, String leftSiteId, String opSiteId, String operatorRuleId, Integer precedence, String rightSiteId) {}
     public record OperatorPlan(List<String> boundaryExprIds, List<String> liftRecipeIds, Proof proof, List<String> ruleIds, String strategy) {}
-    public record Plan(List<ChoicePlan> choices, List<LexicalPlan> lexical, MemoPlan memo, List<OperatorPlan> operators, String profile, List<ScanPlan> scans, PlanTriviaCache triviaCache) {}
+    public record Ll1State(String exprId, Boolean root, Ll1Operation operation) {}
+    public record Ll1Operation(String kind, List<Integer> targets, List<Ll1Transition> transitions,
+                               Integer target, Integer min, Integer max, String value,
+                               Boolean wordBoundary, List<CharRange> ranges) {}
+    public record Ll1Transition(List<CharRange> ranges, Integer target) {}
+    public record Plan(List<ChoicePlan> choices, List<LexicalPlan> lexical, MemoPlan memo, List<OperatorPlan> operators, String profile, List<ScanPlan> scans, PlanTriviaCache triviaCache, List<Ll1State> ll1) {}
     /** D-072: 観測を要求しない終端領域（{@code plan.scans}、任意キー。無ければ空）。 */
     public record ScanPlan(ScanClass class_, String exprId, String kind, Proof proof, Boolean root, List<String> ruleIds) {}
     /** 反復の一括走査表。bitset は u64 なので {@code BigDecimal} のまま受けて 2 の補数の {@code long} へ落とす。 */

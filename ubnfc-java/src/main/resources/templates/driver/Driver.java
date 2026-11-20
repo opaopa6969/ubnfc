@@ -101,12 +101,17 @@ public final class Driver {
         // 走査は fast mode でしか効かないので、同じ条件で 2 度測る。キーが無ければ従来どおり。
         boolean scanAb = options.containsKey("scan");
         generated.internal.Session.scanning = scanAb ? flag(options, "scan") : SCAN_DEFAULT;
-        if (scanAb) lexical = false;
+        boolean ll1Ab = options.containsKey("ll1");
+        boolean ll1 = ll1Ab && flag(options, "ll1");
+        if (scanAb || ll1Ab) lexical = false;
         Map<String, Object> observations = request.get("observations") instanceof Map<?, ?> ? Json.object(request.get("observations")) : Map.of();
         int maxDepth = options.get("maxDepth") instanceof Number number ? new java.math.BigDecimal(number.toString()).intValueExact() : ParseOptions.DEFAULT_MAX_DEPTH;
         var prefixOptions = new ParseOptions(false, false, lexical, true, scanners, maxDepth);
         var fullOptions = new ParseOptions(true, true, lexical, true, scanners, maxDepth);
-        if (scanAb) { prefixOptions = prefixOptions.withObservations(false, false); fullOptions = fullOptions.withObservations(false, false); }
+        if (scanAb || ll1Ab) {
+            prefixOptions = prefixOptions.withObservations(false, false).withLl1(ll1);
+            fullOptions = fullOptions.withObservations(false, false);
+        }
         var prefix = __PARSER__.parseEntry(grammar, entry, input, prefixOptions);
         ParseResult<?> result;
         String mapping = null, mappingKind = null, mappingMessage = null;
