@@ -4,7 +4,7 @@ use super::rt::{
     diag::{Diag, Diagnostics, DisplayDiagnostics, DisplaySnapshot},
     input::Input,
     lexcache::{LexCache, SkipCache},
-    memo::{Key, Memo},
+    memo::{Key, Memo, PreparedKey},
     scope::{Checkpoint, ScopeStore},
 };
 
@@ -969,17 +969,23 @@ if name.is_empty()
             name,
         });
     }
-    pub fn lookup(&mut self, key: Key) -> Option<Step> {
-        if !self.options.memo {
-            return None;
+    #[inline(always)]
+    pub fn memo_key(&self, key: Key) -> Option<PreparedKey> {
+        if self.options.memo {
+            key.prepare()
+        } else {
+            None
         }
-        let saved = self.memo.get(key)?;
+    }
+
+    pub fn lookup(&mut self, key: Option<&PreparedKey>) -> Option<Step> {
+        let saved = self.memo.get_prepared(key)?;
         self.statistics.memo_hits += 1;
         self.display_merge(saved.display);
         self.replay_effects(saved.effects.map(|p| p as usize));
         Some(saved.step())
     }
-    pub fn store(&mut self, key: Key, step: Step, mark: Mark) {
+    pub fn store(&mut self, key: Option<&PreparedKey>, step: Step, mark: Mark) {
         if !self.options.memo || self.depth_failure.is_some() || self.resource_failure.is_some() {
             return;
         }
@@ -994,7 +1000,8 @@ if name.is_empty()
             [0, 0]
         };
         let snapshot = self.display_snapshot();
-        self.memo.insert(key, Saved::new(step, effects, snapshot));
+        self.memo
+            .insert_prepared(key, Saved::new(step, effects, snapshot));
     }
     #[inline(always)]
     pub fn event(&mut self, event: Event) -> EventId {

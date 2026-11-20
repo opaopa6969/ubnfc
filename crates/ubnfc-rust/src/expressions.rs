@@ -53,7 +53,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
         } else {
             "self.scope.state_version()".to_owned()
         };
-        writeln!(s,"let key=Key {{expression:{i},state,matched_mode:{mode},version:{version}}};if let Some(hit)=self.lookup(key) {{return hit;}}").unwrap();
+        writeln!(s,"let key=self.memo_key(Key {{expression:{i},state,matched_mode:{mode},version:{version}}});if let Some(hit)=self.lookup(key.as_ref()) {{return hit;}}").unwrap();
         writeln!(s, "self.display_enter(state.consumed.max(state.matched));let mut out=self.b{i}_{suf}(state);self.display_reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
     } else if leaf {
         writeln!(s, "let mut out=self.b{i}_{suf}(state);self.display_reach(out.state.consumed.max(out.state.matched));\nif out.ok {{").unwrap();
@@ -102,7 +102,7 @@ pub(crate) fn generate(g: &Generator<'_>, i: usize, mode: bool) -> Result<String
     if memoized {
         writeln!(
             s,
-            "if (out.ok && {success}) || (!out.ok && {failure}) {{self.store(key,out,mark);}}self.display_leave();"
+            "if (out.ok && {success}) || (!out.ok && {failure}) {{self.store(key.as_ref(),out,mark);}}self.display_leave();"
         )
         .unwrap();
     }
