@@ -23,11 +23,14 @@ final class CompilerHarness implements AutoCloseable {
         this(ir, pkg, Map.of());
     }
     CompilerHarness(GrammarIr ir, String pkg, Map<String, String> additionalSources) throws Exception {
+        this(ir, pkg, additionalSources, false);
+    }
+    CompilerHarness(GrammarIr ir, String pkg, Map<String, String> additionalSources, boolean swar) throws Exception {
         this.pkg = pkg;
         var process = new ProcessBuilder("mktemp", "-d").start();
         directory = Path.of(new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).strip());
         assertEquals(0, process.waitFor());
-        var emitter = new JavaEmitter(ir, pkg);
+        var emitter = new JavaEmitter(ir, pkg, true, swar);
         emitter.write(directory.resolve("src"));
         for (var source : additionalSources.entrySet()) {
             Path file = directory.resolve("src").resolve(source.getKey()); Files.createDirectories(file.getParent());

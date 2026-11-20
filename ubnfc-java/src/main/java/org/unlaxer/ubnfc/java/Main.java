@@ -10,12 +10,17 @@ public final class Main {
     private Main() {}
     public static void main(String[] args) throws IOException {
         if (args.length == 0 || args.length == 1 && args[0].equals("--help")) {
-            System.out.println("usage: ubnfc-java --ir <grammar.ir.json> --out <dir> [--package x.y (default: grammar package, else org.unlaxer.ubnfc.generated.<grammar>)] [--emit-driver [true|false]] [--no-emit-driver]"); return;
+            System.out.println("usage: ubnfc-java --ir <grammar.ir.json> --out <dir> [--package x.y (default: grammar package, else org.unlaxer.ubnfc.generated.<grammar>)] [--emit-driver [true|false]] [--no-emit-driver] [--swar]"); return;
         }
         String ir = null, out = null, pkg = null;
-        boolean emitDriver = true, driverSeen = false;
+        boolean emitDriver = true, driverSeen = false, swar = false;
         for (int i = 0; i < args.length; i++) {
             String option = args[i];
+            if (option.equals("--swar")) {
+                if (swar) throw new IllegalArgumentException("Duplicate --swar");
+                swar = true;
+                continue;
+            }
             if (option.equals("--emit-driver") || option.equals("--no-emit-driver")) {
                 if (driverSeen) throw new IllegalArgumentException("Duplicate driver option");
                 driverSeen = true; emitDriver = option.equals("--emit-driver");
@@ -37,6 +42,6 @@ public final class Main {
             }
         }
         if (ir == null || out == null) throw new IllegalArgumentException("--ir and --out are required");
-        new JavaEmitter(IrReader.read(Path.of(ir)), pkg, emitDriver).write(Path.of(out));
+        new JavaEmitter(IrReader.read(Path.of(ir)), pkg, emitDriver, swar).write(Path.of(out));
     }
 }
