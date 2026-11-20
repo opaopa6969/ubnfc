@@ -1,0 +1,62 @@
+trace
+ 02:11:21 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-0-false start
+ 02:11:21 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-0-false end
+ 02:11:22 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-0-true start
+ 02:11:22 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-0-true end
+ 02:11:23 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-1-7-false start
+ 02:11:23 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-1-7-false end
+ 02:11:24 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-1-7-true start
+ 02:11:24 up 11 days,  4:07,  2 users,  load average: 16.75, 11.90, 8.32
+short-1-7-true end
+ 02:11:25 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+short-8+-false start
+ 02:11:25 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+short-8+-false end
+ 02:11:26 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-0-false start
+ 02:11:26 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-0-false end
+ 02:11:27 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-0-true start
+ 02:11:27 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-0-true end
+ 02:11:27 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-1-7-false start
+ 02:11:27 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-1-7-false end
+ 02:11:28 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-1-7-true start
+ 02:11:28 up 11 days,  4:07,  2 users,  load average: 15.89, 11.80, 8.30
+candidate-1-7-true end
+ 02:11:29 up 11 days,  4:07,  2 users,  load average: 15.10, 11.70, 8.29
+candidate-8+-false start
+ 02:11:29 up 11 days,  4:07,  2 users,  load average: 15.10, 11.70, 8.29
+candidate-8+-false end
+ 02:11:30 up 11 days,  4:07,  2 users,  load average: 15.10, 11.70, 8.29
+total-scalar start
+ 02:11:30 up 11 days,  4:07,  2 users,  load average: 15.10, 11.70, 8.29
+total-scalar end
+ 02:11:46 up 11 days,  4:08,  2 users,  load average: 17.04, 12.29, 8.54
+total-short start
+ 02:11:49 up 11 days,  4:08,  2 users,  load average: 15.91, 12.14, 8.51
+total-short end
+ 02:12:07 up 11 days,  4:08,  2 users,  load average: 14.00, 11.89, 8.48
+total-candidate start
+ 02:12:08 up 11 days,  4:08,  2 users,  load average: 14.00, 11.89, 8.48
+total-candidate end
+ 02:12:28 up 11 days,  4:08,  2 users,  load average: 13.85, 12.01, 8.60
+total-legacy start
+ 02:12:28 up 11 days,  4:08,  2 users,  load average: 13.85, 12.01, 8.60
+total-legacy end
+ 02:12:51 up 11 days,  4:09,  2 users,  load average: 11.59, 11.64, 8.57
+total-placebo start
+ 02:12:51 up 11 days,  4:09,  2 users,  load average: 11.59, 11.64, 8.57
+total-placebo end
+ 02:13:08 up 11 days,  4:09,  2 users,  load average: 12.77, 11.89, 8.70
