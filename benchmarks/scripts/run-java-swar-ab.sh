@@ -19,7 +19,7 @@ generate() {
   java -cp "$generator" org.unlaxer.ubnfc.java.Main --ir "$repo/$p4" --out "$out" --package org.unlaxer.ubnfc.examples.p4.generated "$@"
 }
 
-case "${1:?prepare または time を指定してください}" in
+case "${1:?prepare、time または profile を指定してください}" in
 prepare)
   base=${BASE_REF:?BASE_REF に比較基準の commit を指定してください}
   suite=${JSON_TEST_SUITE:?JSON_TEST_SUITE に固定 JSONTestSuite の展開先を指定してください}
@@ -29,8 +29,9 @@ prepare)
   mvn -q -f "$work/base/pom.xml" -DskipTests package
   mvn -q -f "$repo/pom.xml" -DskipTests package
   python3 "$repo/benchmarks/scripts/make-json-inputs.py" "$suite/test_parsing" "$work/inputs"
-  cmp "$repo/examples/json/evidence/inputs.sha256" "$work/inputs/inputs.sha256"
   python3 -c 'print("+".join(["1"] * 512), end="")' > "$work/inputs/operators-atoms-512.txt"
+  (cd "$work/inputs" && awk '$2 ~ /^json-.*[.]json$/ || $2 == "operators-atoms-512.txt" { print $1 "  " $2 }' \
+    "$repo/examples/json/evidence/inputs.sha256" | sha256sum --check)
   generate "$work/base/$jar" "$work/before/src"
   generate "$repo/$jar" "$work/default/src"
   generate "$repo/$jar" "$work/after/src" --swar
@@ -69,16 +70,54 @@ time)
         case "$task" in
           json) run UbnfcRunner bench json 認識 1 0.5 "$work/inputs/json-1m.json" ;;
           operators) run UbnfcRunner bench operators 認識 1 0.5 "$work/inputs/operators-atoms-512.txt" ;;
-          p4-formula) run -Dbench.warmup=200 -Dbench.runs=3 -Dbench.modes=recognize-fast \
+          p4-formula) run -Dbench.warmup=200 -Dbench.runs=5 -Dbench.modes=recognize-fast \
             -Dbench.fixtures=complex,complex-x4,complex-x16,complex-x64 \
             org.unlaxer.ubnfc.examples.p4.Benchmark "$fixtures" ;;
-          p4-boolean) run -Dbench.warmup=200 -Dbench.runs=3 -Dbench.modes=recognize-fast \
+          p4-boolean) run -Dbench.warmup=200 -Dbench.runs=5 -Dbench.modes=recognize-fast \
             -Dbench.fixtures=comparison-heavy,comparison-heavy-x64 -Dbench.entry=BooleanExpression \
             org.unlaxer.ubnfc.examples.p4.Benchmark "$fixtures" ;;
         esac
       done
     done
   done
+  ;;
+profile)
+  # 計時の生成物とは別に 1 parse の word 判定回数だけを数える。
+  mkdir -p "$work/profile"
+  python3 - "$work/after/src/gen/json/JsonParser.java" "$work/profile/JsonParser.java" <<'PYCODE'
+import pathlib
+import sys
+
+source = pathlib.Path(sys.argv[1]).read_text()
+marker = "private static final long SCAN_LANE_HIGH"
+assert source.count(marker) == 1
+source = source.replace(marker, "static final long[] SWAR_PREFIXES = new long[5];\n    " + marker)
+check = "if (mismatch == 0) { p += 4;"
+assert check in source
+source = source.replace(check, "SWAR_PREFIXES[mismatch == 0 ? 4 : Long.numberOfTrailingZeros(mismatch) >>> 4]++;\n            " + check)
+pathlib.Path(sys.argv[2]).write_text(source)
+PYCODE
+  cat > "$work/profile/SwarProfile.java" <<'JAVA'
+package gen.json;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import gen.json.api.ParseOptions;
+
+public final class SwarProfile {
+    public static void main(String[] args) throws Exception {
+        String input = Files.readString(Path.of(args[0]));
+        var result = JsonParser.parse(input, ParseOptions.RECOGNIZE);
+        if (!result.ok() || result.consumedCp() != input.codePointCount(0, input.length())) {
+            throw new IllegalStateException("入力全体を受理できない");
+        }
+        System.out.println("prefix 順 0,1,2,3,4 = " + Arrays.toString(JsonParser.SWAR_PREFIXES));
+    }
+}
+JAVA
+  javac --release 17 -cp "$work/after/classes" -d "$work/profile" "$work/profile/"*.java
+  java -cp "$work/profile:$work/after/classes" gen.json.SwarProfile "$work/inputs/json-1m.json"
   ;;
 *) exit 2 ;;
 esac

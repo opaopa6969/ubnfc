@@ -1,6 +1,8 @@
 package org.unlaxer.ubnfc.java;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.unlaxer.ubnfc.java.CompilerHarness.*;
+import static org.unlaxer.ubnfc.java.IrFixture.*;
 import static org.unlaxer.ubnfc.java.ScanEquivalenceTest.*;
 
 import java.nio.file.Path;
@@ -63,6 +65,39 @@ class SwarScanTest {
                     assertEquals(before, observe(h, input, option), label);
                 }
             }
+        }
+    }
+
+    @Test void observedScopeAndCaptureOutsideScanArePreserved() throws Exception {
+        var f = new IrFixture();
+        String digit = f.token("Digits", "DIGIT", obj("kind", "builtin", "which", "Digit", "codePoints", List.of()));
+        String repeat = f.expression("Digits", "repeat", "child", digit, "min", 1, "max", null, "terminator", null);
+        f.rule("Digits", repeat);
+        f.plan.put("scans", List.of(obj("kind", "charClassRepetition", "exprId", repeat, "root", true,
+            "class", obj("asciiLow", 0x03ff000000000000L, "asciiHigh", 0, "ranges", List.of(), "complete", true),
+            "ruleIds", List.of(), "proof", obj("kind", "terminalOnlyScan", "explanation", "数字だけの反復",
+                "exprIds", List.of(repeat)))));
+        String ref = f.ref("Root", "Digits");
+        var text = obj("kind", "text");
+        String site = f.capture(ref, "value", "text", "scalar", text);
+        f.rule("Root", ref);
+        f.mapping("Root", "Root", List.of(field("value", text, "scalar")),
+            List.of(recipeField("value", site, "text", "scalar")));
+        f.effects.add(obj("ruleId", "Root", "mode", "lexical", "events",
+            List.of(obj("when", "successAfterLeave", "action", "declare", "captureSiteId", site, "name", "value"))));
+
+        try (var h = new CompilerHarness(f.build(), "scan.swar.scope", Map.of(), true)) {
+            String input = "01234567890123456789";
+            var fast = h.options.getMethod("withObservations", boolean.class, boolean.class)
+                .invoke(h.options.getField("DEFAULT").get(null), false, false);
+            scanning(h, true);
+            Object result = h.parse(input, fast);
+            assertTrue(ok(result));
+            assertEquals(1, ((List<?>) get(get(result, "scope"), "events")).size());
+            assertFalse(((Map<?, ?>) get(result, "nodeSpans")).isEmpty());
+            Object withScan = observe(h, input, fast);
+            scanning(h, false);
+            assertEquals(withScan, observe(h, input, fast));
         }
     }
 }
