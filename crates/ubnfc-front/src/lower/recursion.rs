@@ -73,6 +73,7 @@ fn heads(a: &A, n: &BTreeSet<SymbolId>, cx: &Context<'_>, out: &mut BTreeSet<Sym
         A::Group { body, .. } | A::Optional { body, .. } | A::Repeat { body, .. } => {
             body_heads(body, n, cx, out)
         }
+        A::Bounded { max: Some(0), .. } => {}
         A::OneOrMore { body, .. }
         | A::Bounded { body, .. }
         | A::Separated { element: body, .. } => heads(body, n, cx, out),

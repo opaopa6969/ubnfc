@@ -95,37 +95,29 @@ fn the_package_entry_is_recorded_as_a_hash_checked_source() {
     assert_eq!(paths, ["main.ubnf", ".ubnf-packages/std/layout"]);
 }
 
-fn validation_codes(files: BTreeMap<PathBuf, String>) -> Vec<String> {
-    match validate_file("/p/main.ubnf", &loader(files)) {
-        Ok(issues) => issues.into_iter().map(|i| i.code).collect(),
-        Err(PipelineError::Resolve(errors)) => errors.into_iter().map(|e| e.code).collect(),
-        Err(other) => panic!("{other}"),
-    }
-}
-
 #[test]
-fn other_tokens_and_non_std_imports_are_not_whitespace_profiles() {
-    // std/layout の別 token は profile にしない。
-    let codes = validation_codes(project(&format!(
-        "grammar G {{ @import layout from 'pkg:std/layout' @whitespace: layout.SPACES {BODY}"
-    )));
-    assert!(
-        codes.contains(&"E-WHITESPACE-GLOBAL-STYLE".to_owned()),
-        "{codes:?}"
-    );
-    // 同じ名前の token を持つ相対 import は std/layout ではない。
-    let mut files = project(&format!(
-        "grammar G {{ @import layout from 'layout.ubnf' @whitespace: layout.SPACES_AND_COMMENTS {BODY}"
-    ));
-    files.insert(
-        PathBuf::from("/p/layout.ubnf"),
-        "grammar L { @ubnf: v2 token SPACES_AND_COMMENTS ::= ' '+; }".into(),
-    );
-    let codes = validation_codes(files);
-    assert!(
-        codes.contains(&"E-WHITESPACE-GLOBAL-STYLE".to_owned()),
-        "{codes:?}"
-    );
+fn other_declarative_tokens_are_lexical_profiles_without_java_style_substitution() {
+    for (import, token, module) in [
+        ("pkg:std/layout", "SPACES", None),
+        (
+            "layout.ubnf",
+            "SPACES_AND_COMMENTS",
+            Some("grammar L { @ubnf: v2 token SPACES_AND_COMMENTS ::= ' '+; }"),
+        ),
+    ] {
+        let mut files = project(&format!(
+            "grammar G {{ @import layout from '{import}' @whitespace: layout.{token} {BODY}"
+        ));
+        if let Some(module) = module {
+            files.insert(PathBuf::from("/p/layout.ubnf"), module.into());
+        }
+        let ir = compile("/p/main.ubnf", &loader(files)).unwrap().ir;
+        let delimiters = &ir.semantics.trivia.policies[0].effective_delimiter_set;
+        assert!(matches!(
+            &delimiters[..],
+            [ubnfc_front::ir::Delimiter::Lexical { .. }]
+        ));
+    }
 }
 
 #[test]

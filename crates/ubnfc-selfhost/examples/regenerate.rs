@@ -1,4 +1,4 @@
-//! Regenerate the self-host IR, parser and capture-site metadata from the upstream UBNF.
+//! upstream UBNF から IR、自己ホスト用の明示的な語境界、capture metadata を再生成する。
 use std::{fs, path::PathBuf};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,8 +17,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         repository.join("ir/fixtures/unlaxer-dsl__grammar__ubnf.ubnf.ir.json"),
         ubnfc_front::ir::to_canonical_json(ir),
     )?;
+    let parser_ir = ubnfc_selfhost::with_keyword_boundaries(ir).map_err(|e| format!("{e:?}"))?;
     let mut generated = ubnfc_rust::emit(
-        ir,
+        &parser_ir,
         &ubnfc_rust::EmitOptions {
             emit_driver: false,
             ..Default::default()
