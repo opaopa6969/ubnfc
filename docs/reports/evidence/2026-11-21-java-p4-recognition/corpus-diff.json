@@ -1,0 +1,20 @@
+{
+  "cases": 1492,
+  "observation_sha256": "df43057f2fee7265d82d5f7f0e916cfbfcb8c4061a2ecf231aee631c09625e37",
+  "front_sha256": "b2c85a2c52cb5409fdeb83716ba4ac8f907f529190178353f9ff073f2d1f58a3",
+  "base_generator_sha256": "1ad1901cd27bbe89cff32a5636490dc1dd6e1cfc1d3f7c6515e28f15e3e4cd80",
+  "trial_generator_sha256": "cc2eeedc9397a363bcecea44d1110c7b03e42bb9de74de1b2430e06d110d78bb",
+  "jobs": 4,
+  "totals": {
+    "ir_failure": 0,
+    "generation_rejected": 0,
+    "javac_failure": 0,
+    "build_failure": 0,
+    "driver_error": 0,
+    "pass": 1377,
+    "expected_rejection_pass": 27,
+    "known_divergence": 29,
+    "fail": 0,
+    "unobserved": 59
+  }
+}

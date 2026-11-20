@@ -1,0 +1,52 @@
+--- benchmarks/java/JavaDirectAstBench.java
++++ benchmarks/java/JavaDirectAstBench.java
+@@ -18 +18 @@
+-                        Field toggle, boolean direct, int warmup, int iterations, double[] ms, long[] bytes) {
++                        Field toggle, boolean direct, int warmup, int iterations, double[] ms, long[] bytes, double[] cpu) {
+@@ -28 +28 @@
+-            new double[RUNS], new long[RUNS]));
++            new double[RUNS], new long[RUNS], new double[RUNS]));
+@@ -103 +103,2 @@
+-                cell.select(); long before = threads.getThreadAllocatedBytes(thread), start = System.nanoTime();
++                cell.select(); long cpuStart = threads.getCurrentThreadCpuTime();
++                long before = threads.getThreadAllocatedBytes(thread), start = System.nanoTime();
+@@ -106,0 +108 @@
++                cell.cpu()[run] = (threads.getCurrentThreadCpuTime() - cpuStart) / (1e6 * cell.iterations());
+@@ -110 +112 @@
+-        System.out.println("fixture,mode,warmup,iterations,runs,median_ms,min_ms,max_ms,bytes,run_ms");
++        System.out.println("fixture,mode,warmup,iterations,runs,median_ms,min_ms,max_ms,bytes,run_ms,run_cpu_ms,run_bytes");
+@@ -114,2 +116,2 @@
+-            System.out.printf("%s,%s,%d,%d,%d,%.6f,%.6f,%.6f,%d,\"%s\"%n", cell.fixture(), cell.mode(), cell.warmup(), cell.iterations(), RUNS,
+-                ms[RUNS / 2], ms[0], ms[RUNS - 1], bytes[RUNS / 2], Arrays.toString(cell.ms()));
++            System.out.printf("%s,%s,%d,%d,%d,%.6f,%.6f,%.6f,%d,\"%s\",\"%s\",\"%s\"%n", cell.fixture(), cell.mode(), cell.warmup(), cell.iterations(), RUNS,
++                ms[RUNS / 2], ms[0], ms[RUNS - 1], bytes[RUNS / 2], Arrays.toString(cell.ms()), Arrays.toString(cell.cpu()), Arrays.toString(cell.bytes()));
+--- benchmarks/src/java_direct_ast.rs
++++ benchmarks/src/java_direct_ast.rs
+@@ -2,0 +3,13 @@
++#[repr(C)]
++struct TimeSpec { seconds: std::ffi::c_long, nanoseconds: std::ffi::c_long }
++
++unsafe extern "C" {
++    fn clock_gettime(clock_id: std::ffi::c_int, time: *mut TimeSpec) -> std::ffi::c_int;
++}
++
++fn thread_cpu_ms() -> f64 {
++    let mut time = TimeSpec { seconds: 0, nanoseconds: 0 };
++    assert_eq!(unsafe { clock_gettime(3, &mut time) }, 0); // Linux CLOCK_THREAD_CPUTIME_ID
++    time.seconds as f64 * 1e3 + time.nanoseconds as f64 / 1e6
++}
++
+@@ -35,0 +49 @@
++    let mut cpu_samples = samples.clone();
+@@ -44,0 +59 @@
++            let cpu_start = thread_cpu_ms();
+@@ -49,0 +65 @@
++            cpu_samples[i].push((thread_cpu_ms() - cpu_start) / n as f64);
+@@ -56,0 +73 @@
++    println!("fixture,mode,median_ms,min_ms,run_ms,run_cpu_ms");
+@@ -61 +78 @@
+-            "{name},{},{:.6},{:.6},{:?}",
++            "{name},{},{:.6},{:.6},\"{:?}\",\"{:?}\"",
+@@ -65 +82 @@
+-            raw
++            raw, cpu_samples[i]
