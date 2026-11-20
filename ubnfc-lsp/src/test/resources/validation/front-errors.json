@@ -1,0 +1,62 @@
+{
+  "badJson": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "front-unavailable"
+      },
+      "source": "ubnfc-front",
+      "message": "文法の意味検査を実行できません（実行ファイル・JSON 応答を確認してください）"
+    }
+  ],
+  "failed": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "front-failed"
+      },
+      "source": "ubnfc-front",
+      "message": "文法の意味検査に失敗しました"
+    }
+  ],
+  "timeout": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "front-timeout"
+      },
+      "source": "ubnfc-front",
+      "message": "文法の意味検査が制限時間を超えました"
+    }
+  ]
+}

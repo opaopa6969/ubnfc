@@ -42,7 +42,11 @@ public final class Diagnostics {
                 var diagnostic = syntax(analysis.uri(), positions, primary.diagnostics());
                 if (analysis.scopedIsPrefix()) {
                     diagnostic.setMessage(diagnostic.getMessage() + "（正常な前半だけを索引化）");
-                    diagnostic.setData(java.util.Map.of("analysis", "prefix", "indexedThroughCp", analysis.cutCp()));
+                    // 出力の並びを固定する（Map.of の反復順は実行ごとに変わる）。
+                    var data = new java.util.LinkedHashMap<String, Object>();
+                    data.put("analysis", "prefix");
+                    data.put("indexedThroughCp", analysis.cutCp());
+                    diagnostic.setData(data);
                 }
                 out.add(diagnostic);
             }

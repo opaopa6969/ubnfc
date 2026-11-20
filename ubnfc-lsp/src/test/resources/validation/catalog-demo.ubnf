@@ -1,0 +1,10 @@
+// 外部 fixture に依存しないカタログ照合用の文法。
+grammar CatalogDemo {
+  @whitespace: javaStyle
+  token IDENT = IDENTIFIER
+  token EOF = END_OF_INPUT
+  @root
+  Program ::= { Value } EOF ;
+  @catalog(context='names')
+  Value ::= IDENT @name ';' ;
+}
