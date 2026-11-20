@@ -1,0 +1,6 @@
+scalar start  04:14:31 up 11 days,  6:10,  2 users,  load average: 5.25, 7.90, 9.50
+scalar end  04:14:54 up 11 days,  6:11,  2 users,  load average: 4.73, 7.62, 9.37
+before start  04:14:54 up 11 days,  6:11,  2 users,  load average: 4.73, 7.62, 9.37
+before end  04:15:18 up 11 days,  6:11,  2 users,  load average: 5.84, 7.65, 9.33
+candidate start  04:15:18 up 11 days,  6:11,  2 users,  load average: 5.84, 7.65, 9.33
+candidate end  04:15:41 up 11 days,  6:12,  2 users,  load average: 4.96, 7.29, 9.17
