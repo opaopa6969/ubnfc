@@ -1,0 +1,37 @@
+{
+  "supportsConditionalBreakpoints": true,
+  "registered": [
+    {
+      "verified": true,
+      "line": 1,
+      "column": 1
+    },
+    {
+      "verified": true,
+      "line": 2
+    },
+    {
+      "verified": true,
+      "line": 3
+    },
+    {
+      "verified": true,
+      "line": 4
+    }
+  ],
+  "events": [
+    "stderr:条件付き breakpoint の評価に失敗しました。\n",
+    "stderr:条件付き breakpoint の式を評価できません。\n",
+    "stopped:breakpoint"
+  ],
+  "stoppedAt": [
+    4,
+    17
+  ],
+  "relaunchedFrames": 0,
+  "noop": {
+    "verified": false,
+    "message": "条件付き breakpoint には対応する EvaluatorBridge が必要です",
+    "line": 4
+  }
+}

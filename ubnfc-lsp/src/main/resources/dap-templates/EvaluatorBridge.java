@@ -83,6 +83,15 @@ public interface EvaluatorBridge {
      */
     default Optional<Evaluation> evaluate(String expression, Object node, String context) { return Optional.empty(); }
 
+    /** 条件付き breakpoint を副作用なしで評価できる場合だけ true を返す。 */
+    default boolean supportsConditionalBreakpoints() { return false; }
+
+    /**
+     * 条件付き breakpoint の候補節点を観測する。adapter は continue 中に候補へ移動する前に呼ぶ。
+     * 状態を変えず、候補の節点と bridge の状態から判断する。未知の式には空を返す。
+     */
+    default Optional<Boolean> evaluateCondition(String expression, Object node) { return Optional.empty(); }
+
     /** variables パネルからの書き換え。{@code Optional.empty()} を返すと未対応の error になる（既定）。 */
     default Optional<Evaluation> setVariable(String container, String name, String value, Object node) {
         return Optional.empty();

@@ -55,19 +55,19 @@
     },
     {
       "verified": false,
-      "message": "条件・hit condition・logpoint は未対応です",
+      "message": "条件付き breakpoint には対応する EvaluatorBridge が必要です",
       "line": 0,
       "column": 24
     },
     {
       "verified": false,
-      "message": "条件・hit condition・logpoint は未対応です",
+      "message": "hit condition・logpoint は未対応です",
       "line": 0,
       "column": 24
     },
     {
       "verified": false,
-      "message": "条件・hit condition・logpoint は未対応です",
+      "message": "hit condition・logpoint は未対応です",
       "line": 0,
       "column": 24
     }
