@@ -155,7 +155,7 @@
         "left": "Value"
       },
       "source": "ubnfc",
-      "message": "構文エラー: \u0027 \u0027 | \u0027*/\u0027 | \u0027/*\u0027 | \u0027//\u0027 | \u0027;\u0027 | AlphabetUnderScoreParser | EndOfSourceParser | IdentifierParser ほか 1 件 を期待しました",
+      "message": "構文エラー: \u0027 \u0027 | \u0027*/\u0027 | \u0027/*\u0027 | \u0027//\u0027 | \u0027;\u0027 | AlphabetUnderScoreParser | EndOfSourceParser | IdentifierParser ほか 1 件 を期待しました（正常な前半だけを索引化）",
       "relatedInformation": [
         {
           "location": {
@@ -173,7 +173,11 @@
           },
           "message": "最深規則: Value"
         }
-      ]
+      ],
+      "data": {
+        "analysis": "prefix",
+        "indexedThroughCp": 17
+      }
     },
     {
       "range": {
