@@ -20,6 +20,7 @@ import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
+import org.eclipse.lsp4j.DocumentFormattingParams;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.HoverParams;
@@ -76,6 +77,7 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
     private final java.nio.file.Path validator;
     private final CatalogDiagnostics catalogs = new CatalogDiagnostics();
     private final SignatureHelpProvider signatures;
+    private final DocumentFormatter formatter;
     private LanguageClient client;
 
     public LanguageServerImpl() { this(scanners(SCANNER_CLASS)); }
@@ -89,7 +91,13 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     public LanguageServerImpl(Map<String, TokenScanner> scanners, java.nio.file.Path validator,
                               SignatureHelpProvider signatures) {
+        this(scanners, validator, signatures, null);
+    }
+
+    public LanguageServerImpl(Map<String, TokenScanner> scanners, java.nio.file.Path validator,
+                              SignatureHelpProvider signatures, DocumentFormatter formatter) {
         this.scanners = Map.copyOf(scanners);
+        this.formatter = formatter;
         this.signatures = signatures;
         if (validator != null && (!GRAMMAR.equals("UBNF") || !validator.isAbsolute()))
             throw new IllegalArgumentException("--validator は UBNF サーバに実行ファイルの絶対パスを指定してください");
@@ -125,6 +133,7 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
         if (!Meta.INLAY_LABELS.isEmpty()) capabilities.setInlayHintProvider(true);
         if (signatures != null)
             capabilities.setSignatureHelpProvider(new SignatureHelpOptions(List.copyOf(signatures.triggerCharacters())));
+        if (formatter != null) capabilities.setDocumentFormattingProvider(true);
         capabilities.setDocumentSymbolProvider(true);
         capabilities.setHoverProvider(true);
         var completion = new CompletionOptions();
@@ -237,6 +246,20 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
             }
         }
         return CompletableFuture.completedFuture(new WorkspaceEdit(changes));
+    }
+
+    @Override public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        if (formatter == null || analysis == null || analysis.primary() == null || !analysis.primary().ok()
+                || !analysis.primary().recoveries().isEmpty())
+            return CompletableFuture.completedFuture(List.of());
+
+        String formatted = formatter.format(analysis);
+        if (formatted == null || formatted.equals(analysis.text()) || !analysis.preservesSyntax(formatted))
+            return CompletableFuture.completedFuture(List.of());
+
+        var positions = analysis.positions();
+        return CompletableFuture.completedFuture(List.of(new TextEdit(positions.rangeOf(0, positions.lengthCp()), formatted)));
     }
 
     @Override public CompletableFuture<SignatureHelp> signatureHelp(SignatureHelpParams params) {

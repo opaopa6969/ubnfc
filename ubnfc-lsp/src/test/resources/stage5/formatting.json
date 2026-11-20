@@ -1,0 +1,37 @@
+{
+  "provider": true,
+  "complete": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 13
+        }
+      },
+      "newText": "let total \u003d 5;\n"
+    }
+  ],
+  "utf16": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 3,
+          "character": 34
+        }
+      },
+      "newText": "{\n  /* keep  😀\r\n x */\n  let total \u003d 5;\n  // keep trailing spaces  \n  note \"😀 // keep  /* spaces */\";\n}\n"
+    }
+  ],
+  "alreadyFormatted": [],
+  "incomplete": [],
+  "invalid": [],
+  "changedToken": []
+}
