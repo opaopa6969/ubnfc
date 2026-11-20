@@ -6,11 +6,9 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import org.eclipse.lsp4j.debug.Breakpoint;
@@ -105,7 +103,8 @@ public class DebugAdapter implements IDebugProtocolServer {
             return line == site.line() && (column == null || column == site.column());
         }
     }
-    private final Set<BreakpointTarget> breakpoints = new LinkedHashSet<>();
+    private record RegisteredBreakpoint(BreakpointTarget target, String condition) { }
+    private final List<RegisteredBreakpoint> breakpoints = new ArrayList<>();
     private int cursor = -1;
     private boolean stopOnEntry = true;
     private boolean launched;
@@ -143,7 +142,7 @@ public class DebugAdapter implements IDebugProtocolServer {
         // hover の自動評価は通知しない。
         capabilities.setSupportsEvaluateForHovers(false);
         capabilities.setSupportsSetVariable(false);
-        capabilities.setSupportsConditionalBreakpoints(false);
+        capabilities.setSupportsConditionalBreakpoints(bridge.supportsConditionalBreakpoints());
         capabilities.setSupportsHitConditionalBreakpoints(false);
         capabilities.setSupportsBreakpointLocationsRequest(true);
         capabilities.setSupportsLogPoints(false);
@@ -256,14 +255,16 @@ public class DebugAdapter implements IDebugProtocolServer {
             breakpoint.setColumn(target.column());
             String reason = null;
             if (!sameSource) reason = "このソースは現在の入力ファイルではありません";
-            else if (request.getCondition() != null || request.getHitCondition() != null || request.getLogMessage() != null)
-                reason = "条件・hit condition・logpoint は未対応です";
+            else if (request.getCondition() != null && !bridge.supportsConditionalBreakpoints())
+                reason = "条件付き breakpoint には対応する EvaluatorBridge が必要です";
+            else if (request.getHitCondition() != null || request.getLogMessage() != null)
+                reason = "hit condition・logpoint は未対応です";
             else if (terminated || steps.stream().map(this::siteOf).noneMatch(target::matches))
                 reason = target.column() == null
                     ? "この行から始まる AST 節点がありません（文法デバッガは節点の開始行で止まります）"
                     : "この位置から始まる AST 節点がありません";
             breakpoint.setVerified(reason == null);
-            if (reason == null) breakpoints.add(target);
+            if (reason == null) breakpoints.add(new RegisteredBreakpoint(target, request.getCondition()));
             else breakpoint.setMessage(reason);
             out[i] = breakpoint;
         }
@@ -297,14 +298,26 @@ public class DebugAdapter implements IDebugProtocolServer {
 
     private void resume() {
         for (int at = cursor + 1; !breakpoints.isEmpty() && at < steps.size(); at++) {
-            var site = siteOf(steps.get(at));
-            if (breakpoints.contains(new BreakpointTarget(site.line(), null))
-                    || breakpoints.contains(new BreakpointTarget(site.line(), site.column()))) {
+            var step = steps.get(at);
+            var site = siteOf(step);
+            if (breakpoints.stream().anyMatch(bp -> bp.target().matches(site) && conditionMatches(bp, step))) {
                 move(at, "breakpoint");
                 return;
             }
         }
         terminate();
+    }
+
+    private boolean conditionMatches(RegisteredBreakpoint breakpoint, Steps.Step step) {
+        if (breakpoint.condition() == null) return true;
+        try {
+            var result = bridge.evaluateCondition(breakpoint.condition(), step.node());
+            if (result.isPresent()) return result.get();
+            output("stderr", "条件付き breakpoint の式を評価できません。\n");
+        } catch (RuntimeException error) {
+            output("stderr", "条件付き breakpoint の評価に失敗しました。\n");
+        }
+        return false;
     }
 
     @Override public CompletableFuture<Void> next(NextArguments args) {

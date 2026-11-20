@@ -13,6 +13,7 @@ import org.eclipse.lsp4j.jsonrpc.json.MessageJsonHandler;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.*;
 import org.unlaxer.ubnfc.examples.stage5.SumEvaluatorBridge;
+import org.unlaxer.ubnfc.examples.stage5.generated.Stage5AST;
 import org.unlaxer.ubnfc.examples.stage5.generated.Stage5Parser;
 import org.unlaxer.ubnfc.examples.stage5.generated.api.ParseOptions;
 import org.unlaxer.ubnfc.examples.stage5.lsp.LanguageServerImpl;
@@ -102,6 +103,7 @@ public final class Stage5Scenario {
         out.put("formatting", formatting());
         out.put("evaluator", evaluator(work));
         out.put("dap-queries", dapQueries(work));
+        out.put("dap-conditions", dapConditions(work));
         return out;
     }
 
@@ -368,6 +370,69 @@ public final class Stage5Scenario {
         return json(out);
     }
 
+    private static String dapConditions(Path work) throws Exception {
+        Path file = work.resolve("conditions.demo");
+        Files.writeString(file, "let n = 0;\nlet broken = 2;\nlet unsure = 3;\nlet zero = 0; { let n = 3; }\n");
+        var source = new Source();
+        source.setPath(file.toString());
+        var out = new LinkedHashMap<String, Object>();
+        EvaluatorBridge bridge = new EvaluatorBridge() {
+            @Override public boolean supportsConditionalBreakpoints() { return true; }
+
+            @Override public Optional<Boolean> evaluateCondition(String expression, Object node) {
+                return switch (expression) {
+                    case "n > 0" -> Optional.of(node instanceof Stage5AST.Let value
+                        && value.name().equals("n") && new java.math.BigDecimal(value.value()).signum() > 0);
+                    case "failed" -> throw new IllegalArgumentException("評価失敗");
+                    default -> Optional.empty();
+                };
+            }
+        };
+        try (var wire = new DapWire(new DebugAdapter(Map.of(), bridge))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertTrue(caps.getSupportsConditionalBreakpoints());
+            out.put("supportsConditionalBreakpoints", caps.getSupportsConditionalBreakpoints());
+            var launch = Map.<String, Object>of("program", file.toString(), "stopOnEntry", false);
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            var registered = setBreakpoints(dap, source, conditionalBreakpoint(1, 1, "n > 0"),
+                conditionalBreakpoint(2, null, "failed"), conditionalBreakpoint(3, null, "unknown"),
+                conditionalBreakpoint(4, null, "n > 0"));
+            assertTrue(Arrays.stream(registered).allMatch(Breakpoint::isVerified));
+            out.put("registered", registered);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var frame = topFrame(dap);
+            assertEquals(4, frame.getLine());
+            assertEquals(17, frame.getColumn());
+            assertEquals(List.of("stderr:条件付き breakpoint の評価に失敗しました。\n",
+                "stderr:条件付き breakpoint の式を評価できません。\n", "stopped:breakpoint"), wire.breakpointEvents);
+            out.put("events", List.copyOf(wire.breakpointEvents));
+            out.put("stoppedAt", List.of(frame.getLine(), frame.getColumn()));
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var frames = dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames();
+            assertEquals(0, frames);
+            assertEquals(3, wire.breakpointEvents.size());
+            out.put("relaunchedFrames", frames);
+        }
+        try (var wire = new DapWire(new DebugAdapter(Map.of()))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertFalse(caps.getSupportsConditionalBreakpoints());
+            dap.launch(Map.of("program", file.toString())).get(30, TimeUnit.SECONDS);
+            var denied = setBreakpoints(dap, source, conditionalBreakpoint(4, null, "n > 0"));
+            assertFalse(denied[0].isVerified());
+            out.put("noop", denied[0]);
+        }
+        return json(out);
+    }
+
+    private static SourceBreakpoint conditionalBreakpoint(int line, Integer column, String expression) {
+        var breakpoint = sourceBreakpoint(line, column);
+        breakpoint.setCondition(expression);
+        return breakpoint;
+    }
+
     private static BreakpointLocation[] locations(IDebugProtocolServer dap, Source source,
             int line, Integer column, Integer endLine, Integer endColumn) throws Exception {
         var args = new BreakpointLocationsArguments();
@@ -476,10 +541,19 @@ public final class Stage5Scenario {
         final ExecutorService executor = Executors.newCachedThreadPool();
         final Future<?> serverListening, clientListening;
         final IDebugProtocolServer proxy;
+        final List<String> breakpointEvents = new CopyOnWriteArrayList<>();
         DapWire(DebugAdapter adapter) throws Exception {
             var s = DSPLauncher.createServerLauncher(adapter, serverIn, serverOut, executor, consumer -> consumer);
             adapter.connect(s.getRemoteProxy());
-            var c = DSPLauncher.createClientLauncher(new IDebugProtocolClient() {}, clientIn, clientOut, executor, consumer -> consumer);
+            var client = new IDebugProtocolClient() {
+                @Override public void stopped(StoppedEventArguments args) {
+                    breakpointEvents.add("stopped:" + args.getReason());
+                }
+                @Override public void output(OutputEventArguments args) {
+                    if ("stderr".equals(args.getCategory())) breakpointEvents.add("stderr:" + args.getOutput());
+                }
+            };
+            var c = DSPLauncher.createClientLauncher(client, clientIn, clientOut, executor, consumer -> consumer);
             serverListening = s.startListening(); clientListening = c.startListening(); proxy = c.getRemoteProxy();
         }
         public void close() throws Exception {

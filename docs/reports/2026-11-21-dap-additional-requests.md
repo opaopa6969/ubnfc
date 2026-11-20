@@ -6,7 +6,7 @@ LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP 
 |---|---|---|
 | `breakpointLocations` | `/* 😀 */ let a = 2; let b = 3;` で、adapter が AST の開始位置を UTF-16 の行・列で返す。bridge は介在しない。 | 実装 |
 | watch | 停止中の `total` が `5` を返す。bridge が選択フレームの節点で副作用なしに評価し、未対応の式には空を返す。 | 実装 |
-| 条件付き breakpoint | `total > 0` が真の候補位置でだけ停止する。bridge が候補位置の状態から副作用なしに条件を評価する。 | [#76](https://github.com/opaopa6969/ubnfc/issues/76) |
+| 条件付き breakpoint | `total > 0` が真の候補位置でだけ停止する。bridge が候補位置の状態から副作用なしに条件を評価する。 | 実装（[#76](https://github.com/opaopa6969/ubnfc/issues/76)） |
 | hit condition | 同じ breakpoint の 3 回目の到達時に停止する。adapter が回数を数え、bridge はカウントを変更しない。 | [#77](https://github.com/opaopa6969/ubnfc/issues/77) |
 | logpoint | `total={total}` を出力して停止せずに進む。adapter が出力し、bridge が埋め込み式の値だけを観測する。 | [#78](https://github.com/opaopa6969/ubnfc/issues/78) |
 | `setExpression` | 停止中の `counter` に `7` を代入し、watch に反映する。bridge が代入先と型を検証してから更新する。 | [#79](https://github.com/opaopa6969/ubnfc/issues/79) |
@@ -18,8 +18,7 @@ LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP 
 節点の開始位置を返す。両端を含む検索範囲内で重複を除き、行・列順に整列する。行と列の起点は
 initialize のクライアント設定に合わせ、列の UTF-16 変換は既存の `Positions` を使う。
 ファイルパス方式の単一ソースを対象とし、別ファイル、解析前・失敗後・終了後、候補がない範囲では
-空を返す。列を省いた登録は行単位で、列付きの登録は該当位置で停止する。条件・回数・ログ付きの
-登録には未検証と理由を返す。別ソースの登録要求は現在のブレークポイントを変更しない。
+空を返す。列を省いた登録は行単位で、列付きの登録は該当位置で停止する。回数・ログ付きの登録には未検証と理由を返す。別ソースの登録要求は現在のブレークポイントを変更しない。
 
 watch は `evaluate(context="watch")` を使い、独立した initialize capability はない。
 停止中の現在または選択中のスタックフレームだけを受け付け、選んだ節点を bridge に渡す。
@@ -28,6 +27,18 @@ watch は `evaluate(context="watch")` を使い、独立した initialize capabi
 未知の式、停止前、スタック外のフレーム、評価器のない NOOP は失敗応答を返す。
 hover の自動評価は通知しない。再 launch は AST、停止位置、ブレークポイント、変数参照を初期化し、
 成功時に bridge の `onLaunch` を呼ぶ。
+
+## 条件付き breakpoint
+
+`EvaluatorBridge.supportsConditionalBreakpoints()` が true の場合だけ DAP の capability を有効にする。
+その他の bridge で条件付き登録を受けたときは未検証と理由を返す。式の意味は bridge が持つ。
+
+`continue` と `stopOnEntry=false` の初回実行では、AST の前順で開始位置が合う候補を探す。
+候補に移動する前に、その節点を `evaluateCondition` に渡す。bridge は候補の節点と現在の状態を
+読み取って判断し、候補を試すためにステップ通知や代入を実行しない。同じ位置に複数の登録があれば
+要求順に評価し、最初に成立した登録で `stopped(reason="breakpoint")` を返す。
+条件が偽ならそのまま次の候補へ進む。未知の式（空の結果）と評価失敗（実行時例外）は
+`stderr` に通知し、どちらも停止せず続行する。再 launch では登録を初期化する。
 
 ## 逆実行を有効にする条件
 
@@ -41,7 +52,7 @@ DAP の同じ capability が対象にする `reverseContinue` の契約も #80 �
 ## 検証
 
 `Stage5GoldenTest` は生成した Java DAP をコンパイルし、実際の JSON-RPC で capability と
-座標、列指定の停止、watch の値・エラー、失敗した launch と再 launch、逆実行の拒否を照合する。
+座標、列指定の停止、watch の値・エラー、条件の真偽と失敗、失敗した launch と再 launch、逆実行の拒否を照合する。
 `ParserUnchangedTest.dapEmissionOnlyAddsFiles` は feature off と on の parser / LSP 全ファイルを
 byte 比較する。VS Code 実機での列ブレークポイントと Watch パネル表示は
 [#28](https://github.com/opaopa6969/ubnfc/issues/28) に記録する。

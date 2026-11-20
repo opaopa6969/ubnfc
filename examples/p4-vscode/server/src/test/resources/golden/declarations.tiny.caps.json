@@ -56,7 +56,7 @@
   "probes": [
     {"at": [0, 5], "definition": [[0, 5, 0, 10]], "references": [[0, 5, 0, 10], [2, 1, 2, 6], [2, 31, 2, 36]], "referencesOnly": [[2, 1, 2, 6], [2, 31, 2, 36]], "hover": {"range": [0, 5, 0, 10], "markdown": "**price** — 宣言\n\n種類: `NumberVariableDeclaration`\n\ndesc"}, "completion": [], "completionCount": 0},
     {"at": [2, 11], "definition": [[1, 5, 1, 10]], "references": [[1, 5, 1, 10], [2, 10, 2, 15]], "referencesOnly": [[2, 10, 2, 15]], "hover": {"range": [2, 10, 2, 15], "markdown": "**count** — 参照\n\n宣言: 2 行 6 桁"}, "completion": ["count"], "completionCount": 1},
-    {"at": [2, 23], "definition": [[3, 6, 3, 12]], "references": [[3, 6, 3, 12], [2, 23, 2, 29]], "referencesOnly": [[2, 23, 2, 29]], "hover": {"range": [2, 23, 2, 29], "markdown": "**double** — 参照\n\n宣言: 4 行 7 桁"}, "completion": ["count", "internal", "price"], "completionCount": 3},
-    {"at": [4, 2], "definition": [], "references": [], "referencesOnly": [], "hover": {"range": [4, 2, 4, 3], "markdown": "`$`\n\n規則: `VariableRef`"}, "completion": ["$", "(", ")", ",", ".", ".length", ":", "?", "abs", "call", "ceil", "cos", "count", "double", "else", "exp", "external", "floor", "if", "internal"], "completionCount": 37}
+    {"at": [2, 23], "definition": [], "references": [[3, 6, 3, 12], [2, 23, 2, 29]], "referencesOnly": [[2, 23, 2, 29]], "hover": {"range": [2, 23, 2, 29], "markdown": "**double** — 参照\n\n宣言が見つかりません。"}, "completion": ["count", "internal", "price"], "completionCount": 3},
+    {"at": [4, 2], "definition": [], "references": [], "referencesOnly": [], "hover": {"range": [4, 2, 4, 3], "markdown": "`$`\n\n規則: `VariableRef`"}, "completion": ["$", "(", ")", ",", ".", ".length", ":", "?", "abs", "call", "ceil", "cos", "count", "else", "exp", "external", "floor", "if", "internal", "len"], "completionCount": 36}
   ]
 }
