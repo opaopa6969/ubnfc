@@ -1,0 +1,134 @@
+{
+  "capabilities": {
+    "supportsConfigurationDoneRequest": true,
+    "supportsConditionalBreakpoints": false,
+    "supportsHitConditionalBreakpoints": false,
+    "supportsEvaluateForHovers": false,
+    "exceptionBreakpointFilters": [],
+    "supportsStepBack": false,
+    "supportsSetVariable": false,
+    "supportsLogPoints": false,
+    "supportsSetExpression": false,
+    "supportsTerminateRequest": false,
+    "supportsBreakpointLocationsRequest": true
+  },
+  "beforeLaunch": [],
+  "locations": [
+    {
+      "line": 0,
+      "column": 0
+    },
+    {
+      "line": 0,
+      "column": 9
+    },
+    {
+      "line": 0,
+      "column": 24
+    },
+    {
+      "line": 2,
+      "column": 0
+    }
+  ],
+  "utf16Range": [
+    {
+      "line": 0,
+      "column": 24
+    }
+  ],
+  "emptyLine": [],
+  "foreignSource": [],
+  "reversedRange": [],
+  "watchBeforeStop": "watch の評価には現在の停止フレームが必要です。",
+  "registered": [
+    {
+      "verified": true,
+      "line": 0,
+      "column": 24
+    },
+    {
+      "verified": false,
+      "message": "この位置から始まる AST 節点がありません",
+      "line": 0,
+      "column": 23
+    },
+    {
+      "verified": false,
+      "message": "条件・hit condition・logpoint は未対応です",
+      "line": 0,
+      "column": 24
+    },
+    {
+      "verified": false,
+      "message": "条件・hit condition・logpoint は未対応です",
+      "line": 0,
+      "column": 24
+    },
+    {
+      "verified": false,
+      "message": "条件・hit condition・logpoint は未対応です",
+      "line": 0,
+      "column": 24
+    }
+  ],
+  "foreignRegistration": [
+    {
+      "verified": false,
+      "message": "このソースは現在の入力ファイルではありません",
+      "line": 0,
+      "column": 24
+    }
+  ],
+  "stoppedAt": [
+    0,
+    24
+  ],
+  "watch": {
+    "result": "5",
+    "type": "number",
+    "variablesReference": 0
+  },
+  "watchForeignFrame": "watch の評価には現在の停止フレームが必要です。",
+  "watchUnknown": "この watch 式を評価できません。EvaluatorBridge が読み取り専用の評価に対応する必要があります。",
+  "stepBack": "stepBack は未対応です（評価器の状態を復元する契約がありません）。",
+  "unchangedFrame": [
+    3,
+    0,
+    24
+  ],
+  "watchAfterStepBack": {
+    "result": "5",
+    "type": "number",
+    "variablesReference": 0
+  },
+  "failedLaunchLocations": [],
+  "failedLaunchWatch": "watch の評価には現在の停止フレームが必要です。",
+  "relaunchedLocations": [
+    {
+      "line": 0,
+      "column": 0
+    }
+  ],
+  "relaunchedWatch": {
+    "result": "7",
+    "type": "number",
+    "variablesReference": 0
+  },
+  "noop": {
+    "locations": [
+      {
+        "line": 1,
+        "column": 1
+      }
+    ],
+    "watch": "この watch 式を評価できません。EvaluatorBridge が読み取り専用の評価に対応する必要があります。",
+    "stepBack": "stepBack は未対応です（評価器の状態を復元する契約がありません）。",
+    "unchangedFrame": [
+      2,
+      1,
+      1
+    ],
+    "watchAfterStepBack": "この watch 式を評価できません。EvaluatorBridge が読み取り専用の評価に対応する必要があります。"
+  }
+}

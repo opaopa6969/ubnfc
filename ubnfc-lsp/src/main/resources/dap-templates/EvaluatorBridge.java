@@ -74,6 +74,10 @@ public interface EvaluatorBridge {
     /**
      * Debug Console / watch の式評価。{@code Optional.empty()} を返すと
      * 「文法デバッガでは未対応」の error になる（既定）。
+     * {@code "watch"} は停止中の現在または選択中のフレームに対する観測で、
+     * 同じ停止中に繰り返し呼ばれる。評価器の状態や外部状態を変更せず、
+     * 副作用なしでは評価できない式には {@code Optional.empty()} を返す。
+     * 再 launch による状態の初期化は {@link #onLaunch} が担う。
      *
      * @param context DAP の {@code EvaluateArguments.context}（{@code "repl"} / {@code "watch"} / {@code "hover"}）
      */

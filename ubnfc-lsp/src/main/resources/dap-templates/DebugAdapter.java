@@ -2,14 +2,21 @@ package __PACKAGE__;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import org.eclipse.lsp4j.debug.Breakpoint;
+import org.eclipse.lsp4j.debug.BreakpointLocation;
+import org.eclipse.lsp4j.debug.BreakpointLocationsArguments;
+import org.eclipse.lsp4j.debug.BreakpointLocationsResponse;
 import org.eclipse.lsp4j.debug.Capabilities;
 import org.eclipse.lsp4j.debug.ConfigurationDoneArguments;
 import org.eclipse.lsp4j.debug.ContinueArguments;
@@ -29,10 +36,12 @@ import org.eclipse.lsp4j.debug.SetBreakpointsArguments;
 import org.eclipse.lsp4j.debug.SetBreakpointsResponse;
 import org.eclipse.lsp4j.debug.SetVariableArguments;
 import org.eclipse.lsp4j.debug.SetVariableResponse;
+import org.eclipse.lsp4j.debug.SourceBreakpoint;
 import org.eclipse.lsp4j.debug.Source;
 import org.eclipse.lsp4j.debug.StackFrame;
 import org.eclipse.lsp4j.debug.StackTraceArguments;
 import org.eclipse.lsp4j.debug.StackTraceResponse;
+import org.eclipse.lsp4j.debug.StepBackArguments;
 import org.eclipse.lsp4j.debug.StepInArguments;
 import org.eclipse.lsp4j.debug.StepOutArguments;
 import org.eclipse.lsp4j.debug.StoppedEventArguments;
@@ -67,7 +76,7 @@ import __LSP_PACKAGE__.Positions;
  * で平らにした列</b>をステップ列とする（{@link Steps}）。位置はステップの節点の範囲で、
  * {@code stackTrace} は根から現在の節点までの鎖をそのまま枠にする。
  * {@code stepIn} は列の次（＝子があれば最初の子）、{@code next} は<b>現在と同じか浅い深さ</b>の次、
- * {@code stepOut} は<b>より浅い深さ</b>の次、{@code continue} は<b>開始行にブレークポイントがある</b>
+ * {@code stepOut} は<b>より浅い深さ</b>の次、{@code continue} は<b>開始位置にブレークポイントがある</b>
  * 次のステップへ進む。いずれも進み先が無ければ {@code terminated}。
  * 旧スタックの token モードは<b>葉だけ</b>を左から右へ辿る後順で、{@code next} しか無かったため
  * 「入る／出る」を表せなかった。ubnfc は型付き AST を持っているので前順にし、
@@ -90,7 +99,13 @@ public class DebugAdapter implements IDebugProtocolServer {
     private Positions positions = new Positions("");
     private ParseResult<?> result;
     private List<Steps.Step> steps = List.of();
-    private final java.util.Set<Integer> breakpointLines = new java.util.LinkedHashSet<>();
+    private record BreakpointSite(int line, int column) { }
+    private record BreakpointTarget(int line, Integer column) {
+        boolean matches(BreakpointSite site) {
+            return line == site.line() && (column == null || column == site.column());
+        }
+    }
+    private final Set<BreakpointTarget> breakpoints = new LinkedHashSet<>();
     private int cursor = -1;
     private boolean stopOnEntry = true;
     private boolean launched;
@@ -124,12 +139,15 @@ public class DebugAdapter implements IDebugProtocolServer {
         }
         var capabilities = new Capabilities();
         capabilities.setSupportsConfigurationDoneRequest(true);
-        // 値を出せるのは EvaluatorBridge を実装したときだけ。無いのに true を返すと
-        // VS Code が watch / hover を出し続けて「黙って空」に見えるので、正直に false を返す。
+        // watch は停止中の evaluate(context=watch)。DAP に独立した watch capability はない。
+        // hover の自動評価は通知しない。
         capabilities.setSupportsEvaluateForHovers(false);
         capabilities.setSupportsSetVariable(false);
         capabilities.setSupportsConditionalBreakpoints(false);
         capabilities.setSupportsHitConditionalBreakpoints(false);
+        capabilities.setSupportsBreakpointLocationsRequest(true);
+        capabilities.setSupportsLogPoints(false);
+        capabilities.setSupportsSetExpression(false);
         capabilities.setSupportsStepBack(false);
         capabilities.setSupportsTerminateRequest(false);
         capabilities.setExceptionBreakpointFilters(new org.eclipse.lsp4j.debug.ExceptionBreakpointsFilter[0]);
@@ -142,6 +160,13 @@ public class DebugAdapter implements IDebugProtocolServer {
         // 「解析済みのステップ列」を見られるので、verified をその場で判定できる。
         // lsp4j は受信スレッド上で 1 要求ずつ処理するので、次の要求はこの launch が返るまで読まれない。
         if (client != null) client.initialized();
+        // 再 launch は失敗で終わった場合も次のセッションから独立する。
+        terminated = false;
+        cursor = -1;
+        steps = List.of();
+        breakpoints.clear();
+        handles.clear();
+        result = null;
         program = string(arguments.get("program"));
         stopOnEntry = !Boolean.FALSE.equals(arguments.get("stopOnEntry"));
         launched = true;
@@ -162,7 +187,6 @@ public class DebugAdapter implements IDebugProtocolServer {
         }
         if (!result.ok() || result.ast().isEmpty()) { fail(null); return done(); }
         steps = Steps.of(result.ast().get(), result.nodeSpans());
-        cursor = -1;
         bridge.onLaunch(program, text, result.ast().get());
         output("stdout", "Parsed " + program + ": " + steps.size() + " AST node step(s)\n");
         return done();
@@ -192,28 +216,74 @@ public class DebugAdapter implements IDebugProtocolServer {
 
     // ---- ブレークポイント ---------------------------------------------------
 
+    @Override public CompletableFuture<BreakpointLocationsResponse> breakpointLocations(BreakpointLocationsArguments args) {
+        var response = new BreakpointLocationsResponse();
+        response.setBreakpoints(new BreakpointLocation[0]);
+        if (args == null || terminated || !matchesSource(args.getSource())) return CompletableFuture.completedFuture(response);
+
+        int firstLine = args.getLine();
+        int lastLine = args.getEndLine() == null ? firstLine : args.getEndLine();
+        int firstColumn = args.getColumn() == null ? column(0) : args.getColumn();
+        int lastColumn = args.getEndColumn() == null ? Integer.MAX_VALUE : args.getEndColumn();
+        if (firstLine < line(0) || lastLine < firstLine || firstColumn < column(0) || lastColumn < column(0))
+            return CompletableFuture.completedFuture(response);
+
+        var locations = steps.stream().map(this::siteOf)
+            .filter(site -> site.line() >= firstLine && site.line() <= lastLine)
+            .filter(site -> site.line() != firstLine || site.column() >= firstColumn)
+            .filter(site -> site.line() != lastLine || site.column() <= lastColumn)
+            .distinct().sorted(Comparator.comparingInt(BreakpointSite::line).thenComparingInt(BreakpointSite::column))
+            .map(site -> {
+                var location = new BreakpointLocation();
+                location.setLine(site.line());
+                location.setColumn(site.column());
+                return location;
+            }).toArray(BreakpointLocation[]::new);
+        response.setBreakpoints(locations);
+        return CompletableFuture.completedFuture(response);
+    }
+
     @Override public CompletableFuture<SetBreakpointsResponse> setBreakpoints(SetBreakpointsArguments args) {
-        breakpointLines.clear();
-        var requested = args == null || args.getBreakpoints() == null
-            ? new org.eclipse.lsp4j.debug.SourceBreakpoint[0] : args.getBreakpoints();
+        var requested = args == null || args.getBreakpoints() == null ? new SourceBreakpoint[0] : args.getBreakpoints();
+        boolean sameSource = args != null && matchesSource(args.getSource());
+        if (sameSource) breakpoints.clear();
         var out = new Breakpoint[requested.length];
         for (int i = 0; i < requested.length; i++) {
-            int line = requested[i].getLine();
-            int zeroBased = linesStartAt1 ? line - 1 : line;
+            var request = requested[i];
+            var target = new BreakpointTarget(request.getLine(), request.getColumn());
             var breakpoint = new Breakpoint();
-            breakpoint.setLine(line);
-            // 旧スタックは検証せず常に verified=true を返していた。ubnfc はステップ列と突き合わせ、
-            // その行から始まる AST 節点が 1 つも無ければ verified=false + 理由を返す。
-            boolean verified = false;
-            for (var step : steps) if (lineOf(step.startCp()) == zeroBased) { verified = true; break; }
-            breakpoint.setVerified(verified);
-            if (verified) breakpointLines.add(zeroBased);
-            else breakpoint.setMessage("この行から始まる AST 節点がありません（文法デバッガは節点の開始行で止まります）");
+            breakpoint.setLine(target.line());
+            breakpoint.setColumn(target.column());
+            String reason = null;
+            if (!sameSource) reason = "このソースは現在の入力ファイルではありません";
+            else if (request.getCondition() != null || request.getHitCondition() != null || request.getLogMessage() != null)
+                reason = "条件・hit condition・logpoint は未対応です";
+            else if (terminated || steps.stream().map(this::siteOf).noneMatch(target::matches))
+                reason = target.column() == null
+                    ? "この行から始まる AST 節点がありません（文法デバッガは節点の開始行で止まります）"
+                    : "この位置から始まる AST 節点がありません";
+            breakpoint.setVerified(reason == null);
+            if (reason == null) breakpoints.add(target);
+            else breakpoint.setMessage(reason);
             out[i] = breakpoint;
         }
         var response = new SetBreakpointsResponse();
         response.setBreakpoints(out);
         return CompletableFuture.completedFuture(response);
+    }
+
+    private BreakpointSite siteOf(Steps.Step step) {
+        var position = positions.positionOf(step.startCp());
+        return new BreakpointSite(line(position.getLine()), column(position.getCharacter()));
+    }
+
+    private boolean matchesSource(Source source) {
+        if (source == null || source.getPath() == null || source.getPath().isBlank() || program.isBlank()) return false;
+        try {
+            return Path.of(program).toAbsolutePath().normalize().equals(Path.of(source.getPath()).toAbsolutePath().normalize());
+        } catch (InvalidPathException error) {
+            return false;
+        }
     }
 
     // ---- 実行 --------------------------------------------------------------
@@ -226,8 +296,14 @@ public class DebugAdapter implements IDebugProtocolServer {
     }
 
     private void resume() {
-        for (int at = cursor + 1; at < steps.size(); at++)
-            if (breakpointLines.contains(lineOf(steps.get(at).startCp()))) { move(at, "breakpoint"); return; }
+        for (int at = cursor + 1; !breakpoints.isEmpty() && at < steps.size(); at++) {
+            var site = siteOf(steps.get(at));
+            if (breakpoints.contains(new BreakpointTarget(site.line(), null))
+                    || breakpoints.contains(new BreakpointTarget(site.line(), site.column()))) {
+                move(at, "breakpoint");
+                return;
+            }
+        }
         terminate();
     }
 
@@ -244,6 +320,10 @@ public class DebugAdapter implements IDebugProtocolServer {
         if (terminated) return done();
         if (cursor + 1 < steps.size()) move(cursor + 1, "step"); else terminate();
         return done();
+    }
+
+    @Override public CompletableFuture<Void> stepBack(StepBackArguments args) {
+        return requestFailed("stepBack は未対応です（評価器の状態を復元する契約がありません）。");
     }
 
     @Override public CompletableFuture<Void> stepOut(StepOutArguments args) {
@@ -458,10 +538,17 @@ public class DebugAdapter implements IDebugProtocolServer {
     // ---- 拡張点（案 b）------------------------------------------------------
 
     @Override public CompletableFuture<EvaluateResponse> evaluate(EvaluateArguments args) {
+        String context = args == null ? null : args.getContext();
         var step = args == null || args.getFrameId() == null ? current() : stepAt(args.getFrameId() - 1);
+        boolean watch = "watch".equals(context);
+        if (watch && (current() == null || step == null || !Steps.chain(steps, cursor).contains(step)))
+            return requestFailed("watch の評価には現在の停止フレームが必要です。");
         var answer = bridge.evaluate(args == null ? "" : args.getExpression(),
-            step == null ? null : step.node(), args == null ? null : args.getContext());
-        if (answer.isEmpty()) return unsupported("evaluate");
+            step == null ? null : step.node(), context);
+        if (answer.isEmpty()) {
+            if (watch) return requestFailed("この watch 式を評価できません。EvaluatorBridge が読み取り専用の評価に対応する必要があります。");
+            return unsupported("evaluate");
+        }
         var response = new EvaluateResponse();
         response.setResult(truncate(answer.get().result()));
         response.setType(answer.get().type());
@@ -484,11 +571,14 @@ public class DebugAdapter implements IDebugProtocolServer {
     }
 
     private static <T> CompletableFuture<T> unsupported(String request) {
+        return requestFailed(request + " は文法デバッガでは未対応です（値を計算する評価器を持っていません）。"
+            + "言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください"
+            + "（生成された EvaluatorBridge.java の Javadoc に例があります）。");
+    }
+
+    private static <T> CompletableFuture<T> requestFailed(String message) {
         return CompletableFuture.failedFuture(new ResponseErrorException(new ResponseError(
-            ResponseErrorCode.RequestFailed,
-            request + " は文法デバッガでは未対応です（値を計算する評価器を持っていません）。"
-                + "言語の評価器を差し込むには EvaluatorBridge を実装し、DebugAdapter に渡してください"
-                + "（生成された EvaluatorBridge.java の Javadoc に例があります）。", null)));
+            ResponseErrorCode.RequestFailed, message, null)));
     }
 
     // ---- 小道具 ------------------------------------------------------------
@@ -496,8 +586,6 @@ public class DebugAdapter implements IDebugProtocolServer {
     private Steps.Step current() { return stepAt(cursor); }
 
     private Steps.Step stepAt(int index) { return index < 0 || index >= steps.size() ? null : steps.get(index); }
-
-    private int lineOf(int offsetCp) { return positions.positionOf(offsetCp).getLine(); }
 
     private int line(int zeroBased) { return linesStartAt1 ? zeroBased + 1 : zeroBased; }
 
