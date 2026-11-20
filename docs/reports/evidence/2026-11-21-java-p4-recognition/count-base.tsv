@@ -1,0 +1,5 @@
+fixture	direct	recipe_count
+complex.tiny	true	0
+complex.tiny	false	153
+complex-x64.tiny	true	0
+complex-x64.tiny	false	9477

@@ -594,10 +594,8 @@ public final class Session {
         int c = f.c, m = f.m, state = scope.stateVersion();
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
         boolean cache = options.memo() && (successMemo || failureMemo);
-        int memoCapacity = 0, slot = 0;
         if (cache) {
-            memoCapacity = memo.capacity();
-            slot = memo.find(memoId, c, m, mode, state);
+            int slot = memo.get(memoId, c, m, mode, state);
             if (slot >= 0) {
                 int payload = memo.payload(slot);
                 if (diag) diagnostics.merge(payloads.diagnostics[payload]);
@@ -669,7 +667,7 @@ public final class Session {
         var diagnostic = diag ? diagnostics.leaveRule(store) : null;
         if (store) {
             int payload = payloads.store(result, f.reset, effectsSince(mark), diagnostic);
-            memo.putAfterMiss(memoId, c, m, mode, state, slot, memoCapacity, result != null, f.c, f.m, payload);
+            memo.put(memoId, c, m, mode, state, result != null, f.c, f.m, payload);
         }
         return result;
     }
@@ -681,8 +679,7 @@ public final class Session {
         if (!options.memo() || !successMemo && !failureMemo) return body.parse(this, f);
         int c = f.c, m = f.m, state = scope.stateVersion();
         int mode = (f.matched ? 1 : 0) | (f.invert ? 2 : 0) | (f.reset ? 4 : 0);
-        int memoCapacity = memo.capacity();
-        int slot = memo.find(id, c, m, mode, state);
+        int slot = memo.get(id, c, m, mode, state);
         if (slot >= 0) {
             int payload = memo.payload(slot);
             if (diag) diagnostics.merge(payloads.diagnostics[payload]);
@@ -696,7 +693,7 @@ public final class Session {
         var diagnostic = diag ? diagnostics.leaveRule(store) : null;
         if (store) {
             int payload = payloads.store(result, f.reset, effectsSince(mark), diagnostic);
-            memo.putAfterMiss(id, c, m, mode, state, slot, memoCapacity, result != null, f.c, f.m, payload);
+            memo.put(id, c, m, mode, state, result != null, f.c, f.m, payload);
         }
         return result;
     }

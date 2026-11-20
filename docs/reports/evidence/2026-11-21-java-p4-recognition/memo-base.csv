@@ -1,0 +1,5 @@
+fixture,ast,hashes,probes,collision_steps,grows
+complex.tiny,false,1185,1185,1042,0
+complex.tiny,true,1185,1185,1042,0
+complex-x64.tiny,false,71367,71367,12186,0
+complex-x64.tiny,true,71367,71367,12186,0
