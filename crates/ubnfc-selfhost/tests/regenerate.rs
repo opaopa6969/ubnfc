@@ -33,7 +33,8 @@ fn assert_generated_bytes(ir: &ubnfc_front::ir::GrammarIr) {
         emit_driver: false,
         ..Default::default()
     };
-    let generated = ubnfc_rust::emit(ir, &options).unwrap();
+    let ir = ubnfc_selfhost::with_keyword_boundaries(ir).unwrap();
+    let generated = ubnfc_rust::emit(&ir, &options).unwrap();
     let temp = Temporary::new();
     generated.write_to(&temp.0).unwrap();
     let committed = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/generated");

@@ -72,14 +72,24 @@ impl<'a> Input<'a> {
 
     /// byte 位置の文字と UTF-8 byte 長。最大 4 byte だけを調べる O(1) 操作。
     pub fn cp_at(&self, byte: usize) -> Option<(char, usize)> {
-        let tail = self.bytes.get(byte..)?;
-        let len = match *tail.first()? {
-            0x00..=0x7f => 1,
+        let first = *self.bytes.get(byte)?;
+        if first.is_ascii() {
+            return Some((char::from(first), 1));
+        }
+        self.cp_at_non_ascii(byte, first)
+    }
+
+    // UTF-8 検証に必要な処理を ASCII の経路から分離する。
+    #[cold]
+    #[inline(never)]
+    fn cp_at_non_ascii(&self, byte: usize, first: u8) -> Option<(char, usize)> {
+        let len = match first {
             0xc2..=0xdf => 2,
             0xe0..=0xef => 3,
             0xf0..=0xf4 => 4,
             _ => return None,
         };
+        let tail = self.bytes.get(byte..)?;
         let ch = std::str::from_utf8(tail.get(..len)?).ok()?.chars().next()?;
         Some((ch, len))
     }

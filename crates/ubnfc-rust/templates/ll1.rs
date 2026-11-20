@@ -56,9 +56,12 @@ impl<const DIAG: bool> Session<'_, DIAG> {
                     continue;
                 }
                 Ll1Op::Repeat(target, min, max) => {
-                    frames.push(Ll1Frame::Repeat { target, min, max, count: 0, last: p });
-                    current = target;
-                    continue;
+                    if max == Some(0) { ok = min == 0; }
+                    else {
+                        frames.push(Ll1Frame::Repeat { target, min, max, count: 0, last: p });
+                        current = target;
+                        continue;
+                    }
                 }
                 Ll1Op::Call(target) => {
                     if calls >= 32 || self.depth.saturating_add(calls) >= self.options.max_depth { return None; }

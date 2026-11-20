@@ -19,13 +19,15 @@ public final class IrReader {
     public static final Set<String> FEATURES = Set.of("dualCursor", "cursorFrameFlag", "orderedChoice",
         "predictiveChoice", "longestChoice", "triviaInsertion", "captures", "deferredMapping", "scopeUndo",
         "backendDiagnostics", "memoReplay", "externTokens", "regex", "operators", "leftRecursionRewrite",
-        "recovery", "imports", "enum", "commonField", "catalog", "structuredOccurrences", "eval", "typeof", "declarativeTokens");
+        "recovery", "imports", "enum", "commonField", "catalog", "structuredOccurrences", "eval", "typeof", "declarativeTokens", "lexicalTrivia");
     public static GrammarIr read(Path path) throws IOException { return read(Files.readString(path)); }
     public static GrammarIr read(String source) {
-        Object value = Json.read(source);
-        var root = Json.object(value);
+        var root = Json.object(Json.read(source));
         for (Object feature : Json.array(root.get("requiredFeatures")))
             if (!FEATURES.contains(feature)) throw new IllegalArgumentException("Unsupported requiredFeatures: " + feature);
+        var plan = Json.object(root.get("plan"));
+        Object ll1 = plan.remove("ll1");
+        root.put("plan", plan);
         try (var stream = IrReader.class.getResourceAsStream("/schema/grammar-ir.v1.schema.json")) {
             if (stream == null) throw new IllegalStateException("Missing bundled IR schema");
             var schema = Json.object(Json.read(new String(stream.readAllBytes(), StandardCharsets.UTF_8)));
@@ -36,9 +38,21 @@ public final class IrReader {
             dfa.put("required", required);
             var properties = Json.object(dfa.get("properties")); properties.put("semantics", Map.of("const", "leftmostFirst"));
             dfa.put("properties", properties); definitions.put("RegexDfa", dfa); schema.put("$defs", definitions);
-            new Schema(schema, true).validate(value);
+            new Schema(schema, true).validate(root);
+            if (ll1 != null) {
+                try {
+                    var planSchema = Json.object(definitions.get("Plan"));
+                    var ll1Schema = Json.object(Json.object(planSchema.get("properties")).get("ll1"));
+                    ll1Schema.put("$defs", definitions);
+                    new Schema(ll1Schema, true).validate(ll1);
+                    for (Object row : Json.array(ll1)) bind(GrammarIr.Ll1State.class, row);
+                    plan.put("ll1", ll1);
+                } catch (IllegalArgumentException | ArithmeticException invalid) {
+                    // 任意計画の型・命令・数値が未対応でも IR の意味論は受け入れる。
+                }
+            }
         } catch (IOException error) { throw new IllegalStateException(error); }
-        GrammarIr ir = (GrammarIr) bind(GrammarIr.class, value);
+        GrammarIr ir = (GrammarIr) bind(GrammarIr.class, root);
         Validation.validate(ir);
         return ir;
     }

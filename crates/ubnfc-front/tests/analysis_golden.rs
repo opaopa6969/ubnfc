@@ -959,7 +959,7 @@ fn repeat_cursor_progress_and_zero_max_are_conservative() {
     check_properties(&s, &a, &p);
     assert_eq!(
         fact(&a, &repeat).may_start.zero_consume_condition,
-        MayStartZeroConsumeCondition::Predicate
+        MayStartZeroConsumeCondition::Always
     );
     assert_eq!(
         fact(&a, &repeat).cursor_transition.consumed_mode,

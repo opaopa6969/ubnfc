@@ -159,3 +159,18 @@ WORK=$WORK CORE=28 SESSIONS=3 benchmarks/scripts/run-java-direct-ast.sh time
 JVM・warmup・反復数は既存の計測規約に合わせる（P4 1,000 warmup、Operators 20,000 warmup、
 `-Xms512m -Xmx2g -Xss16m`、7 run）。結果は `$WORK/results/`。
 `-Dubnfc.directAst=false` で通常の parser 呼出しも旧経路に戻せる。
+
+現行 master と変更後の直接 AST 同士を測る場合は、比較元を別ディレクトリに展開する。
+同名の生成クラスは別クラスローダーで読み込み、同一 JVM で base / change を AST・認識ごとに
+交互実行する。Rust は Java だけを変更する A/B の共通対照として比較元からビルドする。
+
+```sh
+base_repo=$(mktemp -d)
+base_work=$(mktemp -d)
+change_work=$(mktemp -d)
+git archive origin/master | tar -x -C "$base_repo"
+WORK=$base_work "$base_repo/benchmarks/scripts/run-java-direct-ast.sh" prepare
+WORK=$change_work BASE_WORK=$base_work benchmarks/scripts/run-java-direct-ast.sh prepare
+WORK=$change_work BASE_WORK=$base_work BASE_REPO=$base_repo CORE=28 SESSIONS=3 \
+  benchmarks/scripts/run-java-direct-ast.sh time
+```

@@ -29,7 +29,6 @@ import org.unlaxer.ubnfc.java.ir.Validation;
  * 値なし bit は {@code Session.combine} / {@code repeat} の値列（null か空列か）を再現する。
  */
 final class Scanning {
-    private final GrammarIr ir;
     private final Map<String, Expr> expressions;
     private final Map<String, Rule> rules;
     private final Map<String, Token> tokens;
@@ -42,10 +41,12 @@ final class Scanning {
     private final Set<String> members = new LinkedHashSet<>();
     /** 反復ごとの一括走査表。 */
     private final Map<String, ScanClass> classes = new LinkedHashMap<>();
+    private final Map<String, String> wordMasks = new LinkedHashMap<>();
 
     Scanning(GrammarIr ir, Map<String, Expr> expressions, Map<String, Rule> rules, Map<String, Token> tokens,
-             Map<String, GrammarIr.Recipe> recipes, Map<String, Integer> exprIds, BiFunction<String, String, String> constant) {
-        this.ir = ir; this.expressions = expressions; this.rules = rules; this.tokens = tokens; this.recipes = recipes;
+             Map<String, GrammarIr.Recipe> recipes, Map<String, Integer> exprIds, BiFunction<String, String, String> constant,
+             boolean swar) {
+        this.expressions = expressions; this.rules = rules; this.tokens = tokens; this.recipes = recipes;
         this.exprIds = exprIds; this.constant = constant;
         for (ScanPlan plan : ir.plan().scans()) {
             if (!expressions.containsKey(plan.exprId())) continue;
@@ -56,6 +57,16 @@ final class Scanning {
         // 実装範囲が狭い場合の安全側。Rust の generate と同じ作法）。
         roots.removeIf(root -> !supported(root));
         for (String root : roots) members.addAll(region(root));
+        if (swar) {
+            for (String id : members) {
+                ExprNode node = expressions.get(id).node();
+                ScanClass table = classes.get(id);
+                if (node.kind().equals("repeat") && node.max() == null && table != null) {
+                    String mask = asciiWordMask(table);
+                    if (mask != null) wordMasks.put(id, mask);
+                }
+            }
+        }
     }
 
     boolean isRoot(String id) { return roots.contains(id); }
@@ -136,12 +147,12 @@ final class Scanning {
         };
     }
 
-    private String scan(String id) { return "scan" + exprIds.get(id); }
+    String scan(String id) { return "scan" + exprIds.get(id); }
 
     /** {@code e{i}C} の先頭に置く走査経路（根でなければ空）。{@code resetFalse} は参照経路が本体の評価後に残す {@code f.reset}。 */
     String fastPath(String id) {
         if (!roots.contains(id)) return "";
-        String reset = resetsToFalse(id) ? " f.reset = false;" : "";
+        String reset = resetsToFalse(id, false) ? " f.reset = false;" : "";
         return "if (s.scan && !f.invert && f.c == f.m) { Match r = s.scanned(f, " + scan(id) + "(s.chars, f.c));" + reset + " return r; }\n        ";
     }
     /**
@@ -149,15 +160,24 @@ final class Scanning {
      * {@code f.reset = false} にし、連接・選択・反復は入口の値へ戻す。規則参照と delegate の group は
      * 呼び先の e-method をそのまま通すので、呼び先の {@code setFalse} が外へ残る。
      */
-    private boolean resetsToFalse(String id) {
-        ExprNode n = expressions.get(id).node();
-        String target = switch (n.kind()) {
-            case "ruleRef" -> rules.get(n.symbolId()).body();
-            case "group" -> expressions.get(id).execution().transaction().equals("delegate") ? n.child() : null;
-            default -> null;
-        };
-        if (target == null) return false;
-        return expressions.get(target).execution().entryFlag().equals("setFalse") || resetsToFalse(target);
+    boolean resetsToFalse(String id, boolean preserveZeroRepeat) {
+        var seen = new HashSet<String>();
+        while (seen.add(id)) {
+            var expr = expressions.get(id);
+            ExprNode n = expr.node();
+            String target = switch (n.kind()) {
+                case "ruleRef" -> rules.get(n.symbolId()).body();
+                case "group" -> expr.execution().transaction().equals("delegate") ? n.child() : null;
+                default -> null;
+            };
+            if (target == null) return false;
+            var child = expressions.get(target);
+            if (preserveZeroRepeat && child.node().kind().equals("repeat") && Integer.valueOf(0).equals(child.node().max()))
+                return false;
+            if (child.execution().entryFlag().equals("setFalse")) return true;
+            id = target;
+        }
+        return false;
     }
 
     /** 領域内の全式ぶんの走査関数（式 id 順に安定）。 */
@@ -170,7 +190,81 @@ final class Scanning {
             out.append("    /** D-080: 観測を残さない終端領域の走査。{@code (終了位置 << 1) | 値なし}、失敗は -1。 */\n")
                 .append("    private static long ").append(scan(id)).append("(char[] t, int p) {\n        ")
                 .append(body(id).replace("\n", "\n        ")).append("\n    }\n");
+        if (!wordMasks.isEmpty()) out.append(SWAR_HELPERS);
         return out.toString();
+    }
+
+    private static final String SWAR_HELPERS = """
+            /** UTF-16 の位置が小さい lane を下位 16 bit に置く。 */
+            private static long scanSwarWord(char[] t, int p) {
+                return (long) t[p] | (long) t[p + 1] << 16 | (long) t[p + 2] << 32 | (long) t[p + 3] << 48;
+            }
+            private static final long SCAN_LANE_HIGH = 0x8000800080008000L;
+            /** 各 lane の上位 bit を番兵にした減算で borrow を隣の lane から隔離する。 */
+            private static long scanSwarGe(long word, long threshold) {
+                return ((((word & ~SCAN_LANE_HIGH) | SCAN_LANE_HIGH) - threshold) | word) & SCAN_LANE_HIGH;
+            }
+        """;
+
+    private record AsciiRange(int start, int end) {
+        String mask() {
+            if (start == 0) return "SCAN_LANE_HIGH ^ " + ge(end + 1);
+            return ge(start) + " & ~" + ge(end + 1);
+        }
+        private static String ge(int value) {
+            return "scanSwarGe(word, 0x" + Long.toHexString(value * 0x0001000100010001L) + "L)";
+        }
+    }
+
+    private static List<AsciiRange> asciiRanges(ScanClass table, boolean included) {
+        long low = table.asciiLow().toBigInteger().longValue();
+        long high = table.asciiHigh().toBigInteger().longValue();
+        var ranges = new ArrayList<AsciiRange>();
+        int start = -1;
+        for (int c = 0; c <= 128; c++) {
+            boolean member = c < 128 && ((((c < 64 ? low : high) >>> (c & 63)) & 1L) != 0) == included;
+            if (member && start < 0) start = c;
+            if (!member && start >= 0) {
+                ranges.add(new AsciiRange(start, c - 1));
+                start = -1;
+            }
+        }
+        return ranges;
+    }
+
+    /** 簡単な ASCII 表だけを word 化する。非 ASCII は必ず scalar の code point 判定に戻る。 */
+    private static String asciiWordMask(ScanClass table) {
+        var included = asciiRanges(table, true);
+        if (included.isEmpty()) return null;
+        // 補集合は U+0080 以上を含めて不一致側の区間を作る。
+        var excluded = asciiRanges(table, false);
+        if (!excluded.isEmpty() && excluded.getLast().end() == 127) {
+            var last = excluded.removeLast();
+            excluded.add(new AsciiRange(last.start(), Character.MAX_VALUE));
+        } else {
+            excluded.add(new AsciiRange(128, Character.MAX_VALUE));
+        }
+        boolean complement = excluded.size() <= included.size();
+        var ranges = complement ? excluded : included;
+        if (ranges.size() > 3) return null;
+        String mask = ranges.stream().map(r -> r.end() == Character.MAX_VALUE ? AsciiRange.ge(r.start()) : r.mask())
+            .map(term -> "(" + term + ")").collect(Collectors.joining(" | "));
+        return complement ? mask : "SCAN_LANE_HIGH ^ (" + mask + ")";
+    }
+
+    private static String wordLoop(String mismatch) {
+        return """
+                while (p <= t.length - 4) {
+                    long word = scanSwarWord(t, p);
+                    long mismatch = %s;
+                    if (mismatch == 0) { p += 4; count += 4; continue; }
+                    int prefix = Long.numberOfTrailingZeros(mismatch) >>> 4;
+                    p += prefix;
+                    count += prefix;
+                    break;
+                }
+                if (p == t.length) break;
+            """.formatted(mismatch).indent(4);
     }
 
     private String body(String id) {
@@ -220,6 +314,7 @@ final class Scanning {
      * 本体を呼ばずに食べる。表の周回は 1 code point の終端の成功なので値を持つ（値なし bit は立たない）。
      */
     private String repeat(String id, ExprNode n) {
+        if (Integer.valueOf(0).equals(n.max()) && Integer.valueOf(0).equals(n.min())) return "return (long) p << 1 | 1L;";
         int min = n.min() == null ? 0 : n.min();
         String max = n.max() == null ? "Integer.MAX_VALUE" : n.max().toString();
         ScanClass table = n.max() == null ? classes.get(id) : null;
@@ -229,7 +324,9 @@ final class Scanning {
             long low = table.asciiLow().toBigInteger().longValue(), high = table.asciiHigh().toBigInteger().longValue();
             String ranges = table.ranges().isEmpty() ? "false" : table.ranges().stream()
                 .map(r -> "c >= " + r.start() + " && c <= " + r.end()).collect(Collectors.joining(" || "));
+            String mismatch = wordMasks.get(id);
             String bulk = "while (p < t.length) {\n"
+                + (mismatch == null ? "" : wordLoop(mismatch))
                 + "    char ch = t[p];\n"
                 + "    if (ch < 128) { if (((ch < 64 ? 0x" + Long.toHexString(low) + "L >>> ch : 0x" + Long.toHexString(high) + "L >>> (ch - 64)) & 1L) == 0) break; p++; }\n"
                 + "    else { int c = Session.cpAt(t, p); if (!(" + ranges + ")) break; p += Character.charCount(c); }\n"

@@ -40,6 +40,7 @@ public final class JavaEmitter {
     private final Factoring factoring;
     /** D-080: {@code plan.scans} の根ごとの走査関数（D-072 の Java 版）。 */
     private final Scanning scanning;
+    private final Ll1 ll1;
     private final Map<String, Integer> exprIds = new LinkedHashMap<>(), ruleIds = new LinkedHashMap<>();
     /** Generated constants (arrays of boundaries, fields, hints, ...) hoisted to static finals: expression text -> field name. */
     private final Map<String, String> constants = new LinkedHashMap<>();
@@ -55,6 +56,9 @@ public final class JavaEmitter {
     }
     public JavaEmitter(GrammarIr ir, String packageName) { this(ir, packageName, true); }
     public JavaEmitter(GrammarIr ir, String packageName, boolean emitDriver) {
+        this(ir, packageName, emitDriver, false);
+    }
+    public JavaEmitter(GrammarIr ir, String packageName, boolean emitDriver, boolean swar) {
         Validation.validate(ir); this.ir = ir; this.emitDriver = emitDriver;
         var unit = ir.grammarUnits().stream().filter(g -> g.id().equals(ir.entry().grammarId())).findFirst().orElseThrow();
         grammar = unit.name(); Validation.identifier(grammar); ast = grammar + "AST"; parser = grammar + "Parser";
@@ -80,7 +84,14 @@ public final class JavaEmitter {
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
         prediction = new Prediction(ir, expressions, rules, tokens, ruleIds, diagnosticPlan, this::labelText);
         factoring = new Factoring(ir, expressions, rules, captures, semanticShapes, diagnosticPlan, this::labelText, id -> scopeSites().contains(id));
-        scanning = new Scanning(ir, expressions, rules, tokens, recipes, exprIds, this::constant);
+        scanning = new Scanning(ir, expressions, rules, tokens, recipes, exprIds, this::constant, swar);
+        var memo = new LinkedHashMap<String, MemoEntry>();
+        ir.plan().memo().entries().forEach(entry -> memo.putIfAbsent(entry.exprId(), entry));
+        var ruleBodies = rules.values().stream().map(Rule::body).collect(Collectors.toSet());
+        ll1 = new Ll1(ir, expressions, rules, tokens, id -> {
+            var entry = memo.get(id);
+            return entry == null ? ruleBodies.contains(id) : entry.cacheSuccess() || entry.cacheFailure();
+        }, scanning, parser);
     }
     public Map<String, String> sources() throws IOException {
         var result = new TreeMap<String, String>(); String prefix = pkg.replace('.', '/') + "/";
@@ -90,9 +101,8 @@ public final class JavaEmitter {
         result.put(prefix + grammar + "Result.java", "package " + pkg + ";\nimport " + pkg + ".api.ParseResult;\npublic record " + grammar + "Result(ParseResult<" + ast + "> result) {}\n");
         for (String name : List.of("Span", "Capture", "Diagnostic", "MappingException", "ParseOptions", "ParseResult", "TokenScanner", "Json", "SourceName"))
             result.put(prefix + "api/" + name + ".java", resource("/templates/api/" + name + ".java").replace("generated.", pkg + "."));
-        for (String name : List.of("AstEvent", "Recipe", "Session")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
-        if (tokens.values().stream().anyMatch(t -> t.spec().kind().equals("declarative")))
-            result.put(prefix + "internal/LexicalExpression.java", resource("/templates/internal/LexicalExpression.java").replace("generated.", pkg + "."));
+        for (String name : List.of("AstEvent", "Recipe", "Session", "Ll1Machine")) result.put(prefix + "internal/" + name + ".java", resource("/templates/internal/" + name + ".java").replace("generated.", pkg + "."));
+        result.put(prefix + "internal/LexicalExpression.java", resource("/templates/internal/LexicalExpression.java").replace("generated.", pkg + "."));
         for (String name : List.of("Input", "Cursor", "MemoTable", "ScopeStore", "Diagnostics", "Severity"))
             result.put(prefix + "rt/" + name + ".java", resource("/runtime/ubnfc/rt/" + name + ".java").replace("package ubnfc.rt;", "package " + pkg + ".rt;"));
         if (emitDriver) result.put(prefix + "driver/Driver.java", driverSource());
@@ -288,7 +298,7 @@ public final class JavaEmitter {
     }
     private String parserSource() {
         String defaultEntry = ir.semantics().symbols().stream().filter(s -> s.id().equals(ir.entry().ruleId())).findFirst().orElseThrow().name();
-        var out = new StringBuilder("package " + pkg + ";\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Optional;\nimport java.util.regex.Pattern;\nimport " + pkg + ".api.*;\nimport " + pkg + ".internal.AstEvent;\nimport " + pkg + ".internal.Session;\nimport " + pkg + ".internal.Session.*;\n\npublic final class " + parser + " {\n    private " + parser + "() {}\n");
+        var out = new StringBuilder("package " + pkg + ";\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Optional;\nimport java.util.regex.Pattern;\nimport " + pkg + ".api.*;\nimport " + pkg + ".internal.AstEvent;" + (ll1.enabled() ? "\nimport " + pkg + ".internal.Ll1Machine;" : "") + "\nimport " + pkg + ".internal.Session;\nimport " + pkg + ".internal.Session.*;\n\npublic final class " + parser + " {\n    private " + parser + "() {}\n");
         out.append("    public static ParseResult<").append(ast).append("> parse(CharSequence source) { return parse(source, ParseOptions.DEFAULT); }\n")
             .append("    public static ParseResult<").append(ast).append("> parse(CharSequence source, ParseOptions options) {\n")
             .append("        return parseEntry(").append(q(grammar)).append(", ").append(q(defaultEntry)).append(", source, options);\n    }\n")
@@ -347,6 +357,7 @@ public final class JavaEmitter {
             // D-080: rollback の結果は再解析されずに fast session の到達位置（reached）を診断位置として返すので、
             // 走査（reached を更新しない）を切って参照経路と同じ位置を返す。
             .append(scanning.roots.isEmpty() ? "" : "        if (rollback) s.scan = false;\n")
+            .append(ll1.enabled() ? "        if (rollback) s.ll1 = false;\n" : "")
             .append("        var f = new Frame(); Match match = s.parse(entryPoint, f);\n")
             .append("        stackFlag[0] = stackFlag[0] || s.stackOverflowTripped;\n")
             .append("        if (rollback) { s.rollback(f); return s.result(f, null, Map.of()); }\n")
@@ -360,6 +371,7 @@ public final class JavaEmitter {
         emitBuild(out);
         for (Rule rule : rules.values()) emitRule(out, rule);
         for (Expr expr : expressions.values()) emitExpr(out, expr);
+        if (ll1.enabled()) out.append(ll1.source());
         out.append(scanning.functions());
         for (var constant : constants.entrySet()) {
             int split = constant.getKey().indexOf(' ');
@@ -492,7 +504,7 @@ public final class JavaEmitter {
                 .append(", ").append(parser).append("::").append(method).append("Body);\n    }\n")
                 .append("    private static Match ").append(method).append("Body(Session s, Frame f) {\n");
         }
-        if (expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
+        if (!(expr.node().kind().equals("repeat") && Integer.valueOf(0).equals(expr.node().max())) && expr.execution().entryFlag().equals("setFalse")) out.append("        f.reset = false;\n");
         // 認識専用経路（Match 木も診断も作らない）で capture の包みが恒等になる式は、包みを飛ばして
         // 中身を直に呼ぶ。到達位置の更新だけ同じ位置で行う（包みの中の progress と同じ）。
         // D-068: AST を作る経路でも、読まれる capture site を 1 つも持たない式は包みが
@@ -508,7 +520,7 @@ public final class JavaEmitter {
         String body = expression(expr);
         // D-080: 走査は consumed mode（C）だけ。matchOnly mode（M）は参照経路のまま。
         for (String mode : List.of("C", "M")) out.append("    private static Match ").append(method).append(mode).append("(Session s, Frame f) {\n        ")
-            .append(mode.equals("C") ? scanning.fastPath(expr.id()) : "").append(body).append("\n    }\n");
+            .append(mode.equals("C") ? scanning.fastPath(expr.id()) + ll1.fastPath(expr.id()) : "").append(body).append("\n    }\n");
     }
     /** {@code Session.capture} / {@code Session.Cap} が共有する 12 引数（site 表・span 規則・意味形・失敗 hint）。 */
     private String capArgs(Expr expr) {
@@ -581,7 +593,7 @@ public final class JavaEmitter {
             case "seq" -> "return s.sequence(f, " + calls(n.items()) + ", " + boundary + ");";
             case "group" -> expr.execution().transaction().equals("delegate") ? "return " + method(n.child()) + "(s, f);" : "return s.sequence(f, " + calls(List.of(n.child())) + ", " + boundary + ");";
             case "optional" -> "return s.optional(f, " + call(n.child()) + ");";
-            case "repeat" -> "return s.repeat(f, " + call(n.child()) + ", " + n.min() + ", " + (n.max() == null ? "Integer.MAX_VALUE" : n.max()) + ", " + (n.terminator() == null ? "null" : call(n.terminator())) + ", " + boundary + (Integer.valueOf(0).equals(n.max()) && repeatedLiteral(n.child()) != null ? "," + label("'" + repeatedLiteral(n.child()) + "'") : "") + ");";
+            case "repeat" -> "return s.repeat(f, " + call(n.child()) + ", " + n.min() + ", " + (n.max() == null ? "Integer.MAX_VALUE" : n.max()) + ", " + (n.terminator() == null ? "null" : call(n.terminator())) + ", " + boundary + ");";
             case "separated" -> "return s.separated(f, " + call(n.element()) + ", " + call(n.separator()) + ", " + n.min() + ", " + boundary + ");";
             case "choice" -> choice(expr);
             case "literal" -> "return s.literal(f, " + q(n.value()) + ", " + n.caseSensitive() + ", " + Boolean.TRUE.equals(n.wordBoundary()) + ", " + label(label) + ");";
@@ -645,13 +657,7 @@ public final class JavaEmitter {
             + ",List.of(" + e.children().stream().map(this::lexicalProgram).collect(Collectors.joining(",")) + "))";
     }
     private int externIndex(String logicalId) { return externIndices.computeIfAbsent(logicalId, key -> externIndices.size()); }
-    private String repeatedLiteral(String id) {
-        ExprNode node = expressions.get(id).node();
-        if (node.kind().equals("literal")) return node.value();
-        if (node.kind().equals("group")) return repeatedLiteral(node.child());
-        if (node.kind().equals("seq") && node.items().size() == 1) return repeatedLiteral(node.items().getFirst());
-        return null;
-    }
+
     private String regex(TokenSpec spec, String label) {
         if (spec.dfa() != null) {
             var dfa = spec.dfa();
@@ -690,6 +696,10 @@ public final class JavaEmitter {
             + (anyAfter ? constant("Delimiters[]", "new Delimiters[]{" + String.join(",", afterChild) + "}") : "null") + ","
             + phases.getOrDefault("helperExit", "null") + "," + phases.getOrDefault("exit", "null") + ")");
     }
+    static boolean usesFirstFilter(MayStart start) {
+        return !start.certainty().equals("unknown") && start.includesTrivia() && start.zeroConsumeCondition().equals("never")
+            && start.ranges().stream().allMatch(range -> range.end() - range.start() <= 256);
+    }
     private String choice(Expr expr) {
         var plan = ir.plan().choices().stream().filter(p -> p.exprId().equals(expr.id())).findFirst().orElse(null);
         boolean longest = expr.node().selection().equals("longest");
@@ -699,9 +709,9 @@ public final class JavaEmitter {
             var analyses = Validation.index(ir.analysis().expressions(), ExprAnalysis::exprId);
             eligible = "new boolean[]{" + expr.node().alternatives().stream().map(id -> {
                 MayStart start = analyses.get(id).mayStart();
-                if (start.certainty().equals("unknown") || !start.includesTrivia() || !start.zeroConsumeCondition().equals("never")) return "true";
+                if (!usesFirstFilter(start)) return "true";
                 var points = new ArrayList<Integer>();
-                for (var range : start.ranges()) { if (range.end() - range.start() > 256) return "true"; for (int i = range.start(); i <= range.end(); i++) points.add(i); }
+                for (var range : start.ranges()) for (int i = range.start(); i <= range.end(); i++) points.add(i);
                 if (start.eof()) points.add(-1);
                 if (points.isEmpty()) return "false";
                 return "(switch (s.cp(f.reset ? f.c : f.position())) { case " + points.stream().map(Object::toString).collect(Collectors.joining(",")) + " -> true; default -> false; })";
@@ -804,7 +814,7 @@ public final class JavaEmitter {
     private String delimiters(String policyId) {
         TriviaPolicy policy = Validation.index(ir.semantics().trivia().policies(), TriviaPolicy::id).get(policyId);
         return constant("Delimiters", "new Delimiters(" + policy.effectiveDelimiterSet().stream()
-            .map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + ")").collect(Collectors.joining(",")) + ")");
+            .map(d -> "new Delimiter(" + q(d.kind()) + "," + q(d.open()) + "," + q(d.close()) + "," + ints(d.codePoints()) + "," + (d.expression() == null ? "null" : lexicalProgram(d.expression())) + "," + q(d.label()) + ")").collect(Collectors.joining(",")) + ")");
     }
     private void emitBuild(StringBuilder out) {
         if (recipes.values().stream().noneMatch(r -> r.resultTypeId() != null && !Set.of("transparent", "text", "skip").contains(r.kind()))) {

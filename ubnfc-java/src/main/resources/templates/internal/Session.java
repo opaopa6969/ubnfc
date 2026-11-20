@@ -125,9 +125,11 @@ public final class Session {
     }
     /** Trivia delimiter with labels and an ASCII bitmap precomputed once (generated code builds these as static constants). */
     public static final class Delimiter {
-        private final String kind, open, close; private final int[] characters;
+        private final String kind, open, close; private final int[] characters; private final LexicalExpression expression; private final String label;
         final boolean isCharacters, isLineComment; final Label openLabel, closeLabel; final long asciiLow, asciiHigh; final boolean asciiOnly; final char first;
-        public Delimiter(String kind, String open, String close, int[] characters) {
+        public Delimiter(String kind, String open, String close, int[] characters) { this(kind, open, close, characters, null, null); }
+        public Delimiter(String kind, String open, String close, int[] characters, LexicalExpression expression, String label) {
+            this.expression = expression; this.label = label;
             this.kind = kind; this.open = open; this.close = close; this.characters = characters;
             isCharacters = kind.equals("characters"); isLineComment = kind.equals("lineComment");
             openLabel = open == null ? null : Label.of("'" + open + "'"); closeLabel = close == null ? null : Label.of("'" + close + "'");
@@ -160,6 +162,7 @@ public final class Session {
             var members = new ArrayList<Label>();
             for (int i = 0; i < items.length; i++) {
                 if (items[i].isCharacters) members.add(L_SPACE);
+                else if (items[i].expression != null) members.add(Label.of(items[i].label));
                 else if (items[i].isLineComment) members.add(items[i].openLabel);
                 else { members.add(items[i].openLabel); members.add(items[i].closeLabel); }
                 prefixGroups[i] = members.size() == 1 ? members.get(0) : Label.group(members.toArray(new Label[0]));
@@ -344,6 +347,7 @@ public final class Session {
      * 返すので、生成 parser が解析前にこれを false にする（走査は {@code reached} を更新しない）。
      */
     public boolean scan;
+    public boolean ll1;
     /** 入力の UTF-16 列（{@link Input#chars()} と同じ実体）。生成走査関数が直に読む。書き換えない。 */
     public final char[] chars;
     public Session(CharSequence source, ParseOptions options, String[] ruleNames) { this(source, options, ruleNames, false, false); }
@@ -358,6 +362,7 @@ public final class Session {
         this.bypassWrap = !this.occ && !this.diag && !options.lexical() && (astBypass || !this.tree);
         this.factor = factoring && !this.diag && !options.lexical();
         this.plain = plainMatch && plainRecognition && !this.tree;
+        this.ll1 = options.ll1() && !this.tree && !this.diag;
         this.scan = scanning && !this.diag && !this.occ && !options.lexical();
         this.source = source.toString(); this.input = new Input(this.source); this.options = options; this.ruleNames = ruleNames.clone();
         this.chars = input.chars();
@@ -471,6 +476,14 @@ public final class Session {
         f.c = end; f.m = end;
         if (!tree) return success(start, end);
         return (r & 1) == 0 ? Match.empty(start, end) : new Match(List.of(), List.of(), List.of(), List.of(), start, end, false, List.of(), List.of(), null, List.of());
+    }
+    public Match recognizeLl1(Ll1Machine.Op[] ops, int root, Frame f) {
+        int start = f.c;
+        int end = Ll1Machine.run(ops, root, chars, start, options.maxDepth() - depth, scan);
+        if (end < 0) return null;
+        f.c = end; f.m = end;
+        progressAt(end);
+        return success(start, end);
     }
     /** D-080: {@link Input#codePointAt} と同じ読み（孤立 surrogate はその UTF-16 値）。{@code p} は範囲内。 */
     public static int cpAt(char[] t, int p) {
@@ -625,8 +638,10 @@ public final class Session {
                     : new Recipe(recipe, c, nodeEnd, lists, fallback);
                 nodes = made.self();
             }
-            List<Occurrence> completed = result.local();
-            for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
+            if (occ) {
+                List<Occurrence> completed = result.local();
+                for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
+            }
             if (!tree) result = success(c, f.c);
             else {
                 List<Value> values = result.values();
@@ -738,22 +753,29 @@ public final class Session {
         }
         List<Value> values = tree ? projected(result, semanticKind, semanticMany) : result.values();
         if (quantified && sites.length > 0) {
-            var items = new ArrayList<Match>();
-            for (Match item : result.items()) {
-                Match selected = item;
-                if (selected.items().size() == 1) selected = selected.items().get(0);
+            var items = new ArrayList<Match>(result.items().size());
+            int localN = 0, capturesN = 0;
+            for (int j = 0, n = result.items().size(); j < n; j++) {
+                Match item = result.items().get(j);
+                Match selected = item.items().size() == 1 ? item.items().get(0) : item;
                 String text = selected.text() == null ? source.substring(selected.start(), selected.end()).strip() : selected.text();
-                var value = new Match(item.nodes(), item.local(), item.captures(), item.traces(), item.start(), item.end(),
-                    item.mappingFailure(), item.recoveries(), item.items(), text, item.values());
+                List<Occurrence> itemLocal = item.local(), itemCaptures = item.captures();
+                Value value = null;
                 for (int i = 0; i < sites.length; i++) {
-                    if (!tree && !scoped[i]) continue;
-                    value = captured(value, item.start(), item.end(), sites[i], names[i], skips[i]);
+                    if ((!tree && !scoped[i]) || skips[i]) continue;
+                    if (value == null) value = new Value(item.start(), item.end(), item.nodes(), text, item.values());
+                    var occurrence = new Occurrence(sites[i], names[i], value);
+                    itemLocal = appended(itemLocal, occurrence);
+                    if (occ) itemCaptures = appended(itemCaptures, occurrence);
                 }
-                items.add(value);
+                items.add(new Match(item.nodes(), itemLocal, itemCaptures, item.traces(), item.start(), item.end(),
+                    item.mappingFailure(), item.recoveries(), item.items(), text, item.values()));
+                localN += itemLocal.size();
+                capturesN += itemCaptures.size();
             }
-            Match joined = combine(items, result.start(), result.end());
-            return new Match(result.nodes(), joined.local(), joined.captures(), result.traces(), result.start(), result.end(),
-                result.mappingFailure(), result.recoveries(), items, result.text(), values);
+            return new Match(result.nodes(), join(items, LOCAL, localN), join(items, CAPTURES, capturesN),
+                result.traces(), result.start(), result.end(), result.mappingFailure(), result.recoveries(),
+                items, result.text(), values);
         }
         // 出現を site ごとに Match へ包み直すと 1 site につき 1 個の Match を捨てることになる。
         // nodes / text / values は出現を足しても変わらないので、列だけ足して最後に 1 個だけ作る。
@@ -796,13 +818,6 @@ public final class Session {
         return new Match(result.nodes(), result.local(), result.captures(), result.traces(), result.start(), result.end(),
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), null);
     }
-    private Match captured(Match result, int start, int end, String site, String name, boolean skip) {
-        if (skip) return result;
-        var occurrence = new Occurrence(site, name, new Value(start, end, result.nodes(), result.text(), result.values()));
-        return new Match(result.nodes(), appended(result.local(), occurrence),
-            occ ? appended(result.captures(), occurrence) : result.captures(), result.traces(), result.start(), result.end(),
-            result.mappingFailure(), result.recoveries(), result.items(), result.text(), result.values());
-    }
     /** {@code List.of(Object[])} は配列をもう一度複製するので、確保済みの配列をそのまま包む。 */
     private static List<Occurrence> appended(List<Occurrence> list, Occurrence occurrence) {
         if (list.isEmpty()) return List.of(occurrence);
@@ -834,6 +849,10 @@ public final class Session {
             : new Match(List.of(), local, List.of(), List.of(), start, end);
     }
     private Match combine(List<Match> items, int start, int end) {
+        return combine(items, items, start, end, false);
+    }
+    /** 区切り付き反復の区切りは集約するが、要素単位の capture からは除く。 */
+    private Match combine(List<Match> items, List<Match> elements, int start, int end, boolean emptyValues) {
         if (!tree) {
             int localN = 0;
             for (int k = 0, n = items.size(); k < n; k++) localN += items.get(k).local().size();
@@ -842,7 +861,7 @@ public final class Session {
         }
         if (items.size() == 1) {
             Match only = items.get(0);
-            return new Match(only.nodes(), only.local(), only.captures(), only.traces(), start, end, only.mappingFailure(), only.recoveries(), items, only.text(), only.values());
+            return new Match(only.nodes(), only.local(), only.captures(), only.traces(), start, end, only.mappingFailure(), only.recoveries(), elements, only.text(), only.values());
         }
         // 1 回目の走査で各列の合計要素数だけを数え、2 回目で合計長の list を 1 個だけ確保する。
         // 逐次 concat は k 番目までの合計を毎回複製するので、要素数 T・項目数 n に対して O(T*n)
@@ -861,8 +880,8 @@ public final class Session {
         List<Occurrence> local = join(items, LOCAL, localN), captures = join(items, CAPTURES, capturesN);
         List<Trace> traces = join(items, TRACES, tracesN);
         List<RecoveryEvent> recoveries = join(items, RECOVERIES, recoveriesN);
-        List<Value> values = anyValues ? join(items, VALUES, valuesN) : null;
-        return new Match(nodes, local, captures, traces, start, end, failure, recoveries, items, null, values);
+        List<Value> values = emptyValues ? List.of() : anyValues ? join(items, VALUES, valuesN) : null;
+        return new Match(nodes, local, captures, traces, start, end, failure, recoveries, elements, null, values);
     }
     private static final int NODES = 0, LOCAL = 1, CAPTURES = 2, TRACES = 3, RECOVERIES = 4, VALUES = 5;
     private static List<?> column(Match item, int column) {
@@ -878,14 +897,20 @@ public final class Session {
     @SuppressWarnings("unchecked")
     private static <T> List<T> join(List<Match> items, int column, int total) {
         if (total == 0) return List.of();
-        ArrayList<T> merged = null;
+        // addAll は寄与する列ごとに toArray で一時配列を作る。最終配列だけへ順に詰める。
+        Object[] merged = null;
+        int offset = 0;
         for (int k = 0, n = items.size(); k < n; k++) {
             List<T> part = (List<T>) column(items.get(k), column);
             if (part == null || part.isEmpty()) continue;
-            if (merged == null) { if (part.size() == total) return part; merged = new ArrayList<>(total); }
-            merged.addAll(part);
+            int length = part.size();
+            if (merged == null) {
+                if (length == total) return part;
+                merged = new Object[total];
+            }
+            for (int j = 0; j < length; j++) merged[offset++] = part.get(j);
         }
-        return merged;
+        return (List<T>) Arrays.asList(merged);
     }
     // Transactions run on the caller's frame in place: begin saves (c, m, reset) and applies
     // "m := c when reset"; failure restores c/m; either outcome restores reset (a commit never
@@ -1117,6 +1142,11 @@ public final class Session {
         return repeat(parent, child, min, max, terminator, trivia, Label.of(label));
     }
     public Match repeat(Frame f, Call child, int min, int max, Call terminator, Trivia trivia, Label label) {
+        return occurs(f, child, min, max, terminator, trivia, label, false);
+    }
+    private Match occurs(Frame f, Call child, int min, int max, Call terminator, Trivia trivia, Label label, boolean zeroMatchCheck) {
+        // 通常の上限ゼロと、EOF の歴史的な「一度試して失敗だけを受理」を区別する。
+        if (!zeroMatchCheck && min == 0 && max == 0) return success(f.c, f.c);
         long whole = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset, matched0 = f.matched;
         if (reset0) f.m = f.c;
         int start = f.c, count = 0;
@@ -1162,9 +1192,7 @@ public final class Session {
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
         f.reset = reset0;
         if (!tree) return fast(local, start, f.c);
-        Match combined = combine(matches, start, f.c);
-        return new Match(combined.nodes(), combined.local(), combined.captures(), combined.traces(), start, f.c, combined.mappingFailure(), combined.recoveries(), matches, combined.text(),
-            matches.isEmpty() ? List.of() : combined.values());
+        return combine(matches, matches, start, f.c, matches.isEmpty());
     }
     public Match separated(Frame f, Call element, Call separator, int min, Trivia trivia) {
         long whole = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
@@ -1198,9 +1226,7 @@ public final class Session {
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
         f.reset = reset0;
         if (!tree) return fast(local, start, f.c);
-        Match result = combine(matches, start, f.c);
-        return new Match(result.nodes(), result.local(), result.captures(), result.traces(), start, f.c,
-            result.mappingFailure(), result.recoveries(), elements, result.text(), elements.isEmpty() ? List.of() : result.values());
+        return combine(matches, elements, start, f.c, elements.isEmpty());
     }
     public Match look(Frame parent, Call child, boolean negative, String label) { return look(parent, child, negative, Label.of(label)); }
     public Match look(Frame f, Call child, boolean negative, Label label) {
@@ -1234,7 +1260,7 @@ public final class Session {
         f.advance(word.length()); return success(at, at + word.length());
     }
     /** ASCII [A-Za-z0-9_]。組込み IdentifierParser の継続文字集合（D-040）。 */
-    private static boolean identifierChar(int c) {
+    static boolean identifierChar(int c) {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
     }
     public Match any(Frame f, String label) { return any(f, Label.of(label)); }
@@ -1243,7 +1269,7 @@ public final class Session {
         int length = Character.charCount(cp(at)); f.advance(length); return success(at, at + length);
     }
     public Match empty(Frame f) { return optional(f, (s, p) -> s.look(p, (ss, pp) -> ss.any(pp, L_ANY), false, L_EMPTY)); }
-    public Match eof(Frame f) { return repeat(f, (s, p) -> s.any(p, L_WILDCARD_CHAR), 0, 0, null, Trivia.NONE, L_EOS); }
+    public Match eof(Frame f) { return occurs(f, (s, p) -> s.any(p, L_WILDCARD_CHAR), 0, 0, null, Trivia.NONE, L_EOS, true); }
     public Match error(Frame f, String message) { fail(Math.max(f.c, f.m), message); return null; }
     public Match error(Frame f, Label message) { fail(Math.max(f.c, f.m), message); return null; }
     private boolean digit(int p) { return cp(p) >= '0' && cp(p) <= '9'; }
@@ -1379,7 +1405,14 @@ public final class Session {
             if (!set.canStart(p < input.length() ? input.codePointAt(p) : -1)) { fail(at, set.fullGroup()); return; }
             for (var delimiter : delimiters) {
                 int next = p, terminatorEnd = -1;
-                if (delimiter.isCharacters) {
+                if (delimiter.expression != null) {
+                    int end = delimiter.expression.match(source, p);
+                    if (end > p) next = end;
+                    else if (end == p) {
+                        if (failed > 0) fail(at, set.prefixGroups[failed - 1]);
+                        return;
+                    }
+                } else if (delimiter.isCharacters) {
                     int ch = cp(p);
                     if (ch >= 0 && delimiter.contains(ch)) next += Character.charCount(ch);
                 } else if (p < input.length() && input.charAt(p) == delimiter.first && input.startsWith(p, delimiter.open)) {

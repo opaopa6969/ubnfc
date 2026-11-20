@@ -113,6 +113,7 @@ fn a_fixed_seed_campaign_reaches_both_backends_and_finds_no_unregistered_diverge
             .collect::<Vec<_>>()
     );
     assert!(summary.ll1_comparisons >= 10);
+    assert!(summary.java_ll1_comparisons >= 10);
     assert!(
         summary.ll1_findings.is_empty(),
         "表駆動 on/off の差分: {:#?}",
@@ -181,6 +182,7 @@ fn c_v2_left_recursive_grammars_agree_across_backends() {
             .collect::<Vec<_>>()
     );
     assert!(summary.ll1_comparisons >= 10);
+    assert!(summary.java_ll1_comparisons >= 10);
     assert!(
         summary.ll1_findings.is_empty(),
         "表駆動 on/off の差分: {:#?}",
@@ -253,6 +255,7 @@ fn d_v2_word_boundary_literals_agree_across_backends() {
             .collect::<Vec<_>>()
     );
     assert!(summary.ll1_comparisons >= 10);
+    assert!(summary.java_ll1_comparisons >= 10);
     assert!(
         summary.ll1_findings.is_empty(),
         "表駆動 on/off の差分: {:#?}",
@@ -330,6 +333,7 @@ fn e_v2_code_point_class_tokens_agree_across_backends() {
                 .collect::<Vec<_>>()
         );
         assert!(summary.ll1_comparisons >= 10);
+        assert!(summary.java_ll1_comparisons >= 10);
         assert!(
             summary.ll1_findings.is_empty(),
             "表駆動 on/off の差分: {:#?}",
@@ -493,6 +497,7 @@ fn g_direct_token_captures_agree_across_backends() {
         );
         accepted += summary.accepted_all;
         assert!(summary.ll1_comparisons >= 10);
+        assert!(summary.java_ll1_comparisons >= 10);
         assert!(
             summary.ll1_findings.is_empty(),
             "表駆動 on/off の差分: {:#?}",
@@ -568,6 +573,7 @@ fn h_text_group_captures_agree_across_backends() {
         );
         accepted += summary.accepted_all;
         assert!(summary.ll1_comparisons >= 10);
+        assert!(summary.java_ll1_comparisons >= 10);
         assert!(
             summary.ll1_findings.is_empty(),
             "表駆動 on/off の差分: {:#?}",
