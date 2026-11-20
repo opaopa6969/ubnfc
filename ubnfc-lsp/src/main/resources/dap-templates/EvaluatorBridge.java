@@ -92,6 +92,12 @@ public interface EvaluatorBridge {
      */
     default Optional<Boolean> evaluateCondition(String expression, Object node) { return Optional.empty(); }
 
+    /** logpoint の埋め込み式を副作用なしで評価できる場合だけ true を返す。 */
+    default boolean supportsLogpointExpressions() { return false; }
+
+    /** 停止前の候補節点を観測して表示値を返す。未知の式には空を返す。 */
+    default Optional<String> evaluateLogpointExpression(String expression, Object node) { return Optional.empty(); }
+
     /** variables パネルからの書き換え。{@code Optional.empty()} を返すと未対応の error になる（既定）。 */
     default Optional<Evaluation> setVariable(String container, String name, String value, Object node) {
         return Optional.empty();

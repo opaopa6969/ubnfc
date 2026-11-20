@@ -8,7 +8,7 @@ LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP 
 | watch | 停止中の `total` が `5` を返す。bridge が選択フレームの節点で副作用なしに評価し、未対応の式には空を返す。 | 実装 |
 | 条件付き breakpoint | `total > 0` が真の候補位置でだけ停止する。bridge が候補位置の状態から副作用なしに条件を評価する。 | 実装（[#76](https://github.com/opaopa6969/ubnfc/issues/76)） |
 | hit condition | 同じ breakpoint の 3 回目の到達時に停止する。adapter が回数を数え、bridge はカウントを変更しない。 | 実装（[#77](https://github.com/opaopa6969/ubnfc/issues/77)） |
-| logpoint | `total={total}` を出力して停止せずに進む。adapter が出力し、bridge が埋め込み式の値だけを観測する。 | [#78](https://github.com/opaopa6969/ubnfc/issues/78) |
+| logpoint | `total={total}` を出力して停止せずに進む。adapter が出力し、bridge が埋め込み式の値だけを観測する。 | 実装（[#78](https://github.com/opaopa6969/ubnfc/issues/78)） |
 | `setExpression` | 停止中の `counter` に `7` を代入し、watch に反映する。bridge が代入先と型を検証してから更新する。 | [#79](https://github.com/opaopa6969/ubnfc/issues/79) |
 | `stepBack` | B の合計が 5、直前の停止 A の合計が 2 なら、A と 2 を一緒に復元する。adapter が停止履歴を管理し、bridge が状態を復元する。 | [#80](https://github.com/opaopa6969/ubnfc/issues/80) |
 
@@ -18,7 +18,7 @@ LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP 
 節点の開始位置を返す。両端を含む検索範囲内で重複を除き、行・列順に整列する。行と列の起点は
 initialize のクライアント設定に合わせ、列の UTF-16 変換は既存の `Positions` を使う。
 ファイルパス方式の単一ソースを対象とし、別ファイル、解析前・失敗後・終了後、候補がない範囲では
-空を返す。列を省いた登録は行単位で、列付きの登録は該当位置で停止する。ログ付きの登録には未検証と理由を返す。別ソースの登録要求は現在のブレークポイントを変更しない。
+空を返す。列を省いた登録は行単位で、列付きの登録は該当位置に合う。別ソースの登録要求は現在のブレークポイントを変更しない。
 
 watch は `evaluate(context="watch")` を使い、独立した initialize capability はない。
 停止中の現在または選択中のスタックフレームだけを受け付け、選んだ節点を bridge に渡す。
@@ -51,6 +51,18 @@ hover の自動評価は通知しない。再 launch は AST、停止位置、�
 どの登録で停止する場合も各登録を数える。指定の回数に達した候補で通常の条件式を評価し、
 成立時に `stopped(reason="breakpoint")` を返す。指定回数を過ぎた候補は通過する。
 現在のソースへの `setBreakpoints` は登録を置き換えて回数を初期化し、再 launch は全登録を初期化する。
+
+## Logpoint
+
+`supportsLogPoints` は定型メッセージを扱える NOOP を含め有効にする。`{{` と `}}` はリテラルの波括弧、
+`{式}` は埋め込み式とし、式の前後の空白は除く。対応しない括弧、空の式、入れ子は未検証とする。
+埋め込み式は `EvaluatorBridge.supportsLogpointExpressions()` が true の場合だけ登録できる。
+
+継続中に位置、hit condition、通常条件の順で判定し、成立した候補に対して移動前に式を左から順に
+`evaluateLogpointExpression` で読む。値を展開したメッセージに改行を付けて `output(category="console")` を
+送り、その logpoint 自体では停止しない。未知の式や評価例外では `stderr` を 1 件送り、そのメッセージの
+途中結果は出さず続行する。同じ候補に通常の breakpoint があれば、該当する logpoint を登録順に出力した後で
+通常の停止を通知する。再 launch では logpoint の登録も初期化する。
 
 ## 逆実行を有効にする条件
 

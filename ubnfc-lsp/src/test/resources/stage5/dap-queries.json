@@ -7,7 +7,7 @@
     "exceptionBreakpointFilters": [],
     "supportsStepBack": false,
     "supportsSetVariable": false,
-    "supportsLogPoints": false,
+    "supportsLogPoints": true,
     "supportsSetExpression": false,
     "supportsTerminateRequest": false,
     "supportsBreakpointLocationsRequest": true
@@ -65,8 +65,7 @@
       "column": 24
     },
     {
-      "verified": false,
-      "message": "logpoint は未対応です",
+      "verified": true,
       "line": 0,
       "column": 24
     }

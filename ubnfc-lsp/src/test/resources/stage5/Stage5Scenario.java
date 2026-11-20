@@ -101,6 +101,7 @@ public final class Stage5Scenario {
         out.put("dap-queries", dapQueries(work));
         out.put("dap-conditions", dapConditions(work));
         out.put("dap-hit-condition", dapHitCondition(work));
+        out.put("dap-logpoints", dapLogpoints(work));
         return out;
     }
 
@@ -197,7 +198,7 @@ public final class Stage5Scenario {
             assertTrue(caps.getSupportsBreakpointLocationsRequest());
             assertFalse(caps.getSupportsConditionalBreakpoints());
             assertTrue(caps.getSupportsHitConditionalBreakpoints());
-            assertFalse(caps.getSupportsLogPoints());
+            assertTrue(caps.getSupportsLogPoints());
             assertFalse(caps.getSupportsSetExpression());
             assertFalse(caps.getSupportsStepBack());
             assertFalse(caps.getSupportsEvaluateForHovers());
@@ -240,7 +241,7 @@ public final class Stage5Scenario {
             logpoint.setLogMessage("total={total}");
             var registered = setBreakpoints(dap, source, exactBreakpoint, sourceBreakpoint(0, betaColumn - 1),
                 condition, hitCondition, logpoint);
-            assertEquals(List.of(true, false, false, true, false),
+            assertEquals(List.of(true, false, false, true, true),
                 Arrays.stream(registered).map(Breakpoint::isVerified).toList());
             out.put("registered", registered);
             var foreignRegistration = setBreakpoints(dap, other, exactBreakpoint);
@@ -461,6 +462,84 @@ public final class Stage5Scenario {
         return breakpoint;
     }
 
+    private static String dapLogpoints(Path work) throws Exception {
+        Path file = work.resolve("logpoints.demo");
+        Files.writeString(file, "let a = 2;\nlet b = 3;\nuse a;\nuse b;\n");
+        var source = new Source();
+        source.setPath(file.toString());
+        var launch = Map.<String, Object>of("program", file.toString(), "stopOnEntry", false);
+        var out = new LinkedHashMap<String, Object>();
+        var sum = new SumEvaluatorBridge();
+        EvaluatorBridge bridge = new EvaluatorBridge() {
+            @Override public void onLaunch(String program, String text, Object root) {
+                sum.onLaunch(program, text, root);
+            }
+            @Override public boolean supportsConditionalBreakpoints() { return true; }
+            @Override public Optional<Boolean> evaluateCondition(String expression, Object node) {
+                return Optional.of(expression.equals("true"));
+            }
+            @Override public boolean supportsLogpointExpressions() { return true; }
+            @Override public Optional<String> evaluateLogpointExpression(String expression, Object node) {
+                if (expression.equals("failed")) throw new IllegalArgumentException("評価失敗");
+                return sum.evaluateLogpointExpression(expression, node);
+            }
+        };
+        try (var wire = new DapWire(new DebugAdapter(Map.of(), bridge))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertTrue(caps.getSupportsLogPoints());
+            out.put("supportsLogPoints", caps.getSupportsLogPoints());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            var suppressed = logpoint(3, "抑止={failed}");
+            suppressed.setCondition("false");
+            var combined = logpoint(4, "併用={total}");
+            combined.setCondition("true");
+            combined.setHitCondition("1");
+            var registered = setBreakpoints(dap, source, logpoint(2, "total={ total } / {{{total}}}"),
+                logpoint(3, "部分出力なし={total} {unknown}"), suppressed, logpoint(3, "{failed}"),
+                sourceBreakpoint(4, null), combined);
+            assertTrue(Arrays.stream(registered).allMatch(Breakpoint::isVerified));
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            assertEquals(4, topFrame(dap).getLine());
+            assertEquals(List.of("console:total=5 / {5}\n", "stderr:logpoint の式を評価できません。\n",
+                "stderr:logpoint の評価に失敗しました。\n", "console:併用=5\n", "stopped:breakpoint"),
+                wire.breakpointEvents);
+            out.put("events", List.copyOf(wire.breakpointEvents));
+            Files.writeString(file, "let a = 7;\nuse a;\n");
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            assertEquals(0, dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames());
+            assertEquals(5, wire.breakpointEvents.size());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            assertTrue(setBreakpoints(dap, source, logpoint(2, "total={total}"))[0].isVerified());
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            assertEquals(0, dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames());
+            assertEquals("console:total=7\n", wire.breakpointEvents.getLast());
+            out.put("afterRelaunch", List.copyOf(wire.breakpointEvents.subList(5, wire.breakpointEvents.size())));
+        }
+        try (var wire = new DapWire(new DebugAdapter(Map.of()))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertTrue(caps.getSupportsLogPoints());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            var registered = setBreakpoints(dap, source, logpoint(2, "literal={{total}}"),
+                logpoint(2, "{total}"), logpoint(2, "{ "), logpoint(2, "{ }"), logpoint(2, "{ {x} }"));
+            assertEquals(List.of(true, false, false, false, false), Arrays.stream(registered).map(Breakpoint::isVerified).toList());
+            out.put("noopRegistration", registered);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            assertEquals(0, dap.stackTrace(stackRequest()).get(30, TimeUnit.SECONDS).getTotalFrames());
+            assertEquals(List.of("console:literal={total}\n"), wire.breakpointEvents);
+            out.put("noopEvents", List.copyOf(wire.breakpointEvents));
+        }
+        return json(out);
+    }
+
+    private static SourceBreakpoint logpoint(int line, String message) {
+        var breakpoint = sourceBreakpoint(line, null);
+        breakpoint.setLogMessage(message);
+        return breakpoint;
+    }
+
     private static BreakpointLocation[] locations(IDebugProtocolServer dap, Source source,
             int line, Integer column, Integer endLine, Integer endColumn) throws Exception {
         var args = new BreakpointLocationsArguments();
@@ -578,7 +657,9 @@ public final class Stage5Scenario {
                     breakpointEvents.add("stopped:" + args.getReason());
                 }
                 @Override public void output(OutputEventArguments args) {
-                    if ("stderr".equals(args.getCategory())) breakpointEvents.add("stderr:" + args.getOutput());
+                    String category = args.getCategory();
+                    if ("stderr".equals(category) || "console".equals(category))
+                        breakpointEvents.add(category + ":" + args.getOutput());
                 }
             };
             var c = DSPLauncher.createClientLauncher(client, clientIn, clientOut, executor, consumer -> consumer);

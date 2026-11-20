@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import org.eclipse.lsp4j.debug.Breakpoint;
 import org.eclipse.lsp4j.debug.BreakpointLocation;
 import org.eclipse.lsp4j.debug.BreakpointLocationsArguments;
@@ -84,6 +85,7 @@ public class DebugAdapter implements IDebugProtocolServer {
     /** variables の値の表示上限（旧 {@code TinyExpressionDapRuntimeBridge.VALUE_LIMIT} と同じ）。 */
     private static final int VALUE_LIMIT = 200;
     private static final int THREAD_ID = 1;
+    private static final Pattern LOG_PART = Pattern.compile("\\{\\{|\\}\\}|\\{([^{}]+)\\}|[^{}]+");
 
     private final Map<String, TokenScanner> scanners;
     private final EvaluatorBridge bridge;
@@ -103,16 +105,21 @@ public class DebugAdapter implements IDebugProtocolServer {
             return line == site.line() && (column == null || column == site.column());
         }
     }
+    private record LogPart(String text, boolean expression) { }
+
     private static final class RegisteredBreakpoint {
         final BreakpointTarget target;
         final String condition;
         final int hitCondition;
+        final List<LogPart> logMessage;
         int hits;
 
-        RegisteredBreakpoint(BreakpointTarget target, String condition, int hitCondition) {
+        RegisteredBreakpoint(BreakpointTarget target, String condition, int hitCondition,
+                List<LogPart> logMessage) {
             this.target = target;
             this.condition = condition;
             this.hitCondition = hitCondition;
+            this.logMessage = logMessage;
         }
 
         boolean reachedHitCondition() {
@@ -160,7 +167,7 @@ public class DebugAdapter implements IDebugProtocolServer {
         capabilities.setSupportsConditionalBreakpoints(bridge.supportsConditionalBreakpoints());
         capabilities.setSupportsHitConditionalBreakpoints(true);
         capabilities.setSupportsBreakpointLocationsRequest(true);
-        capabilities.setSupportsLogPoints(false);
+        capabilities.setSupportsLogPoints(true);
         capabilities.setSupportsSetExpression(false);
         capabilities.setSupportsStepBack(false);
         capabilities.setSupportsTerminateRequest(false);
@@ -270,19 +277,25 @@ public class DebugAdapter implements IDebugProtocolServer {
             breakpoint.setLine(target.line());
             breakpoint.setColumn(target.column());
             String reason = null;
+            List<LogPart> logMessage = null;
             if (!sameSource) reason = "このソースは現在の入力ファイルではありません";
             else if (request.getCondition() != null && !bridge.supportsConditionalBreakpoints())
                 reason = "条件付き breakpoint には対応する EvaluatorBridge が必要です";
             else if (hitCondition < 0)
                 reason = "hit condition には 1〜2147483647 の十進整数を指定してください";
-            else if (request.getLogMessage() != null)
-                reason = "logpoint は未対応です";
             else if (terminated || steps.stream().map(this::siteOf).noneMatch(target::matches))
                 reason = target.column() == null
                     ? "この行から始まる AST 節点がありません（文法デバッガは節点の開始行で止まります）"
                     : "この位置から始まる AST 節点がありません";
+            else if (request.getLogMessage() != null) {
+                logMessage = parseLogMessage(request.getLogMessage());
+                if (logMessage == null) reason = "logpoint の波括弧または式が不正です";
+                else if (logMessage.stream().anyMatch(LogPart::expression) && !bridge.supportsLogpointExpressions())
+                    reason = "式付き logpoint には対応する EvaluatorBridge が必要です";
+            }
             breakpoint.setVerified(reason == null);
-            if (reason == null) breakpoints.add(new RegisteredBreakpoint(target, request.getCondition(), hitCondition));
+            if (reason == null)
+                breakpoints.add(new RegisteredBreakpoint(target, request.getCondition(), hitCondition, logMessage));
             else breakpoint.setMessage(reason);
             out[i] = breakpoint;
         }
@@ -300,6 +313,27 @@ public class DebugAdapter implements IDebugProtocolServer {
         } catch (NumberFormatException error) {
             return -1;
         }
+    }
+
+    private static List<LogPart> parseLogMessage(String message) {
+        var parts = new ArrayList<LogPart>();
+        var matcher = LOG_PART.matcher(message);
+        int end = 0;
+        while (matcher.find()) {
+            if (matcher.start() != end) return null;
+            end = matcher.end();
+            String expression = matcher.group(1);
+            if (expression != null) {
+                if (expression.isBlank()) return null;
+                parts.add(new LogPart(expression.strip(), true));
+            } else {
+                String literal = matcher.group();
+                if (literal.equals("{{") || literal.equals("}}")) literal = literal.substring(0, 1);
+                parts.add(new LogPart(literal, false));
+            }
+        }
+        if (end != message.length()) return null;
+        return List.copyOf(parts);
     }
 
     private BreakpointSite siteOf(Steps.Step step) {
@@ -331,8 +365,12 @@ public class DebugAdapter implements IDebugProtocolServer {
             var site = siteOf(step);
             boolean shouldStop = false;
             for (var breakpoint : breakpoints) {
-                if (breakpoint.target.matches(site) && breakpoint.reachedHitCondition() && !shouldStop)
-                    shouldStop = conditionMatches(breakpoint, step);
+                if (!breakpoint.target.matches(site) || !breakpoint.reachedHitCondition()) continue;
+                if (breakpoint.logMessage == null) {
+                    if (!shouldStop) shouldStop = conditionMatches(breakpoint, step);
+                } else if (conditionMatches(breakpoint, step)) {
+                    emitLogpoint(breakpoint.logMessage, step);
+                }
             }
             if (shouldStop) {
                 move(at, "breakpoint");
@@ -352,6 +390,28 @@ public class DebugAdapter implements IDebugProtocolServer {
             output("stderr", "条件付き breakpoint の評価に失敗しました。\n");
         }
         return false;
+    }
+
+    private void emitLogpoint(List<LogPart> parts, Steps.Step step) {
+        var message = new StringBuilder();
+        for (var part : parts) {
+            if (!part.expression()) {
+                message.append(part.text());
+                continue;
+            }
+            try {
+                var value = bridge.evaluateLogpointExpression(part.text(), step.node());
+                if (value.isPresent()) {
+                    message.append(value.get());
+                    continue;
+                }
+                output("stderr", "logpoint の式を評価できません。\n");
+            } catch (RuntimeException error) {
+                output("stderr", "logpoint の評価に失敗しました。\n");
+            }
+            return;
+        }
+        output("console", message.append('\n').toString());
     }
 
     @Override public CompletableFuture<Void> next(NextArguments args) {
