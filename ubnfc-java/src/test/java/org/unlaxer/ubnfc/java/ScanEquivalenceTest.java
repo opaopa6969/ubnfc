@@ -66,7 +66,7 @@ class ScanEquivalenceTest {
         return out;
     }
 
-    private static List<String> seeds(String grammar) throws Exception {
+    static List<String> seeds(String grammar) throws Exception {
         var out = new ArrayList<String>();
         if (grammar.equals("json")) {
             try (var files = Files.list(Path.of("../corpus/spec/json"))) {
