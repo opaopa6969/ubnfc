@@ -1,7 +1,7 @@
 //! campaign の進行。seed ごとに 文法 → 入力 → 両バックエンド実行 → 比較 を行い、
 //! 差分を見つけたら入力・文法の順に縮小して再現最小例を書き出す。
 
-use crate::engine::{is_driver_timeout, Built, Discard, Engine};
+use crate::engine::{is_driver_timeout, Built, Discard, Engine, LL1_PROBE_MAX_DEPTH};
 use crate::model::Grammar;
 use crate::observe::{differences, invariants, Violation};
 use crate::{gen, input, model};
@@ -71,15 +71,16 @@ pub struct Finding {
     pub shrink_rounds: usize,
 }
 
-/// D-072 の in-backend A/B で見つけた差。`on` / `off` は同じ backend を
-/// `options.scan` だけ変えて走らせた観測。
+/// 同じ backend の `options.scan` または `options.ll1` を切り替えて見つけた差。
 #[derive(Clone, Debug, Serialize)]
 pub struct ScanFinding {
-    /// `"rust"`（D-072）か `"java"`（D-080）。
+    /// `"rust"` か `"java"`。
     pub backend: &'static str,
     pub seed: u64,
     pub grammar: String,
     pub input: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_depth: Option<u64>,
     pub differences: Vec<Difference>,
     pub on: Value,
     pub off: Value,
@@ -137,8 +138,9 @@ pub struct Summary {
     /// そのうち Java backend（D-080）で比べた回数。
     pub java_scan_comparisons: usize,
     pub scan_findings: Vec<ScanFinding>,
-    /// Rust の LL(1) 表駆動 on/off 比較。
+    /// LL(1) 表駆動 on/off 比較（Rust と Java の合計）。
     pub ll1_comparisons: usize,
+    pub java_ll1_comparisons: usize,
     pub ll1_findings: Vec<ScanFinding>,
     pub elapsed_seconds: f64,
 }
@@ -511,6 +513,7 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
                     seed,
                     grammar: grammar.render(),
                     input: text.clone(),
+                    max_depth: None,
                     differences: difference,
                     on,
                     off,
@@ -518,19 +521,33 @@ fn run_seed(engine: &mut Engine, config: &Config, shared: &Shared, seed: u64) {
             }
         }
     }
-    let ll1_on = engine.run_ll1(&built, &texts, true);
-    let ll1_off = engine.run_ll1(&built, &texts, false);
-    {
+    for (backend, label) in [(Backend::Rust, "rust"), (Backend::Java, "java")] {
+        let ll1_on = engine.run_ll1(&built, backend, &texts, true);
+        let ll1_off = engine.run_ll1(&built, backend, &texts, false);
         let mut summary = shared.summary.lock().expect("summary");
-        summary.ll1_comparisons += texts.len();
-        for ((text, on), off) in texts.iter().zip(ll1_on).zip(ll1_off) {
-            let difference = differences(&on, &off);
+        summary.ll1_comparisons += ll1_on.len();
+        if label == "java" {
+            summary.java_ll1_comparisons += ll1_on.len();
+        }
+        for (index, ((text, on), off)) in texts.iter().cycle().zip(ll1_on).zip(ll1_off).enumerate()
+        {
+            let difference = if label == "java" {
+                // Java 内では言語間比較用の診断・cursor の正規化をせず、応答全体を比較する。
+                if is_driver_timeout(&on) && is_driver_timeout(&off) {
+                    Vec::new()
+                } else {
+                    ubnfc_harness::canonical::diff_values(&off, &on)
+                }
+            } else {
+                differences(&on, &off)
+            };
             if !difference.is_empty() {
                 summary.ll1_findings.push(ScanFinding {
-                    backend: "rust",
+                    backend: label,
                     seed,
                     grammar: grammar.render(),
                     input: text.clone(),
+                    max_depth: (index >= texts.len()).then_some(LL1_PROBE_MAX_DEPTH),
                     differences: difference,
                     on,
                     off,
@@ -723,6 +740,10 @@ pub fn markdown(summary: &Summary) -> String {
         ),
         ("最小化済みの所見", summary.findings.len()),
         ("LL(1) on/off 比較", summary.ll1_comparisons),
+        (
+            "うち Java の LL(1) on/off 比較",
+            summary.java_ll1_comparisons,
+        ),
         ("LL(1) on/off 差分", summary.ll1_findings.len()),
     ] {
         let _ = writeln!(out, "| {label} | {value} |");

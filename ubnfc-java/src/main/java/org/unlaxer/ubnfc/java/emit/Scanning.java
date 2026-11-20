@@ -147,12 +147,12 @@ final class Scanning {
         };
     }
 
-    private String scan(String id) { return "scan" + exprIds.get(id); }
+    String scan(String id) { return "scan" + exprIds.get(id); }
 
     /** {@code e{i}C} の先頭に置く走査経路（根でなければ空）。{@code resetFalse} は参照経路が本体の評価後に残す {@code f.reset}。 */
     String fastPath(String id) {
         if (!roots.contains(id)) return "";
-        String reset = resetsToFalse(id) ? " f.reset = false;" : "";
+        String reset = resetsToFalse(id, false) ? " f.reset = false;" : "";
         return "if (s.scan && !f.invert && f.c == f.m) { Match r = s.scanned(f, " + scan(id) + "(s.chars, f.c));" + reset + " return r; }\n        ";
     }
     /**
@@ -160,15 +160,24 @@ final class Scanning {
      * {@code f.reset = false} にし、連接・選択・反復は入口の値へ戻す。規則参照と delegate の group は
      * 呼び先の e-method をそのまま通すので、呼び先の {@code setFalse} が外へ残る。
      */
-    private boolean resetsToFalse(String id) {
-        ExprNode n = expressions.get(id).node();
-        String target = switch (n.kind()) {
-            case "ruleRef" -> rules.get(n.symbolId()).body();
-            case "group" -> expressions.get(id).execution().transaction().equals("delegate") ? n.child() : null;
-            default -> null;
-        };
-        if (target == null) return false;
-        return expressions.get(target).execution().entryFlag().equals("setFalse") || resetsToFalse(target);
+    boolean resetsToFalse(String id, boolean preserveZeroRepeat) {
+        var seen = new HashSet<String>();
+        while (seen.add(id)) {
+            var expr = expressions.get(id);
+            ExprNode n = expr.node();
+            String target = switch (n.kind()) {
+                case "ruleRef" -> rules.get(n.symbolId()).body();
+                case "group" -> expr.execution().transaction().equals("delegate") ? n.child() : null;
+                default -> null;
+            };
+            if (target == null) return false;
+            var child = expressions.get(target);
+            if (preserveZeroRepeat && child.node().kind().equals("repeat") && Integer.valueOf(0).equals(child.node().max()))
+                return false;
+            if (child.execution().entryFlag().equals("setFalse")) return true;
+            id = target;
+        }
+        return false;
     }
 
     /** 領域内の全式ぶんの走査関数（式 id 順に安定）。 */

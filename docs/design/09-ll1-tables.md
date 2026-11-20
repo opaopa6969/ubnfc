@@ -94,4 +94,20 @@ D-072 ですでに証明した一括走査の根に到達した場合は、既�
    操作計数 `statistics` は最適化により変わるため、同値比較では除外する。
 
 同値の実行検証は生成 Rust のテストと差分 fuzz campaign の LL(1) on/off 比較が担う。
-Java は後続 issue で同じ計画を移植する。
+
+## Java の実行と切替
+
+issue [#39](https://github.com/opaopa6969/ubnfc/issues/39) では、同じ `plan.ll1` を Java の
+`ParseOptions.RECOGNIZE.withLl1(true)` で試せるようにした。Java の意味論から命令と参照を照合し、
+FIRST の必要条件を計算し直す。Java の既存予測が候補を除外する場合も、表の対象が受理範囲を変えないことを確認する。
+旧 IR や任意計画が未対応の IR は従来の式評価で扱う。
+
+認識表の入口は consumed mode で、反転なし、C=M、AST・lexical・出現表・診断の要求なしに限る。
+Java の `char[]` 上で UTF-16 位置を持ち、文字クラスと語境界は code point 単位で判定する。
+孤立 surrogate がクラス判定や選択に来た場合は Java の式評価へ戻る。
+判定から外した候補が先頭文字で失敗するまでに入り得る規則数も数え、深さ上限に近いときは
+省略を行わない。通常の不一致、深さまたは明示 stack の上限到達では元の位置から既存の式を評価する。
+rollback 解析は診断用の再解析を行わないため、表を使わず到達位置を記録する。
+
+Java 内の on/off を差分ファジングに加えた。被覆、計測結果と再現手順は
+[Java の計測報告](../reports/2026-11-20-java-ll1.md) を参照。

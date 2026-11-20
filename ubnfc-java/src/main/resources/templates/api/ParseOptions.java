@@ -11,11 +11,15 @@ import java.util.Map;
  */
 public record ParseOptions(boolean buildAst, boolean requireFullInput, boolean lexical,
                            boolean memo, Map<String, TokenScanner> scanners, int maxDepth,
-                           boolean occurrences, boolean diagnostics) {
+                           boolean occurrences, boolean diagnostics, boolean ll1) {
     public static final int DEFAULT_MAX_DEPTH = 10_000;
     public ParseOptions {
         scanners = Map.copyOf(scanners);
         if (maxDepth < 1) throw new IllegalArgumentException("maxDepth must be positive");
+    }
+    public ParseOptions(boolean buildAst, boolean requireFullInput, boolean lexical, boolean memo,
+                        Map<String, TokenScanner> scanners, int maxDepth, boolean occurrences, boolean diagnostics) {
+        this(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, diagnostics, false);
     }
     /** 既存の呼出し形。観測は従来どおり全て要求する。 */
     public ParseOptions(boolean buildAst, boolean requireFullInput, boolean lexical, boolean memo, Map<String, TokenScanner> scanners, int maxDepth) {
@@ -27,14 +31,18 @@ public record ParseOptions(boolean buildAst, boolean requireFullInput, boolean l
     public ParseOptions(boolean buildAst, boolean requireFullInput) { this(buildAst, requireFullInput, false, true, Map.of()); }
     /** D-023 の再解析用。解析は決定的なので観測は要求して解析し直したものと同一。 */
     public ParseOptions withDiagnostics() {
-        return diagnostics ? this : new ParseOptions(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, true);
+        return diagnostics ? this : new ParseOptions(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, true, ll1);
     }
     /** A/B 計測用に観測要求だけを差し替える。 */
     public ParseOptions withObservations(boolean occurrences, boolean diagnostics) {
-        return new ParseOptions(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, diagnostics);
+        return new ParseOptions(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, diagnostics, ll1);
     }
     public ParseOptions withMemo(boolean memo) {
-        return new ParseOptions(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, diagnostics);
+        return new ParseOptions(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, diagnostics, ll1);
+    }
+    /** 認識専用で LL(1) 表を試す。表のない生成物や観測ありの解析にも渡せる。 */
+    public ParseOptions withLl1(boolean ll1) {
+        return new ParseOptions(buildAst, requireFullInput, lexical, memo, scanners, maxDepth, occurrences, diagnostics, ll1);
     }
     public static final ParseOptions DEFAULT = new ParseOptions(true, true);
     /** 認識専用（D-023 / D-035 の二段構え）。出現表も診断観測も作らない。 */
