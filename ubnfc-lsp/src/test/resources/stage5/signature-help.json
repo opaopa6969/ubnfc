@@ -1,0 +1,114 @@
+{
+  "provider": {
+    "triggerCharacters": [
+      "(",
+      ","
+    ],
+    "retriggerCharacters": null,
+    "workDoneProgress": null
+  },
+  "complete": {
+    "signatures": [
+      {
+        "label": "sum(left, right)",
+        "documentation": null,
+        "parameters": [
+          {
+            "label": "left",
+            "documentation": null
+          },
+          {
+            "label": "right",
+            "documentation": null
+          }
+        ],
+        "activeParameter": null
+      }
+    ],
+    "activeSignature": 0,
+    "activeParameter": 1
+  },
+  "incomplete": {
+    "signatures": [
+      {
+        "label": "sum(left, right)",
+        "documentation": null,
+        "parameters": [
+          {
+            "label": "left",
+            "documentation": null
+          },
+          {
+            "label": "right",
+            "documentation": null
+          }
+        ],
+        "activeParameter": null
+      }
+    ],
+    "activeSignature": 0,
+    "activeParameter": 1
+  },
+  "nested": {
+    "signatures": [
+      {
+        "label": "inc(value)",
+        "documentation": null,
+        "parameters": [
+          {
+            "label": "value",
+            "documentation": null
+          }
+        ],
+        "activeParameter": null
+      }
+    ],
+    "activeSignature": 0,
+    "activeParameter": 0
+  },
+  "outer": {
+    "signatures": [
+      {
+        "label": "sum(left, right)",
+        "documentation": null,
+        "parameters": [
+          {
+            "label": "left",
+            "documentation": null
+          },
+          {
+            "label": "right",
+            "documentation": null
+          }
+        ],
+        "activeParameter": null
+      }
+    ],
+    "activeSignature": 0,
+    "activeParameter": 1
+  },
+  "utf16": {
+    "signatures": [
+      {
+        "label": "sum(left, right)",
+        "documentation": null,
+        "parameters": [
+          {
+            "label": "left",
+            "documentation": null
+          },
+          {
+            "label": "right",
+            "documentation": null
+          }
+        ],
+        "activeParameter": null
+      }
+    ],
+    "activeSignature": 0,
+    "activeParameter": 1
+  },
+  "unknown": null,
+  "outside": null,
+  "closed": null
+}

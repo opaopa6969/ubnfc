@@ -30,6 +30,8 @@ public final class Stage5Scenario {
             assertTrue(caps.getFoldingRangeProvider().getLeft());
             assertTrue(caps.getInlayHintProvider().getLeft());
             assertNull(caps.getSignatureHelpProvider());
+            assertNull(server.signatureHelp(new SignatureHelpParams(id(), new Position(0, 0)))
+                .get(30, TimeUnit.SECONDS));
             assertNull(caps.getDocumentFormattingProvider());
             assertNull(caps.getCodeActionProvider());
             // 直接解析で fixture の成立を検証し、RPC の didOpen 後の要求は診断通知を待って送る。
@@ -93,9 +95,47 @@ public final class Stage5Scenario {
             assertEquals(3, edit.getChanges().get(URI).size());
             out.put("rename-lexical", json(edit));
         }
+        out.put("signature-help", signatureHelp());
         out.put("evaluator", evaluator(work));
         out.put("dap-queries", dapQueries(work));
         return out;
+    }
+
+    private static String signatureHelp() throws Exception {
+        var out = new LinkedHashMap<String, Object>();
+        try (var wire = new Wire(new LanguageServerImpl(Map.of(), null, new DemoSignatureHelp()))) {
+            var capability = wire.lsp.initialize(new InitializeParams()).get(30, TimeUnit.SECONDS)
+                .getCapabilities().getSignatureHelpProvider();
+            assertEquals(List.of("(", ","), capability.getTriggerCharacters());
+            out.put("provider", capability);
+            out.put("complete", signatureAt(wire, "sum(1, |2)", "sum(left, right)", 1));
+            out.put("incomplete", signatureAt(wire, "sum(1, |", "sum(left, right)", 1));
+            out.put("nested", signatureAt(wire, "sum(1, inc(|2))", "inc(value)", 0));
+            out.put("outer", signatureAt(wire, "sum(inc(1), |2)", "sum(left, right)", 1));
+            out.put("utf16", signatureAt(wire, "/* 😀 */ sum(1,|2)", "sum(left, right)", 1));
+            out.put("unknown", signatureAt(wire, "sum(1, unknown(|2))", null, null));
+            out.put("outside", signatureAt(wire, "sum(1, 2)|", null, null));
+            out.put("closed", wire.lsp.getTextDocumentService()
+                .signatureHelp(new SignatureHelpParams(id(), new Position(0, 4))).get(30, TimeUnit.SECONDS));
+        }
+        return new MessageJsonHandler(Map.of()).getGson().newBuilder().serializeNulls().setPrettyPrinting()
+            .create().toJson(out) + "\n";
+    }
+
+    private static SignatureHelp signatureAt(Wire wire, String marked, String label, Integer argument) throws Exception {
+        int column = marked.indexOf('|');
+        wire.open(marked.replace("|", ""));
+        var response = wire.lsp.getTextDocumentService().signatureHelp(new SignatureHelpParams(id(), new Position(0, column)))
+            .get(30, TimeUnit.SECONDS);
+        wire.closeDocument();
+        if (label == null) {
+            assertNull(response);
+        } else {
+            assertNotNull(response);
+            assertEquals(label, response.getSignatures().getFirst().getLabel());
+            assertEquals(argument, response.getActiveParameter());
+        }
+        return response;
     }
 
     private static String evaluator(Path work) throws Exception {
