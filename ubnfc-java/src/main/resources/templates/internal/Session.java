@@ -625,8 +625,10 @@ public final class Session {
                     : new Recipe(recipe, c, nodeEnd, lists, fallback);
                 nodes = made.self();
             }
-            List<Occurrence> completed = result.local();
-            for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
+            if (occ) {
+                List<Occurrence> completed = result.local();
+                for (int k = 0, n = completed.size(); k < n; k++) completed.get(k).completed = nextCaptureCompletion++;
+            }
             if (!tree) result = success(c, f.c);
             else {
                 List<Value> values = result.values();
@@ -738,22 +740,29 @@ public final class Session {
         }
         List<Value> values = tree ? projected(result, semanticKind, semanticMany) : result.values();
         if (quantified && sites.length > 0) {
-            var items = new ArrayList<Match>();
-            for (Match item : result.items()) {
-                Match selected = item;
-                if (selected.items().size() == 1) selected = selected.items().get(0);
+            var items = new ArrayList<Match>(result.items().size());
+            int localN = 0, capturesN = 0;
+            for (int j = 0, n = result.items().size(); j < n; j++) {
+                Match item = result.items().get(j);
+                Match selected = item.items().size() == 1 ? item.items().get(0) : item;
                 String text = selected.text() == null ? source.substring(selected.start(), selected.end()).strip() : selected.text();
-                var value = new Match(item.nodes(), item.local(), item.captures(), item.traces(), item.start(), item.end(),
-                    item.mappingFailure(), item.recoveries(), item.items(), text, item.values());
+                List<Occurrence> itemLocal = item.local(), itemCaptures = item.captures();
+                Value value = null;
                 for (int i = 0; i < sites.length; i++) {
-                    if (!tree && !scoped[i]) continue;
-                    value = captured(value, item.start(), item.end(), sites[i], names[i], skips[i]);
+                    if ((!tree && !scoped[i]) || skips[i]) continue;
+                    if (value == null) value = new Value(item.start(), item.end(), item.nodes(), text, item.values());
+                    var occurrence = new Occurrence(sites[i], names[i], value);
+                    itemLocal = appended(itemLocal, occurrence);
+                    if (occ) itemCaptures = appended(itemCaptures, occurrence);
                 }
-                items.add(value);
+                items.add(new Match(item.nodes(), itemLocal, itemCaptures, item.traces(), item.start(), item.end(),
+                    item.mappingFailure(), item.recoveries(), item.items(), text, item.values()));
+                localN += itemLocal.size();
+                capturesN += itemCaptures.size();
             }
-            Match joined = combine(items, result.start(), result.end());
-            return new Match(result.nodes(), joined.local(), joined.captures(), result.traces(), result.start(), result.end(),
-                result.mappingFailure(), result.recoveries(), items, result.text(), values);
+            return new Match(result.nodes(), join(items, LOCAL, localN), join(items, CAPTURES, capturesN),
+                result.traces(), result.start(), result.end(), result.mappingFailure(), result.recoveries(),
+                items, result.text(), values);
         }
         // 出現を site ごとに Match へ包み直すと 1 site につき 1 個の Match を捨てることになる。
         // nodes / text / values は出現を足しても変わらないので、列だけ足して最後に 1 個だけ作る。
@@ -796,13 +805,6 @@ public final class Session {
         return new Match(result.nodes(), result.local(), result.captures(), result.traces(), result.start(), result.end(),
             result.mappingFailure(), result.recoveries(), result.items(), result.text(), null);
     }
-    private Match captured(Match result, int start, int end, String site, String name, boolean skip) {
-        if (skip) return result;
-        var occurrence = new Occurrence(site, name, new Value(start, end, result.nodes(), result.text(), result.values()));
-        return new Match(result.nodes(), appended(result.local(), occurrence),
-            occ ? appended(result.captures(), occurrence) : result.captures(), result.traces(), result.start(), result.end(),
-            result.mappingFailure(), result.recoveries(), result.items(), result.text(), result.values());
-    }
     /** {@code List.of(Object[])} は配列をもう一度複製するので、確保済みの配列をそのまま包む。 */
     private static List<Occurrence> appended(List<Occurrence> list, Occurrence occurrence) {
         if (list.isEmpty()) return List.of(occurrence);
@@ -834,6 +836,10 @@ public final class Session {
             : new Match(List.of(), local, List.of(), List.of(), start, end);
     }
     private Match combine(List<Match> items, int start, int end) {
+        return combine(items, items, start, end, false);
+    }
+    /** 区切り付き反復の区切りは集約するが、要素単位の capture からは除く。 */
+    private Match combine(List<Match> items, List<Match> elements, int start, int end, boolean emptyValues) {
         if (!tree) {
             int localN = 0;
             for (int k = 0, n = items.size(); k < n; k++) localN += items.get(k).local().size();
@@ -842,7 +848,7 @@ public final class Session {
         }
         if (items.size() == 1) {
             Match only = items.get(0);
-            return new Match(only.nodes(), only.local(), only.captures(), only.traces(), start, end, only.mappingFailure(), only.recoveries(), items, only.text(), only.values());
+            return new Match(only.nodes(), only.local(), only.captures(), only.traces(), start, end, only.mappingFailure(), only.recoveries(), elements, only.text(), only.values());
         }
         // 1 回目の走査で各列の合計要素数だけを数え、2 回目で合計長の list を 1 個だけ確保する。
         // 逐次 concat は k 番目までの合計を毎回複製するので、要素数 T・項目数 n に対して O(T*n)
@@ -861,8 +867,8 @@ public final class Session {
         List<Occurrence> local = join(items, LOCAL, localN), captures = join(items, CAPTURES, capturesN);
         List<Trace> traces = join(items, TRACES, tracesN);
         List<RecoveryEvent> recoveries = join(items, RECOVERIES, recoveriesN);
-        List<Value> values = anyValues ? join(items, VALUES, valuesN) : null;
-        return new Match(nodes, local, captures, traces, start, end, failure, recoveries, items, null, values);
+        List<Value> values = emptyValues ? List.of() : anyValues ? join(items, VALUES, valuesN) : null;
+        return new Match(nodes, local, captures, traces, start, end, failure, recoveries, elements, null, values);
     }
     private static final int NODES = 0, LOCAL = 1, CAPTURES = 2, TRACES = 3, RECOVERIES = 4, VALUES = 5;
     private static List<?> column(Match item, int column) {
@@ -878,14 +884,20 @@ public final class Session {
     @SuppressWarnings("unchecked")
     private static <T> List<T> join(List<Match> items, int column, int total) {
         if (total == 0) return List.of();
-        ArrayList<T> merged = null;
+        // addAll は寄与する列ごとに toArray で一時配列を作る。最終配列だけへ順に詰める。
+        Object[] merged = null;
+        int offset = 0;
         for (int k = 0, n = items.size(); k < n; k++) {
             List<T> part = (List<T>) column(items.get(k), column);
             if (part == null || part.isEmpty()) continue;
-            if (merged == null) { if (part.size() == total) return part; merged = new ArrayList<>(total); }
-            merged.addAll(part);
+            int length = part.size();
+            if (merged == null) {
+                if (length == total) return part;
+                merged = new Object[total];
+            }
+            for (int j = 0; j < length; j++) merged[offset++] = part.get(j);
         }
-        return merged;
+        return (List<T>) Arrays.asList(merged);
     }
     // Transactions run on the caller's frame in place: begin saves (c, m, reset) and applies
     // "m := c when reset"; failure restores c/m; either outcome restores reset (a commit never
@@ -1162,9 +1174,7 @@ public final class Session {
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
         f.reset = reset0;
         if (!tree) return fast(local, start, f.c);
-        Match combined = combine(matches, start, f.c);
-        return new Match(combined.nodes(), combined.local(), combined.captures(), combined.traces(), start, f.c, combined.mappingFailure(), combined.recoveries(), matches, combined.text(),
-            matches.isEmpty() ? List.of() : combined.values());
+        return combine(matches, matches, start, f.c, matches.isEmpty());
     }
     public Match separated(Frame f, Call element, Call separator, int min, Trivia trivia) {
         long whole = mark(); int c0 = f.c, m0 = f.m; boolean reset0 = f.reset;
@@ -1198,9 +1208,7 @@ public final class Session {
         if (trivia.helperExit != null) trivia(f, trivia.helperExit); if (trivia.exit != null) trivia(f, trivia.exit);
         f.reset = reset0;
         if (!tree) return fast(local, start, f.c);
-        Match result = combine(matches, start, f.c);
-        return new Match(result.nodes(), result.local(), result.captures(), result.traces(), start, f.c,
-            result.mappingFailure(), result.recoveries(), elements, result.text(), elements.isEmpty() ? List.of() : result.values());
+        return combine(matches, elements, start, f.c, elements.isEmpty());
     }
     public Match look(Frame parent, Call child, boolean negative, String label) { return look(parent, child, negative, Label.of(label)); }
     public Match look(Frame f, Call child, boolean negative, Label label) {
