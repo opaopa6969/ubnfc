@@ -244,3 +244,40 @@ mod tests {
         assert_eq!(super::capture_sites::CAPTURE_RULES, actual);
     }
 }
+
+/// 自己ホスト frontend のキーワードは UBNF lexer と同じく識別子の途中で切らない。
+/// Classic v2 の一般文法へ暗黙の語境界を足すこととは分け、frontend の生成時に明示する。
+/// 例: `@rooted` は未知の注釈 1 個であり、`@root` と `ed` には分割しない。
+pub fn with_keyword_boundaries(
+    ir: &ubnfc_front::ir::GrammarIr,
+) -> Result<ubnfc_front::ir::GrammarIr, Vec<ubnfc_front::analysis::AnalysisError>> {
+    use ubnfc_front::{
+        boundary::{applies_to, Mode},
+        ir::{ExprNode, TokenSpec},
+    };
+    let mut ir = ir.clone();
+    for expr in &mut ir.semantics.expressions {
+        if let ExprNode::Literal {
+            value,
+            word_boundary,
+            ..
+        } = &mut expr.node
+        {
+            *word_boundary = applies_to(value, Mode::Word);
+        }
+    }
+    for token in &mut ir.semantics.tokens {
+        if let TokenSpec::CaseInsensitive {
+            word,
+            word_boundary,
+            ..
+        } = &mut token.spec
+        {
+            *word_boundary = applies_to(word, Mode::Word);
+        }
+    }
+    let (analysis, plan) = ubnfc_front::analysis::analyze(&ir.semantics)?;
+    ir.analysis = analysis;
+    ir.plan = plan;
+    Ok(ir)
+}

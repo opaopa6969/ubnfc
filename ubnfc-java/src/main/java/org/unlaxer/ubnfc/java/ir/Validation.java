@@ -153,7 +153,12 @@ public final class Validation {
             if (insertion.boundary().at().equals("afterChild")) require(insertion.boundary().childIndex() != null && insertion.boundary().childIndex() < children(expressions.get(insertion.boundary().ownerExprId()).node()).size(), "Invalid trivia childIndex");
         }
         for (var policy : policies.values()) for (var delimiter : policy.effectiveDelimiterSet())
-            if (!delimiter.kind().equals("characters")) require(!delimiter.open().isEmpty() && (delimiter.close() == null || !delimiter.close().isEmpty()), "Empty trivia delimiter");
+            if (delimiter.kind().equals("lexical")) {
+                require(ir.requiredFeatures().contains("lexicalTrivia"), "Missing lexicalTrivia feature");
+                LexicalPrograms.validate(delimiter.expression());
+                require(delimiter.label() != null, "Missing lexical trivia label");
+            }
+            else if (!delimiter.kind().equals("characters")) require(!delimiter.open().isEmpty() && (delimiter.close() == null || !delimiter.close().isEmpty()), "Empty trivia delimiter");
         for (var effect : s.scope().effects()) { reference(rules, effect.ruleId()); for (var event : effect.events()) if (event.captureSiteId() != null) reference(captures, event.captureSiteId()); }
         for (var catalog : s.catalogs()) { reference(rules, catalog.ruleId()); reference(captures, catalog.captureSiteId()); }
         for (var constraint : s.typeofConstraints()) {

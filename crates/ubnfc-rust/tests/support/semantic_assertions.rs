@@ -15,13 +15,66 @@ mod tests {
         };
     }
     #[test]
+    fn zero_bounds_skip_nonempty_children_and_terminators_in_every_mode() {
+        macro_rules! verify {
+            ($module:ident, $input:expr, $c:expr, $m:expr) => {
+                for memo in [false, true] {
+                    for scan in [false, true] {
+                        for ll1 in [false, true] {
+                            for ast in [false, true] {
+                                let r = $module::parse_with_options(
+                                    $input,
+                                    $module::ParseOptions {
+                                        require_eof: false,
+                                        build_ast: ast,
+                                        memo,
+                                        scan,
+                                        ll1,
+                                        lexical: true,
+                                        ..Default::default()
+                                    },
+                                );
+                                assert!(r.ok);
+                                assert_eq!((r.consumed_cp, r.matched_cp), ($c, $m));
+                                assert!(r.captures.is_empty());
+                                assert!(r.diagnostics.is_empty());
+                            }
+                        }
+                    }
+                }
+            };
+        }
+        verify!(zero_literal, "ab", 2, 2);
+        verify!(zero_matched, "ab", 0, 2);
+        verify!(zero_terminator, "ab", 0, 0);
+    }
+    #[test]
+    fn nullable_lexical_trivia_preserves_success_without_failure_hints() {
+        for memo in [false, true] {
+            let r = nullable_trivia::parse_with_options(
+                "aX",
+                nullable_trivia::ParseOptions {
+                    memo,
+                    diagnostics: true,
+                    ..Default::default()
+                },
+            );
+            assert!(!r.ok);
+            assert_eq!(r.diagnostics[0].offset_cp, 0);
+            assert!(r.diagnostics[0].farthest_expected.contains(&"'ab'"));
+            assert!(!r.diagnostics[0].farthest_expected.contains(&"GAP"));
+        }
+    }
+    #[test]
     fn cursors_and_progress() {
         let r = prefix!(empty, "ab");
         assert!(r.ok);
         assert_eq!((r.consumed_cp, r.matched_cp), (0, 1));
         assert!(!prefix!(empty_two, "ab").ok);
         assert!(prefix!(empty_once, "ab").ok);
-        assert!(!prefix!(zero_max, "a").ok);
+        let zero = prefix!(zero_max, "a");
+        assert!(zero.ok);
+        assert_eq!((zero.consumed_cp, zero.matched_cp), (0, 0));
         assert!(zero_max::parse("").ok);
         let r = prefix!(look, "😀x");
         assert!(r.ok);
@@ -258,7 +311,10 @@ mod tests {
         assert!(boundary_on::parse("let").ok);
         assert!(prefix!(boundary_on, "let+x").ok);
         assert!(prefix!(boundary_on, "let あ").ok);
-        assert!(prefix!(boundary_on, "let😀").ok, "非 ASCII は識別子構成文字でない");
+        assert!(
+            prefix!(boundary_on, "let😀").ok,
+            "非 ASCII は識別子構成文字でない"
+        );
         // 境界違反の観測は「一致しなかった」と同じ: 同じ位置、同じ expected。
         let violated = boundary_on::parse("letter");
         let mismatched = boundary_on::parse("lex");

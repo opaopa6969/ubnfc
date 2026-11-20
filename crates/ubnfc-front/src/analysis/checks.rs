@@ -227,6 +227,11 @@ pub(super) fn validate(sem: &Semantics) -> Result<(), Vec<AnalysisError>> {
 pub(super) fn left_recursion(cx: &Context<'_>) -> Vec<AnalysisError> {
     fn collect(cx: &Context<'_>, i: usize, out: &mut BTreeSet<usize>) {
         match &cx.sem.expressions[i].node {
+            ExprNode::Repeat {
+                min: 0,
+                max: Some(0),
+                ..
+            } => {}
             ExprNode::RuleRef { symbol_id } => {
                 out.insert(cx.rules[symbol_id]);
             }

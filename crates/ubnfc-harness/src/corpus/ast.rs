@@ -19,6 +19,9 @@ pub struct AstExpectation {
     /// 明示値がなければ nested-captures は全件受理。
     #[serde(default)]
     pub accepted: Option<bool>,
+    /// RuleTriviaConformanceTest の独立期待値 [kind, code-point offset]。
+    #[serde(default)]
+    pub diagnostic: Option<(String, usize)>,
     #[serde(default)]
     pub prefix: Option<Prefix>,
     /// 捕捉の完了順（同名の nested capture は内側→外側）。
