@@ -1,6 +1,10 @@
 {
-  "documentSymbols": [],
-  "semanticTokens": [],
+  "documentSymbols": [
+    {"name": "Formula", "kind": "Namespace", "detail": null, "range": [0, 0, 0, 2], "selectionRange": [0, 0, 0, 0]}
+  ],
+  "semanticTokens": [
+    {"line": 0, "char": 0, "length": 1, "type": "number"}
+  ],
   "probes": [
     {"at": [0, 3], "definition": [], "references": [], "referencesOnly": [], "hover": null, "completion": ["$", "(", ")", ",", ".", ".length", ":", "?", "abs", "call", "ceil", "cos", "else", "exp", "external", "floor", "if", "internal", "len", "length"], "completionCount": 33}
   ]
