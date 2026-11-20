@@ -63,6 +63,11 @@ fn a_character_class_repetition_carries_a_complete_bulk_table_and_one_tight_loop
             == cfg!(feature = "swar"),
         "SWAR は feature を指定した生成器だけが出力する"
     );
+    assert_eq!(
+        source.contains("p-ascii_start==2"),
+        cfg!(feature = "swar"),
+        "SWAR の word 判定は ASCII 2 byte の消費後に限る"
+    );
     // 表が完全なので、走査が止まった位置で本体を呼び直さない。
     assert!(
         !source.contains("let Some(n)=self.s"),
