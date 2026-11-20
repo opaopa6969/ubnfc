@@ -50,17 +50,39 @@ public final class MemoTable {
 
     /** 未登録は -1。返した slot は次の put/clear まで有効。 */
     public int get(int exprId, int consumed, int matched, int mode, int stateVersion) {
+        return Math.max(-1, find(exprId, consumed, matched, mode, stateVersion));
+    }
+
+    /** 未登録なら最初の空き slot のビット反転を返す。 */
+    public int find(int exprId, int consumed, int matched, int mode, int stateVersion) {
         long expression = expressionKey(exprId, mode, stateVersion);
         long position = positionKey(consumed, matched);
         int slot = locate(expression, position);
-        return occupied(table[slot * STRIDE + 3]) ? slot : -1;
+        return occupied(table[slot * STRIDE + 3]) ? slot : ~slot;
     }
 
     public int put(int exprId, int consumed, int matched, int mode, int stateVersion,
                    boolean ok, int consumedEnd, int matchedEnd, int payload) {
         long expression = expressionKey(exprId, mode, stateVersion);
         long position = positionKey(consumed, matched);
-        int slot = locate(expression, position);
+        return store(expression, position, locate(expression, position), ok, consumedEnd, matchedEnd, payload);
+    }
+
+    /**
+     * 同じキーの find が未登録を返した後に保存する。clear/release を挟まず、当時の容量を渡す。
+     * 容量が同じなら探索済みの slot は埋まったままなので、入れ子の保存があっても空きだった位置から再開できる。
+     */
+    public int putAfterMiss(int exprId, int consumed, int matched, int mode, int stateVersion,
+                            int miss, int previousCapacity, boolean ok, int consumedEnd, int matchedEnd, int payload) {
+        long expression = expressionKey(exprId, mode, stateVersion);
+        long position = positionKey(consumed, matched);
+        int slot = capacity == previousCapacity
+            ? probe(expression, position, ~miss)
+            : locate(expression, position);
+        return store(expression, position, slot, ok, consumedEnd, matchedEnd, payload);
+    }
+
+    private int store(long expression, long position, int slot, boolean ok, int consumedEnd, int matchedEnd, int payload) {
         if (!occupied(table[slot * STRIDE + 3])) {
             if (size == capacity / 2) {
                 grow();
@@ -133,8 +155,11 @@ public final class MemoTable {
         // 上位 bit を使うので 2 冪 mask でも位置と式 id の下位 bit 偏りを拾わない。
         // 同じ容量での探索歩数も連鎖版より少ない（P4 complex で 1,613 → 1,401 歩 / 1,680 probe）。
         long hash = expression * 0x9e37_79b9_7f4a_7c15L + position * 0xbf58_476d_1ce4_e5b9L;
+        return probe(expression, position, (int) (hash >>> 32) & (capacity - 1));
+    }
+
+    private int probe(long expression, long position, int slot) {
         int mask = capacity - 1;
-        int slot = (int) (hash >>> 32) & mask;
         long[] t = table;
         while (occupied(t[slot * STRIDE + 3])
                 && (t[slot * STRIDE] != expression || t[slot * STRIDE + 1] != position)) {
