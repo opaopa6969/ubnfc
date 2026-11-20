@@ -1,0 +1,23 @@
+{
+  "normal": [],
+  "updated": [
+    {
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "severity": "Error",
+      "code": {
+        "left": "E-RULE-UNDEFINED"
+      },
+      "source": "ubnfc-front",
+      "message": "rule lib.Item references undefined rule or token \u0027lib.Missing\u0027（Define a rule or token named \u0027lib.Missing\u0027.）"
+    }
+  ]
+}

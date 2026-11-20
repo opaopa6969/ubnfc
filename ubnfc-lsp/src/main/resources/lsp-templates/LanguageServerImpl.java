@@ -66,11 +66,21 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     private final DocumentStore documents = new DocumentStore();
     private final Map<String, TokenScanner> scanners;
+    private final java.nio.file.Path validator;
+    private final CatalogDiagnostics catalogs = new CatalogDiagnostics();
     private LanguageClient client;
 
     public LanguageServerImpl() { this(scanners(SCANNER_CLASS)); }
 
-    public LanguageServerImpl(Map<String, TokenScanner> scanners) { this.scanners = Map.copyOf(scanners); }
+    public LanguageServerImpl(Map<String, TokenScanner> scanners) { this(scanners, null); }
+
+    /** front は UBNF 編集用サーバでだけ有効。実行ファイルは起動側が指定する。 */
+    public LanguageServerImpl(Map<String, TokenScanner> scanners, java.nio.file.Path validator) {
+        this.scanners = Map.copyOf(scanners);
+        if (validator != null && (!GRAMMAR.equals("UBNF") || !validator.isAbsolute()))
+            throw new IllegalArgumentException("--validator は UBNF サーバに実行ファイルの絶対パスを指定してください");
+        this.validator = validator;
+    }
 
     /** scanner クラスを反射で読む。生成パーサ側の型でしか表現できないので名前で結ぶ。 */
     @SuppressWarnings("unchecked")
@@ -87,8 +97,13 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
     @Override public void connect(LanguageClient client) { this.client = client; }
 
     @Override public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+        catalogs.configure(params.getInitializationOptions());
         var capabilities = new ServerCapabilities();
-        capabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
+        var sync = new org.eclipse.lsp4j.TextDocumentSyncOptions();
+        sync.setOpenClose(true);
+        sync.setChange(TextDocumentSyncKind.Full);
+        sync.setSave(new org.eclipse.lsp4j.SaveOptions(false));
+        capabilities.setTextDocumentSync(sync);
         capabilities.setDefinitionProvider(true);
         capabilities.setReferencesProvider(true);
         capabilities.setRenameProvider(true);
@@ -133,11 +148,25 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
         publish(uri, List.of());
     }
 
-    @Override public void didSave(DidSaveTextDocumentParams params) { }
+    @Override public void didSave(DidSaveTextDocumentParams params) {
+        String uri = params.getTextDocument().getUri();
+        var analysis = documents.get(uri);
+        if (analysis != null) publish(uri, diagnostics(analysis));
+    }
 
-    @Override public void didChangeConfiguration(DidChangeConfigurationParams params) { }
+    @Override public void didChangeConfiguration(DidChangeConfigurationParams params) {
+        catalogs.configure(params.getSettings());
+        refresh();
+    }
 
-    @Override public void didChangeWatchedFiles(DidChangeWatchedFilesParams params) { }
+    @Override public void didChangeWatchedFiles(DidChangeWatchedFilesParams params) { refresh(); }
+
+    private void refresh() {
+        for (String uri : new java.util.TreeSet<>(documents.uris())) {
+            var analysis = documents.get(uri);
+            if (analysis != null) publish(uri, diagnostics(analysis));
+        }
+    }
 
     // ---- capability -------------------------------------------------------
 
@@ -243,7 +272,7 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     /** 1 文書を全文解析して診断を返す。テストからも直接呼べるように公開している。 */
     public List<org.eclipse.lsp4j.Diagnostic> analyze(String uri, String text) {
-        return Diagnostics.of(analysis(uri, text));
+        return diagnostics(analysis(uri, text));
     }
 
     /** 1 文書を解析して覚える。 */
@@ -254,7 +283,14 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
     }
 
     private void update(String uri, String text) {
-        publish(uri, Diagnostics.of(analysis(uri, text)));
+        publish(uri, diagnostics(analysis(uri, text)));
+    }
+
+    private List<org.eclipse.lsp4j.Diagnostic> diagnostics(Analysis analysis) {
+        var out = new ArrayList<>(Diagnostics.of(analysis));
+        out.addAll(FrontValidation.of(analysis, validator));
+        out.addAll(catalogs.of(analysis));
+        return out;
     }
 
     private void publish(String uri, List<org.eclipse.lsp4j.Diagnostic> diagnostics) {

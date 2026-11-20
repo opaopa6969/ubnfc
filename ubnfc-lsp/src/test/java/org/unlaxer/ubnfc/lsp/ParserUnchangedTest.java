@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * LSP は opt-in の feature（D-060）。「off のときは何も変わらない」を機械で押さえる。
@@ -30,14 +32,17 @@ class ParserUnchangedTest {
     private static final Path IR = Path.of("..", "ir", "frozen",
         "tinyexpression-p4-f86ce8a5.ir.json");
 
-    @Test void lspEmissionOnlyAddsFiles(@TempDir Path out) throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"../ir/frozen/tinyexpression-p4-f86ce8a5.ir.json",
+        "../ir/fixtures/unlaxer-dsl__grammar__ubnf.ubnf.ir.json", "src/test/resources/validation/catalog-demo.ir.json"})
+    void lspEmissionOnlyAddsFiles(String irFile, @TempDir Path out) throws Exception {
         org.unlaxer.ubnfc.java.Main.main(new String[]{
-            "--ir", IR.toString(), "--out", out.toString(), "--package", "org.unlaxer.ubnfc.examples.p4.generated", "--no-emit-driver"});
+            "--ir", irFile, "--out", out.toString(), "--package", "org.unlaxer.ubnfc.examples.p4.generated", "--no-emit-driver"});
         Map<Path, byte[]> before = snapshot(out);
         assertFalse(before.isEmpty(), "パーサが生成されていない");
 
         Main.main(new String[]{
-            "--emit-lsp", "--ir", IR.toString(), "--out", out.toString(),
+            "--emit-lsp", "--ir", irFile, "--out", out.toString(),
             "--package", "org.unlaxer.ubnfc.examples.p4.lsp", "--parser-package", "org.unlaxer.ubnfc.examples.p4.generated",
             "--language-id", "tinyexpression-p4", "--scanner-class", "org.unlaxer.ubnfc.examples.p4.P4Scanners"});
         Map<Path, byte[]> after = snapshot(out);
@@ -132,7 +137,7 @@ class ParserUnchangedTest {
         var emitter = new LspEmitter(org.unlaxer.ubnfc.java.ir.IrReader.read(IR), "org.unlaxer.ubnfc.examples.p4.lsp",
             "org.unlaxer.ubnfc.examples.p4.generated", "tinyexpression-p4", "org.unlaxer.ubnfc.examples.p4.P4Scanners", null, null);
         var sources = emitter.sources();
-        assertEquals(12, sources.size());
+        assertEquals(14, sources.size());
         assertEquals("TinyExpressionP4", emitter.grammar());
         assertEquals("Formula", emitter.entry());
         assertEquals("org.unlaxer.ubnfc.examples.p4.lsp.ServerMain", emitter.serverMainClass());

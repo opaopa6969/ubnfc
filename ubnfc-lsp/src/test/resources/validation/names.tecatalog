@@ -1,0 +1,5 @@
+tinyexpression-catalog-v1
+# 合成した名前だけを使う。開発者 tree のカタログに依存しない。
+exact|alpha|既知の名前 😀|names
+exact|other|別の context の名前|other
+prefixWithSuffix|item|_|1|接尾辞を持つ名前|names
