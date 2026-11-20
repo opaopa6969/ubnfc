@@ -11,12 +11,14 @@ public final class ServerMain {
     public static void main(String[] args) throws Exception {
         String scannerClass = LanguageServerImpl.SCANNER_CLASS;
         java.nio.file.Path validator = null;
+        String signatureHelpClass = null;
         for (int i = 0; i < args.length; i++) {
             String option = args[i];
             if (++i == args.length) throw new IllegalArgumentException(option + " の値が必要です");
             switch (option) {
                 case "--scanners" -> scannerClass = args[i];
                 case "--validator" -> validator = java.nio.file.Path.of(args[i]);
+                case "--signature-help" -> signatureHelpClass = args[i];
                 default -> throw new IllegalArgumentException("不明な引数: " + option);
             }
         }
@@ -25,9 +27,19 @@ public final class ServerMain {
         // stdout は JSON-RPC 専用。生成物の println が混ざらないよう stderr へ寄せる。
         System.setOut(new java.io.PrintStream(new java.io.FileOutputStream(java.io.FileDescriptor.err), true,
             java.nio.charset.StandardCharsets.UTF_8));
-        var server = new LanguageServerImpl(LanguageServerImpl.scanners(scannerClass), validator);
+        var server = new LanguageServerImpl(LanguageServerImpl.scanners(scannerClass), validator,
+            loadProvider(signatureHelpClass, SignatureHelpProvider.class));
         var launcher = LSPLauncher.createServerLauncher(server, in, out);
         server.connect(launcher.getRemoteProxy());
         launcher.startListening().get();
+    }
+
+    static <T> T loadProvider(String className, Class<T> type) {
+        if (className == null) return null;
+        try {
+            return Class.forName(className).asSubclass(type).getConstructor().newInstance();
+        } catch (ReflectiveOperationException | ClassCastException error) {
+            throw new IllegalArgumentException(type.getSimpleName() + " を読み込めません: " + className, error);
+        }
     }
 }

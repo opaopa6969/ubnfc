@@ -23,7 +23,8 @@ class Stage5GoldenTest {
         generate(example.resolve("stage5.ir.json"), sources, "stage5", true);
         generate(Path.of("../ir/fixtures/unlaxer-dsl__grammar__ubnf.ubnf.ir.json"), sources, "ubnf", false);
         Files.copy(example.resolve("src/SumEvaluatorBridge.java"), sources.resolve("SumEvaluatorBridge.java"));
-        Files.copy(Path.of("src/test/resources/stage5/Stage5Scenario.java"), sources.resolve("Stage5Scenario.java"));
+        for (String file : java.util.List.of("Stage5Scenario.java", "DemoSignatureHelp.java"))
+            Files.copy(Path.of("src/test/resources/stage5", file), sources.resolve(file));
         var compiler = ToolProvider.getSystemJavaCompiler();
         assertNotNull(compiler, "JDK が必要です");
         try (var manager = compiler.getStandardFileManager(null, null, null);

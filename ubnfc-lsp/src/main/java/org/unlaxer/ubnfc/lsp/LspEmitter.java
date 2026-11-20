@@ -42,7 +42,7 @@ public final class LspEmitter {
     private static final List<String> TEMPLATES = List.of(
         "Positions", "Meta", "Analysis", "Symbols", "Diagnostics", "DocumentStore",
         "Completion", "Hovers", "SemanticTokens", "FoldingRanges", "FrontValidation", "CatalogDiagnostics",
-        "LanguageServerImpl", "ServerMain");
+        "SignatureHelpProvider", "LanguageServerImpl", "ServerMain");
 
     private final Map<String, String> declarationContexts = new LinkedHashMap<>();
 

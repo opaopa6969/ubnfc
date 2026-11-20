@@ -35,6 +35,11 @@ import org.eclipse.lsp4j.SemanticTokensParams;
 import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.ServerInfo;
+import org.eclipse.lsp4j.ParameterInformation;
+import org.eclipse.lsp4j.SignatureHelp;
+import org.eclipse.lsp4j.SignatureHelpOptions;
+import org.eclipse.lsp4j.SignatureHelpParams;
+import org.eclipse.lsp4j.SignatureInformation;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.SymbolKind;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
@@ -70,6 +75,7 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
     private final Map<String, TokenScanner> scanners;
     private final java.nio.file.Path validator;
     private final CatalogDiagnostics catalogs = new CatalogDiagnostics();
+    private final SignatureHelpProvider signatures;
     private LanguageClient client;
 
     public LanguageServerImpl() { this(scanners(SCANNER_CLASS)); }
@@ -78,7 +84,13 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     /** front は UBNF 編集用サーバでだけ有効。実行ファイルは起動側が指定する。 */
     public LanguageServerImpl(Map<String, TokenScanner> scanners, java.nio.file.Path validator) {
+        this(scanners, validator, null);
+    }
+
+    public LanguageServerImpl(Map<String, TokenScanner> scanners, java.nio.file.Path validator,
+                              SignatureHelpProvider signatures) {
         this.scanners = Map.copyOf(scanners);
+        this.signatures = signatures;
         if (validator != null && (!GRAMMAR.equals("UBNF") || !validator.isAbsolute()))
             throw new IllegalArgumentException("--validator は UBNF サーバに実行ファイルの絶対パスを指定してください");
         this.validator = validator;
@@ -111,6 +123,8 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
         capabilities.setRenameProvider(true);
         capabilities.setFoldingRangeProvider(true);
         if (!Meta.INLAY_LABELS.isEmpty()) capabilities.setInlayHintProvider(true);
+        if (signatures != null)
+            capabilities.setSignatureHelpProvider(new SignatureHelpOptions(List.copyOf(signatures.triggerCharacters())));
         capabilities.setDocumentSymbolProvider(true);
         capabilities.setHoverProvider(true);
         var completion = new CompletionOptions();
@@ -223,6 +237,25 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
             }
         }
         return CompletableFuture.completedFuture(new WorkspaceEdit(changes));
+    }
+
+    @Override public CompletableFuture<SignatureHelp> signatureHelp(SignatureHelpParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        if (signatures == null || analysis == null) return CompletableFuture.completedFuture(null);
+
+        int cursor = analysis.positions().offsetOf(params.getPosition());
+        var call = signatures.at(analysis, cursor);
+        if (call == null || cursor < call.startCp() || cursor > call.endCp()
+                || call.startCp() < 0 || call.endCp() > analysis.positions().lengthCp())
+            return CompletableFuture.completedFuture(null);
+
+        var parameters = call.parameters().stream()
+            .map(ParameterInformation::new).toList();
+        var signature = new SignatureInformation(call.label());
+        signature.setParameters(parameters);
+        int active = call.activeParameter();
+        Integer activeParameter = active >= 0 && active < parameters.size() ? active : null;
+        return CompletableFuture.completedFuture(new SignatureHelp(List.of(signature), 0, activeParameter));
     }
 
     @Override public CompletableFuture<List<InlayHint>> inlayHint(InlayHintParams params) {
