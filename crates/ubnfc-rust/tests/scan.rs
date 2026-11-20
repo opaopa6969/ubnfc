@@ -64,11 +64,7 @@ fn a_character_class_repetition_carries_a_complete_bulk_table_and_one_tight_loop
         "SWAR は feature を指定した生成器だけが出力する"
     );
     assert_eq!(
-        source.contains(concat!(
-            "if ASCII[b as usize] {\np+=1;\n",
-            "if bytes.get(p).is_some_and(|&b|ASCII[b as usize]) {\np+=1;\n",
-            "while let Some(chunk)"
-        )),
+        source.contains("p-ascii_start==2"),
         cfg!(feature = "swar"),
         "SWAR の word 判定は ASCII 2 byte の消費後に限る"
     );
