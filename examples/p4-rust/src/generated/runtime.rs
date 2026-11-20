@@ -235,13 +235,24 @@ impl PackedEvent {
         p
     }
     #[inline(always)]
+    fn span_at(&self, i: usize) -> Span {
+        [self.w[i] as usize, self.w[i + 1] as usize]
+    }
+    #[inline(always)]
+    fn token_rule(&self) -> usize {
+        if self.rule == NO_RULE {
+            usize::MAX
+        } else {
+            self.rule as usize
+        }
+    }
+    #[inline(always)]
     fn unpack(self) -> Event {
         let w = self.w;
-        let span = |i: usize| [w[i] as usize, w[i + 1] as usize];
         match self.tag {
             EV_JOIN => Event::Join(EventId(w[0] as usize), EventId(w[1] as usize)),
             EV_VALUES => Event::Values {
-                span: span(0),
+                span: self.span_at(0),
                 child: EventId(w[2] as usize),
                 wrap: self.flags & 1 != 0,
                 text: self.flags & 2 != 0,
@@ -249,28 +260,24 @@ impl PackedEvent {
             EV_CAPTURE => Event::Capture {
                 token_extent: self.flags != 0,
                 site: w[0] as usize,
-                span: span(1),
+                span: self.span_at(1),
                 child: EventId(w[3] as usize),
             },
             EV_RULE => Event::Rule {
                 rule: w[0] as usize,
-                span: span(1),
+                span: self.span_at(1),
                 child: EventId(w[3] as usize),
                 caps: (w[4], w[5]),
             },
             EV_TOKEN => Event::Token {
-                text_span: (self.flags & 1 != 0).then(|| span(2)),
-                content_span: (self.flags & 2 != 0).then(|| span(4)),
+                text_span: (self.flags & 1 != 0).then(|| self.span_at(2)),
+                content_span: (self.flags & 2 != 0).then(|| self.span_at(4)),
                 expr: wide(w[6]),
-                rule: if self.rule == NO_RULE {
-                    usize::MAX
-                } else {
-                    self.rule as usize
-                },
-                span: span(0),
+                rule: self.token_rule(),
+                span: self.span_at(0),
             },
             EV_RECOVERY => Event::Recovery {
-                span: span(0),
+                span: self.span_at(0),
                 detail: w[2],
             },
             _ => Event::Empty,
@@ -4732,7 +4739,8 @@ self.give_captures(caps);let span=self.span(span);let node=self.tree.record(tree
 /// `start` まで戻すため、R の分だけが連続して残る）。これを `caps_flat` へ移して
 /// `(開始, 個数)` を rule の event id に記録する。公開する出現（`captures` / `lexical` /
 /// `tokens`）の並びと番号付けは従来どおり。
-fn occurrences(
+#[inline(never)]
+fn occurrences<const OBSERVE: bool>(
     &mut self,
     root: EventId,
 ) -> (Vec<Capture>, Vec<LexicalOccurrence>, Vec<LexicalOccurrence>) {
@@ -4741,11 +4749,12 @@ fn occurrences(
     // complex-x64 9,731+10,824 / 80,246）。1/4 は 2 倍以上の過大確保で、x64 では
     // `Capture` 72 byte × 20,061 を確保して半分しか使っていなかった。
     let estimate = self.arena.len() / 6 + 8;
-    let build_ast = self.options.wants_ast();
-    let want_lexical = self.options.lexical;
+    // 公開観測を要求しない AST 走査では、出現表の分岐をコンパイル時に取り除く。
+    let build_ast = !OBSERVE || self.options.wants_ast();
+    let want_lexical = OBSERVE && self.options.lexical;
     // 公開する出現表は opt-in（D-035）。見積りで確保するのは要求されたときだけ
     // （AST だけのときに JSON 1 MB で 260,000 × 72 byte を確保して捨てていた）。
-    let want_occurrences = self.options.occurrences || want_lexical;
+    let want_occurrences = OBSERVE;
     let mut captures = Vec::with_capacity(if want_occurrences { estimate } else { 0 });
     let mut lexical = Vec::new();
     let mut tokens = Vec::new();
@@ -4778,24 +4787,29 @@ fn occurrences(
     let mut lexical_order = 0;
     // AST 木の見積り（D-077）: 完了した規則が作る record の slot 数の和。
     let mut rule_slots = 0usize;
-    while let Some((id, parent, done, current)) = stack.pop() {
-        let parent_index = (parent != NONE).then_some(parent as usize);
-        let id = EventId(id as usize);
-        match self.ev(id) {
-            Event::Join(a, b) => {
-                stack.push((b.0 as u32, parent, false, NONE));
-                stack.push((a.0 as u32, parent, false, NONE));
-            }
-            Event::Values { child, .. } => stack.push((child.0 as u32, parent, false, NONE)),
-            Event::Capture {
-                site,
-                span,
-                child,
-                token_extent,
-            } => {
-                if done {
+    while let Some((mut id, mut parent, done, current)) = stack.pop() {
+        // 左枝や単一の子へはそのまま降り、未訪問の右枝と完了処理だけを積む。
+        // packed event から、走査の各段階で必要な欄だけを読む。
+        loop {
+            let event = &self.arena[id as usize];
+            match event.tag {
+                EV_JOIN => {
+                    stack.push((event.w[1], parent, false, NONE));
+                    id = event.w[0];
+                }
+                EV_VALUES => id = event.w[2],
+                EV_CAPTURE => {
+                    let child = event.w[3];
+                    if !done {
+                        stack.push((id, parent, true, NONE));
+                        id = child;
+                        continue;
+                    }
+                    let site = event.w[0] as usize;
+                    let span = event.span_at(1);
                     if build_ast {
-                        let extent = if token_extent {
+                        let child = EventId(child as usize);
+                        let extent = if event.flags != 0 {
                             self.selected_extent(child, span)
                         } else {
                             span
@@ -4814,29 +4828,50 @@ fn occurrences(
                             completion_order: order,
                         });
                     }
-                } else {
-                    stack.push((id.0 as u32, parent, true, NONE));
-                    stack.push((child.0 as u32, parent, false, NONE));
+                    break;
                 }
-            }
-            Event::Token {
-                expr, rule, span, ..
-            }
-if want_lexical && expr != usize::MAX => {
-                tokens.push(LexicalOccurrence {
-                    occurrence_id: tokens.len(),
-                    parent_occurrence_id: parent_index,
-                    rule_id: RULES[rule],
-                    expr_id: EXPRESSIONS[expr],
-                    span: self.span(span),
-                    completion_order: lexical_order,
-                });
-                lexical_order += 1;
-            }
-            Event::Rule {
-                rule, span, child, ..
-            } => {
-                if done {
+                EV_TOKEN => {
+                    if want_lexical && event.w[6] != NONE {
+                        tokens.push(LexicalOccurrence {
+                            occurrence_id: tokens.len(),
+                            parent_occurrence_id: (parent != NONE).then_some(parent as usize),
+                            rule_id: RULES[event.token_rule()],
+                            expr_id: EXPRESSIONS[event.w[6] as usize],
+                            span: self.span(event.span_at(0)),
+                            completion_order: lexical_order,
+                        });
+                        lexical_order += 1;
+                    }
+                    break;
+                }
+                EV_RULE => {
+                    let rule = event.w[0] as usize;
+                    if !done {
+                        if want_intervals {
+                            rule_starts.push((pending.len() as u32, pending_ids.len() as u32));
+                        }
+                        let index = if want_occurrences {
+                            let index = rule_occurrences;
+                            rule_occurrences += 1;
+                            if want_lexical {
+                                lexical.push(LexicalOccurrence {
+                                    occurrence_id: index as usize,
+                                    parent_occurrence_id: (parent != NONE).then_some(parent as usize),
+                                    rule_id: RULES[rule],
+                                    expr_id: BODIES[rule],
+                                    span: self.span(event.span_at(1)),
+                                    completion_order: 0,
+                                });
+                            }
+                            index
+                        } else {
+                            parent
+                        };
+                        stack.push((id, parent, true, index));
+                        id = event.w[3];
+                        parent = index;
+                        continue;
+                    }
                     if want_intervals {
                         let (cap_start, id_start) = rule_starts.pop().unwrap_or((0, 0));
                         if build_ast {
@@ -4846,7 +4881,7 @@ if want_lexical && expr != usize::MAX => {
                             caps_flat.extend_from_slice(&pending[start..]);
                             pending.truncate(start);
                             self.set_rule_caps(
-                                id,
+                                EventId(id as usize),
                                 (offset as u32, (caps_flat.len() - offset) as u32),
                             );
                         }
@@ -4861,41 +4896,17 @@ if want_lexical && expr != usize::MAX => {
                         }
                     }
                     if current != NONE {
-                        let index = current as usize;
                         rule_order += 1;
-                        // rule 出現は lexical のときだけ保持する（AST だけなら完了順だけ要る）。
                         if want_lexical {
-                            let node: &mut LexicalOccurrence = &mut lexical[index];
+                            let node: &mut LexicalOccurrence = &mut lexical[current as usize];
                             node.completion_order = lexical_order;
                         }
                         lexical_order += 1;
                     }
-                } else {
-                    if want_intervals {
-                        rule_starts.push((pending.len() as u32, pending_ids.len() as u32));
-                    }
-                    let index = if want_occurrences {
-                        let index = rule_occurrences;
-                        rule_occurrences += 1;
-                        if want_lexical {
-                            lexical.push(LexicalOccurrence {
-                                occurrence_id: index as usize,
-                                parent_occurrence_id: parent_index,
-                                rule_id: RULES[rule],
-                                expr_id: BODIES[rule],
-                                span: self.span(span),
-                                completion_order: 0,
-                            });
-                        }
-                        index
-                    } else {
-                        parent
-                    };
-                    stack.push((id.0 as u32, parent, true, index));
-                    stack.push((child.0 as u32, index, false, NONE));
+                    break;
                 }
+                _ => break,
             }
-            _ => {}
         }
     }
     for token in &mut tokens {
@@ -5132,10 +5143,10 @@ pub(crate) fn finish_checked(mut self, mut step: Step) -> (ParseResult, bool) {
     // 走査は AST の直下 capture 表のために `build_ast` でも要る。公開する出現表を作るかは
     // `occurrences` / `lexical` が決める（D-035）。認識だけで要求も無ければ走査ごと省く。
     let (captures, lexical, tokens) =
-        if step.ok
-            && (self.options.wants_ast() || self.options.occurrences || self.options.lexical)
-        {
-            self.occurrences(step.events)
+        if step.ok && (self.options.occurrences || self.options.lexical) {
+            self.occurrences::<true>(step.events)
+        } else if step.ok && self.options.wants_ast() {
+            self.occurrences::<false>(step.events)
         } else {
             (vec![], vec![], vec![])
         };
