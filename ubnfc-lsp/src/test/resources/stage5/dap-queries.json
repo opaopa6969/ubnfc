@@ -2,7 +2,7 @@
   "capabilities": {
     "supportsConfigurationDoneRequest": true,
     "supportsConditionalBreakpoints": false,
-    "supportsHitConditionalBreakpoints": false,
+    "supportsHitConditionalBreakpoints": true,
     "supportsEvaluateForHovers": false,
     "exceptionBreakpointFilters": [],
     "supportsStepBack": false,
@@ -60,14 +60,13 @@
       "column": 24
     },
     {
-      "verified": false,
-      "message": "hit condition・logpoint は未対応です",
+      "verified": true,
       "line": 0,
       "column": 24
     },
     {
       "verified": false,
-      "message": "hit condition・logpoint は未対応です",
+      "message": "logpoint は未対応です",
       "line": 0,
       "column": 24
     }

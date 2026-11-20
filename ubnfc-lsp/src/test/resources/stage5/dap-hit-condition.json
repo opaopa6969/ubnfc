@@ -1,0 +1,51 @@
+{
+  "supportsHitConditionalBreakpoints": true,
+  "registrations": [
+    {
+      "verified": true,
+      "line": 1
+    },
+    {
+      "verified": false,
+      "message": "hit condition には 1〜2147483647 の十進整数を指定してください",
+      "line": 1
+    },
+    {
+      "verified": false,
+      "message": "hit condition には 1〜2147483647 の十進整数を指定してください",
+      "line": 1
+    },
+    {
+      "verified": false,
+      "message": "hit condition には 1〜2147483647 の十進整数を指定してください",
+      "line": 1
+    },
+    {
+      "verified": false,
+      "message": "hit condition には 1〜2147483647 の十進整数を指定してください",
+      "line": 1
+    },
+    {
+      "verified": false,
+      "message": "hit condition には 1〜2147483647 の十進整数を指定してください",
+      "line": 1
+    }
+  ],
+  "thirdHit": [
+    1,
+    12
+  ],
+  "relaunchedFrames": 0,
+  "afterReregistration": [
+    1,
+    23
+  ],
+  "events": [
+    "stopped:breakpoint",
+    "stopped:breakpoint",
+    "stopped:breakpoint"
+  ],
+  "combinedEvents": [
+    "stopped:breakpoint"
+  ]
+}

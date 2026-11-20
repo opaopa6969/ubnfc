@@ -103,7 +103,22 @@ public class DebugAdapter implements IDebugProtocolServer {
             return line == site.line() && (column == null || column == site.column());
         }
     }
-    private record RegisteredBreakpoint(BreakpointTarget target, String condition) { }
+    private static final class RegisteredBreakpoint {
+        final BreakpointTarget target;
+        final String condition;
+        final int hitCondition;
+        int hits;
+
+        RegisteredBreakpoint(BreakpointTarget target, String condition, int hitCondition) {
+            this.target = target;
+            this.condition = condition;
+            this.hitCondition = hitCondition;
+        }
+
+        boolean reachedHitCondition() {
+            return hitCondition == 0 || ++hits == hitCondition;
+        }
+    }
     private final List<RegisteredBreakpoint> breakpoints = new ArrayList<>();
     private int cursor = -1;
     private boolean stopOnEntry = true;
@@ -143,7 +158,7 @@ public class DebugAdapter implements IDebugProtocolServer {
         capabilities.setSupportsEvaluateForHovers(false);
         capabilities.setSupportsSetVariable(false);
         capabilities.setSupportsConditionalBreakpoints(bridge.supportsConditionalBreakpoints());
-        capabilities.setSupportsHitConditionalBreakpoints(false);
+        capabilities.setSupportsHitConditionalBreakpoints(true);
         capabilities.setSupportsBreakpointLocationsRequest(true);
         capabilities.setSupportsLogPoints(false);
         capabilities.setSupportsSetExpression(false);
@@ -250,6 +265,7 @@ public class DebugAdapter implements IDebugProtocolServer {
         for (int i = 0; i < requested.length; i++) {
             var request = requested[i];
             var target = new BreakpointTarget(request.getLine(), request.getColumn());
+            int hitCondition = parseHitCondition(request.getHitCondition());
             var breakpoint = new Breakpoint();
             breakpoint.setLine(target.line());
             breakpoint.setColumn(target.column());
@@ -257,20 +273,33 @@ public class DebugAdapter implements IDebugProtocolServer {
             if (!sameSource) reason = "このソースは現在の入力ファイルではありません";
             else if (request.getCondition() != null && !bridge.supportsConditionalBreakpoints())
                 reason = "条件付き breakpoint には対応する EvaluatorBridge が必要です";
-            else if (request.getHitCondition() != null || request.getLogMessage() != null)
-                reason = "hit condition・logpoint は未対応です";
+            else if (hitCondition < 0)
+                reason = "hit condition には 1〜2147483647 の十進整数を指定してください";
+            else if (request.getLogMessage() != null)
+                reason = "logpoint は未対応です";
             else if (terminated || steps.stream().map(this::siteOf).noneMatch(target::matches))
                 reason = target.column() == null
                     ? "この行から始まる AST 節点がありません（文法デバッガは節点の開始行で止まります）"
                     : "この位置から始まる AST 節点がありません";
             breakpoint.setVerified(reason == null);
-            if (reason == null) breakpoints.add(new RegisteredBreakpoint(target, request.getCondition()));
+            if (reason == null) breakpoints.add(new RegisteredBreakpoint(target, request.getCondition(), hitCondition));
             else breakpoint.setMessage(reason);
             out[i] = breakpoint;
         }
         var response = new SetBreakpointsResponse();
         response.setBreakpoints(out);
         return CompletableFuture.completedFuture(response);
+    }
+
+    private static int parseHitCondition(String expression) {
+        if (expression == null) return 0;
+        if (!expression.matches("[0-9]+")) return -1;
+        try {
+            int threshold = Integer.parseInt(expression);
+            return threshold > 0 ? threshold : -1;
+        } catch (NumberFormatException error) {
+            return -1;
+        }
     }
 
     private BreakpointSite siteOf(Steps.Step step) {
@@ -300,7 +329,12 @@ public class DebugAdapter implements IDebugProtocolServer {
         for (int at = cursor + 1; !breakpoints.isEmpty() && at < steps.size(); at++) {
             var step = steps.get(at);
             var site = siteOf(step);
-            if (breakpoints.stream().anyMatch(bp -> bp.target().matches(site) && conditionMatches(bp, step))) {
+            boolean shouldStop = false;
+            for (var breakpoint : breakpoints) {
+                if (breakpoint.target.matches(site) && breakpoint.reachedHitCondition() && !shouldStop)
+                    shouldStop = conditionMatches(breakpoint, step);
+            }
+            if (shouldStop) {
                 move(at, "breakpoint");
                 return;
             }
@@ -309,9 +343,9 @@ public class DebugAdapter implements IDebugProtocolServer {
     }
 
     private boolean conditionMatches(RegisteredBreakpoint breakpoint, Steps.Step step) {
-        if (breakpoint.condition() == null) return true;
+        if (breakpoint.condition == null) return true;
         try {
-            var result = bridge.evaluateCondition(breakpoint.condition(), step.node());
+            var result = bridge.evaluateCondition(breakpoint.condition, step.node());
             if (result.isPresent()) return result.get();
             output("stderr", "条件付き breakpoint の式を評価できません。\n");
         } catch (RuntimeException error) {
