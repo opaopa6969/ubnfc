@@ -1167,6 +1167,7 @@
       "documentSymbolProvider": true,
       "foldingRangeProvider": true,
       "hoverProvider": true,
+      "inlayHintProvider": true,
       "referencesProvider": true,
       "renameProvider": true,
       "semanticTokensProvider": {

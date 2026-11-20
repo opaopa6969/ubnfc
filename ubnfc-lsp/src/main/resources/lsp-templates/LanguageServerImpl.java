@@ -23,6 +23,8 @@ import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.HoverParams;
+import org.eclipse.lsp4j.InlayHint;
+import org.eclipse.lsp4j.InlayHintParams;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.Location;
@@ -48,7 +50,7 @@ import __API_PACKAGE__.TokenScanner;
  * __GRAMMAR__ 用に生成された LSP サーバ（段階 5）。
  *
  * <p>提供するもの: 診断（構文・scope・前半 scope）/ definition / references / document symbols /
- * semantic tokens / completion / hover / rename / folding range。増分解析は無い（D-060）。
+ * semantic tokens / completion / hover / rename / folding range / inlay hints。増分解析は無い（D-060）。
  *
  * <p>生成パーサは依存ゼロのまま。lsp4j に依存するのはこの薄い包み側だけ（opt-in feature）。
  *
@@ -108,6 +110,7 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
         capabilities.setReferencesProvider(true);
         capabilities.setRenameProvider(true);
         capabilities.setFoldingRangeProvider(true);
+        if (!Meta.INLAY_LABELS.isEmpty()) capabilities.setInlayHintProvider(true);
         capabilities.setDocumentSymbolProvider(true);
         capabilities.setHoverProvider(true);
         var completion = new CompletionOptions();
@@ -220,6 +223,28 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
             }
         }
         return CompletableFuture.completedFuture(new WorkspaceEdit(changes));
+    }
+
+    @Override public CompletableFuture<List<InlayHint>> inlayHint(InlayHintParams params) {
+        var analysis = documents.get(params.getTextDocument().getUri());
+        if (Meta.INLAY_LABELS.isEmpty() || analysis == null || analysis.primary() == null
+                || !analysis.primary().ok() || !analysis.primary().recoveries().isEmpty())
+            return CompletableFuture.completedFuture(List.of());
+
+        var positions = analysis.positions();
+        int start = positions.offsetOf(params.getRange().getStart());
+        int end = positions.offsetOf(params.getRange().getEnd());
+        var hints = new ArrayList<InlayHint>();
+        for (var token : analysis.lexical()) {
+            int offset = token.span().start();
+            if (offset < start || offset >= end || token.span().end() <= offset) continue;
+            String label = Meta.INLAY_LABELS.get(token.exprId());
+            if (label == null) continue;
+            var hint = new InlayHint(positions.positionOf(offset), Either.forLeft(label));
+            hint.setPaddingRight(true);
+            hints.add(hint);
+        }
+        return CompletableFuture.completedFuture(hints);
     }
 
     @Override public CompletableFuture<List<FoldingRange>> foldingRange(FoldingRangeRequestParams params) {
