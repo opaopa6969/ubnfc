@@ -639,6 +639,16 @@
         {
           "additionalProperties": false,
           "properties": {
+            "kind": {"const": "lexical"},
+            "expression": {"$ref": "#/$defs/LexicalExpression"},
+            "label": {"type": "string"}
+          },
+          "required": ["kind", "expression", "label"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
             "codePoints": {
               "items": {
                 "minimum": 0,
@@ -2753,10 +2763,7 @@
         "whitespace": {
           "anyOf": [
             {
-              "enum": [
-                "none",
-                "javaStyle"
-              ]
+              "type": "string"
             },
             {
               "type": "null"
@@ -3841,6 +3848,7 @@
           "memoReplay",
           "externTokens",
           "declarativeTokens",
+          "lexicalTrivia",
           "regex",
           "operators",
           "leftRecursionRewrite",

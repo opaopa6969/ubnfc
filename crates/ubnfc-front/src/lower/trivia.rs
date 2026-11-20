@@ -46,12 +46,25 @@ pub(super) fn settings(settings: &[a::GlobalSetting]) -> Settings {
 fn style(value: &str) -> SettingsWhitespace {
     if value.trim().eq_ignore_ascii_case("none") {
         SettingsWhitespace::None
-    } else {
+    } else if value.trim().eq_ignore_ascii_case("javaStyle") {
         SettingsWhitespace::JavaStyle
+    } else {
+        SettingsWhitespace::Named(value.trim().into())
     }
 }
 pub(super) fn policy(cx: &mut Context<'_>, grammar: &r::Grammar, rule: &r::ResolvedRule) -> String {
+    let profiles = crate::packages::whitespace_profiles(cx.grammar, grammar);
+    let profile_style = |s: &str| {
+        if profiles.contains(s) {
+            SettingsWhitespace::JavaStyle
+        } else {
+            style(s)
+        }
+    };
     let mut raw = settings(&grammar.settings);
+    if let Some(SettingsWhitespace::Named(s)) = &raw.whitespace {
+        raw.whitespace = Some(profile_style(s));
+    }
     let whitespace = rule.annotations.iter().find_map(|a| match a {
         a::Annotation::Whitespace { style: s, .. } => Some(s.as_deref().unwrap_or("javaStyle")),
         _ => None,
@@ -61,16 +74,19 @@ pub(super) fn policy(cx: &mut Context<'_>, grammar: &r::Grammar, rule: &r::Resol
         _ => None,
     });
     if let Some(s) = whitespace {
-        raw.whitespace = Some(style(s));
+        raw.whitespace = Some(profile_style(s));
     }
     if let Some(p) = &interleave {
         raw.interleave = Some(p.clone());
     }
     let enabled = whitespace
-        .map(|s| style(s) == SettingsWhitespace::JavaStyle)
+        .map(|s| profile_style(s) != SettingsWhitespace::None)
         .unwrap_or_else(|| {
             interleave.is_some()
-                || raw.whitespace == Some(SettingsWhitespace::JavaStyle)
+                || raw
+                    .whitespace
+                    .as_ref()
+                    .is_some_and(|s| *s != SettingsWhitespace::None)
                 || raw.interleave.is_some()
                 || raw
                     .comment
@@ -79,46 +95,63 @@ pub(super) fn policy(cx: &mut Context<'_>, grammar: &r::Grammar, rule: &r::Resol
         });
     // Java の delimiter クラスは grammar で共有する。別 rule が javaStyle を
     // 要求していると comment-only rule でも同じ集合を使う。
-    let full=settings(&grammar.settings).whitespace==Some(SettingsWhitespace::JavaStyle)||grammar.rules.iter().any(|r|r.annotations.iter().any(|a|matches!(a,a::Annotation::Interleave {..})||matches!(a,a::Annotation::Whitespace {style:s,..} if s.as_deref().is_none_or(|s|style(s)==SettingsWhitespace::JavaStyle))))||raw.interleave.is_some();
+    let full=settings(&grammar.settings).whitespace.as_ref().is_some_and(|s| *s==SettingsWhitespace::JavaStyle || matches!(s, SettingsWhitespace::Named(n) if profiles.contains(n)))||grammar.rules.iter().any(|r|r.annotations.iter().any(|a|matches!(a,a::Annotation::Interleave {..})||matches!(a,a::Annotation::Whitespace {style:s,..} if s.as_deref().is_none_or(|s|profile_style(s)==SettingsWhitespace::JavaStyle))))||raw.interleave.is_some();
     let mut delimiters = vec![];
+    let named = match &raw.whitespace {
+        Some(SettingsWhitespace::Named(name)) => grammar
+            .tokens
+            .iter()
+            .find(|t| t.name == *name)
+            .and_then(|t| match &t.value {
+                r::ResolvedTokenValue::Declarative { expression } => {
+                    Some((expression.clone(), t.name.clone()))
+                }
+                _ => None,
+            }),
+        _ => None,
+    };
     if enabled {
-        if full {
-            delimiters.push(Delimiter::Characters {
-                code_points: vec![9, 10, 11, 12, 13, 32],
-            });
-        }
-        if full {
-            delimiters.push(Delimiter::LineComment {
-                open: "//".into(),
-                line_end_profile: DelimiterLineCommentLineEndProfile,
-            });
-            delimiters.push(Delimiter::BlockComment {
-                open: "/*".into(),
-                close: "*/".into(),
-            });
-        }
-        // D-018 comment-trivia (2)(3): 明示 @comment の line / block は値どおりの区切りを
-        // javaStyle の既定集合へ追加する（置換しない。同一の区切りは重複除去）。
-        // javaStyle 相当がなければ明示コメントだけを有効にする。旧 Java が line の値を
-        // 読まずに `//` を登録していた挙動（D-017 疑義 9）は再現しない。
-        let mut push = |d: Delimiter| {
-            if !delimiters.contains(&d) {
-                delimiters.push(d);
-            }
-        };
-        if let Some(c) = &raw.comment {
-            if let Some(line) = c.line.as_deref().filter(|s| !s.is_empty()) {
-                push(Delimiter::LineComment {
-                    open: line.into(),
-                    line_end_profile: DelimiterLineCommentLineEndProfile,
+        if let Some((expression, label)) = named {
+            delimiters.push(Delimiter::Lexical { expression, label });
+        } else {
+            if full {
+                delimiters.push(Delimiter::Characters {
+                    code_points: vec![9, 10, 11, 12, 13, 32],
                 });
             }
-            if let (Some(open), Some(close)) = (&c.block_open, &c.block_close) {
-                if !open.is_empty() && !close.is_empty() {
-                    push(Delimiter::BlockComment {
-                        open: open.clone(),
-                        close: close.clone(),
+            if full {
+                delimiters.push(Delimiter::LineComment {
+                    open: "//".into(),
+                    line_end_profile: DelimiterLineCommentLineEndProfile,
+                });
+                delimiters.push(Delimiter::BlockComment {
+                    open: "/*".into(),
+                    close: "*/".into(),
+                });
+            }
+            // D-018 comment-trivia (2)(3): 明示 @comment の line / block は値どおりの区切りを
+            // javaStyle の既定集合へ追加する（置換しない。同一の区切りは重複除去）。
+            // javaStyle 相当がなければ明示コメントだけを有効にする。旧 Java が line の値を
+            // 読まずに `//` を登録していた挙動（D-017 疑義 9）は再現しない。
+            let mut push = |d: Delimiter| {
+                if !delimiters.contains(&d) {
+                    delimiters.push(d);
+                }
+            };
+            if let Some(c) = &raw.comment {
+                if let Some(line) = c.line.as_deref().filter(|s| !s.is_empty()) {
+                    push(Delimiter::LineComment {
+                        open: line.into(),
+                        line_end_profile: DelimiterLineCommentLineEndProfile,
                     });
+                }
+                if let (Some(open), Some(close)) = (&c.block_open, &c.block_close) {
+                    if !open.is_empty() && !close.is_empty() {
+                        push(Delimiter::BlockComment {
+                            open: open.clone(),
+                            close: close.clone(),
+                        });
+                    }
                 }
             }
         }

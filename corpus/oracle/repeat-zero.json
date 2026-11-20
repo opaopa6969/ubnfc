@@ -1,7 +1,7 @@
 {
   "feature": "bounded-repeat",
   "grammar": "grammar Probe {\n \n @package: org.example.oracle\n @root @mapping(Value) Root ::= 'a'{0,0};\n}\n",
-  "source": "ed4178e673f93e719b62a7bd181f3a219abf8ed1",
+  "source": "d3ea73e8cfa440df8bdbb70abb29e06259435ba2",
   "cases": [
     {
       "id": "repeat-zero/1",
@@ -28,16 +28,14 @@
         "offset": 0,
         "consumed": 0,
         "matched": 0,
-        "expected": [
-          "'a'"
-        ]
+        "expected": []
       },
       "scopeDepth": 0
     },
     {
       "id": "repeat-zero/2",
       "input": "a",
-      "accepted": false,
+      "accepted": true,
       "allConsumed": false,
       "consumed": 0,
       "matched": 0,
@@ -48,29 +46,22 @@
       "references": [],
       "diagnostics": [
         {
-          "kind": "syntax",
+          "kind": "trailing_input",
           "offset": 0,
           "expected": [
-            "'a'",
-            "RootParser"
+            "end of input"
           ],
           "farthestOffset": 0,
-          "farthestExpected": [
-            "'a'",
-            "RootParser"
-          ],
+          "farthestExpected": [],
           "origin": "Mapper.diagnose"
         }
       ],
-      "parsedStatus": "failed",
+      "parsedStatus": "succeeded",
       "nativeFailure": {
         "offset": 0,
-        "consumed": 1,
-        "matched": 1,
-        "expected": [
-          "'a'",
-          "RootParser"
-        ]
+        "consumed": 0,
+        "matched": 0,
+        "expected": []
       },
       "scopeDepth": 0
     }
@@ -84,8 +75,8 @@
   },
   "generatedSourceSha256": {
     "org/example/oracle/ProbeAST.java": "6b9b3da481fd3775c5f73ff74ac859fcfe5d62d5937edbf09e3699191daf53b7",
-    "org/example/oracle/ProbeMapper.java": "825ba9c35b81b5d78ae63a388e34513a721cfe24cedebfe1f1300e7cb1ed5fe7",
-    "org/example/oracle/ProbeParsers.java": "ffb8edc885ee67981eb1268545310b14cb90d86e1c0ee635b185d7260fe7f9d4"
+    "org/example/oracle/ProbeMapper.java": "715e0cfe298f12ac4bbfbcad6a7257a0fb8bdcdf1c1dca4ea40a026b2ef67233",
+    "org/example/oracle/ProbeParsers.java": "7b9246ed6b4620c707020efa55cc1a9808fee91472b57623769bc6ac1f21c4bb"
   },
   "compilation": {
     "success": true,

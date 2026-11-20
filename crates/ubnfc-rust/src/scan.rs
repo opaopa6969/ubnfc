@@ -271,6 +271,9 @@ fn body(g: &Generator<'_>, scans: &Scans, i: usize) -> Option<String> {
         ExprNode::Repeat {
             child, min, max, ..
         } => {
+            if *max == Some(0) {
+                return Some("let _=p;Some(0)".into());
+            }
             let child = g.expr[child.as_str()];
             let counted = *min > 0 || max.is_some();
             // 一括走査: 1 文字で確定して 1 code point だけ消費する部分集合は、
@@ -308,7 +311,7 @@ fn body(g: &Generator<'_>, scans: &Scans, i: usize) -> Option<String> {
                     s.push_str("count+=1;\n");
                 }
                 if let Some(max) = max {
-                    writeln!(s, "if count>={} {{break;}}", (*max).max(1)).unwrap();
+                    writeln!(s, "if count>={} {{break;}}", *max).unwrap();
                 }
                 s.push_str("}\n");
             }

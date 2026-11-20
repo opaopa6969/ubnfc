@@ -242,6 +242,9 @@ fn delimiters(cx: &Context<'_>, policy: &str) -> CharSet {
         .effective_delimiter_set
     {
         match d {
+            Delimiter::Lexical { .. } => {
+                chars.union(&CharSet::all());
+            }
             Delimiter::Characters { code_points } => {
                 for &cp in code_points {
                     chars.union(&CharSet::range(cp, cp));
@@ -323,8 +326,8 @@ fn evaluate(cx: &Context<'_>, i: usize) -> Facts {
         } => {
             let c = cx.fact(child);
             if *max == Some(0) {
-                // max=0 でも一度試行する。子の成功を許さず、失敗時だけゼロ幅成功。
-                Facts::predicate()
+                // 上限ゼロは子を試行せず、入力に依存しないゼロ幅成功。
+                Facts::empty()
             } else {
                 let mut f = c.clone();
                 f.min = c.min.saturating_mul(*min);

@@ -160,3 +160,22 @@ fn the_prefix_check_still_fires_when_the_next_character_cannot_be_an_identifier(
         );
     }
 }
+
+#[test]
+fn classic_v2_preserves_prefix_literals_even_with_a_reserved_none_token() {
+    let body = "token none ::= '#'; @root Root ::= 'a' 'b';";
+    let classic = source(&grammar("@ubnf: v2", body)).unwrap();
+    for expr in &classic.ir.semantics.expressions {
+        if let ExprNode::Literal { word_boundary, .. } = &expr.node {
+            assert!(!word_boundary);
+        }
+    }
+    let explicit = source(&grammar("@ubnf: v2 @literalBoundary: word", body)).unwrap();
+    assert!(explicit.ir.semantics.expressions.iter().any(|e| matches!(
+        e.node,
+        ExprNode::Literal {
+            word_boundary: true,
+            ..
+        }
+    )));
+}

@@ -491,6 +491,11 @@ impl<'a> Validator<'a> {
         let trivia = &self.ir.semantics.trivia;
         for (i, policy) in trivia.policies.iter().enumerate() {
             for (j, delimiter) in policy.effective_delimiter_set.iter().enumerate() {
+                if let Delimiter::Lexical { expression, .. } = delimiter {
+                    if let Err(message) = expression.validate() {
+                        self.error(&format!("/semantics/trivia/policies/{i}/effectiveDelimiterSet/{j}/expression"), &message);
+                    }
+                }
                 if let Delimiter::Characters { code_points } = delimiter {
                     self.code_points(
                         code_points,
@@ -1017,6 +1022,14 @@ impl<'a> Validator<'a> {
                 needed.insert(feature);
             }
         };
+        require(
+            LexicalTrivia,
+            s.trivia.policies.iter().any(|p| {
+                p.effective_delimiter_set
+                    .iter()
+                    .any(|d| matches!(d, Delimiter::Lexical { .. }))
+            }),
+        );
         require(Captures, !s.captures.is_empty());
         require(
             DeclarativeTokens,

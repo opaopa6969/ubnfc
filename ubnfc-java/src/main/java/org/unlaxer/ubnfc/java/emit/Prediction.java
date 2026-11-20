@@ -144,7 +144,7 @@ final class Prediction {
         if (left.size() != right.size()) return false;
         for (int i = 0; i < left.size(); i++) {
             Delimiter x = left.get(i), y = right.get(i);
-            if (!java.util.Objects.equals(x.kind(), y.kind()) || !java.util.Objects.equals(x.open(), y.open())
+            if (!java.util.Objects.equals(x.label(), y.label()) || !java.util.Objects.equals(x.expression(), y.expression()) || !java.util.Objects.equals(x.kind(), y.kind()) || !java.util.Objects.equals(x.open(), y.open())
                 || !java.util.Objects.equals(x.close(), y.close()) || !java.util.Objects.equals(x.codePoints(), y.codePoints())) return false;
         }
         return true;

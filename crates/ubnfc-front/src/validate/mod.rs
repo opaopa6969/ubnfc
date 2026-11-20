@@ -105,9 +105,17 @@ struct Context<'a> {
 }
 
 impl Context<'_> {
-    /// `javaStyle` / `none`、または std/layout の `SPACES_AND_COMMENTS`（javaStyle と同じ集合）。
+    /// 予約 profile、std/layout の同値 profile、または解決済み宣言的 token。
     fn whitespace_ok(&self, style: &str) -> bool {
-        general::valid_whitespace(style) || self.profiles.contains(style)
+        general::valid_whitespace(style)
+            || self.profiles.contains(style)
+            || self.grammar.tokens.iter().any(|t| {
+                t.name == style
+                    && matches!(
+                        t.value,
+                        crate::resolve::ResolvedTokenValue::Declarative { .. }
+                    )
+            })
     }
 
     fn add(
