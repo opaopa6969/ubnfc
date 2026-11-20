@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.unlaxer.ubnfc.examples.p4.generated.api.*;
-import org.unlaxer.ubnfc.examples.p4.generated.internal.Recipe;
+import org.unlaxer.ubnfc.examples.p4.generated.internal.AstEvent;
 import org.unlaxer.ubnfc.examples.p4.generated.internal.Session;
 import org.unlaxer.ubnfc.examples.p4.generated.internal.Session.*;
 
@@ -188,7 +188,7 @@ public final class TinyExpressionP4Parser {
         if (match.nodes().isEmpty()) return syntax;
         return syntax.withAst((TinyExpressionP4AST) build(match.nodes().get(0), s), s.spans());
     }
-    private static Object build(Recipe r, Session s) {
+    private static Object build(AstEvent r, Session s) {
         if (s.hasBuilt(r)) return s.built(r);
         if (r.id().equals("#recovery")) return s.remember(r, null);
         try {
@@ -289,691 +289,694 @@ public final class TinyExpressionP4Parser {
         return s.remember(r, node);
         } catch (Session.RecoveredNodeMissing missing) { return s.remember(r, null); }
     }
-    private static Object b0(Recipe r, Session s) {
-        List<Recipe.Value> l0 = r.fieldValues(0);
+    private static Object b0(AstEvent r, Session s) {
+        List<AstEvent.Value> l0 = s.fieldValues(r,0);
         Object[] a0 = l0.isEmpty() ? null : new Object[l0.size()]; int k0 = 0;
-        for (int i = 0, n = l0.size(); i < n; i++) { Recipe.Value v = l0.get(i); Object x = (TinyExpressionP4AST.ImportDeclarationExpr) build(s.node(v, r), s); if (x != null) a0[k0++] = x; }
+        for (int i = 0, n = l0.size(); i < n; i++) { AstEvent.Value v = l0.get(i); Object x = (TinyExpressionP4AST.ImportDeclarationExpr) build(s.node(v, r), s); if (x != null) a0[k0++] = x; }
         java.util.List<TinyExpressionP4AST.ImportDeclarationExpr> field0 = s.listOf(a0, k0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (v.nodes().isEmpty() ? null : build(s.node(v, r), s)); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (v.nodes().isEmpty() ? null : build(s.node(v, r), s)); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.Object> field1 = s.listOf(a1, k1);
-        Recipe.Value v2 = s.scalarValue(r,2,"expression");
+        AstEvent.Value v2 = s.scalarValue(r,2,"expression");
         TinyExpressionP4AST.ExpressionExpr field2 = s.present((TinyExpressionP4AST.ExpressionExpr) build(s.node(v2, r), s), v2);
-        List<Recipe.Value> l3 = r.fieldValues(3);
+        List<AstEvent.Value> l3 = s.fieldValues(r,3);
         Object[] a3 = l3.isEmpty() ? null : new Object[l3.size()]; int k3 = 0;
-        for (int i = 0, n = l3.size(); i < n; i++) { Recipe.Value v = l3.get(i); Object x = (v.nodes().isEmpty() ? null : build(s.node(v, r), s)); if (x != null) a3[k3++] = x; }
+        for (int i = 0, n = l3.size(); i < n; i++) { AstEvent.Value v = l3.get(i); Object x = (v.nodes().isEmpty() ? null : build(s.node(v, r), s)); if (x != null) a3[k3++] = x; }
         java.util.List<java.lang.Object> field3 = s.listOf(a3, k3);
         return new TinyExpressionP4AST.FormulaExpr(field0, field1, field2, field3);
     }
-    private static Object b1(Recipe r, Session s) {
+    private static Object b1(AstEvent r, Session s) {
         return new TinyExpressionP4AST.CodeBlockExpr();
     }
-    private static Object b2(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"className");
+    private static Object b2(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"className");
         TinyExpressionP4AST.QualifiedNameExpr field0 = s.present((TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<java.lang.String> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(s.text(v1));
-        Recipe.Value v2 = s.scalarValue(r,2,"alias");
+        AstEvent.Value v2 = s.scalarValue(r,2,"alias");
         java.lang.String field2 = s.present(s.text(v2), v2);
         return new TinyExpressionP4AST.ImportDeclarationExpr(field0, field1, field2);
     }
-    private static Object b3(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"head");
+    private static Object b3(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"head");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.QualifiedNameExpr(field0, field1);
     }
-    private static Object b4(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"varName");
+    private static Object b4(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"varName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BinaryExpr) build(s.node(v2, r), s));
-        Recipe.Value v3 = s.firstValue(r,3);
+        AstEvent.Value v3 = s.firstValue(r,3);
         java.util.Optional<java.lang.String> field3 = v3 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(s.text(v3));
         return new TinyExpressionP4AST.NumberVariableDeclarationExpr(field0, field1, field2, field3);
     }
-    private static Object b5(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"varName");
+    private static Object b5(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"varName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.StringConcatExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.StringConcatExpr) build(s.node(v2, r), s));
-        Recipe.Value v3 = s.firstValue(r,3);
+        AstEvent.Value v3 = s.firstValue(r,3);
         java.util.Optional<java.lang.String> field3 = v3 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(s.text(v3));
         return new TinyExpressionP4AST.StringVariableDeclarationExpr(field0, field1, field2, field3);
     }
-    private static Object b6(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"varName");
+    private static Object b6(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"varName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.BooleanOrExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v2, r), s));
-        Recipe.Value v3 = s.firstValue(r,3);
+        AstEvent.Value v3 = s.firstValue(r,3);
         java.util.Optional<java.lang.String> field3 = v3 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(s.text(v3));
         return new TinyExpressionP4AST.BooleanVariableDeclarationExpr(field0, field1, field2, field3);
     }
-    private static Object b7(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"varName");
+    private static Object b7(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"varName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.OnlyIfAbsentExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.OnlyIfAbsentExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.ObjectExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.ObjectExpr) build(s.node(v2, r), s));
-        Recipe.Value v3 = s.firstValue(r,3);
+        AstEvent.Value v3 = s.firstValue(r,3);
         java.util.Optional<java.lang.String> field3 = v3 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(s.text(v3));
         return new TinyExpressionP4AST.ObjectVariableDeclarationExpr(field0, field1, field2, field3);
     }
-    private static Object b8(Recipe r, Session s) {
+    private static Object b8(AstEvent r, Session s) {
         return new TinyExpressionP4AST.OnlyIfAbsentExpr();
     }
-    private static Object b9(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"methodName");
+    private static Object b9(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"methodName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.MethodParametersExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.scalarValue(r,2,"expression");
+        AstEvent.Value v2 = s.scalarValue(r,2,"expression");
         TinyExpressionP4AST.BinaryExpr field2 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.NumberMethodDeclarationExpr(field0, field1, field2);
     }
-    private static Object b10(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"methodName");
+    private static Object b10(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"methodName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.MethodParametersExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.scalarValue(r,2,"expression");
+        AstEvent.Value v2 = s.scalarValue(r,2,"expression");
         TinyExpressionP4AST.StringConcatExpr field2 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.StringMethodDeclarationExpr(field0, field1, field2);
     }
-    private static Object b11(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"methodName");
+    private static Object b11(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"methodName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.MethodParametersExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.scalarValue(r,2,"expression");
+        AstEvent.Value v2 = s.scalarValue(r,2,"expression");
         TinyExpressionP4AST.BooleanOrExpr field2 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.BooleanMethodDeclarationExpr(field0, field1, field2);
     }
-    private static Object b12(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"methodName");
+    private static Object b12(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"methodName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.MethodParametersExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.MethodParametersExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.scalarValue(r,2,"expression");
+        AstEvent.Value v2 = s.scalarValue(r,2,"expression");
         TinyExpressionP4AST.ObjectExpr field2 = s.present((TinyExpressionP4AST.ObjectExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.ObjectMethodDeclarationExpr(field0, field1, field2);
     }
-    private static Object b13(Recipe r, Session s) {
-        List<Recipe.Value> l0 = r.fieldValues(0);
+    private static Object b13(AstEvent r, Session s) {
+        List<AstEvent.Value> l0 = s.fieldValues(r,0);
         Object[] a0 = l0.isEmpty() ? null : new Object[l0.size()]; int k0 = 0;
-        for (int i = 0, n = l0.size(); i < n; i++) { Recipe.Value v = l0.get(i); Object x = (TinyExpressionP4AST.MethodParameterExpr) build(s.node(v, r), s); if (x != null) a0[k0++] = x; }
+        for (int i = 0, n = l0.size(); i < n; i++) { AstEvent.Value v = l0.get(i); Object x = (TinyExpressionP4AST.MethodParameterExpr) build(s.node(v, r), s); if (x != null) a0[k0++] = x; }
         java.util.List<TinyExpressionP4AST.MethodParameterExpr> field0 = s.listOf(a0, k0);
         return new TinyExpressionP4AST.MethodParametersExpr(field0);
     }
-    private static Object b14(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"paramName");
+    private static Object b14(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"paramName");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<java.lang.String> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(s.text(v1));
         return new TinyExpressionP4AST.MethodParameterExpr(field0, field1);
     }
-    private static Object b15(Recipe r, Session s) {
-        Recipe.Value v0 = s.firstValue(r,0);
+    private static Object b15(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.firstValue(r,0);
         java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = v0 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v0, r), s));
-        Recipe.Value v1 = s.scalarValue(r,1,"name");
+        AstEvent.Value v1 = s.scalarValue(r,1,"name");
         java.lang.String field1 = s.present(s.text(v1), v1);
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.ArgumentsExpr) build(s.node(v2, r), s));
         return new TinyExpressionP4AST.ExternalBooleanInvocationExpr(field0, field1, field2);
     }
-    private static Object b16(Recipe r, Session s) {
-        Recipe.Value v0 = s.firstValue(r,0);
+    private static Object b16(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.firstValue(r,0);
         java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = v0 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v0, r), s));
-        Recipe.Value v1 = s.scalarValue(r,1,"name");
+        AstEvent.Value v1 = s.scalarValue(r,1,"name");
         java.lang.String field1 = s.present(s.text(v1), v1);
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.ArgumentsExpr) build(s.node(v2, r), s));
         return new TinyExpressionP4AST.ExternalNumberInvocationExpr(field0, field1, field2);
     }
-    private static Object b17(Recipe r, Session s) {
-        Recipe.Value v0 = s.firstValue(r,0);
+    private static Object b17(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.firstValue(r,0);
         java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = v0 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v0, r), s));
-        Recipe.Value v1 = s.scalarValue(r,1,"name");
+        AstEvent.Value v1 = s.scalarValue(r,1,"name");
         java.lang.String field1 = s.present(s.text(v1), v1);
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.ArgumentsExpr) build(s.node(v2, r), s));
         return new TinyExpressionP4AST.ExternalStringInvocationExpr(field0, field1, field2);
     }
-    private static Object b18(Recipe r, Session s) {
-        Recipe.Value v0 = s.firstValue(r,0);
+    private static Object b18(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.firstValue(r,0);
         java.util.Optional<TinyExpressionP4AST.QualifiedNameExpr> field0 = v0 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.QualifiedNameExpr) build(s.node(v0, r), s));
-        Recipe.Value v1 = s.scalarValue(r,1,"name");
+        AstEvent.Value v1 = s.scalarValue(r,1,"name");
         java.lang.String field1 = s.present(s.text(v1), v1);
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.ArgumentsExpr) build(s.node(v2, r), s));
         return new TinyExpressionP4AST.ExternalObjectInvocationExpr(field0, field1, field2);
     }
-    private static Object b19(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"name");
+    private static Object b19(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"name");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.ArgumentsExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.ArgumentsExpr) build(s.node(v1, r), s));
         return new TinyExpressionP4AST.MethodInvocationExpr(field0, field1);
     }
-    private static Object b20(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"condition");
+    private static Object b20(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"condition");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"thenExpr");
+        AstEvent.Value v1 = s.scalarValue(r,1,"thenExpr");
         TinyExpressionP4AST.BranchExpressionExpr field1 = s.present((TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v1, r), s), v1);
-        Recipe.Value v2 = s.scalarValue(r,2,"elseExpr");
+        AstEvent.Value v2 = s.scalarValue(r,2,"elseExpr");
         TinyExpressionP4AST.BranchExpressionExpr field2 = s.present((TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.TernaryExpr(field0, field1, field2);
     }
-    private static Object b21(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b21(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
         return new TinyExpressionP4AST.ArgumentExpressionExpr(field0);
     }
-    private static Object b22(Recipe r, Session s) {
-        List<Recipe.Value> l0 = r.fieldValues(0);
+    private static Object b22(AstEvent r, Session s) {
+        List<AstEvent.Value> l0 = s.fieldValues(r,0);
         Object[] a0 = l0.isEmpty() ? null : new Object[l0.size()]; int k0 = 0;
-        for (int i = 0, n = l0.size(); i < n; i++) { Recipe.Value v = l0.get(i); Object x = (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s); if (x != null) a0[k0++] = x; }
+        for (int i = 0, n = l0.size(); i < n; i++) { AstEvent.Value v = l0.get(i); Object x = (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s); if (x != null) a0[k0++] = x; }
         java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field0 = s.listOf(a0, k0);
         return new TinyExpressionP4AST.ArgumentsExpr(field0);
     }
-    private static Object b23(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
-        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+    private static Object b23(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
+        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) (s.direct && v0.nodes().isEmpty() ? leaf0(v0, s) : build(s.node(v0, r), s)), v0);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
-        List<Recipe.Value> l2 = r.fieldValues(2);
+        List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { Recipe.Value v = l2.get(i); Object x = (TinyExpressionP4AST) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST) (s.direct && v.nodes().isEmpty() ? leaf0(v, s) : build(s.node(v, r), s)); if (x != null) a2[k2++] = x; }
         java.util.List<TinyExpressionP4AST> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.BinaryExpr(field0, field1, field2);
     }
-    private static Object b24(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
-        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+    private static Object b24(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
+        TinyExpressionP4AST field0 = s.present((TinyExpressionP4AST) (s.direct && v0.nodes().isEmpty() ? leaf0(v0, s) : build(s.node(v0, r), s)), v0);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
-        List<Recipe.Value> l2 = r.fieldValues(2);
+        List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { Recipe.Value v = l2.get(i); Object x = (TinyExpressionP4AST) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST) (s.direct && v.nodes().isEmpty() ? leaf0(v, s) : build(s.node(v, r), s)); if (x != null) a2[k2++] = x; }
         java.util.List<TinyExpressionP4AST> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.BinaryExpr(field0, field1, field2);
     }
-    private static Object b25(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b25(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.SinExpr(field0);
     }
-    private static Object b26(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b26(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.CosExpr(field0);
     }
-    private static Object b27(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b27(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.TanExpr(field0);
     }
-    private static Object b28(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b28(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.SqrtExpr(field0);
     }
-    private static Object b29(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"first");
+    private static Object b29(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"first");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.MinExpr(field0, field1);
     }
-    private static Object b30(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"first");
+    private static Object b30(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"first");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.ArgumentExpressionExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.MaxExpr(field0, field1);
     }
-    private static Object b31(Recipe r, Session s) {
+    private static Object b31(AstEvent r, Session s) {
         return new TinyExpressionP4AST.RandomExpr();
     }
-    private static Object b32(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b32(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.AbsExpr(field0);
     }
-    private static Object b33(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b33(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.RoundExpr(field0);
     }
-    private static Object b34(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b34(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.CeilExpr(field0);
     }
-    private static Object b35(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b35(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.FloorExpr(field0);
     }
-    private static Object b36(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"base");
+    private static Object b36(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"base");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"exponent");
+        AstEvent.Value v1 = s.scalarValue(r,1,"exponent");
         TinyExpressionP4AST.ArgumentExpressionExpr field1 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v1, r), s), v1);
         return new TinyExpressionP4AST.PowExpr(field0, field1);
     }
-    private static Object b37(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b37(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.LogExpr(field0);
     }
-    private static Object b38(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"arg");
+    private static Object b38(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"arg");
         TinyExpressionP4AST.ArgumentExpressionExpr field0 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.ExpExpr(field0);
     }
-    private static Object b39(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b39(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"defaultValue");
+        AstEvent.Value v1 = s.scalarValue(r,1,"defaultValue");
         TinyExpressionP4AST.ArgumentExpressionExpr field1 = s.present((TinyExpressionP4AST.ArgumentExpressionExpr) build(s.node(v1, r), s), v1);
         return new TinyExpressionP4AST.ToNumExpr(field0, field1);
     }
-    private static Object b40(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b40(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.ToUpperCaseExpr(field0);
     }
-    private static Object b41(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b41(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.ToLowerCaseExpr(field0);
     }
-    private static Object b42(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b42(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.TrimExpr(field0);
     }
-    private static Object b43(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b43(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.LengthExpr(field0);
     }
-    private static Object b44(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b44(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.LengthExpr(field0);
     }
-    private static Object b45(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b45(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.VariableRefExpr field0 = s.present((TinyExpressionP4AST.VariableRefExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.ToUpperCaseDotExpr(field0);
     }
-    private static Object b46(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b46(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.VariableRefExpr field0 = s.present((TinyExpressionP4AST.VariableRefExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.ToLowerCaseDotExpr(field0);
     }
-    private static Object b47(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b47(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.VariableRefExpr field0 = s.present((TinyExpressionP4AST.VariableRefExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.TrimDotExpr(field0);
     }
-    private static Object b48(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b48(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.VariableRefExpr field0 = s.present((TinyExpressionP4AST.VariableRefExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.LengthDotExpr(field0);
     }
-    private static Object b49(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b49(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.StartsWithExpr(field0, field1);
     }
-    private static Object b50(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b50(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.EndsWithExpr(field0, field1);
     }
-    private static Object b51(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b51(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.ContainsExpr(field0, field1);
     }
-    private static Object b52(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b52(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.InExpr(field0, field1);
     }
-    private static Object b53(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b53(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.StartsWithDotExpr(field0, field1);
     }
-    private static Object b54(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b54(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.EndsWithDotExpr(field0, field1);
     }
-    private static Object b55(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b55(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringConcatExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringConcatExpr> field1 = s.listOf(a1, k1);
         return new TinyExpressionP4AST.ContainsDotExpr(field0, field1);
     }
-    private static Object b56(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b56(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.VariableRefExpr field0 = s.present((TinyExpressionP4AST.VariableRefExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.IsPresentExpr(field0);
     }
-    private static Object b57(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"startHour");
+    private static Object b57(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"startHour");
         TinyExpressionP4AST.BinaryExpr field0 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"endHour");
+        AstEvent.Value v1 = s.scalarValue(r,1,"endHour");
         TinyExpressionP4AST.BinaryExpr field1 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v1, r), s), v1);
         return new TinyExpressionP4AST.InTimeRangeExpr(field0, field1);
     }
-    private static Object b58(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"startDay");
+    private static Object b58(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"startDay");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"startHour");
+        AstEvent.Value v1 = s.scalarValue(r,1,"startHour");
         TinyExpressionP4AST.BinaryExpr field1 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v1, r), s), v1);
-        Recipe.Value v2 = s.scalarValue(r,2,"endDay");
+        AstEvent.Value v2 = s.scalarValue(r,2,"endDay");
         java.lang.String field2 = s.present(s.text(v2), v2);
-        Recipe.Value v3 = s.scalarValue(r,3,"endHour");
+        AstEvent.Value v3 = s.scalarValue(r,3,"endHour");
         TinyExpressionP4AST.BinaryExpr field3 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v3, r), s), v3);
         return new TinyExpressionP4AST.InDayTimeRangeExpr(field0, field1, field2, field3);
     }
-    private static Object b59(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b59(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? s.text(v0) : build(s.node(v0, r), s)), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.BinaryExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BinaryExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BinaryExpr) build(s.node(v2, r), s));
-        Recipe.Value v3 = s.firstValue(r,3);
+        AstEvent.Value v3 = s.firstValue(r,3);
         java.util.Optional<TinyExpressionP4AST.BinaryExpr> field3 = v3 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BinaryExpr) build(s.node(v3, r), s));
         return new TinyExpressionP4AST.SliceExpr(field0, field1, field2, field3);
     }
-    private static Object b60(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b60(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? s.text(v0) : build(s.node(v0, r), s)), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<TinyExpressionP4AST.BinaryExpr> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BinaryExpr) build(s.node(v1, r), s));
-        Recipe.Value v2 = s.firstValue(r,2);
+        AstEvent.Value v2 = s.firstValue(r,2);
         java.util.Optional<TinyExpressionP4AST.BinaryExpr> field2 = v2 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BinaryExpr) build(s.node(v2, r), s));
-        Recipe.Value v3 = s.firstValue(r,3);
+        AstEvent.Value v3 = s.firstValue(r,3);
         java.util.Optional<TinyExpressionP4AST.BinaryExpr> field3 = v3 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable((TinyExpressionP4AST.BinaryExpr) build(s.node(v3, r), s));
         return new TinyExpressionP4AST.SliceExpr(field0, field1, field2, field3);
     }
-    private static Object b61(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
+    private static Object b61(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? s.text(v0) : build(s.node(v0, r), s)), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
-        List<Recipe.Value> l2 = r.fieldValues(2);
+        List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { Recipe.Value v = l2.get(i); Object x = (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (v.nodes().isEmpty() ? s.text(v) : build(s.node(v, r), s)); if (x != null) a2[k2++] = x; }
         java.util.List<java.lang.Object> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.StringConcatExpr(field0, field1, field2);
     }
-    private static Object b62(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"name");
+    private static Object b62(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"name");
         java.lang.String field0 = s.present(s.text(v0), v0);
         return new TinyExpressionP4AST.StringCastVariableRefExpr(field0);
     }
-    private static Object b63(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"name");
+    private static Object b63(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"name");
         java.lang.String field0 = s.present(s.text(v0), v0);
         return new TinyExpressionP4AST.StringTypedVariableRefExpr(field0);
     }
-    private static Object b64(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
+    private static Object b64(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
         TinyExpressionP4AST.BooleanAndExpr field0 = s.present((TinyExpressionP4AST.BooleanAndExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
-        List<Recipe.Value> l2 = r.fieldValues(2);
+        List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { Recipe.Value v = l2.get(i); Object x = (TinyExpressionP4AST.BooleanAndExpr) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST.BooleanAndExpr) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
         java.util.List<TinyExpressionP4AST.BooleanAndExpr> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.BooleanOrExpr(field0, field1, field2);
     }
-    private static Object b65(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
+    private static Object b65(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
         TinyExpressionP4AST.BooleanXorExpr field0 = s.present((TinyExpressionP4AST.BooleanXorExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
-        List<Recipe.Value> l2 = r.fieldValues(2);
+        List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { Recipe.Value v = l2.get(i); Object x = (TinyExpressionP4AST.BooleanXorExpr) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST.BooleanXorExpr) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
         java.util.List<TinyExpressionP4AST.BooleanXorExpr> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.BooleanAndExpr(field0, field1, field2);
     }
-    private static Object b66(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
+    private static Object b66(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
         TinyExpressionP4AST.BooleanFactorExpr field0 = s.present((TinyExpressionP4AST.BooleanFactorExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = s.text(v); if (x != null) a1[k1++] = x; }
         java.util.List<java.lang.String> field1 = s.listOf(a1, k1);
-        List<Recipe.Value> l2 = r.fieldValues(2);
+        List<AstEvent.Value> l2 = s.fieldValues(r,2);
         Object[] a2 = l2.isEmpty() ? null : new Object[l2.size()]; int k2 = 0;
-        for (int i = 0, n = l2.size(); i < n; i++) { Recipe.Value v = l2.get(i); Object x = (TinyExpressionP4AST.BooleanFactorExpr) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
+        for (int i = 0, n = l2.size(); i < n; i++) { AstEvent.Value v = l2.get(i); Object x = (TinyExpressionP4AST.BooleanFactorExpr) build(s.node(v, r), s); if (x != null) a2[k2++] = x; }
         java.util.List<TinyExpressionP4AST.BooleanFactorExpr> field2 = s.listOf(a2, k2);
         return new TinyExpressionP4AST.BooleanXorExpr(field0, field1, field2);
     }
-    private static Object b67(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b67(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.NotExpr(field0);
     }
-    private static Object b68(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
+    private static Object b68(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? s.text(v0) : build(s.node(v0, r), s)), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"op");
+        AstEvent.Value v1 = s.scalarValue(r,1,"op");
         java.lang.String field1 = s.present(s.text(v1), v1);
-        Recipe.Value v2 = s.scalarValue(r,2,"right");
+        AstEvent.Value v2 = s.scalarValue(r,2,"right");
         java.lang.Object field2 = s.present((v2.nodes().isEmpty() ? s.text(v2) : build(s.node(v2, r), s)), v2);
         return new TinyExpressionP4AST.BooleanEqualityExpr(field0, field1, field2);
     }
-    private static Object b69(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b69(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? s.text(v0) : build(s.node(v0, r), s)), v0);
         return new TinyExpressionP4AST.BooleanFactorExpr(field0);
     }
-    private static Object b70(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
+    private static Object b70(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"op");
+        AstEvent.Value v1 = s.scalarValue(r,1,"op");
         java.lang.String field1 = s.present(s.text(v1), v1);
-        Recipe.Value v2 = s.scalarValue(r,2,"right");
+        AstEvent.Value v2 = s.scalarValue(r,2,"right");
         TinyExpressionP4AST.StringConcatExpr field2 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.StringComparisonExpr(field0, field1, field2);
     }
-    private static Object b71(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"left");
+    private static Object b71(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"left");
         TinyExpressionP4AST.BinaryExpr field0 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"op");
+        AstEvent.Value v1 = s.scalarValue(r,1,"op");
         java.lang.String field1 = s.present(s.text(v1), v1);
-        Recipe.Value v2 = s.scalarValue(r,2,"right");
+        AstEvent.Value v2 = s.scalarValue(r,2,"right");
         TinyExpressionP4AST.BinaryExpr field2 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.ComparisonExpr(field0, field1, field2);
     }
-    private static Object b72(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b72(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
         return new TinyExpressionP4AST.ObjectExpr(field0);
     }
-    private static Object b73(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"condition");
+    private static Object b73(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"condition");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"thenExpr");
+        AstEvent.Value v1 = s.scalarValue(r,1,"thenExpr");
         TinyExpressionP4AST.BranchExpressionExpr field1 = s.present((TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v1, r), s), v1);
-        Recipe.Value v2 = s.scalarValue(r,2,"elseExpr");
+        AstEvent.Value v2 = s.scalarValue(r,2,"elseExpr");
         TinyExpressionP4AST.BranchExpressionExpr field2 = s.present((TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.IfExpr(field0, field1, field2);
     }
-    private static Object b74(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b74(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
         return new TinyExpressionP4AST.BranchExpressionExpr(field0);
     }
-    private static Object b75(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"condition");
+    private static Object b75(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"condition");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"thenExpr");
+        AstEvent.Value v1 = s.scalarValue(r,1,"thenExpr");
         TinyExpressionP4AST.BranchExpressionExpr field1 = s.present((TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v1, r), s), v1);
-        Recipe.Value v2 = s.scalarValue(r,2,"elseExpr");
+        AstEvent.Value v2 = s.scalarValue(r,2,"elseExpr");
         TinyExpressionP4AST.BranchExpressionExpr field2 = s.present((TinyExpressionP4AST.BranchExpressionExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.TernaryExpr(field0, field1, field2);
     }
-    private static Object b76(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"firstCase");
+    private static Object b76(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"firstCase");
         TinyExpressionP4AST.NumberCaseExpr field0 = s.present((TinyExpressionP4AST.NumberCaseExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.NumberCaseExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.NumberCaseExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.NumberCaseExpr> field1 = s.listOf(a1, k1);
-        Recipe.Value v2 = s.scalarValue(r,2,"defaultCase");
+        AstEvent.Value v2 = s.scalarValue(r,2,"defaultCase");
         TinyExpressionP4AST.NumberDefaultCaseExpr field2 = s.present((TinyExpressionP4AST.NumberDefaultCaseExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.NumberMatchExpr(field0, field1, field2);
     }
-    private static Object b77(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"condition");
+    private static Object b77(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"condition");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"value");
+        AstEvent.Value v1 = s.scalarValue(r,1,"value");
         TinyExpressionP4AST.NumberCaseValueExpr field1 = s.present((TinyExpressionP4AST.NumberCaseValueExpr) build(s.node(v1, r), s), v1);
         return new TinyExpressionP4AST.NumberCaseExpr(field0, field1);
     }
-    private static Object b78(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b78(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.NumberCaseValueExpr field0 = s.present((TinyExpressionP4AST.NumberCaseValueExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.NumberDefaultCaseExpr(field0);
     }
-    private static Object b79(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b79(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.BinaryExpr field0 = s.present((TinyExpressionP4AST.BinaryExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.NumberCaseValueExpr(field0);
     }
-    private static Object b80(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"firstCase");
+    private static Object b80(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"firstCase");
         TinyExpressionP4AST.StringCaseExpr field0 = s.present((TinyExpressionP4AST.StringCaseExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringCaseExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.StringCaseExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.StringCaseExpr> field1 = s.listOf(a1, k1);
-        Recipe.Value v2 = s.scalarValue(r,2,"defaultCase");
+        AstEvent.Value v2 = s.scalarValue(r,2,"defaultCase");
         TinyExpressionP4AST.StringDefaultCaseExpr field2 = s.present((TinyExpressionP4AST.StringDefaultCaseExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.StringMatchExpr(field0, field1, field2);
     }
-    private static Object b81(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"condition");
+    private static Object b81(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"condition");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"value");
+        AstEvent.Value v1 = s.scalarValue(r,1,"value");
         TinyExpressionP4AST.StringCaseValueExpr field1 = s.present((TinyExpressionP4AST.StringCaseValueExpr) build(s.node(v1, r), s), v1);
         return new TinyExpressionP4AST.StringCaseExpr(field0, field1);
     }
-    private static Object b82(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b82(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringCaseValueExpr field0 = s.present((TinyExpressionP4AST.StringCaseValueExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.StringDefaultCaseExpr(field0);
     }
-    private static Object b83(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b83(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.StringConcatExpr field0 = s.present((TinyExpressionP4AST.StringConcatExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.StringCaseValueExpr(field0);
     }
-    private static Object b84(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"firstCase");
+    private static Object b84(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"firstCase");
         TinyExpressionP4AST.BooleanCaseExpr field0 = s.present((TinyExpressionP4AST.BooleanCaseExpr) build(s.node(v0, r), s), v0);
-        List<Recipe.Value> l1 = r.fieldValues(1);
+        List<AstEvent.Value> l1 = s.fieldValues(r,1);
         Object[] a1 = l1.isEmpty() ? null : new Object[l1.size()]; int k1 = 0;
-        for (int i = 0, n = l1.size(); i < n; i++) { Recipe.Value v = l1.get(i); Object x = (TinyExpressionP4AST.BooleanCaseExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
+        for (int i = 0, n = l1.size(); i < n; i++) { AstEvent.Value v = l1.get(i); Object x = (TinyExpressionP4AST.BooleanCaseExpr) build(s.node(v, r), s); if (x != null) a1[k1++] = x; }
         java.util.List<TinyExpressionP4AST.BooleanCaseExpr> field1 = s.listOf(a1, k1);
-        Recipe.Value v2 = s.scalarValue(r,2,"defaultCase");
+        AstEvent.Value v2 = s.scalarValue(r,2,"defaultCase");
         TinyExpressionP4AST.BooleanDefaultCaseExpr field2 = s.present((TinyExpressionP4AST.BooleanDefaultCaseExpr) build(s.node(v2, r), s), v2);
         return new TinyExpressionP4AST.BooleanMatchExpr(field0, field1, field2);
     }
-    private static Object b85(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"condition");
+    private static Object b85(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"condition");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
-        Recipe.Value v1 = s.scalarValue(r,1,"value");
+        AstEvent.Value v1 = s.scalarValue(r,1,"value");
         TinyExpressionP4AST.BooleanCaseValueExpr field1 = s.present((TinyExpressionP4AST.BooleanCaseValueExpr) build(s.node(v1, r), s), v1);
         return new TinyExpressionP4AST.BooleanCaseExpr(field0, field1);
     }
-    private static Object b86(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b86(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.BooleanCaseValueExpr field0 = s.present((TinyExpressionP4AST.BooleanCaseValueExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.BooleanDefaultCaseExpr(field0);
     }
-    private static Object b87(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b87(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         TinyExpressionP4AST.BooleanOrExpr field0 = s.present((TinyExpressionP4AST.BooleanOrExpr) build(s.node(v0, r), s), v0);
         return new TinyExpressionP4AST.BooleanCaseValueExpr(field0);
     }
-    private static Object b88(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"name");
+    private static Object b88(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"name");
         java.lang.String field0 = s.present(s.text(v0), v0);
-        Recipe.Value v1 = s.firstValue(r,1);
+        AstEvent.Value v1 = s.firstValue(r,1);
         java.util.Optional<java.lang.String> field1 = v1 == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(s.text(v1));
         return new TinyExpressionP4AST.VariableRefExpr(field0, field1);
     }
-    private static Object b89(Recipe r, Session s) {
-        Recipe.Value v0 = s.scalarValue(r,0,"value");
+    private static Object b89(AstEvent r, Session s) {
+        AstEvent.Value v0 = s.scalarValue(r,0,"value");
         java.lang.Object field0 = s.present((v0.nodes().isEmpty() ? null : build(s.node(v0, r), s)), v0);
         return new TinyExpressionP4AST.ExpressionExpr(field0);
+    }
+    private static Object leaf0(AstEvent.Value v, Session s) {
+        return s.rememberLeaf(new TinyExpressionP4AST.BinaryExpr(null, List.of(s.source.substring(v.start(), v.end()).strip()), List.of()), v.start(), v.end());
     }
     private static Match parseFormula_0(Session s, Frame f) {
         return s.rule(f, 0, 1043, true, true, TinyExpressionP4Parser::e0, "recipe:Formula", null, "construct", K2, K3, false, K4, false, K5);

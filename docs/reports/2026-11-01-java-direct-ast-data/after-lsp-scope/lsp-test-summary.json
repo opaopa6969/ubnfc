@@ -1,0 +1,32 @@
+{
+  "tests": 16,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "classes": [
+    {
+      "name": "org.unlaxer.ubnfc.lsp.MetadataTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.699
+    },
+    {
+      "name": "org.unlaxer.ubnfc.lsp.ParserUnchangedTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.194
+    },
+    {
+      "name": "org.unlaxer.ubnfc.lsp.Stage5GoldenTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 6.35
+    }
+  ]
+}
