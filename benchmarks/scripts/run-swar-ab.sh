@@ -17,23 +17,43 @@ base=${BASE:-origin/master}
 core=${CORE:-30}
 runs=${RUNS:-7}
 run_seconds=${RUN_SECONDS:-0.5}
+after_root=${AFTER_WORKTREE:-$ubnfc}
+base_root=${BASE_WORKTREE:-$work/base}
+export CARGO_BUILD_JOBS=${CARGO_BUILD_JOBS:-8}
+# 呼出し側は WORK を専用 worktree 内に置き、共有 target を使わない。
+unset CARGO_TARGET_DIR
+after_features=()
+[[ -z ${AFTER_FEATURES:-} ]] || after_features=(--features "$AFTER_FEATURES")
 suite=${JSON_TEST_SUITE:-$ubnfc/benchmarks/external/JSONTestSuite}
 
 prepare() {
   mkdir -p "$work"
-  # 1. 生成器 2 つ。before は BASE の git archive を別 target で build する（作業ツリーは触らない）。
-  rm -rf "$work/base" && mkdir -p "$work/base"
-  (cd "$ubnfc" && git archive "$base" crates Cargo.toml Cargo.lock examples/p4-rust \
-     examples/handwritten-target scanners ir) | tar -xf - -C "$work/base"
-  (cd "$work/base" && CARGO_TARGET_DIR="$work/target-base" cargo build -q --offline --release -p ubnfc-rust --bin ubnfc-rust)
-  (cd "$ubnfc" && CARGO_TARGET_DIR="$work/target-after" cargo build -q --offline --release --bin ubnfc-rust --bin ubnfc)
+  # 同じ package 名・version の別 worktree で Cargo の生成器を取り違えない。
+  # immutable な基準 commit ごとに target を分ける。
+  local base_target=$work/target-base-$(git -C "$ubnfc" rev-parse "$base")
+  local after_target=$work/target-after-$(git -C "$after_root" rev-parse HEAD)
+  # 1. BASE_WORKTREE があれば detached worktree の生成器を使う。
+  if [[ -n ${BASE_WORKTREE:-} ]]; then
+    [[ $(git -C "$base_root" rev-parse HEAD) = $(git -C "$ubnfc" rev-parse "$base") ]] || {
+      echo 'BASE と BASE_WORKTREE の commit が一致しない' >&2; exit 2;
+    }
+    git -C "$base_root" diff --quiet HEAD || {
+      echo '基準生成器に未 commit の変更がある' >&2; exit 2;
+    }
+  fi
+  if [[ -z ${BASE_WORKTREE:-} ]]; then
+    rm -rf "$work/base" && mkdir -p "$work/base"
+    (cd "$ubnfc" && git archive "$base" crates Cargo.toml Cargo.lock examples scanners ir) | tar -xf - -C "$work/base"
+  fi
+  (cd "$base_root" && CARGO_TARGET_DIR="$base_target" cargo build -q --offline --release -p ubnfc-rust --bin ubnfc-rust)
+  (cd "$after_root" && CARGO_TARGET_DIR="$after_target" cargo build -q --offline --release --bin ubnfc-rust --bin ubnfc "${after_features[@]}")
   git -C "$ubnfc" rev-parse "$base" > "$work/base.rev"
-  git -C "$ubnfc" rev-parse HEAD > "$work/after.rev"
-  git -C "$ubnfc" diff -- crates/ubnfc-rust > "$work/generator.diff"
-  sha256sum "$ubnfc/crates/ubnfc-rust/src/scan.rs" "$ubnfc/benchmarks/src/family_swar.rs" > "$work/sources.sha256"
+  git -C "$after_root" rev-parse HEAD > "$work/after.rev"
+  git -C "$after_root" diff -- crates/ubnfc-rust > "$work/generator.diff"
+  sha256sum "$after_root/crates/ubnfc-rust/src/scan.rs" "$ubnfc/benchmarks/src/family_swar.rs" > "$work/sources.sha256"
   # 2. IR（共通）と生成物。
   mkdir -p "$work/ir"
-  "$work/target-after/release/ubnfc" ir --grammar "$ubnfc/examples/json/json.ubnf" --out "$work/ir/json.ir.json"
+  "$after_target/release/ubnfc" ir --grammar "$ubnfc/examples/json/json.ubnf" --out "$work/ir/json.ir.json"
   cp "$ubnfc/ir/frozen/tinyexpression-p4-f86ce8a5.ir.json" "$work/ir/p4.ir.json"
   cp "$ubnfc/ir/fixtures/unlaxer-dsl__src__test__resources__associative__Operators.ubnf.ir.json" "$work/ir/ops.ir.json"
   # 後から追加された LL(1) 表は両側から外し、bulk scan 内部だけを比べる。
@@ -48,7 +68,7 @@ for path in pathlib.Path(sys.argv[1]).glob('*.ir.json'):
         path.write_text(json.dumps(ir, ensure_ascii=False, indent=2) + '\n')
 PY
   for side in before after; do
-    local gen=$work/target-$([ "$side" = before ] && echo base || echo after)/release/ubnfc-rust
+    local gen=$([ "$side" = before ] && echo "$base_target" || echo "$after_target")/release/ubnfc-rust
     rm -rf "$work/$side" && mkdir -p "$work/$side"
     for name in p4 json ops; do
       "$gen" --ir "$work/ir/$name.ir.json" --out "$work/$side/$name" --no-emit-driver
@@ -71,6 +91,11 @@ PY
   mkdir -p "$work/inputs"
   python3 "$ubnfc/benchmarks/scripts/make-json-inputs.py" "$suite/test_parsing" "$work/inputs" >/dev/null
   python3 -c "open('$work/inputs/operators-atoms-512.txt','w').write('+'.join(['1']*512))"
+  { rustc --version; cargo --version; uname -srm;
+    printf 'after_features=%s\n' "${AFTER_FEATURES:-既定}";
+    sha256sum "$base_target/release/ubnfc-rust" "$after_target/release/ubnfc-rust";
+    sha256sum "$work/ir/"*.json "$work/inputs/"* "$work/before/"*/parser.rs "$work/after/"*/parser.rs;
+  } > "$work/build-options.txt"
   echo "# prepare: 完了 ($work, before=$(cat "$work/base.rev"), after=$(cat "$work/after.rev"))" >&2
 }
 

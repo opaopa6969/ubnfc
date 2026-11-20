@@ -5,6 +5,11 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
+# 性能が確認できるまで portable SWAR の生成は明示的な opt-in とする（#31）。
+[features]
+default = []
+swar = []
+
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true

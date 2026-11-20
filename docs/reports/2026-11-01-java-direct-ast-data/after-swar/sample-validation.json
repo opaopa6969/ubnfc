@@ -1,0 +1,17 @@
+{
+  "各cell_samples": 7,
+  "セッション": 3,
+  "中央値再計算一致": true,
+  "ソースSHA再確認": true,
+  "cell件数": {
+    "s1-p4.csv": 8,
+    "s1-operators.csv": 5,
+    "s1-rust.csv": 4,
+    "s2-p4.csv": 8,
+    "s2-operators.csv": 5,
+    "s2-rust.csv": 4,
+    "s3-p4.csv": 8,
+    "s3-operators.csv": 5,
+    "s3-rust.csv": 4
+  }
+}

@@ -80,8 +80,15 @@ code point から UTF-16 への変換も期待位置と照合する。
   フィールドは FieldDecl。未指定の文法では従来の無分類候補を維持する。
   設定は LSP 生成器だけが解釈し、parser / IR / 本番文法は変わらない。
 - references / rename は既存の文書内の綴り単位。型によるフィールドの一意解決は提供しない。
-- `: before ( -- ) ;\n: broken ( ` の不完全入力では正常前半の定義索引も空になる。
-  全文修正後の復帰は検証済み。失敗位置で切る既存の前半再解析では、この例を保持できない。
+- `: before ( -- ) ;\n: broken ( ` の不完全入力でも、単独で成功する正常前半を再解析し、
+  before の定義・その前半の参照・補完・folding を保持する。全文診断のメッセージと
+  `data.analysis=prefix` / `data.indexedThroughCp`、scope 診断の `code=scope-prefix`、
+  補完の detail で部分索引と区別する。壊れた定義の内部や後半は推測で索引化しない。
+  修正・空文書への置換・close・同じ URI の再 open で古い宣言を残さない。
+- 前半探索は最遠失敗位置以下から code point ごとに切断位置を後退し、
+  requireFullInput=true で単独成功した最長の前半だけを採用する。
+  全文成功時の追加解析は無い。失敗時は最悪で入力長に比例する回数の再解析が必要。
+  増分解析や途中の parser 状態の持ち出しは行わない（#18 の設計判断は維持）。
 
 [#49](https://github.com/opaopa6969/ubnfc/issues/49) の語を跨ぐ束縛・入れ子引用・同名更新・
 宣言順・型/語/フィールド補完は protocol golden で検証する。
@@ -100,11 +107,20 @@ TopLevel 回復を生成する。本番 `stax.ubnf` は変更しない。結果�
 
 壊れた入力は `: broken ( -- ) [ ;\n: after ( -- ) ;\n`。
 TopLevel 案では API が ok=true、回復 span=[0,19] / skippedSpan=[0,18] を返す。
-しかし同じ IR から生成した LSP は **publishDiagnostics=[]** を返す。
-現行 `Diagnostics` が primary 成功時の recoveries を列挙しないためで、回復の無言の成功を
-実用上のエラー耐性と数えない。本番で採用する前に、回復領域からエラー診断を出し、
-修正・close で消す契約が必要。選択全体の回復自体には現時点で front 拡張は不要である。
-回復診断と正常前半の索引維持は [#50](https://github.com/opaopa6969/ubnfc/issues/50) で扱う。
+#50 で生成 LSP は primary が成功した場合も、採用済みの recoveries を全件 Error 診断へ写す。
+`code=recovery`、`data.origin=recovery`、ruleId / mode / expected / skippedRange を付け、
+診断 range と関連情報の URI は既存の Positions で code point から UTF-16 へ変換する。
+expected は parser の回復領域が持つ集合そのもの。修正・空文書・close 後に診断を残さない。
+`recovery.json` は最小例・実際の after 参照・同一行の BMP 外文字を含む複数回復を API と
+stdio protocol で照合し、primary 成功・全領域の Error・after のジャンプ・復帰を検証する。
+
+**分離の判断**: TopLevel 回復はエディタの評価用コピーに限定し、既定 VSIX も本番の
+strict 文法を使い続ける。回復 marker を型検査器の通常入力へ混ぜず、正常前半の索引だけでも
+strict 文法の編集を支援できるため。回復付き IR の LSP を生成する機能自体は利用できる。
+本番 stax.ubnf・通常の strict 検証・構文拒否ケース・型検査器の受理範囲は変えない。
+既存の ParseResult.recoveries / scope event / lexical だけを使い、front 拡張や新しい parser
+公開契約は不要。rollback / memo / canonical AST の契約を維持する。
+[#50](https://github.com/opaopa6969/ubnfc/issues/50) の回復診断と正常前半保持は通常 CI で検証する。
 
 ## 実機で試す手順と未確認部分
 

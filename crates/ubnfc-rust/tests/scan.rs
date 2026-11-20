@@ -59,8 +59,9 @@ fn a_character_class_repetition_carries_a_complete_bulk_table_and_one_tight_loop
     );
     assert!(source.contains("fn s"), "走査関数を生成する");
     assert!(
-        source.contains("u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"))"),
-        "ASCII は安全な 8 byte 読み込みで SWAR 判定する"
+        source.contains("u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"))")
+            == cfg!(feature = "swar"),
+        "SWAR は feature を指定した生成器だけが出力する"
     );
     // 表が完全なので、走査が止まった位置で本体を呼び直さない。
     assert!(

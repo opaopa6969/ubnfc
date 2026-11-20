@@ -1,0 +1,19 @@
+{
+  "master_revision": "3152d5721d62ec7fb7f558d8fba64283e320d833",
+  "previous_head": "a61fa8a5520feb4a16f64df576fc836e64d77efb",
+  "all_measured_source_sha256_unchanged": true,
+  "core_front_harness_pin_schema_unchanged": true,
+  "ast_decision_id": "D-092",
+  "lsp_decision_ids_preserved": [
+    "D-086",
+    "D-087",
+    "D-088",
+    "D-091"
+  ],
+  "lsp_reactor_tests": {
+    "tests": 15,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  }
+}

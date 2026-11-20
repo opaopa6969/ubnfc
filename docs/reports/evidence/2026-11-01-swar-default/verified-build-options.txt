@@ -1,0 +1,21 @@
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+cargo 1.99.1 (5f94df478 2026-08-27)
+Linux 6.18.33.2-microsoft-standard-WSL2 x86_64
+after_features=既定
+58d3ba84a58beda6826b8701cf9222b7d1c4780c52f9ff35bc4f9681538e571f  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/target-base-3fa69b5c8e4e438c76a4679c634ef382ef2b1cb6/release/ubnfc-rust
+a5a5b57ffa754993c902e8bbe46280f748565b5c7044137a59c0f22b3cbb7764  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/target-after-12e5e80641c16c5cd98ccb91e92dc656d35fcbb9/release/ubnfc-rust
+3dd24e076d35f26d7b3e7dde84977cfa2ec4add25cbd9d3e694e6c436f66ae03  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/ir/json.ir.json
+5ea4e47b431275ef37868e37a6ff91e89ffdeae4d14eccaaa07c92e51164efeb  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/ir/ops.ir.json
+173e218d671a25184aba2342aa1579c1a4f33e160629384a89a7208ed7cf8868  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/ir/p4.ir.json
+8e3c94bda14b7df83352fede0892d2532f67ee5ba796206864a211cba75184ee  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/inputs/inputs.sha256
+d7a4d32f25212e517f1a4e48cf684326c3874fb49e566f2f541911e9798d2ee1  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/inputs/json-100k.json
+7ab96e563a716f06876abdead3c7125bc945e730831dc5790f99a60ef01f02c1  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/inputs/json-10k.json
+d447f5b338fad2f4418b6b762c6cb6bd451ef33bd36551010252af6c300ddc90  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/inputs/json-1k.json
+ae482dce4b9b5f5ed2dad2f988e1d0f675663faf61f22c31d52dccbefaf9849c  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/inputs/json-1m.json
+c6973089da125bc7162b53db8e8e6fa05cd62ce89ff873f197625ab4c08bf194  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/inputs/operators-atoms-512.txt
+11383e72f5e8197368ae2bdb7c307096ddb98ecdbda51e38def9b6363853c76b  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/before/json/parser.rs
+3e427c47ec53e3c2e8758ccb95851e0084bd1bd7143cf95cd9b4f4af237dfc91  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/before/ops/parser.rs
+71ca298c70574d703e567915007e289052e706044e72e668543ba729441847b6  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/before/p4/parser.rs
+5f77c8fdc6c8a270f34d85e736b0603dfc89274cb11ed901fbb16a4027f35b27  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/after/json/parser.rs
+bd1810b992b830063be3d44366d03040d62581f6bbde8e7c2e71cf1e65ae5360  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/after/ops/parser.rs
+8aad93b3278f26ff8ab7e39a88a100e17278463e750085f51d690174855dde42  /home/opa/work/.wt/ubnfc-perf-31/target/perf31-final-Plv9dh/after/p4/parser.rs

@@ -119,7 +119,7 @@ public final class Symbols {
                 case "enter" -> stack.add(new LinkedHashMap<>());
                 case "leave" -> {
                     boolean entryEnd = reference == null && event.name().equals(LanguageServerImpl.ENTRY)
-                        && event.offsetCp() == analysis.positions().lengthCp();
+                        && event.offsetCp() == (analysis.scopedIsPrefix() ? analysis.cutCp() : analysis.positions().lengthCp());
                     if (!entryEnd && stack.size() > 1) stack.remove(stack.size() - 1);
                 }
                 case "declare" -> {

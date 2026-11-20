@@ -1,0 +1,412 @@
+{
+  "p4": [
+    {
+      "session": 1,
+      "fixture": "complex",
+      "direct": {
+        "median": 0.416256,
+        "min": 0.337363,
+        "max": 0.832265,
+        "bytes": 241048
+      },
+      "recipe": {
+        "median": 0.433515,
+        "min": 0.280035,
+        "max": 0.525652,
+        "bytes": 249528
+      },
+      "recognize_direct": {
+        "median": 0.378953,
+        "min": 0.241527,
+        "max": 0.500106,
+        "bytes": 136888
+      },
+      "recognize_recipe": {
+        "median": 0.273151,
+        "min": 0.193687,
+        "max": 0.707052,
+        "bytes": 136888
+      },
+      "ast_ratio": 0.9601882287810111,
+      "control_ratio": 1.3873388711738197,
+      "load_min": 59.91,
+      "load_max": 66.83
+    },
+    {
+      "session": 1,
+      "fixture": "complex-x64",
+      "direct": {
+        "median": 42.414701,
+        "min": 36.068875,
+        "max": 87.80549,
+        "bytes": 10444336
+      },
+      "recipe": {
+        "median": 50.267013,
+        "min": 40.314723,
+        "max": 89.091717,
+        "bytes": 10970424
+      },
+      "recognize_direct": {
+        "median": 22.724438,
+        "min": 19.250205,
+        "max": 42.410349,
+        "bytes": 4026232
+      },
+      "recognize_recipe": {
+        "median": 25.608189,
+        "min": 17.347678,
+        "max": 39.956999,
+        "bytes": 4026232
+      },
+      "ast_ratio": 0.8437879728401606,
+      "control_ratio": 0.8873894987263644,
+      "load_min": 59.91,
+      "load_max": 66.83
+    },
+    {
+      "session": 2,
+      "fixture": "complex",
+      "direct": {
+        "median": 0.315104,
+        "min": 0.277521,
+        "max": 0.361377,
+        "bytes": 241048
+      },
+      "recipe": {
+        "median": 0.317418,
+        "min": 0.284084,
+        "max": 0.444107,
+        "bytes": 249528
+      },
+      "recognize_direct": {
+        "median": 0.21568,
+        "min": 0.15897,
+        "max": 0.272156,
+        "bytes": 136888
+      },
+      "recognize_recipe": {
+        "median": 0.184272,
+        "min": 0.160434,
+        "max": 0.284784,
+        "bytes": 136888
+      },
+      "ast_ratio": 0.9927099282334336,
+      "control_ratio": 1.1704436919336634,
+      "load_min": 48.03,
+      "load_max": 51.51
+    },
+    {
+      "session": 2,
+      "fixture": "complex-x64",
+      "direct": {
+        "median": 36.567591,
+        "min": 32.820076,
+        "max": 50.164858,
+        "bytes": 10444336
+      },
+      "recipe": {
+        "median": 36.316181,
+        "min": 31.535073,
+        "max": 40.46678,
+        "bytes": 10970424
+      },
+      "recognize_direct": {
+        "median": 21.290275,
+        "min": 16.018735,
+        "max": 27.785735,
+        "bytes": 4026232
+      },
+      "recognize_recipe": {
+        "median": 19.924092,
+        "min": 17.650229,
+        "max": 25.245757,
+        "bytes": 4026232
+      },
+      "ast_ratio": 1.006922809422059,
+      "control_ratio": 1.068569398294286,
+      "load_min": 48.03,
+      "load_max": 51.51
+    },
+    {
+      "session": 3,
+      "fixture": "complex",
+      "direct": {
+        "median": 0.238373,
+        "min": 0.216678,
+        "max": 0.267354,
+        "bytes": 241048
+      },
+      "recipe": {
+        "median": 0.238248,
+        "min": 0.197573,
+        "max": 0.317108,
+        "bytes": 249528
+      },
+      "recognize_direct": {
+        "median": 0.131277,
+        "min": 0.116829,
+        "max": 0.142254,
+        "bytes": 136888
+      },
+      "recognize_recipe": {
+        "median": 0.124306,
+        "min": 0.115546,
+        "max": 0.158284,
+        "bytes": 136888
+      },
+      "ast_ratio": 1.0005246633759781,
+      "control_ratio": 1.0560793525654433,
+      "load_min": 27.77,
+      "load_max": 30.69
+    },
+    {
+      "session": 3,
+      "fixture": "complex-x64",
+      "direct": {
+        "median": 23.321909,
+        "min": 20.026837,
+        "max": 33.550615,
+        "bytes": 10444336
+      },
+      "recipe": {
+        "median": 24.17903,
+        "min": 19.337116,
+        "max": 25.312876,
+        "bytes": 10970424
+      },
+      "recognize_direct": {
+        "median": 13.641535,
+        "min": 11.357257,
+        "max": 17.783146,
+        "bytes": 4026232
+      },
+      "recognize_recipe": {
+        "median": 13.060645,
+        "min": 11.801241,
+        "max": 17.806717,
+        "bytes": 4026232
+      },
+      "ast_ratio": 0.9645510593270284,
+      "control_ratio": 1.0444763639161772,
+      "load_min": 27.77,
+      "load_max": 30.69
+    }
+  ],
+  "layers": [
+    {
+      "session": 1,
+      "fixture": "complex",
+      "java_layer": 0.03730300000000003,
+      "rust_layer": 0.04563300000000001,
+      "ratio": 0.8174566651326897,
+      "rust_ast": {
+        "median": 0.154291,
+        "min": 0.143931,
+        "max": 0.194312941
+      },
+      "rust_recognize": {
+        "median": 0.108658,
+        "min": 0.097336,
+        "max": 0.152788258
+      },
+      "rust_load_min": 56.77,
+      "rust_load_max": 60.78
+    },
+    {
+      "session": 1,
+      "fixture": "complex-x64",
+      "java_layer": 19.690263,
+      "rust_layer": 9.533964000000001,
+      "ratio": 2.065275576874425,
+      "rust_ast": {
+        "median": 20.627171,
+        "min": 14.735985,
+        "max": 24.7297941
+      },
+      "rust_recognize": {
+        "median": 11.093207,
+        "min": 9.502289,
+        "max": 20.940280939999997
+      },
+      "rust_load_min": 56.77,
+      "rust_load_max": 60.78
+    },
+    {
+      "session": 2,
+      "fixture": "complex",
+      "java_layer": 0.09942399999999998,
+      "rust_layer": 0.040992000000000015,
+      "ratio": 2.425448868071818,
+      "rust_ast": {
+        "median": 0.149603,
+        "min": 0.146631,
+        "max": 0.258967284
+      },
+      "rust_recognize": {
+        "median": 0.108611,
+        "min": 0.101059,
+        "max": 0.175717046
+      },
+      "rust_load_min": 58.95,
+      "rust_load_max": 61.12
+    },
+    {
+      "session": 2,
+      "fixture": "complex-x64",
+      "java_layer": 15.277315999999999,
+      "rust_layer": 12.583185,
+      "ratio": 1.2141056497222285,
+      "rust_ast": {
+        "median": 27.093205,
+        "min": 20.598452,
+        "max": 32.663787740000004
+      },
+      "rust_recognize": {
+        "median": 14.51002,
+        "min": 12.442842,
+        "max": 17.39865964
+      },
+      "rust_load_min": 58.95,
+      "rust_load_max": 61.12
+    },
+    {
+      "session": 3,
+      "fixture": "complex",
+      "java_layer": 0.107096,
+      "rust_layer": 0.040433,
+      "ratio": 2.648727524546781,
+      "rust_ast": {
+        "median": 0.150163,
+        "min": 0.123821,
+        "max": 0.2334035805
+      },
+      "rust_recognize": {
+        "median": 0.10973,
+        "min": 0.097667,
+        "max": 0.1629029965
+      },
+      "rust_load_min": 27.37,
+      "rust_load_max": 30.16
+    },
+    {
+      "session": 3,
+      "fixture": "complex-x64",
+      "java_layer": 9.680374000000002,
+      "rust_layer": 5.515263000000001,
+      "ratio": 1.7551971682946037,
+      "rust_ast": {
+        "median": 17.166803,
+        "min": 12.784084,
+        "max": 31.392845259999998
+      },
+      "rust_recognize": {
+        "median": 11.65154,
+        "min": 5.849969,
+        "max": 19.90508478
+      },
+      "rust_load_min": 27.37,
+      "rust_load_max": 30.16
+    }
+  ],
+  "operators": [
+    {
+      "session": 2,
+      "direct": {
+        "median": 0.501393,
+        "min": 0.369068,
+        "max": 0.740327,
+        "bytes": 1194856
+      },
+      "recipe": {
+        "median": 0.599085,
+        "min": 0.472603,
+        "max": 0.63189,
+        "bytes": 1248160
+      },
+      "handwritten": {
+        "median": 0.743436,
+        "min": 0.678584,
+        "max": 0.900745,
+        "bytes": 2768784
+      },
+      "ratio": 0.6744265814407696,
+      "control_ratio": 1.0760692846423212,
+      "load_min": 38.7,
+      "load_max": 42.14
+    },
+    {
+      "session": 3,
+      "direct": {
+        "median": 0.636637,
+        "min": 0.567847,
+        "max": 0.945048,
+        "bytes": 1194824
+      },
+      "recipe": {
+        "median": 0.67953,
+        "min": 0.608432,
+        "max": 0.912539,
+        "bytes": 1248128
+      },
+      "handwritten": {
+        "median": 0.948602,
+        "min": 0.841346,
+        "max": 1.044186,
+        "bytes": 2768784
+      },
+      "ratio": 0.6711318340041451,
+      "control_ratio": 1.1219282999725575,
+      "load_min": 31.32,
+      "load_max": 33.88
+    },
+    {
+      "session": 4,
+      "direct": {
+        "median": 0.678303,
+        "min": 0.535886,
+        "max": 0.919613,
+        "bytes": 1194856
+      },
+      "recipe": {
+        "median": 0.849965,
+        "min": 0.622403,
+        "max": 1.11913,
+        "bytes": 1248160
+      },
+      "handwritten": {
+        "median": 0.893627,
+        "min": 0.819714,
+        "max": 1.472128,
+        "bytes": 2768784
+      },
+      "ratio": 0.7590448811416844,
+      "control_ratio": 0.949781964210924,
+      "load_min": 27.44,
+      "load_max": 31.86
+    }
+  ],
+  "representative": {
+    "complex": {
+      "ast": 0.315104,
+      "recipe_ast": 0.317418,
+      "recognize": 0.21568,
+      "java_layer": 0.09942399999999998,
+      "rust_layer": 0.040992000000000015,
+      "layer_ratio": 2.425448868071818
+    },
+    "complex-x64": {
+      "ast": 36.567591,
+      "recipe_ast": 36.316181,
+      "recognize": 21.290275,
+      "java_layer": 15.277315999999999,
+      "rust_layer": 9.533964000000001,
+      "layer_ratio": 1.602409658773622
+    },
+    "operators": {
+      "ast": 0.636637,
+      "recipe_ast": 0.67953,
+      "handwritten": 0.893627
+    }
+  }
+}

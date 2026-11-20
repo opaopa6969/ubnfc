@@ -3,8 +3,8 @@
 ## 完了範囲と設計判断
 
 段階 3 §5.2 に残した GrammarValidator 相当の検査を、既存 front の
-`ubnfc validate --format json` を呼ぶ生成 `FrontValidation.java` で提供する（D-094）。
-外部 `.tecatalog` は生成 `CatalogDiagnostics.java` が `ParseResult.catalogs()` の capture と照合する（D-095）。
+`ubnfc validate --format json` を呼ぶ生成 `FrontValidation.java` で提供する（D-101）。
+外部 `.tecatalog` は生成 `CatalogDiagnostics.java` が `ParseResult.catalogs()` の capture と照合する（D-102）。
 生成される LSP ソースは 12 → 14 ファイルになる。
 
 **LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP / DAP はない。**
@@ -202,7 +202,7 @@ Rust のソースや期待値は変更していない。CI での workspace 全�
 master `bdd87bd`）が merge されたため取り込んだ。stax の protocol 検査は `textDocumentSync` の
 整数 `1` を前提としていたので、Full 同期を検査しつつ openClose / save の明示通知も検査する形へ追従した。
 既存の protocol golden も同期の通知形式だけを更新し、言語の振る舞いは変更しない。
-その後、増分再解析設計の PR #18（master `06fa27b`）も取り込んだ。master の D-093 を保持し、今回の追加行だけを D-094 / D-095 へ振り直した。
+その後、増分再解析設計の PR #18（master `06fa27b`）も取り込んだ。master の D-093 を保持し、今回の追加行だけを D-101 / D-102 へ振り直した。
 統合後は LSP 全18テスト、stax の protocol / 回復検査と Cargo 側の統合テスト1件が成功した。
 
 stax 段階4を取り込んだ head `2a03b20` の native CI では fuzz campaign の4件が `build:rust` の discard で失敗した。
@@ -214,18 +214,18 @@ issue #26 の完了コメントを参照する。
 
 Rust SWAR 化の PR #32（master `12e5e80`）も CI 待機中に取り込んだ。
 LSP / Java 生成部には追加差分がなく、master の D 行の最大値は D-093 のため
-今回の D-094 / D-095 を維持した。統合後の検査結果は PR checks と完了コメントに記録する。
+今回の D-101 / D-102 を維持した。統合後の検査結果は PR checks と完了コメントに記録する。
 
 その後、PR #55（#54 の詳細ログ保持）と PR #58（scope / catalog context に従う
 定義解決・補完）の master `38efae7` も取り込んだ。#54 は別 PR で close 済みであり、
 当初の CI build 失敗の原因が確定したという意味ではない。今後の再発時に seed と実エラーを追跡できる。
 PR #58 の `--declaration-context` は宣言を補完する用途の生成時設定であり、
 今回の外部カタログを照合する実行時の `catalogs` 設定と併存する。
-D-094 / D-095 の衝突はない。統合後の LSP 全19テストと stax protocol / 回復検査が成功した。
+D-101 / D-102 の衝突はない。統合後の LSP 全19テストと stax protocol / 回復検査が成功した。
 
 stax 段階5の境界検証（PR #53、master `ef4b238`）も取り込んだ。
 追加は stax の境界 fixture / 検査と説明であり、LSP / Java 生成部や protocol 検査への追加差分はない。
-D-094 / D-095 を維持し、最新 master を含む head の CI で全体を検証する。
+D-101 / D-102 を維持し、最新 master を含む head の CI で全体を検証する。
 
 ## 引継ぎと取り消し
 

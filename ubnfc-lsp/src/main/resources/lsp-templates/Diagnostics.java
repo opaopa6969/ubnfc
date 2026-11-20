@@ -11,11 +11,12 @@ import __RT_PACKAGE__.Severity;
 /**
  * 生成パーサの解析結果を LSP の診断へ写す。位置変換は {@link Positions} だけが持つ。
  *
- * <p>出るのは 3 種類。
+ * <p>構文・回復・scope・前半だけの scope 診断を区別する。
  * <ul>
  *   <li>構文エラー — 主位置・{@code expected} 表示ラベル・最深規則</li>
+ *   <li>採用済み回復領域 — primary 成功時にも Error として通知する</li>
  *   <li>scope 診断 — 未定義参照など（WARNING）</li>
- *   <li>前半だけの scope 診断 — 全文が通らない文書で、主失敗位置までを解析し直して得たもの。
+ *   <li>前半だけの scope 診断 — 全文が通らない文書で、単独で成功する正常前半を解析し直して得たもの。
  *       {@code code} を {@code scope-prefix} にして区別できるようにする（D-062）</li>
  * </ul>
  */
@@ -36,7 +37,17 @@ public final class Diagnostics {
             return out;
         }
         var primary = analysis.primary();
-        if (primary != null && !primary.ok()) out.add(syntax(analysis.uri(), positions, primary.diagnostics()));
+        if (primary != null) {
+            if (!primary.ok()) {
+                var diagnostic = syntax(analysis.uri(), positions, primary.diagnostics());
+                if (analysis.scopedIsPrefix()) {
+                    diagnostic.setMessage(diagnostic.getMessage() + "（正常な前半だけを索引化）");
+                    diagnostic.setData(java.util.Map.of("analysis", "prefix", "indexedThroughCp", analysis.cutCp()));
+                }
+                out.add(diagnostic);
+            }
+            for (var recovery : primary.recoveries()) out.add(recovery(analysis, recovery));
+        }
         var scope = analysis.scope();
         if (scope != null)
             for (var diagnostic : scope.diagnostics()) out.add(scope(positions, diagnostic, analysis.scopedIsPrefix()));
@@ -69,6 +80,24 @@ public final class Diagnostics {
                 diagnostic.setRelatedInformation(List.of(new DiagnosticRelatedInformation(
                     new Location(uri, range), "最深規則: " + rule)));
         }
+        return diagnostic;
+    }
+
+    /** 座標・expected は採用済み Recovery から写す。失敗枝や推測したエラーは加えない。 */
+    private static Diagnostic recovery(Analysis analysis, __API_PACKAGE__.ParseResult.Recovery info) {
+        var positions = analysis.positions();
+        var range = positions.rangeOf(info.span().start(), info.span().end());
+        var diagnostic = simple(range, "回復した領域: " + message(info.diagnostic()),
+            DiagnosticSeverity.Error, "recovery");
+        var data = new java.util.LinkedHashMap<String, Object>();
+        data.put("origin", "recovery");
+        data.put("ruleId", info.ruleId());
+        data.put("mode", info.mode());
+        data.put("expected", info.diagnostic() == null ? List.of() : info.diagnostic().expected());
+        data.put("skippedRange", positions.rangeOf(info.skippedSpan().start(), info.skippedSpan().end()));
+        diagnostic.setData(data);
+        diagnostic.setRelatedInformation(List.of(new DiagnosticRelatedInformation(
+            new Location(analysis.uri(), range), "回復規則: " + info.ruleId())));
         return diagnostic;
     }
 
