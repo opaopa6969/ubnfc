@@ -55,6 +55,9 @@ public final class JavaEmitter {
     }
     public JavaEmitter(GrammarIr ir, String packageName) { this(ir, packageName, true); }
     public JavaEmitter(GrammarIr ir, String packageName, boolean emitDriver) {
+        this(ir, packageName, emitDriver, false);
+    }
+    public JavaEmitter(GrammarIr ir, String packageName, boolean emitDriver, boolean swar) {
         Validation.validate(ir); this.ir = ir; this.emitDriver = emitDriver;
         var unit = ir.grammarUnits().stream().filter(g -> g.id().equals(ir.entry().grammarId())).findFirst().orElseThrow();
         grammar = unit.name(); Validation.identifier(grammar); ast = grammar + "AST"; parser = grammar + "Parser";
@@ -80,7 +83,7 @@ public final class JavaEmitter {
         for (String id : rules.keySet()) ruleIds.put(id, ruleIds.size());
         prediction = new Prediction(ir, expressions, rules, tokens, ruleIds, diagnosticPlan, this::labelText);
         factoring = new Factoring(ir, expressions, rules, captures, semanticShapes, diagnosticPlan, this::labelText, id -> scopeSites().contains(id));
-        scanning = new Scanning(ir, expressions, rules, tokens, recipes, exprIds, this::constant);
+        scanning = new Scanning(ir, expressions, rules, tokens, recipes, exprIds, this::constant, swar);
     }
     public Map<String, String> sources() throws IOException {
         var result = new TreeMap<String, String>(); String prefix = pkg.replace('.', '/') + "/";
