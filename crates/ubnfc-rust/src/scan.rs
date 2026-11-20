@@ -289,22 +289,45 @@ fn body(g: &Generator<'_>, scans: &Scans, i: usize) -> Option<String> {
             }
             let bulk = table.map(|class| {
                 let increment = if counted { "count+=1;" } else { "" };
-                let (prefix, word, restart) = if let Some(condition) = cfg!(feature = "swar")
+                if let Some(condition) = cfg!(feature = "swar")
                     .then(|| word_failure_mask(class))
                     .flatten()
                 {
-                    // 短い ASCII 区間は表引きのまま進み、連続して 2 byte 消費したときだけ
-                    // word loop に入る。末尾の端数は表引きに戻し、UTF-8 の後で再試行する。
+                    // 先頭 2 byte と端数は直接表引きする。非 ASCII は UTF-8 判定へ渡し、
+                    // 次の ASCII 区間は先頭から数え直す。
                     let count_word = if counted { "count+=n;" } else { "" };
-                    let word = format!(
-                        "if p-ascii_start==2 {{\nwhile let Some(chunk)=bytes.get(p..).and_then(|tail|tail.get(..8)) {{\nlet w=u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"));\nlet x=w&0x7f7f7f7f7f7f7f7fu64;let _=x;\nlet bad={condition};let n=(bad.trailing_zeros()/8) as usize;p+=n;{count_word}if bad!=0 {{break;}}\n}}}}\n"
+                    return format!(
+                        "const ASCII:[bool;256]={{\n\
+                         let mut table=[false;256];let mut b=0;\n\
+                         while b<64 {{table[b]=({:#x}u64>>b)&1!=0;\n\
+                         table[b+64]=({:#x}u64>>b)&1!=0;b+=1;}}table}};\n\
+                         let bytes=self.text.as_bytes();\n\
+                         while let Some(&b)=bytes.get(p) {{\n\
+                         if ASCII[b as usize] {{\n\
+                         p+=1;{increment}\n\
+                         if bytes.get(p).is_some_and(|&b|ASCII[b as usize]) {{\n\
+                         p+=1;{increment}\n\
+                         while let Some(chunk)=bytes.get(p..).and_then(|tail|tail.get(..8)) {{\n\
+                         let w=u64::from_le_bytes(chunk.try_into().expect(\"8 bytes\"));\n\
+                         let x=w&0x7f7f7f7f7f7f7f7fu64;let _=x;\n\
+                         let bad={condition};let n=(bad.trailing_zeros()/8) as usize;\n\
+                         p+=n;{count_word}if bad!=0 {{break;}}\n\
+                         }}\n\
+                         while bytes.get(p).is_some_and(|&b|ASCII[b as usize]) {{\n\
+                         p+=1;{increment}\n\
+                         }}\n\
+                         }}\n\
+                         }} else {{\n\
+                         if b<128 {{break;}}\n\
+                         let Some((c,n))=self.input.cp_at(p) else {{break;}};\n\
+                         if !{} {{break;}}p+=n;{increment}\n\
+                         }}\n\
+                         }}\n",
+                        class.ascii_low, class.ascii_high, class_condition(class)
                     );
-                    ("let mut ascii_start=p;\n", word, "ascii_start=p;")
-                } else {
-                    ("", String::new(), "")
-                };
+                }
                 format!(
-                    "{prefix}let bytes=self.text.as_bytes();while let Some(&first)=bytes.get(p) {{\nlet b=first;\nif b<0x80 {{if (if b<64 {{{:#x}u64>>b}} else {{{:#x}u64>>(b-64)}})&1==0 {{break;}}p+=1;{word}}}\nelse {{let Some((c,n))=self.input.cp_at(p) else {{break;}};if !{} {{break;}}p+=n;{restart}}}\n{increment}}}\n",
+                    "let bytes=self.text.as_bytes();while let Some(&first)=bytes.get(p) {{\nlet b=first;\nif b<0x80 {{if (if b<64 {{{:#x}u64>>b}} else {{{:#x}u64>>(b-64)}})&1==0 {{break;}}p+=1;}}\nelse {{let Some((c,n))=self.input.cp_at(p) else {{break;}};if !{} {{break;}}p+=n;}}\n{increment}}}\n",
                     class.ascii_low, class.ascii_high, class_condition(class)
                 )
             });
