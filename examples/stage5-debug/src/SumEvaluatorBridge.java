@@ -34,4 +34,10 @@ public final class SumEvaluatorBridge implements EvaluatorBridge {
         return "total".equals(expression.strip())
             ? Optional.of(new Evaluation(total.toPlainString(), "number")) : Optional.empty();
     }
+
+    @Override public boolean supportsLogpointExpressions() { return true; }
+
+    @Override public Optional<String> evaluateLogpointExpression(String expression, Object node) {
+        return evaluate(expression, node, "logpoint").map(Evaluation::result);
+    }
 }

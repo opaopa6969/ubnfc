@@ -1,0 +1,42 @@
+{
+  "supportsLogPoints": true,
+  "events": [
+    "console:total\u003d5 / {5}\n",
+    "stderr:logpoint の式を評価できません。\n",
+    "stderr:logpoint の評価に失敗しました。\n",
+    "console:併用\u003d5\n",
+    "stopped:breakpoint"
+  ],
+  "afterRelaunch": [
+    "console:total\u003d7\n"
+  ],
+  "noopRegistration": [
+    {
+      "verified": true,
+      "line": 2
+    },
+    {
+      "verified": false,
+      "message": "式付き logpoint には対応する EvaluatorBridge が必要です",
+      "line": 2
+    },
+    {
+      "verified": false,
+      "message": "logpoint の波括弧または式が不正です",
+      "line": 2
+    },
+    {
+      "verified": false,
+      "message": "logpoint の波括弧または式が不正です",
+      "line": 2
+    },
+    {
+      "verified": false,
+      "message": "logpoint の波括弧または式が不正です",
+      "line": 2
+    }
+  ],
+  "noopEvents": [
+    "console:literal\u003d{total}\n"
+  ]
+}
