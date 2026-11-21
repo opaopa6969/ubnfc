@@ -107,6 +107,7 @@ public final class Stage5Scenario {
         out.put("dap-conditions", dapConditions(work));
         out.put("dap-hit-condition", dapHitCondition(work));
         out.put("dap-logpoints", dapLogpoints(work));
+        out.put("dap-set-expression", dapSetExpression(work));
         return out;
     }
 
@@ -592,6 +593,74 @@ public final class Stage5Scenario {
         var breakpoint = sourceBreakpoint(line, null);
         breakpoint.setLogMessage(message);
         return breakpoint;
+    }
+
+    private static String dapSetExpression(Path work) throws Exception {
+        Path file = work.resolve("assignment.demo");
+        Files.writeString(file, "let counter = 5;\nlet sibling = 2;\n");
+        var launch = Map.<String, Object>of("program", file.toString());
+        var out = new LinkedHashMap<String, Object>();
+        EvaluatorBridge readOnly = new EvaluatorBridge() {
+            @Override public Optional<Evaluation> evaluate(String expression, Object node, String context) {
+                return "watch".equals(context) && node instanceof Stage5AST.Let value && value.name().equals(expression)
+                    ? Optional.of(new Evaluation(value.value(), "number")) : Optional.empty();
+            }
+            @Override public Optional<Evaluation> setVariable(String container, String name, String value, Object node) {
+                throw new AssertionError("setExpression は setVariable に委譲しない");
+            }
+        };
+        var watch = new EvaluateArguments();
+        watch.setContext("watch");
+        watch.setExpression("counter");
+        try (var wire = new DapWire(new DebugAdapter(Map.of(), readOnly))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertFalse(caps.getSupportsSetExpression());
+            out.put("supportsSetExpression", caps.getSupportsSetExpression());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var step = new StepInArguments();
+            step.setThreadId(1);
+            dap.stepIn(step).get(30, TimeUnit.SECONDS);
+            var frame = topFrame(dap);
+            var value = dap.evaluate(watch).get(30, TimeUnit.SECONDS);
+            assertEquals("5", value.getResult());
+            out.put("validTargetRejected", rejectedAssignment(dap, "7", frame.getId()));
+            out.put("invalidValueRejected", rejectedAssignment(dap, "arbitrary()", frame.getId()));
+            out.put("foreignFrameRejected", rejectedAssignment(dap, "7", frame.getId() + 1));
+            assertEquals(frame, topFrame(dap));
+            assertEquals(value, dap.evaluate(watch).get(30, TimeUnit.SECONDS));
+            assertEquals(List.of("stopped:entry", "stopped:step"), wire.breakpointEvents);
+            out.put("unchangedFrame", List.of(frame.getId(), frame.getLine(), frame.getColumn()));
+            out.put("unchangedValue", value.getResult());
+
+            Files.writeString(file, "let counter = 9;\n");
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            dap.stepIn(step).get(30, TimeUnit.SECONDS);
+            out.put("relaunchedRejected", rejectedAssignment(dap, "7", null));
+            var relaunched = dap.evaluate(watch).get(30, TimeUnit.SECONDS);
+            assertEquals("9", relaunched.getResult());
+            out.put("relaunchedValue", relaunched.getResult());
+        }
+        try (var wire = new DapWire(new DebugAdapter(Map.of()))) {
+            var dap = wire.proxy;
+            assertFalse(dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS).getSupportsSetExpression());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var frame = topFrame(dap);
+            out.put("noopRejected", rejectedAssignment(dap, "7", null));
+            assertEquals(frame, topFrame(dap));
+        }
+        return json(out);
+    }
+
+    private static String rejectedAssignment(IDebugProtocolServer dap, String value, Integer frameId) throws Exception {
+        var args = new SetExpressionArguments();
+        args.setExpression("counter");
+        args.setValue(value);
+        args.setFrameId(frameId);
+        return rejected(() -> dap.setExpression(args).get(30, TimeUnit.SECONDS));
     }
 
     private static BreakpointLocation[] locations(IDebugProtocolServer dap, Source source,
