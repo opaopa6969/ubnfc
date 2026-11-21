@@ -9,7 +9,7 @@ LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP 
 | 条件付き breakpoint | `total > 0` が真の候補位置でだけ停止する。bridge が候補位置の状態から副作用なしに条件を評価する。 | 実装（[#76](https://github.com/opaopa6969/ubnfc/issues/76)） |
 | hit condition | 同じ breakpoint の 3 回目の到達時に停止する。adapter が回数を数え、bridge はカウントを変更しない。 | 実装（[#77](https://github.com/opaopa6969/ubnfc/issues/77)） |
 | logpoint | `total={total}` を出力して停止せずに進む。adapter が出力し、bridge が埋め込み式の値だけを観測する。 | 実装（[#78](https://github.com/opaopa6969/ubnfc/issues/78)） |
-| `setExpression` | 停止中の `counter` に `7` を代入し、watch に反映する。bridge が代入先と型を検証してから更新する。 | [#79](https://github.com/opaopa6969/ubnfc/issues/79) |
+| `setExpression` | 停止中の `counter` に `7` を代入し、watch に反映する。bridge が代入先と型を検証してから更新する。 | 明示拒否（[#79](https://github.com/opaopa6969/ubnfc/issues/79)） |
 | `stepBack` | B の合計が 5、直前の停止 A の合計が 2 なら、A と 2 を一緒に復元する。adapter が停止履歴を管理し、bridge が状態を復元する。 | [#80](https://github.com/opaopa6969/ubnfc/issues/80) |
 
 ## 停止位置と watch
@@ -63,6 +63,18 @@ hover の自動評価は通知しない。再 launch は AST、停止位置、�
 送り、その logpoint 自体では停止しない。未知の式や評価例外では `stderr` を 1 件送り、そのメッセージの
 途中結果は出さず続行する。同じ候補に通常の breakpoint があれば、該当する logpoint を登録順に出力した後で
 通常の停止を通知する。再 launch では logpoint の登録も初期化する。
+
+## Set expression
+
+現在の bridge は `supportsSetExpression=false` とし、直接の `setExpression` には理由を付けて DAP の失敗応答（`success=false`）を返す。
+読み取り専用の評価ができる bridge と NOOP の双方で、代入先と値の全組み合わせを拒否する。
+`evaluate` や `setVariable` には委譲せず、停止位置・変数参照・観測値を保つ。
+
+対応には言語ごとの代入契約が必要になる。指定された停止フレーム内の代入可能な参照を解決し、
+指定を省略した場合は現在の停止フレームを使う。bridge は代入先と値の型を副作用なしで検証し、
+認めた値を状態に一括反映できる場合だけ成功とする。失敗時は元の値と停止位置を保ち、成功後は同じ
+フレームの watch で更新値を観測できることが条件になる。現行の bridge では一括反映を検証できないため
+成功経路を提供しない。
 
 ## 逆実行を有効にする条件
 

@@ -1,0 +1,15 @@
+{
+  "supportsSetExpression": false,
+  "validTargetRejected": "setExpression は未対応です（代入を検証して状態を一括更新する契約がありません）。",
+  "invalidValueRejected": "setExpression は未対応です（代入を検証して状態を一括更新する契約がありません）。",
+  "foreignFrameRejected": "setExpression は未対応です（代入を検証して状態を一括更新する契約がありません）。",
+  "unchangedFrame": [
+    2,
+    1,
+    1
+  ],
+  "unchangedValue": "5",
+  "relaunchedRejected": "setExpression は未対応です（代入を検証して状態を一括更新する契約がありません）。",
+  "relaunchedValue": "9",
+  "noopRejected": "setExpression は未対応です（代入を検証して状態を一括更新する契約がありません）。"
+}

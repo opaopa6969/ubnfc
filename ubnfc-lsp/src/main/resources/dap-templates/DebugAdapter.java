@@ -33,6 +33,8 @@ import org.eclipse.lsp4j.debug.ScopesArguments;
 import org.eclipse.lsp4j.debug.ScopesResponse;
 import org.eclipse.lsp4j.debug.SetBreakpointsArguments;
 import org.eclipse.lsp4j.debug.SetBreakpointsResponse;
+import org.eclipse.lsp4j.debug.SetExpressionArguments;
+import org.eclipse.lsp4j.debug.SetExpressionResponse;
 import org.eclipse.lsp4j.debug.SetVariableArguments;
 import org.eclipse.lsp4j.debug.SetVariableResponse;
 import org.eclipse.lsp4j.debug.SourceBreakpoint;
@@ -662,6 +664,10 @@ public class DebugAdapter implements IDebugProtocolServer {
         response.setVariablesReference(answer.get().children().isEmpty() ? 0
             : handle(() -> answer.get().children().stream().map(this::named).toList()));
         return CompletableFuture.completedFuture(response);
+    }
+
+    @Override public CompletableFuture<SetExpressionResponse> setExpression(SetExpressionArguments args) {
+        return requestFailed("setExpression は未対応です（代入を検証して状態を一括更新する契約がありません）。");
     }
 
     @Override public CompletableFuture<SetVariableResponse> setVariable(SetVariableArguments args) {
