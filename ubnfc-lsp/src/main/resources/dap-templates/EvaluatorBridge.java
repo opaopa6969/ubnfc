@@ -98,6 +98,24 @@ public interface EvaluatorBridge {
     /** 停止前の候補節点を観測して表示値を返す。未知の式には空を返す。 */
     default Optional<String> evaluateLogpointExpression(String expression, Object node) { return Optional.empty(); }
 
+    /** 停止時の値・スコープ・制御状態を再現する、不変のセッション内データ。 */
+    interface Snapshot { }
+
+    /**
+     * 停止時に副作用なしで snapshot を作り、復元を一括で確定できる場合だけ true を返す。
+     * 値は bridge の存続中に固定する。復元できない外部副作用がある場合は有効化しない。
+     */
+    default boolean supportsReverseExecution() { return false; }
+
+    /** onEnterNode の後に呼ばれる。空を返すと、その停止点より前の履歴は使えなくなる。 */
+    default Optional<Snapshot> snapshot() { return Optional.empty(); }
+
+    /**
+     * 同じ launch で保存した状態を一括で復元する。すべて反映できた場合だけ true を返す。
+     * false または例外の場合は、呼出し前の値・スコープ・制御状態をすべて保つ。
+     */
+    default boolean restore(Snapshot snapshot) { return false; }
+
     /** variables パネルからの書き換え。{@code Optional.empty()} を返すと未対応の error になる（既定）。 */
     default Optional<Evaluation> setVariable(String container, String name, String value, Object node) {
         return Optional.empty();

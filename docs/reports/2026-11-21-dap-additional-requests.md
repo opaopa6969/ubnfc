@@ -10,7 +10,7 @@ LSP / DAP は Java 側だけの opt-in feature である。Rust backend に LSP 
 | hit condition | 同じ breakpoint の 3 回目の到達時に停止する。adapter が回数を数え、bridge はカウントを変更しない。 | 実装（[#77](https://github.com/opaopa6969/ubnfc/issues/77)） |
 | logpoint | `total={total}` を出力して停止せずに進む。adapter が出力し、bridge が埋め込み式の値だけを観測する。 | 実装（[#78](https://github.com/opaopa6969/ubnfc/issues/78)） |
 | `setExpression` | 停止中の `counter` に `7` を代入し、watch に反映する。bridge が代入先と型を検証してから更新する。 | 明示拒否（[#79](https://github.com/opaopa6969/ubnfc/issues/79)） |
-| `stepBack` | B の合計が 5、直前の停止 A の合計が 2 なら、A と 2 を一緒に復元する。adapter が停止履歴を管理し、bridge が状態を復元する。 | [#80](https://github.com/opaopa6969/ubnfc/issues/80) |
+| `stepBack` / `reverseContinue` | B の合計が 5、直前の停止 A の合計が 2 なら、A と 2 を一緒に復元する。adapter が停止履歴を管理し、bridge が状態を復元する。 | 実装（[#80](https://github.com/opaopa6969/ubnfc/issues/80)） |
 
 ## 停止位置と watch
 
@@ -78,17 +78,27 @@ hover の自動評価は通知しない。再 launch は AST、停止位置、�
 
 ## 逆実行を有効にする条件
 
-逆実行を実装する bridge は、各停止点の観測時に、値・スコープ・制御状態を再現できる snapshot を
-保存する。復元に失敗したら、復元前の状態とステップ位置を保つ。外部 I/O など復元できない
-副作用を持つ bridge では capability を有効にしない。履歴は launch ごとに作る。
-DAP の同じ capability が対象にする `reverseContinue` の契約も #80 で確定する。
-現行の NOOP と手書き bridge は `supportsStepBack=false` を通知し、直接の `stepBack` には
-失敗応答を返して停止フレームと評価値を保つ。
+`EvaluatorBridge.supportsReverseExecution()` を明示的に有効にする bridge は、値・スコープ・制御状態の
+不変な snapshot を副作用なしで保存し、`restore` によって一括復元できることを保証する。
+外部 I/O など復元できない副作用がある場合は有効にしない。既定の NOOP と `SumEvaluatorBridge` は
+`supportsStepBack=false` を通知し、直接の `stepBack` と `reverseContinue` には理由を付けて失敗を返す。
+
+adapter は前進して停止するたびに、節点への進入通知の後で、bridge の snapshot、カーソル、停止理由、
+登録ごとの hit count を保存する。同じ位置での `pause` は停止履歴を増やさない。snapshot が空または
+取得時に例外となった場合は、それ以前に戻れることを保証できないため履歴を初期化する。
+
+`stepBack` は直前の停止点を復元して理由 `step` で停止する。`reverseContinue` は履歴上で直近の
+`breakpoint` 停止点まで戻り、該当がなければ取得できた最初の停止点にその停止理由で戻る。
+逆実行中に breakpoint の条件や logpoint を再評価せず、節点の進入・退出通知も行わない。
+復元が成功した時にだけカーソルと hit count を戻し、新しい停止を通知して以後の履歴を破棄する。
+現在の breakpoint 登録は使い続け、その停止点に回数がない登録の hit count は 0 に戻す。
+以前の停止点がない時や復元が失敗した時はエラー応答を返し、位置・値・変数参照・履歴を保つ。
+終了時と再 launch 時に履歴を初期化する。
 
 ## 検証
 
 `Stage5GoldenTest` は生成した Java DAP をコンパイルし、実際の JSON-RPC で capability と
-座標、列指定の停止、watch の値・エラー、条件の真偽と失敗、失敗した launch と再 launch、逆実行の拒否を照合する。
+座標、列指定の停止、watch の値・エラー、条件の真偽と失敗、失敗した launch と再 launch、逆実行の成功と安全な拒否を照合する。
 `ParserUnchangedTest.dapEmissionOnlyAddsFiles` は feature off と on の parser / LSP 全ファイルを
 byte 比較する。VS Code 実機での列ブレークポイントと Watch パネル表示は
 [#28](https://github.com/opaopa6969/ubnfc/issues/28) に記録する。
