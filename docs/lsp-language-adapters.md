@@ -45,3 +45,29 @@
 区切り、セミコロンの直前に空白を入れない。文末や波括弧の位置で行を分け、
 ブロック 1 段につき半角空白 2 個で字下げする。各コメントをその深さの独立した行に置き、
 文字列とコメントは字句の内容と出現順を保持する。字句の外の改行には LF を使う。
+
+## 構文診断の quick fix
+
+言語側で生成 LSP パッケージの `SyntaxQuickFix` を実装する。公開の引数なし
+コンストラクターを持つクラスをサーバーのクラスパスに置き、
+`java -jar server.jar --syntax-quick-fix 完全修飾クラス名` で指定する。組み込み時は
+`LanguageServerImpl(scanners, validator, signatures, formatter, quickFix)` に渡せる。
+設定すると `codeActionProvider` に `quickfix` が含まれる。
+
+`forDiagnostic(Analysis document, Diagnostic diagnostic)` は、生成パーサーが出した
+主構文診断の種類 `kind`、最深規則 `deepestRule`、期待ラベル `expected`、code point
+座標などを使って判定する。挿入が一意に決まる場合は編集の表示名と挿入文字列を
+`Insertion` で返し、候補がない場合や複数ある場合は `null` を返す。
+
+クライアントは通知された診断の `data.quickFixDiagnosticId` を code action の
+`context.diagnostics` に引き継ぐ。生成サーバーは開いている文書の最新スナップショットで
+診断 ID・`source`・`code`・`range` を照合し、要求範囲が診断の開始位置を含むことを
+確認する。ID はサーバーのセッション内で文書の更新と再オープンごとに変わる。
+候補は現在の本文の診断開始位置に仮挿入し、全文を再解析する。回復なしで構文解析に
+成功した候補だけを、同じ文書 URI とバージョンを持つ `documentChanges` の編集として
+返す。クライアントにはバージョン付き文書編集のサポートが必要。
+
+[Stage5 用のサンプル](../ubnfc-lsp/src/test/resources/stage5/DemoSyntaxQuickFix.java)は
+`let n = 1` のように `Let` の構文診断が末尾を指し、期待ラベルに `';'` がある場合に
+セミコロンを提案する。`let n =` のように文の内容が決まらない場合や、閉じ波括弧も不足し
+セミコロンの挿入だけでは全文が解析できない場合は編集が空になる。

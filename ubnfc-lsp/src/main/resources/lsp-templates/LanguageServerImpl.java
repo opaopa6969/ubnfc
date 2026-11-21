@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionKind;
+import org.eclipse.lsp4j.CodeActionOptions;
+import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionOptions;
@@ -78,6 +83,8 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
     private final CatalogDiagnostics catalogs = new CatalogDiagnostics();
     private final SignatureHelpProvider signatures;
     private final DocumentFormatter formatter;
+    private final SyntaxQuickFix quickFix;
+    private volatile boolean versionedEdits;
     private LanguageClient client;
 
     public LanguageServerImpl() { this(scanners(SCANNER_CLASS)); }
@@ -96,8 +103,14 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     public LanguageServerImpl(Map<String, TokenScanner> scanners, java.nio.file.Path validator,
                               SignatureHelpProvider signatures, DocumentFormatter formatter) {
+        this(scanners, validator, signatures, formatter, null);
+    }
+
+    public LanguageServerImpl(Map<String, TokenScanner> scanners, java.nio.file.Path validator,
+                              SignatureHelpProvider signatures, DocumentFormatter formatter, SyntaxQuickFix quickFix) {
         this.scanners = Map.copyOf(scanners);
         this.formatter = formatter;
+        this.quickFix = quickFix;
         this.signatures = signatures;
         if (validator != null && (!GRAMMAR.equals("UBNF") || !validator.isAbsolute()))
             throw new IllegalArgumentException("--validator は UBNF サーバに実行ファイルの絶対パスを指定してください");
@@ -134,6 +147,13 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
         if (signatures != null)
             capabilities.setSignatureHelpProvider(new SignatureHelpOptions(List.copyOf(signatures.triggerCharacters())));
         if (formatter != null) capabilities.setDocumentFormattingProvider(true);
+        if (quickFix != null) {
+            capabilities.setCodeActionProvider(new CodeActionOptions(List.of(CodeActionKind.QuickFix)));
+            var clientCapabilities = params.getCapabilities();
+            var workspace = clientCapabilities == null ? null : clientCapabilities.getWorkspace();
+            var edit = workspace == null ? null : workspace.getWorkspaceEdit();
+            versionedEdits = edit != null && Boolean.TRUE.equals(edit.getDocumentChanges());
+        }
         capabilities.setDocumentSymbolProvider(true);
         capabilities.setHoverProvider(true);
         var completion = new CompletionOptions();
@@ -158,14 +178,15 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     @Override public void didOpen(DidOpenTextDocumentParams params) {
         var document = params.getTextDocument();
-        update(document.getUri(), document.getText());
+        update(document.getUri(), document.getText(), document.getVersion());
     }
 
     @Override public void didChange(DidChangeTextDocumentParams params) {
         var changes = params.getContentChanges();
         if (changes.isEmpty()) return;
         // full sync: 最後の変更が文書全体。
-        update(params.getTextDocument().getUri(), changes.get(changes.size() - 1).getText());
+        var document = params.getTextDocument();
+        update(document.getUri(), changes.get(changes.size() - 1).getText(), document.getVersion());
     }
 
     @Override public void didClose(DidCloseTextDocumentParams params) {
@@ -176,8 +197,8 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     @Override public void didSave(DidSaveTextDocumentParams params) {
         String uri = params.getTextDocument().getUri();
-        var analysis = documents.get(uri);
-        if (analysis != null) publish(uri, diagnostics(analysis));
+        var document = documents.snapshot(uri);
+        if (document != null) publish(uri, diagnostics(document));
     }
 
     @Override public void didChangeConfiguration(DidChangeConfigurationParams params) {
@@ -189,8 +210,8 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     private void refresh() {
         for (String uri : new java.util.TreeSet<>(documents.uris())) {
-            var analysis = documents.get(uri);
-            if (analysis != null) publish(uri, diagnostics(analysis));
+            var document = documents.snapshot(uri);
+            if (document != null) publish(uri, diagnostics(document));
         }
     }
 
@@ -246,6 +267,17 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
             }
         }
         return CompletableFuture.completedFuture(new WorkspaceEdit(changes));
+    }
+
+    @Override public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(CodeActionParams params) {
+        if (quickFix == null || !versionedEdits) return CompletableFuture.completedFuture(List.of());
+        String uri = params.getTextDocument().getUri();
+        var document = documents.snapshot(uri);
+        if (document == null || document.version() == null) return CompletableFuture.completedFuture(List.of());
+
+        var action = CodeActions.at(document, params, quickFix);
+        if (action == null || documents.snapshot(uri) != document) return CompletableFuture.completedFuture(List.of());
+        return CompletableFuture.completedFuture(List.of(Either.forRight(action)));
     }
 
     @Override public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
@@ -353,22 +385,26 @@ public final class LanguageServerImpl implements LanguageServer, LanguageClientA
 
     /** 1 文書を全文解析して診断を返す。テストからも直接呼べるように公開している。 */
     public List<org.eclipse.lsp4j.Diagnostic> analyze(String uri, String text) {
-        return diagnostics(analysis(uri, text));
+        return diagnostics(store(uri, text, null));
     }
 
     /** 1 文書を解析して覚える。 */
     public Analysis analysis(String uri, String text) {
-        var analysis = Analysis.of(uri, text, scanners);
-        documents.put(uri, analysis);
-        return analysis;
+        return store(uri, text, null).analysis();
     }
 
-    private void update(String uri, String text) {
-        publish(uri, diagnostics(analysis(uri, text)));
+    private DocumentStore.Snapshot store(String uri, String text, Integer version) {
+        return documents.put(uri, Analysis.of(uri, text, scanners), version);
     }
 
-    private List<org.eclipse.lsp4j.Diagnostic> diagnostics(Analysis analysis) {
-        var out = new ArrayList<>(Diagnostics.of(analysis));
+    private void update(String uri, String text, Integer version) {
+        publish(uri, diagnostics(store(uri, text, version)));
+    }
+
+    private List<org.eclipse.lsp4j.Diagnostic> diagnostics(DocumentStore.Snapshot document) {
+        var analysis = document.analysis();
+        String diagnosticId = quickFix == null || document.version() == null ? null : document.diagnosticId();
+        var out = new ArrayList<>(Diagnostics.of(analysis, diagnosticId));
         out.addAll(FrontValidation.of(analysis, validator));
         out.addAll(catalogs.of(analysis));
         return out;

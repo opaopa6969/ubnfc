@@ -1,6 +1,7 @@
 package __PACKAGE__;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticRelatedInformation;
@@ -25,10 +26,13 @@ public final class Diagnostics {
     public static final String SOURCE = "__SOURCE__";
     /** 期待ラベルをメッセージへ並べる上限。超えた分は件数だけ書く。 */
     private static final int MAX_EXPECTED = 8;
+    static final String QUICK_FIX_ID = "quickFixDiagnosticId";
 
     private Diagnostics() {}
 
-    public static List<Diagnostic> of(Analysis analysis) {
+    public static List<Diagnostic> of(Analysis analysis) { return of(analysis, null); }
+
+    static List<Diagnostic> of(Analysis analysis, String diagnosticId) {
         var out = new ArrayList<Diagnostic>();
         var positions = analysis.positions();
         if (analysis.failure() != null) {
@@ -38,24 +42,29 @@ public final class Diagnostics {
         }
         var primary = analysis.primary();
         if (primary != null) {
-            if (!primary.ok()) {
-                var diagnostic = syntax(analysis.uri(), positions, primary.diagnostics());
-                if (analysis.scopedIsPrefix()) {
-                    diagnostic.setMessage(diagnostic.getMessage() + "（正常な前半だけを索引化）");
-                    // 出力の並びを固定する（Map.of の反復順は実行ごとに変わる）。
-                    var data = new java.util.LinkedHashMap<String, Object>();
-                    data.put("analysis", "prefix");
-                    data.put("indexedThroughCp", analysis.cutCp());
-                    diagnostic.setData(data);
-                }
-                out.add(diagnostic);
-            }
+            var syntax = primarySyntax(analysis, diagnosticId);
+            if (syntax != null) out.add(syntax);
             for (var recovery : primary.recoveries()) out.add(recovery(analysis, recovery));
         }
         var scope = analysis.scope();
         if (scope != null)
             for (var diagnostic : scope.diagnostics()) out.add(scope(positions, diagnostic, analysis.scopedIsPrefix()));
         return out;
+    }
+
+    static Diagnostic primarySyntax(Analysis analysis, String diagnosticId) {
+        var primary = analysis.primary();
+        if (primary == null || primary.ok()) return null;
+        var diagnostic = syntax(analysis.uri(), analysis.positions(), primary.diagnostics());
+        var data = new LinkedHashMap<String, Object>();
+        if (analysis.scopedIsPrefix()) {
+            diagnostic.setMessage(diagnostic.getMessage() + "（正常な前半だけを索引化）");
+            data.put("analysis", "prefix");
+            data.put("indexedThroughCp", analysis.cutCp());
+        }
+        if (diagnosticId != null) data.put(QUICK_FIX_ID, diagnosticId);
+        if (!data.isEmpty()) diagnostic.setData(data);
+        return diagnostic;
     }
 
     private static Diagnostic simple(org.eclipse.lsp4j.Range range, String message, DiagnosticSeverity severity, String code) {

@@ -126,6 +126,16 @@ public final class Analysis {
         return lexical;
     }
 
+    /** 修正候補に対して回復なしで全文解析が成功するか調べる。 */
+    boolean parsesCleanly(String candidate) {
+        try {
+            var result = parse(candidate, options(scanners, true, false));
+            return result.ok() && result.recoveries().isEmpty();
+        } catch (RuntimeException error) {
+            return false;
+        }
+    }
+
     /** 整形前後の構文とトークンを、ソース座標を除いて照合する。 */
     boolean preservesSyntax(String candidate) {
         try {
