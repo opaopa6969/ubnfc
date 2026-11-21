@@ -1,0 +1,51 @@
+{
+  "supportsStepBack": true,
+  "atStart": "復元できる以前の停止点がありません。",
+  "reverseAtStart": "復元できる以前の停止点がありません。",
+  "beforeStepBack": [
+    3,
+    2,
+    1,
+    "5"
+  ],
+  "afterStepBack": [
+    2,
+    1,
+    1,
+    "2"
+  ],
+  "rejectedRestore": "停止点の状態を復元できませんでした。",
+  "failedReverseRestore": "停止点の状態を復元できませんでした。",
+  "afterRestoreFailures": [
+    5,
+    4,
+    1,
+    "10"
+  ],
+  "afterReverseContinue": [
+    3,
+    2,
+    1,
+    "5"
+  ],
+  "events": [
+    "stopped:entry",
+    "stopped:step",
+    "stopped:breakpoint",
+    "stopped:step",
+    "stopped:breakpoint",
+    "stopped:step",
+    "stopped:step",
+    "stopped:breakpoint"
+  ],
+  "relaunched": "復元できる以前の停止点がありません。",
+  "reverseToEntry": [
+    1,
+    1,
+    1,
+    "0"
+  ],
+  "missingSnapshot": "復元できる以前の停止点がありません。",
+  "noopStepBack": "stepBack は未対応です（評価器の状態を復元する契約がありません）。",
+  "noopReverseContinue": "reverseContinue は未対応です（評価器の状態を復元する契約がありません）。"
+}

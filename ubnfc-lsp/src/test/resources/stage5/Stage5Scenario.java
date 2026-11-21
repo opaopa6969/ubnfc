@@ -2,6 +2,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.gson.GsonBuilder;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -108,6 +109,7 @@ public final class Stage5Scenario {
         out.put("dap-hit-condition", dapHitCondition(work));
         out.put("dap-logpoints", dapLogpoints(work));
         out.put("dap-set-expression", dapSetExpression(work));
+        out.put("dap-reverse", dapReverse(work));
         return out;
     }
 
@@ -661,6 +663,136 @@ public final class Stage5Scenario {
         args.setValue(value);
         args.setFrameId(frameId);
         return rejected(() -> dap.setExpression(args).get(30, TimeUnit.SECONDS));
+    }
+
+    private static String dapReverse(Path work) throws Exception {
+        Path file = work.resolve("reverse.demo");
+        Files.writeString(file, "let a = 2;\nlet b = 3;\nlet c = 4;\nlet d = 1;\n");
+        var source = new Source();
+        source.setPath(file.toString());
+        var launch = Map.<String, Object>of("program", file.toString());
+        var advance = new StepInArguments();
+        advance.setThreadId(1);
+        var resume = new ContinueArguments();
+        resume.setThreadId(1);
+        var stepBack = new StepBackArguments();
+        stepBack.setThreadId(1);
+        var reverse = new ReverseContinueArguments();
+        reverse.setThreadId(1);
+        var out = new LinkedHashMap<String, Object>();
+        var bridge = new HistoricalTotals();
+        try (var wire = new DapWire(new DebugAdapter(Map.of(), bridge))) {
+            var dap = wire.proxy;
+            var caps = dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS);
+            assertTrue(caps.getSupportsStepBack());
+            out.put("supportsStepBack", caps.getSupportsStepBack());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            var breakpoint = sourceBreakpoint(2, null);
+            breakpoint.setHitCondition("1");
+            assertTrue(setBreakpoints(dap, source, breakpoint)[0].isVerified());
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var entry = reversePoint(dap, 1, "0");
+            out.put("atStart", rejected(() -> dap.stepBack(stepBack).get(30, TimeUnit.SECONDS)));
+            out.put("reverseAtStart", rejected(() -> dap.reverseContinue(reverse).get(30, TimeUnit.SECONDS)));
+            assertEquals(entry, reversePoint(dap, 1, "0"));
+
+            dap.stepIn(advance).get(30, TimeUnit.SECONDS);
+            var a = reversePoint(dap, 1, "2");
+            dap.continue_(resume).get(30, TimeUnit.SECONDS);
+            var b = reversePoint(dap, 2, "5");
+            out.put("beforeStepBack", b);
+            dap.stepBack(stepBack).get(30, TimeUnit.SECONDS);
+            assertEquals(a, reversePoint(dap, 1, "2"));
+            out.put("afterStepBack", a);
+            dap.continue_(resume).get(30, TimeUnit.SECONDS);
+            assertEquals(b, reversePoint(dap, 2, "5"));
+
+            dap.stepIn(advance).get(30, TimeUnit.SECONDS);
+            reversePoint(dap, 3, "9");
+            dap.stepIn(advance).get(30, TimeUnit.SECONDS);
+            var d = reversePoint(dap, 4, "10");
+            int stops = wire.breakpointEvents.size();
+            bridge.rejectRestore = true;
+            out.put("rejectedRestore", rejected(() -> dap.stepBack(stepBack).get(30, TimeUnit.SECONDS)));
+            assertEquals(d, reversePoint(dap, 4, "10"));
+            bridge.throwOnRestore = true;
+            out.put("failedReverseRestore", rejected(() -> dap.reverseContinue(reverse).get(30, TimeUnit.SECONDS)));
+            assertEquals(d, reversePoint(dap, 4, "10"));
+            assertEquals(stops, wire.breakpointEvents.size());
+            out.put("afterRestoreFailures", d);
+            bridge.rejectRestore = false;
+            bridge.throwOnRestore = false;
+            dap.reverseContinue(reverse).get(30, TimeUnit.SECONDS);
+            assertEquals(b, reversePoint(dap, 2, "5"));
+            out.put("afterReverseContinue", b);
+            out.put("events", List.copyOf(wire.breakpointEvents));
+
+            Files.writeString(file, "let single = 7;\n");
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            out.put("relaunched", rejected(() -> dap.stepBack(stepBack).get(30, TimeUnit.SECONDS)));
+            assertEquals(entry, reversePoint(dap, 1, "0"));
+            dap.stepIn(advance).get(30, TimeUnit.SECONDS);
+            reversePoint(dap, 1, "7");
+            dap.reverseContinue(reverse).get(30, TimeUnit.SECONDS);
+            out.put("reverseToEntry", reversePoint(dap, 1, "0"));
+            assertEquals("stopped:entry", wire.breakpointEvents.getLast());
+
+            bridge.skipSnapshot = true;
+            dap.stepIn(advance).get(30, TimeUnit.SECONDS);
+            out.put("missingSnapshot", rejected(() -> dap.stepBack(stepBack).get(30, TimeUnit.SECONDS)));
+            reversePoint(dap, 1, "7");
+        }
+        try (var wire = new DapWire(new DebugAdapter(Map.of()))) {
+            var dap = wire.proxy;
+            assertFalse(dap.initialize(new InitializeRequestArguments()).get(30, TimeUnit.SECONDS).getSupportsStepBack());
+            dap.launch(launch).get(30, TimeUnit.SECONDS);
+            dap.configurationDone(new ConfigurationDoneArguments()).get(30, TimeUnit.SECONDS);
+            var entry = topFrame(dap);
+            out.put("noopStepBack", rejected(() -> dap.stepBack(stepBack).get(30, TimeUnit.SECONDS)));
+            out.put("noopReverseContinue", rejected(() -> dap.reverseContinue(reverse).get(30, TimeUnit.SECONDS)));
+            assertEquals(entry, topFrame(dap));
+            assertEquals(List.of("stopped:entry"), wire.breakpointEvents);
+        }
+        return json(out);
+    }
+
+    private static List<Object> reversePoint(IDebugProtocolServer dap, int line, String total) throws Exception {
+        var frame = topFrame(dap);
+        assertEquals(line, frame.getLine());
+        var watch = new EvaluateArguments();
+        watch.setContext("watch");
+        watch.setExpression("total");
+        var value = dap.evaluate(watch).get(30, TimeUnit.SECONDS);
+        assertEquals(total, value.getResult());
+        return List.of(frame.getId(), frame.getLine(), frame.getColumn(), value.getResult());
+    }
+
+    private static final class HistoricalTotals implements EvaluatorBridge {
+        private record Total(BigDecimal value) implements Snapshot { }
+        private BigDecimal total = BigDecimal.ZERO;
+        volatile boolean rejectRestore;
+        volatile boolean throwOnRestore;
+        volatile boolean skipSnapshot;
+
+        @Override public void onLaunch(String program, String text, Object root) { total = BigDecimal.ZERO; }
+        @Override public void onEnterNode(Object node) {
+            if (node instanceof Stage5AST.Let value) total = total.add(new BigDecimal(value.value()));
+        }
+        @Override public Optional<Evaluation> evaluate(String expression, Object node, String context) {
+            return "watch".equals(context) && "total".equals(expression)
+                ? Optional.of(new Evaluation(total.toPlainString(), "number")) : Optional.empty();
+        }
+        @Override public boolean supportsReverseExecution() { return true; }
+        @Override public Optional<Snapshot> snapshot() {
+            return skipSnapshot ? Optional.empty() : Optional.of(new Total(total));
+        }
+        @Override public boolean restore(Snapshot snapshot) {
+            if (throwOnRestore) throw new IllegalStateException("評価器の復元失敗");
+            if (rejectRestore || !(snapshot instanceof Total restored)) return false;
+            total = restored.value();
+            return true;
+        }
     }
 
     private static BreakpointLocation[] locations(IDebugProtocolServer dap, Source source,

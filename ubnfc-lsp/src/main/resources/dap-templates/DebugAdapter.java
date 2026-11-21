@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -28,6 +29,7 @@ import org.eclipse.lsp4j.debug.InitializeRequestArguments;
 import org.eclipse.lsp4j.debug.NextArguments;
 import org.eclipse.lsp4j.debug.OutputEventArguments;
 import org.eclipse.lsp4j.debug.PauseArguments;
+import org.eclipse.lsp4j.debug.ReverseContinueArguments;
 import org.eclipse.lsp4j.debug.Scope;
 import org.eclipse.lsp4j.debug.ScopesArguments;
 import org.eclipse.lsp4j.debug.ScopesResponse;
@@ -129,6 +131,9 @@ public class DebugAdapter implements IDebugProtocolServer {
         }
     }
     private final List<RegisteredBreakpoint> breakpoints = new ArrayList<>();
+    private record StopSnapshot(int cursor, String reason, EvaluatorBridge.Snapshot evaluator,
+            Map<RegisteredBreakpoint, Integer> hits) { }
+    private final List<StopSnapshot> stopHistory = new ArrayList<>();
     private int cursor = -1;
     private boolean stopOnEntry = true;
     private boolean launched;
@@ -171,7 +176,7 @@ public class DebugAdapter implements IDebugProtocolServer {
         capabilities.setSupportsBreakpointLocationsRequest(true);
         capabilities.setSupportsLogPoints(true);
         capabilities.setSupportsSetExpression(false);
-        capabilities.setSupportsStepBack(false);
+        capabilities.setSupportsStepBack(bridge.supportsReverseExecution());
         capabilities.setSupportsTerminateRequest(false);
         capabilities.setExceptionBreakpointFilters(new org.eclipse.lsp4j.debug.ExceptionBreakpointsFilter[0]);
         return CompletableFuture.completedFuture(capabilities);
@@ -188,6 +193,7 @@ public class DebugAdapter implements IDebugProtocolServer {
         cursor = -1;
         steps = List.of();
         breakpoints.clear();
+        stopHistory.clear();
         handles.clear();
         result = null;
         program = string(arguments.get("program"));
@@ -432,7 +438,33 @@ public class DebugAdapter implements IDebugProtocolServer {
     }
 
     @Override public CompletableFuture<Void> stepBack(StepBackArguments args) {
-        return requestFailed("stepBack は未対応です（評価器の状態を復元する契約がありません）。");
+        return moveBack("stepBack", false);
+    }
+
+    @Override public CompletableFuture<Void> reverseContinue(ReverseContinueArguments args) {
+        return moveBack("reverseContinue", true);
+    }
+
+    private CompletableFuture<Void> moveBack(String request, boolean toBreakpoint) {
+        if (!bridge.supportsReverseExecution())
+            return requestFailed(request + " は未対応です（評価器の状態を復元する契約がありません）。");
+        int target = stopHistory.size() - 2;
+        if (terminated || target < 0) return requestFailed("復元できる以前の停止点がありません。");
+        if (toBreakpoint) {
+            while (target > 0 && !"breakpoint".equals(stopHistory.get(target).reason())) target--;
+        }
+        var snapshot = stopHistory.get(target);
+        try {
+            if (!bridge.restore(snapshot.evaluator())) return requestFailed("停止点の状態を復元できませんでした。");
+        } catch (RuntimeException error) {
+            return requestFailed("停止点の状態を復元できませんでした。");
+        }
+
+        cursor = snapshot.cursor();
+        for (var breakpoint : breakpoints) breakpoint.hits = snapshot.hits().getOrDefault(breakpoint, 0);
+        stopHistory.subList(target + 1, stopHistory.size()).clear();
+        stop(toBreakpoint ? snapshot.reason() : "step");
+        return done();
     }
 
     @Override public CompletableFuture<Void> stepOut(StepOutArguments args) {
@@ -466,7 +498,25 @@ public class DebugAdapter implements IDebugProtocolServer {
         if (previous != null) bridge.onExitNode(previous.node());
         cursor = at;
         bridge.onEnterNode(steps.get(at).node());
+        recordStop(reason);
         stop(reason);
+    }
+
+    private void recordStop(String reason) {
+        if (!bridge.supportsReverseExecution()) return;
+        Optional<EvaluatorBridge.Snapshot> snapshot;
+        try {
+            snapshot = bridge.snapshot();
+        } catch (RuntimeException error) {
+            snapshot = Optional.empty();
+        }
+        if (snapshot.isEmpty()) {
+            stopHistory.clear();
+            return;
+        }
+        var hits = new LinkedHashMap<RegisteredBreakpoint, Integer>();
+        for (var breakpoint : breakpoints) if (breakpoint.hits != 0) hits.put(breakpoint, breakpoint.hits);
+        stopHistory.add(new StopSnapshot(cursor, reason, snapshot.get(), Map.copyOf(hits)));
     }
 
     private void stop(String reason) {
@@ -482,6 +532,7 @@ public class DebugAdapter implements IDebugProtocolServer {
         if (terminated) return;
         terminated = true;
         cursor = -1;
+        stopHistory.clear();
         if (launched && !program.isBlank()) output("stdout", "Completed: " + program + "\n");
         if (client != null) {
             client.terminated(new TerminatedEventArguments());
